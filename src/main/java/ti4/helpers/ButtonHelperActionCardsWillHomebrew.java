@@ -177,7 +177,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 buttons.add(button);
             }
         }
-        buttons.add(Button.danger("deleteButtons", "Dont give comms"));
+        buttons.add(Button.danger("deleteButtons", "Don't give comms"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot who you want to give 2 comms to",
@@ -215,11 +215,11 @@ public class ButtonHelperActionCardsWillHomebrew {
         if (p2 == null) return;
         List<Button> buttons = new ArrayList<>();
         buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
-        buttons.add(Button.danger("deleteButtons", "Dont place"));
+        buttons.add(Button.danger("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
         buttons = new ArrayList<>();
         buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
-        buttons.add(Button.danger("deleteButtons", "Dont place"));
+        buttons.add(Button.danger("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
         event.getMessage().delete().queue();
     }

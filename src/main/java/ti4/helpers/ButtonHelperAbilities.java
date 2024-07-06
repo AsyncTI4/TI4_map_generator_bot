@@ -222,7 +222,7 @@ public class ButtonHelperAbilities {
         player.setTg(player.getTg() - 1);
         int amount = Math.min(2, vaden.getDebtTokenCount(player.getColor()));
         ClearDebt.clearDebt(vaden, player, amount);
-        String msg = ButtonHelper.getIdentOrColor(player, game) + " paid 1tg to "
+        String msg = ButtonHelper.getIdentOrColor(player, game) + " paid 1TG to "
             + ButtonHelper.getIdentOrColor(vaden, game)
             + "to get 2 debt tokens cleared via the binding debts ability";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -597,7 +597,7 @@ public class ButtonHelperAbilities {
             List<Button> buttons = new ArrayList<>();
             String message2 = "Please confirm this is a valid pillage opportunity and that you wish to pillage.";
             buttons.add(Button.danger(finsFactionCheckerPrefix + "pillage_" + pillaged.getColor() + "_checked",
-                "Pillage a TG"));
+                "Pillage 1TG"));
             if (pillaged.getCommodities() > 0) {
                 buttons.add(Button.danger(finsFactionCheckerPrefix + "pillage_" + pillaged.getColor() + "_checkedcomm",
                     "Pillage a Commodity"));
@@ -607,7 +607,7 @@ public class ButtonHelperAbilities {
         } else {
             MessageChannel channel1 = pillaged.getCorrectChannel();
             MessageChannel channel2 = player.getCorrectChannel();
-            String pillagerMessage = player.getRepresentation(true, true) + " you pillaged, your tgs have gone from "
+            String pillagerMessage = player.getRepresentation(true, true) + " you pillaged, your TGs have gone from "
                 + player.getTg() + " to "
                 + (player.getTg() + 1) + ".";
             String pillagedMessage = pillaged.getRepresentation(true, true) + " you have been pillaged";
@@ -617,7 +617,7 @@ public class ButtonHelperAbilities {
                     + (pillaged.getCommodities() - 1) + ".";
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
             } else {
-                pillagedMessage = pillagedMessage + ", your tgs have gone from " + pillaged.getTg() + " to "
+                pillagedMessage = pillagedMessage + ", your TGs have gone from " + pillaged.getTg() + " to "
                     + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
@@ -1147,7 +1147,7 @@ public class ButtonHelperAbilities {
         planet.addToken(Constants.GLEDGE_CORE_PNG);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdentOrColor(player, game) + "cracked the mantle of "
-                + Helper.getPlanetRepresentation(planetName, game) + " and gained 4tg (" + oldTg + "->"
+                + Helper.getPlanetRepresentation(planetName, game) + " and gained 4TGs (" + oldTg + "->"
                 + player.getTg() + "). This is technically an optional gain");
         pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 4);
@@ -1385,10 +1385,10 @@ public class ButtonHelperAbilities {
 
         if (player.getTg() < 2) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getRepresentation() + " you dont have 2tg, and thus cant use munitions reserve");
+                player.getRepresentation() + " you don't have 2TGs, and thus can't use munitions reserve");
             return;
         }
-        String msg = player.getFactionEmoji() + " used munitions reserves (tg went from " + player.getTg() + " -> "
+        String msg = player.getFactionEmoji() + " used munitions reserves (TGs went from " + player.getTg() + " -> "
             + (player.getTg() - 2)
             + "). Their next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls. ";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -1494,7 +1494,7 @@ public class ButtonHelperAbilities {
             new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 1, false);
         } else {
-            message = player.getFactionEmoji() + " used their Deep Mining ability to gain a tg (tg went from "
+            message = player.getFactionEmoji() + " used their Deep Mining ability to gain 1TG (TGs went from "
                 + player.getTg() + "-> " + (player.getTg() + 1) + ")";
             player.setTg(player.getTg() + 1);
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);

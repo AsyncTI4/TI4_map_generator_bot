@@ -208,8 +208,8 @@ public class PlanetAdd extends PlanetAddRemove {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), fac
-                + " gained 1tg from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
-                + "). Reminder that you do not legally have this tg prior to exploring, and that this was mandatory.");
+                + " gained 1TG from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
+                + "). Reminder that you do not legally have this TG prior to exploring, and that this was mandatory.");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -276,7 +276,7 @@ public class PlanetAdd extends PlanetAddRemove {
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
-                        + " if you have the correct amount of infantry (3 or 4), you can remove them and deploy a spacedock on "
+                        + " if you have the correct amount of infantry (3 or 4), you can remove them and deploy a space dock on "
                         + planet + " using the buttons.",
                     buttons);
 
@@ -285,7 +285,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if (ButtonHelper.isPlayerElected(game, player, "minister_exploration") && event != null) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                fac + " gained 1tg from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1)
+                fac + " gained 1TG from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1)
                     + ").");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
@@ -308,11 +308,11 @@ public class PlanetAdd extends PlanetAddRemove {
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("saarMechRes_" + planet,
-                "Pay 1tg for mech on " + Helper.getPlanetRepresentation(planet, game)));
+                "Pay 1TG for mech on " + Helper.getPlanetRepresentation(planet, game)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
+                    + " you can pay 1TG to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
                 saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {

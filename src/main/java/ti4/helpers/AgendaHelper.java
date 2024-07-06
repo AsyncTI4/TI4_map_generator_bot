@@ -205,7 +205,7 @@ public class AgendaHelper {
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Discarded the ACs of those with warsun tech");
+                            "Discarded the ACs of those with war sun tech");
                     }
                 }
                 if ("defense_act".equalsIgnoreCase(agID)) {
@@ -309,7 +309,7 @@ public class AgendaHelper {
                             ButtonHelperAgents.resolveArtunoCheck(playerWL, game, 3);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Added 3tg to those who voted for");
+                            "Added 3TGs to those who voted for");
                     }
                 }
                 if ("nexus".equalsIgnoreCase(agID)) {
@@ -474,7 +474,7 @@ public class AgendaHelper {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                        player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
                                             + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
@@ -546,7 +546,7 @@ public class AgendaHelper {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                        player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
                                             + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
@@ -590,7 +590,7 @@ public class AgendaHelper {
                             ButtonHelperAbilities.pillageCheck(player, game);
                         }
                         MessageHelper.sendMessageToChannel(actionsChannel,
-                            "Removed all units and gave player appropriate amount of tg");
+                            "Removed all units and gave player appropriate amount of TGs");
 
                     }
                 }
@@ -865,7 +865,7 @@ public class AgendaHelper {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    game.getPing() + " Set everyone's tgs to " + tg);
+                    game.getPing() + " Set everyone's TGs to " + tg);
             }
             if ("crisis".equalsIgnoreCase(agID)) {
                 if (!game.isHomeBrewSCMode()) {
@@ -934,7 +934,7 @@ public class AgendaHelper {
             String message;
             if (rid.hasAbility("future_sight")) {
                 message = rep
-                    + "You have a rider to resolve or you voted for the correct outcome. Either way a tg has been added to your total due to your future sight ability. ("
+                    + "You have a rider to resolve or you voted for the correct outcome. Either way 1TG has been added to your total due to your future sight ability. ("
                     + rid.getTg() + "-->" + (rid.getTg() + 1) + ")";
                 rid.setTg(rid.getTg() + 1);
                 ButtonHelperAgents.resolveArtunoCheck(rid, game, 1);
@@ -1284,7 +1284,9 @@ public class AgendaHelper {
             game.setStoredValue("Genetic Recombination " + player.getFaction(), "");
             if (player.hasTechReady("gr")) {
                 String msg = player.getRepresentation()
-                    + " you have the option to pre-assign the declaration of using genetic recombination on someone. When they are up to vote, it will ping them saying that you wish to use genetic recombination, and then it will be your job to clarify. Feel free to not preassign if you dont want to use it on this agenda";
+                    + " you have the option to pre-assign the declaration of using genetic recombination on someone."
+                    + " When they are up to vote, it will ping them saying that you wish to use genetic recombination, and then it will be your job to clarify."
+                    + " Feel free to not preassign if you don't want to use it on this agenda.";
                 List<Button> buttons2 = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
@@ -1927,7 +1929,7 @@ public class AgendaHelper {
             while ((voteInfo[0] < 1
                 || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()))
                 && counter < game.getRealPlayers().size()) {
-                String skippedMessage = realIdentity + "You are being skipped because the bot thinks you cant vote";
+                String skippedMessage = realIdentity + "You are being skipped because the bot thinks you can't vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity
                         + "You are being skipped because you told the bot you wanted to preset an abstain";
@@ -2158,7 +2160,7 @@ public class AgendaHelper {
                 if (keleres != null && specificVote.contains("Keleres Xxcha Hero")) {
                     int size = getLosingVoters(outcome, game).size();
                     String message = keleres.getRepresentation()
-                        + " You have a Keleres Xxcha Hero to resolve. There were " + size + " players who voted for a different outcome, so you get that many tgs and CCs. ";
+                        + " You have a Keleres Xxcha Hero to resolve. There were " + size + " players who voted for a different outcome, so you get that many TGs and CCs. ";
                     MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), message);
                     if (size > 0) {
                         player.setTg(player.getTg() + size);
@@ -2201,7 +2203,7 @@ public class AgendaHelper {
                             ButtonHelperAbilities.pillageCheck(p2, game);
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
-                                    + " you gained 2tg due to voting the same way as corporate lobbying");
+                                    + " you gained 2TGs due to voting the same way as corporate lobbying");
                             ButtonHelper.checkFleetInEveryTile(p2, game, event);
                         }
                     }
@@ -2345,7 +2347,7 @@ public class AgendaHelper {
                             int cTG = winningR.getTg();
                             winningR.setTg(cTG + 5);
                             MessageHelper.sendMessageToChannel(channel,
-                                identity + " due to having a winning Trade Rider, you have been given 5 tg (" + cTG
+                                identity + " due to having a winning Trade Rider, you have been given 5TGs (" + cTG
                                     + "->" + winningR.getTg() + ")");
                             ButtonHelperAbilities.pillageCheck(winningR, game);
                             ButtonHelperAgents.resolveArtunoCheck(winningR, game, 5);
@@ -2730,7 +2732,7 @@ public class AgendaHelper {
             if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ps")
                 && player.getPromissoryNotesOwned().contains(player.getColor() + "_ps")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
-                    + " this is a reminder that you dont currently hold your political secret, and thus may want to wait until the holder indicates no whens before you do any afters");
+                    + " this is a reminder that you don't currently hold your Political Secret, and thus may want to wait until the holder indicates \"no whens\" before you do any afters.");
             }
         }
     }
@@ -2889,7 +2891,7 @@ public class AgendaHelper {
             planetButtons.add(button);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
-            Button button = Button.secondary("exhaustForVotes_hacanCommanderTg", "Spend a tg for 2 votes")
+            Button button = Button.secondary("exhaustForVotes_hacanCommanderTg", "Spend TGs for 2 votes each")
                 .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             planetButtons.add(button);
         }

@@ -123,7 +123,7 @@ public class TurnStart extends PlayerSubcommandData {
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -156,7 +156,7 @@ public class TurnStart extends PlayerSubcommandData {
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
             }

@@ -208,7 +208,7 @@ public class TechExhaust extends TechAddRemove {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "sd",
                     "placeOneNDone_skipbuild");
                 String message = player.getRepresentation(true, true)
-                    + " select the planet you would like to place or move a spacedock to.";
+                    + " select the planet you would like to place or move a space dock to.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }

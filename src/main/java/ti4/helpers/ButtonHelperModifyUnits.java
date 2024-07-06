@@ -381,7 +381,7 @@ public class ButtonHelperModifyUnits {
                         for (int x = 0; x < min; x++) {
                             player.setTg(player.getTg() + 1);
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                                player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
                                     + "->" + player.getTg()
                                     + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                             ButtonHelperAbilities.pillageCheck(player, game);
@@ -432,7 +432,7 @@ public class ButtonHelperModifyUnits {
             buttons.add(
                 Button.danger(player.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
                     "Remove Structures"));
-            buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
+            buttons.add(Button.secondary("deleteButtons", "Don't Remove Structures"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
         }
         if (event.getMessage() != null) {
@@ -628,7 +628,7 @@ public class ButtonHelperModifyUnits {
                                         for (int x = 0; x < min; x++) {
                                             player.setTg(player.getTg() + 1);
                                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                                                player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                                player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
                                                     + "->" + player.getTg()
                                                     + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                             ButtonHelperAbilities.pillageCheck(player, game);
@@ -1004,7 +1004,7 @@ public class ButtonHelperModifyUnits {
                 b2s.add(Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     true)
-                    + " you can use this button to return naalu fighters to space after combat concludes. This only needs to be done once. Reminder you cant take over a planet with only fighters.",
+                    + " you can use this button to return Naalu fighters to space after combat concludes. This only needs to be done once. Reminder you can't take over a planet with only fighters.",
                     b2s);
             }
         }
@@ -1342,10 +1342,10 @@ public class ButtonHelperModifyUnits {
                 game.getTile(AliasHandler.resolveTile(planetName)), game)) {
                 Button replace = Button.success("FFCC_" + player.getFaction() + "_rohdhnaIndustrious_"
                     + game.getTile(AliasHandler.resolveTile(planetName)).getPosition() + "_" + unit + " "
-                    + planetName, "Replace SD with Warsun");
+                    + planetName, "Replace Space Dock with War Sun");
 
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
-                    playerRep + "Industrious: You may spend 6 resources to replace SD with a Warsun.", replace);
+                    playerRep + "Industrious: You may spend 6 resources to replace a Space Dock with a War Sun.", replace);
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
             new AddUnits().unitParsing(event, player.getColor(),
@@ -2168,7 +2168,7 @@ public class ButtonHelperModifyUnits {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(
                                         player.getCorrectChannel(),
-                                        player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                        player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
                                             + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
@@ -2277,7 +2277,7 @@ public class ButtonHelperModifyUnits {
                 for (int x = 0; x < amount; x++) {
                     player.setTg(player.getTg() + 1);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
-                        .getRepresentation() + " you gained 1tg (" + (player.getTg() - 1) + "->"
+                        .getRepresentation() + " you gained 1TG (" + (player.getTg() - 1) + "->"
                         + player.getTg()
                         + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain");
                     ButtonHelperAbilities.pillageCheck(player, game);

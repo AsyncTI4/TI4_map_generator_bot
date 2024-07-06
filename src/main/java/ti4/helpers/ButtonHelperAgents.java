@@ -310,7 +310,7 @@ public class ButtonHelperAgents {
         String msg2 = ButtonHelper.getIdentOrColor(player, game) + " selected "
             + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Nekro Malleon (Nekro Agent)";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        String message = p2.getRepresentation(true, true) + " increased your tgs by 2 (" + (p2.getTg() - 2) + "->"
+        String message = p2.getRepresentation(true, true) + " increased your TGs by 2 (" + (p2.getTg() - 2) + "->"
             + p2.getTg()
             + "). Use buttons in your cards info thread to discard an AC, or lose a CC";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
@@ -1020,7 +1020,7 @@ public class ButtonHelperAgents {
             MessageChannel channel = p2.getCorrectChannel();
             ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, game, event, Emojis.mirveda + " Agent");
             String message0 = p2.getRepresentation(true, true)
-                + "A cc has been subtracted from your strat pool due to use of " + ssruu + "Logic Machina (Mirveda  Agent). You can add it back if you didn't agree to the agent";
+                + "A CC has been subtracted from your strat pool due to use of " + ssruu + "Logic Machina (Mirveda  Agent). You can add it back if you didn't agree to the agent.";
             String message = p2.getRepresentation(true, true)
                 + " Use buttons to get a tech of a color which matches one of the unit upgrades pre-reqs";
             MessageHelper.sendMessageToChannel(channel, message0);
@@ -1038,7 +1038,7 @@ public class ButtonHelperAgents {
             buttons.add(Button.danger("deleteButtons", "Delete This"));
             MessageChannel channel = ButtonHelper.getCorrectChannel(p2, game);
             String message = p2.getRepresentation(true, true)
-                + " Use buttons to decide to get a TG or to get to produce 2 more units";
+                + " Use buttons to decide to get 1TG or to get to produce 2 more units";
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
 
@@ -1518,7 +1518,7 @@ public class ButtonHelperAgents {
         Tile origTile = game.getTileByPosition(pos);
         RemoveCC.removeCC(event, player.getColor(), origTile, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " removed a cc from "
+            ButtonHelper.getIdent(player) + " removed a CC from "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)");
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : getAdjacentTilesWithStructuresInThemAndNoCC(player, game, origTile)) {
@@ -1540,7 +1540,7 @@ public class ButtonHelperAgents {
         Tile origTile = game.getTileByPosition(pos);
         AddCC.addCC(event, player.getColor(), origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ButtonHelper.getIdent(player) + " placed a cc in "
+            ButtonHelper.getIdent(player) + " placed a CC in "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)");
         event.getMessage().delete().queue();
     }
@@ -1563,7 +1563,7 @@ public class ButtonHelperAgents {
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, game);
         resolveArtunoCheck(player, game, 1);
-        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent) to gain a TG (" + cTG + "->" + fTG + "). ";
+        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent) to gain 1TG (" + cTG + "->" + fTG + "). ";
         player.addSpentThing(msg);
         event.getMessage().delete().queue();
     }
@@ -1818,7 +1818,7 @@ public class ButtonHelperAgents {
             msg = msg + "\n" + player.getFactionEmoji() + "Paid 2 commodities";
         } else {
             player.setTg(player.getTg() - 2);
-            msg = msg + "\n" + player.getFactionEmoji() + "Paid 2 tg";
+            msg = msg + "\n" + player.getFactionEmoji() + "Paid 2TGs";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
@@ -1857,8 +1857,8 @@ public class ButtonHelperAgents {
         ButtonHelperStats.gainComms(event, game, player, commGain, false, true);
         ButtonHelperStats.gainTGs(event, game, player, tgGain, true);
 
-        String msg = ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "tg (" + oldTg + "->"
-            + player.getTg() + ") and " + commGain + " commodities due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "C.O.O. Mgur (Bentor Agent)";
+        String msg = ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG" + (tgGain == 1 ? "" : "s") + " (" + oldTg + "->"
+            + player.getTg() + ") and " + commGain + " commodit" + (commGain == 1 ? "y" : "ies") + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "C.O.O. Mgur (Bentor Agent)";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFoWMode() && bentor != player) {
             msg = player.getRepresentation() + " has finished resolving.";
@@ -1955,7 +1955,7 @@ public class ButtonHelperAgents {
         if (player == game.getActivePlayer()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getFactionEmoji()
-                    + " can spend 4tg to RESEARCH a unit upgrade of one of their units in the system",
+                    + " can spend 4TGs to RESEARCH a unit upgrade of one of their units in the system",
                 List.of(Buttons.GET_A_TECH));
         }
         event.getMessage().delete().queue();
@@ -2133,11 +2133,12 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust Artuno (Nomad Agent) With " + tg + " TGs"));
+                "Exhaust Artuno (Nomad Agent) With " + tg + " TG" + (tg == 1 ? "" : "s")));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " you have the opportunity to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Artuno the Betrayer (Nomad Agent) and place " + tg + " TGs on her.",
+                    + " you have the opportunity to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Artuno the Betrayer (Nomad Agent) and place " + tg + " TG" + (tg == 1 ? "" : "s") + " on her.",
                 buttons);
         }
     }

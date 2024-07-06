@@ -56,8 +56,8 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         switch (planet) {
             // Prophecy of Kings
             case "mallice" -> {
-                output = "Use buttons to gain 2 tg or wash your commodities";
-                buttons.add(Button.success("mallice_2_tg", "Gain 2tg"));
+                output = "Use buttons to gain 2TGs or wash your commodities";
+                buttons.add(Button.success("mallice_2_tg", "Gain 2TGs"));
                 buttons.add(Button.success("mallice_convert_comm", "Convert Commodities"));
             }
             case "hopesend" -> {

@@ -190,7 +190,7 @@ public class StartCombat extends CombatSubcommandData {
                 buttons.add(
                     Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
                         "Remove Structures"));
-                buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
+                buttons.add(Button.secondary("deleteButtons", "Don't remove Structures"));
                 MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg2, buttons);
             }
         } else {

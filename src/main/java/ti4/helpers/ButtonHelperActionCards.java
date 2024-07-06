@@ -211,7 +211,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = getTilesToLuckyShot(player, game, event);
         if (buttons.size() == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true)
-                + " no tiles to lucky shot in found. Remember you cant lucky shot yourself. Report bug if in error. If not an error, please take a different action");
+                + " no tiles to lucky shot in found. Remember you can't Lucky Shot yourself. Report bug if in error. If not an error, please take a different action");
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             player.getRepresentation(true, true) + " Use buttons to select tile to lucky shot in", buttons);
@@ -246,7 +246,7 @@ public class ButtonHelperActionCards {
         String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " tgs increased by " + tgAlready + " (" + player.getTg() + "->"
+            player.getFactionEmoji() + " TGs increased by " + tgAlready + " (" + player.getTg() + "->"
                 + (player.getTg() + tgAlready) + ")");
         player.setTg(player.getTg() + tgAlready);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -299,7 +299,7 @@ public class ButtonHelperActionCards {
         if (tgAlready > 0) {
             tgAlready = tgAlready + (int) removedUnit.getCost();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji() + " tgs increased by " + tgAlready + " (" + player.getTg() + "->"
+                player.getFactionEmoji() + " TGs increased by " + tgAlready + " (" + player.getTg() + "->"
                     + (player.getTg() + tgAlready) + ")");
             player.setTg(player.getTg() + tgAlready);
             ButtonHelperAbilities.pillageCheck(player, game);
@@ -473,10 +473,10 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         player.setTg(oldTg + 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdentOrColor(player, game) + " gained 1tg due to forward supply base (" + oldTg
+            ButtonHelper.getIdentOrColor(player, game) + " gained 1TG due to forward supply base (" + oldTg
                 + "->" + player.getTg() + ")");
         if (game.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained 1tg due to forward supply base");
+            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained 1TG due to forward supply base");
         }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -488,7 +488,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         player.setTg(oldTg + 3);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " gained 3tg (" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained 3TGs (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
         List<Button> buttons = new ArrayList<>();
@@ -507,7 +507,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " choose who should get 1tg", buttons);
+            player.getRepresentation(true, true) + " choose who should get 1TG", buttons);
     }
 
     public static void resolveReparationsStep1(Player player, Game game, ButtonInteractionEvent event,
@@ -1016,7 +1016,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who youre playing salvage on", buttons);
+            player.getRepresentation(true, true) + " tell the bot who you're playing Salvage on", buttons);
     }
 
     public static void resolveInsubStep2(Player player, Game game, ButtonInteractionEvent event,
@@ -1162,7 +1162,7 @@ public class ButtonHelperActionCards {
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAgents.resolveArtunoCheck(p2, game, 2);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
-                p2.getRepresentation() + " you gained 2tg due to being hit by the tech Seeker Drones");
+                p2.getRepresentation() + " you gained 2TGs due to being hit by the tech Seeker Drones");
         }
     }
 
@@ -1392,7 +1392,7 @@ public class ButtonHelperActionCards {
         if (player.getActionCards().containsKey("coup")) {
             game.setStoredValue("Coup", "");
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which SC you will coup. Coup is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                + " you have the option to pre-assign which SC you will Coup. Coup is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
@@ -1421,7 +1421,7 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("summit")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play summit. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                + " you have the option to pre-play Summit. Start of strategy phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("resolvePreassignment_Summit", "Pre-play Summit"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -1436,7 +1436,7 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("investments")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play manipulate investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-play Manipulate Investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("resolvePreassignment_Investments", "Pre-play Manipulate Investments"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -1451,7 +1451,8 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("disgrace")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which SC you will public disgrace. Public disgrace is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it or are unsure of the target. You will be given the option for it to only trigger on a particular person";
+                + " you have the option to pre-assign which SC you will Public Disgrace. Public Disgrace is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it or are unsure of the target. You will be given the option for it to only trigger on a particular person";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
@@ -1623,7 +1624,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         player.setTg(oldTg + resValue);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + resValue + " tgs (" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained " + resValue + "TG" + (resValue == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, resValue);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1926,7 +1927,7 @@ public class ButtonHelperActionCards {
         int count = ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial");
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + count + " tgs(" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         event.getMessage().delete().queue();
@@ -1943,7 +1944,7 @@ public class ButtonHelperActionCards {
         }
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " gained " + count
-            + " tgs (" + oldTg + "->" + player.getTg() + ") from their highest resource planet");
+            + " TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from their highest resource planet");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         event.getMessage().delete().queue();

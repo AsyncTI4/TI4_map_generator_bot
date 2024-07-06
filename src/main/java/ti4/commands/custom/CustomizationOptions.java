@@ -31,7 +31,7 @@ public class CustomizationOptions extends CustomSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE,
             "Reveal all objectives and diplo gets the power to pre-reveal"));
         addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace tg emojis with nomad coin emojis"));
+            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES,
             "Show the bubbles around anti-bombardment planets"));
@@ -46,7 +46,7 @@ public class CustomizationOptions extends CustomSubcommandData {
             "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW,
-            "Consider People To Pass on SCs if they dont respond with X hours. Set X to 0 to turn off"));
+            "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE,
             "Swap player's owned units to units from another source").setAutoComplete(true));
     }

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -205,7 +206,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 }
                 scButtons.add(Button.danger("deleteButtons", "Done adding TG"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
-                    player.getRepresentation() + " Use buttons to increase tgs on SCs. Each press adds 1tg.",
+                    player.getRepresentation() + " Use buttons to increase TGs on SCs. Each press adds 1TG.",
                     scButtons);
             }
             if (actionCardTitle.contains("Archaeological Expedition")) {
@@ -764,7 +765,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     Button setHack = Button.danger("hack_election", "Set the voting order as normal");
                     List<Button> hackButtons = List.of(setHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
-                        "Voting order reversed. Please hit this button if hack election is sabod", game, player,
+                        "Voting order reversed. Please hit this button if Hack Election is Sabo'd", game, player,
                         hackButtons);
                 }
 
@@ -784,9 +785,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 if (player.getLeaderIDs().contains("kelerescommander")
                     && !player.hasLeaderUnlocked("kelerescommander")) {
                     String message2 = player.getRepresentation(true, true)
-                        + " you can unlock keleres commander (if the AC isnt sabod) by paying 1tg.";
+                        + " you can " + (ThreadLocalRandom.current().nextInt(20) == 0 ? "unleash" : "unlock") + " Suffi An by paying 1TG (if the AC isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Button.success("pay1tgforKeleres", "Pay 1tg to unlock Commander"));
+                    buttons2.add(Button.success("pay1tgforKeleres", "Pay 1TG to Unlock Commander"));
                     buttons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }

@@ -347,9 +347,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     || game.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge")
                     && event != null) {
                     String fac = player.getFactionEmoji();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1tg from Scavenge ("
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1TG from Scavenge ("
                         + player.getTg() + "->" + (player.getTg() + 1)
-                        + "). Reminder you do not legally have this tg prior to exploring, and you could potentially deploy a mech before doing it to dodge pillage.");
+                        + "). Reminder you do not legally have this TG prior to exploring, and you could potentially deploy a mech before doing it to dodge pillage.");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     ButtonHelperAbilities.pillageCheck(player, game);
@@ -360,11 +360,11 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Button.success("saarMechRes_" + "mirage",
-                        "Pay 1tg for mech on " + Helper.getPlanetRepresentation("mirage", game)));
+                        "Pay 1TG for mech on " + Helper.getPlanetRepresentation("mirage", game)));
                     saarButton.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation(true, true)
-                            + " you can pay 1tg to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
+                            + " you can pay 1TG to place a mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
                         saarButton);
                 }
 
@@ -372,7 +372,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg()
-                            + "->" + (player.getTg() + 1) + "). You do have this tg prior to exploring.");
+                            + "->" + (player.getTg() + 1) + "). You do have this TG prior to exploring.");
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -387,7 +387,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
-                Button getACButton = Button.success("comm_for_AC", "Spend 1 TG/Comm For An AC")
+                Button getACButton = Button.success("comm_for_AC", "Spend 1TG or 1 Commodity For An AC")
                     .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
                     .withEmoji(Emoji.fromFormatted(Emojis.comm));
@@ -464,14 +464,14 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     msg, buttonsAll);
 
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
-                    "Use this button to shuffle explore decks once youre done with the rest",
+                    "Use this button to shuffle explore decks once you're done with the rest",
                     Button.danger("shuffleExplores", "Shuffle Explore Decks"));
 
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
                 // TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
-                Button getMechButton = Button.success("comm_for_mech", "Spend 1 TG/Comm For A Mech On " + planetID).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                Button getMechButton = Button.success("comm_for_mech", "Spend 1TG or Commodity For A Mech On " + planetID).withEmoji(Emoji.fromFormatted(Emojis.mech));
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -526,7 +526,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainTG = Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On " + planetID)
+                Button gainTG = Button.success("gain_1_tg", "Gain 1TG By Removing 1 Inf Or Having Mech On " + planetID)
                     .withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG, Decline2);
@@ -586,8 +586,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain
-                        + "tg due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
+                    ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG" 
+                        + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
             }

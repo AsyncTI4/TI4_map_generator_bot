@@ -407,7 +407,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.resolveGettingHit(game, event, buttonID);
         } else if (buttonID.startsWith("getPsychoButtons")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                trueIdentity + " use buttons to get a tg per planet exhausted.",
+                trueIdentity + " use buttons to get 1TG per planet exhausted.",
                 ButtonHelper.getPsychoTechPlanets(game, player));
         } else if (buttonID.startsWith("retreatGroundUnits_")) {
             ButtonHelperModifyUnits.retreatGroundUnits(buttonID, event, game, player, ident, buttonLabel);
@@ -1005,7 +1005,7 @@ public class ButtonListener extends ListenerAdapter {
             int tgCount = scTradeGoods.get(scNum);
             game.setScTradeGood(scNum, (tgCount + 1));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Added 1tg to SC #" + scNum + ". There are now " + (tgCount + 1) + " tgs on it.");
+                "Added 1TG to SC #" + scNum + ". There are now " + (tgCount + 1) + " TG" + (tgCount == 0 ? "" : "s") + " on it.");
         } else if (buttonID.startsWith("strategicAction_")) {
             int scNum = Integer.parseInt(buttonID.replace("strategicAction_", ""));
             SCPlay.playSC(event, scNum, game, mainGameChannel, player);
@@ -1370,11 +1370,11 @@ public class ButtonListener extends ListenerAdapter {
                 if (hasSabo) {
                     PlayAC.playAC(event, game, player, saboID, game.getActionsChannel());
                 } else {
-                    message = "Tried to play a sabo but found none in hand.";
+                    message = "Tried to play a Sabo but found none in hand.";
                     sendReact = false;
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                         player.getRepresentation()
-                            + " You clicked the AC sabo button but did not have a sabo in hand.");
+                            + " You clicked the AC Sabo button but did not have a Sabotage in hand.");
                 }
             }
 
@@ -1395,7 +1395,7 @@ public class ButtonListener extends ListenerAdapter {
                 whatIsItFor = buttonID.split("_")[2];
             }
             if (tgLoss > player.getTg()) {
-                String message = "You dont have " + tgLoss + " tgs. No change made.";
+                String message = "You don't have " + tgLoss + " TG" + (tgLoss == 1 ? "" : "s") + ". No change made.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             } else {
                 player.setTg(player.getTg() - tgLoss);
@@ -1416,7 +1416,7 @@ public class ButtonListener extends ListenerAdapter {
                 + (player.getCommodities() - tgLoss) + ")";
 
             if (tgLoss > player.getCommodities()) {
-                message = "You dont have " + tgLoss + " comms. No change made.";
+                message = "You don't have " + tgLoss + " comm" + (tgLoss == 1 ? "" : "s") + ". No change made.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             } else {
                 player.setCommodities(player.getCommodities() - tgLoss);
@@ -1886,7 +1886,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ident + " tgs increased by 1 (" + player.getTg() + "->" + (player.getTg() + 1) + ")");
+                    ident + " TGs increased by 1 (" + player.getTg() + "->" + (player.getTg() + 1) + ")");
                 player.setTg(player.getTg() + 1);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -1996,7 +1996,7 @@ public class ButtonListener extends ListenerAdapter {
                 sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
                 Button pdsButton = Button.success("jrStructure_pds", "Place a PDS");
                 pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
-                Button tgButton = Button.success("jrStructure_tg", "Gain a tg");
+                Button tgButton = Button.success("jrStructure_tg", "Gain 1TG");
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(sdButton);
                 buttons.add(pdsButton);
@@ -2254,7 +2254,7 @@ public class ButtonListener extends ListenerAdapter {
                             player.getRepresentation()
                                 + " you have been public disgraced because someone preset it to occur when the number "
                                 + scpick
-                                + " was chosen. If this is a mistake or the disgrace is sabod, feel free to pick the SC again. Otherwise, pick a different SC.");
+                                + " was chosen. If this is a mistake or the disgrace is Sabo'd, feel free to pick the SC again. Otherwise, pick a different SC.");
                         return;
                     }
                 }
@@ -2549,7 +2549,7 @@ public class ButtonListener extends ListenerAdapter {
                 game.setStoredValue("tnelisCommanderTracker", player.getFaction());
             }
             if (msg.contains("Ghemina")) {
-                msg = msg + " to gain 1tg after winning the space combat";
+                msg = msg + " to gain 1TG after winning the space combat";
                 player.setTg(player.getTg() + 1);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                 ButtonHelperAbilities.pillageCheck(player, game);
@@ -3180,7 +3180,7 @@ public class ButtonListener extends ListenerAdapter {
                         + "You have " + val + " PRODUCTION value in this system";
                     if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
                         message = message
-                            + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit. ";
+                            + ". You also have the Vuil'raith commander which allows you to produce 2 fighters/infantry that don't count towards production limit. ";
                     }
                     if (val > 0 && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
                         message = message
@@ -3291,7 +3291,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "forceACertainScoringOrder" -> {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing()
-                        + "Players will be forced to score in order. Players will not be prevented from declaring they dont score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
+                        + "Players will be forced to score in order. Players will not be prevented from declaring they don't score, and are in fact encouraged to do so without delay if that is the case. This forced scoring order also does not yet affect SOs, it only restrains POs");
                     game.setStoredValue("forcedScoringOrder", "true");
                     ButtonHelper.deleteMessage(event);
                 }
@@ -3716,7 +3716,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "edynCommanderSODraw" -> {
                     if (!game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander")) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            player.getFactionEmoji() + " you dont have Edyn Commander silly");
+                            player.getFactionEmoji() + " you don't have Edyn Commander silly");
                     }
                     String message = "Drew Secret Objective instead of scoring PO, using Edyn Commander";
                     game.drawSecretObjective(player.getUserID());
@@ -4064,7 +4064,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.setTg(player.getTg() - 1);
                         commOrTg = "trade good";
                     } else {
-                        ButtonHelper.addReaction(event, false, false, "Didn't have any comms/tg to spend, no AC drawn",
+                        ButtonHelper.addReaction(event, false, false, "Didn't have any comms/TGs to spend, no AC drawn",
                             "");
                         break;
                     }
@@ -4113,7 +4113,7 @@ public class ButtonListener extends ListenerAdapter {
                         commOrTg = "tg";
                     } else {
                         ButtonHelper.addReaction(event, false, false,
-                            "Didn't have any comms/tg to spend, no mech placed", "");
+                            "Didn't have any comms/TGs to spend, no mech placed", "");
                         break;
                     }
                     new AddUnits().unitParsing(event, player.getColor(),
@@ -4270,7 +4270,7 @@ public class ButtonListener extends ListenerAdapter {
                         failed = message.contains("Please try again.");
                     }
                     if (!failed) {
-                        message = message + "Gained 1 tg (" + player.getTg() + "->" + (player.getTg() + 1) + ").";
+                        message = message + "Gained 1TG (" + player.getTg() + "->" + (player.getTg() + 1) + ").";
                         player.setTg(player.getTg() + 1);
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -4285,7 +4285,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "gain1tgFromCommander" -> {
-                    String message = player.getRepresentation() + " Gained 1 tg (" + player.getTg() + "->"
+                    String message = player.getRepresentation() + " Gained 1TG (" + player.getTg() + "->"
                         + (player.getTg() + 1) + ") from their commander";
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, game);
@@ -4295,7 +4295,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "mallice_2_tg" -> {
                     String playerRep = player.getFactionEmoji();
-                    String message = playerRep + " exhausted Mallice ability and gained 2 tg (" + player.getTg() + "->"
+                    String message = playerRep + " exhausted Mallice ability and gained 2TGs (" + player.getTg() + "->"
                         + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
                     ButtonHelperAbilities.pillageCheck(player, game);
@@ -4311,7 +4311,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     String playerRep = player.getFactionEmoji();
 
-                    String message = playerRep + " exhausted Mallice ability and converted comms to tg (TGs: "
+                    String message = playerRep + " exhausted Mallice ability and converted comms to TGs (TGs: "
                         + player.getTg() + "->" + (player.getTg() + player.getCommodities()) + ").";
                     player.setTg(player.getTg() + player.getCommodities());
                     player.setCommodities(0);
@@ -4527,7 +4527,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.setTg(oldTg - 1);
                     }
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        ButtonHelper.getIdentOrColor(player, game) + " paid 1tg to announce a retreat " + "("
+                        ButtonHelper.getIdentOrColor(player, game) + " paid 1TG to announce a retreat " + "("
                             + oldTg + "->" + player.getTg() + ")");
                     ButtonHelper.deleteMessage(event);
                 }
@@ -4545,11 +4545,11 @@ public class ButtonListener extends ListenerAdapter {
                             + game.getActiveSystem() + "space";
                         if (game.getStoredValue(combatName).isEmpty()) {
                             List<Button> buttons = new ArrayList<>();
-                            buttons.add(Button.success("pay1tg", "Pay 1 tg"));
-                            buttons.add(Button.danger("deleteButtons", "I dont have to pay"));
+                            buttons.add(Button.success("pay1tg", "Pay 1TG"));
+                            buttons.add(Button.danger("deleteButtons", "I don't have to pay"));
                             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                                 player.getRepresentation()
-                                    + " reminder that your opponent has the cargo raiders ability, which means you might have to pay 1tg to announce a retreat if they choose.",
+                                    + " reminder that your opponent has the cargo raiders ability, which means you might have to pay 1TG to announce a retreat if they choose.",
                                 buttons);
                         }
 
@@ -5157,7 +5157,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                         message = player.getRepresentation()
-                            + " Wants to score an SO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
+                            + " Wants to score an SO but has people ahead of them in initiative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
                         if (!game.isFoWMode()) {
                             message = message + player2.getRepresentation(true, true)
                                 + " is the one the game is currently waiting on";
@@ -5302,7 +5302,7 @@ public class ButtonListener extends ListenerAdapter {
         }
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                fowIdentity + " please play sabo by clicking the sabo button on the AC you wish to sabo");
+                fowIdentity + " please play Sabotage by clicking the Sabo button on the AC you wish to Sabo");
             return;
         }
         if (acID.contains("reverse_")) {
@@ -5312,7 +5312,7 @@ public class ButtonListener extends ListenerAdapter {
             scButtons.add(Button.success("resolveReverse_" + actionCardTitle,
                 "Pick up " + actionCardTitle + " from the discard"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                fowIdentity + " After checking for sabos, use buttons to resolve reverse engineer.", scButtons);
+                fowIdentity + " After checking for Sabos, use buttons to resolve Reverse Engineer.", scButtons);
         }
         if (acID.contains("counterstroke_")) {
             String tilePos = acID.split("_")[2];
@@ -5321,7 +5321,7 @@ public class ButtonListener extends ListenerAdapter {
             scButtons.add(Button.success("resolveCounterStroke_" + tilePos,
                 "Counterstroke in " + tilePos));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                fowIdentity + " After checking for sabos, use buttons to resolve counterstroke.", scButtons);
+                fowIdentity + " After checking for Sabos, use buttons to resolve Counterstroke.", scButtons);
         }
         if (channel != null) {
             try {
@@ -5867,7 +5867,7 @@ public class ButtonListener extends ListenerAdapter {
                 // Cleanup");
                 List<Button> buttons = new ArrayList<>();
                 if (game.isRedTapeMode()) {
-                    message2 = "All players have indicated scoring. This game is red tape mode, which means no objective is revealed at this stage. Please press one of the buttons below anyways though -- dont worry, it wont reveal anything, it will just run cleanup.";
+                    message2 = "All players have indicated scoring. This game is red tape mode, which means no objective is revealed at this stage. Please press one of the buttons below anyways though -- don't worry, it wont reveal anything, it will just run cleanup.";
                 }
                 if (game.getRound() < 4) {
                     buttons.add(drawStage1);

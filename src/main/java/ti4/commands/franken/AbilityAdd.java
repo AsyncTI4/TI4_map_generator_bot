@@ -55,7 +55,7 @@ public class AbilityAdd extends AbilityAddRemove {
                 String unitID = AliasHandler.resolveUnit("spacedock");
                 player.setUnitCap(unitID, 4);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
+                    "Set space dock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
             }
             if (abilityID.equalsIgnoreCase("teeming")) {
                 String unitID = AliasHandler.resolveUnit("dreadnought");

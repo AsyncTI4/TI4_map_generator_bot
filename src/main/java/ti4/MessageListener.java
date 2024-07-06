@@ -224,7 +224,7 @@ public class MessageListener extends ListenerAdapter {
             //947310962485108816
             Role lfgRole = CreateGameChannels.getRole("LFG", event.getGuild());
             if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
-                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (its old if it has -launched [FULL] in its title) " + msg.getJumpUrl();
+                String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + msg.getJumpUrl();
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
                 MessageHelper.sendMessageToChannel(lfgPings, msg2);
             }
@@ -454,7 +454,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 3)) {
                                         ping = realIdentity
-                                            + " this is a brusk missive stating that while you may sleep, the bot never does (and its been told to ping you about it).";
+                                            + " this is a brusk missive stating that while you may sleep, the bot never does (and it's been told to ping you about it).";
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 4)) {
                                         ping = realIdentity
@@ -506,7 +506,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 17) {
                                         ping = realIdentity
-                                            + " Your name is goin be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you dont wanna join em ";
+                                            + " Your name is gonna be put on the bot's top 10 most wanted players soon. There's currently 27 players on that list, you don't wanna join em ";
                                     }
                                     if (pingNumber == 16) {
                                         ping = realIdentity
@@ -522,7 +522,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 20) {
                                         ping = realIdentity
-                                            + " Wait too much longer, and the bot is gonna hire some Cabal hit-men to start rifting your ships.";
+                                            + " Wait too much longer, and the bot is gonna hire some Vuil'raith hit-cultists to start rifting your ships.";
                                     }
                                     if (pingNumber == 21) {
                                         ping = realIdentity
@@ -539,7 +539,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 25) {
                                         ping = realIdentity
-                                            + " I apologize, we bots dont have much of a sense of humor, but who knows, maybe you would have laughed if you were here ;_;";
+                                            + " I apologize, we bots don't have much of a sense of humor, but who knows, maybe you would have laughed if you were here ;_;";
                                     }
                                     if (pingNumber == 26) {
                                         ping = realIdentity
@@ -552,7 +552,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 28) {
                                         ping = realIdentity
-                                            + " It's been ages, when will I get a chance to ping someone else in this game? Dont you want them to feel needed too?";
+                                            + " It's been ages, when will I get a chance to ping someone else in this game? Don't you want them to feel needed too?";
                                     }
                                     if (pingNumber == 29) {
                                         ping = realIdentity + " We miss you, please come back ;_;";
@@ -613,7 +613,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 42) {
                                         ping = realIdentity
-                                            + " They say money cant buy happiness, but I hear that trade goods can buy a warsun, which is basically the same thing.";
+                                            + " They say money can't buy happiness, but I hear that trade goods can buy a war sun, which is basically the same thing.";
                                     }
 
                                     int maxSoFar = 42;
@@ -626,7 +626,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == maxSoFar + 2 && !game.isFoWMode()) {
                                         ping = realIdentity
-                                            + " this is your final reminder. Stopping pinging now so we dont come back in 2 months and find 600+ messages";
+                                            + " this is your final reminder. Stopping pinging now so we don't come back in 2 months and find 600+ messages";
                                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                                             game.getPing()
                                                 + " the game has stalled on a player, and autoping will now stop pinging them. ");

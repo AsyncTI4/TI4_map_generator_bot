@@ -1220,7 +1220,7 @@ public class Helper {
             Button button;
             String label = " ";
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFoWMode()) {
-                label = "[has " + game.getScTradeGoods().get(sc) + " tg]";
+                label = "[has " + game.getScTradeGoods().get(sc) + " TG" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
             }
             if (sc == ButtonHelper.getKyroHeroSC(game)) {
                 label = label + " Kyro Hero Cursed";
@@ -1404,7 +1404,7 @@ public class Helper {
             msg = msg + "> ";
             switch (flavor) {
                 case "tg" -> {
-                    msg = msg + "Spent " + player.getSpentTgsThisWindow() + " tgs for " + tg * 2 + " votes " + "\n";
+                    msg = msg + "Spent " + tg + " TG" + (tg == 1 ? "" : "s") + " for " + tg * 2 + " votes " + "\n";
                 }
                 case "infantry" -> {
                     msg = msg + "Spent " + player.getSpentInfantryThisWindow() + " infantry for "
@@ -1640,7 +1640,7 @@ public class Helper {
         res = res + tg + keleresAgent;
         inf = inf + tg + keleresAgent;
         if (tg > 0) {
-            msg = msg + "> Spent " + tg + " tgs " + Emojis.getTGorNomadCoinEmoji(game) + " ("
+            msg = msg + "> Spent " + tg + "TG" + (tg == 1 ? "" : "s") + " " + Emojis.getTGorNomadCoinEmoji(game) + " ("
                 + (player.getTg() + tg) + "->" + player.getTg() + ") \n";
             if (player.hasTech("mc")) {
                 res = res + tg + keleresAgent;
@@ -1990,10 +1990,10 @@ public class Helper {
         if (!"muaatagent".equalsIgnoreCase(warfareNOtherstuff)) {
             if (player.hasWarsunTech() && resourcelimit > 9) {
                 Button wsButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                    "Produce Warsun");
+                    "Produce War Sun");
                 if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun") > 1) {
                     wsButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_warsun_" + tp,
-                        "Produce Warsun");
+                        "Produce War Sun");
                 }
                 wsButton = wsButton.withEmoji(Emoji.fromFormatted(Emojis.warsun));
                 unitButtons.add(wsButton);

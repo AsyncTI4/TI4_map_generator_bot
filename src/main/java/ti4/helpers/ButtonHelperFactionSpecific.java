@@ -49,36 +49,36 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveVadenTgForSpeed(Player player, Game game, GenericInteractionCreateEvent event) {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " is paying tgs to boost their non-fighter ships.");
+            player.getRepresentation() + " is paying TGs to boost their non-fighter ships.");
         List<Button> buttons = new ArrayList<>();
         String whatIsItFor = "both";
         if (player.getTg() > 0) {
-            Button lost1TG = Button.danger("reduceTG_1_" + whatIsItFor, "Spend 1 TG");
+            Button lost1TG = Button.danger("reduceTG_1_" + whatIsItFor, "Spend 1TG");
             buttons.add(lost1TG);
         }
         if (player.getTg() > 1) {
-            Button lost2TG = Button.danger("reduceTG_2_" + whatIsItFor, "Spend 2 TGs");
+            Button lost2TG = Button.danger("reduceTG_2_" + whatIsItFor, "Spend 2TGs");
             buttons.add(lost2TG);
         }
         if (player.getTg() > 2) {
-            Button lost3TG = Button.danger("reduceTG_3_" + whatIsItFor, "Spend 3 TGs");
+            Button lost3TG = Button.danger("reduceTG_3_" + whatIsItFor, "Spend 3TGs");
             buttons.add(lost3TG);
         }
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
-            Button lost1C = Button.danger("reduceComm_1_" + whatIsItFor, "Spend 1 comm");
+            Button lost1C = Button.danger("reduceComm_1_" + whatIsItFor, "Spend 1 commodity");
             buttons.add(lost1C);
         }
 
         if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 1) {
-            Button lost2C = Button.danger("reduceComm_2_" + whatIsItFor, "Spend 2 comms");
+            Button lost2C = Button.danger("reduceComm_2_" + whatIsItFor, "Spend 2 commodities");
             buttons.add(lost2C);
         }
 
-        buttons.add(Button.secondary("resetSpend_" + whatIsItFor, "Reset Spent Planets and Tgs"));
+        buttons.add(Button.secondary("resetSpend_" + whatIsItFor, "Reset Spent Planets and TGs"));
         Button doneExhausting = Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(doneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            "Click how many tg you want to spend", buttons);
+            "Click how many TGs you want to spend", buttons);
         TechExhaust.deleteTheOneButtonIfButtonEvent(event);
     }
 
@@ -300,7 +300,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " you have all your mechs out and cant deploy more");
+                player.getRepresentation(true, true) + " you have all your mechs out and can't deploy more");
             return;
         }
         for (String planet : player.getPlanets()) {
@@ -438,7 +438,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void placeSaarMech(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " paid 1tg(" + player.getTg() + "->" + (player.getTg() - 1)
+        String msg = player.getFactionEmoji() + " paid 1TG (" + player.getTg() + "->" + (player.getTg() - 1)
             + ") to place a mech on " + Helper.getPlanetRepresentation(planet, game);
         delete(event);
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet,
@@ -656,7 +656,7 @@ public class ButtonHelperFactionSpecific {
             }
             if (naalu) {
                 String msg = player.getRepresentation()
-                    + " you have the option to pre-play Naalu PN. Naalu PN is an awkward timing window for async, so if you intend to play it, its best to pre-play it now. Feel free to ignore this message if you dont intend to play it";
+                    + " you have the option to pre-play Naalu PN. Naalu PN is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.success("resolvePreassignment_Play Naalu PN", "Pre-play Naalu PN"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -769,7 +769,7 @@ public class ButtonHelperFactionSpecific {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(hacan.getCorrectChannel(),
-            hacan.getRepresentation(true, true) + " choose who should get 2tg", buttons);
+            hacan.getRepresentation(true, true) + " choose who should get 2TGs", buttons);
     }
 
     public static void resolveQuantumDataHubNodeStep1(Player hacan, Game game, ButtonInteractionEvent event) {
@@ -787,7 +787,7 @@ public class ButtonHelperFactionSpecific {
         hacan.setTg(oldTg - 3);
 
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(),
-            hacan.getFactionEmoji() + " lost a strategy CC and 3tg (" + oldTg + "->" + hacan.getTg() + ")");
+            hacan.getFactionEmoji() + " lost a strategy CC and 3TGs (" + oldTg + "->" + hacan.getTg() + ")");
 
         List<Button> buttons = getSwapSCButtons(game, "qdn", hacan);
         MessageHelper.sendMessageToChannelWithButtons(hacan.getCorrectChannel(),
@@ -861,7 +861,7 @@ public class ButtonHelperFactionSpecific {
             player2.setTg(oldTg + 3);
             ButtonHelperAbilities.pillageCheck(player2, game);
             MessageHelper.sendMessageToChannel(player2.getCorrectChannel(),
-                player2.getFactionEmoji() + " gained 3tg from QDN (" + oldTg + "->" + player2.getTg() + ")");
+                player2.getFactionEmoji() + " gained 3TGs from QDN (" + oldTg + "->" + player2.getTg() + ")");
         }
         player1.addSC(player2SC);
         player1.removeSC(player1SC);
@@ -1236,7 +1236,7 @@ public class ButtonHelperFactionSpecific {
                 game);
             new AddUnits().unitParsing(event, player.getColor(), tile, "sd " + planet, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji()
-                + " deployed a spacedock on " + planet + " by removing " + requiredNum + " infantry");
+                + " deployed a space dock on " + planet + " by removing " + requiredNum + " infantry");
             event.getMessage().delete().queue();
             if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
                 player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
@@ -1245,7 +1245,7 @@ public class ButtonHelperFactionSpecific {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getFactionEmoji() + " does not have " + requiredNum + " infantry on " + planet
-                    + " and therefore cannot deploy the spacedock");
+                    + " and therefore cannot deploy the space dock");
         }
     }
 
@@ -1590,12 +1590,12 @@ public class ButtonHelperFactionSpecific {
                         channel = sender.getPrivateChannel();
                     }
                     String message = sender.getRepresentation(true, true)
-                        + " Dark Pact triggered, your tgs have increased by 1 (" + sender.getTg() + "->"
+                        + " Dark Pact triggered, your TGs have increased by 1 (" + sender.getTg() + "->"
                         + (sender.getTg() + 1) + ")";
                     sender.setTg(sender.getTg() + 1);
                     MessageHelper.sendMessageToChannel(channel, message);
                     message = receiver.getRepresentation(true, true)
-                        + " Dark Pact triggered, your tgs have increased by 1 (" + receiver.getTg() + "->"
+                        + " Dark Pact triggered, your TGs have increased by 1 (" + receiver.getTg() + "->"
                         + (receiver.getTg() + 1) + ")";
                     receiver.setTg(receiver.getTg() + 1);
                     if (game.isFoWMode()) {
@@ -1616,7 +1616,7 @@ public class ButtonHelperFactionSpecific {
         List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.CabalSpacedock,
             UnitType.Spacedock);
         if (tiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldnt find any docks");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any docks");
             return List.of();
         }
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.get(0).getPosition(), player, false);
@@ -2120,7 +2120,7 @@ public class ButtonHelperFactionSpecific {
             msg = "Tile was not suitable for the iff.";
             if (player.getTg() > 0) {
                 player.setTg(player.getTg() - 1);
-                msg = msg + " You lost a tg";
+                msg = msg + " You lost 1TG";
             } else {
                 if (player.getTacticalCC() > 0) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
@@ -2300,8 +2300,7 @@ public class ButtonHelperFactionSpecific {
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        String msg = player.getRepresentation() + " used Salvage Ops to get 1tg (current tg is now " + player.getTg()
-            + ")";
+        String msg = player.getRepresentation() + " used Salvage Ops to get 1TG (you currently have " + player.getTg() + "TG" + (player.getTg() == 1 ? "" : "s") + ")";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -2388,7 +2387,7 @@ public class ButtonHelperFactionSpecific {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentation(true, false) + " recycled " + unit.getUnitEmoji() + " " + unit.getName()
-                + " for " + toGain + " tg (" + before + "->" + player.getTg() + ")");
+                + " for " + toGain + " TG" + (toGain == 1 ? "" : "s") + " (" + before + "->" + player.getTg() + ")");
 
         event.getMessage().delete().queue();
     }

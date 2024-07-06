@@ -102,12 +102,12 @@ public class SCPlay extends PlayerSubcommandData {
                     PlayAC.playAC(event, game, p2, "coup", game.getMainGameChannel());
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
-                    String message = "Use buttons to end turn or play your SC (assuming coup is sabod)";
+                    String message = "Use buttons to end turn or play your SC (assuming Coup is Sabo'd)";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
-                        + " you have been couped due to attempting to play SC #" + scToPlay + ". If this is a mistake or the coup is sabod, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
+                        + " you have been Coup'd due to attempting to play SC #" + scToPlay + ". If this is a mistake or the Coup is Sabo'd, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
                     return;
                 }
             }
@@ -211,7 +211,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (scToPlay == 5) {
                                 Button transaction = Button.primary("transaction", "Transaction");
                                 scButtons.add(transaction);
-                                scButtons.add(Button.success("sendTradeHolder_tg", "Send 1tg"));
+                                scButtons.add(Button.success("sendTradeHolder_tg", "Send 1TG"));
                                 scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
