@@ -3962,7 +3962,6 @@ public class ButtonHelper {
     }
 
     public static int getKyroHeroSC(Game game) {
-
         if (game.getStoredValue("kyroHeroSC").isEmpty()) {
             return 1000;
         } else {

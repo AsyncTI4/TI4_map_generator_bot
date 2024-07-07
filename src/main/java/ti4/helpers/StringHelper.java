@@ -30,6 +30,7 @@ public final class StringHelper {
         String output = input;
         for (Entry<String, String> entry : escapables().entrySet())
             output = output.replace(entry.getKey(), entry.getValue());
+        output.replace("\r", "");
         return output;
     }
 
@@ -39,6 +40,7 @@ public final class StringHelper {
             output = output.replace(entry.getValue(), entry.getKey());
         output = output.replace("666fin", ":");
         output = output.replace("667fin", ",");
+        output.replace("\r", "");
         return output;
     }
 }

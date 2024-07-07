@@ -3,11 +3,13 @@ package ti4.listeners.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 
+@Getter
 public class SelectionMenuContext extends ListenerContext {
-    public String menuID, messageID;
-    public List<String> values;
+    private String menuID, messageID;
+    private List<String> values;
 
     public StringSelectInteractionEvent getEvent() {
         if (event instanceof StringSelectInteractionEvent button)

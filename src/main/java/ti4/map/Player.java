@@ -1943,6 +1943,7 @@ public class Player {
         SCs.clear();
     }
 
+    @JsonIgnore
     public int getLowestSC() {
         try {
             int min = 100;
@@ -2840,7 +2841,7 @@ public class Player {
 
     public String getFlexibleDisplayName() {
         String name = faction;
-        if (displayName != null && !displayName.isEmpty()) {
+        if (displayName != null && !displayName.isEmpty() && !displayName.equals("null")) {
             name = displayName;
         }
         return StringUtils.capitalize(name);
