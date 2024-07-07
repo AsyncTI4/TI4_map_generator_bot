@@ -1428,10 +1428,10 @@ public class GameSaveLoadManager {
             game.setTileMap(tileMap);
         } catch (FileNotFoundException e) {
             BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
-            return  null;
+            return null;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + mapFile.getName(), e);
-            return  null;
+            return null;
         }
 
         game.endGameIfOld();
