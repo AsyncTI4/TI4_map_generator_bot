@@ -5,6 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -176,7 +180,7 @@ public class GameSaveLoadManager {
             return;
         }
 
-        try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {
             Map<String, Tile> tileMap = game.getTileMap();
             writer.write(game.getOwnerID());
             writer.write(System.lineSeparator());
@@ -317,7 +321,7 @@ public class GameSaveLoadManager {
         }
     }
 
-    private static void saveMapInfo(FileWriter writer, Game game, boolean keepModifiedDate) throws IOException {
+    private static void saveMapInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
@@ -1033,7 +1037,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCards(Map<String, Integer> cardList, FileWriter writer, String saveID) throws IOException {
+    private static void writeCards(Map<String, Integer> cardList, Writer writer, String saveID) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Integer> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
@@ -1042,7 +1046,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCardsStrings(Map<String, String> cardList, FileWriter writer, String saveID)
+    private static void writeCardsStrings(Map<String, String> cardList, Writer writer, String saveID)
         throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : cardList.entrySet()) {
@@ -2540,7 +2544,7 @@ public class GameSaveLoadManager {
         // todo implement token read
     }
 
-    private static void savePeekedPublicObjectives(FileWriter writer, final String constant, Map<String, List<String>> peekedPOs) {
+    private static void savePeekedPublicObjectives(Writer writer, final String constant, Map<String, List<String>> peekedPOs) {
         try {
             writer.write(constant + " ");
 
