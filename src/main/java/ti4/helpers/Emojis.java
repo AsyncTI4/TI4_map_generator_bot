@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
 import org.jetbrains.annotations.NotNull;
 
 import software.amazon.awssdk.utils.StringUtils;
@@ -1172,6 +1173,7 @@ public class Emojis {
             case "akhassi" -> Akhassi;
             case "ako" -> Ako;
             case "aranndan" -> Aranndan;
+            case "aranndanb" -> Aranndan;
             case "argenum" -> Argenum;
             case "behjan" -> Behjan;
             case "breakpoint" -> Breakpoint;
@@ -1196,10 +1198,12 @@ public class Emojis {
             case "grishinu" -> Grishinu;
             case "gryenorn" -> Gryenorn;
             case "grywon" -> Grywon;
+            case "grywonb" -> Grywon;
             case "hellsmaw" -> HellsMaw;
             case "hersey" -> Hersey;
             case "heska" -> Heska;
             case "hevahold" -> Hevahold;
+            case "hevaholdb" -> Hevahold;
             case "hrancus" -> HranCus;
             case "hurigati" -> Hurigati;
             case "ikrusiii" -> IkrusIII;
@@ -1262,6 +1266,7 @@ public class Emojis {
             case "ulongamma" -> UlonGamma;
             case "ulonrho" -> UlonRho;
             case "ultimur" -> Ultimur;
+            case "ultimurb" -> Ultimur;
             case "venhalo" -> Venhalo;
             case "vent" -> Vent;
             case "verdis" -> Verdis;
