@@ -14,7 +14,8 @@
         "creus hex",
         "ghost hex",
         "ghost_hs hex",
-        "51h_1"
+        "51h_1",
+        "creuss(hexagon)"
     ],
     "positionInTile": {
         "x": 170.0,
