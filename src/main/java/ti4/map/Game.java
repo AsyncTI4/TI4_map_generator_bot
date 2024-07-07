@@ -2968,6 +2968,25 @@ public class Game {
         Collections.shuffle(explore);
     }
 
+    public void pbd1000decks() {
+        actionCards = Mapper.getDecks().get("action_cards_pok").getNewDeck();
+        actionCards.addAll(Mapper.getDeck("action_deck_2").getNewDeck());
+        List<String> acs = new ArrayList<>();
+        acs.addAll(actionCards);
+        for (String card : acs) {
+            actionCards.add(card + "extra1");
+        }
+        Collections.shuffle(actionCards);
+
+        secretObjectives = Mapper.getDecks().get("pbd100_secret_objectives").getNewDeck();
+        List<String> sos = new ArrayList<>();
+        sos.addAll(secretObjectives);
+        for (String card : sos) {
+            secretObjectives.add(card + "extra1");
+        }
+        Collections.shuffle(secretObjectives);
+    }
+
     public void triplicateACs() {
         actionCards = Mapper.getDecks().get("action_cards_pok").getNewDeck();
         for (String card : actionCards) {
