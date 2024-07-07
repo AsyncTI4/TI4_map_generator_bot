@@ -12,6 +12,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -71,6 +72,10 @@ public class StartPhase extends GameSubcommandData {
             }
             case "statusHomework" -> ButtonHelper.startStatusHomework(event, game);
             case "agendaResolve" -> AgendaHelper.resolveTime(event, game, null);
+            case "pbd1000decks" -> {
+                game.pbd1000decks();
+                GameSaveLoadManager.saveMap(game, event);
+            }
             case "action" -> ButtonHelper.startActionPhase(event, game);
             case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
