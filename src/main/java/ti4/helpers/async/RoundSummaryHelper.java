@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
@@ -16,8 +17,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.RegexHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
-import ti4.listeners.context.ButtonContext;
-import ti4.listeners.context.ModalContext;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -25,9 +24,7 @@ import ti4.message.MessageHelper;
 public class RoundSummaryHelper {
 
     @ButtonHandler("editEndOfRoundSummaries")
-    public static void serveEditSummaryButtons(ButtonContext context) {
-        Game game = context.getGame();
-        Player player = context.getPlayer();
+    public static void serveEditSummaryButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (int x = 1; x <= game.getRound(); x++)
             buttons.add(editSummaryButton(game, player, x));
@@ -45,12 +42,8 @@ public class RoundSummaryHelper {
     }
 
     @ButtonHandler("editRoundSummary_")
-    public static void handleEditRoundSummary(ButtonContext context) {
-        Game game = context.getGame();
-        Player player = context.getPlayer();
-        String buttonID = context.getButtonID();
+    public static void handleEditRoundSummary(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String roundNum = buttonID.replace("editRoundSummary_", "").replace("~MDL", "");
-        ButtonInteractionEvent event = context.getEvent();
 
         String modalId = "finishEditRoundSummary_" + roundNum;
         String currentSummary = game.getStoredValue("endofround" + roundNum + player.getFaction());
@@ -67,14 +60,13 @@ public class RoundSummaryHelper {
     }
 
     @ModalHandler("finishEditRoundSummary_")
-    public static void finishEditRoundSummary(ModalContext context) {
-        String modalID = context.getModalID();
+    public static void finishEditRoundSummary(ModalInteractionEvent event, Game game, Player player, String modalID) {
         String regex = "finishEditRoundSummary_" + RegexHelper.intRegex("round");
         Matcher matcher = Pattern.compile(regex).matcher(modalID);
         if (matcher.matches()) {
-            ModalMapping mapping = context.getEvent().getValue("summary");
+            ModalMapping mapping = event.getValue("summary");
             String thoughts = mapping.getAsString();
-            storeEndOfRoundSummary(context.getGame(), context.getPlayer(), matcher.group("round"), thoughts, false);
+            storeEndOfRoundSummary(game, player, matcher.group("round"), thoughts, false);
         }
     }
 

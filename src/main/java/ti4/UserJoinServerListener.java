@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -23,8 +24,19 @@ import ti4.message.MessageHelper;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
+    private static boolean validateEvent(GenericGuildEvent event) {
+        String eventGuild = event.getGuild().getId();
+        List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
+        if (!asyncGuilds.contains(eventGuild)) {
+            // Do not process these events in guilds that we aren't initialized in
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+        if (!validateEvent(event)) return;
         try {
             checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
         } catch (Exception e) {
@@ -34,6 +46,7 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRemove(@NonNull GuildMemberRemoveEvent event) {
+        if (!validateEvent(event)) return;
         try {
             event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
                 boolean voluntary = true;
@@ -118,7 +131,7 @@ public class UserJoinServerListener extends ListenerAdapter {
                 msg += "\n> " + g.getName() + " -> Link:" + g.getTableTalkChannel().getJumpUrl();
             }
             reportUserLeftServer(msg);
-            
+
             String inviteBack = Helper.getGuildInviteURL(guild, 1);
             String primaryInvite = Helper.getGuildInviteURL(AsyncTI4DiscordBot.guildPrimary, 1, true);
             String usermsg = "It looks like you left a server while playing in `" + gamesQuit.size() + "` games.";

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.User;
 import ti4.AsyncTI4DiscordBot;
 
 public class Constants {
@@ -16,11 +17,13 @@ public class Constants {
     public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     public static String jazzPing() {
-        return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();
+        User jazz = AsyncTI4DiscordBot.jda.getUserById(jazzId);
+        return jazz == null ? "" : jazz.getAsMention();
     }
 
     public static String bltPing() {
-        return AsyncTI4DiscordBot.jda.getUserById(bltId).getAsMention();
+        User blt = AsyncTI4DiscordBot.jda.getUserById(bltId);
+        return blt == null ? "" : blt.getAsMention();
     }
 
     // Tourney Winners
