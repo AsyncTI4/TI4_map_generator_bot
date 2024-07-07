@@ -158,7 +158,7 @@ public class Setup extends PlayerSubcommandData {
                 continue;
             }
             String planetResolved = AliasHandler.resolvePlanet(planet.toLowerCase());
-            new PlanetAdd().doAction(player, planetResolved, game);
+            PlanetAdd.doAction(player, planetResolved, game, event, true);
             player.refreshPlanet(planetResolved);
         }
 
@@ -326,7 +326,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (!game.isFoWMode()) {
-            StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName());
+            StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName(), false);
             if (!sb.toString().contains("No titles yet")) {
                 String msg = "In previous games, " + player.getUserName() + " has earned the titles of: \n" + sb;
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);

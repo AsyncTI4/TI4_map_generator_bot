@@ -78,18 +78,17 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
+import ti4.listeners.ModalListener;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.modals.ModalListener;
 import ti4.selections.SelectionManager;
 import ti4.selections.SelectionMenuListener;
 
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
-    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(
-        Math.max(2, Runtime.getRuntime().availableProcessors()));
+    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
@@ -123,11 +122,11 @@ public class AsyncTI4DiscordBot {
 
         jda.addEventListener(
             new MessageListener(),
-            new ButtonListener(),
-            new UserJoinServerListener(),
-            new AutoCompleteListener(),
+            ButtonListener.getInstance(),
+            ModalListener.getInstance(),
             new SelectionMenuListener(),
-            new ModalListener());
+            new UserJoinServerListener(),
+            new AutoCompleteListener());
 
         try {
             jda.awaitReady();
@@ -424,14 +423,13 @@ public class AsyncTI4DiscordBot {
     }
 
     public static <T> CompletableFuture<T> completeAsync(Supplier<T> supplier) {
-        return CompletableFuture.supplyAsync(supplier, THREAD_POOL)
-            .handle((result, exception) -> {
-                if (exception != null) {
-                    BotLogger.log("Unable to complete async process.", exception);
-                    return null;
-                }
-                return result;
-            });
+        return CompletableFuture.supplyAsync(supplier, THREAD_POOL).handle((result, exception) -> {
+            if (exception != null) {
+                BotLogger.log("Unable to complete async process.", exception);
+                return null;
+            }
+            return result;
+        });
     }
 
     public static List<Category> getAvailablePBDCategories() {

@@ -2,105 +2,86 @@ package ti4.helpers.settingsFramework.menus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.helpers.settingsFramework.settings.*;
+import ti4.helpers.settingsFramework.settings.ChoiceSetting;
+import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.DeckModel;
+import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardSetModel;
 
 // This is a sub-menu
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 public class DeckSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private ChoiceSetting<DeckModel> stage1, stage2, secrets, actionCards, agendas, techs, relics, explores;//, events;
+    private ChoiceSetting<DeckModel> stage1, stage2, secrets, actionCards, agendas, techs, relics, explores;
     private ChoiceSetting<StrategyCardSetModel> stratCards;
+
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Constructor & Initialization
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    private ChoiceSetting<DeckModel> deckChoice(String id, String name, String deckType, String emoji) {
+        List<DeckModel> decks = Mapper.getDecks().values().stream().filter(deck -> deck.getType().equals(deckType)).toList();
+        String defaultDeck = decks.stream().filter(x -> x.getSource() == ComponentSource.pok).findFirst().map(DeckModel::getAlias).orElse("");
+
+        ChoiceSetting<DeckModel> choice = new ChoiceSetting<>(id, name, defaultDeck);
+        choice.setEmoji(emoji);
+        choice.setShow(DeckModel::getName);
+        choice.setAllValues(decks.stream().collect(Collectors.toMap(DeckModel::getAlias, x -> x)));
+        return choice;
+    }
+
+    protected DeckSettings(Game game, JsonNode json, SettingsMenu parent) {
+        super("decks", "Card Decks", "Manually adjust which decks your game will use. This should be automatic, for the most part", parent);
+
+        // Initialize deck settings to default values
+        stage1 = deckChoice("Stg1Deck", "Stage 1 Deck", "public_stage_1_objective", Emojis.Public1);
+        stage2 = deckChoice("Stg2Deck", "Stage 2 Deck", "public_stage_2_objective", Emojis.Public2);
+        secrets = deckChoice("SecretDeck", "Secrets Deck", "secret_objective", Emojis.SecretObjective);
+        actionCards = deckChoice("ACs", "Action Card Deck", "action_card", Emojis.ActionCard);
+        agendas = deckChoice("Agendas", "Agenda Deck", "agenda", Emojis.Agenda);
+        techs = deckChoice("Techs", "Technology Deck", "technology", Emojis.NonUnitTechSkip);
+        relics = deckChoice("Relics", "Relic Deck", "relic", Emojis.Relic);
+        explores = deckChoice("Explores", "Explore Decks", "explore", Emojis.Frontier);
+        //scenarios = deckChoice("Scenarios", "Scenario Deck", "scenario", null);
+
+        // Initialize strat cards to default values
+        stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", "pok");
+        stratCards.setEmoji(Emojis.SC1);
+        stratCards.setAllValues(Mapper.getStrategyCardSets());
+        stratCards.setShow(StrategyCardSetModel::getName);
+
+        // Get the correct JSON node for initialization if applicable.
+        // Add additional names here to support new generated JSON as needed.
+        if (json != null && json.has("deckSettings")) json = json.get("deckSettings");
+
+        // Verify this is the correct JSON node and continue initialization
+        List<String> historicIDs = new ArrayList<>(List.of("decks"));
+        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+            stage1.initialize(json.get("stage1"));
+            stage2.initialize(json.get("stage2"));
+            secrets.initialize(json.get("secrets"));
+            actionCards.initialize(json.get("actionCards"));
+            agendas.initialize(json.get("agendas"));
+            techs.initialize(json.get("techs"));
+            relics.initialize(json.get("relics"));
+            explores.initialize(json.get("explores"));
+            //scenarios.initialize(json.get("scenarios"));
+            stratCards.initialize(json.get("stratCards"));
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Overridden Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    @Override
-    public void finishInitialization(Game game, SettingsMenu parent) {
-        // Required "Static" Attributes
-        this.menuId = "decks";
-        this.menuName = "Card Decks";
-        this.description = "Manually adjust which decks your game will use. This should be automatic, for the most part";
-        this.parent = null;
-
-        if (parent instanceof GameSettings gameSettings && gameSettings.getParent() instanceof MiltySettings milty) {
-            // TODO: Jazz need to think about how to handle source settings
-            // I don't think it makes sense to restrict these based on the SourceSettings menu
-            // because folks like to do weird stuff and I don't want to have to support every
-            // little homebrew manually in these settings menus
-            milty.getSourceSettings();
-        }
-
-        // Initialize
-        stage1 = new ChoiceSetting<>("Stg1Deck", "Stage 1 Deck", "public_stage_1_objectives_pok", stage1);
-        stage2 = new ChoiceSetting<>("Stg2Deck", "Stage 2 Deck", "public_stage_2_objectives_pok", stage2);
-        secrets = new ChoiceSetting<>("SecretDeck", "Secrets Deck", "secret_objectives_pok", secrets);
-        actionCards = new ChoiceSetting<>("ACs", "Action Card Deck", "action_cards_pok", actionCards);
-        agendas = new ChoiceSetting<>("Agendas", "Agenda Deck", "agendas_pok", agendas);
-        techs = new ChoiceSetting<>("Techs", "Technology Deck", "techs_pok", techs);
-        relics = new ChoiceSetting<>("Relics", "Relic Deck", "relics_pok", relics);
-        explores = new ChoiceSetting<>("Explores", "Explore Decks", "explores_pok", explores);
-        //events = new ChoiceSetting<>("Events", "Event Deck", "events_pok", events);
-        stratCards = new ChoiceSetting<>("StratCards", "Strat Card Set", "pok", stratCards);
-
-        // Emojis
-        stage1.setEmoji(Emojis.Public1);
-        stage2.setEmoji(Emojis.Public2);
-        secrets.setEmoji(Emojis.SecretObjective);
-        actionCards.setEmoji(Emojis.ActionCard);
-        agendas.setEmoji(Emojis.Agenda);
-        techs.setEmoji(Emojis.NonUnitTechSkip);
-        relics.setEmoji(Emojis.Relic);
-        explores.setEmoji(Emojis.Frontier);
-        //events.setEmoji(null);
-        stratCards.setEmoji(Emojis.SC1);
-
-        // Setup deck options
-        List<DeckModel> allDecks = new ArrayList<>(Mapper.getDecks().values());
-        Map<String, List<DeckModel>> decksByType = allDecks.stream().collect(Collectors.groupingBy(DeckModel::getType));
-        List<DeckModel> nil = new ArrayList<>();
-        Collector<DeckModel, ?, Map<String, DeckModel>> collector = Collectors.toMap(DeckModel::getAlias, x -> x);
-        stage1.setAllValues(decksByType.getOrDefault("public_stage_1_objective", nil).stream().collect(collector));
-        stage2.setAllValues(decksByType.getOrDefault("public_stage_2_objective", nil).stream().collect(collector));
-        secrets.setAllValues(decksByType.getOrDefault("secret_objective", nil).stream().collect(collector));
-        actionCards.setAllValues(decksByType.getOrDefault("action_card", nil).stream().collect(collector));
-        agendas.setAllValues(decksByType.getOrDefault("agenda", nil).stream().collect(collector));
-        techs.setAllValues(decksByType.getOrDefault("technology", nil).stream().collect(collector));
-        relics.setAllValues(decksByType.getOrDefault("relic", nil).stream().collect(collector));
-        explores.setAllValues(decksByType.getOrDefault("explore", nil).stream().collect(collector));
-        //events.setAllValues(decksByType.getOrDefault("event", nil).stream().collect(collector));
-        stratCards.setAllValues(Mapper.getStrategyCardSets()); // strat cards use a different model
-
-        // shows
-        stage1.setShow(DeckModel::getName);
-        stage2.setShow(DeckModel::getName);
-        secrets.setShow(DeckModel::getName);
-        actionCards.setShow(DeckModel::getName);
-        agendas.setShow(DeckModel::getName);
-        techs.setShow(DeckModel::getName);
-        relics.setShow(DeckModel::getName);
-        explores.setShow(DeckModel::getName);
-        //events.setShow(DeckModel::getName);
-        stratCards.setShow(StrategyCardSetModel::getName);
-
-        super.finishInitialization(game, parent);
-    }
-
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<SettingInterface>();
@@ -113,7 +94,7 @@ public class DeckSettings extends SettingsMenu {
         ls.add(relics);
         ls.add(explores);
         ls.add(stratCards);
-        //ls.add(events);
+        //ls.add(scenarios);
         return ls;
     }
 }

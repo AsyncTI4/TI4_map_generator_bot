@@ -20,10 +20,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -40,11 +46,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.commands.bothelper.ArchiveOldThreads;
@@ -870,6 +873,244 @@ public class Helper {
             + "/" + planet2.getInfluence() + ")";
     }
 
+    public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
+
+        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted:\n" + buildTransactionOffer(p1, p2, game);
+        List<String> transactionItems = p1.getTransactionItems();
+        List<Player> players = new ArrayList<Player>();
+        players.add(p1);
+        players.add(p2);
+        boolean debtOnly = true;
+        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
+        for (Player sender : players) {
+            Player receiver = p2;
+            if (sender == p2) {
+                receiver = p1;
+            }
+            for (String item : transactionItems) {
+                if (item.contains("sending" + sender.getFaction()) && item.contains("receiving" + receiver.getFaction())) {
+                    String thingToTransact = item.split("_")[2];
+                    String furtherDetail = item.split("_")[3];
+                    int amountToTransact = 1;
+                    if (((thingToTransact.equalsIgnoreCase("ACs") || thingToTransact.equalsIgnoreCase("PNs")) && furtherDetail.contains("generic"))) {
+                        amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
+                        furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
+                    }
+                    String spoofedButtonID = "send_" + thingToTransact + "_" + receiver.getFaction() + "_" + furtherDetail;
+                    if (!thingToTransact.toLowerCase().contains("debt")) {
+                        debtOnly = false;
+                    }
+                    switch (thingToTransact) {
+                        case "ACs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    for (int x = 0; x < amountToTransact; x++) {
+                                        String buttonID = "transact_ACs_" + sender.getFaction();
+                                        ButtonHelper.resolveSpecificTransButtonsOld(game, sender, buttonID, event);
+                                    }
+                                }
+                                default -> {
+                                    ButtonHelper.resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                                }
+                            }
+                        }
+                        case "PNs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, p2);
+                                    String message = sender.getRepresentation(true, true)
+                                        + "Please select the PN you would like to send";
+                                    MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
+                                }
+                                default -> {
+                                    ButtonHelper.resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                                }
+                            }
+                        }
+
+                        case "Planets" -> {
+                            ButtonHelperFactionSpecific.resolveHacanMechTradeStepOne(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
+                        }
+                        case "AlliancePlanets" -> {
+                            String exhausted = "exhausted";
+                            if (!furtherDetail.contains(exhausted)) {
+                                exhausted = "refreshed";
+                            }
+                            furtherDetail = furtherDetail.replace(exhausted, "");
+
+                            ButtonHelper.resolveAllianceMemberPlanetTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction() + "_" + exhausted);
+                        }
+                        case "dmz" -> {
+                            ButtonHelper.resolveDMZTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
+                        }
+                        default -> {
+                            ButtonHelper.resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
+                        }
+                    }
+
+                }
+            }
+        }
+        p1.clearTransactionItemsWith(p2);
+        if (!debtOnly) {
+            ButtonHelperAbilities.pillageCheck(p2, game);
+            ButtonHelperAbilities.pillageCheck(p1, game);
+        }
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), summary);
+        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), summary);
+    }
+
+    public static String buildTransactionOffer(Player p1, Player p2, Game game) {
+        List<String> transactionItems = p1.getTransactionItems();
+        String wholeSummary = "";
+        List<Player> players = new ArrayList<Player>();
+        players.add(p1);
+        players.add(p2);
+        for (Player sender : players) {
+            Player receiver = p2;
+            if (sender == p2) {
+                receiver = p1;
+            }
+            String summary = "**" + sender.getRepresentation(false, false) + " gives " + receiver.getRepresentation(false, false) + " the following:**\n";
+            for (String item : transactionItems) {
+                if (item.contains("sending" + sender.getFaction()) && item.contains("receiving" + receiver.getFaction())) {
+                    String thingToTransact = item.split("_")[2];
+                    String furtherDetail = item.split("_")[3];
+                    int amountToTransact = 1;
+                    if (thingToTransact.equalsIgnoreCase("tgs") || thingToTransact.contains("Debt") || thingToTransact.equalsIgnoreCase("comms")) {
+                        amountToTransact = Integer.parseInt(furtherDetail);
+                    }
+                    if (thingToTransact.equalsIgnoreCase("frags") || ((thingToTransact.equalsIgnoreCase("PNs") || thingToTransact.equalsIgnoreCase("ACs")) && furtherDetail.contains("generic"))) {
+                        amountToTransact = Integer.parseInt("" + furtherDetail.charAt(furtherDetail.length() - 1));
+                        furtherDetail = furtherDetail.substring(0, furtherDetail.length() - 1);
+                    }
+                    switch (thingToTransact) {
+                        case "TGs" -> {
+                            summary = summary + amountToTransact + " " + Emojis.tg + "\n";
+                        }
+                        case "SendDebt" -> {
+                            summary = summary + "Send " + amountToTransact + " debt\n";
+                        }
+                        case "ClearDebt" -> {
+                            summary = summary + "Clear " + amountToTransact + " debt\n";
+                        }
+                        case "Comms" -> {
+                            summary = summary + amountToTransact + " " + Emojis.comm + "\n";
+                        }
+                        case "shipOrders" -> {
+                            summary = summary + Mapper.getRelic(furtherDetail).getName() + Emojis.axis + "\n";
+                        }
+                        case "starCharts" -> {
+                            summary = summary + Mapper.getRelic(furtherDetail).getName() + Emojis.DiscordantStars + "\n";
+                        }
+                        case "ACs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    summary = summary + amountToTransact + " " + Emojis.ActionCard + " to be specified verbally\n";
+                                }
+                                default -> {
+                                    int acNum = Integer.parseInt(furtherDetail);
+                                    String acID = null;
+                                    if (!sender.getActionCards().containsValue(acNum)) {
+                                        continue;
+                                    }
+                                    for (Map.Entry<String, Integer> ac : sender.getActionCards().entrySet()) {
+                                        if (ac.getValue().equals(acNum)) {
+                                            acID = ac.getKey();
+                                        }
+                                    }
+                                    summary = summary + Emojis.ActionCard + " " + Mapper.getActionCard(acID).getName() + "\n";
+                                }
+                            }
+                        }
+                        case "PNs" -> {
+                            switch (furtherDetail) {
+                                case "generic" -> {
+                                    summary = summary + amountToTransact + " " + Emojis.PN + " to be specified verbally\n";
+                                }
+                                default -> {
+                                    String id = null;
+                                    int pnIndex;
+                                    try {
+                                        pnIndex = Integer.parseInt(furtherDetail);
+                                        for (Map.Entry<String, Integer> pn : sender.getPromissoryNotes().entrySet()) {
+                                            if (pn.getValue().equals(pnIndex)) {
+                                                id = pn.getKey();
+                                            }
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        id = furtherDetail.replace("fin9", "_");
+                                    }
+                                    if (id == null) {
+                                        continue;
+                                    }
+                                    summary = summary + Emojis.PN + " " + StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")) + " " + Mapper.getPromissoryNote(id).getName() + "\n";
+                                }
+                            }
+                        }
+                        case "Frags" -> {
+                            summary = summary + amountToTransact + " " + getFragEmoji(furtherDetail) + "\n";
+                        }
+                        case "Planets", "AlliancePlanets", "dmz" -> {
+                            summary = summary + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game) + "\n";
+                        }
+                        case "action" -> {
+                            summary = summary + "An in-game " + furtherDetail + " action\n";
+                        }
+                    }
+
+                }
+            }
+            if (StringUtils.countMatches(summary, "\n") > 1) {
+                wholeSummary = wholeSummary + "\n" + summary;
+            } else {
+                wholeSummary = wholeSummary + "\n" + summary + getNothingMessage() + "\n";
+            }
+        }
+
+        return wholeSummary;
+    }
+
+    public static String getFragEmoji(String frag) {
+        frag = frag.toLowerCase();
+        switch (frag) {
+            case "crf":
+                return Emojis.CFrag;
+            case "irf":
+                return Emojis.IFrag;
+            case "hrf":
+                return Emojis.HFrag;
+        }
+        return Emojis.UFrag;
+    }
+
+    public static String getNothingMessage() {
+        int result = ThreadLocalRandom.current().nextInt(1, 11);
+        switch (result) {
+            case 1:
+                return "Nothing But Respect And Good Will";
+            case 2:
+                return "Some Pocket Lint";
+            case 3:
+                return "Sunshine and Rainbows";
+            case 4:
+                return "A Feeling Of Accomplishment";
+            case 5:
+                return "A Crisp High Five";
+            case 6:
+                return "A Well Written Thank-You Note";
+            case 7:
+                return "Heartfelt Thanks";
+            case 8:
+                return "The Best Vibes";
+            case 9:
+                return "A Bot's Blessing For Your Trouble";
+            case 10:
+                return "Good Karma";
+        }
+        return "Nothing";
+    }
+
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Game game) {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
@@ -1283,8 +1524,22 @@ public class Helper {
         int bestRes = 0;
         int keleresAgent = 0;
         for (String thing : spentThings) {
-            if (!thing.contains("tg_") && !thing.contains("boon") && !thing.contains("sarween")
-                && !thing.contains("absol_sarween")
+            boolean found = false;
+            System.out.println("Spent thing: " + thing);
+            switch (thing) {
+                case "sarween" -> {
+                    msg += "> Used Sarween Tools " + Emojis.CyberneticTech + "\n";
+                    res += 1;
+                    found = true;
+                }
+                case "absol_sarween" -> {
+                    int sarweenVal = 1 + calculateCostOfProducedUnits(player, game, true) / 5;
+                    msg += "> Used Sarween Tools " + Emojis.CyberneticTech + " for " + sarweenVal + " resources\n";
+                    res += sarweenVal;
+                    found = true;
+                }
+            }
+            if (!found && !thing.contains("tg_") && !thing.contains("boon")
                 && !thing.contains("ghoti") && !thing.contains("aida")
                 && !thing.contains("commander") && !thing.contains("Agent")) {
                 Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
@@ -1341,15 +1596,7 @@ public class Helper {
                     }
                 }
             } else {
-                if (thing.contains("sarween") && !thing.contains("absol_sarween")) {
-                    msg = msg + "> Used Sarween Tools " + Emojis.CyberneticTech + "\n";
-                    res = res + 1;
-                }
-                if (thing.contains("absol_sarween")) {
-                    int sarweenVal = 1 + calculateCostOfProducedUnits(player, game, true) / 5;
-                    msg = msg + "> Used Sarween Tools " + Emojis.CyberneticTech + " for " + sarweenVal + " resources\n";
-                    res = res + sarweenVal;
-                }
+
                 if (thing.contains("boon")) {
                     msg = msg + "> Used Boon Relic " + Emojis.Relic + "\n";
                     res = res + 1;
@@ -1483,12 +1730,10 @@ public class Helper {
         int productionValueTotal = 0;
         for (UnitKey unit : uH.getUnits().keySet()) {
             if (unit.getColor().equalsIgnoreCase(player.getColor())) {
-                if (unit.getUnitType() == UnitType.TyrantsLament
-                    && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
+                if (unit.getUnitType() == UnitType.TyrantsLament && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("tyrantslament");
                 }
-                if (unit.getUnitType() == UnitType.PlenaryOrbital
-                    && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
+                if (unit.getUnitType() == UnitType.PlenaryOrbital && player.getUnitsByAsyncID(unit.asyncID()).isEmpty()) {
                     player.addOwnedUnitByID("plenaryorbital");
                 }
                 if (player == null || player.getUnitsByAsyncID(unit.asyncID()).size() < 1) {
@@ -1499,9 +1744,7 @@ public class Helper {
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
                     productionValueTotal = productionValueTotal + player.getFleetCC();
                 }
-                if ("sd".equals(unitModel.getAsyncId()) && (productionValue == 2 || productionValue == 4
-                    || player.ownsUnit("mykomentori_spacedock2")
-                    || player.ownsUnit("miltymod_spacedock2"))) {
+                if ("sd".equals(unitModel.getAsyncId()) && (productionValue == 2 || productionValue == 4 || player.ownsUnit("mykomentori_spacedock2") || player.ownsUnit("miltymod_spacedock2"))) {
                     if (uH instanceof Planet planet) {
                         if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
                             productionValue = Math.max(planet.getResources(), planet.getInfluence()) + productionValue;
@@ -1534,7 +1777,7 @@ public class Helper {
                 planetUnitVal = 2;
             }
 
-            if (token.contains("automatons")&& planetUnitVal < 3) {
+            if (token.contains("automatons") && planetUnitVal < 3) {
                 productionValueTotal = productionValueTotal - planetUnitVal;
                 planetUnitVal = 3;
                 productionValueTotal = productionValueTotal + 3;
@@ -1570,8 +1813,7 @@ public class Helper {
                 }
             }
         }
-        if (player.getPlanets().contains(uH.getName())
-            && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
+        if (player.getPlanets().contains(uH.getName()) && player.getLeader("nokarhero").map(Leader::isActive).orElse(false)) {
             productionValueTotal = productionValueTotal + 3;
             productionValueTotal = productionValueTotal - planetUnitVal;
             planetUnitVal = 3;
@@ -1579,8 +1821,6 @@ public class Helper {
                 productionValueTotal++;
             }
         }
-
-        
 
         return productionValueTotal;
 
@@ -1590,8 +1830,7 @@ public class Helper {
         int productionValueTotal = 0;
         if (!singleDock) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
-                productionValueTotal = productionValueTotal
-                    + getProductionValueOfUnitHolder(player, game, tile, uH);
+                productionValueTotal = productionValueTotal + getProductionValueOfUnitHolder(player, game, tile, uH);
             }
             if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 productionValueTotal = productionValueTotal + 5;
@@ -1898,11 +2137,9 @@ public class Helper {
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Emojis.infantry));
                     unitButtons.add(inf2Button);
                 }
-                Button mfButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
-                    "Produce Mech on " + getPlanetRepresentation(pp, game));
+                Button mfButton = Button.success("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, game));
                 if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
-                    mfButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp,
-                        "Produce Mech on " + getPlanetRepresentation(pp, game));
+                    mfButton = Button.secondary("FFCC_" + player.getFaction() + "_" + placePrefix + "_mech_" + pp, "Produce Mech on " + getPlanetRepresentation(pp, game));
                 }
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Emojis.mech));
                 if (resourcelimit > 1) {
@@ -2570,11 +2807,10 @@ public class Helper {
     }
 
     public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
-        return getTechButtons(techs, techType, player, "nope");
+        return getTechButtons(techs, player, "nope");
     }
 
-    public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player,
-        String jolNarHeroTech) {
+    public static List<Button> getTechButtons(List<TechnologyModel> techs, Player player, String buttonPrefixType) {
         List<Button> techButtons = new ArrayList<>();
 
         techs.sort(TechnologyModel.sortByTechRequirements);
@@ -2583,73 +2819,29 @@ public class Helper {
             String techName = tech.getName();
             String techID = tech.getAlias();
             String buttonID;
-            if (!"nope".equalsIgnoreCase(jolNarHeroTech)) {
-                if ("nekro".equalsIgnoreCase(jolNarHeroTech)) {
-                    buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
-                } else {
-                    buttonID = "FFCC_" + player.getFaction() + "_swapTechs__" + jolNarHeroTech + "__" + tech.getAlias();
-                }
-            } else {
+            if ("nope".equalsIgnoreCase(buttonPrefixType)) { // default
                 buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;
+            } else if ("nekro".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
+            } else {
+                buttonID = "FFCC_" + player.getFaction() + "_swapTechs__" + buttonPrefixType + "__" + techID;
             }
-            Button techB;
-            // String requirementsEmoji = tech.getRequirementsEmoji();
-            switch (techType) {
-                case "propulsion" -> {
-                    techB = Button.primary(buttonID, techName);
-                    switch (tech.getRequirements().orElse("")) {
-                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionDisabled));
-                        case "B" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
-                        case "BB" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Propulsion2));
-                        case "BBB" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Propulsion3));
-                    }
-                }
-                case "cybernetic" -> {
-                    techB = Button.secondary(buttonID, techName);
-                    switch (tech.getRequirements().orElse("")) {
-                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticDisabled));
-                        case "Y" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
-                        case "YY" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Cybernetic2));
-                        case "YYY" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Cybernetic3));
-                    }
-                }
-                case "biotic" -> {
-                    techB = Button.success(buttonID, techName);
-                    switch (tech.getRequirements().orElse("")) {
-                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticDisabled));
-                        case "G" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
-                        case "GG" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Biotic2));
-                        case "GGG" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Biotic3));
-                    }
-                }
-                case "warfare" -> {
-                    techB = Button.danger(buttonID, techName);
-                    switch (tech.getRequirements().orElse("")) {
-                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareDisabled));
-                        case "R" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
-                        case "RR" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Warfare2));
-                        case "RRR" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Warfare3));
-                    }
-                }
-                case "unitupgrade" -> {
-                    techB = Button.secondary(buttonID, techName);
-                    String unitType = tech.getBaseUpgrade().isEmpty() ? tech.getAlias() : tech.getBaseUpgrade().get();
-                    switch (unitType) {
-                        case "inf2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.infantry));
-                        case "ff2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.fighter));
-                        case "pds2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.pds));
-                        case "sd2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-                        case "dd2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.destroyer));
-                        case "cr2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.cruiser));
-                        case "cv2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.carrier));
-                        case "dn2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.dreadnought));
-                        case "ws" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.warsun));
-                        case "fs" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.flagship));
-                    }
-                }
-                default -> techB = Button.secondary(buttonID, techName);
+
+            ButtonStyle style;
+            String requirementsEmoji = tech.getCondensedReqsEmojis(true);
+            if (tech.isPropulsionTech()) {
+                style = ButtonStyle.PRIMARY;
+            } else if (tech.isCyberneticTech()) {
+                style = ButtonStyle.SECONDARY;
+            } else if (tech.isBioticTech()) {
+                style = ButtonStyle.SUCCESS;
+            } else if (tech.isWarfareTech()) {
+                style = ButtonStyle.DANGER;
+            } else {
+                style = ButtonStyle.SECONDARY;
             }
-            techButtons.add(techB);
+
+            techButtons.add(Button.of(style, buttonID, techName, Emoji.fromFormatted(requirementsEmoji)));
         }
         return techButtons;
     }
@@ -2658,7 +2850,8 @@ public class Helper {
         List<TechnologyModel> techs = new ArrayList<>();
         Mapper.getTechs().values().stream()
             .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
-            .filter(tech -> tech.getType().toString().equalsIgnoreCase(techType) || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
+            .filter(tech -> tech.isType(techType) || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
+            .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
             .filter(tech -> !player.hasTech(tech.getAlias()))
             .filter(tech -> tech.getFaction().isEmpty() || "".equalsIgnoreCase(tech.getFaction().get()) || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
             .forEach(techs::add);
@@ -2934,19 +3127,12 @@ public class Helper {
             .collect(Collectors.toSet());
     }
 
-    public static String getGuildInviteURL(Guild guild) {
-        List<Invite> invites = guild.retrieveInvites().complete();
-        String inviteUrl = null;
-        if (invites != null && !invites.isEmpty()) {
-            inviteUrl = invites.get(0).getUrl();
-            if(inviteUrl.contains("VFNGGKZ9")){
-                inviteUrl = null;
-            }
-        }
-        if (inviteUrl == null) {
-            inviteUrl = guild.getDefaultChannel().createInvite().complete().getUrl();
-        }
-        return inviteUrl;
+    public static String getGuildInviteURL(Guild guild, int uses) {
+        return getGuildInviteURL(guild, uses, false);
+    }
+
+    public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
+        return guild.getDefaultChannel().createInvite().setMaxUses(uses).setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS).complete().getUrl();
     }
 
     public static String getTimeRepresentationToSeconds(long totalMillis) {

@@ -343,7 +343,7 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + ". You also have " + Emojis.Cabal + " commander which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that dont count towards production limit";
+                + ". You also have " + Emojis.Cabal + " commander which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that dont count towards production limit. ";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
@@ -384,6 +384,25 @@ public class ButtonHelperTacticalAction {
                 ButtonHelper.resolveEmpyCommanderCheck(player, game, tile, event);
                 ButtonHelper.sendEBSWarning(player, game, tile.getPosition());
                 ButtonHelper.checkForIonStorm(game, tile, player);
+                for (Player nonActivePlayer : game.getRealPlayers()) {
+                    if (player == nonActivePlayer) {
+                        continue;
+                    }
+                    if (nonActivePlayer.getTechs().contains("vw")
+                        && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, tile)) {
+
+                        if (game.isFoWMode()) {
+                            MessageHelper.sendMessageToChannel(nonActivePlayer.getCorrectChannel(),
+                                nonActivePlayer.getRepresentation() + " you triggered voidwatch");
+                        }
+                        List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, nonActivePlayer, player);
+                        String message2 = player.getRepresentation(true, true)
+                            + " You have triggered void watch. Please select the PN you would like to send";
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2,
+                            stuffToTransButtons);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you owe the defender one PN");
+                    }
+                }
             }
             List<Button> empyButtons = new ArrayList<>();
             if (!game.getMovedUnitsFromCurrentActivation().isEmpty()

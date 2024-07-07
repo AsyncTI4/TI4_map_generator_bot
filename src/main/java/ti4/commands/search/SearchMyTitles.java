@@ -1,24 +1,20 @@
 package ti4.commands.search;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class SearchMyTitles extends SearchSubcommandData {
@@ -31,11 +27,11 @@ public class SearchMyTitles extends SearchSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
-        StringBuilder sb = getPlayerTitles(user.getId(), user.getName());
+        StringBuilder sb = getPlayerTitles(user.getId(), user.getName(), true);
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Titles List", sb.toString());
     }
 
-    public StringBuilder getPlayerTitles(String userID, String userName) {
+    public StringBuilder getPlayerTitles(String userID, String userName, boolean gamesIncluded) {
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
         Predicate<Game> endedGamesFilter = game -> game.isHasEnded();
         Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(endedGamesFilter);
@@ -68,7 +64,11 @@ public class SearchMyTitles extends SearchSubcommandData {
         }
         for (String title : titles.keySet()) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
-            sb.append("**" + title + "** x" + titles.get(title) + " (" + gameHist.get(title) + ")");
+            if (gamesIncluded) {
+                sb.append("**" + title + "** x" + titles.get(title) + " (" + gameHist.get(title) + ")");
+            } else {
+                sb.append("**" + title + "** x" + titles.get(title));
+            }
             sb.append("\n");
             index++;
         }

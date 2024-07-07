@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-
 import ti4.commands.cardsac.PlayAC;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -182,8 +181,8 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay, event);
             }
-            game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
-            game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
+            game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl());
+            game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId());
             game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction())
@@ -218,14 +217,21 @@ public class SCPlay extends PlayerSubcommandData {
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
                                 "These buttons will work inside the thread", scButtons);
                             if (scToPlay == 5) {
-                                String neighborsMsg = "As a reminder, the following factions are not neighbors with the trade holder:";
+                                String neighborsMsg = "NOT neighbors with the trade holder:";
                                 for (Player p2 : game.getRealPlayers()) {
                                     if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
                                         neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
                                     }
                                 }
+                                String neighborsMsg2 = "Neighbors with the trade holder:";
+                                for (Player p2 : game.getRealPlayers()) {
+                                    if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
+                                        neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
+                                    }
+                                }
                                 if (!player.getPromissoryNotes().containsKey("convoys") && !player.hasAbility("guild_ships")) {
                                     MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg);
+                                    MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2);
                                 }
                             }
                         }
@@ -325,12 +331,12 @@ public class SCPlay extends PlayerSubcommandData {
         Button endTurn = Button.danger(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
-        
+
         if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
             conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
         }
         conclusionButtons.add(deleteButton);
-        conclusionButtons.add(Button.danger("endTurnWhenAllReactedTo_"+scToPlay, "End turn When All Have Reacted"));
+        conclusionButtons.add(Button.danger("endTurnWhenAllReactedTo_" + scToPlay, "End turn When All Have Reacted"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!game.isHomeBrewSCMode() && player.hasAbility("grace")
             && !player.getExhaustedAbilities().contains("grace")

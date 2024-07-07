@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.User;
 import ti4.AsyncTI4DiscordBot;
 
 public class Constants {
@@ -16,12 +17,18 @@ public class Constants {
     public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     public static String jazzPing() {
-        return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();
+        User jazz = AsyncTI4DiscordBot.jda.getUserById(jazzId);
+        return jazz == null ? "" : jazz.getAsMention();
     }
 
     public static String bltPing() {
-        return AsyncTI4DiscordBot.jda.getUserById(bltId).getAsMention();
+        User blt = AsyncTI4DiscordBot.jda.getUserById(bltId);
+        return blt == null ? "" : blt.getAsMention();
     }
+
+    // Tourney Winners
+    public static final String cal1nos = "740848810749722646";
+    public static List<String> tourneyWinners = List.of(cal1nos);
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
@@ -84,8 +91,10 @@ public class Constants {
     public static final String NOMAD_COIN = "nomad_coin";
     public static final String QUEUE_SO = "queue_so";
     public static final String SHOW_BUBBLES = "show_bubbles";
+    public static final String TRANSACTION_METHOD = "transaction_method";
     public static final String SHOW_GEARS = "show_gears";
     public static final String SHOW_BANNERS = "show_banners";
+    public static final String SHOW_HEX_BORDERS = "show_hex_borders";
     public static final String HOMEBREW_MODE = "homebrew_mode";
     public static final String UNDO_BUTTON = "undo_button";
     public static final String FAST_SC_FOLLOW = "fast_sc_follow";
@@ -528,8 +537,10 @@ public class Constants {
     public static final String PLANET6 = "planet6";
     public static final String TECH = "tech";
     public static final String SPENT_THINGS = "spent_things";
+    public static final String TRANSACTION_ITEMS = "transaction_items";
     public static final String TEAMMATE_IDS = "teammate_ids";
     public static final String TECH_EXHAUSTED = "tech_exhausted";
+    public static final String TECH_PURGED = "tech_purged";
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";
     public static final String TECH4 = "tech4";
@@ -807,6 +818,8 @@ public class Constants {
     public static final String HS_TILE_POSITION = "hs_tile_position";
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
+    public static final String ATTACHMENT_IIHQ_1 = "attachment_custodiavigilia_1.png";
+    public static final String ATTACHMENT_IIHQ_2 = "attachment_custodiavigilia_2.png";
     public static final String TERRAFORM = "terraform";
     public static final String CUSTODIAN_TOKEN = "custodian";
     public static final String CONSULATE_TOKEN = "consulate";

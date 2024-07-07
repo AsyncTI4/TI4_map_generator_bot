@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -33,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -61,11 +62,13 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
+import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -144,6 +147,8 @@ public class Game {
     private boolean fastSCFollowMode;
     @ExportableField
     private boolean queueSO = true;
+    @ExportableField
+    private boolean newTransactionMethod = true;
     @ExportableField
     private boolean showBubbles = true;
     @ExportableField
@@ -359,6 +364,9 @@ public class Game {
     @Getter
     @Setter
     private MiltySettings miltySettings = null;
+    @Getter
+    @Setter
+    private String miltyJson = null;
 
     public Game() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -368,8 +376,13 @@ public class Game {
     }
 
     public void finishImport() {
-        if (miltySettings != null) {
-            miltySettings.finishInitialization(this, null);
+        if (miltyJson != null) {
+            try {
+                JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
+                miltySettings = new MiltySettings(this, json);
+            } catch (Exception e) {
+                BotLogger.log("Loading milty settings failed " + Constants.jazzPing(), e);
+            }
         }
     }
 
@@ -583,8 +596,8 @@ public class Game {
 
     public MiltySettings initializeMiltySettings() {
         if (miltySettings == null) {
-            miltySettings = new MiltySettings();
-            miltySettings.finishInitialization(this, null);
+            miltySettings = new MiltySettings(this, null);
+            //miltySettings.finishInitialization(this, null);
         }
         return miltySettings;
     }
@@ -1102,11 +1115,13 @@ public class Game {
     }
 
     public void setStoredValue(String key, String value) {
+        value = StringHelper.escape(value);
         checkingForAllReacts.put(key, value);
     }
 
     public String getStoredValue(String key) {
-        return getFactionsThatReactedToThis(key);
+        String value = getFactionsThatReactedToThis(key);
+        return StringHelper.unescape(value);
     }
 
     public void removeStoredValue(String key) {
@@ -1236,9 +1251,18 @@ public class Game {
         return showBubbles;
     }
 
+    public boolean getWhetherNewTransactionMethod() {
+        return newTransactionMethod;
+    }
+
+    public void setTransactionMethod(boolean onStatus) {
+        newTransactionMethod = onStatus;
+    }
+
     public boolean getShowGears() {
         return showGears;
     }
+
     public boolean getShowBanners() {
         return showBanners;
     }
@@ -1290,6 +1314,7 @@ public class Game {
     public void setShowGears(boolean onStatus) {
         showGears = onStatus;
     }
+
     public void setShowBanners(boolean onStatus) {
         showBanners = onStatus;
     }
@@ -1646,13 +1671,13 @@ public class Game {
         Set<Integer> scPickedList = new HashSet<>();
         for (Player player_ : getRealPlayers()) {
             scPickedList.addAll(player_.getSCs());
-            if(player_.getSCs().size() > 0){
+            if (player_.getSCs().size() > 0) {
                 String scs = "";
-                for(int SC : player_.getSCs()){
+                for (int SC : player_.getSCs()) {
                     scs = scs + SC + "_";
                 }
-                scs =scs.substring(0,scs.length()-1);
-                setStoredValue("Round"+getRound()+"SCPickFor"+player_.getFaction(), scs);
+                scs = scs.substring(0, scs.length() - 1);
+                setStoredValue("Round" + getRound() + "SCPickFor" + player_.getFaction(), scs);
             }
         }
 
@@ -3372,15 +3397,15 @@ public class Game {
 
     public boolean loadGameSettingsFromSettings(GenericInteractionCreateEvent event, MiltySettings miltySettings) {
         SourceSettings sources = miltySettings.getSourceSettings();
-        if (sources.getAbsol().val) setAbsolMode(true);
+        if (sources.getAbsol().isVal()) setAbsolMode(true);
 
         GameSettings settings = miltySettings.getGameSettings();
-        setVp(settings.getPointTotal().val);
-        setMaxSOCountPerPlayer(settings.getSecrets().val);
-        setUpPeakableObjectives(settings.getStage1s().val, 1);
-        setUpPeakableObjectives(settings.getStage2s().val, 2);
-        setCompetitiveTIGLGame(settings.getTigl().val);
-        setAllianceMode(settings.getAlliance().val);
+        setVp(settings.getPointTotal().getVal());
+        setMaxSOCountPerPlayer(settings.getSecrets().getVal());
+        setUpPeakableObjectives(settings.getStage1s().getVal(), 1);
+        setUpPeakableObjectives(settings.getStage2s().getVal(), 2);
+        setCompetitiveTIGLGame(settings.getTigl().isVal());
+        setAllianceMode(settings.getAlliance().isVal());
 
         if (settings.getMapTemplate().getValue().getAlias().equals("1pIsland")) {
             setStoredValue("IslandMode", "true");
@@ -3409,11 +3434,12 @@ public class Game {
         } else {
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
+
         if (absolMode && !deckSettings.getRelics().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
-            success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
+            success &= validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"));
         } else {
-            success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
+            success &= validateAndSetRelicDeck(event, deckSettings.getRelics().getValue());
         }
 
         return success;
@@ -3681,7 +3707,7 @@ public class Game {
     @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return getPlayers().values().stream()
-            .filter(p -> p.isRealPlayer() || (p.isDummy() && p.getFaction().equals("neutral")))
+            .filter(p -> p.isRealPlayer() || (p.getFaction() != null && p.getFaction().equals("neutral")))
             .collect(Collectors.toList());
     }
 
@@ -3878,10 +3904,9 @@ public class Game {
         LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
-            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate
-                + " - the game flag `hasEnded` has been set to true");
+            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
             setHasEnded(true);
-            GameSaveLoadManager.saveMap(this);
+            GameSaveLoadManager.saveMap(this, "Game ended");
         }
     }
 
