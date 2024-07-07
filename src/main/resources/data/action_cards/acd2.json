@@ -31,7 +31,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "That player discards 1 random action card from their hand and returns their command token in that system to their tactic pool. Then, end that player's turn.",
+    "text": "That player discards 1 random action card from their hand and returns their command token from that system to their tactic pool. Then, end that player's turn.",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
     "source": "action_deck_2"
   },
@@ -166,7 +166,7 @@
     "name": "Corruption",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome discards 1 random action card from their hand.",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome discards 1 random action card from their hand; then, take 1 of those cards from the discard pile.",
     "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
     "source": "action_deck_2"
   },
@@ -238,7 +238,7 @@
     "name": "Discord",
     "phase": "Action",
     "window": "When you perform a strategic action",
-    "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
+    "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional token from their strategy pool, if able.",
     "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
     "source": "action_deck_2"
   },
@@ -247,7 +247,7 @@
     "name": "Diverse Strategies",
     "phase": "Action",
     "window": "When you would perform the primary ability of your strategy card",
-    "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place command tokens to resolve these abilities.",
+    "text": "Perform the secondary ability of that strategy card and 2 others instead; do not spend or place command tokens to resolve these abilities.",
     "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
     "source": "action_deck_2"
   },
@@ -363,8 +363,8 @@
     "alias": "hijacked_signal",
     "name": "Hijacked Signal",
     "phase": "Any",
-    "window": "When a command token from your reinforcements or strategy pool would be spent and/or placed on the game board",
-    "text": "Spend and/or place a command token from another player's reinforcements instead.",
+    "window": "After another player moves ships into a system that contains your units",
+    "text": "Place 1 command token from that player's reinforcements in any non-home system.",
     "flavorText": "The Hacan paid heavily to contain the breach. 2RAM named the culprit Acidos and warned them that the worst was to come.",
     "source": "action_deck_2"
   },
