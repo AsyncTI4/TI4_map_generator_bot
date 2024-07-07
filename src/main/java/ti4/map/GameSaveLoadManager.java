@@ -1281,7 +1281,7 @@ public class GameSaveLoadManager {
     @Nullable
     public static Game loadMap(File mapFile) {
         if (mapFile == null) {
-            BotLogger.log("Could not save map, error creating save file");
+            BotLogger.log("Could not load map. Map file was null.");
             return null;
         }
         Game game = new Game();
@@ -1428,8 +1428,10 @@ public class GameSaveLoadManager {
             game.setTileMap(tileMap);
         } catch (FileNotFoundException e) {
             BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
+            return  null;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + mapFile.getName(), e);
+            return  null;
         }
 
         game.endGameIfOld();
