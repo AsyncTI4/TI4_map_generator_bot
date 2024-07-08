@@ -361,7 +361,6 @@ public class Game {
     @Getter
     @Setter
     private int numberOfPurgedFragments;
-    @Getter
     @Setter
     private MiltySettings miltySettings = null;
     @Getter
@@ -373,17 +372,6 @@ public class Game {
         lastModifiedDate = new Date().getTime();
 
         miltyDraftManager = new MiltyDraftManager();
-    }
-
-    public void finishImport() {
-        if (miltyJson != null) {
-            try {
-                JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
-                miltySettings = new MiltySettings(this, json);
-            } catch (Exception e) {
-                BotLogger.log("Loading milty settings failed " + Constants.jazzPing(), e);
-            }
-        }
     }
 
     public void newGameSetup() {
@@ -594,10 +582,24 @@ public class Game {
         return miltyDraftManager;
     }
 
+    @JsonProperty("miltySettings")
+    public MiltySettings getMiltySettingsUnsafe() {
+        return miltySettings;
+    }
+
     public MiltySettings initializeMiltySettings() {
         if (miltySettings == null) {
-            miltySettings = new MiltySettings(this, null);
-            //miltySettings.finishInitialization(this, null);
+            if (miltyJson != null) {
+                try {
+                    JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
+                    miltySettings = new MiltySettings(this, json);
+                } catch (Exception e) {
+                    BotLogger.log("Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing());
+                    MessageHelper.sendMessageToChannel(getActionsChannel(), "Milty draft settings failed to load. ");
+                }
+            } else {
+                miltySettings = new MiltySettings(this, null);
+            }
         }
         return miltySettings;
     }

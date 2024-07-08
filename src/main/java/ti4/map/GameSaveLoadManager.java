@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -48,13 +50,16 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
+import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 
 public class GameSaveLoadManager {
@@ -85,19 +90,54 @@ public class GameSaveLoadManager {
     // TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100% WORKING
     public static final boolean loadFromJSON = false;
 
+    // Log the save times for each map for benchmarking
+    private static final List<Long> saveTimes = new ArrayList<>();
+    private static long jsonTime = 0l;
+    private static long txtTime = 0l;
+    private static long undoTime = 0l;
+
     public static void saveMaps() {
+        jsonTime = txtTime = undoTime = 0l;
         // TODO: Make sure all commands and buttons and such actually save the game
-        //long loadTime = GameManager.getInstance().getLoadTime();
-        GameManager.getInstance().getGameNameToGame().values().parallelStream()
-            .forEach(game -> {
-                try {
-                    // long time = game.getLastModifiedDate();
-                    // if (time > loadTime)
+        List<Game> savedGames = new ArrayList<>();
+        List<Game> skippedGames = new ArrayList<>();
+        long loadTime = 0;//GameManager.getInstance().getLoadTime();
+        GameManager.getInstance().getGameNameToGame().values().parallelStream().forEach(game -> {
+            try {
+                long time = game.getLastModifiedDate();
+                if (time > loadTime) {
                     saveMap(game, true, "Bot Reload");
-                } catch (Exception e) {
-                    BotLogger.log("Error saving map: " + game.getName(), e);
+                    savedGames.add(game);
+                } else {
+                    skippedGames.add(game);
                 }
-            });
+            } catch (Exception e) {
+                BotLogger.log("Error saving map: " + game.getName(), e);
+            }
+        });
+
+        BotLogger.logWithTimestamp("**__Saved `" + savedGames.size() + "` games.__**");
+        BotLogger.logWithTimestamp("**__Skipped saving `" + skippedGames.size() + "` games.__**");
+
+        boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        if (debug && !saveTimes.isEmpty()) {
+            long tot = 0;
+            for (long time : saveTimes)
+                tot += time;
+
+            StringBuilder sb = new StringBuilder("Map save time stats:\n```fix");
+            sb.append("\n").append(debugString("        total:", tot, tot));
+            sb.append("\n").append(debugString("          txt:", txtTime, tot));
+            sb.append("\n").append(debugString("         json:", jsonTime, tot));
+            sb.append("\n").append(debugString("    undo file:", undoTime, tot));
+            sb.append("\n").append(debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot));
+            sb.append("\n```");
+            BotLogger.logWithTimestamp(sb.toString());
+        }
+    }
+
+    private static String debugString(String prefix, long time, long total) {
+        return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
     }
 
     public static void saveMap(Game game, String reason) {
@@ -135,17 +175,22 @@ public class GameSaveLoadManager {
     }
 
     public static void saveMap(Game game, boolean keepModifiedDate, String saveReason) {
+        long saveStart = System.nanoTime();
+
         // ADD COMMAND/BUTTON FOR UNDO INFORMATION
+        List<String> trivialSaveReasons = new ArrayList<>(List.of(
+            "Last Command Unknown - No Event Provided",
+            "Bot Reload",
+            "Auto Ping"));
+        boolean lastSaveTrivial = trivialSaveReasons.contains(game.getLatestCommand());
+        boolean thisSaveTrivial = saveReason == null || trivialSaveReasons.contains(saveReason);
+        if (keepModifiedDate && game.isHasEnded() && lastSaveTrivial && thisSaveTrivial) {
+            //return;
+        }
+
         if (saveReason != null) {
             game.setLatestCommand(saveReason);
         } else {
-            List<String> trivialSaveReasons = new ArrayList<>(List.of(
-                "Last Command Unknown - No Event Provided",
-                "Bot Reload",
-                "Auto Ping"));
-            if (keepModifiedDate && game.isHasEnded() && trivialSaveReasons.contains(game.getLatestCommand())) {
-                return;
-            }
             game.setLatestCommand("Last Command Unknown - No Event Provided");
         }
 
@@ -158,17 +203,20 @@ public class GameSaveLoadManager {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON), game);
-        } catch (IOException e) {
-            BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
-        } catch (Exception e) {
-            BotLogger.log("JSON SAVER", e);
+        long jsonStart = System.nanoTime();
+        if (loadFromJSON || System.getenv("TESTING") != null) {
+            ObjectMapper mapper = ObjectMapperFactory.build();
+            try {
+                mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON), game);
+            } catch (IOException e) {
+                BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
+            } catch (Exception e) {
+                BotLogger.log("JSON SAVER", e);
+            }
+            if (loadFromJSON)
+                return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
         }
-
-        if (loadFromJSON)
-            return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
+        jsonTime += System.nanoTime() - jsonStart;
 
         File mapFile = Storage.getMapImageStorage(game.getName() + TXT);
         if (mapFile == null) {
@@ -176,7 +224,8 @@ public class GameSaveLoadManager {
             return;
         }
 
-        try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
+        long txtStart = System.nanoTime();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {
             Map<String, Tile> tileMap = game.getTileMap();
             writer.write(game.getOwnerID());
             writer.write(System.lineSeparator());
@@ -193,11 +242,17 @@ public class GameSaveLoadManager {
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
+        txtTime += System.nanoTime() - txtStart;
 
+        long undoStart = System.nanoTime();
         mapFile = Storage.getMapImageStorage(game.getName() + TXT);
         if (mapFile.exists()) {
             saveUndo(game, mapFile);
         }
+        undoTime += System.nanoTime() - undoStart;
+
+        long savetime = System.nanoTime() - saveStart;
+        saveTimes.add(savetime);
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
@@ -317,7 +372,7 @@ public class GameSaveLoadManager {
         }
     }
 
-    private static void saveMapInfo(FileWriter writer, Game game, boolean keepModifiedDate) throws IOException {
+    private static void saveMapInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
@@ -706,7 +761,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
         }
 
-        MiltySettings miltySettings = game.getMiltySettings();
+        MiltySettings miltySettings = game.getMiltySettingsUnsafe();
         if (miltySettings != null) {
             writer.write(Constants.MILTY_DRAFT_SETTINGS + " " + miltySettings.json());
             writer.write(System.lineSeparator());
@@ -719,9 +774,8 @@ public class GameSaveLoadManager {
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
         writer.write(System.lineSeparator());
 
-        ObjectMapper mapper = new ObjectMapper();
-        String anomaliesJson = mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually
-                                                                                     // (de)serialising
+        ObjectMapper mapper = ObjectMapperFactory.build();
+        String anomaliesJson = mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
         writer.write(System.lineSeparator());
 
@@ -1033,7 +1087,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCards(Map<String, Integer> cardList, FileWriter writer, String saveID) throws IOException {
+    private static void writeCards(Map<String, Integer> cardList, Writer writer, String saveID) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Integer> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
@@ -1042,7 +1096,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    private static void writeCardsStrings(Map<String, String> cardList, FileWriter writer, String saveID)
+    private static void writeCardsStrings(Map<String, String> cardList, Writer writer, String saveID)
         throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : cardList.entrySet()) {
@@ -1212,7 +1266,7 @@ public class GameSaveLoadManager {
 
     @Nullable
     private static Game loadMapJSON(File mapFile) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = ObjectMapperFactory.build();
         mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
         try {
             return mapper.readValue(mapFile, Game.class);
@@ -1226,7 +1280,7 @@ public class GameSaveLoadManager {
     }
 
     public static Game loadMapJSONString(String mapFile) {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = ObjectMapperFactory.build();
         mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
         try {
             return mapper.readValue(mapFile, Game.class);
@@ -1391,7 +1445,6 @@ public class GameSaveLoadManager {
             }
 
             game.endGameIfOld();
-            game.finishImport();
             return game;
         } else {
             BotLogger.log("Could not save map, error creating save file");
@@ -1460,10 +1513,10 @@ public class GameSaveLoadManager {
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info))
                         break;
-                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectMapper mapper = ObjectMapperFactory.build();
                     try {
-                        game.setBorderAnomalies(mapper.readValue(info, new TypeReference<>() {
-                        }));
+                        JavaType reference = mapper.getTypeFactory().constructParametricType(List.class, BorderAnomalyHolder.class);
+                        game.setBorderAnomalies(mapper.readValue(info, reference));
                     } catch (Exception e) {
                         BotLogger.log("Error reading border anomalies from save file!", e);
                     }
@@ -2540,7 +2593,7 @@ public class GameSaveLoadManager {
         // todo implement token read
     }
 
-    private static void savePeekedPublicObjectives(FileWriter writer, final String constant, Map<String, List<String>> peekedPOs) {
+    private static void savePeekedPublicObjectives(Writer writer, final String constant, Map<String, List<String>> peekedPOs) {
         try {
             writer.write(constant + " ");
 

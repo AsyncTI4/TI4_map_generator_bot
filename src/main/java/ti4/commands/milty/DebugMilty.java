@@ -31,11 +31,16 @@ public class DebugMilty extends MiltySubcommandData {
     }
 
     public static void postInfoInThread(Game game, ThreadChannel thread) {
-        MiltySettings menu = game.getMiltySettings();
+        MiltySettings menu = game.getMiltySettingsUnsafe();
         MiltyDraftManager manager = game.getMiltyDraftManager();
 
         MessageHelper.sendMessageToChannel(thread, manager.superSaveMessage());
-        if (menu != null)
+        if (menu != null) {
             MessageHelper.sendMessageToChannel(thread, menu.json());
+        } else if (game.getMiltyJson() != null) {
+            MessageHelper.sendMessageToChannel(thread, game.getMiltyJson());
+        } else {
+            MessageHelper.sendMessageToChannel(thread, "No milty setting data");
+        }
     }
 }

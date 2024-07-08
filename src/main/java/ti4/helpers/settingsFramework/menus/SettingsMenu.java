@@ -426,16 +426,4 @@ public abstract class SettingsMenu {
         }
         return null;
     }
-
-    @JsonIgnore
-    public static <T extends SettingsMenu> T readJson(String json, Class<T> typeClass) {
-        ObjectMapper mapper = ObjectMapperFactory.build();
-        try {
-            T newMenu = mapper.readValue(json, typeClass);
-            return newMenu;
-        } catch (Exception e) {
-            BotLogger.log("Error reading settings menu from json:", e);
-        }
-        return null;
-    }
 }
