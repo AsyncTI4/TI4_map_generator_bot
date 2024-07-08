@@ -115,7 +115,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
             buttons.add(Button.danger("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hits"));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " your opponent needs to assign " + hits + " hits", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + "\n " + player.getRepresentation() + " your opponent needs to assign " + hits + " hits", buttons);
     }
 
     public static void resolveFlawlessStrategy(Player player, Game game, ButtonInteractionEvent event) {
