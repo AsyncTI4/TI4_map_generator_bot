@@ -875,7 +875,7 @@ public class Helper {
 
     public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
 
-        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted:\n" + buildTransactionOffer(p1, p2, game);
+        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted:\n" + buildTransactionOffer(p1, p2, game, false);
         List<String> transactionItems = p1.getTransactionItems();
         List<Player> players = new ArrayList<Player>();
         players.add(p1);
@@ -960,7 +960,7 @@ public class Helper {
         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), summary);
     }
 
-    public static String buildTransactionOffer(Player p1, Player p2, Game game) {
+    public static String buildTransactionOffer(Player p1, Player p2, Game game, boolean publiclyShared) {
         List<String> transactionItems = p1.getTransactionItems();
         String wholeSummary = "";
         List<Player> players = new ArrayList<Player>();
@@ -971,7 +971,12 @@ public class Helper {
             if (sender == p2) {
                 receiver = p1;
             }
+            int num = 1;
             String summary = "**" + sender.getRepresentation(false, false) + " gives " + receiver.getRepresentation(false, false) + " the following:**\n";
+            if (publiclyShared) {
+                summary = sender.getFactionEmoji() + " gives " + receiver.getFactionEmoji() + " the following: ";
+                num = 0;
+            }
             for (String item : transactionItems) {
                 if (item.contains("sending" + sender.getFaction()) && item.contains("receiving" + receiver.getFaction())) {
                     String thingToTransact = item.split("_")[2];
@@ -1019,7 +1024,11 @@ public class Helper {
                                             acID = ac.getKey();
                                         }
                                     }
-                                    summary = summary + Emojis.ActionCard + " " + Mapper.getActionCard(acID).getName() + "\n";
+                                    if (publiclyShared) {
+                                        summary = summary + Emojis.ActionCard + "\n";
+                                    } else {
+                                        summary = summary + Emojis.ActionCard + " " + Mapper.getActionCard(acID).getName() + "\n";
+                                    }
                                 }
                             }
                         }
@@ -1044,7 +1053,11 @@ public class Helper {
                                     if (id == null) {
                                         continue;
                                     }
-                                    summary = summary + Emojis.PN + " " + StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")) + " " + Mapper.getPromissoryNote(id).getName() + "\n";
+                                    if (publiclyShared) {
+                                        summary = summary + Emojis.PN + "\n";
+                                    } else {
+                                        summary = summary + Emojis.PN + " " + StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")) + " " + Mapper.getPromissoryNote(id).getName() + "\n";
+                                    }
                                 }
                             }
                         }
@@ -1061,10 +1074,15 @@ public class Helper {
 
                 }
             }
-            if (StringUtils.countMatches(summary, "\n") > 1) {
+            if (StringUtils.countMatches(summary, "\n") > num) {
+                if (publiclyShared) {
+                    summary = summary.replace("\n", "; ");
+                    summary = summary.substring(0, summary.length() - 2);
+                }
                 wholeSummary = wholeSummary + "\n" + summary;
+
             } else {
-                wholeSummary = wholeSummary + "\n" + summary + getNothingMessage() + "\n";
+                wholeSummary = wholeSummary + "\n" + summary + getNothingMessage();
             }
         }
 
@@ -1449,8 +1467,13 @@ public class Helper {
 
             }
         }
-        msg = msg + "For a total of **" + votes + "** votes on the outcome "
-            + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
+        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor()) != null) {
+            msg = msg + "For a total of **" + votes + "** votes on the outcome "
+                + Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor());
+        } else {
+            msg = msg + "For a total of **" + votes + "** votes on the outcome "
+                + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
+        }
         if (justVoteTotal) {
             return "" + votes;
         }
