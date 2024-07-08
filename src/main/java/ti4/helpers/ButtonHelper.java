@@ -6755,11 +6755,13 @@ public class ButtonHelper {
         List<Collision> issues = new ArrayList<>();
         for (int i = 0; i < players.size(); i++) {
             Player p1 = players.get(i);
+            ColorModel c1 = Mapper.getColor(p1.getColor());
             for (int j = i + 1; j < players.size(); j++) {
                 Player p2 = players.get(j);
+                ColorModel c2 = Mapper.getColor(p2.getColor());
 
-                double contrast = colorContrast(p1.getColor(), p2.getColor());
-                if (contrast < 4.5) {
+                double contrast = c1.contrastWith(c2);
+                if (contrast < 2.5) {
                     Collision e1 = new Collision(p1, p2, contrast);
                     issues.add(e1);
                 }
@@ -6782,82 +6784,6 @@ public class ButtonHelper {
         }
 
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
-    }
-
-    public static double colorContrast(String color1, String color2) {
-        return Math.max(colorPrimaryContrast(color1, color2), colorSecondaryContrast(color1, color2));
-    }
-
-    private static double colorPrimaryContrast(String color1, String color2) {
-        Color c1 = ColorModel.primaryColor(color1);
-        Color c2 = ColorModel.primaryColor(color2);
-        if (c1 == null || c2 == null)
-            return 1;
-
-        double l1 = relativeLuminance(c1);
-        double l2 = relativeLuminance(c2);
-        double contrast = contrastRatio(l1, l2);
-        return contrast;
-    }
-
-    private static double colorSecondaryContrast(String color1, String color2) {
-        Color c1 = ColorModel.secondaryColor(color1);
-        Color c2 = ColorModel.secondaryColor(color2);
-
-        // if there is no secondary color (not a split color), compare on the primary
-        // color
-        double l1 = c1 == null ? relativeLuminance(ColorModel.primaryColor(color1)) : relativeLuminance(c1);
-        double l2 = c2 == null ? relativeLuminance(ColorModel.primaryColor(color2)) : relativeLuminance(c2);
-        double contrast = contrastRatio(l1, l2);
-        return contrast;
-    }
-
-    /**
-     * For the sRGB colorspace, the relative luminance of a color is defined as
-     * <p>
-     * L = 0.2126 * R + 0.7152 * G + 0.0722 * B
-     * <p>
-     * where R, G and B are defined as:
-     * <p>
-     * if XsRGB <= 0.03928 then X = XsRGB/12.92 else X = ((XsRGB+0.055)/1.055) ^ 2.4
-     * <p>
-     * -
-     * <p>
-     * and RsRGB, GsRGB, and BsRGB are defined as:
-     * <p>
-     * XsRGB = X8bit/255
-     */
-    private static double relativeLuminance(Color color) {
-        if (color == null)
-            return 0;
-        double RsRGB = ((double) color.getRed()) / 255.0;
-        double GsRGB = ((double) color.getGreen()) / 255.0;
-        double BsRGB = ((double) color.getBlue()) / 255.0;
-
-        double r = color.getRed() <= 10 ? RsRGB / 12.92 : Math.pow((RsRGB + 0.055) / 1.055, 2.4);
-        double g = color.getGreen() <= 10 ? GsRGB / 12.92 : Math.pow((GsRGB + 0.055) / 1.055, 2.4);
-        double b = color.getBlue() <= 10 ? BsRGB / 12.92 : Math.pow((BsRGB + 0.055) / 1.055, 2.4);
-
-        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
-    }
-
-    /**
-     * To calculate the contrast ratio, the relative luminance of the lighter colour
-     * (L1) is divided through the relative luminance of the darker colour (L2):
-     * <p>
-     * (L1 + 0.05) / (L2 + 0.05)
-     * <p>
-     * This results in a value ranging from 1:1 (no contrast at all) to 21:1 (the
-     * highest possible contrast).
-     *
-     * @param L1 The lighter color (higher luminance)
-     * @param L2 the darker color (lower luminance)
-     * @return contrast ratio (1:x)
-     */
-    private static double contrastRatio(double L1, double L2) {
-        if (L1 < L2)
-            return contrastRatio(L2, L1);
-        return (L1 + 0.05) / (L2 + 0.05);
     }
 
     public static void resolveStellar(Player player, Game game, ButtonInteractionEvent event, String buttonID) {

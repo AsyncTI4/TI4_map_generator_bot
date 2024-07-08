@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 
 @Data
@@ -15,17 +16,42 @@ public class ColorModel implements ModelInterface {
     private String alias;
     private String name;
     private List<String> aliases;
+    private String textColor;
+
+    private Color primaryColor;
+    private Color secondaryColor;
+
+    private String primaryColorRef;
+    private String secondaryColorRef;
 
     public boolean isValid() {
-        return alias != null && name != null;
+        if (primaryColorRef != null && primaryColorRef.equals(name)) return false;
+        if (secondaryColorRef != null && secondaryColorRef.equals(name)) return false;
+        return alias != null && name != null && textColor != null;
+    }
+
+    public Color getPrimaryColor() {
+        return primaryColor();
+    }
+
+    public Color getSecondaryColor() {
+        return secondaryColor();
     }
 
     public Color primaryColor() {
-        return primaryColor(name);
+        if (primaryColor != null)
+            return new Color(primaryColor.getRed(), primaryColor.getGreen(), primaryColor.getBlue());
+        if (primaryColorRef != null)
+            return Mapper.getColor(primaryColorRef).primaryColor();
+        return new Color(255, 255, 255);
     }
 
     public Color secondaryColor() {
-        return secondaryColor(name);
+        if (secondaryColor != null)
+            return new Color(secondaryColor.getRed(), secondaryColor.getGreen(), secondaryColor.getBlue());
+        if (secondaryColorRef != null)
+            return Mapper.getColor(secondaryColorRef).primaryColor();
+        return primaryColor();
     }
 
     @JsonIgnore
@@ -43,85 +69,43 @@ public class ColorModel implements ModelInterface {
         return null;
     }
 
-    //For now these are hardcoded. TODO: add to json file
-    public static Color primaryColor(String color) {
-        if (color == null) {
-            return Color.WHITE;
-        }
-        if (color.startsWith("split")) {
-            color = color.replace("split", "");
-        }
-        if (color.equals("orca")) {
-            color = "lightgray";
-        }
-        return switch (color) {
-            // Rainbow primary is red
-            case "rainbow" -> primaryColor("red");
-            // Normal colors
-            case "black" -> new Color(5, 5, 5);
-            case "blue" -> new Color(2, 63, 201);
-            case "green" -> new Color(0, 173, 61);
-            case "gray", "grey" -> new Color(114, 123, 143);
-            case "orange" -> new Color(205, 123, 0);
-            case "pink" -> new Color(204, 0, 185);
-            case "purple" -> new Color(112, 0, 141);
-            case "red" -> new Color(230, 1, 1);
-            case "yellow" -> new Color(187, 194, 0);
-            case "petrol" -> new Color(92, 156, 160);
-            case "brown" -> new Color(134, 95, 55);
-            case "tan" -> new Color(160, 149, 110);
-            case "forest" -> new Color(98, 139, 105);
-            case "chrome" -> new Color(130, 135, 81);
-            case "sunset" -> new Color(182, 3, 136);
-            case "turquoise" -> new Color(0, 176, 175);
-            case "gold" -> new Color(167, 165, 0);
-            case "lightgray" -> new Color(193, 193, 198);
-            case "bloodred" -> new Color(126, 0, 27);
-            case "chocolate" -> new Color(79, 37, 32);
-            case "teal" -> new Color(0, 220, 241);
-            case "emerald" -> new Color(0, 143, 10);
-            case "navy" -> new Color(3, 26, 150);
-            case "lime" -> new Color(130, 210, 45);
-            case "lavender" -> new Color(154, 142, 230);
-            case "rose" -> new Color(210, 149, 207);
-            case "spring" -> new Color(221, 232, 146);
-            case "ethereal" -> new Color(52, 85, 202);
-            case "orca" -> primaryColor("black");
-            default -> Color.WHITE;
-        };
+    public double contrastWith(ColorModel c2) {
+        double primary1 = primaryLuminance();
+        double primary2 = c2.primaryLuminance();
+        double secondary1 = secondaryLuminance();
+        double secondary2 = c2.secondaryLuminance();
+
+        return Math.max(contrastRatio(primary1, primary2), contrastRatio(secondary1, secondary2));
     }
 
-    //For now these are hardcoded. TODO: add to json file
-    public static Color secondaryColor(String color) {
-        if (color == null) {
-            return null;
-        }
-        return switch (color) {
-            // gradient secondaries // TODO: do these
-            case "rainbow" -> primaryColor("blue");
-            // lightgray secondaries
-            case "splitbloodred" -> primaryColor("lightgray");
-            case "splitchocolate" -> primaryColor("lightgray");
-            case "splitemerald" -> primaryColor("lightgray");
-            case "splitnavy" -> primaryColor("lightgray");
-            case "splitpurple" -> primaryColor("lightgray");
-            case "splitpetrol" -> primaryColor("lightgray");
-            case "splitrainbow" -> primaryColor("lightgray");
-            // orca is special, counts as lightgray secondary
-            case "orca", "splitblack", "splitlightgray" -> primaryColor("lightgray");
-            // black secondaries
-            case "splityellow" -> primaryColor("black");
-            case "splittan" -> primaryColor("black");
-            case "splitturquoise" -> primaryColor("black");
-            case "splitteal" -> primaryColor("black");
-            case "splitpink" -> primaryColor("black");
-            case "splitred" -> primaryColor("black");
-            case "splitorange" -> primaryColor("black");
-            case "splitlime" -> primaryColor("black");
-            case "splitgreen" -> primaryColor("black");
-            case "splitgold" -> primaryColor("black");
-            case "splitblue" -> primaryColor("black");
-            default -> null;
-        };
+    private double primaryLuminance() {
+        return relativeLuminance(primaryColor());
+    }
+
+    private double secondaryLuminance() {
+        return relativeLuminance(secondaryColor());
+    }
+
+    // For the sRGB colorspace, the relative luminance of a color is defined as
+    //    L = 0.2126 * R + 0.7152 * G + 0.0722 * B
+    // where R, G and B are defined as:
+    //    if XsRGB <= 0.03928 then  X = XsRGB/12.92 
+    //    else                      X = ((XsRGB+0.055)/1.055) ^ 2.4
+    private static double relativeLuminance(Color color) {
+        if (color == null) return 0;
+        double RsRGB = ((double) color.getRed()) / 255.0;
+        double GsRGB = ((double) color.getGreen()) / 255.0;
+        double BsRGB = ((double) color.getBlue()) / 255.0;
+        double r = color.getRed() <= 10 ? RsRGB / 12.92 : Math.pow((RsRGB + 0.055) / 1.055, 2.4);
+        double g = color.getGreen() <= 10 ? GsRGB / 12.92 : Math.pow((GsRGB + 0.055) / 1.055, 2.4);
+        double b = color.getBlue() <= 10 ? BsRGB / 12.92 : Math.pow((BsRGB + 0.055) / 1.055, 2.4);
+        return (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+    }
+
+    // This results in a value ranging from 1:1 (no contrast at all) to 21:1 (the highest possible contrast).
+    private static double contrastRatio(double color1, double color2) {
+        if (color1 < color2)
+            return contrastRatio(color2, color1);
+        return (color1 + 0.05) / (color2 + 0.05);
     }
 }
