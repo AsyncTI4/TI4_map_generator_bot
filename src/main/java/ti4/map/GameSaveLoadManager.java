@@ -13,6 +13,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -95,20 +98,20 @@ public class GameSaveLoadManager {
     public static void saveMaps() {
         jsonTime = txtTime = undoTime = 0l;
         // TODO: Make sure all commands and buttons and such actually save the game
-        List<Game> savedGames = new ArrayList<>();
-        List<Game> skippedGames = new ArrayList<>();
-        long loadTime = 0;//GameManager.getInstance().getLoadTime();
+        ConcurrentMap<String, Game> savedGames = new ConcurrentHashMap<>();
+        ConcurrentMap<String, Game> skippedGames = new ConcurrentHashMap<>();
+        long loadTime = GameManager.getInstance().getLoadTime();
         GameManager.getInstance().getGameNameToGame().values().parallelStream().forEach(game -> {
             try {
                 long time = game.getLastModifiedDate();
                 if (time > loadTime) {
                     saveMap(game, true, "Bot Reload");
-                    savedGames.add(game);
+                    savedGames.put(game.getName(), game);
                 } else {
-                    skippedGames.add(game);
+                    skippedGames.put(game.getName(), game);
                 }
             } catch (Exception e) {
-                BotLogger.log("Error saving map: " + game.getName(), e);
+                BotLogger.log("Error saving game: " + game.getName(), e);
             }
         });
 
@@ -1184,7 +1187,6 @@ public class GameSaveLoadManager {
             } catch (IOException e) {
                 BotLogger.log("Could not create folder for maps", e);
             }
-
         }
         return folder.listFiles((directory, fileName) -> fileName.endsWith(".txt"));
     }
@@ -1199,13 +1201,8 @@ public class GameSaveLoadManager {
             } catch (IOException e) {
                 BotLogger.log("Could not create folder for maps", e);
             }
-
         }
-        return folder.listFiles();
-    }
-
-    private static boolean isJSONExtention(File file) {
-        return file.getAbsolutePath().endsWith(JSON);
+        return folder.listFiles((directory, fileName) -> fileName.endsWith(".json"));
     }
 
     public static boolean deleteMap(String mapName) {
@@ -1215,22 +1212,20 @@ public class GameSaveLoadManager {
     }
 
     public static void loadMaps() {
+        long loadStart = System.nanoTime();
         ConcurrentMap<String, Game> mapList = new ConcurrentHashMap<>();
         if (loadFromJSON) {
             File[] jsonFiles = readAllMapJSONFiles();
             if (jsonFiles != null) {
-                for (File file : jsonFiles) {
-                    if (isJSONExtention(file)) {
-                        try {
-                            Game game = loadMapJSON(file);
-                            if (game != null) {
-                                mapList.put(game.getName(), game);
-                            }
-                        } catch (Exception e) {
-                            BotLogger.log("Could not load JSON game:" + file, e);
-                        }
+                Arrays.stream(jsonFiles).parallel().forEach(file -> {
+                    try {
+                        Game game = loadMapJSON(file);
+                        if (game != null && game.getName() != null)
+                            mapList.put(game.getName(), game);
+                    } catch (Exception e) {
+                        BotLogger.log("Could not load JSON game: " + file.getName(), e);
                     }
-                }
+                });
             }
         } else {
             File[] txtFiles = readAllTxtMapFiles();
@@ -1238,17 +1233,17 @@ public class GameSaveLoadManager {
                 Arrays.stream(txtFiles).parallel().forEach(file -> {
                     try {
                         Game game = loadMap(file);
-                        if (game != null && game.getName() != null) {
+                        if (game != null && game.getName() != null)
                             mapList.put(game.getName(), game);
-                        }
                     } catch (Exception e) {
-                        BotLogger.log("Could not load TXT game:" + file, e);
+                        BotLogger.log("Could not load TXT game: " + file.getName(), e);
                     }
                 });
             }
         }
-
-        GameManager.getInstance().setGameNameToGame(mapList);
+        GameManager.getInstance().setGameNameToGame(new HashMap<>(mapList));
+        long loadTime = System.nanoTime() - loadStart;
+        BotLogger.logWithTimestamp(debugString("Time to load `" + mapList.size() + "` games: ", loadTime, loadTime));
     }
 
     @Nullable
@@ -1286,9 +1281,8 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not load map. Map file was null.");
             return null;
         }
-
         Game game = new Game();
-        try (Scanner reader = new Scanner(new BufferedReader(new FileReader(mapFile)))) {
+        try (Scanner reader = new Scanner(mapFile)) {
             game.setOwnerID(reader.nextLine());
             game.setOwnerName(reader.nextLine());
             game.setName(reader.nextLine());
