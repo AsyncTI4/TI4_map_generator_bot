@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -30,22 +31,7 @@ public class JazzCommand extends BothelperSubcommandData {
         //sendJazzButton(event);
 
         Game game = getActiveGame();
-        MiltySettings menu = game.initializeMiltySettings();
-        String json = json(menu);
-        String json2 = "error :(";
-        try {
-            MiltySettings newMenu = mapper.readValue(json, MiltySettings.class);
-            json2 = json(newMenu);
-        } catch (Exception e) {
-            BotLogger.log(event, e);
-        }
-
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), json);
-        if (json.equals(json2)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "# SUCCESS!!!");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), json2);
-        }
+        ButtonHelper.resolveSetupColorChecker(game);
     }
 
     public static void sendJazzButton(GenericInteractionCreateEvent event) {

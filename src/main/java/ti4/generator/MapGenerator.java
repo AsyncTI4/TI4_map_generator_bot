@@ -545,15 +545,14 @@ public class MapGenerator {
     public static void drawPhaseBanner(String phase, int round, GenericInteractionCreateEvent event) {
         BufferedImage bannerImage = new BufferedImage(511, 331, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile(phase + "banner.png"), 511, 331);
-        
+
         Graphics bannerG = bannerImage.getGraphics();
         bannerG.drawImage(backgroundImage, 0, 0, null);
         bannerG.setFont(Storage.getFont48());
         bannerG.setColor(Color.WHITE);
         superDrawString(bannerG, phase.toUpperCase() + " PHASE", 255, 110, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke8, Color.BLACK);
         bannerG.setFont(Storage.getFont32());
-        switch (round)
-        {
+        switch (round) {
             case 1:
                 superDrawString(bannerG, "ROUND ONE", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
                 break;
@@ -4788,13 +4787,11 @@ public class MapGenerator {
 
             Integer unitDamageCount = unitDamage.get(unitKey);
 
-            Color groupUnitColor = Color.WHITE;
             Integer bulkUnitCount = null;
-            Set<String> lightColors = Set.of("ylw", "org", "pnk", "tan", "crm", "sns", "tqs", "gld", "lme", "lvn",
-                "rse", "spr", "tea", "lgy", "eth");
-            if (lightColors.contains(unitKey.getColorID())) {
-                groupUnitColor = Color.BLACK;
-            }
+            Color groupUnitColor = switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
+                case "black" -> Color.black;
+                default -> Color.white;
+            };
 
             try {
                 String unitPath = Tile.getUnitPath(unitKey);
