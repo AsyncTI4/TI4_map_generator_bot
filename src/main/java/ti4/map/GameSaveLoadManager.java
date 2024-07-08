@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1213,7 +1215,7 @@ public class GameSaveLoadManager {
     }
 
     public static void loadMaps() {
-        Map<String, Game> mapList = new HashMap<>();
+        ConcurrentMap<String, Game> mapList = new ConcurrentHashMap<>();
         if (loadFromJSON) {
             File[] jsonFiles = readAllMapJSONFiles();
             if (jsonFiles != null) {
@@ -1284,6 +1286,7 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not load map. Map file was null.");
             return null;
         }
+
         Game game = new Game();
         try (Scanner reader = new Scanner(new BufferedReader(new FileReader(mapFile)))) {
             game.setOwnerID(reader.nextLine());
