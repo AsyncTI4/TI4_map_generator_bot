@@ -336,7 +336,7 @@ public class AgendaHelper {
                     }
                 }
                 if (game.getCurrentAgendaInfo().contains("Secret")) {
-                    game.addLaw(aID, winner);
+                    game.addLaw(aID, Mapper.getSecretObjectivesJustNames().get(winner));
                     Player playerWithSO = null;
 
                     for (Map.Entry<String, Player> playerEntry : game.getPlayers().entrySet()) {
@@ -3345,6 +3345,9 @@ public class AgendaHelper {
     public static Map<String, Integer> getAdditionalVotesFromOtherSources(Game game, Player player) {
         Map<String, Integer> additionalVotesAndSources = new LinkedHashMap<>();
 
+        if (getVoteCountFromPlanets(game, player) == 0) {
+            return additionalVotesAndSources;
+        }
         // Argent Zeal
         if (player.hasAbility("zeal")) {
             long playerCount = game.getPlayers().values().stream().filter(Player::isRealPlayer).count();

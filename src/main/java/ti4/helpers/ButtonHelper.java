@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -7876,7 +7875,7 @@ public class ButtonHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game) + "\n";
+        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false) + "\n";
         String requestOrOffer = "offer";
         if (requesting) {
             requestOrOffer = "request";
@@ -8080,7 +8079,7 @@ public class ButtonHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game) + "\n Click something else for " + p1.getRepresentation(false, false) + " to offer";
+        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false) + "\n Click something else for " + p1.getRepresentation(false, false) + " to offer";
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message, ButtonHelper.getStuffToTransButtonsNew(game, player, p1, p2));
     }
@@ -8094,7 +8093,7 @@ public class ButtonHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game) + "\n Click something for " + p1.getRepresentation(false, false) + " to offer";
+        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false) + "\n Click something for " + p1.getRepresentation(false, false) + " to offer";
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message, ButtonHelper.getStuffToTransButtonsNew(game, player, p1, p2));
     }
@@ -8102,6 +8101,9 @@ public class ButtonHelper {
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " sent " + p2.getFactionEmoji() + " a transaction offer");
+        if (game.getTableTalkChannel() != null) {
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "An offer has been sent by " + player.getFactionEmoji() + " to " + p2.getFactionEmoji() + ". The offer is: " + Helper.buildTransactionOffer(player, p2, game, true));
+        }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.danger("rescindOffer_" + p2.getFaction(), "Rescind Offer"));
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Successfully sent " + p2.getFactionEmoji() + " a transaction offer. You can use this button to rescind the offer", buttons);
@@ -8110,7 +8112,7 @@ public class ButtonHelper {
         buttons.add(Button.success("acceptOffer_" + player.getFaction(), "Accept"));
         buttons.add(Button.danger("rejectOffer_" + player.getFaction(), "Reject"));
         buttons.add(Button.danger("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));
-        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer. The offer is: " + Helper.buildTransactionOffer(player, p2, game) + "\n Click to accept, reject, or counteroffer", buttons);
+        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer. The offer is: " + Helper.buildTransactionOffer(player, p2, game, false) + "\n Click to accept, reject, or counteroffer", buttons);
     }
 
     public static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
