@@ -11,7 +11,7 @@ public class GameManager {
 
     private long loadTime;
     private static GameManager gameManager;
-    private static final Map<String, String> userNameToGameName = new HashMap<>();
+    private static final ConcurrentMap<String, String> userNameToGameName = new ConcurrentHashMap<>();
     private ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
 
     private GameManager() {
