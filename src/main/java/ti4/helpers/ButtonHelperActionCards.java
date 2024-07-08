@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -1693,7 +1694,7 @@ public class ButtonHelperActionCards {
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
             for (int x = 0; x < amount; x++) {
-                Die d1 = new Die(7);
+                Die d1 = new Die(6);
                 msg.append(d1.getResult()).append(", ");
                 if (d1.isSuccess()) {
                     hits++;
