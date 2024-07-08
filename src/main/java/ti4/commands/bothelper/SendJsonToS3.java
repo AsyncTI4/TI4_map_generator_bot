@@ -22,10 +22,10 @@ public class SendJsonToS3 extends BothelperSubcommandData {
         String JSON = ".json";
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
         Game game = GameManager.getInstance().getGame(gameName);
-        GameSaveLoadManager.saveMap(game, event);
         boolean isWon = game.getWinner().isPresent() && game.isHasEnded();
         if (isWon) {
             try {
+                GameSaveLoadManager.saveMapJson(game);
                 File jsonGameFile = Storage.getMapsJSONStorage(game.getName() + JSON);
                 WebHelper.putFile(game.getName(), jsonGameFile);
             } catch (Exception e) {
