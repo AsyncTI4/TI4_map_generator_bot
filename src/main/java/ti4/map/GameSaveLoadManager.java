@@ -1241,7 +1241,7 @@ public class GameSaveLoadManager {
                 });
             }
         }
-        GameManager.getInstance().setGameNameToGame(new HashMap<>(mapList));
+        GameManager.getInstance().setGameNameToGame(mapList);
         long loadTime = System.nanoTime() - loadStart;
         BotLogger.logWithTimestamp(debugString("Time to load `" + mapList.size() + "` games: ", loadTime, loadTime));
     }
