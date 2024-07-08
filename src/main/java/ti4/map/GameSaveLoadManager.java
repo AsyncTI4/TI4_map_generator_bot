@@ -1,24 +1,14 @@
 package ti4.map;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
@@ -1261,20 +1251,6 @@ public class GameSaveLoadManager {
         return null;
     }
 
-    public static Game loadMapJSONString(String mapFile) {
-        ObjectMapper mapper = ObjectMapperFactory.build();
-        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
-        try {
-            return mapper.readValue(mapFile, Game.class);
-        } catch (Exception e) {
-            BotLogger.log("JSON STRING FAILED TO LOAD", e);
-            // System.out.println(mapFile.getAbsolutePath());
-            // System.out.println(ExceptionUtils.getStackTrace(e));
-        }
-
-        return null;
-    }
-
     @Nullable
     public static Game loadMap(File mapFile) {
         if (mapFile == null) {
@@ -1282,12 +1258,13 @@ public class GameSaveLoadManager {
             return null;
         }
         Game game = new Game();
-        try (Scanner reader = new Scanner(mapFile)) {
-            game.setOwnerID(reader.nextLine());
-            game.setOwnerName(reader.nextLine());
-            game.setName(reader.nextLine());
-            while (reader.hasNextLine()) {
-                String data = reader.nextLine();
+        try {
+            Iterator<String> gameFileLines = Files.readAllLines(mapFile.toPath(), Charset.defaultCharset()).listIterator();
+            game.setOwnerID(gameFileLines.next());
+            game.setOwnerName(gameFileLines.next());
+            game.setName(gameFileLines.next());
+            while (gameFileLines.hasNext()) {
+                String data = gameFileLines.next();
                 if (MAPINFO.equals(data)) {
                     continue;
                 }
@@ -1295,8 +1272,8 @@ public class GameSaveLoadManager {
                     break;
                 }
 
-                while (reader.hasNextLine()) {
-                    data = reader.nextLine();
+                while (gameFileLines.hasNext()) {
+                    data = gameFileLines.next();
                     if (GAMEINFO.equals(data)) {
                         continue;
                     }
@@ -1310,8 +1287,8 @@ public class GameSaveLoadManager {
                     }
                 }
 
-                while (reader.hasNextLine()) {
-                    String tmpData = reader.nextLine();
+                while (gameFileLines.hasNext()) {
+                    String tmpData = gameFileLines.next();
                     if (PLAYERINFO.equals(tmpData)) {
                         continue;
                     }
@@ -1319,12 +1296,12 @@ public class GameSaveLoadManager {
                         break;
                     }
                     Player player = null;
-                    while (reader.hasNextLine()) {
-                        data = tmpData != null ? tmpData : reader.nextLine();
+                    while (gameFileLines.hasNext()) {
+                        data = tmpData != null ? tmpData : gameFileLines.next();
                         tmpData = null;
                         if (PLAYER.equals(data)) {
 
-                            player = game.addPlayerLoad(reader.nextLine(), reader.nextLine());
+                            player = game.addPlayerLoad(gameFileLines.next(), gameFileLines.next());
                             continue;
                         }
                         if (ENDPLAYER.equals(data)) {
@@ -1336,8 +1313,8 @@ public class GameSaveLoadManager {
             }
             Map<String, Tile> tileMap = new HashMap<>();
             try {
-                while (reader.hasNextLine()) {
-                    String tileData = reader.nextLine();
+                while (gameFileLines.hasNext()) {
+                    String tileData = gameFileLines.next();
                     if (TILE.equals(tileData)) {
                         continue;
                     }
@@ -1355,8 +1332,8 @@ public class GameSaveLoadManager {
                             + tileData + "` - tile will be skipped - check save file");
                     }
 
-                    while (reader.hasNextLine()) {
-                        String tmpData = reader.nextLine();
+                    while (gameFileLines.hasNext()) {
+                        String tmpData = gameFileLines.next();
                         if (UNITHOLDER.equals(tmpData)) {
                             continue;
                         }
@@ -1364,11 +1341,11 @@ public class GameSaveLoadManager {
                             break;
                         }
                         String spaceHolder = null;
-                        while (reader.hasNextLine()) {
-                            String data = tmpData != null ? tmpData : reader.nextLine();
+                        while (gameFileLines.hasNext()) {
+                            String data = tmpData != null ? tmpData : gameFileLines.next();
                             tmpData = null;
                             if (UNITS.equals(data)) {
-                                spaceHolder = reader.nextLine().toLowerCase();
+                                spaceHolder = gameFileLines.next().toLowerCase();
                                 if (tile != null) {
                                     if (Constants.MIRAGE.equals(spaceHolder)) {
                                         Helper.addMirageToTile(tile);
@@ -1385,8 +1362,8 @@ public class GameSaveLoadManager {
                             readUnit(tile, data, spaceHolder);
                         }
 
-                        while (reader.hasNextLine()) {
-                            String data = reader.nextLine();
+                        while (gameFileLines.hasNext()) {
+                            String data = gameFileLines.next();
                             if (UNITDAMAGE.equals(data)) {
                                 continue;
                             }
@@ -1396,8 +1373,8 @@ public class GameSaveLoadManager {
                             readUnitDamage(tile, data, spaceHolder);
                         }
 
-                        while (reader.hasNextLine()) {
-                            String data = reader.nextLine();
+                        while (gameFileLines.hasNext()) {
+                            String data = gameFileLines.next();
                             if (PLANET_TOKENS.equals(data)) {
                                 continue;
                             }
@@ -1408,8 +1385,8 @@ public class GameSaveLoadManager {
                         }
                     }
 
-                    while (reader.hasNextLine()) {
-                        String data = reader.nextLine();
+                    while (gameFileLines.hasNext()) {
+                        String data = gameFileLines.next();
                         if (TOKENS.equals(data)) {
                             continue;
                         }
@@ -1423,9 +1400,6 @@ public class GameSaveLoadManager {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
             game.setTileMap(tileMap);
-        } catch (FileNotFoundException e) {
-            BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
-            return null;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + mapFile.getName(), e);
             return null;
