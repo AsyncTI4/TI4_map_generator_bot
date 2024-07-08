@@ -101,7 +101,7 @@ public class GameSaveLoadManager {
         // TODO: Make sure all commands and buttons and such actually save the game
         List<Game> savedGames = new ArrayList<>();
         List<Game> skippedGames = new ArrayList<>();
-        long loadTime = 0;//GameManager.getInstance().getLoadTime();
+        long loadTime = GameManager.getInstance().getLoadTime();
         GameManager.getInstance().getGameNameToGame().values().parallelStream().forEach(game -> {
             try {
                 long time = game.getLastModifiedDate();
@@ -205,16 +205,8 @@ public class GameSaveLoadManager {
 
         long jsonStart = System.nanoTime();
         if (loadFromJSON || System.getenv("TESTING") != null) {
-            ObjectMapper mapper = ObjectMapperFactory.build();
-            try {
-                mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON), game);
-            } catch (IOException e) {
-                BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
-            } catch (Exception e) {
-                BotLogger.log("JSON SAVER", e);
-            }
-            if (loadFromJSON)
-                return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
+            saveMapJson(game);
+            if (loadFromJSON) return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
         }
         jsonTime += System.nanoTime() - jsonStart;
 
@@ -253,6 +245,17 @@ public class GameSaveLoadManager {
 
         long savetime = System.nanoTime() - saveStart;
         saveTimes.add(savetime);
+    }
+
+    public static void saveMapJson(Game game) {
+        ObjectMapper mapper = ObjectMapperFactory.build();
+        try {
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON), game);
+        } catch (IOException e) {
+            BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
+        } catch (Exception e) {
+            BotLogger.log("JSON SAVER", e);
+        }
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {

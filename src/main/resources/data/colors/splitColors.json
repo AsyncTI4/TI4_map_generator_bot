@@ -1,0 +1,154 @@
+[
+    {
+        "alias": "orca",
+        "name": "orca",
+        "aliases": ["orca"],
+        "textColor": "white",
+        "primaryColorRef": "lightgray",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitred",
+        "name": "splitred",
+        "aliases": ["splitred"],
+        "textColor": "white",
+        "primaryColorRef": "red",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitblu",
+        "name": "splitblue",
+        "aliases": ["splitblu", "splitblue"],
+        "textColor": "white",
+        "primaryColorRef": "blue",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitgrn",
+        "name": "splitgreen",
+        "aliases": ["splitgrn", "splitgreen"],
+        "textColor": "white",
+        "primaryColorRef": "green",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitppl",
+        "name": "splitpurple",
+        "aliases": ["splitppl", "splitpurple"],
+        "textColor": "white",
+        "primaryColorRef": "purple",
+        "secondaryColorRef": "lightgray"
+    },
+    {
+        "alias": "splitorg",
+        "name": "splitorange",
+        "aliases": ["splitorg", "splitorange"],
+        "textColor": "white",
+        "primaryColorRef": "orange",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitylw",
+        "name": "splityellow",
+        "aliases": ["splitylw", "splityellow"],
+        "textColor": "white",
+        "primaryColorRef": "yellow",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitpnk",
+        "name": "splitpink",
+        "aliases": ["splitpnk", "splitpink"],
+        "textColor": "white",
+        "primaryColorRef": "pink",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitlme",
+        "name": "splitlime",
+        "aliases": ["splitlme", "splitlime"],
+        "textColor": "white",
+        "primaryColorRef": "lime",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splittan",
+        "name": "splittan",
+        "aliases": ["splittan", "splittan"],
+        "textColor": "white",
+        "primaryColorRef": "tan",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splittea",
+        "name": "splitteal",
+        "aliases": ["splittea", "splitteal"],
+        "textColor": "white",
+        "primaryColorRef": "teal",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitptr",
+        "name": "splitpetrol",
+        "aliases": ["splitptr", "splitpetrol"],
+        "textColor": "white",
+        "primaryColorRef": "petrol",
+        "secondaryColorRef": "lightgray"
+    },
+    {
+        "alias": "splittqs",
+        "name": "splitturquoise",
+        "aliases": ["splittqs", "splitturquoise"],
+        "textColor": "white",
+        "primaryColorRef": "turquoise",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitgld",
+        "name": "splitgold",
+        "aliases": ["splitgld", "splitgold"],
+        "textColor": "white",
+        "primaryColorRef": "gold",
+        "secondaryColorRef": "black"
+    },
+    {
+        "alias": "splitbld",
+        "name": "splitbloodred",
+        "aliases": ["splitbld", "splitbloodred"],
+        "textColor": "white",
+        "primaryColorRef": "bloodred",
+        "secondaryColorRef": "lightgray"
+    },
+    {
+        "alias": "splitnvy",
+        "name": "splitnavy",
+        "aliases": ["splitnvy", "splitnavy"],
+        "textColor": "white",
+        "primaryColorRef": "navy",
+        "secondaryColorRef": "lightgray"
+    },
+    {
+        "alias": "splitchk",
+        "name": "splitchocolate",
+        "aliases": ["splitchk", "splitchocolate"],
+        "textColor": "white",
+        "primaryColorRef": "chocolate",
+        "secondaryColorRef": "lightgray"
+    },
+    {
+        "alias": "spliteme",
+        "name": "splitemerald",
+        "aliases": ["spliteme", "splitemerald"],
+        "textColor": "white",
+        "primaryColorRef": "emerald",
+        "secondaryColorRef": "lightgray"
+    },
+    {
+        "alias": "splitrbw",
+        "name": "splitrainbow",
+        "aliases": ["splitrbw", "splitrainbow"],
+        "textColor": "white",
+        "primaryColorRef": "rainbow",
+        "secondaryColorRef": "lightgray"
+    }
+]

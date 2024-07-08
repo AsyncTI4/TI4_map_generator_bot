@@ -2929,7 +2929,7 @@ public class Player {
         StringBuilder foot = new StringBuilder();
         eb.setFooter(foot.toString());
 
-        eb.setColor(ColorModel.primaryColor(color));
+        eb.setColor(Mapper.getColor(color).primaryColor());
         return eb.build();
     }
 

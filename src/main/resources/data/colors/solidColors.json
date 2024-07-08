@@ -1,0 +1,142 @@
+[
+    {
+        "alias": "lgy",
+        "name": "lightgray",
+        "aliases": ["lgy"],
+        "textColor": "black",
+        "primaryColor": { "red": 206, "green": 206, "blue": 206 }
+    },
+    {
+        "alias": "red",
+        "name": "red",
+        "aliases": ["red", "red"],
+        "textColor": "white",
+        "primaryColor": { "red": 240, "green": 6, "blue": 6 }
+    },
+    {
+        "alias": "org",
+        "name": "orange",
+        "aliases": ["orange", "E", "org"],
+        "textColor": "black",
+        "primaryColor": { "red": 240, "green": 180, "blue": 6 }
+    },
+    {
+        "alias": "ylw",
+        "name": "yellow",
+        "aliases": ["yellow", "Y", "ylw"],
+        "textColor": "black",
+        "primaryColor": { "red": 245, "green": 245, "blue": 6 }
+    },
+    {
+        "alias": "grn",
+        "name": "green",
+        "aliases": ["green", "green", "grn"],
+        "textColor": "white",
+        "primaryColor": { "red": 6, "green": 175, "blue": 50 }
+    },
+    {
+        "alias": "blu",
+        "name": "blue",
+        "aliases": ["blue", "blue", "blu"],
+        "textColor": "white",
+        "primaryColor": { "red": 6, "green": 75, "blue": 203 }
+    },
+    {
+        "alias": "ppl",
+        "name": "purple",
+        "aliases": ["purple", "P", "ppl"],
+        "textColor": "white",
+        "primaryColor": { "red": 146, "green": 6, "blue": 186 }
+    },
+    {
+        "alias": "pnk",
+        "name": "pink",
+        "aliases": ["pink", "K", "pnk"],
+        "textColor": "black",
+        "primaryColor": { "red": 240, "green": 138, "blue": 240 }
+    },
+    {
+        "alias": "blk",
+        "name": "black",
+        "aliases": ["black", "blk"],
+        "textColor": "white",
+        "primaryColor": { "red": 50, "green": 50, "blue": 50 }
+    },
+    {
+        "alias": "ptr",
+        "name": "petrol",
+        "aliases": ["ptr"],
+        "textColor": "white",
+        "primaryColor": { "red": 66, "green": 140, "blue": 140 }
+    },
+    {
+        "alias": "bwn",
+        "name": "brown",
+        "aliases": ["bwn"],
+        "textColor": "white",
+        "primaryColor": { "red": 150, "green": 80, "blue": 42 }
+    },
+    {
+        "alias": "gry",
+        "name": "gray",
+        "aliases": ["gray", "grey", "white", "W", "gry"],
+        "textColor": "white",
+        "primaryColor": { "red": 110, "green": 122, "blue": 150 }
+    },
+    {
+        "alias": "tan",
+        "name": "tan",
+        "aliases": ["tan"],
+        "textColor": "black",
+        "primaryColor": { "red": 172, "green": 160, "blue": 116 }
+    },
+    {
+        "alias": "frs",
+        "name": "forest",
+        "aliases": ["frs"],
+        "textColor": "white",
+        "primaryColor": { "red": 90, "green": 150, "blue": 100 }
+    },
+    {
+        "alias": "tea",
+        "name": "teal",
+        "aliases": ["tea"],
+        "textColor": "black",
+        "primaryColor": { "red": 0, "green": 235, "blue": 255 }
+    },
+    {
+        "alias": "rse",
+        "name": "rose",
+        "aliases": ["rse"],
+        "textColor": "black",
+        "primaryColor": { "red": 217, "green": 165, "blue": 229 }
+    },
+    {
+        "alias": "lme",
+        "name": "lime",
+        "aliases": ["lme"],
+        "textColor": "black",
+        "primaryColor": { "red": 177, "green": 229, "blue": 165 }
+    },
+    {
+        "alias": "lvn",
+        "name": "lavender",
+        "aliases": ["lvn"],
+        "textColor": "black",
+        "primaryColor": { "red": 169, "green": 167, "blue": 231 }
+    },
+    {
+        "alias": "spr",
+        "name": "spring",
+        "aliases": ["spr"],
+        "textColor": "black",
+        "primaryColor": { "red": 219, "green": 231, "blue": 167 }
+    },
+    {
+        "alias": "eth",
+        "name": "ethereal",
+        "aliases": ["eth"],
+        "textColor": "black",
+        "primaryColor": { "red": 35, "green": 104, "blue": 200 }
+    }
+]
