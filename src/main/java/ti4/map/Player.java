@@ -1060,6 +1060,7 @@ public class Player {
         removePromissoryNotesInPlayArea(id);
     }
 
+    @JsonIgnore
     public int getMaxSOCount() {
         int maxSOCount = getGame().getMaxSOCountPerPlayer();
         if (hasRelic("obsidian"))
@@ -1357,6 +1358,7 @@ public class Player {
         return getRepresentation(false, false);
     }
 
+    @JsonIgnore
     public String getRepresentation(boolean overrideFow, boolean ping) {
         Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
