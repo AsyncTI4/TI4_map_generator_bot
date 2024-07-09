@@ -1,0 +1,11 @@
+{"id":"s16","name":"Agnar Vath","aliases":["s16","agnarvath"],"imagePath":"S16_AgnarVath.png","planets":["agnarvath"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{"id":"s17","name":"Belsung IX","aliases":["s17","belsungix"],"imagePath":"S17_BelsungIX.png","planets":["belsungix"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{"id":"s18","name":"Cycada VII","aliases":["s18","cycadavii"],"imagePath":"S18_CycadaVII.png","planets":["cycadavii"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{"id":"s19","name":"Iota 8217","aliases":["s19","iota8217","iota"],"imagePath":"S19_Iota8218.png","planets":["iota8217"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{"id":"s20","name":"Dryptaar","aliases":["s20","dryptaar"],"imagePath":"S20_Dryptaar.png","planets":["dryptaar"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{"id":"s21","name":"Briis Theta","aliases":["s21","briistheta"],"imagePath":"S21_BriisTheta.png","planets":["briistheta"],"shipPositionsType":"TYPE04","tileBack":"blue","source":"somno"}
+{"id":"s22","name":"Trith Tao/Trith Chek","aliases":["s22","trithtao","trithchek"],"imagePath":"S22_TrithTao.png","planets":["trithtao","trithchek"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{"id":"s23","name":"Trisrodh/Brakke","aliases":["s23","trisrodh","brakke"],"imagePath":"S23_Trisrodh.png","planets":["trisrodh","brakke"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{"id":"s24","name":"Evita XL/Gryphon III","aliases":["s24","evitaxl","gryphoniii"],"imagePath":"S24_EvitaXL.png","planets":["evitaxl","gryphoniii"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{"id":"s25","name":"Jaferra/Suul Mogg","aliases":["s25","jaferra","suulmogg"],"imagePath":"S25_Jaferra.png","planets":["jaferra","suulmogg"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
+{"id":"s26","name":"Drak Mor II/Drak Mor VI","aliases":["s26","drakmorii","drakmorvi","drakmor","drak"],"imagePath":"S26_DrakMorII.png","planets":["drakmorii","drakmorvi"],"shipPositionsType":"TYPE05","tileBack":"blue","source":"somno"}
