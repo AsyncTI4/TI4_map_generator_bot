@@ -83,6 +83,7 @@ public class Constants {
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
+    public static final String NOTEPAD = "notepad";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";

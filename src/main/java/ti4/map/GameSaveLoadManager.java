@@ -204,16 +204,8 @@ public class GameSaveLoadManager {
 
         long jsonStart = System.nanoTime();
         if (loadFromJSON || System.getenv("TESTING") != null) {
-            ObjectMapper mapper = ObjectMapperFactory.build();
-            try {
-                mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON), game);
-            } catch (IOException e) {
-                BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
-            } catch (Exception e) {
-                BotLogger.log("JSON SAVER", e);
-            }
-            if (loadFromJSON)
-                return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
+            saveMapJson(game);
+            if (loadFromJSON) return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
         }
         jsonTime += System.nanoTime() - jsonStart;
 
@@ -252,6 +244,17 @@ public class GameSaveLoadManager {
 
         long savetime = System.nanoTime() - saveStart;
         saveTimes.add(savetime);
+    }
+
+    public static void saveMapJson(Game game) {
+        ObjectMapper mapper = ObjectMapperFactory.build();
+        try {
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON), game);
+        } catch (IOException e) {
+            BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
+        } catch (Exception e) {
+            BotLogger.log("JSON SAVER", e);
+        }
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
@@ -866,6 +869,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ELIMINATED + " " + player.isEliminated());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.NOTEPAD + " " + player.getNotes());
             writer.write(System.lineSeparator());
 
             // BENTOR Ancient Blueprints
@@ -2288,6 +2294,7 @@ public class GameSaveLoadManager {
                 case Constants.AFK_HOURS -> player.setHoursThatPlayerIsAFK(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
+                case Constants.NOTEPAD -> player.setNotes(tokenizer.nextToken());
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
