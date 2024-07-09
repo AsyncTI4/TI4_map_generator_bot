@@ -1316,7 +1316,7 @@ public class ButtonHelperFactionSpecific {
                             + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false)
                             + "\nUse the below button if you want to play RA to get it.";
                         Button transact = Button.success("resolvePNPlay_ra_" + AliasHandler.resolveTech(tech),
-                            "Acquire " + tech);
+                            "Acquire " + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false));
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(transact);
                         buttons.add(Button.danger("deleteButtons", "Decline"));

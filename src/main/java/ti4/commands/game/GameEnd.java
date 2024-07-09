@@ -242,6 +242,7 @@ public class GameEnd extends GameSubcommandData {
                 }
 
                 // send game json file to s3
+                GameSaveLoadManager.saveMapJson(game);
                 File jsonGameFile = Storage.getMapsJSONStorage(game.getName() + ".json");
                 boolean isWon = game.getWinner().isPresent() && game.isHasEnded();
                 if (isWon) {

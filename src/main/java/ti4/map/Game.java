@@ -588,7 +588,7 @@ public class Game {
     }
 
     public MiltySettings initializeMiltySettings() {
-        if (miltySettings != null) {
+        if (miltySettings == null) {
             if (miltyJson != null) {
                 try {
                     JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
