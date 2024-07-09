@@ -872,6 +872,9 @@ public class GameSaveLoadManager {
             writer.write(Constants.ELIMINATED + " " + player.isEliminated());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.NOTEPAD + " " + player.getNotes());
+            writer.write(System.lineSeparator());
+
             // BENTOR Ancient Blueprints
             writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.hasFoundCulFrag());
             writer.write(System.lineSeparator());
@@ -2309,6 +2312,7 @@ public class GameSaveLoadManager {
                 case Constants.AFK_HOURS -> player.setHoursThatPlayerIsAFK(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
+                case Constants.NOTEPAD -> player.setNotes(tokenizer.nextToken());
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));

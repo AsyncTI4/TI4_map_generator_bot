@@ -311,7 +311,6 @@ public class CardsInfo implements Command, InfoThreadCommand {
         if (!hadAnyUnplayedSCs) {
             buttons.add(Button.danger("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
         }
-        buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));
         buttons.add(Buttons.REFRESH_INFO);
 
         List<String> phasesBeforeAction = List.of("action", "strategy", "playerSetup");
@@ -324,6 +323,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
             // after the action phase round 1, show the edit summary button by default
             buttons.add(Buttons.EDIT_SUMMARIES);
         }
+        buttons.add(Buttons.POST_NOTEPAD);
+        buttons.add(Buttons.EDIT_NOTEPAD);
+        buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             "You can use these buttons to do various things", buttons);
