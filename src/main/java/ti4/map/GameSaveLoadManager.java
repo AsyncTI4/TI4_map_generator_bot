@@ -91,12 +91,12 @@ public class GameSaveLoadManager {
 
     // Log the save times for each map for benchmarking
     private static final List<Long> saveTimes = new ArrayList<>();
-    private static long jsonTime = 0l;
-    private static long txtTime = 0l;
-    private static long undoTime = 0l;
+    private static long jsonTime = 0L;
+    private static long txtTime = 0L;
+    private static long undoTime = 0L;
 
     public static void saveMaps() {
-        jsonTime = txtTime = undoTime = 0l;
+        jsonTime = txtTime = undoTime = 0L;
         // TODO: Make sure all commands and buttons and such actually save the game
         ConcurrentMap<String, Game> savedGames = new ConcurrentHashMap<>();
         ConcurrentMap<String, Game> skippedGames = new ConcurrentHashMap<>();
