@@ -13,14 +13,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -98,25 +96,25 @@ public class GameSaveLoadManager {
     public static void saveMaps() {
         jsonTime = txtTime = undoTime = 0L;
         // TODO: Make sure all commands and buttons and such actually save the game
-        ConcurrentMap<String, Game> savedGames = new ConcurrentHashMap<>();
-        ConcurrentMap<String, Game> skippedGames = new ConcurrentHashMap<>();
+        AtomicInteger savedGamesCount = new AtomicInteger();
+        AtomicInteger skippedGamesCount = new AtomicInteger();
         long loadTime = GameManager.getInstance().getLoadTime();
         GameManager.getInstance().getGameNameToGame().values().parallelStream().forEach(game -> {
             try {
                 long time = game.getLastModifiedDate();
                 if (time > loadTime) {
                     saveMap(game, true, "Bot Reload");
-                    savedGames.put(game.getName(), game);
+                    savedGamesCount.getAndIncrement();
                 } else {
-                    skippedGames.put(game.getName(), game);
+                    skippedGamesCount.getAndIncrement();
                 }
             } catch (Exception e) {
                 BotLogger.log("Error saving game: " + game.getName(), e);
             }
         });
 
-        BotLogger.logWithTimestamp("**__Saved `" + savedGames.size() + "` games.__**");
-        BotLogger.logWithTimestamp("**__Skipped saving `" + skippedGames.size() + "` games.__**");
+        BotLogger.logWithTimestamp("**__Saved `" + savedGamesCount.get() + "` games.__**");
+        BotLogger.logWithTimestamp("**__Skipped saving `" + skippedGamesCount.get() + "` games.__**");
 
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (debug && !saveTimes.isEmpty()) {
