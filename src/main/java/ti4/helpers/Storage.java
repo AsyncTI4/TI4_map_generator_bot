@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.message.BotLogger;
 
@@ -234,42 +235,52 @@ public class Storage {
         return tiFont;
     }
 
+    @NotNull
     public static File getMapUndoStorage(String mapName) {
         return new File(getStoragePath() + MAPS_UNDO + mapName);
     }
 
+    @NotNull
     public static File getMapUndoDirectory() {
         return new File(getStoragePath() + MAPS_UNDO);
     }
 
+    @NotNull
     public static File getMapImageStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
+    @NotNull
     public static File getMapImageDirectory() {
         return new File(getStoragePath() + MAPS);
     }
 
+    @NotNull
     public static File getMapStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
+    @NotNull
     public static File getDeletedMapStorage(String mapName) {
         return new File(getStoragePath() + DELETED_MAPS + mapName);
     }
-
+  
+    @NotNull
     public static File getTTPGExportDirectory() {
         return new File(getStoragePath() + TTPG_EXPORTS);
     }
 
+    @NotNull
     public static File getTTPGExportStorage(String fileName) {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
+    @NotNull
     public static File getMapsJSONDirectory() {
         return new File(getStoragePath() + MAPS_JSON);
     }
 
+    @NotNull
     public static File getMapsJSONStorage(String fileName) {
         return new File(getStoragePath() + MAPS_JSON + fileName);
     }

@@ -122,14 +122,13 @@ public class GameSaveLoadManager {
             for (long time : saveTimes)
                 tot += time;
 
-            StringBuilder sb = new StringBuilder("Map save time stats:\n```fix");
-            sb.append("\n").append(debugString("        total:", tot, tot));
-            sb.append("\n").append(debugString("          txt:", txtTime, tot));
-            sb.append("\n").append(debugString("         json:", jsonTime, tot));
-            sb.append("\n").append(debugString("    undo file:", undoTime, tot));
-            sb.append("\n").append(debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot));
-            sb.append("\n```");
-            BotLogger.logWithTimestamp(sb.toString());
+            String sb = "Map save time stats:\n```fix" + "\n" + debugString("        total:", tot, tot) +
+                    "\n" + debugString("          txt:", txtTime, tot) +
+                    "\n" + debugString("         json:", jsonTime, tot) +
+                    "\n" + debugString("    undo file:", undoTime, tot) +
+                    "\n" + debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot) +
+                    "\n```";
+            BotLogger.logWithTimestamp(sb);
         }
     }
 
@@ -1258,22 +1257,6 @@ public class GameSaveLoadManager {
             return mapper.readValue(mapFile, Game.class);
         } catch (Exception e) {
             BotLogger.log(mapFile.getName() + "JSON FAILED TO LOAD", e);
-            // System.out.println(mapFile.getAbsolutePath());
-            // System.out.println(ExceptionUtils.getStackTrace(e));
-        }
-
-        return null;
-    }
-
-    public static Game loadMapJSONString(String mapFile) {
-        ObjectMapper mapper = ObjectMapperFactory.build();
-        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
-        try {
-            return mapper.readValue(mapFile, Game.class);
-        } catch (Exception e) {
-            BotLogger.log("JSON STRING FAILED TO LOAD", e);
-            // System.out.println(mapFile.getAbsolutePath());
-            // System.out.println(ExceptionUtils.getStackTrace(e));
         }
 
         return null;
@@ -1281,8 +1264,9 @@ public class GameSaveLoadManager {
 
     @Nullable
     public static Game loadMap(File mapFile) {
-        if (mapFile == null) {
-            BotLogger.log("Could not load map. Map file was null.");
+        if (mapFile == null || !mapFile.exists()) {
+            BotLogger.log("Could not save map, map file does not exist: " +
+                    (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
             return null;
         }
         Game game = new Game();
@@ -1327,7 +1311,6 @@ public class GameSaveLoadManager {
                         data = tmpData != null ? tmpData : reader.nextLine();
                         tmpData = null;
                         if (PLAYER.equals(data)) {
-
                             player = game.addPlayerLoad(reader.nextLine(), reader.nextLine());
                             continue;
                         }
@@ -1368,6 +1351,7 @@ public class GameSaveLoadManager {
                             break;
                         }
                         String spaceHolder = null;
+
                         while (reader.hasNextLine()) {
                             String data = tmpData != null ? tmpData : reader.nextLine();
                             tmpData = null;
@@ -1420,23 +1404,20 @@ public class GameSaveLoadManager {
                         if (ENDTOKENS.equals(data)) {
                             break;
                         }
-                        readTokens(tile, data);
+                        // readTokens(tile, data);
                     }
                 }
             } catch (Exception e) {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
             game.setTileMap(tileMap);
-        } catch (FileNotFoundException e) {
-            BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
-            return null;
+            game.endGameIfOld();
+            return game;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + mapFile.getName(), e);
-            return null;
         }
 
-        game.endGameIfOld();
-        return game;
+        return null;
     }
 
     private static void readGameInfo(Game game, String data) {
@@ -2570,14 +2551,6 @@ public class GameSaveLoadManager {
                 tile.addToken(token, unitHolderName);
             }
         }
-    }
-
-    private static void readTokens(Tile tile, String data) {
-        if (tile == null)
-            return;
-        // StringTokenizer tokenizer = new StringTokenizer(data, " ");
-        // tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
-        // todo implement token read
     }
 
     private static void savePeekedPublicObjectives(Writer writer, final String constant, Map<String, List<String>> peekedPOs) {
