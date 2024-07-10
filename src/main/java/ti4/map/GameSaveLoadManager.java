@@ -1210,6 +1210,9 @@ public class GameSaveLoadManager {
 
     public static boolean deleteMap(String mapName) {
         File mapStorage = Storage.getMapStorage(mapName + TXT);
+        if (!mapStorage.exists()) {
+            return false;
+        }
         File deletedMapStorage = Storage.getDeletedMapStorage(mapName + "_" + System.currentTimeMillis() + TXT);
         return mapStorage.renameTo(deletedMapStorage);
     }
