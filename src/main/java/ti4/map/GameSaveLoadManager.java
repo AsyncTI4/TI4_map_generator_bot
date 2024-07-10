@@ -11,10 +11,14 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -89,25 +93,25 @@ public class GameSaveLoadManager {
     public static void saveMaps() {
         jsonTime = txtTime = undoTime = 0L;
         // TODO: Make sure all commands and buttons and such actually save the game
-        List<Game> savedGames = new ArrayList<>();
-        List<Game> skippedGames = new ArrayList<>();
+        AtomicInteger savedGamesCount = new AtomicInteger();
+        AtomicInteger skippedGamesCount = new AtomicInteger();
         long loadTime = GameManager.getInstance().getLoadTime();
         GameManager.getInstance().getGameNameToGame().values().parallelStream().forEach(game -> {
             try {
                 long time = game.getLastModifiedDate();
                 if (time > loadTime) {
                     saveMap(game, true, "Bot Reload");
-                    savedGames.add(game);
+                    savedGamesCount.getAndIncrement();
                 } else {
-                    skippedGames.add(game);
+                    skippedGamesCount.getAndIncrement();
                 }
             } catch (Exception e) {
                 BotLogger.log("Error saving map: " + game.getName(), e);
             }
         });
 
-        BotLogger.logWithTimestamp("**__Saved `" + savedGames.size() + "` games.__**");
-        BotLogger.logWithTimestamp("**__Skipped saving `" + skippedGames.size() + "` games.__**");
+        BotLogger.logWithTimestamp("**__Saved `" + savedGamesCount.get() + "` games.__**");
+        BotLogger.logWithTimestamp("**__Skipped saving `" + skippedGamesCount.get() + "` games.__**");
 
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         if (debug && !saveTimes.isEmpty()) {
@@ -115,7 +119,8 @@ public class GameSaveLoadManager {
             for (long time : saveTimes)
                 tot += time;
 
-            String sb = "Map save time stats:\n```fix" + "\n" + debugString("        total:", tot, tot) +
+            String sb = "Map save time stats:\n```fix" +
+                    "\n" + debugString("        total:", tot, tot) +
                     "\n" + debugString("          txt:", txtTime, tot) +
                     "\n" + debugString("         json:", jsonTime, tot) +
                     "\n" + debugString("    undo file:", undoTime, tot) +
@@ -200,7 +205,7 @@ public class GameSaveLoadManager {
         jsonTime += System.nanoTime() - jsonStart;
 
         File mapFile = Storage.getMapImageStorage(game.getName() + TXT);
-        if (mapFile == null) {
+        if (!mapFile.exists()) {
             BotLogger.log("Could not save map, error creating save file");
             return;
         }
@@ -232,8 +237,8 @@ public class GameSaveLoadManager {
         }
         undoTime += System.nanoTime() - undoStart;
 
-        long savetime = System.nanoTime() - saveStart;
-        saveTimes.add(savetime);
+        long saveTime = System.nanoTime() - saveStart;
+        saveTimes.add(saveTime);
     }
 
     public static void saveMapJson(Game game) {
@@ -1030,21 +1035,7 @@ public class GameSaveLoadManager {
             writer.write(Constants.LEADERS + " " + leaderInfo);
             writer.write(System.lineSeparator());
 
-            StringBuilder fogOfWarSystems = new StringBuilder();
-            Map<String, String> fow_systems = player.getFogTiles();
-            Map<String, String> fow_labels = player.getFogLabels();
-            for (String key : fow_systems.keySet()) {
-                String system = fow_systems.get(key);
-                String label = fow_labels.get(key);
-                if (label != null)
-                    label = label.replaceAll(" ", "—"); // replace spaces with em dash
-                fogOfWarSystems.append(key);
-                fogOfWarSystems.append(",");
-                fogOfWarSystems.append(system);
-                fogOfWarSystems.append(",");
-                fogOfWarSystems.append(label == null || "".equals(label) ? "." : label);
-                fogOfWarSystems.append(";");
-            }
+            StringBuilder fogOfWarSystems = getFowSystems(player);
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
             writer.write(System.lineSeparator());
 
@@ -1080,6 +1071,25 @@ public class GameSaveLoadManager {
 
         writer.write(ENDMAPINFO);
         writer.write(System.lineSeparator());
+    }
+
+    private static StringBuilder getFowSystems(Player player) {
+        StringBuilder fogOfWarSystems = new StringBuilder();
+        Map<String, String> fow_systems = player.getFogTiles();
+        Map<String, String> fow_labels = player.getFogLabels();
+        for (String key : fow_systems.keySet()) {
+            String system = fow_systems.get(key);
+            String label = fow_labels.get(key);
+            if (label != null)
+                label = label.replaceAll(" ", "—"); // replace spaces with em dash
+            fogOfWarSystems.append(key);
+            fogOfWarSystems.append(",");
+            fogOfWarSystems.append(system);
+            fogOfWarSystems.append(",");
+            fogOfWarSystems.append(label == null || label.isEmpty() ? "." : label);
+            fogOfWarSystems.append(";");
+        }
+        return fogOfWarSystems;
     }
 
     private static void writeCards(Map<String, Integer> cardList, Writer writer, String saveID) throws IOException {
@@ -1185,35 +1195,13 @@ public class GameSaveLoadManager {
             }
 
         }
-        return folder.listFiles();
-    }
-
-    private static File[] readAllMapJSONFiles() {
-        File folder = Storage.getMapsJSONDirectory();
-        if (!folder.exists()) {
-            try {
-                if (folder.createNewFile()) {
-                    folder = Storage.getMapImageDirectory();
-                }
-            } catch (IOException e) {
-                BotLogger.log("Could not create folder for maps", e);
-            }
-
-        }
-        return folder.listFiles();
-    }
-
-    private static boolean isTxtExtention(File file) {
-        return file.getAbsolutePath().endsWith(TXT);
-    }
-
-    private static boolean isJSONExtention(File file) {
-        return file.getAbsolutePath().endsWith(JSON);
+        File[] files = folder.listFiles((directory, fileName) -> fileName.endsWith(".txt"));
+        return files == null ? new File[0] : files;
     }
 
     public static boolean deleteMap(String mapName) {
         File mapStorage = Storage.getMapStorage(mapName + TXT);
-        if (mapStorage == null) {
+        if (!mapStorage.exists()) {
             return false;
         }
         File deletedMapStorage = Storage.getDeletedMapStorage(mapName + "_" + System.currentTimeMillis() + TXT);
@@ -1221,55 +1209,20 @@ public class GameSaveLoadManager {
     }
 
     public static void loadMaps() {
-        Map<String, Game> mapList = new HashMap<>();
-        if (loadFromJSON) {
-            File[] jsonFiles = readAllMapJSONFiles();
-            if (jsonFiles != null) {
-                for (File file : jsonFiles) {
-                    if (isJSONExtention(file)) {
-                        try {
-                            Game game = loadMapJSON(file);
-                            if (game != null) {
-                                mapList.put(game.getName(), game);
-                            }
-                        } catch (Exception e) {
-                            BotLogger.log("Could not load JSON game:" + file, e);
-                        }
-                    }
+        ConcurrentMap<String, Game> mapList = new ConcurrentHashMap<>();
+        File[] txtFiles = readAllMapFiles();
+        Arrays.stream(txtFiles).forEach(file -> {
+            try {
+                Game game = loadMap(file);
+                if (game != null && game.getName() != null) {
+                    mapList.put(game.getName(), game);
                 }
+            } catch (Exception e) {
+                BotLogger.log("Could not load TXT game:" + file, e);
             }
-        } else {
-            File[] txtFiles = readAllMapFiles();
-            if (txtFiles != null) {
-                for (File file : txtFiles) {
-                    if (isTxtExtention(file)) {
-                        try {
-                            Game game = loadMap(file);
-                            if (game != null && game.getName() != null) {
-                                mapList.put(game.getName(), game);
-                            }
-                        } catch (Exception e) {
-                            BotLogger.log("Could not load TXT game:" + file, e);
-                        }
-                    }
-                }
-            }
-        }
+        });
 
         GameManager.getInstance().setGameNameToGame(mapList);
-    }
-
-    @Nullable
-    private static Game loadMapJSON(File mapFile) {
-        ObjectMapper mapper = ObjectMapperFactory.build();
-        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
-        try {
-            return mapper.readValue(mapFile, Game.class);
-        } catch (Exception e) {
-            BotLogger.log(mapFile.getName() + "JSON FAILED TO LOAD", e);
-        }
-
-        return null;
     }
 
     @Nullable
