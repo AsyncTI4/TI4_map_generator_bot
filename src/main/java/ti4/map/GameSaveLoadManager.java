@@ -10,10 +10,14 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.JavaType;
@@ -198,7 +202,7 @@ public class GameSaveLoadManager {
         jsonTime += System.nanoTime() - jsonStart;
 
         File mapFile = Storage.getMapImageStorage(game.getName() + TXT);
-        if (mapFile == null) {
+        if (!mapFile.exists()) {
             BotLogger.log("Could not save map, error creating save file");
             return;
         }
@@ -1171,6 +1175,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
+    @NotNull
     private static File[] readAllTxtMapFiles() {
         File folder = Storage.getMapImageDirectory();
         if (!folder.exists()) {
@@ -1182,21 +1187,8 @@ public class GameSaveLoadManager {
                 BotLogger.log("Could not create folder for maps", e);
             }
         }
-        return folder.listFiles((directory, fileName) -> fileName.endsWith(".txt"));
-    }
-
-    private static File[] readAllMapJSONFiles() {
-        File folder = Storage.getMapsJSONDirectory();
-        if (!folder.exists()) {
-            try {
-                if (folder.createNewFile()) {
-                    folder = Storage.getMapImageDirectory();
-                }
-            } catch (IOException e) {
-                BotLogger.log("Could not create folder for maps", e);
-            }
-        }
-        return folder.listFiles((directory, fileName) -> fileName.endsWith(".json"));
+        File[] files = folder.listFiles((directory, fileName) -> fileName.endsWith(".txt"));
+        return files == null ? new File[0] : files;
     }
 
     public static boolean deleteMap(String mapName) {
@@ -1210,56 +1202,25 @@ public class GameSaveLoadManager {
 
     public static void loadMaps() {
         long loadStart = System.nanoTime();
-        ConcurrentMap<String, Game> mapList = new ConcurrentHashMap<>();
-        if (loadFromJSON) {
-            File[] jsonFiles = readAllMapJSONFiles();
-            if (jsonFiles != null) {
-                Arrays.stream(jsonFiles).parallel().forEach(file -> {
-                    try {
-                        Game game = loadMapJSON(file);
-                        if (game != null && game.getName() != null)
-                            mapList.put(game.getName(), game);
-                    } catch (Exception e) {
-                        BotLogger.log("Could not load JSON game: " + file.getName(), e);
-                    }
-                });
+        ConcurrentMap<String, Game> games = new ConcurrentHashMap<>();
+        Arrays.stream(readAllTxtMapFiles()).forEach(file -> {
+            try {
+                Game game = loadMap(file);
+                if (game != null && game.getName() != null)
+                    games.put(game.getName(), game);
+            } catch (Exception e) {
+                BotLogger.log("Could not load game: " + file.getName(), e);
             }
-        } else {
-            File[] txtFiles = readAllTxtMapFiles();
-            if (txtFiles != null) {
-                Arrays.stream(txtFiles).parallel().forEach(file -> {
-                    try {
-                        Game game = loadMap(file);
-                        if (game != null && game.getName() != null)
-                            mapList.put(game.getName(), game);
-                    } catch (Exception e) {
-                        BotLogger.log("Could not load TXT game: " + file.getName(), e);
-                    }
-                });
-            }
-        }
-        GameManager.getInstance().setGameNameToGame(mapList);
+        });
+        GameManager.getInstance().setGameNameToGame(games);
         long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + mapList.size() + "` games: ", loadTime, loadTime));
-    }
-
-    @Nullable
-    private static Game loadMapJSON(File mapFile) {
-        ObjectMapper mapper = ObjectMapperFactory.build();
-        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
-        try {
-            return mapper.readValue(mapFile, Game.class);
-        } catch (Exception e) {
-            BotLogger.log(mapFile.getName() + "JSON FAILED TO LOAD", e);
-        }
-
-        return null;
+        BotLogger.logWithTimestamp(debugString("Time to load `" + games.size() + "` games: ", loadTime, loadTime));
     }
 
     @Nullable
     public static Game loadMap(File mapFile) {
         if (mapFile == null || !mapFile.exists()) {
-            BotLogger.log("Could not save map, map file does not exist: " +
+            BotLogger.log("Could not load map, map file does not exist: " +
                     (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
             return null;
         }
