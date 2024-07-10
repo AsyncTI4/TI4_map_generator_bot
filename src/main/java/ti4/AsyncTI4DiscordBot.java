@@ -234,66 +234,31 @@ public class AsyncTI4DiscordBot {
         // Async: Stroter's Paradise
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
-            if (guildSecondary != null) {
-                CommandListUpdateAction commandsD = guildSecondary.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-                commandsD.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildSecondary.getName());
-                guilds.add(guildSecondary);
-                serversToCreateNewGamesOn.add(guildSecondary);
-            }
+            startBot(commandManager, guildSecondary);
         }
 
         // Async: Dreadn't
         if (args.length >= 7) {
             guildTertiary = jda.getGuildById(args[6]);
-            if (guildTertiary != null) {
-                CommandListUpdateAction commandsD = guildTertiary.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-                commandsD.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildTertiary.getName());
-                guilds.add(guildTertiary);
-                serversToCreateNewGamesOn.add(guildTertiary);
-            }
+            startBot(commandManager, guildTertiary);
         }
 
         // Async: War Sun Tzu
         if (args.length >= 8) {
             guildQuaternary = jda.getGuildById(args[7]);
-            if (guildQuaternary != null) {
-                CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-                commandsD.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuaternary.getName());
-                guilds.add(guildQuaternary);
-                serversToCreateNewGamesOn.add(guildQuaternary);
-            }
+            startBot(commandManager, guildQuaternary);
         }
 
         // Async: Fighter Club
         if (args.length >= 9) {
             guildQuinary = jda.getGuildById(args[8]);
-            if (guildQuinary != null) {
-                CommandListUpdateAction commandsD = guildQuinary.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-                commandsD.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuinary.getName());
-                guilds.add(guildQuinary);
-                serversToCreateNewGamesOn.add(guildQuinary);
-            }
+            startBot(commandManager, guildQuinary);
         }
 
         // Async: Tommer Hawk
         if (args.length >= 10) {
             guildSenary = jda.getGuildById(args[9]);
-            if (guildSenary != null) {
-                CommandListUpdateAction commandsD = guildSenary.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-                commandsD.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildSenary.getName());
-                guilds.add(guildSenary);
-                serversToCreateNewGamesOn.add(guildSenary);
-            }
+            startBot(commandManager, guildSenary);
         }
 
         // LOAD DATA
@@ -345,6 +310,17 @@ public class AsyncTI4DiscordBot {
                 e.printStackTrace();
             }
         }));
+    }
+
+    private static void startBot(CommandManager commandManager, Guild guildQuaternary) {
+        if (guildQuaternary != null) {
+            CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
+            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+            commandsD.queue();
+            BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuaternary.getName());
+            guilds.add(guildQuaternary);
+            serversToCreateNewGamesOn.add(guildQuaternary);
+        }
     }
 
     /**
