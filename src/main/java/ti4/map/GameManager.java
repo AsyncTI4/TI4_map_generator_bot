@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class GameManager {
 
-    private long loadTime;
+    private final long loadTime;
     private static GameManager gameManager;
     private static final ConcurrentMap<String, String> userNameToGameName = new ConcurrentHashMap<>();
     private ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
