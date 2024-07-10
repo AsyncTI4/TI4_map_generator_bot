@@ -4,15 +4,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class GameManager {
 
     private long loadTime;
     private static GameManager gameManager;
-    private static final ConcurrentMap<String, String> userNameToGameName = new ConcurrentHashMap<>();
-    private ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
+    private static final Map<String, String> userNameToGameName = new HashMap<>();
+    private Map<String, Game> gameNameToGame = new HashMap<>();
 
     private GameManager() {
         loadTime = new Date().getTime();
@@ -29,7 +27,7 @@ public class GameManager {
         return gameNameToGame;
     }
 
-    public void setGameNameToGame(ConcurrentMap<String, Game> gameNameToGame) {
+    public void setGameNameToGame(Map<String, Game> gameNameToGame) {
         this.gameNameToGame = gameNameToGame;
     }
 
