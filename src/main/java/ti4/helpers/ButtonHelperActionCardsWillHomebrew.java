@@ -234,12 +234,11 @@ public class ButtonHelperActionCardsWillHomebrew {
     }
 
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
-        List<String> types = new ArrayList<String>(List.of("hazardous", "cultural", "industrial", "frontier"));
+        List<String> types = new ArrayList<>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
         for (String type : types) {
             List<String> deck = game.getExploreDeck(type);
-            String topCard = deck.get(0);
-            String cardID = topCard;
+            String cardID = deck.get(0);
 
             ExploreModel card = Mapper.getExplore(cardID);
             String cardType = card.getResolution();
@@ -250,8 +249,8 @@ public class ButtonHelperActionCardsWillHomebrew {
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             } else {
-                sb.append("Looked at the top of the " + type + " deck and saw that it was not a relic frag.\n");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), Mapper.getExplore(cardID).getName());
+                sb.append("Looked at the top of the ").append(type).append(" deck and saw that it was not a relic frag.\n");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
             }
         }
         ButtonHelper.fullCommanderUnlockCheck(player, game, "kollecc", event);
@@ -365,7 +364,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static List<Button> getStrandedShipButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getPlanetUnitHolders().size() == 0 && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            if (tile.getPlanetUnitHolders().isEmpty() && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
                 buttons.add(Button.success("strandedShipStep2_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
 
