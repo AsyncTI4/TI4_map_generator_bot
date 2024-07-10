@@ -12,6 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,8 +30,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.bothelper.CreateGameChannels;
@@ -40,6 +41,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -237,7 +239,7 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
 
-            autoPingGames();
+            autoPingGames(event);
             handleFoWWhispersAndFowCombats(event, msg);
             mapLog(event, msg);
             saveJSONInTTPGExportsChannel(event);
@@ -269,13 +271,14 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private void autoPingGames() {
+    private void autoPingGames(MessageReceivedEvent event) {
         Game mapreference = GameManager.getInstance().getGame("finreference");
+        if (mapreference == null) return;
         int multiplier = 1000; // should be 1000
-        if (mapreference != null
-            && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10 * 60 * multiplier) // 10
-                                                                                                                                          // minutes
-        {
+        int tenMin = 10 * 60 * multiplier; // 10 minutes
+        long timeSinceLast = (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime();
+
+        if (timeSinceLast > tenMin) {
             mapreference.setLastTimeGamesChecked(new Date());
             List<String> storedValues = new ArrayList<>();
             storedValues.addAll(mapreference.getMessagesThatICheckedForAllReacts().keySet());
@@ -284,7 +287,7 @@ public class MessageListener extends ListenerAdapter {
                     mapreference.removeStoredValue(value);
                 }
             }
-            GameSaveLoadManager.saveMap(mapreference);
+            GameSaveLoadManager.saveMap(mapreference, "Auto Ping");
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
 
             for (Game game : mapList.values()) {
@@ -321,10 +324,7 @@ public class MessageListener extends ListenerAdapter {
                                                 .append(
                                                     " has been played and now it has been half the alloted time and you havent reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                                                sb.append("Message link is: ")
-                                                    .append(game.getStoredValue("scPlay" + sc)
-                                                        .replace("666fin", ":"))
-                                                    .append("\n");
+                                                sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                                             }
                                             sb.append("You currently have ").append(p2.getStrategicCC())
                                                 .append(" CC in your strategy pool.");
@@ -426,6 +426,17 @@ public class MessageListener extends ListenerAdapter {
                                         && milliSinceLastPing > (60 * 5 * multiplier) && (60 * 60 * multiplier * spacer) > milliSinceLastPing) {
                                         ping = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinance";
                                     }
+                                    String playersInCombat = game.getStoredValue("factionsInCombat");
+                                    if (playersInCombat.contains(player.getFaction())) {
+                                        for (Player p2 : game.getRealPlayers()) {
+                                            if (p2 == player) {
+                                                continue;
+                                            }
+                                            if (playersInCombat.contains(p2.getFaction())) {
+                                                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
+                                            }
+                                        }
+                                    }
                                 }
                                 if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
                                     AgendaHelper.pingMissingPlayers(game);
@@ -445,23 +456,23 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 4)) {
                                         ping = realIdentity
-                                            + " this is a sternly worded letter from the bot regarding your noted absence. Do you know how much paperwork this creates? (none in reality but a lot in theory)";
+                                            + " this is a sternly worded letter from the bot regarding your noted absence.";
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 5)) {
                                         ping = realIdentity
-                                            + " this is a firm request from the bot that you do something to end this situation. At this rate you will never make the top 100 fastest players";
+                                            + " this is a firm request from the bot that you do something to end this situation.";
                                     }
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 6)) {
                                         ping = realIdentity
-                                            + " Half dozen times the charm they say. I have it on good authority that if you move in the next 10 ms, you're guaranteed to win the next combat you have, bot's honor. Wait too long though and your dice get cursed. ";
+                                            + " Half dozen times the charm they say. ";
                                     }
                                     if (pingNumber == 7) {
                                         ping = realIdentity
-                                            + " I can write whatever I want here, not like it's likely that you've checked in to read any of it anyways.";
+                                            + " I can write whatever I want here, not like you've checked in to read any of it anyways.";
                                     }
                                     if (pingNumber == 8) {
                                         ping = realIdentity
-                                            + " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the angry bear";
+                                            + " You should end turn soon, there might be a bear on the loose, and you know which friend gets eaten by the bear";
                                     }
                                     if (pingNumber == 9) {
                                         ping = realIdentity
@@ -644,7 +655,7 @@ public class MessageListener extends ListenerAdapter {
                                     player.setWhetherPlayerShouldBeTenMinReminded(false);
                                 }
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game);
+                                GameSaveLoadManager.saveMap(game, "Auto Ping");
                             }
                         }
                     } else {
@@ -653,7 +664,7 @@ public class MessageListener extends ListenerAdapter {
                             if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
                                 AgendaHelper.pingMissingPlayers(game);
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game);
+                                GameSaveLoadManager.saveMap(game, "Auto Ping");
                             }
 
                         }
@@ -700,10 +711,13 @@ public class MessageListener extends ListenerAdapter {
             if (game != null && game.getBotFactionReacts() && !game.isFoWMode()) {
                 Player player = game.getPlayer(event.getAuthor().getId());
                 if (game.isCommunityMode()) {
-                    Collection<Player> players = game.getPlayers().values();
+
                     List<Role> roles = event.getMember().getRoles();
-                    for (Player player2 : players) {
+                    for (Player player2 : game.getRealPlayers()) {
                         if (roles.contains(player2.getRoleForCommunity())) {
+                            player = player2;
+                        }
+                        if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
                             player = player2;
                         }
                     }
@@ -770,6 +784,7 @@ public class MessageListener extends ListenerAdapter {
                     if (roles.contains(player2.getRoleForCommunity())) {
                         player3 = player2;
                     }
+
                 }
             }
 
@@ -838,10 +853,12 @@ public class MessageListener extends ListenerAdapter {
             } else if (game != null) {
                 Player player = game.getPlayer(event.getAuthor().getId());
                 if (game.isCommunityMode()) {
-                    Collection<Player> players = game.getPlayers().values();
                     List<Role> roles = event.getMember().getRoles();
-                    for (Player player2 : players) {
+                    for (Player player2 : game.getRealPlayers()) {
                         if (roles.contains(player2.getRoleForCommunity())) {
+                            player = player2;
+                        }
+                        if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
                             player = player2;
                         }
                     }
@@ -887,24 +904,12 @@ public class MessageListener extends ListenerAdapter {
                 } else if (messageToMyself) {
                     String previousThoughts = "";
                     if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
-                        previousThoughts = game
-                            .getStoredValue("futureMessageFor" + player.getFaction()) + "; ";
+                        previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
                     }
-                    game.setStoredValue("futureMessageFor" + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
+                    game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
                 } else if (endOfRoundSummery) {
-                    String previousThoughts = "";
-                    if (!game.getStoredValue(messageBeginning.toLowerCase() + player.getFaction()).isEmpty()) {
-                        previousThoughts = game
-                            .getStoredValue(messageBeginning.toLowerCase() + player.getFaction()) + "; ";
-                    }
-                    game.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin").replace("\n", ". "));
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        player.getFactionEmoji() + " stored an end of round summary");
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Someone stored an end of round summary");
+                    RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true);
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);
@@ -919,10 +924,8 @@ public class MessageListener extends ListenerAdapter {
                             break;
                         }
                     }
-                    game.setStoredValue("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction(),
-                        game.getStoredValue(
-                            "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " "
-                            + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
+                    String futureMsgKey = "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction();
+                    game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent someone else a future message");
                 }
                 msg.delete().queue();

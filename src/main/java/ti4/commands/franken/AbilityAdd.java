@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -42,6 +44,33 @@ public class AbilityAdd extends AbilityAddRemove {
                         player.setTrapCard(key);
                     }
                 }
+            }
+            if (abilityID.equalsIgnoreCase("private_fleet")) {
+                String unitID = AliasHandler.resolveUnit("destroyer");
+                player.setUnitCap(unitID, 12);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
+            }
+            if (abilityID.equalsIgnoreCase("industrialists")) {
+                String unitID = AliasHandler.resolveUnit("spacedock");
+                player.setUnitCap(unitID, 4);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Set spacedock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
+            }
+            if (abilityID.equalsIgnoreCase("teeming")) {
+                String unitID = AliasHandler.resolveUnit("dreadnought");
+                player.setUnitCap(unitID, 7);
+                unitID = AliasHandler.resolveUnit("mech");
+                player.setUnitCap(unitID, 5);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Set dread unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
+                        + " due to the teeming ability");
+            }
+            if (abilityID.equalsIgnoreCase("diplomats")) {
+                ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Set up free people ability markers. " + player.getRepresentation(true, true)
+                        + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

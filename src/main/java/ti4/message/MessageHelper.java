@@ -100,6 +100,8 @@ public class MessageHelper {
 	}
 
 	public static List<Button> addUndoButtonToList(List<Button> buttons, Game game) {
+		if (game == null) return buttons;
+
 		boolean undoPresent = false;
 		List<Button> newButtons = new ArrayList<>(buttons);
 		for (Button button : buttons) {
@@ -330,10 +332,13 @@ public class MessageHelper {
 						}
 
 						// CLEAN UP "UP NEXT" MESSAGE
-						if (message.toLowerCase().contains("up next") && message.contains("#")) {
+						if (message.toLowerCase().contains("up next")) {
 							if (game.getLatestUpNextMsg() != null && !"".equalsIgnoreCase(game.getLatestUpNextMsg())) {
 								String id = game.getLatestUpNextMsg().split("_")[0];
-								String msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1).replace("#", "");
+								String msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1);
+								// if (message.contains("# ")) {
+								// 	msg = game.getLatestUpNextMsg().substring(game.getLatestUpNextMsg().indexOf("_") + 1).replace("#", "");
+								// }
 								msg = msg.replace("UP NEXT", "started their turn");
 								game.getActionsChannel().editMessageById(id, msg).queue(null,
 									error -> BotLogger.log(getRestActionFailureMessage(channel, "Error editing message", messageCreateData, error)));

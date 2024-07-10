@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.message.BotLogger;
 
@@ -36,6 +37,7 @@ public class Storage {
     private static Font TI_FONT_32;
     private static Font TI_FONT_35;
     private static Font TI_FONT_40;
+    private static Font TI_FONT_48;
     private static Font TI_FONT_50;
     private static Font TI_FONT_64;
     private static Font TI_FONT_80;
@@ -163,6 +165,14 @@ public class Storage {
         return TI_FONT_40;
     }
 
+    public static Font getFont48() {
+        if (TI_FONT_48 != null) {
+            return TI_FONT_48;
+        }
+        TI_FONT_48 = getFont(48f);
+        return TI_FONT_48;
+    }
+
     public static Font getFont50() {
         if (TI_FONT_50 != null) {
             return TI_FONT_50;
@@ -225,52 +235,52 @@ public class Storage {
         return tiFont;
     }
 
-    @Nullable
+    @NotNull
     public static File getMapUndoStorage(String mapName) {
         return new File(getStoragePath() + MAPS_UNDO + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapUndoDirectory() {
         return new File(getStoragePath() + MAPS_UNDO);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapImageStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapImageDirectory() {
         return new File(getStoragePath() + MAPS);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getDeletedMapStorage(String mapName) {
         return new File(getStoragePath() + DELETED_MAPS + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getTTPGExportDirectory() {
         return new File(getStoragePath() + TTPG_EXPORTS);
     }
 
-    @Nullable
+    @NotNull
     public static File getTTPGExportStorage(String fileName) {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapsJSONDirectory() {
         return new File(getStoragePath() + MAPS_JSON);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapsJSONStorage(String fileName) {
         return new File(getStoragePath() + MAPS_JSON + fileName);
     }

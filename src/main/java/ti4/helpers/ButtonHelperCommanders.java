@@ -90,7 +90,7 @@ public class ButtonHelperCommanders {
         Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         count = Math.max(p.getInfluence(), p.getResources());
         player.setTg(oldTg + count);
-        new PlanetExhaust().doAction(player, planet, game);
+        PlanetExhaust.doAction(player, planet, game);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         String msg = player.getRepresentation(true, true) + " used Olradin Commander to exhaust "
@@ -187,8 +187,9 @@ public class ButtonHelperCommanders {
     }
 
     public static void handleRavenCommander(ButtonContext context) {
-        Game game = context.game;
-        Player player = context.player;
+        Game game = context.getGame();
+        Player player = context.getPlayer();
+        String buttonID = context.getButtonID();
 
         String part1 = "ravenMigration";
         String part2 = part1 + "_" + RegexHelper.posRegex(game, "posfrom");
@@ -199,14 +200,14 @@ public class ButtonHelperCommanders {
         Matcher matcher;
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
-        if ((matcher = Pattern.compile(part1).matcher(context.buttonID)).matches()) {
+        if ((matcher = Pattern.compile(part1).matcher(buttonID)).matches()) {
             String message = player.getRepresentation() + " Choose a tile to migrate from:";
             Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
-            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, context.buttonID, pred, false);
+            List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             ButtonHelper.deleteTheOneButton(context.getEvent());
 
-        } else if ((matcher = Pattern.compile(part2).matcher(context.buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             newMessage = player.getRepresentation() + " You are migrating from " + from.getRepresentationForButtons(game, player) + ". Choose a unit you'd like to move:";
             for (UnitHolder uh : from.getUnitHolders().values()) {
@@ -223,7 +224,7 @@ public class ButtonHelperCommanders {
                     .forEach(newButtons::add);
             }
 
-        } else if ((matcher = Pattern.compile(part3).matcher(context.buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part3).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             String unitHolderFrom = matcher.group("planetfrom");
             PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
@@ -243,7 +244,7 @@ public class ButtonHelperCommanders {
                 }
             }
 
-        } else if ((matcher = Pattern.compile(part4).matcher(context.buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part4).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             String unitHolderFrom = matcher.group("planetfrom");
             PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
@@ -262,7 +263,7 @@ public class ButtonHelperCommanders {
                 newButtons.add(Button.success(prefix + uh.getName(), planetNameTo));
             }
 
-        } else if ((matcher = Pattern.compile(part5).matcher(context.buttonID)).matches()) {
+        } else if ((matcher = Pattern.compile(part5).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
             String unitHolderFrom = matcher.group("planetfrom");
             PlanetModel planet = Mapper.getPlanet(unitHolderFrom);
@@ -283,7 +284,7 @@ public class ButtonHelperCommanders {
             String message = player.getRepresentation() + " your " + unitType.humanReadableName() + " successfully migrated " + fromLang + ", and has landed itself " + toLang;
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.deleteMessage(context.event);
+            ButtonHelper.deleteMessage(context.getEvent());
         }
 
         if (newMessage != null) {
@@ -389,8 +390,8 @@ public class ButtonHelperCommanders {
         if (player.hasUnit("kolume_mech")) {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
-                    if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
-                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
+                    if (uH.getUnitDamageCount(UnitType.Mech, player.getColorID()) > 0) {
+                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColorID()));
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
                     }
                 }
@@ -400,7 +401,7 @@ public class ButtonHelperCommanders {
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
-                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColor()));
+                        uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColorID()));
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
                     }
                 }

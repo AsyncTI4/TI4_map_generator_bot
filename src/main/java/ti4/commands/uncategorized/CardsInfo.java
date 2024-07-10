@@ -2,6 +2,7 @@ package ti4.commands.uncategorized;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -298,6 +299,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
         Button listGames = Button.secondary("searchMyGames", "List All My Games");
         buttons.add(listGames);
         buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
+        if (!game.isFoWMode()) {
+            buttons.add(Button.secondary("checkWHView", "Check Wormholes"));
+        }
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
             if (!game.getPlayedSCs().contains(SC)) {
@@ -307,8 +311,21 @@ public class CardsInfo implements Command, InfoThreadCommand {
         if (!hadAnyUnplayedSCs) {
             buttons.add(Button.danger("resolvePreassignment_Pre Pass " + player.getFaction(), "Pass on Next Turn"));
         }
-        buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));
         buttons.add(Buttons.REFRESH_INFO);
+
+        List<String> phasesBeforeAction = List.of("action", "strategy", "playerSetup");
+        boolean hasSummary = false;
+        for (int x = 1; x <= game.getRound(); ++x) {
+            if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty())
+                hasSummary = true;
+        }
+        if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getCurrentPhase()) || hasSummary) {
+            // after the action phase round 1, show the edit summary button by default
+            buttons.add(Buttons.EDIT_SUMMARIES);
+        }
+        buttons.add(Buttons.POST_NOTEPAD);
+        buttons.add(Buttons.EDIT_NOTEPAD);
+        buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             "You can use these buttons to do various things", buttons);

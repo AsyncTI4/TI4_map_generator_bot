@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -114,7 +115,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
             buttons.add(Button.danger("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hits"));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " your opponent needs to assign " + hits + " hits", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + "\n " + player.getRepresentation() + " your opponent needs to assign " + hits + " hits", buttons);
     }
 
     public static void resolveFlawlessStrategy(Player player, Game game, ButtonInteractionEvent event) {
@@ -236,17 +237,20 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<String> types = new ArrayList<String>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
         for (String type : types) {
-            String cardID = game.drawExplore(type);
+            List<String> deck = game.getExploreDeck(type);
+            String topCard = deck.get(0);
+            String cardID = topCard;
 
             ExploreModel card = Mapper.getExplore(cardID);
             String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+                cardID = game.drawExplore(type);
                 sb.append(Mapper.getExplore(cardID).getName()).append(System.lineSeparator());
                 sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             } else {
-                sb.append("Looked at the top of the " + type + " deck and saw that it was not a relic frag");
+                sb.append("Looked at the top of the " + type + " deck and saw that it was not a relic frag.\n");
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), Mapper.getExplore(cardID).getName());
             }
         }

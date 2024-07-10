@@ -13,10 +13,10 @@
         "alias": "nf_bws",
         "name": "Bacterial Weapons Systems",
         "types": [
-            "BIOTIC",
-            "WARFARE"
+            "WARFARE",
+            "BIOTIC"
         ],
-        "requirements": "BR",
+        "requirements": "RG",
         "source": "nomadfalcon",
         "text": "After 1 of your opponents ships are destroyed you may exhyast this card to destroy 2 infantry in the space area of the active system.\nThis card counts as either a red or green prerequiste."
     },
@@ -77,10 +77,10 @@
         "alias": "nf_ni",
         "name": "Neural Implants",
         "types": [
-            "BIOTIC",
-            "CYBERNETIC"
+            "CYBERNETIC",
+            "BIOTIC"
         ],
-        "requirements": "YB",
+        "requirements": "YG",
         "source": "nomadfalcon",
         "text": "At the start of your turn you may remove 1 of your infantry from the game board to gain 1 trade good.\nThis card counts as either a green or yellow prerequsite."
     },

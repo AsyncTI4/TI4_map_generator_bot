@@ -25,6 +25,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
+import ti4.generator.MapGenerator;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -36,6 +37,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -105,6 +107,7 @@ public class TurnEnd extends PlayerSubcommandData {
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         game.setTemporaryPingDisable(false);
         game.setStoredValue("lawsDisabled", "no");
+        game.setStoredValue("endTurnWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -155,7 +158,7 @@ public class TurnEnd extends PlayerSubcommandData {
                 //  Block of code to handle errors
             }
         }
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
         }
@@ -235,7 +238,11 @@ public class TurnEnd extends PlayerSubcommandData {
     }
 
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
-        String message = "All players passed. Please score objectives. " + game.getPing();
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
+        if (game.getShowBanners()) {
+            MapGenerator.drawPhaseBanner("status", game.getRound(), event);
+        }
+        String message = "Please score objectives, " + game.getPing() + ".";
 
         game.setCurrentPhase("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", new Date().getTime() + "");
@@ -401,9 +408,11 @@ public class TurnEnd extends PlayerSubcommandData {
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), ms2);
             }
-            String endOfRoundMessage = p2.getRepresentation() + " you can write down your end of round thoughts, to be shared at the end of the game. Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing). Simply start your message with endofround" + game.getRound()
-                + " (capitalization doesnt matter) and the rest of the message will get recorded. You can do multiple messages, and they'll all get added onto eachother.";
-            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), endOfRoundMessage);
+            Button editSummary = RoundSummaryHelper.editSummaryButton(game, p2, game.getRound());
+            String endOfRoundMessage = p2.getRepresentation();
+            endOfRoundMessage += " you can write down your end of round thoughts, to be shared at the end of the game.";
+            endOfRoundMessage += " Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing).";
+            MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), endOfRoundMessage, editSummary);
         }
 
         String key2 = "queueToScorePOs";

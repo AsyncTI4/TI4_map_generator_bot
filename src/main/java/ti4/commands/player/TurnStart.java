@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
 import ti4.commands.uncategorized.CardsInfo;
+import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -87,7 +88,7 @@ public class TurnStart extends PlayerSubcommandData {
                 goingToPass = true;
             }
         }
-        String text = "# " + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
+        String text = "" + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
@@ -134,6 +135,10 @@ public class TurnStart extends PlayerSubcommandData {
                 game.setTileAsPinged(x, null);
             }
         } else {
+            //checkhere
+            if (game.getShowBanners()) {
+                MapGenerator.drawBanner(player);
+            }
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, buttonText, buttons);
@@ -162,8 +167,7 @@ public class TurnStart extends PlayerSubcommandData {
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 player.getRepresentation(true, true) + " you left yourself the following message: \n"
-                    + game.getStoredValue("futureMessageFor" + player.getFaction())
-                        .replace("666fin", ":"));
+                    + game.getStoredValue("futureMessageFor" + player.getFaction()));
             game.setStoredValue("futureMessageFor" + player.getFaction(), "");
         }
         for (Player p2 : game.getRealPlayers()) {
@@ -171,8 +175,7 @@ public class TurnStart extends PlayerSubcommandData {
                 .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
                 .isEmpty()) {
                 String msg2 = "This is a message sent from the past:\n" + game
-                    .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
-                    .replace("666fin", ":");
+                    .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction());
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                     p2.getRepresentation(true, true) + " your future message got delivered");
                 Whisper.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
@@ -231,8 +234,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(game, sc));
                 if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                    sb.append(" ")
-                        .append(game.getStoredValue("scPlay" + sc).replace("666fin", ":"));
+                    sb.append(" ").append(game.getStoredValue("scPlay" + sc));
                 }
                 sb.append("\n");
                 sendReminder = true;
@@ -297,9 +299,7 @@ public class TurnStart extends PlayerSubcommandData {
                             .append(
                                 " has been played and now it is their turn again and you still havent reacted. If you already reacted, check if your reaction got undone");
                         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                            sb.append("Message link is: ").append(
-                                game.getStoredValue("scPlay" + sc).replace("666fin", ":"))
-                                .append("\n");
+                            sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                         }
                         sb.append("You currently have ").append(p2.getStrategicCC())
                             .append(" CC in your strategy pool.");

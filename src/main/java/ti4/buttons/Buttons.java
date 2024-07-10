@@ -14,6 +14,9 @@ public class Buttons {
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
 
     // Cards Info Buttons
+    public static final Button EDIT_SUMMARIES = blue("editEndOfRoundSummaries", "Edit round summaries");
+    public static final Button EDIT_NOTEPAD = blue("notepadEdit~MDL", "Edit your notepad");
+    public static final Button POST_NOTEPAD = blue("notepadPost", "Post your notepad");
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
     public static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info");
     public static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info");

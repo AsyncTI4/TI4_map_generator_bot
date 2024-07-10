@@ -191,7 +191,7 @@ public class StartCombat extends CombatSubcommandData {
                     Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
                         "Remove Structures"));
                 buttons.add(Button.secondary("deleteButtons", "Dont remove Structures"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), msg2, buttons);
             }
         } else {
             StartCombat.findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
@@ -221,6 +221,8 @@ public class StartCombat extends CombatSubcommandData {
         if (!game.isFoWMode()) {
             channel = game.getMainGameChannel();
         }
+        game.setStoredValue("factionsInCombat", player1.getFaction()+"_"+player2.getFaction());
+        
 
         StartCombat.sendStartOfCombatSecretMessages(game, player1, player2, tile, spaceOrGround, unitHolderName);
         String combatName2 = "combatRoundTracker" + player1.getFaction() + tile.getPosition() + unitHolderName;

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.generator.Mapper;
+import ti4.generator.MapGenerator;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -42,12 +43,29 @@ public class RevealAgenda extends AgendaSubcommandData {
     }
 
     public static void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Game game, MessageChannel channel) {
+        if(game.getMainGameChannel() != null){
+            channel = game.getMainGameChannel();
+        }
         if (!game.getStoredValue("lastAgendaReactTime").isEmpty()
             && ((new Date().getTime()) - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake");
             return;
         }
+        
+        String agendaCount = game.getStoredValue("agendaCount");
+        int aCount = 0;
+        if (agendaCount.isEmpty()) {
+            aCount = 1;
+        } else {
+            aCount = Integer.parseInt(agendaCount) + 1;
+        }
+        game.setStoredValue("agendaCount", aCount + "");
+        if (aCount == 1 && game.getShowBanners())
+        {
+            MapGenerator.drawPhaseBanner("agenda", game.getRound(), event);
+        }
+        
         game.setStoredValue("noWhenThisAgenda", "");
         game.setStoredValue("noAfterThisAgenda", "");
         game.setStoredValue("AssassinatedReps", "");
@@ -138,14 +156,6 @@ public class RevealAgenda extends AgendaSubcommandData {
             AgendaHelper.checkForAssigningGeneticRecombination(game);
             AgendaHelper.checkForPoliticalSecret(game);
         }
-        String agendaCount = game.getStoredValue("agendaCount");
-        int aCount = 0;
-        if (agendaCount.isEmpty()) {
-            aCount = 1;
-        } else {
-            aCount = Integer.parseInt(agendaCount) + 1;
-        }
-        game.setStoredValue("agendaCount", aCount + "");
         game.resetCurrentAgendaVotes();
         game.setHackElectionStatus(false);
         game.setPlayersWhoHitPersistentNoAfter("");

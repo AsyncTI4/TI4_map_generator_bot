@@ -58,7 +58,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         return cardIDs.size();
     }
 
-    private void setCardIDs(List<String> cardIDs) { // This method is for Jackson
+    protected void setCardIDs(List<String> cardIDs) { // This method is for Jackson
         this.cardIDs = Collections.unmodifiableList(cardIDs);
     }
 

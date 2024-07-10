@@ -14,6 +14,13 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -27,11 +34,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -265,20 +267,10 @@ public class AgendaHelper {
                 if ("shared_research".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player player : game.getRealPlayers()) {
-                            Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
-                            if (player.hasAbility("mobile_command") && ButtonHelper
-                                .getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).size() > 0) {
-                                tile = ButtonHelper
-                                    .getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).get(0);
+                            Tile tile = player.getHomeSystemTile();
+                            if (tile != null) {
+                                AddCC.addCC(event, player.getColor(), tile);
                             }
-                            if (tile == null) {
-                                tile = player.getHomeSystemTile();
-                            }
-                            if (tile == null) {
-                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                    "Could not find a HS, sorry bro");
-                            }
-                            AddCC.addCC(event, player.getColor(), tile);
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                             "Added player's CCs to their HS");
@@ -344,7 +336,7 @@ public class AgendaHelper {
                     }
                 }
                 if (game.getCurrentAgendaInfo().contains("Secret")) {
-                    game.addLaw(aID, winner);
+                    game.addLaw(aID, Mapper.getSecretObjectivesJustNames().get(winner));
                     Player playerWithSO = null;
 
                     for (Map.Entry<String, Player> playerEntry : game.getPlayers().entrySet()) {
@@ -1485,10 +1477,15 @@ public class AgendaHelper {
             if (!nextInLine.getColor().equalsIgnoreCase(player.getColor())) {
                 String realIdentity;
                 realIdentity = nextInLine.getRepresentation(true, true);
-                String pFaction = StringUtils.capitalize(nextInLine.getFaction());
+                String pFaction = nextInLine.getFlexibleDisplayName();
                 String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
                 Button Vote = Button.success(finChecker + "vote", pFaction + " Choose To Vote");
-                Button Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+                Button Abstain;
+                if (nextInLine.hasAbility("future_sight")) {
+                    Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain (You have future sight)");
+                } else {
+                    Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+                }
                 Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_" + nextInLine.getFaction(),
                     "(For Others) Abstain for this player");
                 game.updateActivePlayer(nextInLine);
@@ -1581,7 +1578,9 @@ public class AgendaHelper {
             Button noBribery = Button.primary("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
             if (!game.isFoWMode()) {
-                message.append("The following players (" + losers.size() + ") have the opportunity to play " + Emojis.ActionCard + "Deadly Plot:\n");
+                if (!game.isACInDiscard("Deadly Plot")) {
+                    message.append("The following players (" + losers.size() + ") have the opportunity to play " + Emojis.ActionCard + "Deadly Plot:\n");
+                }
                 for (Player loser : losers) {
                     message.append("> ").append(loser.getRepresentation(true, true)).append("\n");
                 }
@@ -1951,7 +1950,12 @@ public class AgendaHelper {
             message = realIdentity + message;
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Button.success(finChecker + "vote", pFaction + " Choose To Vote");
-            Button Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+            Button Abstain;
+            if (nextInLine.hasAbility("future_sight")) {
+                Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain (You have future sight)");
+            } else {
+                Abstain = Button.danger(finChecker + "resolveAgendaVote_0", pFaction + " Choose To Abstain");
+            }
             Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_" + nextInLine.getFaction(),
                 "(For Others) Abstain for this player");
             try {
@@ -3341,6 +3345,9 @@ public class AgendaHelper {
     public static Map<String, Integer> getAdditionalVotesFromOtherSources(Game game, Player player) {
         Map<String, Integer> additionalVotesAndSources = new LinkedHashMap<>();
 
+        if (getVoteCountFromPlanets(game, player) == 0) {
+            return additionalVotesAndSources;
+        }
         // Argent Zeal
         if (player.hasAbility("zeal")) {
             long playerCount = game.getPlayers().values().stream().filter(Player::isRealPlayer).count();

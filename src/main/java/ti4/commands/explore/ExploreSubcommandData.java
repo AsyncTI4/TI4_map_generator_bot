@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -18,9 +20,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
-
-import org.jetbrains.annotations.NotNull;
-
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -336,8 +335,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Invalid planet: " + mirageID);
                     return;
                 }
-                new PlanetAdd().doAction(player, mirageID, game);
-                new PlanetRefresh().doAction(player, mirageID, game);
+                PlanetAdd.doAction(player, mirageID, game, null, false);
+                PlanetRefresh.doAction(player, mirageID, game);
                 String exploreID = game.drawExplore(Constants.CULTURAL);
                 if (exploreID == null) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),

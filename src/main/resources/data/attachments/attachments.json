@@ -105,7 +105,8 @@
             "cultural",
             "industrial",
             "hazardous"
-        ]
+        ],
+        "isFakeAttachment": true
     },
     {
         "id": "negativeinf",
@@ -367,6 +368,16 @@
         "planetTypes": [
             "hazardous"
         ],
+        "isFakeAttachment": true
+    },
+    {
+        "id": "custodiavigilia1",
+        "imagePath": "attachment_custodiavigilia_1.png",
+        "isFakeAttachment": true
+    },
+    {
+        "id": "custodiavigilia2",
+        "imagePath": "attachment_custodiavigilia_2.png",
         "isFakeAttachment": true
     }
 ]

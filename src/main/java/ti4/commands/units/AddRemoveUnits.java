@@ -1,11 +1,14 @@
 package ti4.commands.units;
 
-import com.amazonaws.util.CollectionUtils;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.amazonaws.util.CollectionUtils;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,7 +16,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.planet.PlanetAdd;
@@ -126,8 +128,7 @@ abstract public class AddRemoveUnits implements Command {
         actionAfterAll((GenericInteractionCreateEvent) event, tile, color, game);
     }
 
-    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList,
-        Game game) {
+    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game game) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
 
         if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
@@ -334,7 +335,7 @@ abstract public class AddRemoveUnits implements Command {
                             String colorID = Mapper.getColorID(player.getColor());
                             if (unitColor.equals(colorID)) {
                                 if (!player.getPlanetsAllianceMode().contains(planetName)) {
-                                    new PlanetAdd().doAction(player, planetName, game, event);
+                                    PlanetAdd.doAction(player, planetName, game, event, false);
                                 }
                                 break;
                             }

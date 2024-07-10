@@ -4,7 +4,7 @@ concurrency:
   group: "Start Bot"
 jobs:
   build:
-    name: Stop
+    name: Stop Bot
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands using password

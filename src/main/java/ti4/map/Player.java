@@ -36,9 +36,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.player.TurnEnd;
 import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
@@ -51,6 +53,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
@@ -119,7 +122,7 @@ public class Player {
     private int totalExpenses;
 
     private Set<Integer> followedSCs = new HashSet<>();
-
+    private List<String> transactionItems = new ArrayList<>();
     private final Map<String, Integer> actionCards = new LinkedHashMap<>();
     private final Map<String, Integer> events = new LinkedHashMap<>();
     private final Map<String, Integer> trapCards = new LinkedHashMap<>();
@@ -143,10 +146,16 @@ public class Player {
     private DraftBag currentDraftBag = new DraftBag();
     private final DraftBag draftItemQueue = new DraftBag();
     private List<String> exhaustedTechs = new ArrayList<>();
+    @Getter
+    @Setter
+    private List<String> purgedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
     private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
     private List<String> mahactCC = new ArrayList<>();
+    @Getter
+    @Setter
+    private String notes = "";
 
     @JsonProperty("leaders")
     private List<Leader> leaders = new ArrayList<>();
@@ -277,6 +286,41 @@ public class Player {
             }
         }
         return 0;
+    }
+
+    public void resetTransactionItems() {
+        transactionItems = new ArrayList<>();
+    }
+
+    public List<String> getTransactionItems() {
+        return transactionItems;
+    }
+
+    public void clearTransactionItemsWith(Player p2) {
+        List<String> newTransactionItems = new ArrayList<>();
+        for (String item : transactionItems) {
+            if (!item.contains("ing" + p2.getFaction())) {
+                newTransactionItems.add(item);
+            }
+        }
+        transactionItems = newTransactionItems;
+    }
+
+    public void addTransactionItem(String thing) {
+        transactionItems.add(thing);
+    }
+
+    public void removeTransactionItem(String thing) {
+        transactionItems.remove(thing);
+    }
+
+    public void replaceTransactionItem(String thingToRemove, String thingToAdd) {
+        removeTransactionItem(thingToRemove);
+        addTransactionItem(thingToAdd);
+    }
+
+    public void setTransactionItems(List<String> things) {
+        transactionItems = things;
     }
 
     public int getSpentInfantryThisWindow() {
@@ -794,6 +838,7 @@ public class Player {
         return unitsOwned;
     }
 
+    @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
         return unitsOwned.stream()
             .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
@@ -1019,6 +1064,7 @@ public class Player {
         removePromissoryNotesInPlayArea(id);
     }
 
+    @JsonIgnore
     public int getMaxSOCount() {
         int maxSOCount = getGame().getMaxSOCountPerPlayer();
         if (hasRelic("obsidian"))
@@ -1197,54 +1243,43 @@ public class Player {
         crf = irf = hrf = vrf = 0;
         for (String cardID : fragments) {
             String color = Mapper.getExplore(cardID).getType().toLowerCase();
+            int firstTime = 0;
             switch (color) {
                 case Constants.CULTURAL -> {
                     crf++;
                     if (!hasFoundCulFrag) {
                         hasFoundCulFrag = true;
-                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
-                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
-                                "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
-                        }
+                        firstTime++;
                     }
                 }
                 case Constants.INDUSTRIAL -> {
                     irf++;
                     if (!hasFoundIndFrag) {
                         hasFoundIndFrag = true;
-                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
-                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
-                                "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
-                        }
+                        firstTime++;
                     }
                 }
                 case Constants.HAZARDOUS -> {
                     hrf++;
                     if (!hasFoundHazFrag) {
                         hasFoundHazFrag = true;
-                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
-                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
-                                "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
-                        }
+                        firstTime++;
                     }
                 }
                 case Constants.FRONTIER -> {
                     vrf++;
                     if (!hasFoundUnkFrag) {
                         hasFoundUnkFrag = true;
-                        if (hasUnit("bentor_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true) < 4) {
-                            List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(),
-                                "mech", "placeOneNDone_skipbuild"));
-                            String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
-                            MessageHelper.sendMessageToChannel(getCorrectChannel(), message, buttons);
-                        }
+                        firstTime++;
                     }
+                }
+            }
+            if (hasUnit("bentor_mech") && firstTime > 0) {
+                int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true);
+                List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(), "mech", "placeOneNDone_skipbuild"));
+                String message = getRepresentation() + " due to your mech deploy ability, you can now place a mech on a planet you control";
+                for (int i = 0; i < firstTime && i < mechsRemain; i++) {
+                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
                 }
             }
         }
@@ -1327,6 +1362,7 @@ public class Player {
         return getRepresentation(false, false);
     }
 
+    @JsonIgnore
     public String getRepresentation(boolean overrideFow, boolean ping) {
         Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
@@ -1354,8 +1390,13 @@ public class Player {
                 }
                 return sb.toString();
             } else if (roleForCommunity != null) {
-                return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
-                    + Emojis.getColorEmojiWithName(getColor());
+                if (ping) {
+                    return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
+                        + Emojis.getColorEmojiWithName(getColor());
+                } else {
+                    return getFactionEmoji() + " " + roleForCommunity.getName() + " "
+                        + Emojis.getColorEmojiWithName(getColor());
+                }
             } else {
                 return getFactionEmoji() + " " + Emojis.getColorEmojiWithName(getColor());
             }
@@ -1402,6 +1443,7 @@ public class Player {
         return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
     }
 
+    @JsonIgnore
     public String getFactionEmojiOrColor() {
         if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
             return Emojis.getColorEmojiWithName(getColor());
@@ -1829,6 +1871,27 @@ public class Player {
         followedSCs.add(sc);
     }
 
+    public void addFollowedSC(Integer sc, GenericInteractionCreateEvent event) {
+        Game game = getGame();
+
+        followedSCs.add(sc);
+        if (game != null && game.getActivePlayer() != null) {
+            if (game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!p2.hasFollowedSC(sc)) {
+                        return;
+                    }
+                }
+                game.setStoredValue("endTurnWhenSCFinished", "");
+                Player p2 = game.getActivePlayer();
+                TurnEnd.pingNextPlayer(event, game, p2);
+                if (!game.isFoWMode()) {
+                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round " + game.getRound() + " for " + p2.getFactionEmoji());
+                }
+            }
+        }
+    }
+
     public void removeFollowedSC(Integer sc) {
         followedSCs.remove(sc);
     }
@@ -1886,6 +1949,7 @@ public class Player {
         SCs.clear();
     }
 
+    @JsonIgnore
     public int getLowestSC() {
         try {
             int min = 100;
@@ -2240,6 +2304,13 @@ public class Player {
         doAdditionalThingsWhenRemovingTech(tech);
     }
 
+    public void purgeTech(String tech) {
+        if (techs.contains(tech)) {
+            removeTech(tech);
+            purgedTechs.add(tech);
+        }
+    }
+
     public void addPlanet(String planet) {
         if (!planets.contains(planet)) {
             planets.add(planet);
@@ -2252,14 +2323,12 @@ public class Player {
         }
         Game game = getGame();
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null && game.isAbsolMode()
-            && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList()
-                .contains("attachment_nanoforge.png")
+            && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList().contains("attachment_nanoforge.png")
             && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannel(this.getCorrectChannel(),
-                getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), getRepresentation() + " You can choose to Exhaust Nanoforge Ability to ready the planet", buttons);
         }
     }
 
@@ -2776,6 +2845,14 @@ public class Player {
         }
     }
 
+    public String getFlexibleDisplayName() {
+        String name = faction;
+        if (displayName != null && !displayName.isEmpty() && !displayName.equals("null")) {
+            name = displayName;
+        }
+        return StringUtils.capitalize(name);
+    }
+
     @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
@@ -2856,7 +2933,7 @@ public class Player {
         StringBuilder foot = new StringBuilder();
         eb.setFooter(foot.toString());
 
-        eb.setColor(ColorModel.primaryColor(color));
+        eb.setColor(Mapper.getColor(color).primaryColor());
         return eb.build();
     }
 

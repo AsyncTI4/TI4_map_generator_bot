@@ -2,11 +2,14 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -16,8 +19,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExploreSubcommandData;
@@ -533,7 +534,7 @@ public class ButtonHelperFactionSpecific {
         String buttonID = "transact_ACs_" + player.getFaction();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
             "Sent Yssaril buttons so that they can send you an AC");
-        ButtonHelper.resolveSpecificTransButtons(game, yssaril, buttonID, event);
+        ButtonHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
 
@@ -677,6 +678,10 @@ public class ButtonHelperFactionSpecific {
         if (players.size() > 1) {
             StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, ButtonHelper.getUnitHolderFromPlanetName(planet, game), game.getTileFromPlanet(planet));
         }
+        List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        options.add(Button.danger("deleteButtons", "Done Exhausting Planets"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            player.getRepresentation(true, true) + " pay 3r for the mech", options);
     }
 
     public static void resolveRaghsCallStepOne(Player player, Game game, ButtonInteractionEvent event,
@@ -709,7 +714,7 @@ public class ButtonHelperFactionSpecific {
                         "Relocate to " + Helper.getPlanetRepresentation(planet, game)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(hacan.getCorrectChannel(),
             hacan.getRepresentation(true, true) + "Choose which planet to relocate your units to", buttons);
         event.getMessage().delete().queue();
     }
@@ -928,7 +933,7 @@ public class ButtonHelperFactionSpecific {
             new AddUnits().unitParsing(event, hacan.getColor(), game.getTileFromPlanet(newPlanet),
                 amount + " " + unitName + " " + newPlanet, game);
         }
-        new PlanetAdd().doAction(p2, origPlanet, game, event);
+        PlanetAdd.doAction(p2, origPlanet, game, event, false);
 
         List<Button> goAgainButtons = new ArrayList<>();
         Button button = Button.secondary("transactWith_" + p2.getColor(), "Send something else to player?");
@@ -940,15 +945,17 @@ public class ButtonHelperFactionSpecific {
         goAgainButtons.add(button);
         goAgainButtons.add(done);
         goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
-        if (game.isFoWMode()) {
-            MessageHelper.sendMessageToChannel(hacan.getPrivateChannel(), message2);
-            MessageHelper.sendMessageToChannelWithButtons(hacan.getPrivateChannel(),
-                ident + " Use Buttons To Complete Transaction", goAgainButtons);
-            MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
-        } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message2);
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                ident + " Use Buttons To Complete Transaction", goAgainButtons);
+        MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message2);
+        if (game.isFoWMode() || !game.getWhetherNewTransactionMethod()) {
+            if (game.isFoWMode()) {
+                MessageHelper.sendMessageToChannelWithButtons(hacan.getPrivateChannel(),
+                    ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
+            } else {
+
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
+                    ident + " Use Buttons To Complete Transaction", goAgainButtons);
+            }
         }
         event.getMessage().delete().queue();
     }
@@ -1254,6 +1261,28 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static void checkIihqAttachment(Game game) {
+        Tile tile = game.getMecatolTile();
+        if (tile == null) return; // no mecatol tile
+        for (Planet mecatol : tile.getPlanetUnitHolders()) {
+            if (Constants.MECATOLS.contains(mecatol.getName())) {
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_2);
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken("token_custodiavigilia_1.png");
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2)) mecatol.removeToken("token_custodiavigilia_2.png");
+
+                for (Player player : game.getRealPlayers()) {
+                    if (!player.hasTech("iihq")) continue;
+                    if (player.controlsMecatol(true)) {
+                        mecatol.addToken(Constants.ATTACHMENT_IIHQ_1);
+                    } else {
+                        mecatol.addToken(Constants.ATTACHMENT_IIHQ_2);
+                    }
+                }
+            }
+        }
+    }
+
     public static void KeleresIIHQCCGainCheck(Player player, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -1273,7 +1302,6 @@ public class ButtonHelperFactionSpecific {
                 break;
             }
         }
-
     }
 
     public static void resolveResearchAgreementCheck(Player player, String tech, Game game) {
@@ -1288,7 +1316,7 @@ public class ButtonHelperFactionSpecific {
                             + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false)
                             + "\nUse the below button if you want to play RA to get it.";
                         Button transact = Button.success("resolvePNPlay_ra_" + AliasHandler.resolveTech(tech),
-                            "Acquire " + tech);
+                            "Acquire " + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false));
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(transact);
                         buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -1421,8 +1449,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(Button.danger("deleteButtons", "Decline"));
         String message = "Use buttons to select how to use the Kollecc AI Survey PN";
         // System.out.println(player.getFaction() + " is playing PN KOLLEC");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game game, Player player,
@@ -1961,7 +1988,7 @@ public class ButtonHelperFactionSpecific {
         boolean removed = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             int count = uH.getUnitCount(UnitType.Mech, player.getColor())
-                - uH.getUnitDamageCount(UnitType.Mech, player.getColor());
+                - uH.getUnitDamageCount(UnitType.Mech, player.getColorID());
 
             if (count > 0 && !removed) {
                 removed = true;
@@ -2022,7 +2049,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveWinnuPN(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String scNum = buttonID.split("_")[1];
         int sc = Integer.parseInt(scNum);
-        player.addFollowedSC(sc);
+        player.addFollowedSC(sc, event);
         ButtonHelper.resolvePNPlay("acq", player, game, event);
         String msg = player.getRepresentation(true, true) + " you will be marked as having followed " + sc
             + " without having needed to spend a CC. Please still use the SC buttons to resolve the SC effect";
