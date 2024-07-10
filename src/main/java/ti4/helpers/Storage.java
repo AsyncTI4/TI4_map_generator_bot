@@ -234,52 +234,42 @@ public class Storage {
         return tiFont;
     }
 
-    @Nullable
     public static File getMapUndoStorage(String mapName) {
         return new File(getStoragePath() + MAPS_UNDO + mapName);
     }
 
-    @Nullable
     public static File getMapUndoDirectory() {
         return new File(getStoragePath() + MAPS_UNDO);
     }
 
-    @Nullable
     public static File getMapImageStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @Nullable
     public static File getMapImageDirectory() {
         return new File(getStoragePath() + MAPS);
     }
 
-    @Nullable
     public static File getMapStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @Nullable
     public static File getDeletedMapStorage(String mapName) {
         return new File(getStoragePath() + DELETED_MAPS + mapName);
     }
 
-    @Nullable
     public static File getTTPGExportDirectory() {
         return new File(getStoragePath() + TTPG_EXPORTS);
     }
 
-    @Nullable
     public static File getTTPGExportStorage(String fileName) {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
-    @Nullable
     public static File getMapsJSONDirectory() {
         return new File(getStoragePath() + MAPS_JSON);
     }
 
-    @Nullable
     public static File getMapsJSONStorage(String fileName) {
         return new File(getStoragePath() + MAPS_JSON + fileName);
     }
