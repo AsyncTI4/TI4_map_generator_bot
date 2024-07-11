@@ -62,7 +62,7 @@ public class FoWHelper {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
-			return game.isFoWMode();
+			return game.isFowMode();
 		}
 		if (game == null) {
 			String gameName = channel.getName();
@@ -73,7 +73,7 @@ public class FoWHelper {
 				return false;
 			}
 		}
-		if (game.isFoWMode() && channel_ != null || event != null) {
+		if (game.isFowMode() && channel_ != null || event != null) {
 			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
 		}
 		return false;

@@ -468,7 +468,7 @@ public class ButtonHelperAgents {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String message = ButtonHelper.resolveACDraw(p2, game, event);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ButtonHelper.getIdentOrColor(p2, game) + " gained an AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)");
         }
@@ -489,7 +489,7 @@ public class ButtonHelperAgents {
         }
 
         MessageChannel channel2 = game.getMainGameChannel();
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             channel2 = player.getPrivateChannel();
         }
         playerLeader.setExhausted(true);
@@ -525,7 +525,7 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
                 ButtonHelper.getIdentOrColor(player, game) + " gained 2TGs from " + ssruu + "Clodho (Augers Agent) being used ("
                     + oldTg + "->" + p2.getTg() + ")");
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     ButtonHelper.getIdentOrColor(p2, game) + " gained 2TGs due to agent usage");
             }
@@ -540,7 +540,7 @@ public class ButtonHelperAgents {
                 Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
                 String message = ButtonHelper.resolveACDraw(p2, game, event);
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         ButtonHelper.getIdentOrColor(p2, game) + " gained an AC due to agent usage");
                 }
@@ -726,7 +726,7 @@ public class ButtonHelperAgents {
                 return;
             game.setNaaluAgent(true);
             MessageChannel channel = event.getMessageChannel();
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 channel = p2.getPrivateChannel();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
             }
@@ -1248,7 +1248,7 @@ public class ButtonHelperAgents {
                     + tile.getPosition() + ")*:";
                 ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
-                    && game.getCurrentPhase().contains("agenda")) {
+                    && game.getPhaseOfGame().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Florzen Commander");
@@ -1288,7 +1288,7 @@ public class ButtonHelperAgents {
                     + tile.getPosition() + ")*:";
                 ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
-                    && game.getCurrentPhase().contains("agenda")) {
+                    && game.getPhaseOfGame().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Florzen Commander");
@@ -1601,7 +1601,7 @@ public class ButtonHelperAgents {
             + player.getCommodities() + ") due to " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yudri Sukhov (Vaden Agent)";
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode() && vaden != player) {
+        if (game.isFowMode() && vaden != player) {
             msg = ButtonHelper.getIdentOrColor(player, game) + " has finished resolving";
             MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
         }
@@ -1624,7 +1624,7 @@ public class ButtonHelperAgents {
         String msg = ButtonHelper.getIdentOrColor(player, game) + " lost a " + cardInfo.getName() + " to "
             + ButtonHelper.getIdentOrColor(bentor, game) + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Queen Lucreia (Kortali Agent)";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode() && bentor != player) {
+        if (game.isFowMode() && bentor != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
         }
     }
@@ -1657,7 +1657,7 @@ public class ButtonHelperAgents {
         String msg = ButtonHelper.getIdentOrColor(player, game)
             + " can produce a unit in their HS or in a system with a tech skip planet due to " + (zealots.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh (Zealots Agent)";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
-        if (game.isFoWMode() && zealots != player) {
+        if (game.isFowMode() && zealots != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(zealots, game), msg);
         }
     }
@@ -1687,7 +1687,7 @@ public class ButtonHelperAgents {
             + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Sparrow (Nokar Agent). "
             + "A transaction can be done with transaction buttons.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode() && bentor != player) {
+        if (game.isFowMode() && bentor != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
         }
     }
@@ -1717,7 +1717,7 @@ public class ButtonHelperAgents {
             + tile.getRepresentationForButtons(game, player)
             + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Zelian A (Zelian Agent).";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode() && bentor != player) {
+        if (game.isFowMode() && bentor != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
         }
 
@@ -1745,7 +1745,7 @@ public class ButtonHelperAgents {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, p2, event);
         cabalAgentInitiation(game, p2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode() && kyro != player) {
+        if (game.isFowMode() && kyro != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(kyro, game), msg);
         }
 
@@ -1860,7 +1860,7 @@ public class ButtonHelperAgents {
         String msg = ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "tg (" + oldTg + "->"
             + player.getTg() + ") and " + commGain + " commodities due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "C.O.O. Mgur (Bentor Agent)";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode() && bentor != player) {
+        if (game.isFowMode() && bentor != player) {
             msg = player.getRepresentation() + " has finished resolving.";
             MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), msg);
         }

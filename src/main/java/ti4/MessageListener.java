@@ -110,7 +110,7 @@ public class MessageListener extends ListenerAdapter {
                 } else {
                     harmless = true;
                 }
-                if (userActiveGame != null && !userActiveGame.isFoWMode() && !harmless
+                if (userActiveGame != null && !userActiveGame.isFowMode() && !harmless
                     && userActiveGame.getName().contains("pbd")) {
                     if (event.getMessageChannel() instanceof ThreadChannel thread) {
                         if (!thread.isPublic()) {
@@ -397,7 +397,7 @@ public class MessageListener extends ListenerAdapter {
                         spacer = player.getPersonalPingInterval();
                     }
                 }
-                if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase()) && spacer != 0) {
+                if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame()) && spacer != 0) {
                     spacer = spacer / 3;
                     spacer = Math.max(spacer, 1);
                 }
@@ -408,10 +408,10 @@ public class MessageListener extends ListenerAdapter {
                         ButtonHelper.postTechSummary(game);
                     }
                 }
-                if (game.getAutoPingStatus() && spacer != 0 && !game.getTemporaryPingDisable()) {
-                    if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                if (game.getAutoPingStatus() && spacer != 0 && !game.isTemporaryPingDisable()) {
+                    if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
 
-                        if (player != null || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                        if (player != null || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                             long milliSinceLastPing = new Date().getTime()
                                 - game.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (60 * 60 * multiplier * spacer)
@@ -438,7 +438,7 @@ public class MessageListener extends ListenerAdapter {
                                         }
                                     }
                                 }
-                                if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                                if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                     AgendaHelper.pingMissingPlayers(game);
                                 } else {
                                     long milliSinceLastTurnChange = new Date().getTime()
@@ -619,10 +619,10 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity
                                             + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time. ";
                                     }
-                                    if (pingNumber > maxSoFar + 1 && !game.isFoWMode()) {
+                                    if (pingNumber > maxSoFar + 1 && !game.isFowMode()) {
                                         continue;
                                     }
-                                    if (pingNumber == maxSoFar + 2 && !game.isFoWMode()) {
+                                    if (pingNumber == maxSoFar + 2 && !game.isFowMode()) {
                                         ping = realIdentity
                                             + " this is your final reminder. Stopping pinging now so we dont come back in 2 months and find 600+ messages";
                                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -630,7 +630,7 @@ public class MessageListener extends ListenerAdapter {
                                                 + " the game has stalled on a player, and autoping will now stop pinging them. ");
                                     }
 
-                                    if (game.isFoWMode()) {
+                                    if (game.isFowMode()) {
                                         MessageHelper.sendPrivateMessageToPlayer(player, game, ping);
                                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                                             "Active player has been pinged. This is ping #" + pingNumber);
@@ -661,7 +661,7 @@ public class MessageListener extends ListenerAdapter {
                     } else {
                         long milliSinceLastPing = new Date().getTime() - game.getLastActivePlayerPing().getTime();
                         if (milliSinceLastPing > (60 * 60 * multiplier * game.getAutoPingSpacer())) {
-                            if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                            if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                 AgendaHelper.pingMissingPlayers(game);
                                 game.setLastActivePlayerPing(new Date());
                                 GameSaveLoadManager.saveMap(game, "Auto Ping");
@@ -708,7 +708,7 @@ public class MessageListener extends ListenerAdapter {
             String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
             Game game = GameManager.getInstance().getGame(gameName);
-            if (game != null && game.getBotFactionReacts() && !game.isFoWMode()) {
+            if (game != null && game.isBotFactionReacts() && !game.isFowMode()) {
                 Player player = game.getPlayer(event.getAuthor().getId());
                 if (game.isCommunityMode()) {
 
@@ -788,7 +788,7 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
 
-            if (game.isFoWMode() &&
+            if (game.isFowMode() &&
                 ((player3 != null && player3.isRealPlayer()
                     && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot())
                     || (event.getAuthor().isBot() && messageText.contains("Total hits ")))) {

@@ -134,7 +134,7 @@ public class ScorePublic extends StatusSubcommandData {
 
 		String message = player.getRepresentation() + " scored " + emojiName + " __**" + poName + "**__";
 		MessageHelper.sendMessageToChannel(channel, message);
-		if (game.isFoWMode()) {
+		if (game.isFowMode()) {
 			FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 		}
 		Helper.checkIfHeroUnlocked(game, player);

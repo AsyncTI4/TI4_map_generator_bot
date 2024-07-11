@@ -393,7 +393,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         } else {
             representation = model.getRepresentation() + "\n> ";
         }
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation = representation + player.getFactionEmoji() + ": ";
                 if (game.getRevealedPublicObjectives().containsKey(objID)

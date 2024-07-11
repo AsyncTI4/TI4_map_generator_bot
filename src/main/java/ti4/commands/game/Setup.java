@@ -127,7 +127,7 @@ public class Setup extends GameSubcommandData {
     public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
         boolean isTIGLGame) {
         if (isTIGLGame
-            && (baseGameMode || absolMode || discordantStarsMode || game.isHomeBrewSCMode() || game.isFoWMode() || game.isAllianceMode() || game.isCommunityMode())) {
+            && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {

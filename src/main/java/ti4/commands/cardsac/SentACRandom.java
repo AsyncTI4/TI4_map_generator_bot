@@ -58,7 +58,7 @@ public class SentACRandom extends ACCardsSubcommandData {
         Collections.shuffle(actionCards);
         String acID = actionCards.get(0);
         // FoW specific pinging
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
         }
         player.removeActionCard(actionCardsMap.get(acID));

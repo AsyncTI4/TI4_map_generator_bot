@@ -126,7 +126,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append(game.getPing()).append(" ").append(game.getName()).append("\n");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             sb.append("Someone played the Action Card " + actionCardTitle + ":\n");
         } else {
             sb.append(player.getRepresentation()).append(" played the Action Card " + actionCardTitle + ":\n");
@@ -217,13 +217,13 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             if (actionCardTitle.contains("Planetary Rigs")) {
                 List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
-                
+
                 String msg = player.getRepresentation()
                     + " After checking for sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve";
-                if(acbuttons.size() == 0){
+                if (acbuttons.size() == 0) {
                     msg = player.getRepresentation() + " there were no attachments found in the applicable exploration decks.";
                 }
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
             }
 
             String codedName = "Plagiarize";
@@ -760,7 +760,7 @@ public class PlayAC extends ACCardsSubcommandData {
                         "Please select your prediction target", game, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election")) {
-                    game.setHackElectionStatus(true);
+                    game.setHasHackElectionBeenPlayed(true);
                     Button setHack = Button.danger("hack_election", "Set the voting order as normal");
                     List<Button> hackButtons = List.of(setHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
@@ -815,7 +815,7 @@ public class PlayAC extends ACCardsSubcommandData {
         }
 
         // Fog of war ping
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             String fowMessage = player.getRepresentation() + " played an Action Card: " + actionCardTitle;
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card: " + actionCardTitle);

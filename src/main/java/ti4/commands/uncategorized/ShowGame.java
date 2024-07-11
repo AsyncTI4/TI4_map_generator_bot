@@ -90,7 +90,7 @@ public class ShowGame implements Command {
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapGenerator.saveImage(game, displayType, event).thenAccept(fileUpload -> {
             List<Button> buttons = new ArrayList<>();
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
                 buttons.add(linkToWebsite);
                 buttons.add(Button.success("gameInfoButtons", "Player Info"));
@@ -101,7 +101,7 @@ public class ShowGame implements Command {
 
             // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
             MessageChannel channel = event.getMessageChannel();
-            if (!game.isFoWMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
+            if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
                 channel = game.getBotMapUpdatesThread();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
             }

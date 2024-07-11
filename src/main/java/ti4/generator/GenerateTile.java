@@ -111,7 +111,7 @@ public class GenerateTile {
         }
 
         // Resolve fog of war vision limitations
-        if (game.isFoWMode() && event != null) {
+        if (game.isFowMode() && event != null) {
             isFoWPrivate = false;
             if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;

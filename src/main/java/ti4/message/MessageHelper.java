@@ -93,7 +93,7 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
 		Game game = getGameFromChannelName(channel.getName());
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
-			&& !messageText.contains("end of turn ability") && game != null && game.getUndoButton()) {
+			&& !messageText.contains("end of turn ability") && game != null && game.isUndoButtonOffered()) {
 			buttons = addUndoButtonToList(buttons, game);
 		}
 		splitAndSent(messageText, channel, embeds, buttons);
@@ -313,7 +313,7 @@ public class MessageHelper {
 		buttons = sanitizeButtons(buttons, channel);
 
 		Game game = getGameFromChannelName(channel.getName());
-		if (game != null && game.isInjectRulesLinks() && !game.isFoWMode()) {
+		if (game != null && game.isInjectRulesLinks() && !game.isFowMode()) {
 			messageText = injectRules(messageText);
 		}
 		final String message = messageText;
@@ -326,7 +326,7 @@ public class MessageHelper {
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					if (message != null && game != null && !game.isFoWMode()) {
+					if (message != null && game != null && !game.isFowMode()) {
 						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
 							game.setLatestTransactionMsg(complete.getId());
 						}
@@ -425,7 +425,7 @@ public class MessageHelper {
 			return false;
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
-			if (!game.isFoWMode()) {
+			if (!game.isFowMode()) {
 				privateChannel = player.getCardsInfoThread();
 			}
 			if (privateChannel == null) {

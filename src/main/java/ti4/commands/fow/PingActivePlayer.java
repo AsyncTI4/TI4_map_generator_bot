@@ -42,7 +42,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
             String ping = player.getRepresentation(true, true) + " this is a gentle reminder that it is your turn.";
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
                 MessageHelper.sendPrivateMessageToPlayer(player, game, ping);
             } else {

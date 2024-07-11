@@ -125,7 +125,7 @@ public class AutoCompleteProvider {
                     break;
                 }
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     List<String> factionColors = new ArrayList<>(Mapper.getFactionIDs());
                     factionColors.addAll(Mapper.getColorNames());
 
@@ -297,7 +297,7 @@ public class AutoCompleteProvider {
             }
             case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
                 List<String> leaderIDs = new ArrayList<>();
-                if (game == null || game.isFoWMode() || Constants.LEADER_ADD.equals(event.getSubcommandName())) {
+                if (game == null || game.isFowMode() || Constants.LEADER_ADD.equals(event.getSubcommandName())) {
                     leaderIDs.addAll(Mapper.getLeaders().keySet());
                 } else {
                     leaderIDs.addAll(List.of("agent", "commander", "hero"));
@@ -336,7 +336,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
                 Map<String, String> planets = Mapper.getPlanetRepresentations();
-                if (game != null && !game.isFoWMode()) {
+                if (game != null && !game.isFowMode()) {
                     planetIDs = game.getPlanets();
                     List<Command.Choice> options = planets.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
@@ -346,7 +346,7 @@ public class AutoCompleteProvider {
                             value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), game) + "/" + Helper.getPlanetInfluence(value.getKey(), game) + ")", value.getKey()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                } else if (game != null && game.isFoWMode()) {
+                } else if (game != null && game.isFowMode()) {
                     List<Command.Choice> options = planets.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
@@ -503,7 +503,7 @@ public class AutoCompleteProvider {
                     return;
                 }
                 String latestCommand;
-                if (game.isFoWMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
+                if (game.isFowMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
                     latestCommand = "Game is Fog of War mode - last command is hidden.";
                 } else {
                     latestCommand = StringUtils.left(game.getLatestCommand(), 100);
@@ -515,7 +515,7 @@ public class AutoCompleteProvider {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
                     return;
                 }
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
                 }
                 long datetime = new Date().getTime();
@@ -535,7 +535,7 @@ public class AutoCompleteProvider {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
                     return;
                 }
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     List<String> positions = new ArrayList<>(game.getTileMap().keySet());
                     List<Command.Choice> options = positions.stream()
                         .filter(value -> value.toLowerCase().contains(enteredValue))
@@ -1159,7 +1159,7 @@ public class AutoCompleteProvider {
     private static void resolveExploreAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName, Game game) {
         if (subCommandName.equals(Constants.USE)) {
             if (optionName.equals(Constants.EXPLORE_CARD_ID)) {
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     event.replyChoice("You can not see the autocomplete in Fog of War", "[error]").queue();
                     return;
                 }

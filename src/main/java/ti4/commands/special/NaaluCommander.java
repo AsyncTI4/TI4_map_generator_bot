@@ -73,7 +73,7 @@ public class NaaluCommander extends SpecialSubcommandData {
             sb.append(PNInfo.getPromissoryNoteCardInfo(game, player_, false, true));
         }
 
-        if (!game.isFoWMode()) MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+        if (!game.isFowMode()) MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
             player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
     }
@@ -84,7 +84,7 @@ public class NaaluCommander extends SpecialSubcommandData {
         String agendaID = game.lookAtTopAgenda(0);
         MessageEmbed embed = null;
         if (game.getSentAgendas().get(agendaID) != null) {
-            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getCurrentPhase().startsWith("agenda")) {
+            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
                 sb.append("You are currently voting on covert legislation and the top agenda is in the speaker's hand.");
                 sb.append(" Showing the next agenda because thats how it should be by the RULEZ\n");
                 agendaID = game.lookAtTopAgenda(1);

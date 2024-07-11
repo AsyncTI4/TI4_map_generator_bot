@@ -325,7 +325,7 @@ public class MapGenerator {
     private void setupFow(GenericInteractionCreateEvent event, Map<String, Tile> tilesToDisplay) {
         if (debug)
             debugStartTime = System.nanoTime();
-        if (game.isFoWMode() && event != null) {
+        if (game.isFowMode() && event != null) {
             if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
                 Player player = getFowPlayer(event);
@@ -866,7 +866,7 @@ public class MapGenerator {
 
                 // Status
                 String activePlayerID = game.getActivePlayerID();
-                String phase = game.getCurrentPhase();
+                String phase = game.getPhaseOfGame();
                 if (player.isPassed()) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(new Color(238, 58, 80));
@@ -892,7 +892,7 @@ public class MapGenerator {
                         xSpacer += len + 8;
                     }
                 }
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.RED);
                     graphics.drawString("Neighbors: ", x + 9 + xSpacer, y + 125 + yDelta);
@@ -944,7 +944,7 @@ public class MapGenerator {
                 drawPAImage(x + 280, y + yDelta, pnImage);
                 graphics.drawString(Integer.toString(player.getPnCount()), x + 300, y + deltaY + 50);
 
-                if (game.getNomadCoin()) {
+                if (game.isNomadCoin()) {
                     drawPAImage(x + 345, y + yDelta, nomadCoinImage);
                 } else {
                     drawPAImage(x + 345, y + yDelta, tradeGoodImage);
@@ -1626,7 +1626,7 @@ public class MapGenerator {
                 }
 
                 String unitName = unitKey.getUnitType().humanReadableName();
-                if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.getCCNPlasticLimit()) {
+                if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.isCcNPlasticLimit()) {
                     String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
                     List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warningMessage, removeButtons);
@@ -2707,7 +2707,7 @@ public class MapGenerator {
     private Coord drawTurnOrderTracker(int x, int y) {
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         String activePlayerUserID = game.getActivePlayerID();
-        if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getCurrentPhase())) {
+        if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getPhaseOfGame())) {
             graphics.setFont(Storage.getFont20());
             graphics.setColor(new Color(50, 230, 80));
             graphics.drawString("ACTIVE", x + 10, y + 35);
@@ -2740,7 +2740,7 @@ public class MapGenerator {
     }
 
     private int drawCardDecks(int x, int y) {
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             int cardWidth = 60;
             int cardHeight = 90;
             int horSpacing = cardWidth + 15;
@@ -3192,7 +3192,7 @@ public class MapGenerator {
 
         { // PAINT PASSED/ACTIVE/AFK
             String activePlayerID = game.getActivePlayerID();
-            String phase = game.getCurrentPhase();
+            String phase = game.getPhaseOfGame();
             if (player.isPassed()) {
                 point = PositionMapper.getPlayerStats("newpassed");
                 point.translate(miscTile.x, miscTile.y);
@@ -3364,7 +3364,7 @@ public class MapGenerator {
             }
         }
         String activePlayerID = game.getActivePlayerID();
-        String phase = game.getCurrentPhase();
+        String phase = game.getPhaseOfGame();
         if (player.isPassed()) {
             point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
             graphics.setColor(new Color(238, 58, 80));
@@ -4220,7 +4220,7 @@ public class MapGenerator {
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                 }
-                if (prodInSystem > 0 && game.getShowGears() && !game.isFoWMode()) {
+                if (prodInSystem > 0 && game.isShowGears() && !game.isFowMode()) {
                     int textModifer = 0;
                     if (prodInSystem == 1) {
                         textModifer = 7;
@@ -4302,7 +4302,7 @@ public class MapGenerator {
                 }
             }
             case Distance -> {
-                if (game.isFoWMode())
+                if (game.isFowMode())
                     break;
                 Integer distance = game.getTileDistances().get(tile.getPosition());
                 if (distance == null)
@@ -4321,7 +4321,7 @@ public class MapGenerator {
                     Storage.getFont100());
             }
             case Wormholes -> {
-                if (game.isFoWMode())
+                if (game.isFowMode())
                     break;
 
                 BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
@@ -4559,7 +4559,7 @@ public class MapGenerator {
             }
             return o1.compareTo(o2);
         });
-        if (game.getShowBubbles() && unitHolder instanceof Planet planetHolder
+        if (game.isShowBubbles() && unitHolder instanceof Planet planetHolder
             && shouldPlanetHaveShield(unitHolder, game)) {
             String tokenPath;
             switch (planetHolder.getContrastColor()) {

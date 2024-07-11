@@ -203,7 +203,7 @@ public class ButtonHelperHeroes {
     public static void resolveKhraskHero(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("khraskHeroStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("khraskHeroStep2_" + p2.getFaction(), " ");
@@ -443,7 +443,7 @@ public class ButtonHelperHeroes {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("axisHeroStep3_" + shipOrder + "_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("axisHeroStep3_" + shipOrder + "_" + p2.getFaction(), " ");
@@ -1225,7 +1225,7 @@ public class ButtonHelperHeroes {
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
         message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message2);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, game), message2);
         }
         event.getMessage().delete().queue();
@@ -1282,7 +1282,7 @@ public class ButtonHelperHeroes {
         String relic = buttonID.split("_")[2];
         String msg = ButtonHelper.getIdentOrColor(player, game) + " stole " + Mapper.getRelic(relic).getName()
             + " from " + ButtonHelper.getIdentOrColor(p2, game);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), msg);
         }
         boolean exhausted = p2.getExhaustedRelics().contains(relic);
@@ -1515,7 +1515,7 @@ public class ButtonHelperHeroes {
         String acID = buttonID.replace("cymiaeHeroStep2_", "");
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, p2.getColor()));
             } else {
                 Button button = Button.secondary("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, " ");
@@ -1800,7 +1800,7 @@ public class ButtonHelperHeroes {
                 String prefix = "vadenHeroClearDebt";
                 Player player = target;
                 String faction = player.getFaction();
-                if (!game.isFoWMode() && !faction.contains("franken")) {
+                if (!game.isFowMode() && !faction.contains("franken")) {
                     button = Button.secondary(prefix + "_" + faction, " ");
                     button = button.withEmoji(Emoji.fromFormatted(player.getFactionEmoji()));
                 } else {
@@ -1872,7 +1872,7 @@ public class ButtonHelperHeroes {
             }
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(vaden, game), msg);
         }
 
@@ -1967,7 +1967,7 @@ public class ButtonHelperHeroes {
             Button button;
             String label = " ";
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomeBrewSCMode()) {
+                && !game.isHomebrewSCMode()) {
                 button = Button.secondary("winnuHero_" + sc, label).withEmoji(scEmoji);
             } else {
                 button = Button.secondary("winnuHero_" + sc, "" + sc + label);

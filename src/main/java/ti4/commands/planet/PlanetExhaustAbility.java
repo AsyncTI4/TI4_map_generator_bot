@@ -87,7 +87,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
             }
             case "tarrock" -> {
-                if (!game.isFoWMode() && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
+                if (!game.isFowMode() && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) < 0) {
                     String riderName = "Tarrock Ability";
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
                     List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
@@ -98,7 +98,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 }
             }
             case "prism" -> {
-                if (!game.isFoWMode() && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
+                if (!game.isFowMode() && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
                     resolvePrismStep1(player, game);
                 } else {
                     output = player.getFactionEmoji() + " choose a tech to return";
@@ -162,7 +162,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("prismStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("prismStep2_" + p2.getFaction(), " ");

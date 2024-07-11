@@ -47,7 +47,7 @@ public class POInfo extends StatusSubcommandData {
                 List<Player> playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
                     .map(player -> game.getPlayer(player))
                     .filter(player -> player != null)
-                    .filter(player -> !game.isFoWMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
+                    .filter(player -> !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
                     .toList();
 
                 if (!playersWhoHaveScoredObjective.isEmpty()) {
