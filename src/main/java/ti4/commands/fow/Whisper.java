@@ -1,13 +1,13 @@
 package ti4.commands.fow;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import software.amazon.awssdk.utils.StringUtils;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -99,14 +99,14 @@ public class Whisper extends FOWSubcommandData {
             }
             String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
             String whisperHistory = game.getStoredValue(key);
-            if (whisperHistory.isEmpty()) {
+            if (whisperHistory.isEmpty() && !game.getName().equalsIgnoreCase("pbd1000")) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is whispering for the first time this turn to " + player_.getFactionEmoji());
                 game.setStoredValue(key, "1");
             } else {
                 int num = Integer.parseInt(whisperHistory);
                 num = num + 1;
                 game.setStoredValue(key, "" + num);
-                if (num == 5 || num == 10) {
+                if ((num == 5 || num == 10) && !game.getName().equalsIgnoreCase("pbd1000")) {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to " + player_.getFactionEmoji());
                 }
             }

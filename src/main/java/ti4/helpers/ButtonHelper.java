@@ -1171,9 +1171,9 @@ public class ButtonHelper {
         ButtonHelperStats.replenishComms(event, game, p2, true);
     }
 
-    public static List<Button> getForcedRefreshButtons(Game game, Player player) {
+    public static List<Button> getForcedRefreshButtons(Game game, Player player, List<Player> followingPlayers) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : followingPlayers) {
             if (p2 == player) {
                 continue;
             }
@@ -2559,7 +2559,8 @@ public class ButtonHelper {
             case "argent" -> {
                 int num = getNumberOfUnitsOnTheBoard(game, player, "pds", false)
                     + getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
-                    + getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
+                    + getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
+                    + getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
                 if (num > 5) {
                     shouldBeUnlocked = true;
                 }
@@ -8315,8 +8316,6 @@ public class ButtonHelper {
 
                 ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
-                ButtonHelperAbilities.pillageCheck(p1, game);
-                ButtonHelperAbilities.pillageCheck(p2, game);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));

@@ -126,6 +126,23 @@ public class SCPlay extends PlayerSubcommandData {
         message.append(".\n\n");
 
         String gamePing = game.getPing();
+        List<Player> playersToFollow = game.getRealPlayers();
+        if (game.getName().equalsIgnoreCase("pbd1000")) {
+            playersToFollow = new ArrayList<>();
+            String num = scToPlay + "";
+            num = num.substring(num.length() - 1, num.length());
+            gamePing = "";
+            for (Player p2 : game.getRealPlayers()) {
+                for (Integer sc : p2.getSCs()) {
+                    String num2 = sc + "";
+                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    if (num2.equalsIgnoreCase(num)) {
+                        gamePing = p2.getRepresentation() + " ";
+                        playersToFollow.add(p2);
+                    }
+                }
+            }
+        }
         if (!gamePing.isEmpty()) {
             message.append(gamePing).append("\n");
         }
@@ -139,13 +156,10 @@ public class SCPlay extends PlayerSubcommandData {
 
         TextChannel textChannel = (TextChannel) mainGameChannel;
 
-        for (Player player2 : game.getPlayers().values()) {
-            if (!player2.isRealPlayer() || winnuHero) {
+        for (Player player2 : playersToFollow) {
+            if (winnuHero) {
                 continue;
             }
-            String faction = player2.getFaction();
-            if (faction == null || faction.isEmpty() || "null".equals(faction))
-                continue;
             player2.removeFollowedSC(scToPlay);
         }
 
@@ -208,7 +222,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
                                 MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, game));
                             }
-                            if (scToPlay == 5) {
+                            if (scModel.usesAutomationForSCID("pok5trade")) {
                                 Button transaction = Button.primary("transaction", "Transaction");
                                 scButtons.add(transaction);
                                 scButtons.add(Button.success("sendTradeHolder_tg", "Send 1tg"));
@@ -279,11 +293,11 @@ public class SCPlay extends PlayerSubcommandData {
         if (scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
                 + " you can force players to refresh, normally done in order to trigger a trade agreement. This is not required and not advised if you are offering them a conditional refresh.";
-            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player);
+            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage2, forceRefresh);
 
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                     String message2 = p2.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
@@ -303,7 +317,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         if (!scModel.usesAutomationForSCID("pok1leadership")) {
             Button emelpar = Button.danger("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
-            for (Player player3 : game.getRealPlayers()) {
+            for (Player player3 : playersToFollow) {
                 if (player3 == player) {
                     continue;
                 }
@@ -348,8 +362,8 @@ public class SCPlay extends PlayerSubcommandData {
                 player.getRepresentation(true, true) + " you can resolve grace with the buttons",
                 graceButtons);
         }
-        if (player.ownsPromissoryNote("acq") && scToPlay != 1 && !winnuHero) {
-            for (Player player2 : game.getPlayers().values()) {
+        if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
+            for (Player player2 : playersToFollow) {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {

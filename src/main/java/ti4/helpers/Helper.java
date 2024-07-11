@@ -974,7 +974,7 @@ public class Helper {
             int num = 1;
             String summary = "**" + sender.getRepresentation(false, false) + " gives " + receiver.getRepresentation(false, false) + " the following:**\n";
             if (publiclyShared) {
-                summary = sender.getFactionEmoji() + " gives " + receiver.getFactionEmoji() + " the following: ";
+                summary = sender.getFactionEmoji() + " gives " + receiver.getFactionEmoji() + ": ";
                 num = 0;
             }
             for (String item : transactionItems) {
