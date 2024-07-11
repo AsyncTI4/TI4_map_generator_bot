@@ -24,7 +24,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
     }
 
     public static void showUnscored(Game game, GenericInteractionCreateEvent event) {
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
             return;
         }

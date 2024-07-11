@@ -95,7 +95,7 @@ public class TurnStart extends PlayerSubcommandData {
             : game.getMainGameChannel();
 
         game.updateActivePlayer(player);
-        game.setCurrentPhase("action");
+        game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
@@ -136,7 +136,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
         } else {
             //checkhere
-            if (game.getShowBanners()) {
+            if (game.isShowBanners()) {
                 MapGenerator.drawBanner(player);
             }
             MessageHelper.sendMessageToChannel(gameChannel, text);
@@ -282,7 +282,7 @@ public class TurnStart extends PlayerSubcommandData {
         for (Integer SC : player.getSCs()) {
             if (!game.getPlayedSCs().contains(SC)) {
                 hadAnyUnplayedSCs = true;
-                if (game.isHomeBrewSCMode()) {
+                if (game.isHomebrewSCMode()) {
                     Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC);
                     startButtons.add(strategicAction);
                 } else {
@@ -301,7 +301,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
 
             startButtons.add(pass);
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
@@ -332,7 +332,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (ButtonHelper.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Button.secondary(finChecker + "ministerOfWar", "Use Minister of War"));
             }
-            if (!game.getJustPlayedComponentAC()) {
+            if (!game.isJustPlayedComponentAC()) {
                 player.setWhetherPlayerShouldBeTenMinReminded(true);
             }
         } else {
@@ -454,7 +454,7 @@ public class TurnStart extends PlayerSubcommandData {
         // startButtons.addAll(getButtonsToSwitchWithAllianceMembers(player, game,
         // false));
         // }
-        if (!doneActionThisTurn && game.isFoWMode()) {
+        if (!doneActionThisTurn && game.isFowMode()) {
             startButtons.add(Button.secondary("showGameAgain", "Show Game"));
         }
 

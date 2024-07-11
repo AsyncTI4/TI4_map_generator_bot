@@ -358,7 +358,7 @@ public class Tile {
     @JsonIgnore
     public String getRepresentationForButtons(Game game, Player player) {
         try {
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 if (player == null)
                     return getPosition();
 

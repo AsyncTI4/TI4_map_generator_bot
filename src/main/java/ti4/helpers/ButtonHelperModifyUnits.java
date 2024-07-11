@@ -1144,7 +1144,7 @@ public class ButtonHelperModifyUnits {
         String playerColor = buttonID.split("_")[3];
         Player player = game.getPlayerFromColorOrFaction(playerColor);
         MessageChannel channel = event.getChannel();
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
         String msg = player.getRepresentation() + " you have had one of your units assigned a hit, please cancel the hit (shields holding, titans agent, sustain) somehow or accept the lost of the unit";
@@ -1472,7 +1472,7 @@ public class ButtonHelperModifyUnits {
         if (("sd".equalsIgnoreCase(unit) || "pds".equalsIgnoreCase(unitLong))
             && event.getMessage().getContentRaw().contains("for construction")) {
 
-            if (game.isFoWMode() || (!"action".equalsIgnoreCase(game.getCurrentPhase()) && !"statusScoring".equalsIgnoreCase(game.getCurrentPhase()))) {
+            if (game.isFowMode() || (!"action".equalsIgnoreCase(game.getPhaseOfGame()) && !"statusScoring".equalsIgnoreCase(game.getPhaseOfGame()))) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + " " + successMessage);
             } else {
                 ButtonHelper.sendMessageToRightStratThread(player, game, playerRep + " " + successMessage,
@@ -1500,7 +1500,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
                 if (!player.getSCs().contains(Integer.parseInt("4"))
-                    && !hasConstruction && ("action".equalsIgnoreCase(game.getCurrentPhase())
+                    && !hasConstruction && ("action".equalsIgnoreCase(game.getPhaseOfGame())
                         || game.getCurrentAgendaInfo().contains("Strategy"))
                     && !ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
                     String color = player.getColor();
@@ -1520,7 +1520,7 @@ public class ButtonHelperModifyUnits {
                             + " has Rohdhna Commander and is thus doing the Primary which does not place a CC";
                     }
 
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                     } else {
                         ButtonHelper.sendMessageToRightStratThread(player, game, msg, "construction");

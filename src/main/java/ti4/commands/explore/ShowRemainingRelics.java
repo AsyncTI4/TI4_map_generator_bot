@@ -53,7 +53,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
             }
         }
 
-        if (player != null && "action".equalsIgnoreCase(game.getCurrentPhase()) && !over && game.isFoWMode()) {
+        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && !over && game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), text.toString());
