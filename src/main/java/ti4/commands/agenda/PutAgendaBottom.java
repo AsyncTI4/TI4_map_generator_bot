@@ -19,7 +19,7 @@ public class PutAgendaBottom extends AgendaSubcommandData {
 
     public void putBottom(GenericInteractionCreateEvent event, int agendaID, Game game) {
         boolean success = game.putAgendaBottom(agendaID);
-        if (success && !game.isFoWMode()) {
+        if (success && !game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom");
             List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
             String threadName = game.getName() + "-round-" + game.getRound() + "-politics";
@@ -31,7 +31,7 @@ public class PutAgendaBottom extends AgendaSubcommandData {
             }
 
         } else {
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             }
         }

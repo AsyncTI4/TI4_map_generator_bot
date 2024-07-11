@@ -223,13 +223,13 @@ abstract public class AddRemoveUnits implements Command {
             int numPlayersNew = 0;
             if (event instanceof SlashCommandInteractionEvent) {
                 List<Player> playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
-                if (!planetName.equalsIgnoreCase("space") && !game.isFoWMode()) {
+                if (!planetName.equalsIgnoreCase("space") && !game.isFowMode()) {
                     playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, planetName);
                 }
                 numPlayersOld = playersForCombat.size();
             }
             unitAction(event, tile, count, planetName, unitID, color, game);
-            if (event instanceof SlashCommandInteractionEvent && !game.isFoWMode()) {
+            if (event instanceof SlashCommandInteractionEvent && !game.isFowMode()) {
                 List<Player> playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
                 if (!planetName.equalsIgnoreCase("space")) {
                     playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, planetName);
@@ -268,7 +268,7 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
 
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             boolean pingedAlready = false;
             int countF = 0;
             String[] tileList = game.getListOfTilesPinged();

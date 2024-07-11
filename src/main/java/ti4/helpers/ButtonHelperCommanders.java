@@ -310,7 +310,7 @@ public class ButtonHelperCommanders {
     public static void resolveLetnevCommanderCheck(Player player, Game game,
         GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
-            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFoWMode()) {
+            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
                 int old = player.getTg();
                 int newTg = player.getTg() + 1;
                 player.setTg(player.getTg() + 1);
@@ -373,7 +373,7 @@ public class ButtonHelperCommanders {
 
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event, String reason) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
-            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFoWMode()) {
+            if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
                 String message = player.getRepresentation(true, true) + " you gained a " + Emojis.tg + " from " + Emojis.MuaatCommander + "Muaat Commander " + player.gainTG(1) + " (" + reason + ")";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
@@ -479,7 +479,7 @@ public class ButtonHelperCommanders {
             message = " Yssaril commander used to look at PNs";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + message);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(enemy.getPrivateChannel(), message);
         }
         event.getMessage().delete().queue();
@@ -533,7 +533,7 @@ public class ButtonHelperCommanders {
 
             for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, true)) {
                 Tile tile2 = game.getTileByPosition(pos2);
-                if (AddCC.hasCC(event, player.getColor(), tile2) && !game.getDominusOrbStatus()
+                if (AddCC.hasCC(event, player.getColor(), tile2) && !game.isDominusOrb()
                     && tile2 != tile) {
                     continue;
                 }

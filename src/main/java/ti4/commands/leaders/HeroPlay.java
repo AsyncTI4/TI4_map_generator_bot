@@ -317,7 +317,7 @@ public class HeroPlay extends LeaderAction {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             case "vaylerianhero" -> {
-                if (!game.getNaaluAgent()) {
+                if (!game.isNaaluAgent()) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
                     AddCC.addCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()));
                     game.setStoredValue("vaylerianHeroActive", "true");

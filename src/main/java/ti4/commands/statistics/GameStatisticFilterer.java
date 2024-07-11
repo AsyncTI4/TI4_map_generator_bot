@@ -53,8 +53,8 @@ public final class GameStatisticFilterer {
 
     private static boolean filterOnFogType(Boolean fogFilter, Game game) {
         return fogFilter == null
-            || (fogFilter && (game.isFoWMode() || game.isLightFogMode()))
-            || (!fogFilter && (!game.isFoWMode() && !game.isLightFogMode()));
+            || (fogFilter && (game.isFowMode() || game.isLightFogMode()))
+            || (!fogFilter && (!game.isFowMode() && !game.isLightFogMode()));
     }
 
     private static boolean filterOnGameType(String gameTypeFilter, Game game) {

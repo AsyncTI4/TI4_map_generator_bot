@@ -124,7 +124,7 @@ public class Replace extends GameSubcommandData {
         }
         if (removedPlayer.getUserID().equals(game.getActivePlayerID())) {
             // do not update stats for this action
-            game.setActivePlayer(addedUser.getId());
+            game.setActivePlayerID(addedUser.getId());
         }
 
         Helper.fixGameChannelPermissions(event.getGuild(), game);

@@ -38,7 +38,7 @@ public class Whisper extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
             return;
         }
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
             return;
         }
@@ -59,11 +59,11 @@ public class Whisper extends FOWSubcommandData {
         String message;
         String realIdentity = player_.getRepresentation(true, true);
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
-        if (!game.isFoWMode() && !(feedbackChannel instanceof ThreadChannel)) {
+        if (!game.isFowMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();
             MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your cards info channel, and do not need to use the /fow whisper command, you can just start a message with toblue or something");
         }
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
         }
         for (Player player2 : game.getRealPlayers()) {
@@ -75,7 +75,7 @@ public class Whisper extends FOWSubcommandData {
         } else {
             message = "Attention " + realIdentity + "! " + player1 + " says: " + msg;
         }
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             String fail = "Could not notify receiving player.";
             String success;
             String player2 = Emojis.getColorEmojiWithName(player_.getColor());

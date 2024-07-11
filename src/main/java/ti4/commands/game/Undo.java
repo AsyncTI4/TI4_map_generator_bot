@@ -91,7 +91,7 @@ public class Undo extends GameSubcommandData {
                 undoFileToBeDeleted.delete();
             }
         }
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
         } else {
             ButtonHelper.findOrCreateThreadWithMessage(game, game.getName() + "-undo-log", sb.toString());

@@ -84,7 +84,7 @@ public class MiltyDraftHelper {
                 .findFirst().orElse(null);
 
             BufferedImage sliceImage;
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 sliceImage = partialSliceImage(slice, mapTemplate, playerPicked != null);
             } else {
                 sliceImage = sliceImageWithPlayerInfo(slice, manager, playerPicked);
