@@ -16,6 +16,8 @@ public final class StringHelper {
 
     private static Map<String, String> escapables() {
         Map<String, String> escape = new LinkedHashMap<>();
+        // Do not simply change these values.
+        // If you need to change any value, add a line in escape to handle the old value
         escape.put("-", "{dsh}");
         escape.put("_", "{usc}");
         escape.put(":", "{cln}");
@@ -23,6 +25,7 @@ public final class StringHelper {
         escape.put("|", "{pip}");
         escape.put(",", "{cma}");
         escape.put("\n", "{nl}");
+        escape.put(" ", "{sp}");
         return escape;
     }
 

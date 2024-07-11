@@ -73,6 +73,13 @@ public class ShipPositionModel {
             };
         }
 
+        public boolean isSpiral() {
+            return switch (this) {
+                case TYPE09, TYPE12, TYPE15 -> true;
+                default -> false;
+            };
+        }
+
         private static final Point offset = new Point(12, -7);
         private static final Point allianceOffset = new Point(8, -5);
 

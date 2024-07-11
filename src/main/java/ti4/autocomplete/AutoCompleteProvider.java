@@ -685,7 +685,6 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.VERBOSITY -> event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
             case Constants.AUTO_ARCHIVE_DURATION -> event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
             case Constants.PLANET_TYPE -> {
                 List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
@@ -782,16 +781,16 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.DRAFT_MODE -> {
-              String enteredValue = event.getFocusedOption().getValue();
-              List<FrankenDraftMode> modes = Arrays.asList(FrankenDraftMode.values());
-              List<Command.Choice> options = modes.stream()
-                  .filter(mode -> mode.search(enteredValue))
-                  .limit(25)
-                  .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
-                  .map(mode -> new Command.Choice(mode.getAutoCompleteName(), mode.toString()))
-                  .collect(Collectors.toList());
-              event.replyChoices(options).queue();
-          }
+                String enteredValue = event.getFocusedOption().getValue();
+                List<FrankenDraftMode> modes = Arrays.asList(FrankenDraftMode.values());
+                List<Command.Choice> options = modes.stream()
+                    .filter(mode -> mode.search(enteredValue))
+                    .limit(25)
+                    .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
+                    .map(mode -> new Command.Choice(mode.getAutoCompleteName(), mode.toString()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
         }
     }
 
