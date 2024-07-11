@@ -11,10 +11,13 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -1032,21 +1035,7 @@ public class GameSaveLoadManager {
             writer.write(Constants.LEADERS + " " + leaderInfo);
             writer.write(System.lineSeparator());
 
-            StringBuilder fogOfWarSystems = new StringBuilder();
-            Map<String, String> fow_systems = player.getFogTiles();
-            Map<String, String> fow_labels = player.getFogLabels();
-            for (String key : fow_systems.keySet()) {
-                String system = fow_systems.get(key);
-                String label = fow_labels.get(key);
-                if (label != null)
-                    label = label.replaceAll(" ", "—"); // replace spaces with em dash
-                fogOfWarSystems.append(key);
-                fogOfWarSystems.append(",");
-                fogOfWarSystems.append(system);
-                fogOfWarSystems.append(",");
-                fogOfWarSystems.append(label == null || "".equals(label) ? "." : label);
-                fogOfWarSystems.append(";");
-            }
+            StringBuilder fogOfWarSystems = getFogOfWarSystems(player);
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
             writer.write(System.lineSeparator());
 
@@ -1082,6 +1071,25 @@ public class GameSaveLoadManager {
 
         writer.write(ENDMAPINFO);
         writer.write(System.lineSeparator());
+    }
+
+    private static @NotNull StringBuilder getFogOfWarSystems(Player player) {
+        StringBuilder fogOfWarSystems = new StringBuilder();
+        Map<String, String> fow_systems = player.getFogTiles();
+        Map<String, String> fow_labels = player.getFogLabels();
+        for (String key : fow_systems.keySet()) {
+            String system = fow_systems.get(key);
+            String label = fow_labels.get(key);
+            if (label != null)
+                label = label.replaceAll(" ", "—"); // replace spaces with em dash
+            fogOfWarSystems.append(key);
+            fogOfWarSystems.append(",");
+            fogOfWarSystems.append(system);
+            fogOfWarSystems.append(",");
+            fogOfWarSystems.append(label == null || "".equals(label) ? "." : label);
+            fogOfWarSystems.append(";");
+        }
+        return fogOfWarSystems;
     }
 
     private static void writeCards(Map<String, Integer> cardList, Writer writer, String saveID) throws IOException {
@@ -1190,75 +1198,33 @@ public class GameSaveLoadManager {
         return folder.listFiles();
     }
 
-    private static File[] readAllMapJSONFiles() {
-        File folder = Storage.getMapsJSONDirectory();
-        if (!folder.exists()) {
-            try {
-                if (folder.createNewFile()) {
-                    folder = Storage.getMapImageDirectory();
-                }
-            } catch (IOException e) {
-                BotLogger.log("Could not create folder for maps", e);
-            }
-
-        }
-        return folder.listFiles();
-    }
-
     private static boolean isTxtExtention(File file) {
         return file.getAbsolutePath().endsWith(TXT);
     }
 
-    private static boolean isJSONExtention(File file) {
-        return file.getAbsolutePath().endsWith(JSON);
-    }
-
     public static boolean deleteMap(String mapName) {
-        File mapStorage = Storage.getMapStorage(mapName + TXT);
-        if (mapStorage == null) {
+        File map = Storage.getMapStorage(mapName + TXT);
+        if (!map.exists()) {
             return false;
         }
         File deletedMapStorage = Storage.getDeletedMapStorage(mapName + "_" + System.currentTimeMillis() + TXT);
-        return mapStorage.renameTo(deletedMapStorage);
+        return map.renameTo(deletedMapStorage);
     }
 
     public static void loadMaps() {
-        Map<String, Game> mapList = new HashMap<>();
-        if (loadFromJSON) {
-            File[] jsonFiles = readAllMapJSONFiles();
-            if (jsonFiles != null) {
-                for (File file : jsonFiles) {
-                    if (isJSONExtention(file)) {
-                        try {
-                            Game game = loadMapJSON(file);
-                            if (game != null) {
-                                mapList.put(game.getName(), game);
-                            }
-                        } catch (Exception e) {
-                            BotLogger.log("Could not load JSON game:" + file, e);
-                        }
-                    }
+        ConcurrentMap<String, Game> games = new ConcurrentHashMap<>();
+        Arrays.stream(readAllMapFiles()).parallel().forEach(file -> {
+            try {
+                Game game = loadMap(file);
+                if (game != null && game.getName() != null) {
+                    games.put(game.getName(), game);
                 }
+            } catch (Exception e) {
+                BotLogger.log("Could not load TXT game:" + file, e);
             }
-        } else {
-            File[] txtFiles = readAllMapFiles();
-            if (txtFiles != null) {
-                for (File file : txtFiles) {
-                    if (isTxtExtention(file)) {
-                        try {
-                            Game game = loadMap(file);
-                            if (game != null && game.getName() != null) {
-                                mapList.put(game.getName(), game);
-                            }
-                        } catch (Exception e) {
-                            BotLogger.log("Could not load TXT game:" + file, e);
-                        }
-                    }
-                }
-            }
-        }
+        });
 
-        GameManager.getInstance().setGameNameToGame(mapList);
+        GameManager.getInstance().setGameNameToGame(games);
     }
 
     @Nullable
