@@ -61,6 +61,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
@@ -87,7 +88,7 @@ import ti4.model.UnitModel;
 public class Game {
 
     private String ownerID;
-    private String ownerName = "";
+    private @Getter @Setter String ownerName = "";
     private String name;
     private String latestCommand = "";
     private String latestOutcomeVotedFor = "";
@@ -124,37 +125,30 @@ public class Game {
     @Getter
     @Setter
     private int maxSOCountPerPlayer = 3;
-    @ExportableField
-    private boolean competitiveTIGLGame;
-    @ExportableField
-    private boolean communityMode;
-    @ExportableField
-    private boolean allianceMode;
-    @ExportableField
-    private boolean homeBrew;
-    @ExportableField
-    private boolean fowMode;
     private final Map<String, String> fowOptions = new HashMap<>();
-    @ExportableField
-    private boolean naaluAgent;
-    @ExportableField
-    private boolean l1Hero;
-    @ExportableField
-    private boolean nomadCoin;
-    @ExportableField
-    private boolean undoButtonOffered = true;
-    @ExportableField
-    private boolean fastSCFollowMode;
-    @ExportableField
-    private boolean queueSO = true;
-    @ExportableField
-    private boolean newTransactionMethod = true;
-    @ExportableField
-    private boolean showBubbles = true;
-    @ExportableField
-    private boolean showGears = true;
-    @ExportableField
-    private boolean showBanners = true;
+
+    // Game mode data
+    private @ExportableField boolean competitiveTIGLGame;
+    private @ExportableField boolean communityMode;
+    private @ExportableField boolean allianceMode;
+    private @ExportableField boolean homeBrew;
+    private @ExportableField boolean fowMode;
+    private @ExportableField @Getter @Setter boolean absolMode;
+    private @ExportableField @Getter @Setter boolean miltyModMode;
+
+    // Boolean tracking values
+    private @ExportableField boolean naaluAgent;
+    private @ExportableField boolean l1Hero;
+    private @ExportableField boolean nomadCoin;
+    private @ExportableField boolean undoButtonOffered = true;
+    private @ExportableField boolean fastSCFollowMode;
+    private @ExportableField boolean queueSO = true;
+    private @ExportableField boolean newTransactionMethod = true;
+    private @ExportableField boolean showBubbles = true;
+    private @ExportableField boolean showGears = true;
+    private @ExportableField boolean showBanners = true;
+    private @ExportableField @Getter @Setter String hexBorderStyle = "off";
+
     @ExportableField
     private boolean temporaryPingDisable;
     @ExportableField
@@ -182,13 +176,6 @@ public class Game {
     @Getter
     @Setter
     private String textSize = "medium";
-    @ExportableField
-    @Getter
-    @Setter
-    private boolean absolMode;
-    @Getter
-    @Setter
-    private boolean miltyModMode;
     @Getter
     @Setter
     private boolean showUnitTags;
@@ -3632,14 +3619,6 @@ public class Game {
         return ownerID;
     }
 
-    public String getOwnerName() {
-        return ownerName == null ? "" : ownerName;
-    }
-
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
-    }
-
     public String getName() {
         return name;
     }
@@ -3703,6 +3682,26 @@ public class Game {
         return tileMap.values().stream()
             .filter(tile -> tile.getTileID().equals(tileID))
             .count() > 1;
+    }
+
+    @JsonIgnore
+    public Map<String, Player> getPlayerControlMap() {
+        Map<String, Player> controlMap = new HashMap<>();
+        for (Tile tile : getTileMap().values()) {
+            Player controllingPlayer = null;
+            for (Player p : getRealPlayers()) {
+                if (FoWHelper.playerHasActualShipsInSystem(p, tile)) {
+                    if (controllingPlayer == null) {
+                        controllingPlayer = p;
+                    } else {
+                        controllingPlayer = null;
+                        break;
+                    }
+                }
+            }
+            controlMap.put(tile.getPosition(), controllingPlayer);
+        }
+        return controlMap;
     }
 
     public void addPlayer(String id, String name) {
