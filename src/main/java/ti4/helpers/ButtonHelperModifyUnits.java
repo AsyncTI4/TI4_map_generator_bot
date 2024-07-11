@@ -31,6 +31,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperModifyUnits {
@@ -1490,8 +1491,16 @@ public class ButtonHelperModifyUnits {
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             } else {
+                boolean hasConstruction = false;
+                for (Integer sc : player.getSCs()) {
+                    StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
+                    if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("pok4construction")) {
+                        hasConstruction = true;
+                        break;
+                    }
+                }
                 if (!player.getSCs().contains(Integer.parseInt("4"))
-                    && ("action".equalsIgnoreCase(game.getCurrentPhase())
+                    && !hasConstruction && ("action".equalsIgnoreCase(game.getCurrentPhase())
                         || game.getCurrentAgendaInfo().contains("Strategy"))
                     && !ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
                     String color = player.getColor();
