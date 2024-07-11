@@ -67,7 +67,7 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(factionColorOption);
 		// NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty()) {
-			if (game.isFoWMode()) {
+			if (game.isFowMode()) {
 				MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
 					getPlayersCurrentStatsText(player, game));
 			} else {
@@ -379,7 +379,7 @@ public class Stats extends PlayerSubcommandData {
 		}
 
 		player.addSC(scNumber);
-		if (game.isFoWMode()) {
+		if (game.isFowMode()) {
 			String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " picked SC #" + scNumber;
 			FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
 		}
@@ -401,7 +401,7 @@ public class Stats extends PlayerSubcommandData {
 			tg += tgCount;
 			MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
 				player.getRepresentation() + " gained " + tgCount + " tgs from picking SC #" + scNumber);
-			if (game.isFoWMode()) {
+			if (game.isFowMode()) {
 				String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
 					+ " tgs from picking SC #" + scNumber;
 				FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
@@ -447,7 +447,7 @@ public class Stats extends PlayerSubcommandData {
 					explanation);
 				if (!suppressMessage)
 					MessageHelper.sendMessageToEventChannel(event, messageToSend);
-				if (game.isFoWMode()) {
+				if (game.isFowMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
 				}
 			} else {
@@ -458,7 +458,7 @@ public class Stats extends PlayerSubcommandData {
 					newNumber, explanation);
 				if (!suppressMessage)
 					MessageHelper.sendMessageToEventChannel(event, messageToSend);
-				if (game.isFoWMode()) {
+				if (game.isFowMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
 				}
 			}

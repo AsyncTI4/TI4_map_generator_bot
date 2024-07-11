@@ -270,7 +270,7 @@ public class ButtonHelperTacticalAction {
     }
 
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
-        if (!game.getL1Hero()) {
+        if (!game.isL1Hero()) {
             ButtonHelper.exploreDET(player, game, event);
             ButtonHelperFactionSpecific.cleanCavUp(game, event);
             if (player.hasAbility("cunning")) {
@@ -313,7 +313,7 @@ public class ButtonHelperTacticalAction {
             systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
         }
-        if (game.getNaaluAgent()) {
+        if (game.isNaaluAgent()) {
             player = game.getPlayer(game.getActivePlayerID());
             game.setNaaluAgent(false);
         }
@@ -323,7 +323,7 @@ public class ButtonHelperTacticalAction {
         String message = player.getRepresentation(true, true) + " Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
@@ -391,7 +391,7 @@ public class ButtonHelperTacticalAction {
                     if (nonActivePlayer.getTechs().contains("vw")
                         && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, tile)) {
 
-                        if (game.isFoWMode()) {
+                        if (game.isFowMode()) {
                             MessageHelper.sendMessageToChannel(nonActivePlayer.getCorrectChannel(),
                                 nonActivePlayer.getRepresentation() + " you triggered voidwatch");
                         }
@@ -456,7 +456,7 @@ public class ButtonHelperTacticalAction {
             }
         }
 
-        if (systemButtons.size() == 2 || game.getL1Hero()) {
+        if (systemButtons.size() == 2 || game.isL1Hero()) {
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         }
         if (player.getLeaderIDs().contains("nivyncommander") && !player.hasLeaderUnlocked("nivyncommander")) {
@@ -474,7 +474,7 @@ public class ButtonHelperTacticalAction {
             ButtonHelper.fullCommanderUnlockCheck(p2, game, "empyrean", event);
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        if (needPDSCheck && !game.getL1Hero() && playersWithPds2.size() > 0) {
+        if (needPDSCheck && !game.isL1Hero() && playersWithPds2.size() > 0) {
             StartCombat.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game,
                 player, tile);
         }
@@ -524,7 +524,7 @@ public class ButtonHelperTacticalAction {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         game.resetCurrentMovedUnitsFrom1TacticalAction();
 
-        if (player.doesPlayerPreferDistanceBasedTacticalActions() && !game.isFoWMode() && game.getRingCount() < 5) {
+        if (player.doesPlayerPreferDistanceBasedTacticalActions() && !game.isFowMode() && game.getRingCount() < 5) {
             alternateWayOfOfferingTiles(player, game);
         } else {
             String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
@@ -586,10 +586,10 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true) + " activated "
             + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
 
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
 
             for (Player player_ : game.getRealPlayers()) {
-                if (!game.getL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction())
+                if (!game.isL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction())
                     && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, game.getTileByPosition(pos))) {
                     String msgA = player_.getRepresentation() + " has units in the system";
@@ -619,7 +619,7 @@ public class ButtonHelperTacticalAction {
         }
 
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);
-        if (!game.isFoWMode() && playersWithPds2.size() > 0 && !game.getL1Hero()) {
+        if (!game.isFowMode() && playersWithPds2.size() > 0 && !game.isL1Hero()) {
             StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true)
                 + " the selected system is in range of space cannon units owned by");
             if (playersWithPds2.size() != 1 || playersWithPds2.get(0) != player) {
@@ -631,7 +631,7 @@ public class ButtonHelperTacticalAction {
         }
 
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
-        if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.getL1Hero()) {
+        if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentation(true, true) + " You can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "I48S (L1Z1Z Agent) if you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
         }
@@ -646,7 +646,7 @@ public class ButtonHelperTacticalAction {
         }
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, game, event);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty()
-            && !game.getL1Hero()) {
+            && !game.isL1Hero()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Please resolve scanlink",
                 button2);
             if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {
@@ -680,8 +680,8 @@ public class ButtonHelperTacticalAction {
                     buttons4);
             }
         }
-        if (!game.isFoWMode()) {
-            if (!game.getL1Hero()) {
+        if (!game.isFowMode()) {
+            if (!game.isL1Hero()) {
                 ButtonHelper.resolveOnActivationEnemyAbilities(game, game.getTileByPosition(pos), player, false, event);
             }
             // if (abilities > 0 ) {

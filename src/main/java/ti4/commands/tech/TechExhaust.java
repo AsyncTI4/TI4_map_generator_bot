@@ -190,7 +190,7 @@ public class TechExhaust extends TechAddRemove {
                     if (p2 == player || p2.getAc() == 0) {
                         continue;
                     }
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
                     } else {
                         Button button = Button.secondary(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");

@@ -120,7 +120,7 @@ public class SCPlay extends PlayerSubcommandData {
         StringBuilder message = new StringBuilder();
         message.append(Helper.getSCRepresentation(game, scToPlay));
         message.append(" played");
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
         message.append(".\n\n");
@@ -175,11 +175,11 @@ public class SCPlay extends PlayerSubcommandData {
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
-        if (scModel.usesAutomationForSCID("pok7technology") && !game.isFoWMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
+        if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
 
-        if (scModel.usesAutomationForSCID("pok4construction") && !game.isFoWMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
+        if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Button.secondary("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
 
@@ -204,7 +204,7 @@ public class SCPlay extends PlayerSubcommandData {
                     game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());
                 }
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 // in fow, send a message back to the player that includes their emoji
                 String response = "SC played.";
                 response += reactionEmoji != null ? " " + reactionEmoji.getFormatted()
@@ -352,7 +352,7 @@ public class SCPlay extends PlayerSubcommandData {
         conclusionButtons.add(deleteButton);
         conclusionButtons.add(Button.danger("endTurnWhenAllReactedTo_" + scToPlay, "End turn When All Have Reacted"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
-        if (!game.isHomeBrewSCMode() && player.hasAbility("grace")
+        if (!game.isHomebrewSCMode() && player.hasAbility("grace")
             && !player.getExhaustedAbilities().contains("grace")
             && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
             List<Button> graceButtons = new ArrayList<>();
@@ -423,7 +423,7 @@ public class SCPlay extends PlayerSubcommandData {
         game.setStoredValue(key, "");
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
-        if (game.getQueueSO()) {
+        if (game.isQueueSO()) {
             for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
                     || player.getSoScored() == player.getMaxSOCount()
@@ -467,7 +467,7 @@ public class SCPlay extends PlayerSubcommandData {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));

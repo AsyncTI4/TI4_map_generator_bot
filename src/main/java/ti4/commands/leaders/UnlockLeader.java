@@ -25,7 +25,7 @@ public class UnlockLeader extends LeaderAction {
     public static void unlockLeader(String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         MessageChannel channel = game.getMainGameChannel();
-        if (game.isFoWMode())
+        if (game.isFowMode())
             channel = player.getPrivateChannel();
 
         if (playerLeader == null) {
