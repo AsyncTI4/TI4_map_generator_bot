@@ -122,6 +122,7 @@ public class MapGenerator {
     private final int height;
     private final int heightForGameInfo;
     private final boolean extraRow;
+    private final Map<String, Player> playerControlMap;
 
     private int mapWidth;
     private int minX = -1;
@@ -137,7 +138,7 @@ public class MapGenerator {
     private long debugGameInfoTime;
     private long debugDiscordTime;
 
-    private static final BasicStroke stroke1 = new BasicStroke(1.0f);
+    //private static final BasicStroke stroke1 = new BasicStroke(1.0f);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke3 = new BasicStroke(3.0f);
     private static final BasicStroke stroke4 = new BasicStroke(4.0f);
@@ -158,6 +159,7 @@ public class MapGenerator {
         this.game = game;
         this.displayType = defaultIfNull(displayType);
         this.uploadToDiscord = uploadToDiscord;
+        this.playerControlMap = game.getPlayerControlMap();
 
         debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
 
@@ -337,6 +339,7 @@ public class MapGenerator {
                 keys.removeAll(tilesToShow);
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
+                    playerControlMap.remove(key);
                     if (fowPlayer != null) {
                         tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
                     }
@@ -348,6 +351,7 @@ public class MapGenerator {
     }
 
     private void logDebug(GenericInteractionCreateEvent event) {
+        ImageHelper.getCacheStats().ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
         if (!debug)
             return;
         long total = System.nanoTime() - debugAbsoluteStartTime;
@@ -358,8 +362,6 @@ public class MapGenerator {
             "\n" + debugString(" Discord time: ", debugDiscordTime, total) +
             "\n";
         MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
-        ImageHelper.getCacheStats()
-            .ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
     }
 
     private static String debugString(String prefix, long time, long total) {
@@ -2781,9 +2783,21 @@ public class MapGenerator {
     }
 
     private List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken) {
+        boolean fow = isFoWPrivate != null && isFoWPrivate;
+        boolean randomizeLocation = false;
+        if (fow && player != fowPlayer) {
+            if (FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
+                if (!FoWHelper.hasHomeSystemInView(game, player, fowPlayer)) {
+                    // if we can see a players stats, but we cannot see their home system - move their stats somewhere random
+                    randomizeLocation = true;
+                }
+            }
+        }
+
         String anchor = player.getPlayerStatsAnchorPosition();
         if (anchor == null) anchor = player.getHomeSystemPosition();
         if (anchor == null) return null;
+        if (randomizeLocation) anchor = "000"; // just stick them on 000
 
         Set<String> validPositions = PositionMapper.getTilePositions().stream()
             .filter(pos -> tileRing(pos) <= (game.getRingCount() + 1))
@@ -2802,12 +2816,15 @@ public class MapGenerator {
         // 3. Use those tiles :)
 
         // 1.
+        boolean rand = randomizeLocation;
         PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
             Point positionPoint = PositionMapper.getTilePosition(pos);
             if (positionPoint == null) return 100000000f;
             int ring = tileRing(pos);
             Point realPosition = getTilePosition(pos, positionPoint.x, positionPoint.y);
-            return realPosition.distance(anchorPt) + (ring * 75);
+            double distance = realPosition.distance(anchorPt);
+            distance = rand ? ThreadLocalRandom.current().nextInt(0, 200) : distance + ring * 75;
+            return distance;
         }));
         pq.addAll(validPositions);
 
@@ -2843,9 +2860,20 @@ public class MapGenerator {
     private void playerInfo(Game game) {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
+
+        // Do some stuff for FoW
+        boolean fow = isFoWPrivate != null && isFoWPrivate;
         List<Player> players = new ArrayList<>(game.getPlayers().values());
-        if (isFoWPrivate != null && isFoWPrivate) {
+        List<Player> statOrder = new ArrayList<>(game.getRealPlayers());
+        if (fow) {
             Collections.shuffle(players);
+            statOrder.clear();
+            // always build fowplayer's stat location first
+            statOrder.add(fowPlayer);
+            // then build the stats of players we can see home systems
+            players.stream().filter(player -> FoWHelper.hasHomeSystemInView(game, player, fowPlayer)).forEach(statOrder::add);
+            // then build the stats of everyone else
+            players.stream().filter(player -> FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)).forEach(statOrder::add);
         }
 
         int ringCount = game.getRingCount();
@@ -2855,8 +2883,11 @@ public class MapGenerator {
         boolean useNewSystem = true;
         Set<String> statTilesInUse = new HashSet<>();
         Map<String, List<String>> playerStatTiles = new LinkedHashMap<>();
-        for (Player p : game.getRealPlayers()) {
-            if (p.getFaction() == null) continue;
+        for (Player p : statOrder) {
+            if (p == null || p.getFaction() == null || playerStatTiles.containsKey(p.getFaction())) continue;
+            // if we can't see stats anyway, skip this player
+            if (fow && !FoWHelper.canSeeStatsOfPlayer(game, p, fowPlayer)) continue;
+
             List<String> myStatTiles = findThreeNearbyStatTiles(game, p, statTilesInUse);
             if (myStatTiles == null) {
                 useNewSystem = false;
@@ -2866,7 +2897,7 @@ public class MapGenerator {
             playerStatTiles.put(p.getFaction(), myStatTiles);
         }
 
-        for (Player player : players) {
+        for (Player player : statOrder) {
             if (player.getFaction() == null || !player.isRealPlayer()) {
                 continue;
             }
@@ -2879,13 +2910,20 @@ public class MapGenerator {
         }
     }
 
-    private BufferedImage hexBorder(ColorModel color, List<Integer> openSides) {
+    private BufferedImage hexBorder(ColorModel color, List<Integer> openSides, boolean solidLines) {
         BufferedImage img = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = img.createGraphics();
+        boolean rainbow = color.getName().endsWith("rainbow");
 
+        float inlineSize = 3.0f;
+        float outlineSize = 6.0f;
         // on, off, on, off, ....
-        float[] dash = { 30.0f, 17.0f, 30.0f, 1000.0f };
-        g2.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f, dash, 0.0f));
+        float[] dash = { solidLines ? 85.0f : 30.0f, solidLines ? 1000.0f : 17.0f, 30.0f, 1000.0f };
+        float[] sparse = { 11.0f, 1000.0f };
+        Stroke line = new BasicStroke(inlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0.0f);
+        Stroke outline = new BasicStroke(outlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, dash, 0.0f);
+        Stroke lineSparse = new BasicStroke(inlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, sparse, 0.0f);
+        Stroke outlineSparse = new BasicStroke(outlineSize, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 1.0f, sparse, 0.0f);
 
         Color primary = color.primaryColor();
         Color secondary = color.secondaryColor();
@@ -2893,22 +2931,31 @@ public class MapGenerator {
         if (color.getName().equals("black"))
             primary = secondary = Color.darkGray;
 
-        List<Point> corners = List.of(
-            new Point(88, 2),
-            new Point(256, 2),
-            new Point(342, 149),
-            new Point(256, 296),
-            new Point(88, 296),
-            new Point(2, 149));
+        List<Point> corners = List.of(new Point(88, 2), new Point(256, 2), new Point(342, 149), new Point(256, 296), new Point(88, 296), new Point(2, 149));
         //corners.forEach(c -> c.translate(10, 10)); // offset by 10 pixels so that our border can slightly overlap the bounds of the hex
 
+        // Draw outlines
+        g2.setColor(Color.black);
         for (int i = 0; i < 6; i++) {
-            if (openSides.contains(i)) continue;
+            if (openSides.contains(i)) g2.setStroke(outlineSparse);
+            if (!openSides.contains(i)) g2.setStroke(outline);
+            Point c1 = corners.get(i);
+            Point c2 = corners.get((i + 1) % 6);
+            g2.drawLine(c1.x, c1.y, c2.x, c2.y);
+            g2.drawLine(c2.x, c2.y, c1.x, c1.y);
+        }
+
+        // Draw Real Colors
+        g2.setStroke(line);
+        for (int i = 0; i < 6; i++) {
+            if (openSides.contains(i)) g2.setStroke(lineSparse);
+            if (!openSides.contains(i)) g2.setStroke(line);
+
             Point c1 = corners.get(i);
             Point c2 = corners.get((i + 1) % 6);
 
             GradientPaint gpOne = null, gpTwo = null;
-            if (color.getName().endsWith("rainbow")) { // special handling for rainbow
+            if (rainbow) { // special handling for rainbow
                 Point mid = new Point((c1.x + c2.x) / 2, (c1.y + c2.y) / 2);
                 if (i % 2 == 0) {
                     gpOne = new GradientPaint(c1, Color.red, mid, Color.yellow);
@@ -2936,9 +2983,14 @@ public class MapGenerator {
     }
 
     private BufferedImage hexBorderCache(ColorModel color, List<Integer> openSides) {
-        Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides);
+        String style = game.getHexBorderStyle();
+        // don't cache these, it's not worth it
+        if (openSides.size() > 2) return hexBorder(color, openSides, style.equals("solid"));
+
+        // Otherwise, cache it
+        Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides, style.equals("solid"));
         Collections.sort(openSides);
-        String key = color.getName() + "-HexBorder";
+        String key = color.getName() + "-HexBorder-" + style;
         for (int x : openSides)
             key += "_" + x;
         return ImageHelper.createOrLoadCalculatedImage(key, loader);
@@ -2951,7 +3003,7 @@ public class MapGenerator {
         }
 
         // Get the map positions for each of the "stat tiles"
-        if (statTiles.size() < 3) return;
+        if (statTiles == null || statTiles.size() < 3) return;
         Map<String, Point> points = new HashMap<>();
         for (String pos : statTiles) {
             Point p = PositionMapper.getTilePosition(pos);
@@ -3351,11 +3403,15 @@ public class MapGenerator {
             int centreCustomTokenHorizontally = 0;
             if (!hideFactionIcon) {
                 factionImage = getPlayerFactionIconImageScaled(player, 45, 45);
-                centreCustomTokenHorizontally = ccImage != null ? ccImage.getWidth() / 2 - factionImage.getWidth() / 2 : 0;
+                if (factionImage == null) {
+                    hideFactionIcon = true;
+                } else {
+                    centreCustomTokenHorizontally = ccImage != null ? ccImage.getWidth() / 2 - factionImage.getWidth() / 2 : 0;
+                }
             }
 
             int delta = rightAlign ? -20 : 20;
-            if (ccCount == 0 && player.getMahactCC().isEmpty()) {
+            if (ccCount == 0) {
                 ccCount = 1;
                 ccImage = blankCC;
                 hideFactionIcon = true;
@@ -3366,7 +3422,11 @@ public class MapGenerator {
                     graphics.drawImage(factionImage, x + (delta * i) + centreCustomTokenHorizontally, y + DELTA_Y, null);
             }
         } catch (Exception e) {
-            BotLogger.log("Ignored error during map generation", e);
+            String gameName = "";
+            if (player == null) gameName = "Null Player";
+            if (player != null && player.getGame() == null) gameName = "Null Game";
+            if (player != null && player.getGame() != null) gameName = player.getGame().getName();
+            BotLogger.log("Ignored error during map generation for `" + gameName + "`", e);
         }
     }
 
@@ -4092,6 +4152,23 @@ public class MapGenerator {
                 if (tile.isAnomaly(game)) {
                     BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
+                }
+
+                // ADD HEX BORDERS FOR CONTROL
+                Player controllingPlayer = playerControlMap.get(tile.getPosition());
+                boolean fow = isFrogPrivate != null && isFrogPrivate;
+                if (!game.getHexBorderStyle().equals("off") && controllingPlayer != null && !tile.getTileModel().getShipPositionsType().isSpiral()) {
+                    int sideNum = 0;
+                    List<Integer> openSides = new ArrayList<>();
+                    for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
+                        if (playerControlMap.get(adj) == controllingPlayer) {
+                            openSides.add(sideNum);
+                        }
+                        sideNum++;
+                    }
+                    if (fow && this.fowPlayer == null) openSides.clear();
+                    BufferedImage border = hexBorderCache(Mapper.getColor(controllingPlayer.getColor()), openSides);
+                    tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
                 }
 
                 if ("large".equals(game.getTextSize())) {

@@ -664,6 +664,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_BANNERS + " " + game.getShowBanners());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_HEX_BORDERS + " " + game.getHexBorderStyle());
+        writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_FRAGMENTS + " " + game.getNumberOfPurgedFragments());
         writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + game.getTemporaryPingDisable());
@@ -1948,6 +1950,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
