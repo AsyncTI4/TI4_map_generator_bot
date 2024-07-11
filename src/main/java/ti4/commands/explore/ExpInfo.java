@@ -32,7 +32,7 @@ public class ExpInfo extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         List<String> types = new ArrayList<>();
         OptionMapping reqType = event.getOption(Constants.TRAIT);
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
@@ -49,25 +49,25 @@ public class ExpInfo extends ExploreSubcommandData {
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
         }
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        secondHalfOfExpInfo(types, event, player, activeGame, over);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        secondHalfOfExpInfo(types, event, player, game, over);
     }
 
-    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide) {
-        secondHalfOfExpInfo(types, event, player, activeGame, overRide, false);
+    public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide) {
+        secondHalfOfExpInfo(types, event, player, game, overRide, false);
     }
 
-    public void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game activeGame, boolean overRide, boolean fullText) {
+    public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide, boolean fullText) {
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
-            List<String> deck = activeGame.getExploreDeck(currentType);
+            List<String> deck = game.getExploreDeck(currentType);
             Collections.sort(deck);
             Integer deckCount = deck.size();
             Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
             NumberFormat formatPercent = NumberFormat.getPercentInstance();
             formatPercent.setMaximumFractionDigits(1);
-            List<String> discard = activeGame.getExploreDiscard(currentType);
+            List<String> discard = game.getExploreDiscard(currentType);
             Collections.sort(discard);
             Integer discardCount = discard.size();
 
@@ -83,16 +83,16 @@ public class ExpInfo extends ExploreSubcommandData {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || overRide || !activeGame.isFoWMode()) {
+            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), info.toString());
             }
         }
-        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && activeGame.isFoWMode() && !overRide) {
+        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && game.isFowMode() && !overRide) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }
 
-    private String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
+    private static String listNames(List<String> deck, boolean showPercents, boolean showFullText) {
         int deckCount = deck.size();
         double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();

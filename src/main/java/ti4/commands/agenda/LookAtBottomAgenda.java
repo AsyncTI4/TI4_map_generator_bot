@@ -7,8 +7,10 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class LookAtBottomAgenda extends AgendaSubcommandData {
+
     public LookAtBottomAgenda() {
         super(Constants.LOOK_AT_BOTTOM, "Look at bottom Agenda from deck");
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");
@@ -16,7 +18,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         int count = 1;
         OptionMapping countOption = event.getOption(Constants.COUNT);
@@ -25,12 +27,12 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("You are not a player in this game.");
+            MessageHelper.sendMessageToEventChannel(event, "You are not a player in this game.");
             return;
         }
-        LookAtTopAgenda.lookAtAgendas(activeGame, player, count, true);
+        LookAtTopAgenda.lookAtAgendas(game, player, count, true);
     }
 }

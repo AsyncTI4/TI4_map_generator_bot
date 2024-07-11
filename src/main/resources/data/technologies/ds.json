@@ -2,7 +2,7 @@
     {
         "alias": "dsaxisb",
         "name": "Rift Engines",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "axis",
         "source": "ds",
@@ -11,7 +11,7 @@
     {
         "alias": "dsaxisy",
         "name": "Emergency Deployment",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YYY",
         "faction": "axis",
         "source": "ds",
@@ -20,7 +20,7 @@
     {
         "alias": "dsbentg",
         "name": "Broker Network",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "bentor",
         "source": "ds",
@@ -29,7 +29,7 @@
     {
         "alias": "dsbenty",
         "name": "Merged Replicators",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "bentor",
         "source": "ds",
@@ -37,8 +37,8 @@
     },
     {
         "alias": "dsceldr",
-        "name": "Emergency Mobilization",
-        "type": "WARFARE",
+        "name": "Emergency Mobilization Protocols",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "celdauri",
         "source": "ds",
@@ -47,7 +47,7 @@
     {
         "alias": "dsceldsd",
         "name": "Trade Port II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "faction": "celdauri",
         "baseUpgrade": "sd2",
@@ -57,7 +57,7 @@
     {
         "alias": "dscheidn",
         "name": "Chitin Hulk II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BBY",
         "faction": "cheiran",
         "baseUpgrade": "dn2",
@@ -67,7 +67,7 @@
     {
         "alias": "dscheir",
         "name": "Brood Pod",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "cheiran",
         "source": "ds",
@@ -76,7 +76,7 @@
     {
         "alias": "dscymiinf",
         "name": "Unholy Abomination II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "faction": "cymiae",
         "baseUpgrade": "inf2",
@@ -86,7 +86,7 @@
     {
         "alias": "dscymiy",
         "name": "Recursive Worm",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "cymiae",
         "source": "ds",
@@ -95,7 +95,7 @@
     {
         "alias": "dsdihmdn",
         "name": "Aegis II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BBY",
         "faction": "dihmohn",
         "baseUpgrade": "dn2",
@@ -105,7 +105,7 @@
     {
         "alias": "dsdihmy",
         "name": "Impressment Programs",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "dihmohn",
         "source": "ds",
@@ -114,7 +114,7 @@
     {
         "alias": "dsedyng",
         "name": "Unity Algorithm",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GGG",
         "faction": "edyn",
         "source": "ds",
@@ -123,7 +123,7 @@
     {
         "alias": "dsedyny",
         "name": "Encrypted Trade Hub",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "edyn",
         "source": "ds",
@@ -132,7 +132,7 @@
     {
         "alias": "dsflorg",
         "name": "Blackmail Programs",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "florzen",
         "source": "ds",
@@ -141,7 +141,7 @@
     {
         "alias": "dsflorff",
         "name": "Corsair II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BG",
         "faction": "florzen",
         "baseUpgrade": "ff2",
@@ -151,7 +151,7 @@
     {
         "alias": "dsfreeg",
         "name": "Envoy Network",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "freesystems",
         "source": "ds",
@@ -160,7 +160,7 @@
     {
         "alias": "dsfreey",
         "name": "Covert Strike Teams",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "freesystems",
         "source": "ds",
@@ -169,7 +169,7 @@
     {
         "alias": "dsghemcv",
         "name": "Combat Transport II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BB",
         "faction": "ghemina",
         "baseUpgrade": "cv2",
@@ -179,7 +179,7 @@
     {
         "alias": "dsghemg",
         "name": "War Song Implants",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GGG",
         "faction": "ghemina",
         "source": "ds",
@@ -188,7 +188,7 @@
     {
         "alias": "dsghotg",
         "name": "Networked Command",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "ghoti",
         "source": "ds",
@@ -197,7 +197,7 @@
     {
         "alias": "dsghoty",
         "name": "Parallel Production",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "ghoti",
         "source": "ds",
@@ -206,7 +206,7 @@
     {
         "alias": "dsgledb",
         "name": "Lightning Drives",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BBB",
         "faction": "gledge",
         "source": "ds",
@@ -215,7 +215,7 @@
     {
         "alias": "dsgledpds",
         "name": "Orion Platform II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RY",
         "faction": "gledge",
         "baseUpgrade": "pds2",
@@ -225,7 +225,7 @@
     {
         "alias": "dsaugug",
         "name": "Psychographics",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GGG",
         "faction": "augers",
         "source": "ds",
@@ -234,7 +234,7 @@
     {
         "alias": "dsauguy",
         "name": "Sentient Datapool",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "augers",
         "source": "ds",
@@ -243,7 +243,7 @@
     {
         "alias": "dskjalg",
         "name": "Zhrgar Stimulants",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "G",
         "faction": "kjalengard",
         "source": "ds",
@@ -252,7 +252,7 @@
     {
         "alias": "dskjalcv",
         "name": "Star Dragon II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BB",
         "faction": "kjalengard",
         "baseUpgrade": "cv2",
@@ -262,7 +262,7 @@
     {
         "alias": "dskollb",
         "name": "Shrouded Skirmishers",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "kollecc",
         "source": "ds",
@@ -271,7 +271,7 @@
     {
         "alias": "dskolly",
         "name": "Seeker Drones",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "kollecc",
         "source": "ds",
@@ -280,7 +280,7 @@
     {
         "alias": "dskolug",
         "name": "Applied Biothermics",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "kolume",
         "source": "ds",
@@ -289,16 +289,16 @@
     {
         "alias": "dskolur",
         "name": "Omniscience Field",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RRR",
         "faction": "kolume",
         "source": "ds",
-        "text": "Once per space combat, after 1 of your non-fighter ships is destroyed, you may produce 1 hit and assign it to 1 of your opponent's non-carrier ships."
+        "text": "After a system is activated, you may exhaust this card to choose 1 player. Apply +1 or -1 to all rolls that player makes during this tactical action."
     },
     {
         "alias": "dskortg",
         "name": "Tempest Drive",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "kortali",
         "source": "ds",
@@ -307,7 +307,7 @@
     {
         "alias": "dskortr",
         "name": "Deliverance Engine",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "kortali",
         "source": "ds",
@@ -316,7 +316,7 @@
     {
         "alias": "dskyrog",
         "name": "Indoctrination Teams",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "kyro",
         "source": "ds",
@@ -325,7 +325,7 @@
     {
         "alias": "dskyroy",
         "name": "Vector Program",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "kyro",
         "source": "ds",
@@ -334,7 +334,7 @@
     {
         "alias": "dslaneb",
         "name": "Spark Thrusters",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "faction": "lanefir",
         "source": "ds",
@@ -343,7 +343,7 @@
     {
         "alias": "dslaner",
         "name": "ATS Armaments",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "lanefir",
         "source": "ds",
@@ -352,7 +352,7 @@
     {
         "alias": "dslizhb",
         "name": "Wraith Engine",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "faction": "lizho",
         "source": "ds",
@@ -361,7 +361,7 @@
     {
         "alias": "dslizhff",
         "name": "Heavy Bomber II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BG",
         "faction": "lizho",
         "baseUpgrade": "ff2",
@@ -371,7 +371,7 @@
     {
         "alias": "dskhrag",
         "name": "Stone's Embrace",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "khrask",
         "source": "ds",
@@ -380,7 +380,7 @@
     {
         "alias": "dskhracr",
         "name": "Shattered Sky II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GRY",
         "faction": "khrask",
         "baseUpgrade": "cr2",
@@ -390,7 +390,7 @@
     {
         "alias": "dsmirvr",
         "name": "Orbital Defense Grid",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "mirveda",
         "source": "ds",
@@ -399,7 +399,7 @@
     {
         "alias": "dsmirvpds",
         "name": "Gauss Cannon II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RY",
         "faction": "mirveda",
         "baseUpgrade": "pds2",
@@ -409,7 +409,7 @@
     {
         "alias": "dsmortr",
         "name": "Fractal Plating",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "mortheus",
         "source": "ds",
@@ -418,7 +418,7 @@
     {
         "alias": "dsmorty",
         "name": "Fabrication Grid",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "mortheus",
         "source": "ds",
@@ -427,7 +427,7 @@
     {
         "alias": "dsmykog",
         "name": "Psychoactive Armaments",
-        "type": "BIOTIC",
+        "types": ["BIOTIC"],
         "requirements": "GG",
         "faction": "mykomentori",
         "source": "ds",
@@ -436,7 +436,7 @@
     {
         "alias": "dsmykosd",
         "name": "Mycelium Ring II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "YY",
         "faction": "mykomentori",
         "baseUpgrade": "sd2",
@@ -446,7 +446,7 @@
     {
         "alias": "dsnivymf",
         "name": "Voidflare Warden II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BRY",
         "faction": "nivyn",
         "source": "ds",
@@ -455,7 +455,7 @@
     {
         "alias": "dsnivyy",
         "name": "Voidwake Missiles",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "nivyn",
         "source": "ds",
@@ -464,7 +464,7 @@
     {
         "alias": "dsnokadd",
         "name": "Sabre II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RR",
         "faction": "nokar",
         "baseUpgrade": "dd2",
@@ -474,7 +474,7 @@
     {
         "alias": "dsnokay",
         "name": "Local Contracts",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "nokar",
         "source": "ds",
@@ -483,7 +483,7 @@
     {
         "alias": "dsolrab",
         "name": "Geosympathic Impeller",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "olradin",
         "source": "ds",
@@ -492,7 +492,7 @@
     {
         "alias": "dsolrar",
         "name": "False Flag Operations",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "faction": "olradin",
         "source": "ds",
@@ -501,7 +501,7 @@
     {
         "alias": "dsrhodb",
         "name": "Pilgrimage Beacons",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "BB",
         "faction": "zealots",
         "source": "ds",
@@ -510,7 +510,7 @@
     {
         "alias": "dsrhody",
         "name": "Sanctification Field",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YYY",
         "faction": "zealots",
         "source": "ds",
@@ -519,7 +519,7 @@
     {
         "alias": "dsrohdws",
         "name": "Terrafactory II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RRRY",
         "faction": "rohdhna",
         "baseUpgrade": "ws",
@@ -529,7 +529,7 @@
     {
         "alias": "dsrohdy",
         "name": "Contractual Obligations",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "rohdhna",
         "source": "ds",
@@ -538,7 +538,7 @@
     {
         "alias": "dstneldd",
         "name": "Blockade Runner II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "RR",
         "faction": "tnelis",
         "baseUpgrade": "dd2",
@@ -548,7 +548,7 @@
     {
         "alias": "dstnely",
         "name": "Daedalon Flight System",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "Y",
         "faction": "tnelis",
         "source": "ds",
@@ -557,7 +557,7 @@
     {
         "alias": "dsvadeb",
         "name": "Midas Turbine",
-        "type": "PROPULSION",
+        "types": ["PROPULSION"],
         "requirements": "B",
         "faction": "vaden",
         "source": "ds",
@@ -566,7 +566,7 @@
     {
         "alias": "dsvadey",
         "name": "Krovoz Strike Teams",
-        "type": "CYBERNETIC",
+        "types": ["CYBERNETIC"],
         "requirements": "YY",
         "faction": "vaden",
         "source": "ds",
@@ -575,7 +575,7 @@
     {
         "alias": "dsvaylr",
         "name": "Scavanger Exos",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "faction": "vaylerian",
         "source": "ds",
@@ -584,7 +584,7 @@
     {
         "alias": "dsvaylcr",
         "name": "Raider II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GRY",
         "faction": "vaylerian",
         "baseUpgrade": "cr2",
@@ -594,7 +594,7 @@
     {
         "alias": "dsveldr",
         "name": "Seidr Project",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "RR",
         "faction": "veldyr",
         "source": "ds",
@@ -603,7 +603,7 @@
     {
         "alias": "dsvelddn",
         "name": "Lancer Dreadnought II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "BBY",
         "faction": "veldyr",
         "baseUpgrade": "dn2",
@@ -613,7 +613,7 @@
     {
         "alias": "dszelir",
         "name": "Shard Volley",
-        "type": "WARFARE",
+        "types": ["WARFARE"],
         "requirements": "R",
         "faction": "zelian",
         "source": "ds",
@@ -622,7 +622,7 @@
     {
         "alias": "dszeliinf",
         "name": "Impactor II",
-        "type": "UNITUPGRADE",
+        "types": ["UNITUPGRADE"],
         "requirements": "GG",
         "faction": "zelian",
         "baseUpgrade": "inf2",

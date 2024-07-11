@@ -1,5 +1,6 @@
 package ti4.commands.planet;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -13,9 +14,9 @@ public class PlanetRemove extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Game activeGame) {
+    public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
         player.removePlanet(planet);
-        UnitHolder unitHolder = activeGame.getPlanetsInfo().get(planet);
+        Planet unitHolder = game.getPlanetsInfo().get(planet);
         removePlayerControlToken(player, unitHolder);
 
         if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {

@@ -1,0 +1,10 @@
+{
+    "id": "chocolateblank",
+    "name": "Chocolate, blank draft tile",
+    "aliases": [
+        "chocolateblank"
+    ],
+    "imagePath": "draft_chocolateblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

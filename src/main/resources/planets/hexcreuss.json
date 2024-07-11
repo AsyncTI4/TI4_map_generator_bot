@@ -1,0 +1,125 @@
+{
+    "id": "hexcreuss",
+    "tileId": "51h",
+    "name": "Creuss (Hexagon)",
+    "shortName": null,
+    "aliases": [
+        "hexcreuss",
+        "creuss hex",
+        "ghosts hex",
+        "ghostsofcruess hex",
+        "ghostshs hex",
+        "cruesshs hex",
+        "ghosts_hs hex",
+        "creus hex",
+        "ghost hex",
+        "ghost_hs hex",
+        "51h_1",
+        "creuss(hexagon)"
+    ],
+    "positionInTile": {
+        "x": 170.0,
+        "y": 116.0
+    },
+    "resources": 4,
+    "influence": 2,
+    "factionHomeworld": "ghost",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "hexcreuss",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 130.0,
+                    "y": 112.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 190.0,
+                    "y": 146.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 136.0,
+                    "y": 138.0
+                },
+                {
+                    "x": 152.0,
+                    "y": 138.0
+                },
+                {
+                    "x": 170.0,
+                    "y": 138.0
+                },
+                {
+                    "x": 144.0,
+                    "y": 150.0
+                },
+                {
+                    "x": 162.0,
+                    "y": 150.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 138.0,
+                    "y": 68.0
+                },
+                {
+                    "x": 156.0,
+                    "y": 68.0
+                },
+                {
+                    "x": 130.0,
+                    "y": 80.0
+                },
+                {
+                    "x": 148.0,
+                    "y": 80.0
+                },
+                {
+                    "x": 166.0,
+                    "y": 80.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 150.0,
+                    "y": 108.0
+                },
+                {
+                    "x": 116.0,
+                    "y": 108.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 74.0,
+                    "y": 100.0
+                },
+                {
+                    "x": 82.0,
+                    "y": 70.0
+                },
+                {
+                    "x": 200.0,
+                    "y": 100.0
+                },
+                {
+                    "x": 192.0,
+                    "y": 70.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "contrastColor": "orange",
+    "flavourText": "*Trapped between matter and void lies the realm of the Creuss. Made of trapped light and radioactive gas, this realm hosts the most peculiar forms of life.*",
+    "source": "dane_leaks"
+}

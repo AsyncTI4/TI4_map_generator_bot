@@ -19,12 +19,12 @@ public class Cleanup extends AgendaSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())){
+        if (option == null || !"YES".equals(option.getAsString())) {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game activeGame = getActiveGame();
-        Map<String, Player> players = activeGame.getPlayers();
+        Game game = getActiveGame();
+        Map<String, Player> players = game.getPlayers();
         for (Player player : players.values()) {
             player.cleanExhaustedPlanets(false);
         }

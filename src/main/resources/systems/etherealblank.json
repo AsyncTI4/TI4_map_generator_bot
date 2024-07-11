@@ -1,0 +1,10 @@
+{
+    "id": "etherealblank",
+    "name": "Ethereal, blank draft tile",
+    "aliases": [
+        "etherealblank"
+    ],
+    "imagePath": "draft_etherealblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

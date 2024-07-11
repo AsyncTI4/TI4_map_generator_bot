@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
+import ti4.message.MessageHelper;
 
 public class FixGameChannelPermissions extends BothelperSubcommandData {
     public FixGameChannelPermissions() {
@@ -13,10 +14,10 @@ public class FixGameChannelPermissions extends BothelperSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
-        Game activeGame = getActiveGame();
-        if (guild != null && activeGame != null) {
-            Helper.fixGameChannelPermissions(guild, activeGame);
+        Game game = getActiveGame();
+        if (guild != null && game != null) {
+            Helper.fixGameChannelPermissions(guild, game);
         }
-        sendMessage("Channel Permissions Fixed");
+        MessageHelper.sendMessageToEventChannel(event, "Channel Permissions Fixed");
     }
 }

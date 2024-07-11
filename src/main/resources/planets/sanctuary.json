@@ -17,7 +17,7 @@
     "resources": 3,
     "influence": 4,
     "factionHomeworld": "olradin",
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
@@ -111,5 +111,6 @@
             ]
         },
         "removeUnitCoordinate": true
-    }
+    },
+    "source": "ds"
 }

@@ -4,8 +4,7 @@
     "aliases": [
         "thetarocks"
     ],
-    "imagePath": "er41_theta_asteroid.png",
-    "planetIds": [],
+    "imagePath": "er_41_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -33,5 +32,7 @@
         "THETA"
     ],
     "planets": [],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

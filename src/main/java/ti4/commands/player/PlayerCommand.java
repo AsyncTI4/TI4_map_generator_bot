@@ -37,36 +37,13 @@ public class PlayerCommand implements Command {
             }
             Game userActiveGame = gameManager.getUserActiveGame(userID);
             if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                MessageHelper.replyToMessage(event,
+                    "You're not a player of the game, please call function /join gameName");
                 return false;
             }
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
     }
 
     @Override
@@ -90,12 +67,11 @@ public class PlayerCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
 
-        MapGenerator.saveImageToWebsiteOnly(activeGame, event);
+        MapGenerator.saveImageToWebsiteOnly(game, event);
     }
-
 
     protected String getActionDescription() {
         return "Player";
@@ -119,9 +95,11 @@ public class PlayerCommand implements Command {
         subcommands.add(new SendDebt());
         subcommands.add(new ClearDebt());
         subcommands.add(new ChangeColor());
+        subcommands.add(new CorrectFaction());
         subcommands.add(new ChangeUnitDecal());
         subcommands.add(new UnitInfo());
         subcommands.add(new AddAllianceMember());
+        subcommands.add(new RemoveAllianceMember());
         subcommands.add(new AddTeamMate());
         subcommands.add(new RemoveTeamMate());
         subcommands.add(new SetStatsAnchor());
@@ -132,7 +110,7 @@ public class PlayerCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

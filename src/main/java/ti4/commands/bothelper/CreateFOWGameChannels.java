@@ -30,7 +30,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class CreateFOWGameChannels extends BothelperSubcommandData {
-    public CreateFOWGameChannels(){
+    public CreateFOWGameChannels() {
         super(Constants.CREATE_FOW_GAME_CHANNELS, "Create Role and Game Channels for a New FOW Game");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
@@ -48,14 +48,13 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild;
 
-        
         //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         String gameName;
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
             if (gameOrRoleAlreadyExists(gameName)) {
-                sendMessage("Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
+                MessageHelper.sendMessageToEventChannel(event, "Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
                 return;
             }
         } else {
@@ -63,34 +62,27 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         //CHECK IF GIVEN CATEGORY IS VALID
-        
-        
-            
 
         guild = event.getGuild();
         //CHECK IF CATEGORY EXISTS
-       
+
         if (guild == null) {
-            sendMessage("Guild was null");
+            MessageHelper.sendMessageToEventChannel(event, "Guild was null");
             return;
         }
-     
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            sendMessage("Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
-
-        
-
 
         //PLAYERS
         List<Member> members = new ArrayList<>();
         Member gameOwner;
         if (Objects.nonNull(event.getOption("fowgm"))) {
             gameOwner = event.getOption("fowgm").getAsMember();
-        }else{
+        } else {
             gameOwner = event.getMember();
         }
         for (int i = 1; i <= 8; i++) {
@@ -105,30 +97,29 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         //CHECK IF GUILD HAS ALL PLAYERS LISTED
         List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
         boolean sendInviteLink = false;
+        int count = 0;
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
-                sendMessage(member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
+                MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
                 sendInviteLink = true;
+                count++;
             }
         }
         if (sendInviteLink) {
-            sendMessage(Helper.getGuildInviteURL(guild));
+            MessageHelper.sendMessageToEventChannel(event, Helper.getGuildInviteURL(guild, count + 1));
             return;
         }
-        Role everyone = guild.getRolesByName("@everyone",true).get(0);
-        long permission2 = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue() | Permission.MANAGE_PERMISSIONS.getRawValue() | Permission.MANAGE_THREADS.getRawValue();
-        Category category =  guild.createCategory(gameName).addRolePermissionOverride(everyone.getIdLong(), 0, permission2).addMemberPermissionOverride(gameOwner.getIdLong(), permission2, 0 ).complete();
-        
-        //CREATE ROLE
+
+        //CREATE ROLES
         Role role = guild.createRole()
-        .setName(gameName)
-        .setMentionable(true)
-        .complete();
+            .setName(gameName)
+            .setMentionable(true)
+            .complete();
 
         Role roleGM = guild.createRole()
-        .setName(gameName+" GM")
-        .setMentionable(true)
-        .complete();
+            .setName(gameName + " GM")
+            .setMentionable(true)
+            .complete();
 
         guild.addRoleToMember(gameOwner, roleGM).complete();
         //ADD PLAYERS TO ROLE
@@ -136,8 +127,9 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
             guild.addRoleToMember(member, role).complete();
         }
 
-        //CREATE GAME
+        // CREATE GAME
         Game newGame = GameCreate.createNewGame(event, gameName, gameOwner);
+        newGame.setFowMode(true);
 
         //ADD PLAYERS
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
@@ -145,40 +137,43 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
             newGame.addPlayer(member.getId(), member.getEffectiveName());
         }
 
-        newGame.setFoWMode(true);
+        // CREATE CATEGORY
+        Role everyone = guild.getRolesByName("@everyone", true).get(0);
+        long permission2 = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue() | Permission.MANAGE_PERMISSIONS.getRawValue() | Permission.MANAGE_THREADS.getRawValue();
+        Category category = guild.createCategory(gameName).addRolePermissionOverride(everyone.getIdLong(), 0, permission2).addRolePermissionOverride(roleGM.getIdLong(), permission2, 0).complete();
+
         //CREATE CHANNELS
         String newChatChannelName = gameName + "-gm-room";
         String newActionsChannelName = gameName + "-anonymous-announcements-private";
         long gameRoleID = role.getIdLong();
         long gameRoleGMID = roleGM.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-        
+
         // CREATE GM CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
-        .syncPermissionOverrides()
-        .addRolePermissionOverride(gameRoleGMID, permission, 0)
-        .complete();
-        MessageHelper.sendMessageToChannel(chatChannel, roleGM.getAsMention()+ " - gm room");
-        
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleGMID, permission, 0)
+            .complete();
+        MessageHelper.sendMessageToChannel(chatChannel, roleGM.getAsMention() + " - gm room");
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-        .syncPermissionOverrides()
-        .addRolePermissionOverride(gameRoleID, permission, 0)
-        .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         MessageHelper.sendMessageToChannel(actionsChannel, role.getAsMention() + " - actions channel");
-        newGame.setMainGameChannelID(actionsChannel.getId());
+        newGame.setMainChannelID(actionsChannel.getId());
 
         // Individual player channels
         for (Member member : members) {
             String name = member.getNickname();
-            if(name == null){
+            if (name == null) {
                 name = member.getEffectiveName();
             }
-            TextChannel memberChannel = guild.createTextChannel(gameName+"-"+name+"-private", category)
-            .syncPermissionOverrides()
-            .addMemberPermissionOverride(member.getIdLong(), permission, 0)
-            .complete();
+            TextChannel memberChannel = guild.createTextChannel(gameName + "-" + name + "-private", category)
+                .syncPermissionOverrides()
+                .addMemberPermissionOverride(member.getIdLong(), permission, 0)
+                .complete();
             Player player_ = newGame.getPlayer(member.getId());
             player_.setPrivateChannelID(memberChannel.getId());
         }
@@ -186,12 +181,11 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
             "> " + chatChannel.getAsMention() + "\n" +
             "> " + actionsChannel.getAsMention() + "\n";
-        sendMessage(message);
+        MessageHelper.sendMessageToEventChannel(event, message);
 
         GameSaveLoadManager.saveMap(newGame, event);
     }
 
-    
     private static String getNextFOWGameName() {
         ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
         if (existingNums.isEmpty()) {
@@ -222,7 +216,6 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         return mapNames.contains(name);
     }
 
-   
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
@@ -256,8 +249,6 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         return pbdNumbers;
     }
 
-   
-
     private static boolean serverCanHostNewGame(Guild guild) {
         return guild != null && serverHasRoomForNewRole(guild)
             && serverHasRoomForNewChannels(guild);
@@ -283,10 +274,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         return true;
     }
 
-   
-    
     public static List<Category> getAllAvailablePBDCategories() {
-
         return AsyncTI4DiscordBot.jda.getCategories().stream()
             .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
             .toList();

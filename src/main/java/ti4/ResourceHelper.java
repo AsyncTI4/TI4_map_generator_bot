@@ -16,6 +16,7 @@ public class ResourceHelper {
     private final Map<String, String> spoopyCache = new HashMap<>();
     private final Map<String, String> tileCache = new HashMap<>();
     private final Map<String, String> ccCache = new HashMap<>();
+    private final Map<String, String> peekMarkerCache = new HashMap<>();
     private final Map<String, String> attachmentCache = new HashMap<>();
     private final Map<String, String> tokenCache = new HashMap<>();
     private final Map<String, String> factionCache = new HashMap<>();
@@ -154,6 +155,17 @@ public class ResourceHelper {
     }
 
     @Nullable
+    public String getPeekMarkerFile(String name) {
+        String markerPath = peekMarkerCache.get(name);
+        if (markerPath != null) {
+            return markerPath;
+        }
+        String marker = getResourceFromFolder("peek_marker/", name, "Could not find peek marker file");
+        peekMarkerCache.put(name, marker);
+        return marker;
+    }
+
+    @Nullable
     public String getAttachmentFile(String name) {
         String tokenPath = attachmentCache.get(name);
         if (tokenPath != null) {
@@ -193,6 +205,16 @@ public class ResourceHelper {
             return tokenPath;
         }
         String token = getResourceFromFolder("tokens/", name, "Could not find token file");
+        tokenCache.put(name, token);
+        return token;
+    }
+    @Nullable
+    public String getExtraFile(String name) {
+        String tokenPath = tokenCache.get(name);
+        if (tokenPath != null) {
+            return tokenPath;
+        }
+        String token = getResourceFromFolder("extra/", name, "Could not find token file");
         tokenCache.put(name, token);
         return token;
     }

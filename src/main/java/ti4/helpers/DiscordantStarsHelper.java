@@ -1,6 +1,10 @@
 package ti4.helpers;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -12,49 +16,56 @@ import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 
 public class DiscordantStarsHelper {
-    public static void checkGardenWorlds(Game activeGame) {
-        for (Player player : activeGame.getPlayers().values()) {
-            if (player.hasAbility(Constants.GARDEN_WORLDS)) {
-                for (Tile tile : activeGame.getTileMap().values()) {
-                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                        if (unitHolder instanceof Planet planet) {
-                            if (player.getPlanets().contains(planet.getName())) {
-                                if (planet.hasGroundForces(player) && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
-                                    planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                                } else if (!planet.hasGroundForces(player)) {
-                                    planet.addToken(Constants.GARDEN_WORLDS_PNG);
-                                }
-                            } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
-                                planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                            }
+    public static void checkGardenWorlds(Game game) {
+        Player player = Helper.getPlayerFromAbility(game, "garden_worlds");
+        if (player == null) {
+            return;
+        }
+
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder instanceof Planet planet) {
+                    if (player.getPlanets().contains(planet.getName())) {
+                        if (planet.hasGroundForces(player) && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                            planet.removeToken(Constants.GARDEN_WORLDS_PNG);
+                        } else if (!planet.hasGroundForces(player)) {
+                            planet.addToken(Constants.GARDEN_WORLDS_PNG);
                         }
+                    } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                        planet.removeToken(Constants.GARDEN_WORLDS_PNG);
                     }
                 }
             }
         }
+
     }
 
-    public static void checkSigil(Game activeGame) { //Edyn Mech adds Sigil tokens under them
-        for (Player player : activeGame.getPlayers().values()) {
-            if (player.ownsUnit("edyn_mech")) {
-                for (Tile tile : activeGame.getTileMap().values()) {
-                    if (player.hasMechInSystem(tile)) {
-                        tile.addToken(Constants.SIGIL, Constants.SPACE);
-                    } else {
-                        tile.removeToken(Constants.SIGIL, Constants.SPACE);
-                    }
-                }
+    public static void checkSigil(Game game) { //Edyn Mech adds Sigil tokens under them
+        Player player = Helper.getPlayerFromUnit(game, "edyn_mech");
+        if (player == null) {
+            return;
+        }
+
+        for (Tile tile : game.getTileMap().values()) {
+            if (player.hasMechInSystem(tile)) {
+                tile.addToken(Constants.SIGIL, Constants.SPACE);
+            } else {
+                tile.removeToken(Constants.SIGIL, Constants.SPACE);
             }
         }
+
     }
 
     public static void checkOlradinMech(Game activeMap) {
         for (Player player : activeMap.getPlayers().values()) {
             String tokenToAdd;
+            String tokenToRemove;
             if (player.ownsUnit("olradin_mech_positive")) {
                 tokenToAdd = Constants.OLRADIN_MECH_INF_PNG;
+                tokenToRemove = Constants.OLRADIN_MECH_RES_PNG;
             } else if (player.ownsUnit("olradin_mech_negative")) {
                 tokenToAdd = Constants.OLRADIN_MECH_RES_PNG;
+                tokenToRemove = Constants.OLRADIN_MECH_INF_PNG;
             } else {
                 continue;
             }
@@ -69,6 +80,7 @@ public class DiscordantStarsHelper {
                                 planet.removeToken(Constants.OLRADIN_MECH_RES_PNG);
                             } else if (oneMechCheck(planet.getName(), activeMap, player)) {
                                 planet.addToken(tokenToAdd);
+                                planet.removeToken(tokenToRemove);
                             }
                         }
                     }
@@ -90,73 +102,84 @@ public class DiscordantStarsHelper {
         return numMechs == 1;
     }
 
-    public static void handleOlradinPoliciesWhenExhaustingPlanets(Game activeGame, Player player, String planet) {
-        if (activeGame == null || !activeGame.isDiscordantStarsMode() || !"action".equalsIgnoreCase(activeGame.getCurrentPhase()) || player == null || !player.hasOlradinPolicies()) return;
+    public static void handleOlradinPoliciesWhenExhaustingPlanets(Game game, Player player, String planet) {
+        if (game == null || !"action".equalsIgnoreCase(game.getPhaseOfGame()) || player == null || !player.hasOlradinPolicies()) return;
         PlanetModel planetModel = Mapper.getPlanet(planet);
         if (planetModel == null) return;
-        StringBuilder sb = new StringBuilder();
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        Planet planetHolder = (Planet) unitHolder;
+        if (planetHolder == null)
+            return;
 
-        if (planetModel.isLegendary()) {
-            sb.append("You exhausted ").append(Emojis.LegendaryPlanet).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-            resolveEnvironmentPreserveAbility(player, planetModel, sb);
-            resolveEconomyEmpowerAbility(player, sb);
-            resolvePeopleConnectAbility(player, planetModel, sb);
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
-            sb.append(
-                "Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
+        boolean hasAbility = planetHolder.isLegendary();
+        if (hasAbility) {
+            resolveEnvironmentPreserveAbility(player, planetModel, game);
+            resolveEconomyEmpowerAbility(player, game, planetModel);
+            resolvePeopleConnectAbility(player, planetModel, game);
             return;
         }
 
-        switch (planetModel.getPlanetType()) {
-            case HAZARDOUS -> {
-                sb.append("You exhausted ").append(Emojis.Hazardous).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-                resolveEnvironmentPreserveAbility(player, planetModel, sb);
-            }
-            case INDUSTRIAL -> {
-                sb.append("You exhausted ").append(Emojis.Industrial).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-                resolveEconomyEmpowerAbility(player, sb);
-                resolveEconomyExploitAbility(player, sb);
-            }
-            case CULTURAL -> {
-                sb.append("You exhausted ").append(Emojis.Cultural).append(planetModel.getName()).append(" and triggered the following abilities:\n");
-                resolvePeopleConnectAbility(player, planetModel, sb);
-            }
-            default -> {
-                return;
+        for (String type : ButtonHelper.getTypeOfPlanet(game, planet)) {
+            switch (type) {
+                case "hazardous" -> {
+                    resolveEnvironmentPreserveAbility(player, planetModel, game);
+                }
+                case "industrial" -> {
+                    resolveEconomyEmpowerAbility(player, game, planetModel);
+                    resolveEconomyExploitAbility(player, planetModel, game);
+                }
+                case "cultural" -> {
+                    resolvePeopleConnectAbility(player, planetModel, game);
+                }
+                default -> {
+                    return;
+                }
             }
         }
-        sb.append(
-            "Please be mindful that these abilities can only be used 'Once per Action' and this suggestion *may* be incorrectly timed.\nPlease resolve these abilities yourself and report them to all players.");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
+
     }
 
-    private static void resolveEconomyExploitAbility(Player player, StringBuilder sb) {
+    private static void resolveEconomyExploitAbility(Player player, PlanetModel planetModel, Game game) {
         if (!player.getHasUsedEconomyExploitAbility() && player.hasAbility("policy_the_economy_exploit")) { //add a fighter with ships
             player.setHasUsedEconomyExploitAbility(true);
-            sb.append("**The Economy - Exploit (+)**: You may place 1 " + Emojis.fighter + "Fighter from your reinforcements in a system that contains 1 or more of your ships.\n");
+            String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The Economy - Exploit (+)**: You may place 1 " + Emojis.fighter + "Fighter from your reinforcements in a system that contains 1 or more of your ships.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            List<Button> buttons = new ArrayList<>();
+            buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "ff", "placeOneNDone_skipbuild"));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
         }
     }
 
-    private static void resolvePeopleConnectAbility(Player player, PlanetModel planetModel, StringBuilder sb) {
-        if (!player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect")) {
-            player.setHasUsedPeopleConnectAbility(true);
-            sb.append("> **The People - Connect (+)**: You may move 1 " + Emojis.infantry + "Infantry on ").append(planetModel.getName()).append(" to another planet you control.\n");
+    private static void resolvePeopleConnectAbility(Player player, PlanetModel planetModel, Game game) {
+        UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planetModel.getId(), game);
+
+        if (!player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect") && uh != null && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+            String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The People - Connect (+)**: You may move 1 " + Emojis.infantry + "Infantry on " + planetModel.getName() + " to another planet you control.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            List<Button> buttons = ButtonHelperAbilities.offerOlradinConnectButtons(player, game, planetModel.getId());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
         }
     }
 
-    private static void resolveEconomyEmpowerAbility(Player player, StringBuilder sb) {
+    private static void resolveEconomyEmpowerAbility(Player player, Game game, PlanetModel planetModel) {
         if (!player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
             player.setHasUsedEconomyEmpowerAbility(true);
-            sb.append("> **The Economy - Empower (+)**: You gain 1 " + Emojis.comm + "commodity.\n");
+            String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The Economy - Empower (+)**: You gain 1 " + Emojis.comm + "commodity.\n";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
+                .withEmoji(Emoji.fromFormatted(Emojis.comm));
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "Resolve ability", getCommButton);
         }
     }
 
-    private static void resolveEnvironmentPreserveAbility(Player player, PlanetModel planetModel, StringBuilder sb) {
+    private static void resolveEnvironmentPreserveAbility(Player player, PlanetModel planetModel, Game game) {
         if (!player.getHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
-            player.setHasUsedEnvironmentPreserveAbility(true);
-            String planetType = planetModel.getPlanetType().toString();
-            String fragmentType = Emojis.getEmojiFromDiscord(StringUtils.left(planetType, 1) + "frag");
-            sb.append("> **The Environment - Preserve (+)**: You may reveal the top card of the ").append(Emojis.getEmojiFromDiscord(planetType)).append(planetType).append(" deck; if it is a ").append(fragmentType).append(" relic fragment, gain it, otherwise discard that card.\n");
+            List<Button> buttons = ButtonHelperAbilities.getOlradinPreserveButtons(game, player, planetModel.getId());
+            if (buttons.size() > 0) {
+                String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you can resolve the following ability: **The Environment - Preserve (+)**: You may reveal the top card of the planets types exploration deck; if it is a relic fragment, gain it, otherwise discard that card.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Resolve ability", buttons);
+            }
         }
     }
 }

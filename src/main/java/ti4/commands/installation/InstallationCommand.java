@@ -48,30 +48,6 @@ public class InstallationCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         InstallationSubcommandData executedCommand = null;
@@ -92,12 +68,11 @@ public class InstallationCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
-        MapGenerator.saveImageToWebsiteOnly(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
+        MapGenerator.saveImageToWebsiteOnly(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
-
 
     protected String getActionDescription() {
         return "Installations";

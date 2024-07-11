@@ -1,1 +1,16 @@
-{"id":"d11","name":"Void","aliases":["d11","ghoti","DS_ghoti"],"imagePath":"D11_Void.png","shipPositionsType":"TYPE08","spaceTokenLocations":[],"wormholes":[],"planets":[]}
+{
+    "id": "d11",
+    "name": "Void",
+    "aliases": [
+        "d11",
+        "ghoti",
+        "DS_ghoti"
+    ],
+    "imagePath": "D11_Void.png",
+    "shipPositionsType": "TYPE08",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [],
+    "source": "ds",
+    "tileBack": "green"
+}

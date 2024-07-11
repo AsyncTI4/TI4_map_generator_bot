@@ -31,7 +31,7 @@ public class CaptureCommand implements Command {
         if (event.getName().equals(getActionID())) {
             String userID = event.getUser().getId();
             GameManager gameManager = GameManager.getInstance();
-             
+
             if (!gameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
@@ -44,30 +44,6 @@ public class CaptureCommand implements Command {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
     }
 
     @Override
@@ -91,12 +67,11 @@ public class CaptureCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
 
-        MapGenerator.saveImageToWebsiteOnly(activeGame, event);
+        MapGenerator.saveImageToWebsiteOnly(game, event);
     }
-
 
     protected String getActionDescription() {
         return "Capture units";
@@ -113,7 +88,7 @@ public class CaptureCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

@@ -32,15 +32,21 @@ public class SpeakerOrderDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getItemEmoji() {
-        if ("1".equals(ItemId)) {
-            return Emojis.SpeakerToken;
+        try {
+            return Emojis.getSpeakerPickEmoji(getSpeakerOrder());
+        } catch (Exception e) {
+            return Emojis.getResourceEmoji(getSpeakerOrder());
         }
-        return Emojis.getResourceEmoji(Integer.parseInt(ItemId));
     }
 
-    public static List<DraftItem> buildAllDraftableItems(Game activeGame) {
+    @JsonIgnore
+    public int getSpeakerOrder() {
+        return Integer.parseInt(ItemId);
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(Game game) {
         List<DraftItem> allItems = new ArrayList<>();
-        for (int i = 0; i < activeGame.getRealPlayers().size(); i++) {
+        for (int i = 0; i < game.getRealPlayers().size(); i++) {
             allItems.add(DraftItem.Generate(DraftItem.Category.DRAFTORDER, Integer.toString(i + 1)));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.DRAFTORDER);

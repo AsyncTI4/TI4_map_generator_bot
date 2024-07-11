@@ -6,6 +6,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
 
@@ -16,11 +17,11 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player activePlayer = activeGame.getPlayer(getUser().getId());
-        activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
+        Game game = getActiveGame();
+        Player activePlayer = game.getPlayer(getUser().getId());
+        activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
         if (activePlayer == null) {
-            sendMessage("Player not found in game.");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
             return;
         }
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
@@ -30,11 +31,11 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
             if (Mapper.getExplore(id) != null) {
                 activePlayer.removeFragment(id);
                 sb.append("Fragment discarded: ").append(displayExplore(id)).append(System.lineSeparator());
-                activeGame.addExplore(id);
+                game.addExplore(id);
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

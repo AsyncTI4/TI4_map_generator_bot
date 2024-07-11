@@ -1,12 +1,19 @@
 package ti4.commands.status;
 
+import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.PublicObjectiveModel;
 
 public class POInfo extends StatusSubcommandData {
     public POInfo() {
@@ -16,35 +23,37 @@ public class POInfo extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        var includeScored = event.getOption(Constants.INCLUDE_SCORED, false, OptionMapping::getAsBoolean);
+        boolean includeScored = event.getOption(Constants.INCLUDE_SCORED, false, OptionMapping::getAsBoolean);
 
-        var game = getActiveGame();
-        var publicObjectiveIDs = game.getRevealedPublicObjectives();
-        var scoredPublicObjectives = game.getScoredPublicObjectives();
-        var publicObjectives = publicObjectiveIDs.entrySet().stream()
+        Game game = getActiveGame();
+        Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();
+        Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
+        List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.entrySet().stream()
             .filter(id -> Mapper.isValidPublicObjective(id.getKey()))
             .map(id -> Mapper.getPublicObjective(id.getKey()))
             .toList();
 
-        var stringBuilder = new StringBuilder();
+        Player currentPlayer = game.getPlayer(getUser().getId());
+        StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("__**Current Public Objectives**__\n");
         int publicObjectiveNumber = 1;
-        for (var publicObjective : publicObjectives) {
+        for (PublicObjectiveModel publicObjective : publicObjectives) {
             stringBuilder.append(publicObjectiveNumber)
                 .append(". ")
                 .append(publicObjective.getRepresentation())
                 .append("\n");
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {
-                var playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
+                List<Player> playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
                     .map(player -> game.getPlayer(player))
                     .filter(player -> player != null)
+                    .filter(player -> !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
                     .toList();
 
                 if (!playersWhoHaveScoredObjective.isEmpty()) {
                     stringBuilder.append("> Scored By:");
                 }
-                for (var player : playersWhoHaveScoredObjective) {
+                for (Player player : playersWhoHaveScoredObjective) {
                     stringBuilder.append(player.getFactionEmoji());
                 }
                 stringBuilder.append("\n");
@@ -54,7 +63,6 @@ public class POInfo extends StatusSubcommandData {
 
         MessageHelper.sendMessageToChannel(
             event.getMessageChannel(),
-            stringBuilder.toString()
-        );
+            stringBuilder.toString());
     }
 }

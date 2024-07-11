@@ -133,7 +133,7 @@ public class ConvertTTPGtoAsync {
     //     // JsonNode node = toJson(map);
     //     // System.out.println(generateString(node,true));
 
-    //     MapSaveLoadManager.saveMap(map);
+    //     MapSaveLoadManager.saveMap(map, "Converted from TTPG");
     //     // Map newMap = MapSaveLoadManager.loadMap
     // }
 
@@ -145,8 +145,8 @@ public class ConvertTTPGtoAsync {
                 BotLogger.log("TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
                 return false;
             }
-            Game activeGame = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
-            GameSaveLoadManager.saveMap(activeGame);
+            Game game = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
+            GameSaveLoadManager.saveMap(game, "Imported from TTPG");
             GameSaveLoadManager.loadMaps();
         } catch (Exception e) {
             BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename, e);

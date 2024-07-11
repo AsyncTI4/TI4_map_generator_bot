@@ -15,15 +15,15 @@ public class RelicLookAtTop extends GenericRelicAction {
     }
 
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        List<String> relicDeck = activeGame.getAllRelics();
+        Game game = getActiveGame();
+        List<String> relicDeck = game.getAllRelics();
         if (relicDeck.isEmpty()) {
-            sendMessage("Relic deck is empty");
+            MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
             return;
         }
         String relicID = relicDeck.get(0);
         RelicModel relicModel = Mapper.getRelic(relicID);
         String sb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);
     }
 }

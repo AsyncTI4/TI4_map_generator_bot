@@ -17,20 +17,20 @@ public class ShowPurgedActionCards extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        showPurged(activeGame, event);
+        Game game = getActiveGame();
+        showPurged(game, event);
     }
 
-    public void showPurged(Game activeGame, GenericInteractionCreateEvent event){
+    public void showPurged(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("Action card purge list: ").append("\n");
         int index = 1;
-        for (Map.Entry<String, Integer> ac : activeGame.getPurgedActionCards().entrySet()) {
-            sb.append("`").append(index).append(".").append(Helper.leftpad("("+ac.getValue(), 4)).append(")` - ");
-            if(Mapper.getActionCard(ac.getKey()) != null){
+        for (Map.Entry<String, Integer> ac : game.getPurgedActionCards().entrySet()) {
+            sb.append("`").append(index).append(".").append(Helper.leftpad("(" + ac.getValue(), 4)).append(")` - ");
+            if (Mapper.getActionCard(ac.getKey()) != null) {
                 sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation());
             }
-            
+
             index++;
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());

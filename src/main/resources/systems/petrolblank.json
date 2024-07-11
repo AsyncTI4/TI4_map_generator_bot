@@ -1,0 +1,10 @@
+{
+    "id": "petrolblank",
+    "name": "Petrol, blank draft tile",
+    "aliases": [
+        "petrolblank"
+    ],
+    "imagePath": "draft_petrolblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

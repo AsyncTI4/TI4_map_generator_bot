@@ -1,5 +1,15 @@
 package ti4.commands.planet;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,15 +22,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import ti4.message.MessageHelper;
 
 public abstract class PlanetAddRemove extends PlanetSubcommandData {
     public PlanetAddRemove(String id, String description) {
@@ -38,12 +40,12 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
@@ -57,32 +59,32 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
         Set<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(OptionMapping::getAsString).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        sendMessage(getActionHeaderMessage(activeGame, player) + ":");
+        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(game, player) + ":");
 
         for (String planetID : planetIDs) {
-            parseParameter(event, player, planetID, activeGame);
+            parseParameter(event, player, planetID, game);
         }
     }
 
-    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Game activeGame) {
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Game game) {
         try {
             if (Mapper.isValidPlanet(planetID)) {
-                doAction(player, planetID, activeGame);
-                sendMessage("> " + resolvePlanetMessage(planetID));
+                doAction(event, player, planetID, game);
+                MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planetID));
             } else {
-                Set<String> planets = activeGame.getPlanets();
+                Set<String> planets = game.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
-                if (possiblePlanets.isEmpty()){
-                    sendMessage("> No matching Planet '" + planetID + "'' found - please try again.");
+                if (possiblePlanets.isEmpty()) {
+                    MessageHelper.sendMessageToEventChannel(event, "> No matching Planet '" + planetID + "'' found - please try again.");
                     return;
                 } else if (possiblePlanets.size() > 1) {
-                    sendMessage("> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
+                    MessageHelper.sendMessageToEventChannel(event, "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
                     return;
                 }
                 String planet = possiblePlanets.get(0);
                 BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
-                doAction(player, planet, activeGame);
-                sendMessage("> " + resolvePlanetMessage(planet));
+                doAction(event, player, planet, game);
+                MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
             BotLogger.log(event, "Error parsing planet: " + planetID);
@@ -90,42 +92,45 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
         }
     }
 
-    public abstract void doAction(Player player, String techID, Game activeGame);
+    public abstract void doAction(GenericInteractionCreateEvent event, Player player, String techID, Game game);
 
-    /** Customize the initial header response depending on ActionID (which /player planet_* action is used)
+    /**
+     * Customize the initial header response depending on ActionID (which /player planet_* action is used)
      */
-    private String getActionHeaderMessage(Game activeGame, Player player) {
+    private String getActionHeaderMessage(Game game, Player player) {
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" ");
         return switch (getActionID()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s):").toString();
             case Constants.PLANET_REMOVE -> message.append(" removed planet(s):").toString();
             case Constants.PLANET_EXHAUST -> message.append(" exhausted planet(s):").toString();
             case Constants.PLANET_REFRESH -> message.append(" readied planet(s):").toString();
-            case Constants.PLANET_EXHAUST_ABILITY -> message.append(" exhausted the legendary ability:").toString();
+            case Constants.PLANET_EXHAUST_ABILITY -> message.append(" exhausted the legendary ability").toString();
             case Constants.PLANET_REFRESH_ABILITY -> message.append(" readied the legendary ability:").toString();
             default -> "";
         };
     }
 
-    /** Customize the message depending on ActionID and planet name
+    /**
+     * Customize the message depending on ActionID and planet name
+     * 
      * @return special message depending on which action was used and which planet was targeted
      */
     private String resolvePlanetMessage(String planet) {
         // System.out.println("resolving " + getActionID() + " message for " + planet);
         if (getActionID().equals(Constants.PLANET_EXHAUST_ABILITY)) {
             return switch (planet) {
-                case "hopesend" ->  Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**: You may exhaust this card at the end of your turn to place 1 mech from your reinforcements on any planet you control, or draw 1 action card";
-                case "primor" ->  Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**: You may exhaust this card at the end of your turn to place up to 2 infantry from your reinforcements on any planet you control";
-                case "mallice" ->  Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**: You may exhaust this card at the end of your turn to gain 2 trade goods or convert all of your commodities into trade goods";
-                case "mirage" ->  Emojis.LegendaryPlanet + " **Mirage Flight Academy**: You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships";
+                case "hopesend" -> Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**: You may exhaust this card at the end of your turn to place 1 mech from your reinforcements on any planet you control, or draw 1 action card";
+                case "primor" -> Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**: You may exhaust this card at the end of your turn to place up to 2 infantry from your reinforcements on any planet you control";
+                case "mallice" -> Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**: You may exhaust this card at the end of your turn to gain 2 trade goods or convert all of your commodities into trade goods";
+                case "mirage" -> Emojis.LegendaryPlanet + " **Mirage Flight Academy**: You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships";
                 default -> planet;
             };
         } else if (getActionID().equals(Constants.PLANET_REFRESH_ABILITY)) {
             return switch (planet) {
-                case "hopesend" ->  Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**";
-                case "primor" ->  Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**";
-                case "mallice" ->  Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**";
-                case "mirage" ->  Emojis.LegendaryPlanet + " **Mirage Flight Academy**";
+                case "hopesend" -> Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**";
+                case "primor" -> Emojis.Primor + Emojis.LegendaryPlanet + " **The Atrament**";
+                case "mallice" -> Emojis.Mallice + Emojis.LegendaryPlanet + " **Exterrix Headquarters**";
+                case "mirage" -> Emojis.LegendaryPlanet + " **Mirage Flight Academy**";
                 default -> planet;
             };
         } else {

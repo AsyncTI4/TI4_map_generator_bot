@@ -57,7 +57,6 @@
             }
         ]
     },
-    
     {
         "alias": "plus1_roll_mechs_naaz_flagship",
         "type": "extrarolls",
@@ -74,7 +73,6 @@
                 "message": "Naaz Mechs get +1 die due to Flagship"
             }
         ]
-
     },
     {
         "alias": "plus1_1round_all",
@@ -278,13 +276,13 @@
         "valueScalingType": "damaged_units_same_type",
         "persistenceType": "CONDITIONAL",
         "condition": "nivyn_commander_damaged",
-        "scope": "_ship_",
+        "scope": "",
         "forCombatAbility": "combatround",
         "related": [
             {
                 "type": "custom",
                 "alias": "custom",
-                "message": "> Nivyn Commander Grants an Extra Die To Sustained Ships\n"
+                "message": "> Nivyn Commander Grants an Extra Die To Up To 2 Sustained Units\n"
             }
         ]
     },
@@ -383,6 +381,37 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "minus1_roll_tnelis_flagship",
+        "type": "extrarolls",
+        "value": "-1",
+        "scope": "_best_",
+        "persistenceType": "CONDITIONAL",
+        "condition": "tnelisopponentfs",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "Tnelis Flagship causes -1 to best ships rolls"
+            }
+        ]
+    },
+    {
+        "alias": "plus1_roll_cheiran_fs_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "next_to_structure",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "cheiran_flagship"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
         "alias": "plus1_roll_argent_commander_bombard",
         "type": "extrarolls",
         "value": "+1",
@@ -466,10 +495,6 @@
             {
                 "type": "ability",
                 "alias": "unrelenting"
-            },
-            {
-                "type": "relic",
-                "alias": "absol_thalnos"
             }
         ],
         "forCombatAbility": "combatround"
@@ -640,6 +665,21 @@
         "forCombatAbility": "combatround"
     },
     {
+        "alias": "plus1_roll_cheiran_fs_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "next_to_structure",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "cheiran_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "plus_x_opponent_faction_tech_always_mech",
         "type": "mods",
         "value": "+1",
@@ -780,7 +820,6 @@
                 "alias": "mirvedacommander"
             }
         ],
-        
         "forCombatAbility": "SpaceCannonOffence"
     },
     {
@@ -817,6 +856,36 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus_x_frag_always_flagship_spacecannon",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
+        "alias": "plus_x_frag_always_flagship_bombardment",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistenceType": "ALWAYS",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
         "alias": "miltymod_cruiser2_bonus_hits_9_10",
         "type": "bonus_hits",
         "value": "+1",
@@ -845,5 +914,50 @@
             }
         ],
         "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_every_round_of_combat",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "combat_round",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "veldyr_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_every_adjacent_mech_comb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_mech",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "gledge_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_every_adjacent_mech_bomb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_mech",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "gledge_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
     }
 ]

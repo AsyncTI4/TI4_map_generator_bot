@@ -1,0 +1,109 @@
+{
+    "id": "shigonas",
+    "tileId": "er65",
+    "name": "Shigonas",
+    "aliases": [
+        "shigonas"
+    ],
+    "positionInTile": {
+        "x": 200.0,
+        "y": 210.0
+    },
+    "resources": 0,
+    "influence": 2,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "unitPositions": {
+        "unitHolderName": "shigonas",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 159.0,
+                    "y": 197.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 130.0,
+                    "y": 232.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 164.0,
+                    "y": 224.0
+                },
+                {
+                    "x": 181.0,
+                    "y": 224.0
+                },
+                {
+                    "x": 198.0,
+                    "y": 224.0
+                },
+                {
+                    "x": 173.0,
+                    "y": 235.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 235.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 166.0,
+                    "y": 153.0
+                },
+                {
+                    "x": 184.0,
+                    "y": 153.0
+                },
+                {
+                    "x": 159.0,
+                    "y": 166.0
+                },
+                {
+                    "x": 177.0,
+                    "y": 166.0
+                },
+                {
+                    "x": 195.0,
+                    "y": 166.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 178.0,
+                    "y": 194.0
+                },
+                {
+                    "x": 145.0,
+                    "y": 194.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 97.0,
+                    "y": 201.0
+                },
+                {
+                    "x": 221.0,
+                    "y": 155.0
+                },
+                {
+                    "x": 229.0,
+                    "y": 186.0
+                },
+                {
+                    "x": 221.0,
+                    "y": 217.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "Shigonas is one of the better archaeological Lazax sites, and researchers and entrepreneurs flock to it despite the poisonous atmosphere.",
+    "source": "eronous"
+}

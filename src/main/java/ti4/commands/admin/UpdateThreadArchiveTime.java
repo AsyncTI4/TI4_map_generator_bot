@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.message.MessageHelper;
 
 public class UpdateThreadArchiveTime extends AdminSubcommandData {
     public UpdateThreadArchiveTime() {
@@ -22,7 +23,7 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.THREAD_SEARCH_STRING, null, OptionMapping::getAsString).toLowerCase();
         if (searchString.isEmpty() || searchString.isBlank()) {
-            sendMessage("Please do better with the search string.");
+            MessageHelper.sendMessageToEventChannel(event, "Please do better with the search string.");
             return;
         }
 
@@ -38,13 +39,13 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
         }
 
         if (autoArchiveDuration == null) {
-            sendMessage("Must pick autoArchive duration from the list");
+            MessageHelper.sendMessageToEventChannel(event, "Must pick autoArchive duration from the list");
             return;
         }
 
         Guild guild = event.getGuild();
         if (guild == null) {
-            sendMessage("What did you do wrong this time?");
+            MessageHelper.sendMessageToEventChannel(event, "What did you do wrong this time?");
             return;
         }
 
@@ -56,7 +57,7 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
             threadChannel.getManager().setAutoArchiveDuration(autoArchiveDuration).queue();
             sb.append("> ").append(threadChannel.getAsMention()).append("\n");
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 
 }

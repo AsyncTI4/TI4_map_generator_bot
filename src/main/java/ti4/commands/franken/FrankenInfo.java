@@ -10,20 +10,20 @@ public class FrankenInfo extends FrankenSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        //Game activeGame = getActiveGame();
-        //String threadName = activeGame.getName() + " - Franken Info";
-        //MessageHelper.sendMessageToThread(event.getChannel(), threadName, getFrankenInfo(activeGame));
+        //Game game = getActiveGame();
+        //String threadName = game.getName() + " - Franken Info";
+        //MessageHelper.sendMessageToThread(event.getChannel(), threadName, getFrankenInfo(game));
     }
 
-//    public static String getFrankenInfo(Game activeGame) {
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("# __Franken Info for ").append(activeGame.getName()).append("__\n");
-//
-//        for (Player player : activeGame.getRealPlayers()) {
-//            sb.append("## ").append(player.getUserName()).append("\n");
-//            //stuff for each player
-//        }
-//
-//        return "";
+    //    public static String getFrankenInfo(Game game) {
+    //        StringBuilder sb = new StringBuilder();
+    //        sb.append("# __Franken Info for ").append(game.getName()).append("__\n");
+    //
+    //        for (Player player : game.getRealPlayers()) {
+    //            sb.append("## ").append(player.getUserName()).append("\n");
+    //            //stuff for each player
+    //        }
+    //
+    //        return "";
     //}
 }

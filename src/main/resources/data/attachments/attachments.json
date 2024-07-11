@@ -99,6 +99,16 @@
         ]
     },
     {
+        "id": "threetraits",
+        "imagePath": "attachment_threetraits.png",
+        "planetTypes": [
+            "cultural",
+            "industrial",
+            "hazardous"
+        ],
+        "isFakeAttachment": true
+    },
+    {
         "id": "negativeinf",
         "imagePath": "attachment_negativeinf.png",
         "influenceModifier": -1
@@ -173,27 +183,32 @@
     },
     {
         "id": "lizhotrap",
-        "imagePath": "attachment_lizhotrap.png"
+        "imagePath": "attachment_lizhotrap.png",
+        "isFakeAttachment": true
     },
     {
         "id": "veldyrtaxhaven",
         "imagePath": "attachment_veldyrtaxhaven.png",
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "isFakeAttachment": true
     },
     {
         "id": "veldyrbroadcasthub",
         "imagePath": "attachment_veldyrbroadcasthub.png",
-        "influenceModifier": 1
+        "influenceModifier": 1,
+        "isFakeAttachment": true
     },
     {
         "id": "veldyrreservebank",
         "imagePath": "attachment_veldyrreservebank.png",
-        "resourcesModifier": 1
+        "resourcesModifier": 1,
+        "isFakeAttachment": true
     },
     {
         "id": "veldyrorbitalshipyard",
         "imagePath": "attachment_veldyrorbitalshipyard.png",
-        "resourcesModifier": 1
+        "resourcesModifier": 1,
+        "isFakeAttachment": true
     },
     {
         "id": "automatons",
@@ -330,5 +345,39 @@
         "id": "weaponstat",
         "imagePath": "attachment_weaponstat.png",
         "source": "asteroid"
+    },
+    {
+        "id": "cultural",
+        "imagePath": "attachment_cultural.png",
+        "planetTypes": [
+            "cultural"
+        ],
+        "isFakeAttachment": true
+    },
+    {
+        "id": "industrial",
+        "imagePath": "attachment_industrial.png",
+        "planetTypes": [
+            "industrial"
+        ],
+        "isFakeAttachment": true
+    },
+    {
+        "id": "hazardous",
+        "imagePath": "attachment_hazardous.png",
+        "planetTypes": [
+            "hazardous"
+        ],
+        "isFakeAttachment": true
+    },
+    {
+        "id": "custodiavigilia1",
+        "imagePath": "attachment_custodiavigilia_1.png",
+        "isFakeAttachment": true
+    },
+    {
+        "id": "custodiavigilia2",
+        "imagePath": "attachment_custodiavigilia_2.png",
+        "isFakeAttachment": true
     }
 ]

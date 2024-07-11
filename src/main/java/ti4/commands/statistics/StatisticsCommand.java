@@ -47,8 +47,8 @@ public class StatisticsCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
     }
 
     protected String getActionDescription() {
@@ -63,6 +63,8 @@ public class StatisticsCommand implements Command {
         subcommands.add(new MedianTurnTime());
         subcommands.add(new CompareAFKTimes());
         subcommands.add(new DiceLuck());
+        subcommands.add(new LifetimeRecord());
+        subcommands.add(new FactionRecordOfTech());
         subcommands.add(new StellarConverter());
 
         return subcommands;

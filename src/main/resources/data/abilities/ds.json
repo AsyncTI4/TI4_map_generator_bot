@@ -319,7 +319,7 @@
     },
     {
         "id": "glory",
-        "name": "For Glory",
+        "name": "Glory",
         "faction": "kjalengard",
         "window": "After you win a combat",
         "windowEffect": "You may place or move a Glory token into the active system, or spend 1 token from your strategy pool to research a unit upgrade technology of the same type as 1 of your units that participated in that combat.",
@@ -336,7 +336,7 @@
     },
     {
         "id": "heroism",
-        "name": "Heroic Tales",
+        "name": "Heroism",
         "faction": "kjalengard",
         "permanentEffect": "Capture your infantry and fighters that are destroyed during combat.",
         "window": "When you pass",
@@ -410,7 +410,15 @@
     },
     {
         "id": "fervor",
-        "name": "Fervor",
+        "name": "Zealous",
+        "faction": "kortali",
+        "window": "When you spend a command token to resolve the secondary ability of the \"Warfare\" strategy card",
+        "windowEffect": "You may resolve the primary ability instead.",
+        "source": "ds"
+    },
+    {
+        "id": "zealous",
+        "name": "Zealous",
         "faction": "kortali",
         "window": "When you spend a command token to resolve the secondary ability of the \"Warfare\" strategy card",
         "windowEffect": "You may resolve the primary ability instead.",
@@ -429,7 +437,7 @@
         "name": "Contagion",
         "faction": "kyro",
         "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card",
-        "windowEffect": "Commit 1 infantry from your reinforcements to each of 2 planets that are in or adjacent to a system that contains a planet you control; resolve invasion on those planets.",
+        "windowEffect": "Before 3/31/24: Commit 1 infantry from your reinforcements to each of 2 planets that are in or adjacent to a system that contains a planet you control; resolve invasion on those planets. After 3/31/24: commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
         "source": "ds"
     },
     {
@@ -468,7 +476,7 @@
         "name": "War Stories",
         "faction": "lanefir",
         "window": "Once per action, after you win a combat",
-        "windowEffect": "Explore 1 planet you control, or if the active system does not contain any planets, the frontier exploration deck in the active system.",
+        "windowEffect": "You may explore 1 planet you control, or if the active system does not contain any planets, the frontier exploration deck in the active system.",
         "source": "ds"
     },
     {

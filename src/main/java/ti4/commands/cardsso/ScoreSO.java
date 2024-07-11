@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -31,26 +32,26 @@ public class ScoreSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            sendMessage("Please select which Secret Objective to score");
+            MessageHelper.sendMessageToEventChannel(event, "Please select which Secret Objective to score");
             return;
         }
 
         int soID = option.getAsInt();
-        scoreSO(event, activeGame, player, soID, event.getChannel());
+        scoreSO(event, game, player, soID, event.getChannel());
     }
 
-    public static void scoreSO(GenericInteractionCreateEvent event, Game activeGame, Player player, int soID, MessageChannel channel) {
+    public static void scoreSO(GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
-        boolean scored = activeGame.scoreSecretObjective(player.getUserID(), soID);
+        boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return;
@@ -61,33 +62,39 @@ public class ScoreSO extends SOCardsSubcommandData {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey())).append("\n");
-            for(Player p2: activeGame.getRealPlayers()){
-                if(p2 == player){
+            if (ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) > 0) {
+                message.append(SOInfo.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
+                message.append(" (" + ListPlayerInfoButton.getPlayerProgressOnObjective(entry.getKey(), game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) + ")\n");
+            } else {
+                message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey()));
+            }
+            //message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey())).append("\n");
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player) {
                     continue;
                 }
-                if(p2.hasLeaderUnlocked("tnelishero")){
+                if (p2.hasLeaderUnlocked("tnelishero")) {
                     List<Button> buttons = new ArrayList<>();
                     String soStringID = entry.getKey();
-                    buttons.add(Button.success("tnelisHeroAttach_"+soStringID, "Attach to "+Mapper.getSecretObjectivesJustNames().get(soStringID)));
-                    buttons.add(Button.danger("deleteButtons","Decline"));
-                    String msg = p2.getRepresentation(true, true)+ " you have the opportunity to attach your hero to the recently scored SO "+Mapper.getSecretObjectivesJustNames().get(soStringID) +". Use buttons to resolve";
+                    buttons.add(Button.success("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
+                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach your hero to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
-            if(entry.getKey().equalsIgnoreCase("dhw")){
+            if (entry.getKey().equalsIgnoreCase("dhw")) {
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> fragmentsToPurge = new ArrayList<>();
                     List<String> playerFragments = player.getFragments();
                     fragmentsToPurge.addAll(playerFragments);
                     for (String fragid : fragmentsToPurge) {
                         player.removeFragment(fragid);
-                        activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
+                        game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                     }
                     String message2 = player.getRepresentation() + " purged fragments: "
-                    + fragmentsToPurge;
-                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), message2);
-                }else{
+                        + fragmentsToPurge;
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
+                } else {
                     Player p1 = player;
                     String finChecker = p1.getFinsFactionCheckerPrefix();
                     List<Button> purgeFragButtons = new ArrayList<>();
@@ -97,7 +104,7 @@ public class ScoreSO extends SOCardsSubcommandData {
                     }
                     if (p1.getIrf() > 0) {
                         Button transact = Button.success(finChecker + "purge_Frags_IRF_1",
-                                "Purge 1 Industrial Fragment");
+                            "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (p1.getHrf() > 0) {
@@ -106,13 +113,13 @@ public class ScoreSO extends SOCardsSubcommandData {
                     }
                     if (p1.getUrf() > 0) {
                         Button transact = Button.secondary(finChecker + "purge_Frags_URF_1",
-                                "Purge 1 Frontier Fragment");
+                            "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
                     Button transact2 = Button.success(finChecker + "deleteButtons", "Done purging");
                     purgeFragButtons.add(transact2);
-                    
-                    MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeGame), "Purge 2 fragments please", purgeFragButtons);
+
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Purge 2 fragments please", purgeFragButtons);
                 }
             }
         }
@@ -123,17 +130,17 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
 
         // FoW logic, specific for players with visilibty, generic for the rest
-        if (activeGame.isFoWMode()) {
-            FoWHelper.pingPlayersDifferentMessages(activeGame, event, player, message.toString(), "Scores changed");
+        if (game.isFowMode()) {
+            FoWHelper.pingPlayersDifferentMessages(game, event, player, message.toString(), "Scores changed");
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
         String headerText = player.getRepresentation();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        SOInfo.sendSecretObjectiveInfo(activeGame, player);
-        Helper.checkIfHeroUnlocked(event, activeGame, player);
-        if(player.getLeaderIDs().contains("nomadcommander") && !player.hasLeaderUnlocked("nomadcommander")){
-                ButtonHelper.commanderUnlockCheck(player, activeGame, "nomad", event);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        SOInfo.sendSecretObjectiveInfo(game, player);
+        Helper.checkIfHeroUnlocked(game, player);
+        if (player.getLeaderIDs().contains("nomadcommander") && !player.hasLeaderUnlocked("nomadcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "nomad", event);
         }
-        Helper.checkEndGame(activeGame, player);
+        Helper.checkEndGame(game, player);
     }
 }

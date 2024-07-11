@@ -8,19 +8,21 @@
         "custodia",
         "vigilia",
         "cust",
-        "cv"
+        "cv",
+        "custodiavigilia"
     ],
     "positionInTile": null,
     "resources": 2,
     "influence": 3,
     "factionHomeworld": null,
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": null,
-    "legendaryAbilityText": null,
+    "legendaryAbilityName": "Custodian's Favour",
+    "legendaryAbilityText": "While you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores a victory point with the second clause of the 'Imperial' strategy card.",
     "unitPositions": null,
     "spaceCannonDieCount": 1,
     "spaceCannonHitsOn": 5,
-    "flavourText": "*Custodia Vigilia. The fully realized seat of the Keleres. A veritable fortress in the heart of Mecatol City. Ten thousand people come and go daily, and the Keleres see them all.*"
+    "flavourText": "*Custodia Vigilia. The fully realized seat of the Keleres. A veritable fortress in the heart of Mecatol City. Ten thousand people come and go daily, and the Keleres see them all.*",
+    "source": "codex3"
 }

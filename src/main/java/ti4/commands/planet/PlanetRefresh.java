@@ -1,6 +1,6 @@
 package ti4.commands.planet;
 
-import ti4.helpers.ButtonHelper;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -12,9 +12,13 @@ public class PlanetRefresh extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Game activeGame) {
-        if(!player.getPlanets().contains(planet)){
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation()+" the bot doesnt think you have a planet by the name of "+planet);
+    public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
+        doAction(player, planet, game);
+    }
+
+    public static void doAction(Player player, String planet, Game game) {
+        if (!player.getPlanets().contains(planet)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " the bot doesnt think you have a planet by the name of " + planet);
         }
         player.refreshPlanet(planet);
     }

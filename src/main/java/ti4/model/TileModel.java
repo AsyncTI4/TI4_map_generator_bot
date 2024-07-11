@@ -1,25 +1,27 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.Point;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
-import ti4.message.BotLogger;
+import ti4.model.Source.ComponentSource;
 
 @Data
-public class TileModel {
+public class TileModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String name;
     private List<String> aliases;
     private String imagePath;
-    private List<String> planetIds;
+    private List<String> planets;
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
@@ -27,18 +29,20 @@ public class TileModel {
     private Boolean isSupernova;
     private Boolean isNebula;
     private Boolean isGravityRift;
+    private ComponentSource source;
+    private String tileBack;
+
+    @Override
+    @JsonIgnore
+    public boolean isValid() {
+        return id != null 
+            && imagePath != null
+            && source != null;
+    }
 
     @JsonIgnore
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");
-    }
-
-    public List<String> getPlanets() {
-        return planetIds;
-    }
-
-    public void setPlanets(List<String> planetIds) {
-        this.planetIds = planetIds;
     }
 
     public MessageEmbed getHelpMessageEmbed(boolean includeAliases) {
@@ -68,7 +72,7 @@ public class TileModel {
         String tileName = Mapper.getTileID(getId());
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.log("Could not find tile image: " + getId());
+            //BotLogger.log("Could not find tile image: " + getId());
         }
         return tilePath;
     }
@@ -121,5 +125,20 @@ public class TileModel {
         return getId().toLowerCase().contains(searchString) ||
             getNameNullSafe().toLowerCase().contains(searchString) ||
             (getAliases() != null && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
+    }
+
+    @JsonIgnore
+    public MessageEmbed getRepresentationEmbed() {
+        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+    }
+
+    @JsonIgnore
+    public String getAlias() {
+        return getId();
+    }
+
+    @JsonIgnore
+    public Optional<String> getTileBackOption() {
+        return Optional.ofNullable(tileBack);
     }
 }

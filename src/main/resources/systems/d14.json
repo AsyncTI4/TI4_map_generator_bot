@@ -1,1 +1,23 @@
-{"id":"d14","name":"Pax/Vess/Kyr (Lizho)","aliases":["d14","pax","vess","kyr","lizho","dynasty","DS_lizho"],"imagePath":"D14_Pax.png","shipPositionsType":"TYPE03","spaceTokenLocations":[],"wormholes":[],"planets":["pax","kyr","vess"]}
+{
+    "id": "d14",
+    "name": "Pax/Vess/Kyr (Lizho)",
+    "aliases": [
+        "d14",
+        "pax",
+        "vess",
+        "kyr",
+        "lizho",
+        "dynasty",
+        "DS_lizho"
+    ],
+    "imagePath": "D14_Pax.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "pax",
+        "kyr",
+        "vess"
+    ],
+    "source": "ds"
+}

@@ -29,22 +29,22 @@ public class FighterConscription extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        doFfCon(event, player, activeGame);
+        doFfCon(event, player, game);
     }
 
-    public void doFfCon(GenericInteractionCreateEvent event, Player player, Game activeGame){
+    public void doFfCon(GenericInteractionCreateEvent event, Player player, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
 
         List<Tile> tilesAffected = new ArrayList<>();
-        for (Tile tile : activeGame.getTileMap().values()) {
+        for (Tile tile : game.getTileMap().values()) {
             boolean hasSD = false;
             boolean hasCap = false;
             boolean blockaded = false;
@@ -84,7 +84,7 @@ public class FighterConscription extends SpecialSubcommandData {
             }
 
             if (!blockaded && (hasCap || hasSD)) {
-                new AddUnits().unitParsing(event, player.getColor(), tile, "ff", activeGame);
+                new AddUnits().unitParsing(event, player.getColor(), tile, "ff", game);
                 tilesAffected.add(tile);
             }
         }

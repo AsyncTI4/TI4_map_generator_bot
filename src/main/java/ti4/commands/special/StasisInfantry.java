@@ -23,10 +23,10 @@ public class StasisInfantry extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -34,12 +34,12 @@ public class StasisInfantry extends SpecialSubcommandData {
 
         OptionMapping option = event.getOption(Constants.COUNT);
         if (option != null) {
-            setValue(event, activeGame, player, player::setStasisInfantry, player::getStasisInfantry, option.getAsString());
+            setValue(event, game, player, player::setStasisInfantry, player::getStasisInfantry, option.getAsString());
         }
 
     }
 
-    public void setValue(SlashCommandInteractionEvent event, Game activeGame, Player player, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
+    public void setValue(SlashCommandInteractionEvent event, Game game, Player player, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
@@ -47,7 +47,7 @@ public class StasisInfantry extends SpecialSubcommandData {
             String explanation = "";
             if (setValue) {
                 consumer.accept(number);
-                String messageToSend = Stats.getSetValueMessage(event, player, Constants.COUNT, number, existingNumber,explanation);
+                String messageToSend = Stats.getSetValueMessage(event, player, Constants.COUNT, number, existingNumber, explanation);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             } else {
                 int newNumber = existingNumber + number;
@@ -57,7 +57,7 @@ public class StasisInfantry extends SpecialSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             }
         } catch (Exception e) {
-            sendMessage("Could not parse number for: " + Constants.COUNT);
+            MessageHelper.sendMessageToEventChannel(event, "Could not parse number for: " + Constants.COUNT);
         }
     }
 

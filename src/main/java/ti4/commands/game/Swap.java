@@ -1,6 +1,9 @@
 package ti4.commands.game;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -9,20 +12,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.player.TurnStart;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
 
 public class Swap extends GameSubcommandData {
 
@@ -35,8 +31,8 @@ public class Swap extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User callerUser = event.getUser();
-        Game activeGame = getActiveGame();
-        Collection<Player> players = activeGame.getPlayers().values();
+        Game game = getActiveGame();
+        Collection<Player> players = game.getPlayers().values();
         Member member = event.getMember();
         boolean isAdmin = false;
         if (member != null) {
@@ -56,8 +52,8 @@ public class Swap extends GameSubcommandData {
         OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if (removeOption != null && addOption != null) {
-            Player removedPlayer = Helper.getPlayer(activeGame, null, event);
-            Player swapperPlayer = activeGame.getPlayer(addOption.getAsUser().getId());
+            Player removedPlayer = Helper.getPlayer(game, null, event);
+            Player swapperPlayer = game.getPlayer(addOption.getAsUser().getId());
             if (removedPlayer == null) {
                 MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
                 return;
@@ -67,23 +63,23 @@ public class Swap extends GameSubcommandData {
                 return;
             }
             User addedUser = addOption.getAsUser();
-            secondHalfOfSwap(activeGame, swapperPlayer, removedPlayer, addedUser, event);
+            secondHalfOfSwap(game, swapperPlayer, removedPlayer, addedUser, event);
         } else {
             MessageHelper.replyToMessage(event, "Specify player to swap");
             return;
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
-        GameSaveLoadManager.reload(activeGame);
+        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.reload(game);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
-    public void secondHalfOfSwap(Game activeGame, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
-        String message;
-        Collection<Player> players = activeGame.getPlayers().values();
+    public void secondHalfOfSwap(Game game, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
+        StringBuilder message = new StringBuilder("Users have swapped factions:\n");
+        message.append("> **Before:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
+        Collection<Player> players = game.getPlayers().values();
         if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
-            message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
-            Player player = activeGame.getPlayer(removedPlayer.getUserID());
-            Map<String, List<String>> scoredPublicObjectives = activeGame.getScoredPublicObjectives();
+            Player player = game.getPlayer(removedPlayer.getUserID());
+            Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
             for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
                 List<String> value = poEntry.getValue();
                 boolean removed = value.remove(removedPlayer.getUserID());
@@ -107,12 +103,12 @@ public class Swap extends GameSubcommandData {
             player.setUserName(addedUser.getName());
             player.setUserID(addedUser.getId());
 
-            if (activeGame.getActivePlayerID() != null && activeGame.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-                // if (!activeGame.isFoWMode()) {
+            if (game.getActivePlayerID() != null && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
+                // if (!game.isFoWMode()) {
                 //     try {
-                //         if (activeGame.getLatestTransactionMsg() != null && !"".equals(activeGame.getLatestTransactionMsg())) {
-                //             activeGame.getMainGameChannel().deleteMessageById(activeGame.getLatestTransactionMsg()).queue();
-                //             activeGame.setLatestTransactionMsg("");
+                //         if (game.getLatestTransactionMsg() != null && !"".equals(game.getLatestTransactionMsg())) {
+                //             game.getMainGameChannel().deleteMessageById(game.getLatestTransactionMsg()).queue();
+                //             game.setLatestTransactionMsg("");
                 //         }
                 //     } catch (Exception e) {
                 //         //  Block of code to handle errors
@@ -120,18 +116,19 @@ public class Swap extends GameSubcommandData {
                 // }
                 // String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
                 // String buttonText = "Use buttons to do your turn. ";
-                // List<Button> buttons = TurnStart.getStartOfTurnButtons(player, activeGame, true, event);
-                // MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(), text);
-                // MessageHelper.sendMessageToChannelWithButtons(activeGame.getMainGameChannel(), buttonText, buttons);
+                // List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
+                // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);
+                // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), buttonText, buttons);
             }
         } else {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
             return;
         }
-        GameSaveLoadManager.saveMap(activeGame, event);
-        GameSaveLoadManager.reload(activeGame);
+        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.reload(game);
         // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
         // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        message.append("> **After:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
     }
 }

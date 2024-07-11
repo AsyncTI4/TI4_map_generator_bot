@@ -1,0 +1,10 @@
+{
+    "id": "lavenderblank",
+    "name": "Lavender, blank draft tile",
+    "aliases": [
+        "lavenderblank"
+    ],
+    "imagePath": "draft_lavenderblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

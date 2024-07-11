@@ -1,6 +1,6 @@
 [
   {
-    "alias": "ancient_data_archive",
+    "alias": "data_archive",
     "name": "Data Archive",
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
@@ -13,7 +13,7 @@
     "name": "Ancient Trade Routes",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose any number of players. Those players gain 1 commodity. During this turn, treat each other player as if you were neighbors.",
+    "text": "Choose up to 2 other players. You and each of those players gain 2 commodities. During this turn, treat those players as if you were neighbors.",
     "flavorText": "\"Stationmaster,\" Kier said, fidgeting nervously, \"we can't just show up expecting cargo. These routes have been dead for centuries.\" Artuno smirked, \"See to it that they are reinstated, then. The Memoria will accompany you if necessary.\"",
     "source": "action_deck_2"
   },
@@ -27,12 +27,21 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "armament_rider",
+    "name": "Armament Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, produce up to 2 units that each have a cost of 4 or less in a system that contains 1 of your space docks.",
+    "flavorText": "Procyon's cold silence enraged Sakora. \"Your ambivalence was expected, as was your cowardice. Fine! At least arm us so that we may once again sacrifice in your stead.\"",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "armistice",
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "End that player's turn and return their command token in the active system to their tactic pool. [Note: They do not have to have a token in the system to play this card.]",
-    "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more. Her thoughts drifted to the Ul, to home, and she sighed audibly.",
+    "text": "End that player's turn. Then, that player may discard 1 random action card from their hand to return their command token in that system to their tactic pool.",
+    "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
     "source": "action_deck_2"
   },
   {
@@ -40,7 +49,7 @@
     "name": "Arms Deal",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 of your neighbors. That player places 1 cruiser and 1 destroyer from their reinforcements in any system containing their ships.",
+    "text": "Choose 1 of your neighbors. That player places up to 1 cruiser and/or destroyer from their reinforcements in a system that contains their ships.",
     "flavorText": "Ipswitch smirked when the Commander asked for the ships' documentation, \"Probably burned... with the bodies.\"",
     "source": "action_deck_2"
   },
@@ -63,11 +72,29 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "averted_crisis",
+    "name": "Averted Crisis",
+    "phase": "Action",
+    "window": "After you pass",
+    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that strategy card is readied, do not spend or place a command token to resolve that ability.",
+    "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "betrayal",
+    "name": "Betrayal",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Choose another player. That player gives you 1 random action card from their hand and cannot play action cards or promissory notes during this turn.",
+    "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "black_market_raid",
     "name": "Black Market Raid",
     "phase": "Action",
     "window": "Action",
-    "text": "Spend 3 resources and purge 2 of your relic fragments to gain 1 relic.",
+    "text": "Purge up to 3 relic fragments and spend 9 resources to gain 1 relic; for each relic fragment purged, reduce the resources spent by 3.",
     "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
     "source": "action_deck_2"
   },
@@ -76,17 +103,8 @@
     "name": "Boarding Torpedoes",
     "phase": "Action",
     "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
-    "text": "Replace that ship with a matching unit from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure, that the other player is treating as a ship, you cannot place that unit.]",
+    "text": "Replace that ship with a matching ship from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
     "flavorText": "\"Brother,\" the Admiral said. \"Our ships are breaking up. If we retreat now...\" Milor glared at him. \"No! Have them launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "brilliant_tactician",
-    "name": "Brilliant Tactician",
-    "phase": "Action",
-    "window": "At the start of your turn",
-    "text": "Redistribute any number of your command tokens on your command sheet or place 1 command token from your reinforcements in your tactic pool.",
-    "flavorText": "Suffi An watched from a safe distance as the payload fell, the glow from the bombardment illuminating her cockpit. Eventually, it would become too dangerous to remain, but for now... for now she would observe.",
     "source": "action_deck_2"
   },
   {
@@ -94,7 +112,7 @@
     "name": "Brutal Occupation",
     "phase": "Action",
     "window": "After you gain control of a planet",
-    "text": "Ready that planet or gain 2 commodities.",
+    "text": "Ready and explore that planet.",
     "flavorText": "The harvest of Ordinian was so complete that even the planet's core was depleted. The Nekro left nothing usable. Only its lifeless shell remained.",
     "source": "action_deck_2"
   },
@@ -102,9 +120,18 @@
     "alias": "chain_reaction",
     "name": "Chain Reaction",
     "phase": "Action",
-    "window": "After you destroy 1 of your opponent's non-fighter ships",
-    "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
+    "window": "After you destroy another player's non-fighter ship in the active system",
+    "text": "Produce 1 hit against that player's ships in that system. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
     "flavorText": "Jace smiled at the rookie pilot's disbelief. The ship the youngster's ordnance connected with had transformed into a deadlier weapon than any in their fleet.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "classified_rider",
+    "name": "Classified Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, look at the top 3 cards of the secret objective deck. Draw 1 of those cards and shuffle the rest back into the deck.",
+    "flavorText": "The din of the council chamber faded as the speaker called for order. Qanoj smiled. A new chapter in  his career would begin today.",
     "source": "action_deck_2"
   },
   {
@@ -117,28 +144,10 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "close_quarters",
-    "name": "Close Quarters",
-    "phase": "Action",
-    "window": "At the start of a combat",
-    "text": "During this combat, apply +3 to the result of your unit's combat rolls and your opponent's unit's combat rolls.",
-    "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "concise_legal_text",
-    "name": "Concise Legal Text",
-    "phase": "Agenda",
-    "window": "When an agenda is revealed",
-    "text": "Players cannot resolve abilities until this agenda is being resolved.",
-    "flavorText": "Magmus chuckled at Elder Junn's look of concern. \"Let's see you worm your way out of this...\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "continuous_barrage",
     "name": "Continuous Barrage",
     "phase": "Action",
-    "window": "At the start of a round of space combat",
+    "window": "At the start of the second round of a space combat",
     "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
     "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
     "source": "action_deck_2"
@@ -148,17 +157,8 @@
     "name": "Corporate Lobbying",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, you and each player that voted for the resolved outcome gain 2 trade goods.",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome gains 2 trade goods.",
     "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "crisis_management",
-    "name": "Crisis Management",
-    "phase": "Action",
-    "window": "After you pass",
-    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that card is readied, spend command tokens from your reinforcements instead of your strategy pool when performing that ability.",
-    "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Elder Junn sighed. \"We must remain focused. Steady.\"",
     "source": "action_deck_2"
   },
   {
@@ -167,7 +167,7 @@
     "phase": "Action",
     "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
     "text": "Remove your command token from the active system.",
-    "flavorText": "The Letnev fleet had sliced through the blockade in an instant. Their survival was owed solely to T'ro's prudent decision to retreat.",
+    "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
   },
   {
@@ -194,7 +194,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place up to 2 PDS from your reinforcements on a planet you control.",
-    "flavorText": "\"In the final moments of their empire, the Lazax wished to see us armed against our oppressors.\" As  Magmus spoke, his voice rose from a gravelly rumble to a roar, \"I now invoke their final decree!\"",
+    "flavorText": "\"In the final moments of their empire, the Lazax wished to see us armed against our oppressors.\" As Magmus spoke, his voice rose from a gravelly rumble to a roar, \"I now invoke their final decree!\"",
     "source": "action_deck_2"
   },
   {
@@ -202,8 +202,17 @@
     "name": "Deflection",
     "phase": "Strategy",
     "window": "At the start of the strategy phase",
-    "text": "Choose 1 strategy card. Other players must spend 1 token from their strategy pool to choose that strategy card during this strategy phase, if they have another choice.",
+    "text": "Choose 1 strategy card. During this strategy phase, other players must spend 1 token from their strategy pool to choose that strategy card, if they have another choice.",
     "flavorText": "The Tribe elder's eyes flickered in the light of the campfire. \"The greatest form of persuasion lies in coercing another to believe the course of action you wish for them to take was their idea all along.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "demoralization",
+    "name": "Demoralization",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome destroys 3 of their infantry on the game board.",
+    "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
     "source": "action_deck_2"
   },
   {
@@ -220,26 +229,17 @@
     "name": "Discord",
     "phase": "Action",
     "window": "When you perform a strategic action",
-    "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
-    "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped him. Panic filled the Federation airwaves. His human minions had done well.",
+    "text": "Choose another player. If that player spends a command token during this strategic action, they must spend 1 additional command token from their strategy pool, if able.",
+    "flavorText": "Spittle flew forth from The Stillness of Stars' crimson maw as a gurgled laugh escaped them. Panic filled the Federation airwaves. Their human minions had done well.",
     "source": "action_deck_2"
   },
   {
     "alias": "diverse_strategies",
     "name": "Diverse Strategies",
-    "phase": "Any",
+    "phase": "Action",
     "window": "When you would perform the primary ability of your strategy card",
-    "text": "Perform the secondary ability of up to 2 other different strategy cards instead; when you perform those abilities, spend command tokens from your reinforcements instead of your strategy pool.",
-    "flavorText": "\"Diversity is our strength,\" Claire said with pride. \"Endlessly variable, capable citizens, each contributing to our inevitable victory.\"",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "double_agents",
-    "name": "Double Agents",
-    "phase": "Any",
-    "window": "When another non-active player plays an action card other than \"Sabotage\"",
-    "text": "Cancel and take that action card.",
-    "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'Ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
+    "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place a command token to resolve those abilities.",
+    "flavorText": "\"We will win this war, Qanoj, based on how we adapt to it,\" Clair said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
     "source": "action_deck_2"
   },
   {
@@ -256,7 +256,7 @@
     "name": "Early Voting",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Choose 1 player. That player votes first on this agenda. After this agenda is resolved, if that player cast votes on the resolved outcome, they place up to 2 command tokens from their reinforcements in their strategy pool. [Note: Voting continues in the normal order. They do not vote again.]",
+    "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
     "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
     "source": "action_deck_2"
   },
@@ -265,17 +265,17 @@
     "name": "Efficiency Initiative",
     "phase": "Action",
     "window": "When 1 or more of your units use PRODUCTION",
-    "text": "Reduce the total PRODUCTION value of those units by up to 3 to reduce the combined cost of the produced units by an equal amount and gain an equal number of trade goods. [Note: These trade goods are available to be spent during this production.]",
+    "text": "Reduce the total PRODUCTION value of those units by up to 4 to gain an equal number of trade goods. Then, gain 2 commodities. [Note: These trade goods are available to be spent during this production.]",
     "flavorText": "I48S surveyed the new installation. The new processes increased output by nearly 11%. With a little work, he was sure he could increase efficiency by another 4%.",
     "source": "action_deck_2"
   },
   {
-    "alias": "escape_route",
-    "name": "Escape Route",
+    "alias": "energy_pulse",
+    "name": "Energy Pulse",
     "phase": "Action",
-    "window": "At the start of the \"Announce Retreats\" step",
-    "text": "During this combat, you treat each system that contains 1 of your space docks as adjacent to this system when you announce or resolve a retreat. If you announce a retreat, you may reroll any die your opponent rolls.",
-    "flavorText": "These were ancient routes, forgotten by time and kept secret by the Argent for use during their migration protocols.",
+    "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
+    "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
+    "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
   },
   {
@@ -283,7 +283,7 @@
     "name": "Espionage",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
+    "text": "Choose another player with the most victory points. You may look at that player's action cards; otherwise, look at 1 of their unscored secret objectives, at random.",
     "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
     "source": "action_deck_2"
   },
@@ -301,8 +301,17 @@
     "name": "Field Test",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Gain 1 technology. Return that technology to your technology deck at the end of this turn.",
+    "text": "Choose 1 technology in your technology deck. During this turn, treat that technology as if you own it.",
     "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "final_mission",
+    "name": "Final Mission",
+    "phase": "Action",
+    "window": "After 1 of your mechs is destroyed during a ground combat",
+    "text": "Choose up to 3 of your opponent's ground forces. Roll 1 die for each of those units; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
+    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
   {
@@ -310,17 +319,8 @@
     "name": "Flawless Strategy",
     "phase": "Action",
     "window": "After you exhaust your strategy card",
-    "text": "Perform the secondary ability of that strategy card; when you perform that ability, spend command tokens from your reinforcements instead of your strategy pool.",
-    "flavorText": "PROTOCOL SUCCESSFUL >> [NULL ID] FATE SEALED << DEFEAT INEVITABLE >> PEERLESS MANY << INFINITE ONE >> [ID:NIITAKA] << QUEUED1 << QUEUED2 << QUEUED3...",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "forced_hand",
-    "name": "Forced Hand",
-    "phase": "Action",
-    "window": "After another player performs an action",
-    "text": "That player must perform an additional action this turn or pass.",
-    "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
+    "text": "Perform the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
+    "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
     "source": "action_deck_2"
   },
   {
@@ -328,7 +328,7 @@
     "name": "Freedom Fighters",
     "phase": "Action",
     "window": "After you commit units to land on another player's non-home planet",
-    "text": "Place 1 infantry on that planet. Then, if you have more ground forces on that planet than that player, place 1 additional infantry.",
+    "text": "Place 1 infantry on that planet. Then, if you have less ground forces on that planet than that player, place 1 additional infantry.",
     "flavorText": "Harrugh had brought them supplies, lived among them, honored their traditions, and filled them with hope. On the promised day, they would repay him with their determination for liberation.",
     "source": "action_deck_2"
   },
@@ -338,24 +338,15 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, explore up to 2 frontier tokens on the game board.",
-    "flavorText": "Although Xuange had promised secrecy, they did not discourage the search for Mirage.",
+    "flavorText": "Acamar had sealed the fates of many within the void, not out of malice, but as a warning. When word spread of a fabled weapon on a long-forgotten world, Acamar knew the councilors would turn a deaf ear to tales of those lost souls.",
     "source": "action_deck_2"
   },
   {
-    "alias": "garner_tribute",
-    "name": "Tributes",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Exhaust 1 planet you control to gain trade goods equal to the combined value of its resources and influence.",
-    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "grand_heist",
+    "alias": "heist",
     "name": "Heist",
     "phase": "Action",
     "window": "After you gain control of a planet that was controlled by another player",
-    "text": "Choose 1 type of relic fragment. That player must give you each relic fragment of that type in their play area.",
+    "text": "Take up to 2 of that player's relic fragments. Then, for each, you may discard that relic fragment to gain 2 trade goods.",
     "flavorText": "Mot awoke in a pool of his own blood. He was no longer bound – S'Ula had granted him that courtesy at least – but he was too weak to stand. So, he laid in front of the empty vault and wept.",
     "source": "action_deck_2"
   },
@@ -366,6 +357,15 @@
     "window": "Action",
     "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to exceeding your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
     "flavorText": "M'aban sighed at the man's pleas. How many others could mask their intentions so well? The hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "hijacked_signal",
+    "name": "Hijacked Signal",
+    "phase": "Any",
+    "window": "When a command token from your reinforcements or strategy pool would be spent and/or placed on the game board",
+    "text": "Spend and/or place a command token from another player's reinforcements instead.",
+    "flavorText": "Threats of death accompanied the many conflicting commands. The Stillness of Stars' eyes rolled back in pleasure at the palpable confusion.",
     "source": "action_deck_2"
   },
   {
@@ -382,7 +382,7 @@
     "name": "Intrigue",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Look at the bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order. Then, draw 1 action card.",
+    "text": "Look at the top 2 and bottom 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order.",
     "flavorText": "After years of honing the stillness of his mind, Ronald's schemes were finally paying off. Jord had paid him well to infiltrate M'aban's inner circle, but they would only ever receive a pittance of the benefits. No, only the Cabal could provide him with the power he truly desired.",
     "source": "action_deck_2"
   },
@@ -391,7 +391,7 @@
     "name": "Ixthian Gift",
     "phase": "Action",
     "window": "At the end of a turn during which you resolved a transaction with a player",
-    "text": "Commit 1 infantry from your reinforcements to a planet that player controls. If that planet contains their ground forces, resolve a ground combat. [Note: This does not trigger PDS.]",
+    "text": "Commit 1 infantry from your reinforcements to a non-home planet that player controls. If that planet contains their ground forces, resolve a ground combat. [Note: This does not trigger PDS.]",
     "flavorText": "As the last of the extorted goods were lifted into the ship, the Mahact emissary turned to its smug captain, who had been eyeing her, waiting for a reaction. She smiled.",
     "source": "action_deck_2"
   },
@@ -400,17 +400,8 @@
     "name": "Joint Research",
     "phase": "Any",
     "window": "After you research a non-faction technology",
-    "text": "Choose 1 other player. That player gains that technology.",
+    "text": "Choose another player. That player gains that technology.",
     "flavorText": "Rin had received multiple warnings to avoid working with the Vuil'Raith. However, existential threats to the galaxy had never done much to stifle her curiosity.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "kickbacks",
-    "name": "Kickbacks",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome must give you 1 promissory note from their hand.",
-    "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
   },
   {
@@ -418,7 +409,7 @@
     "name": "Last Minute Deliberation",
     "phase": "Agenda",
     "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Each player readies up to 2 planets they control. Then, reveal and vote on the top card of the agenda deck.",
+    "text": "Ready up to 3 planets you control. Each other player may ready 1 planet they control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
     "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
     "source": "action_deck_2"
   },
@@ -426,8 +417,8 @@
     "alias": "mercenary_contract",
     "name": "Mercenary Contract",
     "phase": "Action",
-    "window": "After a player activates a system that contains your ships",
-    "text": "Spend 2 trade goods to place 1 cruiser and 1 destroyer from your reinforcements in the active system.",
+    "window": "After a player activates a system that contains your units",
+    "text": "Produce up to 2 ships in that system; you may spend influence as if it were resources to produce those units.",
     "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
     "source": "action_deck_2"
   },
@@ -436,8 +427,17 @@
     "name": "Micrometeoroid Storm",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
+    "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 7 or greater, destroy 1 of those units.",
     "flavorText": "The disaster investigation unit could not determine whether it was an act of providence or the beginning stages of an incursion.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "military_treatise",
+    "name": "Military Treatise",
+    "phase": "Action",
+    "window": "At the start of your turn",
+    "text": "Redistribute any number of your command tokens on your command sheet or place 1 command token from your reinforcements in your fleet pool.",
+    "flavorText": "Unlenn massaged his brow and shut off his holoscreen. Even he had his limits. The magnum opus Lazax war theory at his fingertips, and yet... it was the single most boring piece of literature he'd ever had the displeasure to read.",
     "source": "action_deck_2"
   },
   {
@@ -450,12 +450,93 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "mysterious_brokers",
+    "name": "Mysterious Brokers",
+    "phase": "Action",
+    "window": "After you pass",
+    "text": "You may purge 1 of your relics to gain 1 relic; otherwise, gain trade goods equal to the number of players that have not passed.",
+    "flavorText": "The broker sat unmoving. Its body, nearly stone, lent it to such an activity. However, this being was worth its weight in credits, for its memories stretched to the dawn of wonders, and its stories flowed to those who would fulfill its needs.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "overtime",
     "name": "Overtime",
     "phase": "Action",
-    "window": "Action",
-    "text": "Spend between 1 and 3 trade goods to ready an equal number of non-home planets you control.",
+    "window": "At the end of your turn",
+    "text": "Spend 1 or 2 trade goods to ready an equal number of non-home planets you control.",
     "flavorText": "Captain Agerro sighed. The work was not what he had expected, not what he had wanted, but it had to be done. Fighting would come later.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outgun1",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outgun2",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outgun3",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outgun4",
+    "name": "Outgun",
+    "phase": "Action",
+    "window": "When you produce a hit",
+    "text": "Produce 1 additional hit.",
+    "flavorText": "",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver1",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver2",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship to port. “Zat would've cut us in half,” he muttered.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver3",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "T'esla checked her wingman, relieved to see that he had followed her evasive maneuver. \"Jam zem!\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "outmaneuver4",
+    "name": "Outmaneuver",
+    "phase": "Action",
+    "window": "When a hit is produced against your units",
+    "text": "Cancel that hit.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"
   },
   {
@@ -472,8 +553,17 @@
     "name": "Pivoted Plans",
     "phase": "Action",
     "window": "Action",
-    "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards. Then, draw 1 additional action card.",
+    "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
     "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "promissory_rider",
+    "name": "Promissory Rider",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+    "flavorText": "Gil was an emissary to the Civita Planetar. His career had made him well-connected, with comrades in hundreds of bureaucracies and favors owed in many more.",
     "source": "action_deck_2"
   },
   {
@@ -481,7 +571,7 @@
     "name": "Propaganda",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to the planet's influence value.",
+    "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to that planet's influence value.",
     "flavorText": "The Federation anthem accompanied Sara, Blake, and Nolad on the screen. \"They're doing their part. Are you? Join the Mobile Legion and save the galaxy. Service guarantees citizenship.\"",
     "source": "action_deck_2"
   },
@@ -495,20 +585,11 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "proxy_war",
-    "name": "Proxy War",
-    "phase": "Action",
-    "window": "At the start of your turn",
-    "text": "During this turn, until you activate another player's home system, players treat all promissory notes as blank.",
-    "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as an entire fleet of unmarked ships poured forth from the wormhole, raining destruction upon the unsuspecting convoy. Reports be damned, these were no mere pirates.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "public_outcry",
     "name": "Public Outcry",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "Players must vote on this agenda, if able. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome discards 2 random action cards from their hand.",
+    "text": "During this agenda, players must vote, if able. Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome discards 2 random action cards from their hand.",
     "flavorText": "A crowd formed outside the Senate Possessional. As they hurled objects towards those accessing the building, Ciel smiled, \"Nice dodge, Junn, quite agile for your age.\"",
     "source": "action_deck_2"
   },
@@ -535,7 +616,7 @@
     "name": "Relay Connection",
     "phase": "Action",
     "window": "After 1 of your units uses PRODUCTION to produce a ship in a system",
-    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION.",
+    "text": "Produce 1 ship of that type in any number of other systems that contain 1 of your units with PRODUCTION; reduce the combined cost of those units by 2.",
     "flavorText": "His engineers broke into celebration as Umbat called out to praise them, \"The forge burns my soul alight! This is our freedom!\"",
     "source": "action_deck_2"
   },
@@ -552,9 +633,18 @@
     "alias": "rendezvous_point",
     "name": "Rendezvous Point",
     "phase": "Action",
-    "window": "Action",
-    "text": "Choose 1 system that does not contain other players' units. Move 1 or more of your ships in adjacent systems that do not contain 1 of your command tokens into the chosen system. [Note: You can transport ground forces during this movement.]",
-    "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
+    "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's units",
+    "text": "Remove your command token from that system and end your turn.",
+    "flavorText": "Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair as he finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "renegotiation_acd2",
+    "name": "Renegotiation",
+    "phase": "Any",
+    "window": "After another player resolves an effect of 1 of your promissory notes",
+    "text": "That player must give you 1 promissory note from their hand.",
+    "flavorText": "The Creuss merchants were overwhelmed by the wares of the bazaar: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
     "source": "action_deck_2"
   },
   {
@@ -576,24 +666,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "safety_overrides",
-    "name": "Safety Overrides",
-    "phase": "Action",
-    "window": "After 1 of your mechs is destroyed during a ground combat",
-    "text": "Produce 2 hits against your opponent's units.",
-    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "sensor_jam",
-    "name": "Sensor Jam",
-    "phase": "Action",
-    "window": "At the start of a round of space combat",
-    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
-    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "schematics_rider",
     "name": "Schematics Rider",
     "phase": "Agenda",
@@ -605,10 +677,10 @@
   {
     "alias": "short-lived_clone",
     "name": "Short-lived Clone",
-    "phase": "Any",
+    "phase": "Action",
     "window": "At the start of your turn",
     "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted, and is readied at the end of this turn.",
-    "flavorText": "Commandeering the genetic spinner for the task was arduous and the creature it produced quickly became unpredictable.",
+    "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that Spinner after all. This galaxy can barely handle one of me.\"",
     "source": "action_deck_2"
   },
   {
@@ -616,7 +688,7 @@
     "name": "Shrapnel Turrets",
     "phase": "Action",
     "window": "At the start of a space combat",
-    "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9 (x2) until the end of the combat.",
+    "text": "Each of your non-fighter ships in the active system that have a capacity value and do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9 (x2) until the end of the combat.",
     "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. If we get it movin' fast enough, it'll shred 'em up just fine.\"",
     "source": "action_deck_2"
   },
@@ -630,20 +702,11 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "singularity_charge",
-    "name": "Singularity Charge",
-    "phase": "Action",
-    "window": "At the start of a combat you are participating in",
-    "text": "Each unit that is participating in this combat and has SUSTAIN DAMAGE becomes damaged.",
-    "flavorText": "In a barely visible flash, their ships' shields dropped. Mendosa growled, \"Full throttle evasive maneuvers, the Tribesmen have laid a trap!\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "sister_ship",
     "name": "Sister Ship",
     "phase": "Any",
     "window": "After 1 of your non-fighter ships is destroyed",
-    "text": "Produce a unit of that type in your home system; reduce the cost of that unit by half, rounded up.",
+    "text": "Produce 1 ship of that type in a system that contains 1 of your units with PRODUCTION; reduce the cost of that unit by half, rounded up.",
     "flavorText": "The production of the Van Hauge VI had finished in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
@@ -652,7 +715,7 @@
     "name": "Smuggler Routes",
     "phase": "Action",
     "window": "Action",
-    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this movement. [Note: You can transport ground forces during this movement.]",
+    "text": "Move 1 of your ships to an adjacent system that does not contain other players' units; ignore the effects of anomalies during this movement. [Note: You can transport units during this movement.]",
     "flavorText": "Greg closed his book, a tale of the Passage of Tears, with a sigh. As he looked to the sky and imagined the space beyond—a place he had never been—he quietly sang in tune with the Symphony, \"I wanna be where the Mentak are. I wanna see—wanna see 'em raidin'.\"",
     "source": "action_deck_2"
   },
@@ -669,7 +732,7 @@
     "alias": "special_considerations",
     "name": "Special Considerations",
     "phase": "Agenda",
-    "window": "After an agenda is revealed",
+    "window": "When an agenda is revealed",
     "text": "Ready up to 3 planets you control. Game effects cannot prevent you from voting on this agenda.",
     "flavorText": "\"It is our right to determine the future of this artifact,\" Mathis said calmly, flashing his imperial seal in a practiced motion. \"Are we not owed such respect?\"",
     "source": "action_deck_2"
@@ -697,7 +760,7 @@
     "name": "Stranded Ship",
     "phase": "Action",
     "window": "Action",
-    "text": "Place 1 cruiser from your reinforcements in a non-home anomaly that does not contain other players' units.",
+    "text": "Place 1 cruiser from your reinforcements in a system that does not contain planets and does not contain other players' units.",
     "flavorText": "\"To be clear,\" Tai said flatly, \"you knew this ship had no weapons, no fuel, and a faulty navigation when you purchased it. And yet,\" he gestured, \"here we are.\"",
     "source": "action_deck_2"
   },
@@ -733,16 +796,25 @@
     "name": "Tomb Raiders",
     "phase": "Action",
     "window": "Action",
-    "text": "For each exploration deck, look at the top card of that deck; gain that card if it is a relic fragment.",
+    "text": "For each exploration deck, look at the top card of that deck; if it is a relic fragment, gain that card.",
     "flavorText": "As her hostages hurled insults, S'Ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "tributes",
+    "name": "Tributes",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Exhaust 1 non-home planet you control other than Mecatol Rex to gain trade goods equal to the combined value of its resources and influence.",
+    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
     "source": "action_deck_2"
   },
   {
     "alias": "virulent_gas",
     "name": "Virulent Gas",
     "phase": "Action",
-    "window": "After your unit's SPACE CANNON or BOMBARDMENT ability produces a hit against another player's ground forces on a planet",
-    "text": "Destroy half of that player's infantry on that planet, rounded up.",
+    "window": "After your SPACE CANNON or BOMBARDMENT roll produces hits against another player's units on a planet",
+    "text": "Produce 1 additional hit. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
     "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
     "source": "action_deck_2"
   },

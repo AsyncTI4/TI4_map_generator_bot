@@ -8,22 +8,24 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
-
+import ti4.model.Source.ComponentSource;
 
 public class DeckModel implements ModelInterface, EmbeddableModel {
 
-  private String alias;
-  private String name;
-  private String type;
-  private String description;
-  private List<String> cardIDs;
+    private String alias;
+    private String name;
+    private String type;
+    private String description;
+    private List<String> cardIDs;
+    private ComponentSource source;
 
-  public boolean isValid() {
+    public boolean isValid() {
         return alias != null
             && name != null
             && type != null
             && description != null
-            && cardIDs != null;
+            && cardIDs != null
+            && source != null;
     }
 
     public String getAlias() {
@@ -56,8 +58,8 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         return cardIDs.size();
     }
 
-    private void setCardIDs(List<String> cardIDs) { // This method is for Jackson
-      this.cardIDs = Collections.unmodifiableList(cardIDs);
+    protected void setCardIDs(List<String> cardIDs) { // This method is for Jackson
+        this.cardIDs = Collections.unmodifiableList(cardIDs);
     }
 
     @Override
@@ -65,12 +67,12 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-      String title = getTypeEmoji() +
-          "__**" + getName() + "**__";
+        String title = getTypeEmoji() +
+            "__**" + getName() + "**__";
         eb.setTitle(title);
 
         //DESCRIPTION
-      eb.setDescription(getDescription());
+        eb.setDescription(getDescription());
 
         // // FIELDS
         // String cardList = getNewDeck().stream().collect(Collectors.joining("\n"));
@@ -89,10 +91,9 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         //     }
         // }
 
-        
         //FOOTER
-      eb.setFooter("ID: " + getAlias());
-        
+        eb.setFooter("ID: " + getAlias());
+
         eb.setColor(Color.BLACK);
         return eb.build();
     }
@@ -104,7 +105,11 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-      return StringUtils.left(StringUtils.substringBefore("[" + getType() + "] " + getName() + " --> " + getDescription(), "\n"), 100);
+        return StringUtils.left(StringUtils.substringBefore("[" + getType() + "] " + getName() + " --> " + getDescription(), "\n"), 100);
+    }
+
+    public ComponentSource getSource() {
+        return source;
     }
 
     private String getTypeEmoji() {

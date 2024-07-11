@@ -1,0 +1,109 @@
+{
+    "id": "mecantor",
+    "tileId": "er96",
+    "name": "Mecantor",
+    "aliases": [
+        "mecantor"
+    ],
+    "positionInTile": {
+        "x": 135.0,
+        "y": 130.0
+    },
+    "resources": 2,
+    "influence": 1,
+    "planetTypes": [
+        "HAZARDOUS"
+    ],
+    "unitPositions": {
+        "unitHolderName": "mecantor",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 94.0,
+                    "y": 117.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 65.0,
+                    "y": 152.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 99.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 116.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 133.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 108.0,
+                    "y": 155.0
+                },
+                {
+                    "x": 126.0,
+                    "y": 155.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 101.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 119.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 94.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 112.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 130.0,
+                    "y": 86.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 113.0,
+                    "y": 114.0
+                },
+                {
+                    "x": 80.0,
+                    "y": 114.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 32.0,
+                    "y": 121.0
+                },
+                {
+                    "x": 156.0,
+                    "y": 75.0
+                },
+                {
+                    "x": 164.0,
+                    "y": 106.0
+                },
+                {
+                    "x": 156.0,
+                    "y": 137.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "In place of a normal star, Mecantor orbits around a minor gravity rift. While within the habitable range, incoming ships must stick to pre-determined routes to avoid the dangers of the anomaly.",
+    "source": "eronous"
+}

@@ -1,8 +1,11 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class AbilityRemove extends AbilityAddRemove {
     public AbilityRemove() {
@@ -11,6 +14,10 @@ public class AbilityRemove extends AbilityAddRemove {
 
     @Override
     public void doAction(Player player, List<String> abilityIDs) {
+        removeAbilities(getEvent(), player, abilityIDs);
+    }
+
+    public static void removeAbilities(GenericInteractionCreateEvent event, Player player, List<String> abilityIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed abilities:\n");
         for (String abilityID : abilityIDs) {
             if (!player.hasAbility(abilityID)) {
@@ -21,6 +28,6 @@ public class AbilityRemove extends AbilityAddRemove {
             sb.append("\n");
             player.removeAbility(abilityID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

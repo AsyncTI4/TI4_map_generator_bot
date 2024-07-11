@@ -1,0 +1,39 @@
+{
+    "id": "er82",
+    "name": "Ako.4.OM",
+    "aliases": [
+        "er82",
+        "ako",
+        "ako.4.om",
+        "ako40"
+    ],
+    "imagePath": "er_82_async.png",
+    "planets": [
+        "ako40m"
+    ],
+    "shipPositionsType": "TYPE10",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": null,
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": true,
+    "source": "eronous"
+}

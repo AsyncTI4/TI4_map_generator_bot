@@ -1,16 +1,19 @@
 package ti4.map;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class GameManager {
 
+    private long loadTime;
     private static GameManager gameManager;
     private static final Map<String, String> userNameToGameName = new HashMap<>();
     private Map<String, Game> gameNameToGame = new HashMap<>();
 
     private GameManager() {
+        loadTime = new Date().getTime();
     }
 
     public static GameManager getInstance() {
@@ -20,7 +23,6 @@ public class GameManager {
         return gameManager;
     }
 
-
     public Map<String, Game> getGameNameToGame() {
         return gameNameToGame;
     }
@@ -29,8 +31,8 @@ public class GameManager {
         this.gameNameToGame = gameNameToGame;
     }
 
-    public void addGame(Game activeGame) {
-        gameNameToGame.put(activeGame.getName(), activeGame);
+    public void addGame(Game game) {
+        gameNameToGame.put(game.getName(), game);
     }
 
     public Game getGame(String gameName) {
@@ -64,5 +66,9 @@ public class GameManager {
 
     public List<String> getGameNames() {
         return getGameNameToGame().keySet().stream().sorted().toList();
+    }
+
+    public long getLoadTime() {
+        return loadTime;
     }
 }

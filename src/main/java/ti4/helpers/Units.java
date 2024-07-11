@@ -1,6 +1,10 @@
 package ti4.helpers;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +22,7 @@ public class Units {
      * </H3>
      * 
      * <p>
-     * It is being used as a key in some major hashmaps which causes issues when we attempt to 
+     * It is being used as a key in some major hashmaps which causes issues when we attempt to
      * save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces
      * us to use custom mappers to resolve.
      * </p>
@@ -50,13 +54,13 @@ public class Units {
             if (unitType == UnitType.Destroyer && ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if(UnitType.TyrantsLament == unitType || UnitType.Lady == unitType || UnitType.Cavalry == unitType){
+            if (UnitType.TyrantsLament == unitType || UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
-            if(UnitType.PlenaryOrbital == unitType){
+            if (UnitType.PlenaryOrbital == unitType) {
                 return String.format("%s_%s.png", colorID, "sd");
             }
-            
+
             return String.format("%s_%s.png", colorID, asyncID());
         }
 
@@ -158,7 +162,11 @@ public class Units {
         }
     }
 
-    private static UnitType findUnitType(String unitType) {
+    private static final String unitRegex() {
+        return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
+    }
+
+    public static UnitType findUnitType(String unitType) {
         for (UnitType t : UnitType.values()) {
             if (t.value.equalsIgnoreCase(unitType)) return t;
         }
@@ -171,13 +179,18 @@ public class Units {
         return new UnitKey(u, colorID);
     }
 
+    @Nullable
     public static UnitKey parseID(String id) {
         if (id.contains(".png")) {
             id = id.replace(".png", "").replace("_", emdash);
         }
-        String[] parts = id.split(emdash);
-        String colorID = parts[0];
-        String unitType = parts[1];
-        return getUnitKey(unitType, colorID);
+
+        Matcher unitParser = Pattern.compile(unitRegex()).matcher(id);
+        if (unitParser.matches()) {
+            String colorID = unitParser.group("color");
+            String unitType = unitParser.group("unittype");
+            return getUnitKey(unitType, colorID);
+        }
+        return null;
     }
 }

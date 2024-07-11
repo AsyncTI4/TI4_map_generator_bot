@@ -13,15 +13,16 @@ import ti4.message.MessageHelper;
 
 public class RemoveFogTile extends FOWSubcommandData {
     public RemoveFogTile() {
-        super(Constants.REMOVE_FOG_TILE, "Remove a Fog of War tile from the map.");
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true));
+        super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.");
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to remove from").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
 
         MessageChannel channel = event.getChannel();
         if (player == null) {
@@ -29,20 +30,28 @@ public class RemoveFogTile extends FOWSubcommandData {
             return;
         }
 
-        OptionMapping positionMapping = event.getOption(Constants.POSITION);
+        String positionMapping = event.getOption(Constants.POSITION, null, OptionMapping::getAsString);
         if (positionMapping == null) {
             MessageHelper.replyToMessage(event, "Specify position");
             return;
         }
 
-        String position = positionMapping.getAsString().toLowerCase();
-        if (!PositionMapper.isTilePositionValid(position)) {
-            MessageHelper.replyToMessage(event, "Tile position is not allowed");
+        Player targetPlayer = Helper.getPlayer(game, player, event);
+        if (targetPlayer == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to remove tiles from was not found.");
             return;
         }
 
-        //remove the custom tile from the player
-        player.removeFogTile(position);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        String[] positions = positionMapping.replace(" ", "").split(",");
+        for (String position : positions) {
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.replyToMessage(event, "Tile position is not allowed");
+                return;
+            }
+
+            //remove the custom tile from the player
+            targetPlayer.removeFogTile(position);
+        }
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

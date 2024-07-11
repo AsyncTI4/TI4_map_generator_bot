@@ -20,45 +20,49 @@ public class NaaluCommander extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        secondHalfOfNaaluCommander(event, activeGame, player);
+        secondHalfOfNaaluCommander(event, game, player);
     }
 
-    public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game activeGame, Player player) {
+    public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
 
-        if (!activeGame.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
-            sendMessage("Only players with access to an unlocked Naalu Commander can use this ability");
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
+            MessageHelper.sendMessageToEventChannel(event, "Only players with access to an unlocked Naalu Commander can use this ability");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentation(true, true)).append(" you are using the Naalu Commander:");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
 
         // Top Agenda
-        sendTopAgendaToCardsInfoSkipCovert(activeGame, player);
+        sendTopAgendaToCardsInfoSkipCovert(game, player);
 
         // Bottom Agenda
         MessageEmbed embed = null;
         sb.setLength(0);
         sb.append("__**Bottom Agenda:**__\n");
-        String agendaID = activeGame.lookAtBottomAgenda(0);
-        if (activeGame.getSentAgendas().get(agendaID) != null) {
+        String agendaID = game.lookAtBottomAgenda(0);
+        if (game.getSentAgendas().get(agendaID) != null) {
             embed = AgendaModel.agendaIsInSomeonesHandEmbed();
         } else if (agendaID != null) {
             embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
         } else {
             sb.append("Could not find agenda");
         }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        if (embed != null) {
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+        }
 
         sb.setLength(0);
         boolean first = true;
@@ -66,26 +70,26 @@ public class NaaluCommander extends SpecialSubcommandData {
             if (!first) sb.append("\n\n");
             first = false;
             sb.append("## ").append(player_.getRepresentation(false, false)).append("'s ");
-            sb.append(PNInfo.getPromissoryNoteCardInfo(activeGame, player_, false, true));
+            sb.append(PNInfo.getPromissoryNoteCardInfo(game, player_, false, true));
         }
 
-        if (!activeGame.isFoWMode()) MessageHelper.sendMessageToChannel(activeGame.getMainGameChannel(),
+        if (!game.isFowMode()) MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
             player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
     }
 
-    public static void sendTopAgendaToCardsInfoSkipCovert(Game activeGame, Player player) {
+    public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("__**Top Agenda:**__");
-        String agendaID = activeGame.lookAtTopAgenda(0);
+        String agendaID = game.lookAtTopAgenda(0);
         MessageEmbed embed = null;
-        if (activeGame.getSentAgendas().get(agendaID) != null) {
-            if (activeGame.getCurrentAgendaInfo().contains("_CL_") && activeGame.getCurrentPhase().startsWith("agenda")) {
+        if (game.getSentAgendas().get(agendaID) != null) {
+            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
                 sb.append("You are currently voting on covert legislation and the top agenda is in the speaker's hand.");
                 sb.append(" Showing the next agenda because thats how it should be by the RULEZ\n");
-                agendaID = activeGame.lookAtTopAgenda(1);
+                agendaID = game.lookAtTopAgenda(1);
 
-                if (activeGame.getSentAgendas().get(agendaID) != null) {
+                if (game.getSentAgendas().get(agendaID) != null) {
                     embed = AgendaModel.agendaIsInSomeonesHandEmbed();
                 } else if (agendaID != null) {
                     embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();

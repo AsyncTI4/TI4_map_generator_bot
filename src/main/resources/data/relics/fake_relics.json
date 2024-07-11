@@ -89,5 +89,21 @@
         "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random. Place that tile at the edge of the game board, adjacent to at least 2 other systems.",
         "isFakeRelic": true,
         "source": "ds"
+    },
+    {
+        "alias": "passturn",
+        "name": "Pass Turn",
+        "shortName": "Pass\nTurn",
+        "text": "Place this token faceup in your play area. When this token is in your play area, you must perform the following action before doing any other actions.\nACTION: You may redistribute your command tokens. Discard this token and end your turn.",
+        "isFakeRelic": true,
+        "source": "salliance"
+    },
+    {
+        "alias": "oath_ntnl_protec",
+        "name": "Oath of National Protection",
+        "shortName": "Oath\nNtnl Protec",
+        "text": "**Oathkeeper Objective:** After a command token is added to the Emperor player's fleet pool, they place this card into their play area. When this card is in the Emperor's play area, once per phase when an objective is scored a Citizen player it can be scored by the Emperor player as well. After the Emperor player passes during the action phase, if they do not have a number of non-fighter ships equal to their fleet pool in their home system, they return this card to the board. Return this card to the board at the end of every Status Phase. **Successor Objective:** When the Emperor player would hit the goal Victory Points; if a Citizen has the most un-exhausted planets out of any faction, they gain 2 Victory Points first.",
+        "isFakeRelic": true,
+        "source": "oath_of_kings"
     }
 ]

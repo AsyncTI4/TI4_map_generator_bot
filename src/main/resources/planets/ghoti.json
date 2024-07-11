@@ -1,1 +1,18 @@
-{"id":"ghoti","tileId":null,"name":"Ghoti","shortName":null,"aliases":null,"positionInTile":null,"resources":3,"influence":3,"factionHomeworld":"ghoti","planetType":"NONE","cardImagePath":null,"techSpecialties":null,"legendaryAbilityName":null,"legendaryAbilityText":null,"unitPositions":null}
+{
+    "id": "ghoti",
+    "tileId": null,
+    "name": "Ghoti",
+    "shortName": null,
+    "aliases": ["ghoti"],
+    "positionInTile": null,
+    "resources": 3,
+    "influence": 3,
+    "factionHomeworld": "ghoti",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Money From Nuthin N Fish-Points For Free",
+    "legendaryAbilityText": "When you move 1 or more ships into a system that contains no planets, gain 1 commodity. You may score objectives if your home system contains no planets.",
+    "unitPositions": null,
+    "source": "ds"
+}

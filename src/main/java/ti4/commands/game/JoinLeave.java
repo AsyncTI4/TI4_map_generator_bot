@@ -19,15 +19,16 @@ abstract public class JoinLeave extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         User user = event.getUser();
-        action(activeGame, user);
+        action(game, user);
 
-       // Helper.fixGameChannelPermissions(event.getGuild(), activeGame);
-        GameSaveLoadManager.saveMap(activeGame, event);
-        MessageHelper.replyToMessage(event, getResponseMessage(activeGame, user));
+        // Helper.fixGameChannelPermissions(event.getGuild(), game);
+        GameSaveLoadManager.saveMap(game, event);
+        MessageHelper.replyToMessage(event, getResponseMessage(game, user));
     }
-    abstract protected String getResponseMessage(Game activeGame, User user);
 
-    abstract protected void action(Game activeGame, User user);
+    abstract protected String getResponseMessage(Game game, User user);
+
+    abstract protected void action(Game game, User user);
 }

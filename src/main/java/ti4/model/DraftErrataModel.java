@@ -1,22 +1,29 @@
 package ti4.model;
 
-import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class DraftErrataModel implements ModelInterface{
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import ti4.draft.DraftItem;
+import ti4.generator.Mapper;
+import ti4.model.Source.ComponentSource;
+
+public class DraftErrataModel implements ModelInterface {
     @Override
     public boolean isValid() {
-        return true;
+        return ItemCategory != null
+            && ItemId != null
+            && source != null;
     }
 
     @Override
     public String getAlias() {
-        return ItemCategory.toString()+":"+ItemId;
+        return ItemCategory.toString() + ":" + ItemId;
     }
+
     // The type of item to be drafted
     public DraftItem.Category ItemCategory;
 
@@ -28,6 +35,8 @@ public class DraftErrataModel implements ModelInterface{
     public boolean Undraftable;
 
     public boolean AlwaysAddToPool;
+
+    private ComponentSource source;
 
     public DraftErrataModel(String alias) {
         String[] split = alias.split(":");
@@ -43,6 +52,23 @@ public class DraftErrataModel implements ModelInterface{
         Map<String, DraftErrataModel> frankenErrata = Mapper.getFrankenErrata();
         items.removeIf((DraftItem item) -> frankenErrata.containsKey(item.getAlias()) && frankenErrata.get(item.getAlias()).Undraftable);
         items.addAll(DraftItem.GetAlwaysIncludeItems(listCategory));
+        Set<DraftItem> itemsSet = Set.copyOf(items); // Remove duplicates
+        items.clear();
+        items.addAll(itemsSet);
         Collections.shuffle(items);
+    }
+
+    @JsonIgnore
+    public List<DraftErrataModel> getAdditionalComponents() {
+        return List.of(AdditionalComponents);
+    }
+
+    @JsonIgnore
+    public List<DraftErrataModel> getOptionalSwaps() {
+        return List.of(OptionalSwaps);
+    }
+
+    public ComponentSource getSource() {
+        return source;
     }
 }

@@ -1,18 +1,12 @@
 {
     "id": "m28",
     "name": "Bunker",
-    "aliases": [
-        "m28",
-        "bunker"
-    ],
+    "aliases": ["m28", "bunker"],
     "imagePath": "M28_bunker.png",
-    "shipPositionsType": null,
+    "shipPositionsType": "TYPE17",
     "spaceTokenLocations": null,
-    "wormholes": [
-        null
-    ],
-    "planets": [
-        "bunker"
-    ],
-    "isAsteroidField": true
+    "wormholes": [null],
+    "planets": ["bunker"],
+    "isAsteroidField": true,
+    "source": "asteroid"
 }

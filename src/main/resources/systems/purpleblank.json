@@ -1,0 +1,10 @@
+{
+    "id": "purpleblank",
+    "name": "Purple, blank draft tile",
+    "aliases": [
+        "purpleblank"
+    ],
+    "imagePath": "draft_purpleblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

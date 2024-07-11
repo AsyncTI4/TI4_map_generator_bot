@@ -9,6 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.message.MessageHelper;
 
 public class ReloadMap extends AdminSubcommandData {
 
@@ -23,17 +24,17 @@ public class ReloadMap extends AdminSubcommandData {
         if (option != null) {
             String mapName = option.getAsString();
             if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                sendMessage("Game with such name does not exists, use /list_games");
+                MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
 
                 return;
             }
-            Game activeGame = GameManager.getInstance().getGame(mapName);
-            GameSaveLoadManager.reload(activeGame);
-            activeGame = GameManager.getInstance().getGame(mapName);
-            ShowGame.simpleShowGame(activeGame, event);
+            Game game = GameManager.getInstance().getGame(mapName);
+            GameSaveLoadManager.reload(game);
+            game = GameManager.getInstance().getGame(mapName);
+            ShowGame.simpleShowGame(game, event);
 
         } else {
-            sendMessage("No Game specified.");
+            MessageHelper.sendMessageToEventChannel(event, "No Game specified.");
         }
     }
 }

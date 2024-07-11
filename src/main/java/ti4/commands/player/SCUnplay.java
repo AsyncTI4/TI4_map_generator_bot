@@ -12,42 +12,43 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class SCUnplay extends PlayerSubcommandData {
     public SCUnplay() {
         super(Constants.SC_UNPLAY, "Unplay an SC");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,"Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
 
         if (player == null) {
-            sendMessage("You're not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
             return;
         }
 
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
-            sendMessage("No SC has been selected");
+            MessageHelper.sendMessageToEventChannel(event, "No SC has been selected");
             return;
         }
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { //Only one SC selected
-            sendMessage("Player has more than one SC. Please try again, using the `strategy_card` option.");
+            MessageHelper.sendMessageToEventChannel(event, "Player has more than one SC. Please try again, using the `strategy_card` option.");
             return;
         }
 
         Integer scToUnplay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
-        activeGame.setSCPlayed(scToUnplay, false);
+        game.setSCPlayed(scToUnplay, false);
 
         //fix sc reminders for all players
-        for (Player player_ : activeGame.getPlayers().values()) {
+        for (Player player_ : game.getPlayers().values()) {
             if (!player_.isRealPlayer()) {
                 continue;
             }
@@ -56,7 +57,7 @@ public class SCUnplay extends PlayerSubcommandData {
             player_.addFollowedSC(scToUnplay);
         }
 
-        sendMessage("SC has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed)");
+        MessageHelper.sendMessageToEventChannel(event, "SC has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed)");
     }
 
 }

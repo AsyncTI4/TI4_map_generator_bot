@@ -1,5 +1,13 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -7,10 +15,15 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
-import ti4.map.*;
-import java.util.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
+import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 
 public class ChangeColor extends PlayerSubcommandData {
     public ChangeColor() {
@@ -20,39 +33,55 @@ public class ChangeColor extends PlayerSubcommandData {
     }
 
     @Override
+    public void reply(SlashCommandInteractionEvent event) {
+        String userID = event.getUser().getId();
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
+        ShowGame.simpleShowGame(game, event);
+    }
+
+    @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         String newColor = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isValidColor(newColor)) {
-            sendMessage("Color not valid");
+            MessageHelper.sendMessageToEventChannel(event, "Color not valid");
             return;
         }
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
-        Map<String, Player> players = activeGame.getPlayers();
+        Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (newColor.equals(playerInfo.getColor())) {
-                    sendMessage("Player:" + playerInfo.getUserName() + " already uses color:" + newColor);
+                    MessageHelper.sendMessageToEventChannel(event, "Player:" + playerInfo.getUserName() + " already uses color:" + newColor);
                     return;
                 }
             }
         }
 
         String oldColor = player.getColor();
+        changePlayerColor(game, player, oldColor, newColor);
+    }
+
+    public void changePlayerColor(Game game, Player player, String oldColor, String newColor) {
+        StringBuilder sb = new StringBuilder(player.getRepresentation(false, false));
+        sb.append(" changed their color to ").append(Emojis.getColorEmojiWithName(newColor));
+
         String oldColorKey = oldColor + "_";
         String newColorKey = newColor + "_";
         player.changeColor(newColor);
         String oldColorID = Mapper.getColorID(oldColor);
         String newColorID = Mapper.getColorID(newColor);
 
+        Map<String, Player> players = game.getPlayers();
         for (Player playerInfo : players.values()) {
             Map<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
 
@@ -61,6 +90,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 String key = pn.getKey();
                 Integer value = pn.getValue();
                 String newKey = key;
+
                 if (key.startsWith(oldColorKey)) {
                     newKey = key.replace(oldColorKey, newColorKey);
                 }
@@ -110,20 +140,12 @@ public class ChangeColor extends PlayerSubcommandData {
         player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
         // Convert all unitholders
-        activeGame.getTileMap().values().stream()
+        game.getTileMap().values().stream()
             .flatMap(t -> t.getUnitHolders().values().stream())
             .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
-        activeGame.getPlayers().values().stream().map(Player::getNomboxTile)
+        game.getPlayers().values().stream().map(Player::getNomboxTile)
             .flatMap(t -> t.getUnitHolders().values().stream())
             .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
-        ShowGame.simpleShowGame(activeGame, event);
     }
 
     private void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {
@@ -154,14 +176,15 @@ public class ChangeColor extends PlayerSubcommandData {
 
         Set<String> controlList = new HashSet<>(unitHolder.getControlList());
         for (String control : controlList) {
-            if (!control.contains(oldColorID)) continue;
+            if (!control.contains(oldColorSuffix)) continue;
             unitHolder.removeControl(control);
-            control = control.replace(oldColorID, newColorID);
+            control = control.replace(oldColorSuffix, newColorSuffix);
             unitHolder.addControl(control);
         }
 
         Set<String> ccList = new HashSet<>(unitHolder.getCCList());
         for (String cc : ccList) {
+            if (!cc.contains(oldColorSuffix)) continue;
             unitHolder.removeCC(cc);
             cc = cc.replace(oldColorSuffix, newColorSuffix);
             unitHolder.addCC(cc);

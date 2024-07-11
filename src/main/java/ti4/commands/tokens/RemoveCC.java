@@ -19,33 +19,33 @@ import java.util.List;
 
 public class RemoveCC extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game activeGame) {
+    void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
         for (String color : colors) {
             String ccID = Mapper.getCCID(color);
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
             }
-            if (activeGame.isFoWMode()) {
+            if (game.isFowMode()) {
                 String colorMention = Emojis.getColorEmojiWithName(color);
-                FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
+                FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a token in the system");
             }
 
             tile.removeCC(ccID);
-            Helper.isCCCountCorrect(event, activeGame, color);
+            Helper.isCCCountCorrect(event, game, color);
         }
     }
 
-    public static void removeCC(GenericInteractionCreateEvent event, String color, Tile tile, Game activeGame) {
+    public static void removeCC(GenericInteractionCreateEvent event, String color, Tile tile, Game game) {
 
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-        if (activeGame.isFoWMode()) {
+        if (game.isFowMode()) {
             String colorMention = Emojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(activeGame, event, tile.getPosition(), colorMention + " has removed a token in the system");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a token in the system");
         }
         tile.removeCC(ccID);
 
@@ -53,7 +53,7 @@ public class RemoveCC extends AddRemoveToken {
 
     @Override
     protected String getActionDescription() {
-        return "Remove cc from tile/system";
+        return "Remove CCs from tile/system";
     }
 
     @Override

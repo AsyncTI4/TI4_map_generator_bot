@@ -4,20 +4,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class BothelperCommand implements Command {
@@ -48,30 +43,6 @@ public class BothelperCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)) {
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         //BothelperSubcommandData subCommandExecuted;
         String subcommandName = event.getInteraction().getSubcommandName();
@@ -92,6 +63,7 @@ public class BothelperCommand implements Command {
         Collection<BothelperSubcommandData> subcommands = new HashSet<>();
         // subcommands.add(new ImportTTPG());
         subcommands.add(new CreateGameChannels());
+        subcommands.add(new ControlGameCreation());
         subcommands.add(new CreateFOWGameChannels());
         subcommands.add(new ServerLimitStats());
         // subcommands.add(new ListOldChannels());
@@ -100,15 +72,15 @@ public class BothelperCommand implements Command {
         subcommands.add(new FixGameChannelPermissions());
         subcommands.add(new ListCategoryChannelCounts());
         subcommands.add(new BeginVideoGeneration());
-        subcommands.add(new CreatePlanet());
-        subcommands.add(new CreateTile());
+        // subcommands.add(new CreatePlanet());
+        // subcommands.add(new CreateTile());
         subcommands.add(new ReExportAllTiles());
         subcommands.add(new JazzCommand());
-        subcommands.add(new Observer());
         subcommands.add(new ListButtons());
         subcommands.add(new ListSlashCommandsUsed());
         subcommands.add(new SendJsonToS3());
         subcommands.add(new GameStats());
+        subcommands.add(new RemoveTitle());
         return subcommands;
     }
 

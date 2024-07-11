@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public abstract class LeaderAddRemove extends FrankenSubcommandData {
     public LeaderAddRemove(String name, String description) {
@@ -39,24 +40,24 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
         leaderIDs.removeIf(leaderID -> !Mapper.isValidLeader(leaderID));
 
         if (leaderIDs.isEmpty()) {
-            sendMessage("No valid leaders were provided. Please see `/help list_leaders` for available choices.");
+            MessageHelper.sendMessageToEventChannel(event, "No valid leaders were provided. Please see `/help list_leaders` for available choices.");
             return;
         }
-        
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         doAction(player, leaderIDs);
 
-        LeaderInfo.sendLeadersInfo(activeGame, player, event);
+        LeaderInfo.sendLeadersInfo(game, player, event);
     }
 
     public abstract void doAction(Player player, List<String> leaderIDs);
-    
+
 }

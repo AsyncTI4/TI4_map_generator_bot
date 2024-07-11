@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -56,7 +58,13 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getLeaderEmoji() {
-        return Optional.ofNullable(getEmoji()).orElse(Emojis.getEmojiFromDiscord(getID()));
+        if (getEmoji() != null) {
+            return getEmoji();
+        }
+        if (getHomebrewReplacesID().isPresent()) {
+            return Emojis.getEmojiFromDiscord(getHomebrewReplacesID().get());
+        }
+        return Emojis.getEmojiFromDiscord(getID());
     }
 
     public Optional<String> getAbilityName() {
@@ -89,11 +97,15 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
+        FactionModel factionModel = Mapper.getFaction(getFaction());
+        String factionEmoji = Emojis.getFactionIconFromDiscord(getFaction());
+        if (factionModel != null) factionEmoji = Emojis.getFactionIconFromDiscord(factionModel.getAlias());
+
+        String factionName = getFaction();
+        if (factionModel != null) factionName = factionModel.getFactionName();
 
         //TITLE
-        String title = getLeaderEmoji() +
-            " __**" + getName() + "**__" + " - " + getTitle() +
-            getSource().emoji();
+        String title = factionEmoji + " __**" + getName() + "**__ " + Emojis.getLeaderTypeEmoji(type) + " " + getTitle() + getSource().emoji();
         eb.setTitle(title);
 
         Emoji emoji = Emoji.fromFormatted(getLeaderEmoji());
@@ -104,19 +116,16 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         //DESCRIPTION
         StringBuilder description = new StringBuilder();
         if (includeFactionType) {
-            FactionModel faction = Mapper.getFaction(getFaction());
-            if (faction != null) {
-                description.append(Emojis.getFactionIconFromDiscord(faction.getAlias())).append(" ").append(faction.getFactionName()).append(" ");
-            } else {
-                description.append(Emojis.getFactionIconFromDiscord(getFaction())).append(" ").append(getFaction());
-            }
+            description.append(factionEmoji).append(" ").append(factionName).append(" ");
             description.append(" ").append(StringUtils.capitalize(getType()));
         }
         if (showUnlockConditions && !"agent".equals(getType())) description.append("\n*Unlock: ").append(getUnlockCondition()).append("*");
         eb.setDescription(description.toString());
 
         //FIELDS
-        eb.addField(getAbilityName().orElse(" "), "**" + getAbilityWindow() + "**\n> " + getAbilityText(), false);
+        String fieldTitle = getAbilityName().orElse(" ") + "\n**" + getAbilityWindow() + "**";
+        String fieldContent = getAbilityText();
+        eb.addField(fieldTitle, fieldContent, false);
         if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
 
         //FOOTER
@@ -126,6 +135,10 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
         eb.setColor(Color.black);
         return eb.build();
+    }
+
+    public String getNameRepresentation() {
+        return Emojis.getFactionIconFromDiscord(getFaction()) + Emojis.getLeaderTypeEmoji(getType()) + getLeaderEmoji() + " " + getName() + " " + " (" + getTitle() + ") " + getSource().emoji();
     }
 
     public boolean search(String searchString) {
@@ -139,11 +152,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
             || getAbilityText().toLowerCase().contains(searchString)
             || getUnlockCondition().toLowerCase().contains(searchString)
             || getAutoCompleteName().toLowerCase().contains(searchString)
+            || getSource().toString().toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return getName() + " (" + getFaction() + " " + getType() + ")";
+        return getName() + " (" + getFaction() + " " + getType() + ") [" + getSource().toString() + "]";
     }
-
 }

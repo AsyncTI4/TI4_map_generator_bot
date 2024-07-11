@@ -1,0 +1,10 @@
+{
+    "id": "goldblank",
+    "name": "Gold, blank draft tile",
+    "aliases": [
+        "goldblank"
+    ],
+    "imagePath": "draft_goldblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

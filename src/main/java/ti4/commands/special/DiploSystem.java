@@ -1,11 +1,11 @@
 package ti4.commands.special;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -23,35 +23,46 @@ public class DiploSystem extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null){
+        if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
-        String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-            return;
-        }
 
-        for (Player player_ : activeGame.getPlayers().values()) {
-            if (player_ != player) {
+        diploSystem(event, game, player, tileOption.getAsString().toLowerCase());
+    }
+
+    public static boolean diploSystem(GenericInteractionCreateEvent event, Game game, Player player, String tileToResolve) {
+        String tileID = AliasHandler.resolveTile(tileToResolve);
+        
+        Tile tile = game.getTile(tileID);
+        if (tile == null) {
+            tile = game.getTileByPosition(tileID);
+        }
+        if (tile == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            return false;
+        }
+        
+        for (Player player_ : game.getPlayers().values()) {
+            if (player_ != player && player_.isRealPlayer()) {
                 String color = player_.getColor();
                 if (Mapper.isValidColor(color)) {
                     AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, activeGame, color);
+                    Helper.isCCCountCorrect(event, game, color);
                 }
             }
         }
+      
+        return true;
     }
 }

@@ -122,6 +122,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    public String getNameRepresentation() {
+        String factionEmoji = getFaction().isEmpty() ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
+        String unitEmoji = getBaseType() == null ? "" : Emojis.getEmojiFromDiscord(getBaseType());
+        String name = getName() == null ? "" : getName();
+        return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
+    }
+
     public String getSourceEmoji() {
         return source.emoji();
     }
@@ -134,62 +141,101 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonDieCount();
         };
     }
-    public int getCombatDieCountForAbility(CombatRollType rollType, Player player, Game activeGame) {
+
+    public int getCombatDieCountForAbility(CombatRollType rollType, Player player, Game game) {
         return switch (rollType) {
             case combatround -> getCombatDieCount();
-            case AFB -> getAfbDieCount(player, activeGame);
-            case bombardment -> getBombardDieCount();
-            case SpaceCannonOffence -> getSpaceCannonDieCount(player, activeGame);
+            case AFB -> getAfbDieCount(player, game);
+            case bombardment -> getBombardDieCount(player, game);
+            case SpaceCannonOffence -> getSpaceCannonDieCount(player, game);
             case SpaceCannonDefence -> getSpaceCannonDieCount();
         };
     }
 
-    public int getAfbDieCount(Player player, Game activeGame){
-        if(!activeGame.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")){
+    public int getAfbDieCount(Player player, Game game) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
+                return 2;
+            }
             return getAfbDieCount();
-        }else{
-            if(getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))){
+        } else {
+            if (getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
                 return 1;
-            }else{
+            } else {
                 return getAfbDieCount();
             }
         }
     }
-    public int getSpaceCannonDieCount(Player player, Game activeGame){
-        if(!activeGame.getFactionsThatReactedToThis("EBSFaction").equalsIgnoreCase(player.getFaction())){
+
+    public int getSpaceCannonDieCount(Player player, Game game) {
+        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
             return getSpaceCannonDieCount();
-        }else{
-            if(getBaseType().equalsIgnoreCase("spacedock")){
+        } else {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
                 return 3;
-            }else{
+            } else {
                 return getSpaceCannonDieCount();
             }
         }
     }
 
-    public int getAfbHitsOn(Player player, Game activeGame){
-        if(!activeGame.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")){
+    public int getAfbHitsOn(Player player, Game game) {
+        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
+                return 9;
+            }
             return getAfbHitsOn();
-        }else{
-            if(getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))){
+        } else {
+            if (getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
                 return 5;
-            }else{
+            } else {
                 return getAfbHitsOn();
             }
         }
     }
-    public int getSpaceCannonHitsOn(Player player, Game activeGame){
-        if(!activeGame.getFactionsThatReactedToThis("EBSFaction").equalsIgnoreCase(player.getFaction())){
+
+    public int getSpaceCannonHitsOn(Player player, Game game) {
+        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
             return getSpaceCannonHitsOn();
-        }else{
-            if(getBaseType().equalsIgnoreCase("spacedock")){
+        } else {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
                 return 5;
-            }else{
+            } else {
                 return getSpaceCannonHitsOn();
             }
         }
     }
-    
+
+    public int getBombardDieCount(Player player, Game game) {
+        if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
+
+            if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction()) && getBombardDieCount() == 0 && getAfbDieCount() > 0) {
+                return getAfbDieCount();
+            }
+            return getBombardDieCount();
+        } else {
+            if (getIsShip() && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+                return 1;
+            } else {
+                return getBombardDieCount();
+            }
+        }
+    }
+
+    public int getBombardHitsOn(Player player, Game game) {
+        if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
+            if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction()) && getBombardDieCount() == 0 && getAfbDieCount() > 0) {
+                return getAfbHitsOn();
+            }
+            return getBombardHitsOn();
+        } else {
+            if (isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+                return 6;
+            } else {
+                return getBombardHitsOn();
+            }
+        }
+    }
 
     public int getCombatDieHitsOnForAbility(CombatRollType rollType) {
         return switch (rollType) {
@@ -199,12 +245,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             case SpaceCannonOffence, SpaceCannonDefence -> getSpaceCannonHitsOn();
         };
     }
-    public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player, Game activeGame) {
+
+    public int getCombatDieHitsOnForAbility(CombatRollType rollType, Player player, Game game) {
         return switch (rollType) {
             case combatround -> getCombatHitsOn();
-            case AFB -> getAfbHitsOn(player, activeGame);
-            case bombardment -> getBombardHitsOn();
-            case SpaceCannonOffence -> getSpaceCannonHitsOn(player, activeGame);
+            case AFB -> getAfbHitsOn(player, game);
+            case bombardment -> getBombardHitsOn(player, game);
+            case SpaceCannonOffence -> getSpaceCannonHitsOn(player, game);
             case SpaceCannonDefence -> getSpaceCannonHitsOn();
         };
     }

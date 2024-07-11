@@ -1,13 +1,20 @@
 package ti4.map;
 
+import java.awt.Color;
+import java.util.Comparator;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.model.LeaderModel;
 
 public class Leader {
@@ -90,5 +97,43 @@ public class Leader {
     @JsonIgnore
     public Optional<LeaderModel> getLeaderModel() {
         return Optional.ofNullable(Mapper.getLeader(getId()));
+    }
+
+    @JsonIgnore
+    public static Comparator<Leader> sortByType() {
+        return Comparator.comparing(Leader::getType);
+    }
+
+    @JsonIgnore
+    public MessageEmbed getLeaderEmbed() {
+        if (getLeaderModel().isEmpty()) {
+            return null;
+        }
+        EmbedBuilder eb = new EmbedBuilder();
+        MessageEmbed modelEmbed = getLeaderModel().get().getRepresentationEmbed(false, false, isLocked(), false);
+        eb.copyFrom(modelEmbed);
+
+        if (getTgCount() > 0) {
+            String desc = modelEmbed.getDescription();
+            eb.setDescription(desc + "\n" + StringUtils.repeat(Emojis.tg, getTgCount()));
+        }
+
+        if (isExhausted()) {
+            eb.setColor(Color.GRAY);
+        } else {
+            eb.setColor(Color.GREEN);
+        }
+
+        if (isLocked()) {
+            eb.setColor(Color.RED);
+            eb.setAuthor("🔒 Locked");
+        }
+        
+        if (isActive()) {
+            eb.setColor(Color.BLUE);
+            eb.setAuthor("🔒 ACTIVE - Leader will be purged during status phase cleanup");
+        }
+
+        return eb.build();
     }
 }

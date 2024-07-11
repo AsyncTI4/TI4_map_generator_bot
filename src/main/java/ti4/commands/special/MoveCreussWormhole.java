@@ -18,6 +18,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.MessageHelper;
 
 public class MoveCreussWormhole extends SpecialSubcommandData {
 
@@ -29,46 +30,46 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null){
-            sendMessage("Specify a tile");
+        if (tileOption == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Specify a tile");
             return;
         }
         String tileID = AliasHandler.resolveTile(StringUtils.substringBefore(tileOption.getAsString().toLowerCase(), " "));
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
+        Tile tile = AddRemoveUnits.getTile(event, tileID, game);
         if (tile == null) {
-            sendMessage("Could not resolve tileID:  `" + tileID + "`. Tile not found");
+            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         String tokenName = event.getOption(Constants.CREUSS_TOKEN_NAME, null, OptionMapping::getAsString);
         tokenName = AliasHandler.resolveToken(tokenName);
         if (!isValidCreussWormhole(tokenName)) {
-            sendMessage("Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
+            MessageHelper.sendMessageToEventChannel(event, "Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
             return;
         }
 
         StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
         sb.append(" moved ").append(Emojis.getEmojiFromDiscord(tokenName)).append(" to ").append(tile.getRepresentation());
-        for (Tile tile_ : activeGame.getTileMap().values()) {
+        for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 sb.append(" (from ").append(tile_.getRepresentation()).append(")");
                 break;
             }
         }
-        sendMessage(sb.toString());
-        if(player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")){
-                ButtonHelper.commanderUnlockCheck(player, activeGame, "ghost", event);
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        if (player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "ghost", event);
         }
     }
 

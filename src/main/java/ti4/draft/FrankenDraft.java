@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import ti4.commands.milty.MiltyDraftHelper;
 import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.StartMilty;
 import ti4.draft.items.*;
 import ti4.generator.Mapper;
 import ti4.map.Game;
+import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 
 public class FrankenDraft extends BagDraft {
@@ -32,12 +34,11 @@ public class FrankenDraft extends BagDraft {
         return "franken";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral" };
 
-
-    public static List<FactionModel> getDraftableFactionsForGame(Game activeGame) {
+    public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
-        if (!activeGame.isDiscordantStarsMode()) {
+        if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
         return factionSet;
@@ -46,7 +47,7 @@ public class FrankenDraft extends BagDraft {
     public static List<FactionModel> getAllFrankenLegalFactions() {
         List<FactionModel> factionSet = Mapper.getFactions();
         factionSet.removeIf((FactionModel model) -> {
-            if (model.getSource().isPok() || model.getSource().isDs()){
+            if (model.getSource().isPok() || model.getSource().isDs()) {
                 for (String excludedFaction : excludedFactions) {
                     if (model.getAlias().contains(excludedFaction)) {
                         return true;
@@ -60,9 +61,9 @@ public class FrankenDraft extends BagDraft {
     }
 
     @Override
-    public List<DraftBag> generateBags(Game activeGame) {
+    public List<DraftBag> generateBags(Game game) {
         Map<DraftItem.Category, List<DraftItem>> allDraftableItems = new HashMap<>();
-        List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(activeGame);
+        List<FactionModel> allDraftableFactions = getDraftableFactionsForGame(game);
 
         allDraftableItems.put(DraftItem.Category.ABILITY, AbilityDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.TECH, TechDraftItem.buildAllDraftableItems(allDraftableFactions));
@@ -77,17 +78,17 @@ public class FrankenDraft extends BagDraft {
         allDraftableItems.put(DraftItem.Category.STARTINGFLEET, StartingFleetDraftItem.buildAllDraftableItems(allDraftableFactions));
         allDraftableItems.put(DraftItem.Category.STARTINGTECH, StartingTechDraftItem.buildAllDraftableItems(allDraftableFactions));
 
-        allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(activeGame));
+        allDraftableItems.put(DraftItem.Category.DRAFTORDER, SpeakerOrderDraftItem.buildAllDraftableItems(game));
 
-        MiltyDraftManager draftManager = activeGame.getMiltyDraftManager();
-        new StartMilty().initDraftTiles(draftManager);
+        MiltyDraftManager draftManager = game.getMiltyDraftManager();
+        draftManager.clear();
+        MiltyDraftHelper.initDraftTiles(draftManager, game);
         allDraftableItems.put(DraftItem.Category.REDTILE, RedTileDraftItem.buildAllDraftableItems(draftManager));
         allDraftableItems.put(DraftItem.Category.BLUETILE, BlueTileDraftItem.buildAllDraftableItems(draftManager));
 
-
         List<DraftBag> bags = new ArrayList<>();
 
-        for (int i = 0; i < activeGame.getRealPlayers().size(); i++) {
+        for (int i = 0; i < game.getRealPlayers().size(); i++) {
             DraftBag bag = new DraftBag();
 
             // Walk through each type of draftable...
@@ -97,7 +98,11 @@ public class FrankenDraft extends BagDraft {
                 // ... and pull out the appropriate number of items from its collection...
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
-                    bag.Contents.add(draftableCollection.getValue().remove(0));
+                    if (!draftableCollection.getValue().isEmpty()) {
+                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                    } else {
+                        BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                    }
                 }
             }
 

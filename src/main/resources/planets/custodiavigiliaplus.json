@@ -4,6 +4,8 @@
     "name": "Custodia Vigilia (Plus)",
     "shortName": null,
     "aliases": [
+        "custodiavigiliaplus",
+        "custodiavigilia(plus)",
         "custodia vigilia",
         "custodia",
         "vigilia",
@@ -14,12 +16,13 @@
     "resources": 1,
     "influence": 2,
     "factionHomeworld": null,
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Custodian's Favour",
     "legendaryAbilityText": "While you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores a victory point with the second clause of the 'Imperial' strategy card.",
     "unitPositions": null,
     "spaceCannonDieCount": 1,
-    "spaceCannonHitsOn": 5
+    "spaceCannonHitsOn": 5,
+    "source": "keleresplus"
 }

@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.TileHelper;
+import ti4.commands.milty.MiltyDraftTile;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -23,102 +24,56 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
     public DrawBlueBackTile() {
         super(Constants.DRAW_BLUE_BACK_TILE, "Draw a random blue back tile (for Star Charts and Decrypted Cartoglyph)");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw? Default: 1"));
-        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async blue back tiles in this list (not just PoK + DS). Default: false)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
-        boolean includeAllTiles = event.getOption(Constants.INCLUDE_ALL_ASYNC_TILES, false, OptionMapping::getAsBoolean);
-        drawBlueBackTiles(event, activeGame, player, count, includeAllTiles);
+        drawBlueBackTiles(event, game, player, count);
     }
 
-    public void drawBlueBackTiles(GenericInteractionCreateEvent event, Game activeGame, Player player, int count, boolean includeAllTiles) {
-        List<String> tilesToPullFrom = new ArrayList<>(List.of(
-            //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
-            //         https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
-            "19",      //Wellon
-            "20",      //Vefut II
-            "21",      //Thibah
-            "22",      //Tar'mann
-            "23",      //Saudor
-            "24",      //Mehar Xull
-            "25",      //Quann
-            "26",      //Lodor
-            "27",      //Starpoint
-            "28",      //Tequ'ran
-            "29",      //Qucen'n
-            "30",      //Mellon
-            "31",      //Lazar
-            "32",      //Dal Bootha
-            "33",      //Corneeq
-            "34",      //Centauri
-            "35",      //Bereg
-            "36",      //Arnor
-            "37",      //Arinham
-            "38",      //Abyz
-            "59",      //Archon Vail
-            "60",      //Perimeter
-            "61",      //Ang
-            "62",      //Sem-Lore
-            "63",      //Vorhal
-            "64",      //Atlas
-            "65",      //Primor
-            "66",      //Hope's End
-            "69",      //Accoen
-            "70",      //Kraag
-            "71",      //Bakal
-            "72",      //Lisis
-            "73",      //Cealdri
-            "74",      //Vega Major
-            "75",      //Loki
-            "76",      //Rigel I
-            "d100",    //Silence
-            "d101",    //Echo
-            "d102",    //Tarrock
-            "d103",    //Prism
-            "d105",    //Inan
-            "d106",    //Troac
-            "d107",    //Etir V
-            "d108",    //Vioss
-            "d109",    //Fakrenn
-            "d110",    //San-Vit
-            "d111",    //Dorvok
-            "d112",    //Rysaa
-            "d113",    //Slin
-            "d114",    //Detic
-            "d115",    //Qaak
-            "d116"     //Mandle
-        ));
+    public static void drawBlueBackTiles(GenericInteractionCreateEvent event, Game game, Player player, int count) {
+        List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
+            .filter(tile -> tile.getTierList().isBlue())
+            .toList());
 
-        // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile -> !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
-        tilesToPullFrom.removeAll(activeGame.getTileMap().values().stream().map(Tile::getTileID).toList());
-        List<String> tileToPullFromUnshuffled = new ArrayList<>(tilesToPullFrom);
-        Collections.shuffle(tilesToPullFrom);
+        List<MiltyDraftTile> tileToPullFromUnshuffled = new ArrayList<>(unusedBlueTiles);
+        Collections.shuffle(unusedBlueTiles);
 
-        if (tilesToPullFrom.size() < count) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Not enough tiles to draw from");
+        if (unusedBlueTiles.size() < count) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");
             return;
         }
 
         List<MessageEmbed> tileEmbeds = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            String tileID = tilesToPullFrom.get(i);
-            TileModel tile = TileHelper.getTile(tileID);
-            tileEmbeds.add(tile.getHelpMessageEmbed(false));
+            Tile tile = unusedBlueTiles.get(i).getTile();
+            TileModel tileModel = tile.getTileModel();
+            tileEmbeds.add(tileModel.getHelpMessageEmbed(false));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileToPullFromUnshuffled);
+        String tileString = String.join(",", tileToPullFromUnshuffled.stream().map(t -> t.getTile().getTileID()).toList());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use /map add_tile to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+        if (ids.size() == 1) {
+            if (game.isDiscordantStarsMode()) {
+                ButtonHelper.starChartStep1(game, player, ids.get(0));
+            } else {
+                ButtonHelper.detTileAdditionStep1(game, player, ids.get(0));
+            }
+        } else {
+            ButtonHelper.starChartStep0(game, player, ids);
+        }
     }
-    
+
 }

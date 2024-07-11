@@ -1,0 +1,92 @@
+[
+    {
+        "id": "luminous1",
+        "initiative": 1,
+        "name": "Anticipation",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_1",
+        "source": "other"
+    },
+    {
+        "id": "luminous2",
+        "initiative": 2,
+        "name": "Diplomacy",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_2",
+        "source": "other"
+    },
+    {
+        "id": "luminous3",
+        "initiative": 3,
+        "name": "Leadership",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_3",
+        "source": "other"
+    },
+    {
+        "id": "luminous4",
+        "initiative": 4,
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_4",
+        "source": "other"
+    },
+    {
+        "id": "luminous5",
+        "initiative": 5,
+        "name": "Construction",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_5",
+        "source": "other"
+    },
+    {
+        "id": "luminous6",
+        "initiative": 6,
+        "name": "Trade",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_6",
+        "source": "other"
+    },
+    {
+        "id": "luminous7",
+        "initiative": 7,
+        "name": "Warfare",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_7",
+        "source": "other"
+    },
+    {
+        "id": "luminous8",
+        "initiative": 8,
+        "name": "Technology",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_8",
+        "source": "other"
+    },
+    {
+        "id": "luminous9",
+        "initiative": 9,
+        "name": "Espionage",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_9",
+        "source": "other"
+    },
+    {
+        "id": "luminous10",
+        "initiative": 10,
+        "name": "Imperial",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "imageFileName": "luminous_10",
+        "source": "other"
+    }
+]

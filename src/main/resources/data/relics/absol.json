@@ -44,14 +44,14 @@
     {
         "alias": "absol_plenaryorbital",
         "name": "Plenary Orbital",
-        "text": "PLENARY ORBITAL (Note: not a Space Dock) Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that you control and which does not contain a space dock. The planet this card is attached to contains this unit. This unit cannot be destroyed or replaced.\nUp to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in this system do not count against your fleet pool. PRODUCTION 10, PLANETARY SHIELD",
+        "text": "PLENARY ORBITAL Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that you control and which does not contain a space dock. The planet this card is attached to contains this unit. This unit cannot be destroyed or replaced.\nUp to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in this system do not count against your fleet pool. PRODUCTION 10, PLANETARY SHIELD",
         "source": "absol",
         "flavourText": "*To many, the ring represented hope - a testament to the preseverance of the Gashlai.  To Magmus, it represented waste.  Extravagance.  Foolishness.  He sneered.*"
     },
     {
         "alias": "absol_quantumcore",
         "name": "Quantumcore",
-        "text": "[Cybernetic][Warfare] After you roll dice for SPACE CANNON, you may exhaust this technology to reroll any number of those dice and treat all hits generated as a result of 10.",
+        "text": "Gain the following tech immediately: [Cybernetic][Warfare] After you roll dice for SPACE CANNON, you may exhaust this technology to reroll any number of those dice and treat all hits generated as a result of 10. [Note, this synergizes with absol plasma scoring]",
         "source": "absol",
         "flavourText": "*Trilossa slipped the core into the hololattice's main terminal.  The lattice was ancient - as old as the Flight itself - and tampering with it was tantamount to sin.  Hopefully the rest of the Flight would would see the necessity of the upgrade.*"
     },
@@ -135,7 +135,7 @@
     {
         "alias": "absol_tyrantslament",
         "name": "Tyrant's Lament",
-        "text": "TYRANT'S LAMENT (Note: not a Flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
+        "text": "TYRANT'S LAMENT (Note: not a Flagship) Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card.  This unit is not affected by action cards, anomalies, or your faction abilities or your technologies. Space Cannon 5(x3), Anti-Fighter Barrage 5(x3), Sustain Damage, Move 2, Combat 5(x3)",
         "source": "absol",
         "flavourText": "*Instrument of Judgement\nThe Tyrant's Lament has never responded to a hail, and fights under no banner.  Wherever it appears, death rains.  And then it is gone.*"
     }

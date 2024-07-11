@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -32,41 +33,41 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        sendSecretObjectiveInfo(activeGame, player, event);
-        sendMessage("SO Info Sent");
+        sendSecretObjectiveInfo(game, player, event);
+        MessageHelper.sendMessageToEventChannel(event, "SO Info Sent");
     }
 
-    public static void sendSecretObjectiveInfo(Game activeGame, Player player, SlashCommandInteractionEvent event) {
+    public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
         String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendSecretObjectiveInfo(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendSecretObjectiveInfo(game, player);
     }
 
-    public static void sendSecretObjectiveInfo(Game activeGame, Player player, GenericInteractionCreateEvent event) {
+    public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation(true, true) + " used something";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendSecretObjectiveInfo(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendSecretObjectiveInfo(game, player);
     }
 
-    public static void sendSecretObjectiveInfo(Game activeGame, Player player, ButtonInteractionEvent event) {
+    public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         String headerText = player.getRepresentation(true, true) + " pressed button: " + event.getButton().getLabel();
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        sendSecretObjectiveInfo(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        sendSecretObjectiveInfo(game, player);
     }
 
-    public static void sendSecretObjectiveInfo(Game activeGame, Player player) {
+    public static void sendSecretObjectiveInfo(Game game, Player player) {
         //SO INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, getSecretObjectiveCardInfo(activeGame, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
-        
+
         // SCORE/DISCARD BUTTONS
         String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
         List<Button> buttons = new ArrayList<>();
@@ -91,30 +92,38 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     }
 
     public static String getSecretObjectiveRepresentation(String soID) {
-        return getSecretObjectiveRepresentation(soID, null);
+        return getSecretObjectiveRepresentation(soID, null, true);
     }
 
-    private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID) {
+    public static String getSecretObjectiveRepresentationNoNewLine(String soID) {
+        return getSecretObjectiveRepresentation(soID, null, false);
+    }
+
+    private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID, boolean newLine) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();
-        sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+        if (newLine) {
+            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+        } else {
+            sb.append(Emojis.SecretObjective).append("__**").append(soName).append("**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription);
+        }
         return sb.toString();
     }
 
-    private static String getSecretObjectiveCardInfo(Game activeGame, Player player) {
+    private static String getSecretObjectiveCardInfo(Game game, Player player) {
         Map<String, Integer> secretObjective = player.getSecrets();
         Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
-        for (String id : activeGame.getSoToPoList()) {
+        for (String id : game.getSoToPoList()) {
             scoredSecretObjective.remove(id);
         }
         StringBuilder sb = new StringBuilder();
         int index = 1;
 
         //SCORED SECRET OBJECTIVES
-        sb.append("**Scored Secret Objectives:**").append("\n");
+        sb.append("**Scored Secret Objectives (" + player.getSoScored() + "/" + player.getMaxSOCount() + "):**").append("\n");
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -135,7 +144,13 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                     Integer idValue = so.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
-                    sb.append(getSecretObjectiveRepresentation(so.getKey()));
+
+                    if (ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) > 0) {
+                        sb.append(getSecretObjectiveRepresentationNoNewLine(so.getKey()));
+                        sb.append(" (" + ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) + ")\n");
+                    } else {
+                        sb.append(getSecretObjectiveRepresentation(so.getKey()));
+                    }
                     index++;
                 }
             }
@@ -143,7 +158,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         return sb.toString();
     }
 
-    public static List<Button> getUnscoredSecretObjectiveButtons(Game activeGame, Player player) {
+    public static List<Button> getUnscoredSecretObjectiveButtons(Game game, Player player) {
         Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
         if (secretObjectives != null && !secretObjectives.isEmpty()) {
@@ -159,7 +174,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         return soButtons;
     }
 
-    public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Game activeGame, Player player) {
+    public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Game game, Player player) {
         Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
         if (secretObjectives != null && !secretObjectives.isEmpty()) {

@@ -1,0 +1,10 @@
+{
+    "id": "greyblank",
+    "name": "Grey, blank draft tile",
+    "aliases": [
+        "greyblank"
+    ],
+    "imagePath": "draft_greyblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

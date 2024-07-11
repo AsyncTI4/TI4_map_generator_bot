@@ -1,0 +1,110 @@
+{
+    "id": "plutus",
+    "tileId": "er110",
+    "name": "Plutus",
+    "aliases": [
+        "plutus"
+    ],
+    "positionInTile": {
+        "x": 170.0,
+        "y": 130.0
+    },
+    "resources": 1,
+    "influence": 0,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "legendaryAbilityName": "Curse of Wealth",
+    "legendaryAbilityText": "At the start of the Strategy phase, you may exhaust this card and any number of planets you control to place a number of trade goods on this card equal to either the combined resource or influence value of those planets. When you ready this card, gain all trade goods on this card.",
+    "unitPositions": {
+        "unitHolderName": "plutus",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 129.0,
+                    "y": 117.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 100.0,
+                    "y": 152.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 134.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 151.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 168.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 143.0,
+                    "y": 155.0
+                },
+                {
+                    "x": 161.0,
+                    "y": 155.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 136.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 154.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 129.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 147.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 165.0,
+                    "y": 86.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 148.0,
+                    "y": 114.0
+                },
+                {
+                    "x": 115.0,
+                    "y": 114.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 67.0,
+                    "y": 121.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 75.0
+                },
+                {
+                    "x": 199.0,
+                    "y": 106.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 137.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "eronous"
+}

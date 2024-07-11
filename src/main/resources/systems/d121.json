@@ -9,7 +9,6 @@
         "4258"
     ],
     "imagePath": "d121.png",
-    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -36,5 +35,6 @@
     "wormholes": null,
     "planets": [],
     "isAsteroidField": true,
-    "isGravityRift": true
+    "isGravityRift": true,
+    "source": "uncharted_space"
 }

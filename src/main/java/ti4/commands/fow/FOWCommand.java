@@ -48,30 +48,6 @@ public class FOWCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         FOWSubcommandData executedCommand = null;
@@ -92,11 +68,10 @@ public class FOWCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
-
 
     protected String getActionDescription() {
         return "Fog of War";
@@ -106,6 +81,7 @@ public class FOWCommand implements Command {
         Collection<FOWSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new AddCustomAdjacentTile());
         subcommands.add(new AddAdjacencyOverride());
+        subcommands.add(new AddAdjacencyOverrideList());
         subcommands.add(new AddFogTile());
         subcommands.add(new CheckChannels());
         subcommands.add(new PingActivePlayer());
@@ -118,6 +94,7 @@ public class FOWCommand implements Command {
         subcommands.add(new SetFogFilter());
         subcommands.add(new Whisper());
         subcommands.add(new Announce());
+        subcommands.add(new FOWOptions());
         return subcommands;
     }
 

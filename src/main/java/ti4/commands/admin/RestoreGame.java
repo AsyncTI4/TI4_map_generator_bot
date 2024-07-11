@@ -14,6 +14,7 @@ import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.message.MessageHelper;
 
 public class RestoreGame extends AdminSubcommandData {
 
@@ -27,15 +28,15 @@ public class RestoreGame extends AdminSubcommandData {
         Attachment attachment = event.getOption(Constants.SAVE_FILE, null, OptionMapping::getAsAttachment);
 
         if (attachment == null) {
-            sendMessage("No save file specified.");
+            MessageHelper.sendMessageToEventChannel(event, "No save file specified.");
             return;
         }
         if (!"txt".equals(attachment.getFileExtension())) {
-            sendMessage("Save file must be a .txt file.");
+            MessageHelper.sendMessageToEventChannel(event, "Save file must be a .txt file.");
             return;
         }
         if (!"text/plain; charset=utf-8".equals(attachment.getContentType())) {
-            sendMessage("Save file must be text/plain; charset=utf-8");
+            MessageHelper.sendMessageToEventChannel(event, "Save file must be text/plain; charset=utf-8");
             return;
         }
         File gameFile = Storage.getMapImageStorage(attachment.getFileName());
@@ -49,17 +50,17 @@ public class RestoreGame extends AdminSubcommandData {
 
         Game game = GameSaveLoadManager.loadMap(gameFile);
         if (game == null) {
-            sendMessage("Failed to load game.");
+            MessageHelper.sendMessageToEventChannel(event, "Failed to load game.");
             return;
         }
         if (!attachment.getFileName().equals(game.getName() + ".txt")) {
-            sendMessage("Save file name must be the same as the game name.");
+            MessageHelper.sendMessageToEventChannel(event, "Save file name must be the same as the game name.");
             return;
         }
 
         GameManager.getInstance().deleteGame(game.getName());
         GameManager.getInstance().addGame(game);
-        sendMessage(game.getName() + " restored.");
+        MessageHelper.sendMessageToEventChannel(event, game.getName() + " restored.");
         GameSaveLoadManager.saveMap(game, event);
     }
 }

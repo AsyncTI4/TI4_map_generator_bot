@@ -24,17 +24,17 @@ public class PlayEvent extends EventSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         String eventIDOption = StringUtils.substringBefore(event.getOption(Constants.EVENT_ID, "", OptionMapping::getAsString).toLowerCase(), " ");
         if (eventIDOption.isEmpty()) {
-            sendMessage("Please select what Event ID to play");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Event ID to play");
             return;
         }
 
@@ -42,12 +42,12 @@ public class PlayEvent extends EventSubcommandData {
         try {
             eventNumericalID = Integer.parseInt(eventIDOption);
         } catch (Exception e) {
-            sendMessage("Event ID must be numeric");
+            MessageHelper.sendMessageToEventChannel(event, "Event ID must be numeric");
             return;
         }
 
         if (!player.getEvents().containsValue(eventNumericalID)) {
-            sendMessage("Player does not have Event `" + eventNumericalID + "` in hand");
+            MessageHelper.sendMessageToEventChannel(event, "Player does not have Event `" + eventNumericalID + "` in hand");
             return;
         }
 
@@ -55,23 +55,23 @@ public class PlayEvent extends EventSubcommandData {
         String eventID = player.getEvents().entrySet().stream().filter(e -> numericID == e.getValue()).map(e -> e.getKey()).findFirst().orElse(null);
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel == null) {
-            sendMessage("Event ID `" + eventID + "` could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Event ID `" + eventID + "` could not be found");
             return;
         }
 
-        playEventFromHand(event, activeGame, player, eventModel);
+        playEventFromHand(event, game, player, eventModel);
     }
 
-    public static void playEventFromHand(GenericInteractionCreateEvent event, Game activeGame, Player player, EventModel eventModel) {
-        activeGame.discardEvent(eventModel.getAlias());
+    public static void playEventFromHand(GenericInteractionCreateEvent event, Game game, Player player, EventModel eventModel) {
+        game.discardEvent(eventModel.getAlias());
         player.removeEvent(eventModel.getAlias());
 
-        activeGame.getActionsChannel().sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
+        game.getActionsChannel().sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
 
-        Integer discardedEventNumericalID = activeGame.getDiscardedEvents().get(eventModel.getAlias());
+        Integer discardedEventNumericalID = game.getDiscardedEvents().get(eventModel.getAlias());
 
         if (eventModel.staysInPlay()) {
-            activeGame.addEventInEffect(discardedEventNumericalID);
+            game.addEventInEffect(discardedEventNumericalID);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Event `" + eventModel.getAlias() + "` is now in effect");
         }
     }

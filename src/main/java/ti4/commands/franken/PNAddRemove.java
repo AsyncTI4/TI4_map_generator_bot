@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public abstract class PNAddRemove extends FrankenSubcommandData {
     public PNAddRemove(String name, String description) {
@@ -34,19 +35,19 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         pnIDs.removeIf(StringUtils::isEmpty);
         pnIDs.removeIf(pn -> !Mapper.getAllPromissoryNoteIDs().contains(pn));
 
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         doAction(player, pnIDs);
-        activeGame.checkPromissoryNotes();
+        game.checkPromissoryNotes();
         PNInfo.checkAndAddPNs(getActiveGame(), player);
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, false, event);
+        PNInfo.sendPromissoryNoteInfo(game, player, false, event);
     }
 
     public abstract void doAction(Player player, List<String> pnIDs);

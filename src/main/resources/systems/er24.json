@@ -4,10 +4,7 @@
     "aliases": [
         "ynnis"
     ],
-    "imagePath": "er24_ynnis.png",
-    "planetIds": [
-        "ynnis"
-    ],
+    "imagePath": "er_24_async.png",
     "shipPositionsType": "TYPE10",
     "spaceTokenLocations": [
         {
@@ -33,5 +30,7 @@
     "planets": [
         "ynnis"
     ],
-    "isGravityRift": true
+    "isGravityRift": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

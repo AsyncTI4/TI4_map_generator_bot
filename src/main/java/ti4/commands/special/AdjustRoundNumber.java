@@ -16,13 +16,13 @@ public class AdjustRoundNumber extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         OptionMapping roundOption = event.getOption(Constants.ROUND);
-        if (roundOption == null){
+        if (roundOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify round number");
             return;
         }
-        activeGame.setRound(roundOption.getAsInt());
+        game.setRound(roundOption.getAsInt());
     }
 }

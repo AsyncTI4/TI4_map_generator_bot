@@ -6,9 +6,6 @@
         "lazax"
     ],
     "imagePath": "m17_origin.png",
-    "planetIds": [
-        "origin"
-    ],
     "shipPositionsType": "TYPE01",
     "spaceTokenLocations": [
         {
@@ -28,9 +25,9 @@
             "y": 205.0
         }
     ],
-    "wormholes": null,
     "planets": [
         "origin"
     ],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "source": "asteroid"
 }

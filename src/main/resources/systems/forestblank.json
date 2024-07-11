@@ -1,0 +1,10 @@
+{
+    "id": "forestblank",
+    "name": "Forest, blank draft tile",
+    "aliases": [
+        "forestblank"
+    ],
+    "imagePath": "draft_forestblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

@@ -13,7 +13,7 @@
     "resources": 1,
     "influence": 3,
     "factionHomeworld": "qulane",
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
@@ -107,5 +107,6 @@
             ]
         },
         "removeUnitCoordinate": true
-    }
+    },
+    "source": "ignis_aurora"
 }

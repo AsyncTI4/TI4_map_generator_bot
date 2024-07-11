@@ -17,40 +17,40 @@ public class RefreshLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
+    void action(SlashCommandInteractionEvent event, String leaderID, Game game, Player player) {
         Leader playerLeader = player.getLeader(leaderID).orElse(null);
         if (playerLeader != null) {
             if (playerLeader.isLocked()) {
-                sendMessage("Leader is locked");
+                MessageHelper.sendMessageToEventChannel(event, "Leader is locked");
                 return;
             }
             int tgCount = playerLeader.getTgCount();
-            refreshLeader(player, playerLeader, activeGame);
-            sendMessage(Emojis.getFactionLeaderEmoji(playerLeader));
+            refreshLeader(player, playerLeader, game);
+            MessageHelper.sendMessageToEventChannel(event, Emojis.getFactionLeaderEmoji(playerLeader));
             StringBuilder message = new StringBuilder(player.getRepresentation())
                 .append(" readied ")
                 .append(Helper.getLeaderShortRepresentation(playerLeader));
             if (tgCount > 0) {
-                message.append(" - ").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" transferred from leader to player");
+                message.append(" - ").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(game)).append(" transferred from leader to player");
 
             }
             String msg = message.toString();
-            sendMessage(msg);
+            MessageHelper.sendMessageToEventChannel(event, msg);
         } else {
-            sendMessage("Leader not found");
+            MessageHelper.sendMessageToEventChannel(event, "Leader not found");
         }
     }
 
-    public static void refreshLeader(Player player, Leader playerLeader, Game activeGame) {
+    public static void refreshLeader(Player player, Leader playerLeader, Game game) {
         int tgCount = playerLeader.getTgCount();
         playerLeader.setExhausted(false);
         if (tgCount > 0) {
             int tg = player.getTg();
             tg += tgCount;
             player.setTg(tg);
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame),
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation(true, true) + " you gained " + tgCount + " tgs (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied");
-            ButtonHelperAbilities.pillageCheck(player, activeGame);
+            ButtonHelperAbilities.pillageCheck(player, game);
             playerLeader.setTgCount(0);
         }
     }

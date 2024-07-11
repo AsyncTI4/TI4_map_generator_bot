@@ -7,9 +7,6 @@
         "4253"
     ],
     "imagePath": "d104.png",
-    "planetIds": [
-        "domna"
-    ],
     "shipPositionsType": "TYPE01",
     "spaceTokenLocations": [
         {
@@ -33,5 +30,6 @@
     "planets": [
         "domna"
     ],
-    "isNebula": true
+    "isNebula": true,
+    "source": "uncharted_space"
 }

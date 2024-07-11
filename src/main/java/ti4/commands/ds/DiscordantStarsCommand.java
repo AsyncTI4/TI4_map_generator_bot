@@ -45,30 +45,6 @@ public class DiscordantStarsCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(user.getId());
-        String activeGame = "";
-        if (userActiveGame != null) {
-            activeGame = "Active map: " + userActiveGame.getName();
-        }
-        String commandExecuted = "User: " + userName + " executed command. " + activeGame + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         DiscordantStarsSubcommandData executedCommand = null;
@@ -89,13 +65,12 @@ public class DiscordantStarsCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        GameSaveLoadManager.saveMap(game, event);
 
-      //  FileUpload file = new GenerateMap().saveImage(activeMap, event);
-      //  MessageHelper.replyToMessage(event, file);
+        //  FileUpload file = new GenerateMap().saveImage(activeMap, event);
+        //  MessageHelper.replyToMessage(event, file);
     }
-
 
     protected String getActionDescription() {
         return "Discordant Stars Commands";
@@ -110,6 +85,7 @@ public class DiscordantStarsCommand implements Command {
         subcommands.add(new FlipGrace());
         subcommands.add(new SetPolicy());
         subcommands.add(new DrawBlueBackTile());
+        subcommands.add(new DrawRedBackTile());
         subcommands.add(new AddOmenDie());
         subcommands.add(new KyroHero());
         subcommands.add(new ATS());
@@ -120,7 +96,7 @@ public class DiscordantStarsCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

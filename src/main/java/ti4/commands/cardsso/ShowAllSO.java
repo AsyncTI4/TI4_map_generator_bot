@@ -19,25 +19,25 @@ public class ShowAllSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        
-        Player player_ = Helper.getPlayer(activeGame, null, event);
+
+        Player player_ = Helper.getPlayer(game, null, event);
         if (player_ == null) {
-            sendMessage("Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
-        showAll(player, player_, activeGame);
+        showAll(player, player_, game);
     }
 
-    public void showAll(Player player, Player player_, Game activeGame) {
+    public void showAll(Player player, Player player_, Game game) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
+        sb.append("Game: ").append(game.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Secret Objectives:").append("\n");
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
@@ -45,7 +45,7 @@ public class ShowAllSO extends SOCardsSubcommandData {
         for (String id : secrets) {
             sb.append(SOInfo.getSecretObjectiveRepresentation(id)).append("\n");
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, "All SOs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All SOs shown to player");
     }
 }

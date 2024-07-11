@@ -14,6 +14,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class SendDebt extends PlayerSubcommandData {
     public SendDebt() {
@@ -25,16 +26,16 @@ public class SendDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player sendingPlayer = activeGame.getPlayer(getUser().getId());
-        sendingPlayer = Helper.getGamePlayer(activeGame, sendingPlayer, event, null);
+        Game game = getActiveGame();
+        Player sendingPlayer = game.getPlayer(getUser().getId());
+        sendingPlayer = Helper.getGamePlayer(game, sendingPlayer, event, null);
 
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR_1);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeGame.getPlayers().values()) {
+            for (Player player_ : game.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     sendingPlayer = player_;
                     break;
@@ -43,27 +44,27 @@ public class SendDebt extends PlayerSubcommandData {
         }
 
         if (sendingPlayer == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
-        Player receivingPlayer = Helper.getPlayer(activeGame, sendingPlayer, event);
+        Player receivingPlayer = Helper.getPlayer(game, sendingPlayer, event);
         if (receivingPlayer == null) {
-            sendMessage("Player to send Debt could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to send Debt could not be found");
             return;
         }
 
         int debtCountToSend = event.getOption(Constants.DEBT_COUNT, 0, OptionMapping::getAsInt);
         if (debtCountToSend <= 0) {
-            sendMessage("Debt count must be a positive integer");
+            MessageHelper.sendMessageToEventChannel(event, "Debt count must be a positive integer");
             return;
         }
 
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
-        
-        ButtonHelper.fullCommanderUnlockCheck(receivingPlayer, activeGame, "vaden", event);
-        
-        sendMessage(sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
+
+        ButtonHelper.fullCommanderUnlockCheck(receivingPlayer, game, "vaden", event);
+
+        MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
 
     }
 

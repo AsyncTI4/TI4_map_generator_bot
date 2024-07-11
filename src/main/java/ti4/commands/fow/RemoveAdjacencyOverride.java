@@ -17,18 +17,18 @@ public class RemoveAdjacencyOverride extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
-        if (primaryTileOption == null){
+        if (primaryTileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Primary tile");
             return;
         }
         String primaryTile = primaryTileOption.getAsString().toLowerCase();
-        if (primaryTile.isBlank() || !PositionMapper.isTilePositionValid(primaryTile)){
+        if (primaryTile.isBlank() || !PositionMapper.isTilePositionValid(primaryTile)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad data, try again");
             return;
         }
 
-        activeGame.removeAdjacentTileOverrides(primaryTile);
+        game.removeAdjacentTileOverrides(primaryTile);
     }
 }

@@ -1,11 +1,13 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 
 public class FactionTechAdd extends FactionTechAddRemove {
@@ -15,6 +17,10 @@ public class FactionTechAdd extends FactionTechAddRemove {
 
     @Override
     public void doAction(Player player, List<String> techIDs) {
+        addFactionTechs(getEvent(), player, techIDs);
+    }
+
+    public static void addFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added techs:\n");
         for (String techID : techIDs) {
             if (player.getFactionTechs().contains(techID)) {
@@ -28,7 +34,7 @@ public class FactionTechAdd extends FactionTechAddRemove {
             // ADD BASE UNIT IF ADDING UNIT UPGRADE TECH
             TechnologyModel techModel = Mapper.getTech(techID);
             if (techModel == null) continue;
-            if (techModel.getType() == TechnologyType.UNITUPGRADE) {
+            if (techModel.isUnitUpgrade()) {
                 UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
                 unitModel.getUpgradesFromUnitId().ifPresent(upgradesFromUnitId -> {
                     player.removeOwnedUnitByID(unitModel.getBaseType());
@@ -36,6 +42,6 @@ public class FactionTechAdd extends FactionTechAddRemove {
                 });
             }
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

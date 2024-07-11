@@ -1,0 +1,109 @@
+{
+    "id": "sehnn",
+    "tileId": "er48",
+    "name": "Sehnn",
+    "aliases": [
+        "sehnn"
+    ],
+    "positionInTile": {
+        "x": 200.0,
+        "y": 210.0
+    },
+    "resources": 1,
+    "influence": 2,
+    "planetTypes": [
+        "INDUSTRIAL"
+    ],
+    "unitPositions": {
+        "unitHolderName": "sehnn",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 159.0,
+                    "y": 197.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 130.0,
+                    "y": 232.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 164.0,
+                    "y": 224.0
+                },
+                {
+                    "x": 181.0,
+                    "y": 224.0
+                },
+                {
+                    "x": 198.0,
+                    "y": 224.0
+                },
+                {
+                    "x": 173.0,
+                    "y": 235.0
+                },
+                {
+                    "x": 191.0,
+                    "y": 235.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 166.0,
+                    "y": 153.0
+                },
+                {
+                    "x": 184.0,
+                    "y": 153.0
+                },
+                {
+                    "x": 159.0,
+                    "y": 166.0
+                },
+                {
+                    "x": 177.0,
+                    "y": 166.0
+                },
+                {
+                    "x": 195.0,
+                    "y": 166.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 178.0,
+                    "y": 194.0
+                },
+                {
+                    "x": 145.0,
+                    "y": 194.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 97.0,
+                    "y": 201.0
+                },
+                {
+                    "x": 221.0,
+                    "y": 155.0
+                },
+                {
+                    "x": 229.0,
+                    "y": 186.0
+                },
+                {
+                    "x": 221.0,
+                    "y": 217.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "Sehnn gets its rusty orange color from a think layer of dusty iron rich top soil. The primary industry is to extract this iron and use it in a variety of steel products.",
+    "source": "eronous"
+}

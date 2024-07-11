@@ -3,7 +3,9 @@ package ti4.commands.map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -57,16 +59,31 @@ public class AddTileList extends MapSubcommandData {
         MapGenerator.saveImage(game, event).thenAccept(fileUpload -> MessageHelper.replyToMessage(event, fileUpload));
     }
 
-    public static void addTileListToMap(Game activeGame, String tileList, GenericInteractionCreateEvent event) {
-        Map<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, activeGame);
+    public static void addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {
+        Map<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, game);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
             return;
         }
 
         List<String> badTiles = new ArrayList<>();
-        activeGame.clearTileMap();
-        for (Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
+        game.clearTileMap();
+        try {
+            badTiles = addTileMapToGame(game, mappedTilesToPosition);
+        } catch (Exception e) {
+            BotLogger.log(e.getMessage(), e);
+            MessageHelper.replyToMessage(event, e.getMessage());
+        }
+
+        if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
+
+        finishSetup(game, event);
+    }
+
+    public static List<String> addTileMapToGame(Game game, Map<String, String> tileMap) throws Exception {
+        List<String> badTiles = new ArrayList<>();
+        game.clearTileMap();
+        for (Map.Entry<String, String> entry : tileMap.entrySet()) {
             String tileID = entry.getValue().toLowerCase();
             if ("-1".equals(tileID)) {
                 continue;
@@ -82,32 +99,33 @@ public class AddTileList extends MapSubcommandData {
             String position = entry.getKey();
             String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
             if (tilePath == null) {
-                MessageHelper.replyToMessage(event, "Could not find tile: " + tileID);
-                return;
+                throw new Exception("Could not find tile: " + tileID);
             }
             Tile tile = new Tile(tileID, position);
             AddTile.addCustodianToken(tile);
-            activeGame.setTile(tile);
+            game.setTile(tile);
         }
+        return badTiles;
+    }
 
-        if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles + "\n");
-
+    public static void finishSetup(Game game, GenericInteractionCreateEvent event) {
         try {
             Tile tile;
             tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
-            activeGame.setTile(tile);
-            if (!tileList.startsWith("{") && !tileList.contains("}")) {
+            game.setTile(tile);
+            if (game.getTileByPosition("000") == null) {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
                 AddTile.addCustodianToken(tile);
-                activeGame.setTile(tile);
+                game.setTile(tile);
             }
         } catch (Exception e) {
             BotLogger.log("Could not add setup and Mallice tiles", e);
         }
 
-        if (!activeGame.isBaseGameMode()) {
-            new AddFrontierTokens().parsingForTile(event, activeGame);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
+        if (!game.isBaseGameMode()) {
+            MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
+            AddFrontierTokens.parsingForTile(event, game);
+            MessageHelper.sendMessageToChannel(channel, Emojis.Frontier + "Frontier Tokens have been added to empty spaces.");
         }
     }
 }

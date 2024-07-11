@@ -80,36 +80,36 @@ public class AllInfo implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
-        Game activeGame;
+        Game game;
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            activeGame = gameManager.getUserActiveGame(userID);
-            String color = Helper.getColor(activeGame, event);
+            game = gameManager.getUserActiveGame(userID);
+            String color = Helper.getColor(game, event);
             if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }
         }
 
-        Player player = activeGame.getPlayer(userID);
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Player player = game.getPlayer(userID);
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event) + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeGame, headerText);
-        AbilityInfo.sendAbilityInfo(activeGame, player);
-        UnitInfo.sendUnitInfo(activeGame, player);
-        LeaderInfo.sendLeadersInfo(activeGame, player);
-        TechInfo.sendTechInfo(activeGame, player);
-        RelicInfo.sendRelicInfo(activeGame, player);
-        SOInfo.sendSecretObjectiveInfo(activeGame, player);
-        ACInfo.sendActionCardInfo(activeGame, player);
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
-        CardsInfo.sendVariousAdditionalButtons(activeGame, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        AbilityInfo.sendAbilityInfo(game, player);
+        UnitInfo.sendUnitInfo(game, player, false);
+        LeaderInfo.sendLeadersInfo(game, player);
+        TechInfo.sendTechInfo(game, player);
+        RelicInfo.sendRelicInfo(game, player);
+        SOInfo.sendSecretObjectiveInfo(game, player);
+        ACInfo.sendActionCardInfo(game, player);
+        PNInfo.sendPromissoryNoteInfo(game, player, false);
+        CardsInfo.sendVariousAdditionalButtons(game, player);
     }
 
     protected String getActionDescription() {

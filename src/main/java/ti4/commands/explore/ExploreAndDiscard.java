@@ -7,14 +7,14 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.message.MessageHelper;
 
 public class ExploreAndDiscard extends ExploreSubcommandData {
     public ExploreAndDiscard() {
         super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.");
         addOptions(
-                typeOption.setRequired(true),
-                new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)")
-        );
+            typeOption.setRequired(true),
+            new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
     }
 
     @Override
@@ -29,12 +29,12 @@ public class ExploreAndDiscard extends ExploreSubcommandData {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             String userID = event.getUser().getId();
-            Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-            String cardID = activeGame.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
+            Game game = GameManager.getInstance().getUserActiveGame(userID);
+            String cardID = game.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
             sb.append(displayExplore(cardID)).append(System.lineSeparator());
         }
         sb.append("Cards have been discarded. Resolve effects and/or purge manually.\n");
         sb.append("To choose a card to keep/use, run this command: `/explore use explore_card_id:{ID}`");
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

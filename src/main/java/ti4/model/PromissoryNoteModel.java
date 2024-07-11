@@ -2,28 +2,57 @@ package ti4.model;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
 
 @Data
-public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
+public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
     private String alias;
     private String name;
     private String faction;
     private String color;
     private Boolean playArea;
+    private Boolean playImmediately;
     private String attachment;
     private ComponentSource source;
     private String text;
     private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
+    private boolean dupe = false;
+
+    public boolean isDupe() {
+        return dupe;
+    }
+
+    public boolean isColorable() {
+        return color != null && color.equals("<color>");
+    }
+
+    @Override
+    public PromissoryNoteModel duplicateAndSetColor(ColorModel newColor) {
+        PromissoryNoteModel pn = new PromissoryNoteModel();
+        pn.setAlias(this.alias.replaceAll("<color>", newColor.getName()));
+        pn.setName(this.name);
+        pn.setFaction(this.faction);
+        pn.setColor(newColor.getName());
+        pn.setPlayArea(this.playArea);
+        pn.setAttachment(this.attachment);
+        pn.setSource(this.source);
+        String newText = getText().replaceAll("<color>", newColor.getName());
+        pn.setText(newText);
+        pn.setHomebrewReplacesID(this.homebrewReplacesID);
+        pn.setSearchTags(new ArrayList<>(searchTags));
+        pn.setDupe(true);
+        return pn;
+    }
 
     public boolean isValid() {
         return alias != null
@@ -43,7 +72,10 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
 
     public String getFactionOrColor() {
         if (!StringUtils.isBlank(getFaction().orElse(""))) return faction;
-        if (!StringUtils.isBlank(getColor().orElse(""))) return color;
+        if (!StringUtils.isBlank(getColor().orElse(""))) {
+            if (color.equals("<color>")) return "generic";
+            return color;
+        }
         return faction + "_" + color;
     }
 
@@ -68,13 +100,9 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         if (playArea == null) {
             return false;
         }
-        List<String> pnIDsToHoldInHandBeforePlayArea = Arrays.asList(
-            "gift", "antivirus", "convoys", "dark_pact", "blood_pact",
-            "pop", "terraform", "dspnauge", "dspnaxis", "dspnbent",
-            "dspndihm", "dspnghot", "dspngled", "dspnkolu", "dspnkort",
-            "dspnlane", "dspnmyko", "dspnolra", "dspnrohd"); //TODO: just add a field to the model for this
+        if (playImmediately != null) return playArea && playImmediately;
 
-        return playArea && !pnIDsToHoldInHandBeforePlayArea.contains(alias);
+        return playArea;
     }
 
     public MessageEmbed getRepresentationEmbed() {
@@ -89,7 +117,15 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         title.append(Emojis.PN);
         if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
         title.append("__**").append(getName()).append("**__");
-        if (!StringUtils.isBlank(getColor().orElse(""))) title.append(" (").append(getColor()).append(")");
+        if (!StringUtils.isBlank(getColor().orElse(""))) {
+            title.append(" (");
+            if (color.equals("<color>")) {
+                title.append("generic");
+            } else {
+                title.append(color);
+            }
+            title.append(")");
+        }
         title.append(getSource().emoji());
         eb.setTitle(title.toString());
 
@@ -121,6 +157,29 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    public String getNameRepresentation() {
+        StringBuilder sb = new StringBuilder();
+        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
+        sb.append(Emojis.PN);
+        sb.append(" ").append(getName()).append("");
+        if (!StringUtils.isBlank(getColor().orElse(""))) {
+            sb.append(" (");
+            if (color.equals("<color>")) {
+                sb.append("generic");
+            } else {
+                sb.append(color);
+            }
+            sb.append(")");
+        }
+        sb.append(getSource().emoji());
+        return sb.toString();
+    }
+
+    public boolean isNotWellKnown() {
+        return getFaction().isPresent()
+            || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
+    }
+
     /**
      * @deprecated This only exists to simulate the old text based promissory note .property files
      */
@@ -142,5 +201,4 @@ public class PromissoryNoteModel implements ModelInterface, EmbeddableModel {
     public String getAutoCompleteName() {
         return getName() + " (" + getFactionOrColor() + ") [" + getSource() + "]";
     }
-
 }

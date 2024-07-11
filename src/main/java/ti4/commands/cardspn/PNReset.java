@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class PNReset extends PNCardsSubcommandData {
     public PNReset() {
@@ -18,23 +19,23 @@ public class PNReset extends PNCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
         if (Mapper.isValidColor(playerColor) && Mapper.isValidFaction(playerFaction)) {
-            List<String> promissoryNotes = new ArrayList<>(Mapper.getColorPromissoryNoteIDs(activeGame, playerColor));
+            List<String> promissoryNotes = new ArrayList<>(Mapper.getColorPromissoryNoteIDs(game, playerColor));
             for (String promissoryNote : promissoryNotes) {
-                activeGame.removePurgedPN(promissoryNote);
+                game.removePurgedPN(promissoryNote);
             }
         }
-        PNInfo.checkAndAddPNs(activeGame, player);
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, true, event);
-        sendMessage("PN Info Sent");
+        PNInfo.checkAndAddPNs(game, player);
+        PNInfo.sendPromissoryNoteInfo(game, player, true, event);
+        MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
     }
 }

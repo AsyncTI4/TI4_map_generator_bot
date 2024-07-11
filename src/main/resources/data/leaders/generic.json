@@ -1,0 +1,36 @@
+[
+    {
+        "id": "genericagent",
+        "faction": "generic",
+        "type": "agent",
+        "name": "Agent",
+        "title": "Generic Title",
+        "abilityWindow": "Generic Ability Window",
+        "abilityText": "Generic Ability Text",
+        "unlockCondition": "Always Unlocked",
+        "source": "other"
+    },
+    {
+        "id": "genericcommander",
+        "faction": "generic",
+        "type": "commander",
+        "name": "Commander",
+        "title": "Generic Title",
+        "abilityWindow": "Generic Ability Window",
+        "abilityText": "Generic Ability Text",
+        "unlockCondition": "Generic Unlock Condition",
+        "source": "other"
+    },
+    {
+        "id": "generichero",
+        "faction": "generic",
+        "type": "hero",
+        "name": "Hero",
+        "title": "Generic Title",
+        "abilityName": "Generic Ability Name",
+        "abilityWindow": "Generic Ability Window",
+        "abilityText": "Generic Ability Text",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "other"
+    }
+]

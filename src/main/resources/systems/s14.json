@@ -1,1 +1,23 @@
-{"id":"s14","name":"Somna/Tera/Hospoona","aliases":["s14","adminshs","adminhs","somna","tera","hospoona","spoona"],"imagePath":"S14_Somna.png","shipPositionsType":"TYPE03","spaceTokenLocations":[],"wormholes":[],"planets":["tera","somna","hospoona"]}
+{
+    "id": "s14",
+    "name": "Somna/Tera/Hospoona",
+    "aliases": [
+        "s14",
+        "adminshs",
+        "adminhs",
+        "somna",
+        "tera",
+        "hospoona",
+        "spoona"
+    ],
+    "imagePath": "S14_Somna.png",
+    "shipPositionsType": "TYPE03",
+    "spaceTokenLocations": [],
+    "wormholes": [],
+    "planets": [
+        "tera",
+        "somna",
+        "hospoona"
+    ],
+    "source": "somno"
+}

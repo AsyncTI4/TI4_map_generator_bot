@@ -1,8 +1,11 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class PNRemove extends PNAddRemove {
     public PNRemove() {
@@ -11,6 +14,10 @@ public class PNRemove extends PNAddRemove {
 
     @Override
     public void doAction(Player player, List<String> pnIDs) {
+        removePromissoryNotes(getEvent(), player, pnIDs);
+    }
+
+    public static void removePromissoryNotes(GenericInteractionCreateEvent event, Player player, List<String> pnIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed PNs:\n");
         for (String pnID : pnIDs) {
             if (!player.ownsPromissoryNote(pnID)) {
@@ -21,6 +28,6 @@ public class PNRemove extends PNAddRemove {
             sb.append("\n");
             player.removeOwnedPromissoryNoteByID(pnID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

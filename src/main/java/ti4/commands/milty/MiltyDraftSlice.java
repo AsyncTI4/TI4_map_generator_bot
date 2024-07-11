@@ -1,60 +1,54 @@
 package ti4.commands.milty;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
+
+@Data
 public class MiltyDraftSlice {
 
     private String name;
+    private List<MiltyDraftTile> tiles;
 
-    private MiltyDraftTile left;
-    private MiltyDraftTile equadistant;
-    private MiltyDraftTile right;
-    private MiltyDraftTile front;
-    private MiltyDraftTile farFront;
-
-    public String getName() {
-        return name;
+    public void setTiles(List<MiltyDraftTile> tiles) {
+        this.tiles = new ArrayList<>(tiles);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @JsonIgnore
+    public int getOptimalTotalValue() {
+        return getOptimalRes() + getOptimalInf() + getOptimalFlex();
     }
 
-    public MiltyDraftTile getLeft() {
-        return left;
+    @JsonIgnore
+    public int getOptimalRes() {
+        return tiles.stream().map(MiltyDraftTile::getMilty_res).reduce(0, (x, y) -> x + y);
     }
 
-    public void setLeft(MiltyDraftTile left) {
-        this.left = left;
+    @JsonIgnore
+    public int getOptimalInf() {
+        return tiles.stream().map(MiltyDraftTile::getMilty_inf).reduce(0, (x, y) -> x + y);
     }
 
-    public MiltyDraftTile getEquadistant() {
-        return equadistant;
+    @JsonIgnore
+    public int getOptimalFlex() {
+        return tiles.stream().map(MiltyDraftTile::getMilty_flex).reduce(0, (x, y) -> x + y);
     }
 
-    public void setEquadistant(MiltyDraftTile equadistant) {
-        this.equadistant = equadistant;
+    @JsonIgnore
+    public int getTotalRes() {
+        return tiles.stream().map(MiltyDraftTile::getResources).reduce(0, (x, y) -> x + y);
     }
 
-    public MiltyDraftTile getRight() {
-        return right;
+    @JsonIgnore
+    public int getTotalInf() {
+        return tiles.stream().map(MiltyDraftTile::getInfluence).reduce(0, (x, y) -> x + y);
     }
 
-    public void setRight(MiltyDraftTile right) {
-        this.right = right;
-    }
-
-    public MiltyDraftTile getFront() {
-        return front;
-    }
-
-    public void setFront(MiltyDraftTile front) {
-        this.front = front;
-    }
-
-    public MiltyDraftTile getFarFront() {
-        return farFront;
-    }
-
-    public void setFarFront(MiltyDraftTile farFront) {
-        this.farFront = farFront;
+    public String ttsString() {
+        List<String> ls = tiles.stream().map(tile -> tile.getTile().getTileID()).toList();
+        return String.join(",", ls);
     }
 }

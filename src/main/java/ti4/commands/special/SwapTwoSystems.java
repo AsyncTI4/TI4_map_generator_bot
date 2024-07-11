@@ -4,8 +4,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.MapGenerator;
+import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -22,7 +24,7 @@ public class SwapTwoSystems extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
@@ -34,29 +36,34 @@ public class SwapTwoSystems extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
-        String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeGame);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
+        String tile1ID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
+        Tile tile1 = AddRemoveUnits.getTile(event, tile1ID, game);
+        if (tile1 == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
             return;
         }
 
-        String tileIDTo = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
-        Tile tileTo = AddRemoveUnits.getTile(event, tileIDTo, activeGame);
-        if (tileTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileIDTo:  `" + tileID + "`. Tile not found");
+        String tile2ID = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
+        Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, game);
+
+        String positionFrom = tile1.getPosition();
+        String positionTo = tile2ID; //need to validate position
+
+        if (tile2 != null) { // tile exists, so swap
+            positionTo = tile2.getPosition();
+            tile2.setPosition(positionFrom);
+            game.setTile(tile2);
+        } else if (!PositionMapper.isTilePositionValid(positionTo)) { // tile does not exist, so validate the TO position
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Tile To position: " + positionTo);
             return;
+        } else {
+            //game.removeTile(positionFrom);
         }
 
-        String position = tile.getPosition();
-        String positionTo = tileTo.getPosition();
-        tile.setPosition(positionTo);
-        tileTo.setPosition(position);
-        activeGame.setTile(tile);
-        activeGame.setTile(tileTo);
-        activeGame.rebuildTilePositionAutoCompleteList();
-        DisplayType displayType = DisplayType.map;
-        MapGenerator.saveImage(activeGame, displayType, event)
-                .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+        tile1.setPosition(positionTo);
+        game.setTile(tile1);
+
+        game.rebuildTilePositionAutoCompleteList();
+        ShowGame.simpleShowGame(game, event, DisplayType.map);
     }
 }

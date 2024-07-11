@@ -59,7 +59,7 @@ public class CombatHelper {
     }
 
     public static Map<UnitModel, Integer> GetUnitsInCombat(Tile tile, UnitHolder unitHolder, Player player,
-        GenericInteractionCreateEvent event, CombatRollType roleType, Game activeGame) {
+        GenericInteractionCreateEvent event, CombatRollType roleType, Game game) {
         Planet unitHolderPlanet = null;
         if (unitHolder instanceof Planet) {
             unitHolderPlanet = (Planet) unitHolder;
@@ -68,7 +68,7 @@ public class CombatHelper {
             case combatround -> GetUnitsInCombatRound(unitHolder, player, event, tile);
             case AFB -> GetUnitsInAFB(tile, player, event);
             case bombardment -> GetUnitsInBombardment(tile, player, event);
-            case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, activeGame);
+            case SpaceCannonOffence -> getUnitsInSpaceCannonOffense(tile, player, event, game);
             case SpaceCannonDefence -> getUnitsInSpaceCannonDefence(unitHolderPlanet, player, event);
         };
     }
@@ -140,7 +140,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-            .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount() > 0)
+            .filter(entry -> entry.getKey() != null && entry.getKey().getAfbDieCount(player, player.getGame()) > 0)
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -176,7 +176,7 @@ public class CombatHelper {
         Map<UnitModel, Integer> unitsInCombat = getUnitsInCombat(player, unitsByAsyncId);
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsInCombat.entrySet().stream()
-            .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount() > 0)
+            .filter(entry -> entry.getKey() != null && entry.getKey().getBombardDieCount(player, player.getGame()) > 0)
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         checkBadUnits(player, event, unitsByAsyncId, output);
 
@@ -210,6 +210,11 @@ public class CombatHelper {
         // Check for space cannon die on planet
         PlanetModel planetModel = Mapper.getPlanet(planet.getName());
         String ccID = Mapper.getControlID(player.getColor());
+        if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasTech("iihq")) {
+            PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+            planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+            planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+        }
         if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
             UnitModel planetFakeUnit = new UnitModel();
             planetFakeUnit.setSpaceCannonHitsOn(planet.getSpaceCannonHitsOn());
@@ -232,7 +237,7 @@ public class CombatHelper {
     }
 
     public static Map<UnitModel, Integer> getUnitsInSpaceCannonOffense(Tile tile, Player player,
-        GenericInteractionCreateEvent event, Game activeGame) {
+        GenericInteractionCreateEvent event, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
 
         Map<String, Integer> unitsByAsyncId = new HashMap<>();
@@ -243,12 +248,12 @@ public class CombatHelper {
         }
 
         Map<String, Integer> adjacentUnitsByAsyncId = new HashMap<>();
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeGame, tile.getPosition(), player, false);
+        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false);
         for (String adjacentTilePosition : adjTiles) {
             if (adjacentTilePosition.equals(tile.getPosition())) {
                 continue;
             }
-            Tile adjTile = activeGame.getTileByPosition(adjacentTilePosition);
+            Tile adjTile = game.getTileByPosition(adjacentTilePosition);
             for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
                 getUnitsOnHolderByAsyncId(colorID, adjacentUnitsByAsyncId, unitHolder);
             }
@@ -266,8 +271,14 @@ public class CombatHelper {
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
 
         // Check for space cannon die on planets
+
         for (UnitHolder unitHolder : unitHolders) {
             if (unitHolder instanceof Planet planet) {
+                if (player.controlsMecatol(true) && Constants.MECATOLS.contains(planet.getName()) && player.hasTech("iihq")) {
+                    PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
+                    planet.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
+                    planet.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
+                }
                 PlanetModel planetModel = Mapper.getPlanet(planet.getName());
                 String ccID = Mapper.getControlID(player.getColor());
                 if (planet.getControlList().contains(ccID) && planet.getSpaceCannonDieCount() > 0) {
@@ -284,26 +295,45 @@ public class CombatHelper {
                 }
             }
         }
+        if (player.hasAbility("starfall_gunnery")) {
+            if (player == game.getActivePlayer()) {
+                int count = Math.min(3, ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, game, tile));
+                if (count > 0) {
+                    UnitModel starfallFakeUnit = new UnitModel();
+                    starfallFakeUnit.setSpaceCannonHitsOn(8);
+                    starfallFakeUnit.setSpaceCannonDieCount(1);
+                    starfallFakeUnit
+                        .setName("Starfall Gunnery space cannon");
+                    starfallFakeUnit.setAsyncId("starfallpds");
+                    starfallFakeUnit.setId("starfallpds");
+                    starfallFakeUnit.setBaseType("pds");
+                    starfallFakeUnit.setFaction(player.getFaction());
+                    unitsOnTile.put(starfallFakeUnit, count);
+                }
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " this is a reminder that due to the starfall gunnery ability, only space cannon of 1 unit should be counted at this point. Hopefully you declared beforehand what that unit was, but by default its probably the best one. Only look at/count the rolls of that one unit");
+            }
+        }
 
         HashMap<UnitModel, Integer> output = new HashMap<>(unitsOnTile.entrySet().stream()
-            .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount() > 0)
+            .filter(entry -> entry.getKey() != null && entry.getKey().getSpaceCannonDieCount(player, game) > 0)
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         HashMap<UnitModel, Integer> adjacentOutput = new HashMap<>(unitsOnAdjacentTiles.entrySet().stream()
             .filter(entry -> entry.getKey() != null
-                && entry.getKey().getSpaceCannonDieCount(player, activeGame) > 0
-                && (entry.getKey().getDeepSpaceCannon() || activeGame.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander") || (entry.getKey().getBaseType().equalsIgnoreCase("spacedock"))))
+                && entry.getKey().getSpaceCannonDieCount(player, game) > 0
+                && (entry.getKey().getDeepSpaceCannon() || game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander") || (entry.getKey().getBaseType().equalsIgnoreCase("spacedock"))))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         int limit = 0;
         for (var entry : adjacentOutput.entrySet()) {
-            if(entry.getKey().getDeepSpaceCannon()){
+            if (entry.getKey().getDeepSpaceCannon()) {
                 if (output.containsKey(entry.getKey())) {
                     output.put(entry.getKey(), entry.getValue() + output.get(entry.getKey()));
                 } else {
                     output.put(entry.getKey(), entry.getValue());
                 }
-            }else{
-                if(limit < 1){
+            } else {
+                if (limit < 1) {
                     limit = 1;
                     if (output.containsKey(entry.getKey())) {
                         output.put(entry.getKey(), 1 + output.get(entry.getKey()));
@@ -338,12 +368,12 @@ public class CombatHelper {
         }
     }
 
-    public static Player GetOpponent(Player player, List<UnitHolder> unitHolders, Game activeGame) {
+    public static Player GetOpponent(Player player, List<UnitHolder> unitHolders, Game game) {
         Player opponent = null;
         String playerColorID = Mapper.getColorID(player.getColor());
         List<Player> opponents = unitHolders.stream().flatMap(holder -> holder.getUnitColorsOnHolder().stream())
             .filter(color -> !color.equals(playerColorID))
-            .map(activeGame::getPlayerByColorID)
+            .map(game::getPlayerByColorID)
             .filter(Optional::isPresent)
             .map(Optional::get)
             .toList();
@@ -353,7 +383,7 @@ public class CombatHelper {
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
-                .filter(opp -> opp.getUserID().equals(activeGame.getActivePlayerID()))
+                .filter(opp -> opp.getUserID().equals(game.getActivePlayerID()))
                 .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
@@ -366,7 +396,7 @@ public class CombatHelper {
         List<NamedCombatModifierModel> extraRolls,
         List<NamedCombatModifierModel> autoMods, List<NamedCombatModifierModel> tempMods, Player player,
         Player opponent,
-        Game activeGame, CombatRollType rollType, GenericInteractionCreateEvent event, Tile activeSystem) {
+        Game game, CombatRollType rollType, GenericInteractionCreateEvent event, Tile activeSystem) {
 
         String result = "";
 
@@ -390,23 +420,27 @@ public class CombatHelper {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
 
-            int toHit = unit.getCombatDieHitsOnForAbility(rollType, player, activeGame);
+            int toHit = unit.getCombatDieHitsOnForAbility(rollType, player, game);
             int modifierToHit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, mods, player, opponent,
-                activeGame,
-                playerUnitsList, opponentUnitsList, rollType);
+                game,
+                playerUnitsList, opponentUnitsList, rollType, activeSystem);
             int extraRollsForUnit = CombatModHelper.GetCombinedModifierForUnit(unit, numOfUnit, extraRolls, player,
                 opponent,
-                activeGame, playerUnitsList, opponentUnitsList, rollType);
-            int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType, player, activeGame);
+                game, playerUnitsList, opponentUnitsList, rollType, activeSystem);
+            int numRollsPerUnit = unit.getCombatDieCountForAbility(rollType, player, game);
             boolean extraRollsCount = false;
-            if((numRollsPerUnit > 1 || extraRollsForUnit > 0) && activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
+            if ((numRollsPerUnit > 1 || extraRollsForUnit > 0) && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                 extraRollsCount = true;
                 numRollsPerUnit = 1;
                 extraRollsForUnit = 0;
             }
-            if(rollType == CombatRollType.SpaceCannonOffence && numRollsPerUnit == 3 && unit.getBaseType().equalsIgnoreCase("spacedock")){
+            if (rollType == CombatRollType.SpaceCannonOffence && numRollsPerUnit == 3 && unit.getBaseType().equalsIgnoreCase("spacedock")) {
                 numOfUnit = 1;
-                activeGame.setCurrentReacts("EBSFaction", "");
+                game.setStoredValue("EBSFaction", "");
+            }
+            if (rollType == CombatRollType.bombardment && numRollsPerUnit > 1 && unit.getBaseType().equalsIgnoreCase("destroyer")) {
+                numOfUnit = 1;
+                game.setStoredValue("TnelisAgentFaction", "");
             }
             int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
             List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
@@ -420,46 +454,58 @@ public class CombatHelper {
                     }
                 }
             }
-            int misses = numRolls-hitRolls;
-            totalMisses = totalMisses+misses;
-            
-            if(misses > 0 && !extraRollsCount && activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
-                extra = player.getFactionEmoji()+" destroyed "+misses+" of their own "+unit.getName() +" due to Thalnos misses";
-                for(String thalnosUnit : activeGame.getThalnosUnits().keySet()){
+            if (unit.getId().equalsIgnoreCase("vaden_flagship") && CombatRollType.bombardment == rollType) {
+                for (Die die : resultRolls) {
+                    if (die.getResult() > 4) {
+                        player.setTg(player.getTg() + 1);
+                        ButtonHelperAbilities.pillageCheck(player, game);
+                        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1tg due to hitting on a bombardment roll with their flagship");
+                        break;
+
+                    }
+                }
+            }
+            int misses = numRolls - hitRolls;
+            totalMisses = totalMisses + misses;
+
+            if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + " due to Thalnos misses";
+                for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
-                    Tile tile = activeGame.getTileByPosition(pos);
-                    int amount = activeGame.getSpecificThalnosUnit(thalnosUnit);
+                    Tile tile = game.getTileByPosition(pos);
+                    int amount = game.getSpecificThalnosUnit(thalnosUnit);
                     String unitName = ButtonHelper.getUnitName(unit.getAsyncId());
-                    thalnosUnit = thalnosUnit.split("_")[2].replace("damaged","");
-                    if(thalnosUnit.equals(unitName)){
-                        new RemoveUnits().unitParsing(event, player.getColor(), tile, misses +" "+ unitName+" "+unitHolderName, activeGame);
-                        if(unitName.equalsIgnoreCase("infantry")){
-                            ButtonHelper.resolveInfantryDeath(activeGame, player, misses);
+                    thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
+                    if (thalnosUnit.equals(unitName)) {
+                        new RemoveUnits().unitParsing(event, player.getColor(), tile, misses + " " + unitName + " " + unitHolderName, game);
+                        if (unitName.equalsIgnoreCase("infantry")) {
+                            ButtonHelper.resolveInfantryDeath(game, player, misses);
                         }
-                        if(unitName.equalsIgnoreCase("mech")){
-                            if ( player.hasUnit("mykomentori_mech")) {
+                        if (unitName.equalsIgnoreCase("mech")) {
+                            if (player.hasUnit("mykomentori_mech")) {
                                 for (int x = 0; x < misses; x++) {
-                                    ButtonHelper.rollMykoMechRevival(activeGame, player);
+                                    ButtonHelper.rollMykoMechRevival(game, player);
                                 }
                             }
-                            if(player.hasTech("sar")){
+                            if (player.hasTech("sar")) {
                                 for (int x = 0; x < misses; x++) {
                                     player.setTg(player.getTg() + 1);
-                                    MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeGame), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
                                         + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
-                                    ButtonHelperAbilities.pillageCheck(player, activeGame);
+                                    ButtonHelperAbilities.pillageCheck(player, game);
                                 }
-                                ButtonHelperAgents.resolveArtunoCheck(player, activeGame, 1);
+                                ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                             }
                         }
                         break;
                     }
                 }
-                
-            }else{
-                if(misses > 0 && activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")){
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),player.getFactionEmoji()+" had "+misses+" "+unit.getName() +" misses on a thalnos roll, but no units were removed due to extra rolls being unaccounted for");
+
+            } else {
+                if (misses > 0 && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " had " + misses + " " + unit.getName() + " misses on a thalnos roll, but no units were removed due to extra rolls being unaccounted for");
                 }
             }
 
@@ -469,7 +515,7 @@ public class CombatHelper {
             resultBuilder.append(unitRoll);
             List<Die> resultRolls2 = new ArrayList<>();
             int numMisses = numRolls - hitRolls;
-            if (activeGame.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander") && rollType != CombatRollType.combatround && numMisses > 0) {
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander") && rollType != CombatRollType.combatround && numMisses > 0) {
                 int numRolls2 = numMisses;
                 resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numRolls2);
                 player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls2 * (11 - toHit + modifierToHit)));
@@ -479,7 +525,7 @@ public class CombatHelper {
                 resultBuilder.append("Rerolling " + numMisses + " misses due to Jol-Nar Commander:\n " + unitRoll2);
             }
 
-            if (activeGame.getFactionsThatReactedToThis("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround && numMisses > 0) {
+            if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround && numMisses > 0) {
                 int numRolls2 = numMisses;
                 resultRolls2 = DiceHelper.rollDice(toHit - modifierToHit, numRolls2);
                 player.setExpectedHitsTimes10(player.getExpectedHitsTimes10() + (numRolls2 * (11 - toHit + modifierToHit)));
@@ -507,21 +553,24 @@ public class CombatHelper {
                 String kills = "\nDue to SWA II destroyer ability, " + argentInfKills + " of " + opponent.getRepresentation(false, true) + " infantry were destroyed\n";
                 resultBuilder.append(kills);
                 space.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), opponent.getColorID()), argentInfKills);
-                ButtonHelper.resolveInfantryDeath(activeGame, opponent, argentInfKills);
+                ButtonHelper.resolveInfantryDeath(game, opponent, argentInfKills);
             }
         }
         result = resultBuilder.toString();
 
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
-        if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !activeGame.getFactionsThatReactedToThis("thalnosPlusOne").equalsIgnoreCase("true")) {
+        if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
             result = result + "\n" + player.getFactionEmoji() + " You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives";
         }
-        if(!extra.isEmpty()){
-            result = result + "\n\n"+extra;
+        if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {
+            result = result + "\n" + player.getFactionEmoji() + " You have shard volley and thus should produce an additional hit to the ones rolled above";
         }
-        if (activeGame.getFactionsThatReactedToThis("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround){
-            activeGame.setCurrentReacts("munitionsReserves", "");
+        if (!extra.isEmpty()) {
+            result = result + "\n\n" + extra;
+        }
+        if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
+            game.setStoredValue("munitionsReserves", "");
         }
         return result;
     }

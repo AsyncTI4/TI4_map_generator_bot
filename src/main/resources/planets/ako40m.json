@@ -1,0 +1,107 @@
+{
+    "id": "ako40m",
+    "tileId": "er82",
+    "name": "Ako.4.0.m",
+    "aliases": ["ako40m", "ako.4.0.m"],
+    "positionInTile": {
+        "x": 135.0,
+        "y": 130.0
+    },
+    "resources": 1,
+    "influence": 1,
+    "planetTypes": ["HAZARDOUS"],
+    "legendaryAbilityName": "Gravitational Gambit",
+    "legendaryAbilityText": "At the end of your turn, you may exhaust this card to roll a die. On a result of 1-3 purge each attachment to this planet, and remove all units on this planet from the game board. Otherwise, attach an Improvement card to this planet. Improvement: ATTACH: This planet's resource and influence values are each increased by 1.",
+    "unitPositions": {
+        "unitHolderName": "ako40m",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 94.0,
+                    "y": 117.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 65.0,
+                    "y": 152.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 99.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 116.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 133.0,
+                    "y": 144.0
+                },
+                {
+                    "x": 108.0,
+                    "y": 155.0
+                },
+                {
+                    "x": 126.0,
+                    "y": 155.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 101.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 119.0,
+                    "y": 73.0
+                },
+                {
+                    "x": 94.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 112.0,
+                    "y": 86.0
+                },
+                {
+                    "x": 130.0,
+                    "y": 86.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 113.0,
+                    "y": 114.0
+                },
+                {
+                    "x": 80.0,
+                    "y": 114.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 32.0,
+                    "y": 121.0
+                },
+                {
+                    "x": 156.0,
+                    "y": 75.0
+                },
+                {
+                    "x": 164.0,
+                    "y": 106.0
+                },
+                {
+                    "x": 156.0,
+                    "y": 137.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "Actively being torn apart by a gravity rift. A fact that itself does not deter the brave. Mining operations have remained strong even as the planet is full further towards its doom.",
+    "source": "eronous"
+}

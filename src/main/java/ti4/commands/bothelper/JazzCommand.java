@@ -1,55 +1,67 @@
 package ti4.commands.bothelper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.AsyncTI4DiscordBot;
-//import ti4.helpers.AgendaHelper;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.json.ObjectMapperFactory;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.util.*;
-
 public class JazzCommand extends BothelperSubcommandData {
+
+    ObjectMapper mapper = ObjectMapperFactory.build();
+
     public JazzCommand() {
         super("jazz_command", "jazzxhands");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!"228999251328368640".equals(event.getUser().getId())) {
-            String jazz = AsyncTI4DiscordBot.jda.getUserById("228999251328368640").getAsMention();
-            if ("150809002974904321".equals(event.getUser().getId())) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + jazz + ", but you are an honorary jazz so you may proceed");
-            } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + jazz);
-                return;
-            }
+        if (!jazzCheck(event)) return;
+        //sendJazzButton(event);
+
+        Game game = getActiveGame();
+        ButtonHelper.resolveSetupColorChecker(game);
+    }
+
+    public static void sendJazzButton(GenericInteractionCreateEvent event) {
+        Emoji spinner = Emoji.fromFormatted(Emojis.scoutSpinner);
+        Button jazz = Button.success("jazzButton", spinner);
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), Constants.jazzPing() + " button", jazz);
+    }
+
+    public static void handleJazzButton(ButtonInteractionEvent event, Player p, Game game) {
+
+    }
+
+    public static boolean jazzCheck(GenericInteractionCreateEvent event) {
+        if (Constants.jazzId.equals(event.getUser().getId())) return true;
+        if (Constants.honoraryJazz.contains(event.getUser().getId())) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are an honorary jazz so you may proceed");
+            return true;
         }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not " + Constants.jazzPing());
+        return false;
+    }
 
-        List<String> colorsToCheck = List.of("gray", "black", "blue", "green", "orange", "pink", "purple", "red", "yellow", "petrol", "brown", "tan", "forest", "chrome", "sunset", "turquoise", "gold",
-            "lightgray", "teal", "bloodred", "emerald", "navy", "rose", "lime", "lavender", "spring", "chocolate", "rainbow", "ethereal", "orca", "splitred", "splitblue", "splitgreen", "splitpurple",
-            "splitorange", "splityellow", "splitpink", "splitgold", "splitlime", "splittan", "splitteal", "splitturquoise", "splitbloodred", "splitchocolate", "splitemerald", "splitnavy",
-            "splitpetrol", "splitrainbow");
-
-        StringBuilder sb2 = new StringBuilder("\t");
-        for (String c : colorsToCheck) {
-            sb2.append(c).append("\t");
+    public String json(MiltySettings object) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String val = mapper.writeValueAsString(object);
+            return val;
+        } catch (Exception e) {
+            BotLogger.log("Error mapping to json: ", e);
         }
-        sb2.append("\n");
-
-        Map<String, Map<String, Double>> contrastMap = new HashMap<>();
-        for (int i = 0; i < colorsToCheck.size(); i++) {
-            String c1 = colorsToCheck.get(i);
-            sb2.append(c1);
-
-            for (String c2 : colorsToCheck) {
-                double contrast = ButtonHelper.colorContrast(c1, c2);
-                sb2.append(String.format("\t%f", contrast));
-
-                contrastMap.computeIfAbsent(c1, k -> new HashMap<>());
-                contrastMap.get(c1).put(c2, contrast);
-            }
-            sb2.append("\n");
-        }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb2.toString());
+        return null;
     }
 }

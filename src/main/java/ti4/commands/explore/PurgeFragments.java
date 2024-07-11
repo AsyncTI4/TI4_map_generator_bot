@@ -12,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.generator.Mapper;
 
@@ -27,12 +28,12 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game activeGame = getActiveGame();
-		Player activePlayer = activeGame.getPlayer(getUser().getId());
-		activePlayer = Helper.getGamePlayer(activeGame, activePlayer, event, null);
-		activePlayer = Helper.getPlayer(activeGame, activePlayer, event);
+		Game game = getActiveGame();
+		Player activePlayer = game.getPlayer(getUser().getId());
+		activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
+		activePlayer = Helper.getPlayer(game, activePlayer, event);
 		if (activePlayer == null) {
-			sendMessage("Player not found in game.");
+			MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
 			return;
 		}
 		String color = event.getOption(Constants.TRAIT).getAsString();
@@ -59,7 +60,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 		while (fragmentsToPurge.size() < count) {
 			if (unknowns.isEmpty()) {
-				sendMessage("Not enough fragments. Note that default count is 3.");
+				MessageHelper.sendMessageToEventChannel(event, "Not enough fragments. Note that default count is 3.");
 				return;
 			}
 			fragmentsToPurge.add(unknowns.remove(0));
@@ -67,27 +68,27 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
-			activeGame.setNumberOfPurgedFragments(activeGame.getNumberOfPurgedFragments() + 1);
+			game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
 		}
 
-		Player lanefirPlayer = activeGame.getPlayers().values().stream().filter(
+		Player lanefirPlayer = game.getPlayers().values().stream().filter(
 			p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
 
 		if (lanefirPlayer != null) {
-			ButtonHelper.commanderUnlockCheck(activePlayer, activeGame, "lanefir", event);
+			ButtonHelper.commanderUnlockCheck(activePlayer, game, "lanefir", event);
 		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
-		sendMessage(message);
+		MessageHelper.sendMessageToEventChannel(event, message);
 
 		if (activePlayer.hasTech("dslaner")) {
 			activePlayer.setAtsCount(activePlayer.getAtsCount() + 1);
-			sendMessage(activePlayer.getRepresentation() + " Put 1 commodity on ATS Armaments");
+			MessageHelper.sendMessageToEventChannel(event, activePlayer.getRepresentation() + " Put 1 commodity on ATS Armaments");
 		}
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {
 			if (drawRelicOption.getAsBoolean()) {
-				DrawRelic.drawRelicAndNotify(activePlayer, event, activeGame);
+				DrawRelic.drawRelicAndNotify(activePlayer, event, game);
 			}
 		}
 	}

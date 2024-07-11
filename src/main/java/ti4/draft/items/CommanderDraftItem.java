@@ -53,17 +53,21 @@ public class CommanderDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));
-            if (leaders.isEmpty()) {
-                continue;
+            for (String leader : leaders) {
+                allItems.add(DraftItem.Generate(Category.COMMANDER, leader));
             }
-            allItems.add(DraftItem.Generate(Category.COMMANDER, leaders.get(0)));
         }
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
         return allItems;
     }
 }

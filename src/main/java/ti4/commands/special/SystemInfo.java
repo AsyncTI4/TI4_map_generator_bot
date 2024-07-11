@@ -2,7 +2,9 @@ package ti4.commands.special;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,6 +21,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.RegexHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -41,7 +44,7 @@ public class SystemInfo extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         int context = 0;
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
@@ -61,7 +64,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 continue;
             }
             String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-            Tile tile = AddUnits.getTile(event, tileID, activeGame);
+            Tile tile = AddUnits.getTile(event, tileID, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;
@@ -73,8 +76,7 @@ public class SystemInfo extends SpecialSubcommandData {
             StringBuilder sb = new StringBuilder();
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-            Map<String, String> colorToId = Mapper.getColorToId();
-            Boolean privateGame = FoWHelper.isPrivateGame(activeGame, event);
+            Boolean privateGame = FoWHelper.isPrivateGame(game, event);
             for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
                 String representation = planetRepresentations.get(name);
@@ -83,7 +85,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 UnitHolder unitHolder = entry.getValue();
                 if (unitHolder instanceof Planet planet) {
-                    sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, activeGame));
+                    sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, game));
                     sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
                 } else {
                     sb.append(representation);
@@ -95,20 +97,9 @@ public class SystemInfo extends SpecialSubcommandData {
                         sb.append("Command Counters: ");
                         hasCC = true;
                     }
-                    addtFactionIcon(activeGame, sb, colorToId, cc, privateGame);
+                    appendFactionIcon(game, sb, cc, privateGame);
                 }
                 if (hasCC) {
-                    sb.append("\n");
-                }
-                boolean hasControl = false;
-                for (String control : unitHolder.getControlList()) {
-                    if (!hasControl) {
-                        sb.append("Control Counters: ");
-                        hasControl = true;
-                    }
-                    addtFactionIcon(activeGame, sb, colorToId, control, privateGame);
-                }
-                if (hasControl) {
                     sb.append("\n");
                 }
                 boolean hasToken = false;
@@ -130,12 +121,23 @@ public class SystemInfo extends SpecialSubcommandData {
                 if (hasToken) {
                     sb.append("\n");
                 }
+                boolean hasControl = false;
+                for (String control : unitHolder.getControlList()) {
+                    if (!hasControl) {
+                        sb.append("Control Counters: ");
+                        hasControl = true;
+                    }
+                    appendFactionIcon(game, sb, control, privateGame);
+                }
+                if (hasControl) {
+                    sb.append("\n");
+                }
 
                 Map<UnitKey, Integer> units = unitHolder.getUnits();
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey unitKey = unitEntry.getKey();
                     String color = AliasHandler.resolveColor(unitKey.getColorID());
-                    Player player = activeGame.getPlayerFromColorOrFaction(color);
+                    Player player = game.getPlayerFromColorOrFaction(color);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                     sb.append(player.getFactionEmojiOrColor()).append(Emojis.getColorEmojiWithName(color));
@@ -148,30 +150,30 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 sb.append("----------\n");
             }
-            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(activeGame, context, tile.getPosition(), event);
+            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event);
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, "System", false);
-            if (!activeGame.isFoWMode()) {
-                for (Player player : activeGame.getRealPlayers()) {
+            if (!game.isFowMode()) {
+                for (Player player : game.getRealPlayers()) {
 
                     if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                         continue;
                     }
-                    List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeGame, tile);
+                    List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
                     if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         Player player2 = players.get(0);
                         if (player2 == player) {
                             player2 = players.get(1);
                         }
-                        List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, tile.getPosition(), player, player2, "space", event);
+                        List<Button> buttons = StartCombat.getGeneralCombatButtons(game, tile.getPosition(), player, player2, "space", event);
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                         return;
                     } else {
                         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                             if (unitHolder instanceof Planet) {
-                                if (ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName()).size() > 1) {
-                                    List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeGame, tile, unitHolder.getName());
-                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(activeGame, tile.getPosition(), listP.get(0), listP.get(1), "ground", event);
+                                if (ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName()).size() > 1) {
+                                    List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
+                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(game, tile.getPosition(), listP.get(0), listP.get(1), "ground", event);
                                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
                                     return;
                                 }
@@ -185,21 +187,18 @@ public class SystemInfo extends SpecialSubcommandData {
         }
     }
 
-    private static void addtFactionIcon(Game activeGame, StringBuilder sb, Map<String, String> colorToId, String key, Boolean privateGame) {
-
-        for (Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
-            String colorKey = colorEntry.getKey();
-            String color = colorEntry.getValue();
-            if (key.contains(colorKey)) {
-                for (Player player_ : activeGame.getPlayers().values()) {
-                    if (Objects.equals(player_.getColor(), color)) {
-                        if (privateGame != null && privateGame) {
-                            sb.append(" (").append(color).append(") ");
-                        } else {
-                            sb.append(player_.getFactionEmoji()).append(" ").append(" (").append(color).append(") ");
-                        }
-                    }
-                }
+    private static void appendFactionIcon(Game game, StringBuilder sb, String key, Boolean privateGame) {
+        // parse IDs like "control_blk.png" and "command_red.png"
+        String colorTokenRegex = "[a-z]+_" + RegexHelper.colorRegex(game) + "\\.png";
+        Matcher tokenMatch = Pattern.compile(colorTokenRegex).matcher(key);
+        if (tokenMatch.matches()) {
+            String colorID = tokenMatch.group("color");
+            String color = Mapper.getColorName(colorID);
+            Player player = game.getPlayerFromColorOrFaction(color);
+            if (privateGame != null && privateGame) {
+                sb.append(" (").append(color).append(") ");
+            } else {
+                sb.append(player.getFactionEmoji()).append(" ").append(" (").append(color).append(") ");
             }
         }
     }

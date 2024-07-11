@@ -22,16 +22,16 @@ public class ShowPNToAll extends PNCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            sendMessage("Please select what Promissory Note to show to All");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to show to All");
             return;
         }
 
@@ -45,7 +45,7 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         }
 
         if (pnID == null) {
-            sendMessage("No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
             return;
         }
 
@@ -53,7 +53,7 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         player.setPromissoryNote(pnID);
 
         String message = player.getRepresentation(false, false) + " showed a promissory note:";
-        PNInfo.sendPromissoryNoteInfo(activeGame, player, false);
+        PNInfo.sendPromissoryNoteInfo(game, player, false);
         MessageHelper.sendMessageToChannelWithEmbed(event.getChannel(), message, pnEmbed);
     }
 }

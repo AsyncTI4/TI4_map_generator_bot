@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import ti4.helpers.Constants;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 import java.util.List;
 
@@ -21,16 +22,16 @@ public class AddRelicBackIntoDeck extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC_ALL);
         if (option == null) {
-            sendMessage("Specify relic");
+            MessageHelper.sendMessageToEventChannel(event, "Specify relic");
             return;
         }
         String relicId = option.getAsString();
         List<String> allRelics = getActiveGame().getAllRelics();
         if (!allRelics.contains(relicId)){
             getActiveGame().shuffleRelicBack(relicId);
-            sendMessage("Relic " + relicId + " added back into deck");
+            MessageHelper.sendMessageToEventChannel(event, "Relic " + relicId + " added back into deck");
         } else {
-            sendMessage("Invalid relic or specified relic exists in deck");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid relic or specified relic exists in deck");
         }
     }
 }

@@ -1,17 +1,23 @@
 package ti4.commands.special;
 
+import java.util.List;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddUnits;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.List;
-import java.util.Set;
+import ti4.model.PlanetModel;
 
 public class RiseOfMessiah extends SpecialSubcommandData {
     public RiseOfMessiah() {
@@ -22,39 +28,52 @@ public class RiseOfMessiah extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        doRise(player, event, activeGame);
-        
+        doRise(player, event, game);
+
     }
 
-    public void doRise(Player player, GenericInteractionCreateEvent event, Game activeGame){
+    public static void doRise(Player player, GenericInteractionCreateEvent event, Game game) {
         List<String> planets = player.getPlanetsAllianceMode();
-        for (Tile tile : activeGame.getTileMap().values()) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(player.getRepresentationNoPing()).append(" added one ").append(Emojis.infantry).append(" to each of: ");
+        int count = 0;
+        for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (planets.contains(unitHolder.getName())){
+                if (planets.contains(unitHolder.getName())) {
                     Set<String> tokenList = unitHolder.getTokenList();
                     boolean ignorePlanet = false;
                     for (String token : tokenList) {
-                        if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED_PNG)){
+                        if (token.contains("dmz") || token.contains(Constants.WORLD_DESTROYED_PNG) || token.contains("arcane_shield")) {
                             ignorePlanet = true;
                             break;
                         }
                     }
-                    if (ignorePlanet){
+                    if (ignorePlanet) {
                         continue;
                     }
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf "+unitHolder.getName(), activeGame);
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + unitHolder.getName(), game);
+                    PlanetModel planetModel = Mapper.getPlanet(unitHolder.getName());
+                    if (planetModel != null) {
+                        sb.append("\n> ").append(Helper.getPlanetRepresentationPlusEmoji(unitHolder.getName()));
+                        count++;
+                    }
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added 1 infantry to each planet for "+ player.getColor());
+        if (count == 0) {
+            sb = new StringBuilder(player.getRepresentationNoPing()).append(" did not have any planets which could receive +1 infantry");
+        } else if (count > 5) {
+            sb.append("\n> Total of ").append(count);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     @Override

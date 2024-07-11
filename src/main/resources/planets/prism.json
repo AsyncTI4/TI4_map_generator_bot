@@ -104,5 +104,6 @@
             ]
         },
         "removeUnitCoordinate": true
-    }
+    },
+    "source": "uncharted_space"
 }

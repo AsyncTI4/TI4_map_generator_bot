@@ -1014,7 +1014,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: At the start of your turn, purge 1 of your relic fragments to place 1 mech on a planet you control, if you do, you may end your turn."
+        "ability": "DEPLOY: At the start of your turn, purge 1 of your relic fragments to place 1 mech on a planet you control, if you do, you may end your turn. [Note: Treated as a component action in the bot, despite not entirely being one]"
     },
     {
         "id": "lizho_fighter",
@@ -1382,7 +1382,7 @@
         "capacityValue": 3,
         "capacityUsed": 1,
         "cost": 8,
-        "combatHitsOn": 9,
+        "combatHitsOn": 5,
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,

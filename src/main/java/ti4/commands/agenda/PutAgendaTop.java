@@ -16,15 +16,15 @@ public class PutAgendaTop extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 
-    public void putTop(GenericInteractionCreateEvent event, int agendaID, Game activeGame) {
-        boolean success = activeGame.putAgendaTop(agendaID);
-        if (success && !activeGame.isFoWMode()) {
+    public void putTop(GenericInteractionCreateEvent event, int agendaID, Game game) {
+        boolean success = game.putAgendaTop(agendaID);
+        if (success && !game.isFowMode()) {
 
-            MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "Agenda put on top");
-            ButtonHelper.sendMessageToRightStratThread(activeGame.getPlayer(activeGame.getActivePlayerID()), activeGame, "Agenda put on top", "politics");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on top");
+            ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game, "Agenda put on top", "politics");
         } else {
-            if (!activeGame.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(activeGame.getActionsChannel(), "No Agenda ID found");
+            if (!game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             }
 
         }
@@ -32,12 +32,12 @@ public class PutAgendaTop extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        putTop(event, option.getAsInt(), activeGame);
+        putTop(event, option.getAsInt(), game);
     }
 }

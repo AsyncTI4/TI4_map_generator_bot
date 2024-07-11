@@ -4,8 +4,7 @@
     "aliases": [
         "kapparift"
     ],
-    "imagePath": "er44_kappa_rift.png",
-    "planetIds": [],
+    "imagePath": "er_44_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -33,5 +32,7 @@
         "KAPPA"
     ],
     "planets": [],
-    "isGravityRift": true
+    "isGravityRift": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

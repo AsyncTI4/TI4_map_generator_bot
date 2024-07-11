@@ -34,5 +34,7 @@
     ],
     "wormholes": [],
     "planets": [],
-    "isGravityRift": true
+    "isGravityRift": true,
+    "source": "base",
+    "tileBack": "red"
 }

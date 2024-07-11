@@ -15,6 +15,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 
 public class UseExplore extends ExploreSubcommandData {
 
@@ -27,18 +28,18 @@ public class UseExplore extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
         id = StringUtils.substringBefore(id, " ");
-        if (activeGame.pickExplore(id) != null) {
+        if (game.pickExplore(id) != null) {
             OptionMapping planetOption = event.getOption(Constants.PLANET);
             String planetName = null;
             if (planetOption != null) {
                 planetName = planetOption.getAsString();
             }
             Tile tile = null;
-            if (activeGame.getPlanets().contains(planetName)) {
-                for (Tile tile_ : activeGame.getTileMap().values()) {
+            if (game.getPlanets().contains(planetName)) {
+                for (Tile tile_ : game.getTileMap().values()) {
                     if (tile != null) {
                         break;
                     }
@@ -50,16 +51,16 @@ public class UseExplore extends ExploreSubcommandData {
                     }
                 }
                 if (tile == null) {
-                    sendMessage("System not found that contains planet");
+                    MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet");
                     return;
                 }
             }
-            Player player = activeGame.getPlayer(event.getUser().getId());
-            player = Helper.getGamePlayer(activeGame, player, event, null);
+            Player player = game.getPlayer(event.getUser().getId());
+            player = Helper.getGamePlayer(game, player, event, null);
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
-            resolveExplore(event, id, tile, planetName, messageText, player, activeGame);
+            resolveExplore(event, id, tile, planetName, messageText, player, game);
         } else {
-            sendMessage("Invalid card ID");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid card ID");
         }
     }
 

@@ -5,8 +5,7 @@
         "nebula1e",
         "n1e"
     ],
-    "imagePath": "er67_nebula1.png",
-    "planetIds": [],
+    "imagePath": "er_67_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -34,5 +33,7 @@
         null
     ],
     "planets": [],
-    "isNebula": true
+    "isNebula": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

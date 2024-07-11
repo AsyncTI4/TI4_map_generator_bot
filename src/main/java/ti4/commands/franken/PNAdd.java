@@ -1,9 +1,13 @@
 package ti4.commands.franken;
 
 import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.commands.cardspn.PNInfo;
 import ti4.helpers.Constants;
+import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class PNAdd extends PNAddRemove {
     public PNAdd() {
@@ -12,9 +16,13 @@ public class PNAdd extends PNAddRemove {
 
     @Override
     public void doAction(Player player, List<String> pnIDs) {
+        addPromissoryNotes(getEvent(), getActiveGame(), player, pnIDs);
+    }
+
+    public static void addPromissoryNotes(GenericInteractionCreateEvent event, Game game, Player player, List<String> pnIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added PNs:\n");
         for (String pnID : pnIDs ){
-            Player pnOwner = getActiveGame().getPNOwner(pnID);
+            Player pnOwner = game.getPNOwner(pnID);
             sb.append("> ");
             if (pnOwner != null) {
                 sb.append(pnID).append(" is already owned by ").append(pnOwner.getUserName());
@@ -27,10 +35,10 @@ public class PNAdd extends PNAddRemove {
                 sb.append("\n");
                 continue;
             }
-            sb.append(PNInfo.getPromissoryNoteRepresentation(getActiveGame(), pnID));
+            sb.append(PNInfo.getPromissoryNoteRepresentation(game, pnID));
             sb.append("\n");
             player.addOwnedPromissoryNoteByID(pnID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

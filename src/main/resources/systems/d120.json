@@ -6,7 +6,6 @@
         "4257"
     ],
     "imagePath": "d120.png",
-    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -33,5 +32,6 @@
     "wormholes": null,
     "planets": [],
     "isAsteroidField": true,
-    "isNebula": true
+    "isNebula": true,
+    "source": "uncharted_space"
 }

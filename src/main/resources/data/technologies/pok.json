@@ -2,14 +2,18 @@
     {
         "alias": "amd",
         "name": "Antimass Deflectors",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "source": "base",
         "text": "Your ships can move into and through asteroid fields. When other players' units use SPACE CANNON against your units, apply -1 to the result of each die roll."
     },
     {
         "alias": "gd",
         "name": "Gravity Drive",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "B",
         "source": "base",
         "text": "After you activate a system, apply +1 to the move value of 1 of your ships during this tactical action."
@@ -17,7 +21,9 @@
     {
         "alias": "fl",
         "name": "Fleet Logistics",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "source": "base",
         "text": "During each of your turns of the action phase, you may perform 2 actions instead of 1."
@@ -25,7 +31,9 @@
     {
         "alias": "lwd",
         "name": "Light/Wave Deflector",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BBB",
         "source": "base",
         "text": "Your ships can move through systems that contain other players' ships."
@@ -33,14 +41,18 @@
     {
         "alias": "det",
         "name": "Dark Energy Tap",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "source": "pok",
         "text": "After you perform a tactical action in a system that contains a frontier token, if you have 1 or more ships in that system, explore that token. Your ships can retreat into adjacent systems that do not contain other players' units, even if you do not have units or control planets in that system."
     },
     {
         "alias": "sr",
         "name": "Sling Relay",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "B",
         "source": "pok",
         "text": "ACTION: Exhaust this card to produce 1 ship in any system that contains one of your space docks."
@@ -48,14 +60,18 @@
     {
         "alias": "nm",
         "name": "Neural Motivator",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "source": "base",
         "text": "During the status phase, draw 2 action cards instead of 1."
     },
     {
         "alias": "dxa",
         "name": "Dacxive Animators",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "source": "base",
         "text": "After you win a ground combat, you may place 1 infantry from your reinforcements on that planet."
@@ -63,7 +79,9 @@
     {
         "alias": "hm",
         "name": "Hyper Metabolism",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "source": "base",
         "text": "During the status phase, gain 3 command tokens instead of 2."
@@ -71,7 +89,9 @@
     {
         "alias": "x89",
         "name": "X-89 Bacterial Weapon",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "source": "base",
         "text": "After 1 or more of your units use BOMBARDMENT against a planet, if at least 1 of your opponent's infantry was destroyed, you may destroy all of your opponent's infantry on that planet."
@@ -79,14 +99,18 @@
     {
         "alias": "pa",
         "name": "Psychoarchaeology",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "source": "pok",
         "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted. During the Action Phase, you can exhaust planets you control that have technology specialties to gain 1 Trade Good."
     },
     {
         "alias": "bs",
         "name": "Bio-Stims",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "source": "pok",
         "text": "You may exhaust this card at the end of your turn to ready 1 of your planets that has a technology specialty or 1 of your other technologies."
@@ -94,14 +118,18 @@
     {
         "alias": "ps",
         "name": "Plasma Scoring",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "source": "base",
         "text": "When 1 or more of your units use Bombardment or Space Cannon, 1 of those units may roll 1 additional die."
     },
     {
         "alias": "md",
         "name": "Magen Defense Grid",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "source": "base",
         "text": "Base: You may exhaust this card at the start of a round of ground combat on a planet that contains 1 or more of your units that have Planetary Shield; your opponent cannot make combat rolls this combat round. Omega: At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces."
@@ -109,7 +137,9 @@
     {
         "alias": "da",
         "name": "Duranium Armor",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "source": "base",
         "text": "During each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use Sustain Damage during this combat round."
@@ -117,7 +147,9 @@
     {
         "alias": "asc",
         "name": "Assault Cannon",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RRR",
         "source": "base",
         "text": "At the start of a space combat in a system that contains 3 or more of your non-fighter ships, your opponent must destroy 1 of their non-fighter ships."
@@ -125,14 +157,18 @@
     {
         "alias": "aida",
         "name": "AI Development Algorithm",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "source": "pok",
         "text": "When you research a unit upgrade technology, you may exhaust this card to ignore any 1 prerequisite. When 1 or more of your units use Production, you may exhaust this card to reduce the combined cost of the produced units by the number of unit upgrade technologies that you own."
     },
     {
         "alias": "sar",
         "name": "Self-Assembly Routines",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "source": "pok",
         "text": "After 1 or more of your units use PRODUCTION, you may exhaust this card to place 1 mech from your reinforcements on a planet you control in that system. After 1 of your mechs is destroyed, gain 1 trade good."
@@ -140,14 +176,18 @@
     {
         "alias": "st",
         "name": "Sarween Tools",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "source": "base",
         "text": "When 1 or more of your units use Production, reduce the combined cost of the produced units by 1."
     },
     {
         "alias": "gls",
         "name": "Graviton Laser System",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "source": "base",
         "text": "You may exhaust this card before 1 or more of your units uses Space Cannon; hits produced by those units must be assigned to non-fighter ships if able."
@@ -155,7 +195,9 @@
     {
         "alias": "td",
         "name": "Transit Diodes",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "source": "base",
         "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control."
@@ -163,7 +205,9 @@
     {
         "alias": "ie",
         "name": "Integrated Economy",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YYY",
         "source": "base",
         "text": "After you gain control of a planet, you may produce any number of units on that planet that have a combined cost equal to or less than that planet's resource value."
@@ -171,14 +215,18 @@
     {
         "alias": "sdn",
         "name": "Scanlink Drone Network",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "source": "pok",
         "text": "When you activate a system, you may explore 1 planet in that system which contains 1 or more of your units."
     },
     {
         "alias": "pi",
         "name": "Predictive Intelligence",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "source": "pok",
         "text": "At the end of your turn, you may exhaust this card to redistribute your command tokens.\n\nWhen you cast votes during the agenda phase, you may cast 3 additional votes; if you do, and the outcome you voted for is not resolved, exhaust this card."
@@ -186,7 +234,9 @@
     {
         "alias": "ws",
         "name": "War Sun",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "RRRY",
         "source": "base",
         "text": "Cost 12, Combat 3(x3), Move 2, Capacity 6, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability."
@@ -194,15 +244,19 @@
     {
         "alias": "sd2",
         "name": "Space Dock II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YY",
         "source": "base",
-        "text": "This unit's PRODUCTION value is equal to 4 more than the resource or influence value of this planet. Up to 3 fighters in this system do not count against your ships' capacity. PRODUCTION X"
+        "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet. Up to 3 fighters in this system do not count against your ships' capacity. PRODUCTION X"
     },
     {
         "alias": "lw2",
         "name": "Letani Warrior II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GG",
         "faction": "arborec",
         "baseUpgrade": "inf2",
@@ -212,7 +266,9 @@
     {
         "alias": "swa2",
         "name": "Strike Wing Alpha II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "RR",
         "faction": "argent",
         "baseUpgrade": "dd2",
@@ -222,7 +278,9 @@
     {
         "alias": "l4",
         "name": "L4 Disruptors",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "letnev",
         "source": "base",
@@ -231,7 +289,9 @@
     {
         "alias": "cm",
         "name": "Chaos Mapping",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "B",
         "faction": "saar",
         "source": "base",
@@ -240,7 +300,9 @@
     {
         "alias": "pws2",
         "name": "Prototype War Sun II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "RRRY",
         "faction": "muaat",
         "baseUpgrade": "ws",
@@ -250,7 +312,9 @@
     {
         "alias": "qdn",
         "name": "Quantum Datahub Node",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YYY",
         "faction": "hacan",
         "source": "base",
@@ -259,7 +323,9 @@
     {
         "alias": "as",
         "name": "Aetherstream",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "empyrean",
         "source": "pok",
@@ -268,7 +334,9 @@
     {
         "alias": "ac2",
         "name": "Advanced Carrier II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BB",
         "faction": "sol",
         "baseUpgrade": "cv2",
@@ -278,7 +346,9 @@
     {
         "alias": "sdn2",
         "name": "Super Dreadnought II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BBY",
         "faction": "l1z1x",
         "baseUpgrade": "dn2",
@@ -288,7 +358,9 @@
     {
         "alias": "cl2",
         "name": "Crimson Legionnaire II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GG",
         "faction": "mahact",
         "baseUpgrade": "inf2",
@@ -298,7 +370,9 @@
     {
         "alias": "mc",
         "name": "Mirror Computing",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YYY",
         "faction": "mentak",
         "source": "base",
@@ -307,7 +381,9 @@
     {
         "alias": "hcf2",
         "name": "Hybrid Crystal Fighter II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GB",
         "faction": "naalu",
         "baseUpgrade": "ff2",
@@ -317,7 +393,9 @@
     {
         "alias": "pfa",
         "name": "Pre-Fab Arcologies",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "faction": "naaz",
         "source": "pok",
@@ -326,7 +404,9 @@
     {
         "alias": "vax",
         "name": "Valefar Assimilator X",
-        "type": "NONE",
+        "types": [
+            "NONE"
+        ],
         "faction": "nekro",
         "source": "base",
         "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"X\" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token."
@@ -334,7 +414,9 @@
     {
         "alias": "m2",
         "name": "Memoria II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GBY",
         "faction": "nomad",
         "source": "pok",
@@ -343,7 +425,9 @@
     {
         "alias": "exo2",
         "name": "Exotrireme II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BBY",
         "faction": "sardakk",
         "baseUpgrade": "dn2",
@@ -353,7 +437,9 @@
     {
         "alias": "se2",
         "name": "Saturn Engine II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GYR",
         "faction": "titans",
         "baseUpgrade": "cr2",
@@ -363,7 +449,9 @@
     {
         "alias": "cr2",
         "name": "Cruiser II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GYR",
         "source": "base",
         "text": "Cost 2, Combat 6, Move 3, Capacity 1"
@@ -371,7 +459,9 @@
     {
         "alias": "scc",
         "name": "Spatial Conduit Cylinders",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "jolnar",
         "source": "base",
@@ -380,7 +470,9 @@
     {
         "alias": "dt2",
         "name": "Dimensional Tear II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YY",
         "faction": "cabal",
         "source": "pok",
@@ -389,7 +481,9 @@
     {
         "alias": "lgf",
         "name": "Lazax Gate Folding",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "winnu",
         "source": "base",
@@ -398,7 +492,9 @@
     {
         "alias": "it",
         "name": "Instinct Training",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "faction": "xxcha",
         "source": "base",
@@ -407,7 +503,9 @@
     {
         "alias": "mi",
         "name": "Mageon Implants",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "faction": "yssaril",
         "source": "base",
@@ -416,7 +514,9 @@
     {
         "alias": "bio",
         "name": "Bioplasmosis",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "faction": "arborec",
         "source": "base",
@@ -425,7 +525,9 @@
     {
         "alias": "ah",
         "name": "Aerie Hololattice",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "argent",
         "source": "pok",
@@ -434,7 +536,9 @@
     {
         "alias": "nes",
         "name": "Non-Euclidean Shielding",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "faction": "letnev",
         "source": "base",
@@ -443,7 +547,9 @@
     {
         "alias": "ffac2",
         "name": "Floating Factory II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YY",
         "faction": "saar",
         "baseUpgrade": "sd2",
@@ -453,7 +559,9 @@
     {
         "alias": "mr",
         "name": "Magmus Reactor",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "faction": "muaat",
         "source": "base",
@@ -462,7 +570,9 @@
     {
         "alias": "pm",
         "name": "Production Biomes",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "faction": "hacan",
         "source": "base",
@@ -471,7 +581,9 @@
     {
         "alias": "vw",
         "name": "Voidwatch",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "faction": "empyrean",
         "source": "pok",
@@ -480,7 +592,9 @@
     {
         "alias": "so2",
         "name": "Spec Ops II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GG",
         "faction": "sol",
         "baseUpgrade": "inf2",
@@ -490,7 +604,9 @@
     {
         "alias": "wg",
         "name": "Wormhole Generator",
-        "type": "PROPULSION",
+        "types": [
+            "PROPULSION"
+        ],
         "requirements": "BB",
         "faction": "ghost",
         "source": "base",
@@ -499,7 +615,9 @@
     {
         "alias": "ds",
         "name": "Dimensional Splicer",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "faction": "ghost",
         "source": "base",
@@ -508,7 +626,9 @@
     {
         "alias": "is",
         "name": "Inheritance Systems",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "l1z1x",
         "source": "base",
@@ -517,7 +637,9 @@
     {
         "alias": "gr",
         "name": "Genetic Recombination",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "faction": "mahact",
         "source": "pok",
@@ -526,7 +648,9 @@
     {
         "alias": "so",
         "name": "Salvage Operations",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "mentak",
         "source": "base",
@@ -535,7 +659,9 @@
     {
         "alias": "ng",
         "name": "Neuroglaive",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GGG",
         "faction": "naalu",
         "source": "base",
@@ -544,7 +670,9 @@
     {
         "alias": "sc",
         "name": "Supercharge",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "faction": "naaz",
         "source": "pok",
@@ -553,7 +681,9 @@
     {
         "alias": "vay",
         "name": "Valefar Assimilator Y",
-        "type": "NONE",
+        "types": [
+            "NONE"
+        ],
         "faction": "nekro",
         "source": "base",
         "text": "When you would gain another players technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token."
@@ -561,7 +691,9 @@
     {
         "alias": "tcs",
         "name": "Temporal Command Suite",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "nomad",
         "source": "pok",
@@ -570,7 +702,9 @@
     {
         "alias": "vpw",
         "name": "Valkyrie Particle Weave",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "RR",
         "faction": "sardakk",
         "source": "base",
@@ -579,7 +713,9 @@
     {
         "alias": "ht2",
         "name": "Hel-Titan II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "YR",
         "faction": "titans",
         "baseUpgrade": "pds2",
@@ -589,7 +725,9 @@
     {
         "alias": "ers",
         "name": "E-Res Siphons",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "jolnar",
         "source": "base",
@@ -598,7 +736,9 @@
     {
         "alias": "dn2",
         "name": "Dreadnought II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BBY",
         "source": "base",
         "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 5. \"Direct Hit\" cards are no longer effective against this type of ship."
@@ -606,7 +746,9 @@
     {
         "alias": "dd2",
         "name": "Destroyer II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "RR",
         "source": "base",
         "text": "Cost 1, Combat 8, Move 2, ANTI-FIGHTER BARRAGE 6(x3)"
@@ -614,7 +756,9 @@
     {
         "alias": "pds2",
         "name": "PDS II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "RY",
         "source": "base",
         "text": "PLANETARY SHIELD, DEEP SPACE CANNON 5"
@@ -622,7 +766,9 @@
     {
         "alias": "cv2",
         "name": "Carrier II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "BB",
         "source": "base",
         "text": "Cost 3, Combat 9, Move 2, Capacity 6"
@@ -630,7 +776,9 @@
     {
         "alias": "ff2",
         "name": "Fighter II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GB",
         "source": "base",
         "text": "Cost 1(x2), Combat 8, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
@@ -638,7 +786,9 @@
     {
         "alias": "inf2",
         "name": "Infantry II",
-        "type": "UNITUPGRADE",
+        "types": [
+            "UNITUPGRADE"
+        ],
         "requirements": "GG",
         "source": "base",
         "text": "Cost 1(x2), Combat 7. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home."
@@ -646,7 +796,9 @@
     {
         "alias": "vtx",
         "name": "Vortex",
-        "type": "WARFARE",
+        "types": [
+            "WARFARE"
+        ],
         "requirements": "R",
         "faction": "cabal",
         "source": "pok",
@@ -655,7 +807,9 @@
     {
         "alias": "htp",
         "name": "Hegemonic Trade Policy",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "winnu",
         "source": "base",
@@ -664,7 +818,9 @@
     {
         "alias": "nf",
         "name": "Nullification Field",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "xxcha",
         "source": "base",
@@ -673,7 +829,9 @@
     {
         "alias": "yso",
         "name": "Yin Spinner Omega",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "GG",
         "faction": "yin",
         "source": "base",
@@ -682,7 +840,9 @@
     {
         "alias": "ic",
         "name": "Impulse Core",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "yin",
         "source": "base",
@@ -691,7 +851,9 @@
     {
         "alias": "tp",
         "name": "Transparasteel Plating",
-        "type": "BIOTIC",
+        "types": [
+            "BIOTIC"
+        ],
         "requirements": "G",
         "faction": "yssaril",
         "source": "base",
@@ -700,7 +862,9 @@
     {
         "alias": "iihq",
         "name": "I.I.H.Q. Modernization",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "Y",
         "faction": "keleres",
         "source": "pok",
@@ -709,7 +873,9 @@
     {
         "alias": "asn",
         "name": "Agency Supply Network",
-        "type": "CYBERNETIC",
+        "types": [
+            "CYBERNETIC"
+        ],
         "requirements": "YY",
         "faction": "keleres",
         "source": "pok",

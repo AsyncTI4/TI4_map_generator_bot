@@ -3,14 +3,13 @@ package ti4.commands.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -18,13 +17,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
@@ -33,7 +28,7 @@ public class CreateGameButton extends GameSubcommandData {
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel")
-                .setRequired(true));
+            .setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -87,50 +82,55 @@ public class CreateGameButton extends GameSubcommandData {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
-
         if (members.size() > 0) {
             buttonMsg = "Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n";
             int counter = 1;
             for (Member member : members) {
                 buttonMsg = buttonMsg + counter + ":" + member.getId() + ".("
-                        + member.getEffectiveName().replace(":", "")
-                        + ")\n";
+                    + member.getEffectiveName().replace(":", "")
+                    + ")\n";
                 counter++;
             }
             Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
-            buttonMsg = buttonMsg + "\n\n" + " A bothelper has been pinged to start the game";
+            buttonMsg = buttonMsg + "\n\n" + " Please hit this button after confirming that the members are the correct ones.";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg);
-            // MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
+            MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
             ActionRow actionRow = ActionRow.of(buttons);
             baseMessageObject.addComponents(actionRow);
-            // message_.getJumpUrl()
-            event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
-                String msg = bothelperRole.getAsMention() + " this game is ready for launching "
-                        + message_.getJumpUrl();
-                TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
-                        .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-                if (bothelperLoungeChannel == null)
-                    return;
-                List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-                if (threadChannels.isEmpty())
-                    return;
-                String threadName = "game-starts-and-ends";
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        MessageHelper.sendMessageToChannel(threadChannel_, msg);
-                        break;
-                    }
-                }
-            });
+            // event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
+            //     String msg = bothelperRole.getAsMention() + " this game is ready for launching "
+            //         + message_.getJumpUrl();
+            //     TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
+            //         .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
+            //     if (bothelperLoungeChannel == null)
+            //         return;
+            //     List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+            //     if (threadChannels.isEmpty())
+            //         return;
+            //     String threadName = "game-starts-and-ends";
+            //     // SEARCH FOR EXISTING OPEN THREAD
+            //     for (ThreadChannel threadChannel_ : threadChannels) {
+            //         if (threadChannel_.getName().equals(threadName)) {
+            //             MessageHelper.sendMessageToChannel(threadChannel_, msg);
+            //             break;
+            //         }
+            //     }
+            // });
         }
     }
 
     public static void decodeButtonMsg(ButtonInteractionEvent event) {
         event.getChannel().sendMessage(event.getUser().getEffectiveName() + " pressed the [Create Game] button")
-                .queue();
+            .queue();
         Member member = event.getMember();
         boolean isAdmin = false;
+        Game mapreference = GameManager.getInstance().getGame("finreference");
+
+        if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when its fixed.");
+            return;
+        }
         if (member != null) {
             List<Role> roles = member.getRoles();
             for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
@@ -140,10 +140,12 @@ public class CreateGameButton extends GameSubcommandData {
                 }
             }
         }
-        if (!isAdmin) {
+        if (!isAdmin && mapreference != null && !mapreference.getStoredValue("gameCreator" + member.getIdLong()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Only authorized users can press this button successfully.");
+                "You created a game within the last 10 minutes and thus are being stopped from creating more until some time has passed. You can have someone else in the game press the button instead. ");
             return;
+        } else if (mapreference != null) {
+            mapreference.setStoredValue("gameCreator" + member.getIdLong(), "created");
         }
         event.editButton(null).queue();
 
@@ -151,11 +153,11 @@ public class CreateGameButton extends GameSubcommandData {
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         String gameName = CreateGameChannels.getNextGameName();
         String lastGame = CreateGameChannels.getLastGameName();
-        Game activeGame = GameManager.getInstance().getGame(lastGame);
-        if (activeGame != null) {
-            if (activeGame.getCustomName().equalsIgnoreCase(gameSillyName)) {
+        Game game = GameManager.getInstance().getGame(lastGame);
+        if (game != null) {
+            if (game.getCustomName().equalsIgnoreCase(gameSillyName)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "The custom name of the last game is the same as the one for this game, so the bot suspects a double press occurred and is cancelling the creation of another game. Ping Fin if this worked incorrectly. ");
+                    "The custom name of the last game is the same as the one for this game, so the bot suspects a double press occurred and is cancelling the creation of another game. ");
                 return;
             }
         }

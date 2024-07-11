@@ -4,8 +4,7 @@
     "aliases": [
         "repsilonrocks"
     ],
-    "imagePath": "er28_epsilonasteroid.png",
-    "planetIds": [],
+    "imagePath": "er_28_async.png",
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -33,5 +32,7 @@
         "EPSILON"
     ],
     "planets": [],
-    "isAsteroidField": true
+    "isAsteroidField": true,
+    "tileBack": "red",
+    "source": "eronous"
 }

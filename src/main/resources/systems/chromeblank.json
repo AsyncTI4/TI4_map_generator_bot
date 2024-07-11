@@ -1,0 +1,10 @@
+{
+    "id": "chromeblank",
+    "name": "Chrome, blank draft tile",
+    "aliases": [
+        "chromeblank"
+    ],
+    "imagePath": "draft_chromeblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

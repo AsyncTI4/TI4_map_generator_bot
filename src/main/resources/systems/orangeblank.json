@@ -1,0 +1,10 @@
+{
+    "id": "orangeblank",
+    "name": "Orange, blank draft tile",
+    "aliases": [
+        "orangeblank"
+    ],
+    "imagePath": "draft_orangeblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

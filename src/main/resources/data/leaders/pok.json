@@ -58,7 +58,7 @@
         "id": "hacanagent",
         "faction": "hacan",
         "type": "agent",
-        "name": "Carth of the Golden Sands",
+        "name": "Carth of Golden Sands",
         "title": "Tripartite Governor",
         "abilityWindow": "During the action phase:",
         "abilityText": "You may exhaust this card to gain 2 commodities or replenish another player's commodities.",
@@ -97,7 +97,9 @@
         "abilityText": "You may exhaust this card to allow that player to replace 1 of their infantry in the active system with 1 mech from their reinforcements.",
         "unlockCondition": "Always Unlocked",
         "source": "pok",
-        "searchTags": ["l1 agent"]
+        "searchTags": [
+            "l1 agent"
+        ]
     },
     {
         "id": "letnevagent",
@@ -276,6 +278,17 @@
         "source": "pok"
     },
     {
+        "id": "fogallianceagent",
+        "faction": "fogalliance",
+        "type": "agent",
+        "name": "The Cab Driver",
+        "title": "Teleporter In Chief",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this agent to select one system that contains your ships and does not contain one of your command counters. Then select one system that contains an alliance member's ships and is not adjacent to or in a hostile home system. Move any number of your ships (can transport) from the 1st system to the 2nd system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "pok"
+    },
+    {
         "id": "yinagent",
         "faction": "yin",
         "type": "agent",
@@ -395,7 +408,10 @@
         "abilityText": "Units that have Planetary Shield do not prevent you from using Bombardment.",
         "unlockCondition": "Have 4 dreadnoughts on the game board.",
         "source": "pok",
-        "searchTags": ["l1 commander", "l1 comm"]
+        "searchTags": [
+            "l1 commander",
+            "l1 comm"
+        ]
     },
     {
         "id": "letnevcommander",
@@ -415,7 +431,7 @@
         "name": "Il Na Viroset",
         "title": "Archon of Virtue",
         "abilityWindow": "During your tactical actions:",
-        "abilityText": "you can activate systems that contain your command tokens. If you do, return both command tokens to your reinforcements and end your turn.",
+        "abilityText": "you can activate systems that contain your command tokens. If you do, return both command tokens to your reinforcements and end your turn. [Note, this is not really a tactical action and does not trigger any on activation effects. It's really a component action in effect, and the bot treats it as such. You can find it under component actions]",
         "unlockCondition": "Have 2 other factions' command tokens in your fleet pool.",
         "source": "pok"
     },
@@ -653,7 +669,7 @@
         "title": "Perfected Being",
         "abilityName": "Genetic Memory: Brilliance of the Hylar",
         "abilityWindow": "ACTION:",
-        "abilityText": "For each non-unit ugprade technology you own, you may replace that technology with any technology of the same color from the deck. Then, purge this card.",
+        "abilityText": "For each non-unit upgrade technology you own, you may replace that technology with any technology of the same color from the deck. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },
@@ -704,7 +720,9 @@
         "abilityText": "Choose 1 system that does not contain other players' ships. you may move your flagship and any number of your dreadnoughts from other systems into the chosen system. Then, purge this card.[Note: This can move/carry ground forces and fighters up to capacity, but cannot land them]",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok",
-        "searchTags": ["l1 hero"]
+        "searchTags": [
+            "l1 hero"
+        ]
     },
     {
         "id": "letnevhero",

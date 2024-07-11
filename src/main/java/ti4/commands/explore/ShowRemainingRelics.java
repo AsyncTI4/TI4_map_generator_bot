@@ -25,23 +25,18 @@ public class ShowRemainingRelics extends GenericRelicAction {
 
     @Override
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        List<String> allRelics = new ArrayList<>(getActiveGame().getAllRelics());
-        Game activeGame = getActiveGame();
-        int deckCount = allRelics.size();
-        Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
-        NumberFormat formatPercent = NumberFormat.getPercentInstance();
-        formatPercent.setMaximumFractionDigits(1);
+        Game game = getActiveGame();
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
         boolean over = false;
         if (override != null) {
-           over = "TRUE".equalsIgnoreCase(override.getAsString());
+            over = "TRUE".equalsIgnoreCase(override.getAsString());
         }
-        showRemaining(event, over, activeGame, player);
+        showRemaining(event, over, game, player);
     }
 
-    public void showRemaining(GenericInteractionCreateEvent event, boolean over, Game activeGame, Player player){
-        List<String> allRelics = new ArrayList<>(activeGame.getAllRelics());
-       
+    public static void showRemaining(GenericInteractionCreateEvent event, boolean over, Game game, Player player) {
+        List<String> allRelics = new ArrayList<>(game.getAllRelics());
+
         Integer deckCount = allRelics.size();
         Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
@@ -58,10 +53,10 @@ public class ShowRemainingRelics extends GenericRelicAction {
             }
         }
 
-        if (player != null && "action".equalsIgnoreCase(activeGame.getCurrentPhase()) && !over && activeGame.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"It is foggy outside, please wait until status/agenda to do this command, or override the fog.");    
+        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && !over && game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),text.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), text.toString());
         }
     }
 }

@@ -21,28 +21,28 @@ public class ExhaustLeader extends LeaderAction {
 	}
 
 	@Override
-	void action(SlashCommandInteractionEvent event, String leaderID, Game activeGame, Player player) {
+	void action(SlashCommandInteractionEvent event, String leaderID, Game game, Player player) {
 		Leader playerLeader = player.unsafeGetLeader(leaderID);
 		if (playerLeader == null) {
-			sendMessage("Leader '" + leaderID + "'' not found");
+			MessageHelper.sendMessageToEventChannel(event, "Leader '" + leaderID + "'' not found");
 			return;
 		}
 
 		if (playerLeader.isLocked()) {
-			sendMessage("Leader '" + playerLeader.getId() + "' is locked");
+			MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is locked");
 			return;
 		}
 
 		if (playerLeader.isExhausted()) {
-			sendMessage("Leader '" + playerLeader.getId() + "' is exhausted already");
+			MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is exhausted already");
 			return;
 		}
 
 		Integer tgCount = event.getOption(Constants.TG, null, OptionMapping::getAsInt);
-		exhaustLeader(event, activeGame, player, playerLeader, tgCount);
+		exhaustLeader(event, game, player, playerLeader, tgCount);
 	}
-	
-	public static void exhaustLeader(GenericInteractionCreateEvent event, Game activeGame, Player player, Leader leader, Integer tgCount) {
+
+	public static void exhaustLeader(GenericInteractionCreateEvent event, Game game, Player player, Leader leader, Integer tgCount) {
 		leader.setExhausted(true);
 		LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
 		String message = player.getRepresentation() + " exhausted: ";
@@ -55,14 +55,14 @@ public class ExhaustLeader extends LeaderAction {
 		if (tgCount != null) {
 			StringBuilder sb = new StringBuilder();
 			leader.setTgCount(tgCount);
-			sb.append("\n").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame))
-					.append(" was placed on top of the leader");
+			sb.append("\n").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(game))
+				.append(" was placed on top of the leader");
 			if (leader.getTgCount() != tgCount) {
-				sb.append(" *(").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(activeGame)).append(" total)*\n");
+				sb.append(" *(").append(tgCount).append(Emojis.getTGorNomadCoinEmoji(game)).append(" total)*\n");
 			}
 			MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
 		}
-		
+
 		var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
 		if (posssibleCombatMod != null) {
 			player.addNewTempCombatMod(posssibleCombatMod);

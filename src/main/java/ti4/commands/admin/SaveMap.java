@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.message.MessageHelper;
 
 public class SaveMap extends AdminSubcommandData {
 
@@ -23,15 +24,15 @@ public class SaveMap extends AdminSubcommandData {
         if (option != null) {
             String mapName = option.getAsString();
             if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                sendMessage("Game with such name does not exists, use /list_games");
+                MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
                 return;
             }
-            Game activeGame = GameManager.getInstance().getGame(mapName);
-            GameSaveLoadManager.saveMap(activeGame, event);
-            sendMessage("Save map: " + activeGame.getName());
+            Game game = GameManager.getInstance().getGame(mapName);
+            GameSaveLoadManager.saveMap(game, event);
+            MessageHelper.sendMessageToEventChannel(event, "Save map: " + game.getName());
 
         } else {
-            sendMessage("No Game specified.");
+            MessageHelper.sendMessageToEventChannel(event, "No Game specified.");
         }
     }
 }

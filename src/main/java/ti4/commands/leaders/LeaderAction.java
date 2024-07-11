@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 abstract public class LeaderAction extends LeaderSubcommandData {
     public LeaderAction(String id, String description) {
@@ -22,23 +23,23 @@ abstract public class LeaderAction extends LeaderSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
-        player = Helper.getPlayer(activeGame, player, event);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
         String leaderID = event.getOption(Constants.LEADER, null, OptionMapping::getAsString);
         if (leaderID == null) {
-            sendMessage("Need to specify leader");
+            MessageHelper.sendMessageToEventChannel(event, "Need to specify leader");
             return;
         }
-        
-        action(event, leaderID, activeGame, player);
+
+        action(event, leaderID, game, player);
     }
 
-    abstract void action(SlashCommandInteractionEvent event, String leader, Game activeGame, Player player);
+    abstract void action(SlashCommandInteractionEvent event, String leader, Game game, Player player);
 }

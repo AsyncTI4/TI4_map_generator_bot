@@ -9,6 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ShowSOToAll extends SOCardsSubcommandData {
     public ShowSOToAll() {
@@ -18,16 +19,16 @@ public class ShowSOToAll extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            sendMessage("Please select what Secret Objective to show to All");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Secret Objective to show to All");
             return;
         }
 
@@ -40,7 +41,7 @@ public class ShowSOToAll extends SOCardsSubcommandData {
                 break;
             }
         }
-        if (soID == null){
+        if (soID == null) {
             for (Map.Entry<String, Integer> so : player.getSecretsScored().entrySet()) {
                 if (so.getValue().equals(soIndex)) {
                     soID = so.getKey();
@@ -51,14 +52,14 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         }
 
         if (soID == null) {
-            sendMessage("No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeGame.getName()).append("\n");
+        sb.append("Game: ").append(game.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
-        if (scored){
+        if (scored) {
             sb.append("Showed Scored Secret Objectives:").append("\n");
         } else {
             sb.append("Showed Secret Objectives:").append("\n");
@@ -67,6 +68,6 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         if (!scored) {
             player.setSecret(soID);
         }
-        sendMessage(sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }
 }

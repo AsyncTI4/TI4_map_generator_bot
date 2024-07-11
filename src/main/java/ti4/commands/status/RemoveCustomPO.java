@@ -16,14 +16,14 @@ public class RemoveCustomPO extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
 
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Public Objective to shuffle back in");
             return;
         }
-        boolean removedCustomPO = activeGame.removeCustomPO(option.getAsInt());
+        boolean removedCustomPO = game.removeCustomPO(option.getAsInt());
         if (!removedCustomPO) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");
         }

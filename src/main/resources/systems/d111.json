@@ -9,11 +9,11 @@
         "derbrae",
         "dorvak"
     ],
-    "imagePath": "d111.png",
-    "planetIds": [
+    "planets":[
         "dorvok",
         "debrbrae"
     ],
+    "imagePath": "d111.png",
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
         {
@@ -33,9 +33,5 @@
             "y": 170.0
         }
     ],
-    "wormholes": null,
-    "planets": [
-        "dorvok",
-        "debrae"
-    ]
+    "source": "uncharted_space"
 }

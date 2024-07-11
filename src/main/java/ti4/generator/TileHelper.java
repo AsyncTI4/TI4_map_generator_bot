@@ -1,21 +1,24 @@
 package ti4.generator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
-import ti4.helpers.Storage;
-import ti4.message.BotLogger;
-import ti4.model.PlanetModel;
-import ti4.model.TileModel;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ti4.helpers.Storage;
+import ti4.message.BotLogger;
+import ti4.model.PlanetModel;
+import ti4.model.TileModel;
 
 public class TileHelper {
 
@@ -23,9 +26,9 @@ public class TileHelper {
     private static final Map<String, PlanetModel> allPlanets = new HashMap<>();
 
     public static void init() {
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  Initiating Planets");
+        BotLogger.logWithTimestamp("Initiating Planets");
         initPlanetsFromJson();
-        BotLogger.log("`" + new Timestamp(System.currentTimeMillis()) + "`  Initiating Tiles");
+        BotLogger.logWithTimestamp("Initiating Tiles");
         initTilesFromJson();
     }
 
@@ -52,24 +55,30 @@ public class TileHelper {
         List<File> files = new ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
 
-        if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
+        if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
 
+        List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
-                    try {
-                        PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
-                        allPlanets.put(planet.getId(), planet);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
+            try {
+                PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
+                allPlanets.put(planet.getId(), planet);
+                if (!planet.isValid()) {
+                    badObjects.add(planet.getAlias());
+                }
+            } catch (Exception e) {
+                BotLogger.log("Error reading planet from file:\n> " + file.getPath(), e);
+            }
+        });
+        if (!badObjects.isEmpty())
+            BotLogger.log("The following **PlanetModel** are improperly formatted, but were imported anyway:\n> "
+                + String.join("\n> ", badObjects));
     }
 
     public static void initTilesFromJson() {
@@ -79,22 +88,56 @@ public class TileHelper {
         List<File> files = new ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
 
-        if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
+        if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                    .filter(file -> !file.isDirectory())
-                    .toList());
-        }
-        files.addAll(Stream.of(new File(resourcePath).listFiles())
+                .filter(file -> file.exists())
                 .filter(file -> !file.isDirectory())
                 .toList());
+        }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+            .filter(file -> !file.isDirectory())
+            .toList());
+        List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
                 allTiles.put(tile.getId(), tile);
+                if (!tile.isValid()) {
+                    badObjects.add(tile.getAlias());
+                }
+
+                if (isDraftTile(tile)) {
+                    duplicateDraftTiles(tile);
+                }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                //BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
+        if (!badObjects.isEmpty())
+            BotLogger.log("The following **TileModel** are improperly formatted, but were imported anyway:\n> "
+                + String.join("\n> ", badObjects));
+    }
+
+    private static void duplicateDraftTiles(TileModel tile) {
+        String color = tile.getAlias().replaceAll("blank", "");
+        String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
+
+        for (int i = 0; i < 13; i++) {
+            TileModel newTile = new TileModel();
+            newTile.setId(color + i);
+            newTile.setName(namePre + i);
+            newTile.setAliases(new ArrayList<>(List.of(color + i)));
+            newTile.setImagePath(tile.getImagePath());
+            newTile.setWormholes(Collections.emptySet());
+            newTile.setPlanets(Collections.emptyList());
+            newTile.setSource(tile.getSource());
+            allTiles.put(newTile.getId(), newTile);
+        }
+    }
+
+    public static boolean isDraftTile(TileModel tile) {
+        if (tile.getImagePath().startsWith("draft_")) return true;
+        return false;
     }
 
     public static void addNewTileToList(TileModel tile) {

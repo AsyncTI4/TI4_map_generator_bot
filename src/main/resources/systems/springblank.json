@@ -1,0 +1,10 @@
+{
+    "id": "springblank",
+    "name": "Spring, blank draft tile",
+    "aliases": [
+        "springblank"
+    ],
+    "imagePath": "draft_springblank.png",
+    "tileBack": "black",
+    "source": "draft"
+}

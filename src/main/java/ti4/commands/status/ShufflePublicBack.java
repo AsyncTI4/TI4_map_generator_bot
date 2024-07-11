@@ -17,13 +17,13 @@ public class ShufflePublicBack extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
+        Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Public Objective to shuffle back in");
             return;
         }
-        boolean shuffled = activeGame.shuffleObjectiveBackIntoDeck(option.getAsInt());
+        boolean shuffled = game.shuffleObjectiveBackIntoDeck(option.getAsInt());
         if (!shuffled) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");
         }

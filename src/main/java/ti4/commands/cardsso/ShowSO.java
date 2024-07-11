@@ -1,4 +1,5 @@
 package ti4.commands.cardsso;
+
 import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -19,16 +20,16 @@ public class ShowSO extends SOCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player player = activeGame.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeGame, player, event, null);
+        Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            sendMessage("Please select what Secret Objective to show");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what Secret Objective to show");
             return;
         }
 
@@ -41,24 +42,24 @@ public class ShowSO extends SOCardsSubcommandData {
         }
 
         if (soID == null) {
-            sendMessage("No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
             return;
         }
 
-      String sb = "Game: " + activeGame.getName() + "\n" +
-          "Player: " + player.getUserName() + "\n" +
-          "Showed Secret Objectives:" + "\n" +
-          SOInfo.getSecretObjectiveRepresentation(soID) + "\n";
+        String sb = "Game: " + game.getName() + "\n" +
+            "Player: " + player.getUserName() + "\n" +
+            "Showed Secret Objectives:" + "\n" +
+            SOInfo.getSecretObjectiveRepresentation(soID) + "\n";
         player.setSecret(soID);
 
-        Player player_ = Helper.getPlayer(activeGame, null, event);
+        Player player_ = Helper.getPlayer(game, null, event);
         if (player_ == null) {
-            sendMessage("Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
-        
-        sendMessage("SO shown to player");
-        SOInfo.sendSecretObjectiveInfo(activeGame, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeGame, sb);
+
+        MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
+        SOInfo.sendSecretObjectiveInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb);
     }
 }

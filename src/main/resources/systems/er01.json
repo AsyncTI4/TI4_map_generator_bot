@@ -1,1 +1,18 @@
-{"id":"er01","name":"Rial Arhon","aliases":["rialarhon","rial"],"imagePath":"er01_rialarchon.png","planetIds":["rialarhon"],"shipPositionsType":null,"spaceTokenLocations":null,"wormholes":[null],"planets":["rialarhon"]}
+{
+    "id": "er01",
+    "name": "Rial Archon",
+    "aliases": [
+        "rialarchon",
+        "rial"
+    ],
+    "imagePath": "er01_rialarchon.png",
+    "shipPositionsType": null,
+    "wormholes": [
+        null
+    ],
+    "planets": [
+        "rialarchon"
+    ],
+    "tileBack": "blue",
+    "source": "eronous"
+}

@@ -1,9 +1,6 @@
 package ti4.commands.map;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
@@ -11,12 +8,10 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.message.MessageHelper;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class MapCommand implements Command {
     private final Collection<MapSubcommandData> subcommandData = getSubcommands();
@@ -32,25 +27,6 @@ public class MapCommand implements Command {
     }
 
     @Override
-    public void logBack(SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        String userName = user.getName();
-        String commandExecuted = "User: " + userName + " executed command.\n" +
-            event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + getOptionValue(option))
-                .collect(Collectors.joining(" "));
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
-    }
-
-    private String getOptionValue(OptionMapping option) {
-        if (option.getType() == OptionType.USER) {
-            return option.getAsUser().getName();
-        }
-        return option.getAsString();
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         for (MapSubcommandData subcommand : subcommandData) {
@@ -60,9 +36,9 @@ public class MapCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game activeGame = GameManager.getInstance().getUserActiveGame(userID);
-        if (activeGame == null) return;
-        ShowGame.simpleShowGame(activeGame, event);
+        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        if (game == null) return;
+        ShowGame.simpleShowGame(game, event);
     }
 
     protected String getActionDescription() {
@@ -78,6 +54,8 @@ public class MapCommand implements Command {
         subcommands.add(new RemoveBorderAnomaly());
         //subcommands.add(new InitTspmap());
         subcommands.add(new Preset());
+        subcommands.add(new ShowMapSetup());
+        subcommands.add(new SetMapTemplate());
         return subcommands;
     }
 

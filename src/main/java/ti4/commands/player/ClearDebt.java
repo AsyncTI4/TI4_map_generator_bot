@@ -13,6 +13,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class ClearDebt extends PlayerSubcommandData {
     public ClearDebt() {
@@ -24,16 +25,16 @@ public class ClearDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game activeGame = getActiveGame();
-        Player clearingPlayer = activeGame.getPlayer(getUser().getId());
-        clearingPlayer = Helper.getGamePlayer(activeGame, clearingPlayer, event, null);
+        Game game = getActiveGame();
+        Player clearingPlayer = game.getPlayer(getUser().getId());
+        clearingPlayer = Helper.getGamePlayer(game, clearingPlayer, event, null);
 
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR_1);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : activeGame.getPlayers().values()) {
+            for (Player player_ : game.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
                     clearingPlayer = player_;
                     break;
@@ -42,29 +43,29 @@ public class ClearDebt extends PlayerSubcommandData {
         }
 
         if (clearingPlayer == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
 
-        Player clearedPlayer = Helper.getPlayer(activeGame, clearingPlayer, event);
+        Player clearedPlayer = Helper.getPlayer(game, clearingPlayer, event);
         if (clearedPlayer == null) {
-            sendMessage("Player to have debt cleared could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to have debt cleared could not be found");
             return;
         }
 
         int debtCountToClear = event.getOption(Constants.DEBT_COUNT, 0, OptionMapping::getAsInt);
         if (debtCountToClear <= 0) {
-            sendMessage("Debt count must be a positive integer");
+            MessageHelper.sendMessageToEventChannel(event, "Debt count must be a positive integer");
             return;
         }
 
         if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearedPlayer.getColor())) {
-            sendMessage("You cannot clear more debt tokens than you have");
+            MessageHelper.sendMessageToEventChannel(event, "You cannot clear more debt tokens than you have");
             return;
         }
 
         clearDebt(clearingPlayer, clearedPlayer, debtCountToClear);
-        sendMessage(clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt tokens owned by " + clearedPlayer.getRepresentation());
+        MessageHelper.sendMessageToEventChannel(event, clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt tokens owned by " + clearedPlayer.getRepresentation());
     }
 
     public static void clearDebt(Player clearingPlayer, Player clearedPlayer, int debtCountToClear) {

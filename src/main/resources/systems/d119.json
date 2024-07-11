@@ -6,7 +6,6 @@
         "4256"
     ],
     "imagePath": "d119.png",
-    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -34,5 +33,6 @@
         "BETA"
     ],
     "planets": [],
-    "isNebula": true
+    "isNebula": true,
+    "source": "uncharted_space"
 }
