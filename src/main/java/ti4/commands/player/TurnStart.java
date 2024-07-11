@@ -231,6 +231,17 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(" Please resolve these before doing anything else:\n");
         int count = 0;
         for (int sc : game.getPlayedSCsInOrder(player)) {
+            if (game.getName().equalsIgnoreCase("pbd1000")) {
+                String num = sc + "";
+                num = num.substring(num.length() - 1, num.length());
+                for (Integer sc2 : player.getSCs()) {
+                    String num2 = sc2 + "";
+                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    if (!num2.equalsIgnoreCase(num) && !player.hasFollowedSC(sc)) {
+                        player.addFollowedSC(sc);
+                    }
+                }
+            }
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(game, sc));
                 if (!game.getStoredValue("scPlay" + sc).isEmpty()) {

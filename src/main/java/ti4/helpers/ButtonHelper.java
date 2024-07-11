@@ -1171,9 +1171,9 @@ public class ButtonHelper {
         ButtonHelperStats.replenishComms(event, game, p2, true);
     }
 
-    public static List<Button> getForcedRefreshButtons(Game game, Player player) {
+    public static List<Button> getForcedRefreshButtons(Game game, Player player, List<Player> followingPlayers) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : followingPlayers) {
             if (p2 == player) {
                 continue;
             }
