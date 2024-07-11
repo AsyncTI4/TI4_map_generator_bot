@@ -33,6 +33,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
+import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 
 public class FoWHelper {
@@ -197,7 +198,7 @@ public class FoWHelper {
 		}
 	}
 
-	private static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
+	public static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
 		@NotNull Player viewingPlayer) {
 		Tile tile = player.getHomeSystemTile();
 		if (tile != null && !tile.hasFog(viewingPlayer)) {
@@ -361,7 +362,7 @@ public class FoWHelper {
 				position_ = override;
 			}
 
-			if ("x".equals(position_) || (hyperlaneData != null && !hyperlaneData.get(i))) {
+			if ("x".equals(position_) || (hyperlaneData != null && !hyperlaneData.isEmpty() && !hyperlaneData.get(i))) {
 				// the hyperlane doesn't exist & doesn't go that direction, skip.
 				continue;
 			}
@@ -686,8 +687,9 @@ public class FoWHelper {
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {
-			if (unitKey != null && unitKey.getColorID().equals(colorID) && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
-				return true;
+			if (unitKey != null && unitKey.getColorID().equals(colorID)) {
+				UnitModel model = player.getUnitFromAsyncID(unitKey.asyncID());
+				return model != null && model.getIsShip();
 			}
 		}
 		return false;

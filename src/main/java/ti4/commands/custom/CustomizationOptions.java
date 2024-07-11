@@ -1,23 +1,30 @@
 package ti4.commands.custom;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
 public class CustomizationOptions extends CustomSubcommandData {
+    private List<Choice> verbChoices = Constants.VERBOSITY_OPTIONS.stream().map(v -> new Choice(v, v)).toList();
+    private List<Choice> onOff = List.of("ON", "OFF").stream().map(v -> new Choice(v, v)).toList();
+    private List<Choice> hexBorderChoices = List.of("off", "dash", "solid").stream().map(v -> new Choice(v, v)).toList();
+
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options");
         addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want strategy card follow reminders, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Turn ON or OFF strategy card follow reminders at the start of turn").addChoices(onOff));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT, "Show full text of components when using/exhausting"));
-        addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding limits. ON to turn on. OFF to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Bot leaves your faction react on msgs. ON to turn on. OFF to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON to turn on. OFF to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").addChoices(verbChoices));
+        addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Turn ON or OFF pings for exceeding component limits").addChoices(onOff));
+        addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Turn ON or OFF the bot leaving your faction react on msgs").addChoices(onOff));
+        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON or OFF").addChoices(onOff));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE, "Reveal all objectives and diplo gets the power to pre-reveal"));
@@ -27,7 +34,7 @@ public class CustomizationOptions extends CustomSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
-        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships").addChoices(hexBorderChoices));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
@@ -42,9 +49,9 @@ public class CustomizationOptions extends CustomSubcommandData {
         OptionMapping stratPings = event.getOption(Constants.STRAT_PINGS);
         if (stratPings != null) {
             String stratP = stratPings.getAsString();
-            if ("YES".equalsIgnoreCase(stratP)) {
+            if ("ON".equalsIgnoreCase(stratP)) {
                 game.setStratPings(true);
-            } else if ("FALSE".equalsIgnoreCase(stratP)) {
+            } else if ("OFF".equalsIgnoreCase(stratP)) {
                 game.setStratPings(false);
             }
         }
@@ -116,6 +123,13 @@ public class CustomizationOptions extends CustomSubcommandData {
         Boolean showBa = event.getOption(Constants.SHOW_BANNERS, null, OptionMapping::getAsBoolean);
         if (showBa != null)
             game.setShowBanners(showBa);
+
+        String hexStyle = event.getOption(Constants.SHOW_HEX_BORDERS, null, OptionMapping::getAsString).toLowerCase();
+        if (hexStyle != null) {
+            if (hexStyle.equals("dash") || hexStyle.equals("off") || hexStyle.equals("solid")) {
+                game.setHexBorderStyle(hexStyle);
+            }
+        }
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null)

@@ -6,21 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -92,12 +82,12 @@ public class GameSaveLoadManager {
 
     // Log the save times for each map for benchmarking
     private static final List<Long> saveTimes = new ArrayList<>();
-    private static long jsonTime = 0l;
-    private static long txtTime = 0l;
-    private static long undoTime = 0l;
+    private static long jsonTime = 0L;
+    private static long txtTime = 0L;
+    private static long undoTime = 0L;
 
     public static void saveMaps() {
-        jsonTime = txtTime = undoTime = 0l;
+        jsonTime = txtTime = undoTime = 0L;
         // TODO: Make sure all commands and buttons and such actually save the game
         List<Game> savedGames = new ArrayList<>();
         List<Game> skippedGames = new ArrayList<>();
@@ -125,14 +115,13 @@ public class GameSaveLoadManager {
             for (long time : saveTimes)
                 tot += time;
 
-            StringBuilder sb = new StringBuilder("Map save time stats:\n```fix");
-            sb.append("\n").append(debugString("        total:", tot, tot));
-            sb.append("\n").append(debugString("          txt:", txtTime, tot));
-            sb.append("\n").append(debugString("         json:", jsonTime, tot));
-            sb.append("\n").append(debugString("    undo file:", undoTime, tot));
-            sb.append("\n").append(debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot));
-            sb.append("\n```");
-            BotLogger.logWithTimestamp(sb.toString());
+            String sb = "Map save time stats:\n```fix" + "\n" + debugString("        total:", tot, tot) +
+                    "\n" + debugString("          txt:", txtTime, tot) +
+                    "\n" + debugString("         json:", jsonTime, tot) +
+                    "\n" + debugString("    undo file:", undoTime, tot) +
+                    "\n" + debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot) +
+                    "\n```";
+            BotLogger.logWithTimestamp(sb);
         }
     }
 
@@ -675,6 +664,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_BANNERS + " " + game.getShowBanners());
         writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_HEX_BORDERS + " " + game.getHexBorderStyle());
+        writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_FRAGMENTS + " " + game.getNumberOfPurgedFragments());
         writer.write(System.lineSeparator());
         writer.write(Constants.TEMPORARY_PING_DISABLE + " " + game.getTemporaryPingDisable());
@@ -870,6 +861,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ELIMINATED + " " + player.isEliminated());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.NOTEPAD + " " + player.getNotes());
             writer.write(System.lineSeparator());
 
             // BENTOR Ancient Blueprints
@@ -1231,9 +1225,9 @@ public class GameSaveLoadManager {
     public static void loadMaps() {
         Map<String, Game> mapList = new HashMap<>();
         if (loadFromJSON) {
-            File[] jsonfiles = readAllMapJSONFiles();
-            if (jsonfiles != null) {
-                for (File file : jsonfiles) {
+            File[] jsonFiles = readAllMapJSONFiles();
+            if (jsonFiles != null) {
+                for (File file : jsonFiles) {
                     if (isJSONExtention(file)) {
                         try {
                             Game game = loadMapJSON(file);
@@ -1275,22 +1269,6 @@ public class GameSaveLoadManager {
             return mapper.readValue(mapFile, Game.class);
         } catch (Exception e) {
             BotLogger.log(mapFile.getName() + "JSON FAILED TO LOAD", e);
-            // System.out.println(mapFile.getAbsolutePath());
-            // System.out.println(ExceptionUtils.getStackTrace(e));
-        }
-
-        return null;
-    }
-
-    public static Game loadMapJSONString(String mapFile) {
-        ObjectMapper mapper = ObjectMapperFactory.build();
-        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
-        try {
-            return mapper.readValue(mapFile, Game.class);
-        } catch (Exception e) {
-            BotLogger.log("JSON STRING FAILED TO LOAD", e);
-            // System.out.println(mapFile.getAbsolutePath());
-            // System.out.println(ExceptionUtils.getStackTrace(e));
         }
 
         return null;
@@ -1298,159 +1276,158 @@ public class GameSaveLoadManager {
 
     @Nullable
     public static Game loadMap(File mapFile) {
-        if (mapFile != null) {
-            Game game = new Game();
-            try (Scanner myReader = new Scanner(mapFile)) {
-                game.setOwnerID(myReader.nextLine());
-                game.setOwnerName(myReader.nextLine());
-                game.setName(myReader.nextLine());
-                while (myReader.hasNextLine()) {
-                    String data = myReader.nextLine();
-                    if (MAPINFO.equals(data)) {
+        if (mapFile == null || !mapFile.exists()) {
+            BotLogger.log("Could not save map, map file does not exist: " +
+                    (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
+            return null;
+        }
+        Game game = new Game();
+        try {
+            Iterator<String> gameFileLines = Files.readAllLines(mapFile.toPath(), Charset.defaultCharset()).listIterator();
+            game.setOwnerID(gameFileLines.next());
+            game.setOwnerName(gameFileLines.next());
+            game.setName(gameFileLines.next());
+            while (gameFileLines.hasNext()) {
+                String data = gameFileLines.next();
+                if (MAPINFO.equals(data)) {
+                    continue;
+                }
+                if (ENDMAPINFO.equals(data)) {
+                    break;
+                }
+
+                while (gameFileLines.hasNext()) {
+                    data = gameFileLines.next();
+                    if (GAMEINFO.equals(data)) {
                         continue;
                     }
-                    if (ENDMAPINFO.equals(data)) {
+                    if (ENDGAMEINFO.equals(data)) {
                         break;
                     }
+                    try {
+                        readGameInfo(game, data);
+                    } catch (Exception e) {
+                        BotLogger.log("Data is bad: " + game.getName(), e);
+                    }
+                }
 
-                    while (myReader.hasNextLine()) {
-                        data = myReader.nextLine();
-                        if (GAMEINFO.equals(data)) {
+                while (gameFileLines.hasNext()) {
+                    String tmpData = gameFileLines.next();
+                    if (PLAYERINFO.equals(tmpData)) {
+                        continue;
+                    }
+                    if (ENDPLAYERINFO.equals(tmpData)) {
+                        break;
+                    }
+                    Player player = null;
+                    while (gameFileLines.hasNext()) {
+                        data = tmpData != null ? tmpData : gameFileLines.next();
+                        tmpData = null;
+                        if (PLAYER.equals(data)) {
+
+                            player = game.addPlayerLoad(gameFileLines.next(), gameFileLines.next());
                             continue;
                         }
-                        if (ENDGAMEINFO.equals(data)) {
+                        if (ENDPLAYER.equals(data)) {
                             break;
                         }
-                        try {
-                            readGameInfo(game, data);
-                        } catch (Exception e) {
-                            BotLogger.log("Data is bad: " + game.getName(), e);
-                        }
+                        readPlayerInfo(player, data, game);
+                    }
+                }
+            }
+            Map<String, Tile> tileMap = new HashMap<>();
+            try {
+                while (gameFileLines.hasNext()) {
+                    String tileData = gameFileLines.next();
+                    if (TILE.equals(tileData)) {
+                        continue;
+                    }
+                    if (ENDTILE.equals(tileData)) {
+                        continue;
+                    }
+                    if (tileData.isEmpty()) {
+                        continue;
+                    }
+                    Tile tile = readTile(tileData);
+                    if (tile != null) {
+                        tileMap.put(tile.getPosition(), tile);
+                    } else {
+                        BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `"
+                            + tileData + "` - tile will be skipped - check save file");
                     }
 
-                    while (myReader.hasNextLine()) {
-                        String tmpData = myReader.nextLine();
-                        if (PLAYERINFO.equals(tmpData)) {
+                    while (gameFileLines.hasNext()) {
+                        String tmpData = gameFileLines.next();
+                        if (UNITHOLDER.equals(tmpData)) {
                             continue;
                         }
-                        if (ENDPLAYERINFO.equals(tmpData)) {
+                        if (ENDUNITHOLDER.equals(tmpData)) {
                             break;
                         }
-                        Player player = null;
-                        while (myReader.hasNextLine()) {
-                            data = tmpData != null ? tmpData : myReader.nextLine();
+                        String spaceHolder = null;
+                        while (gameFileLines.hasNext()) {
+                            String data = tmpData != null ? tmpData : gameFileLines.next();
                             tmpData = null;
-                            if (PLAYER.equals(data)) {
-
-                                player = game.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
-                                continue;
-                            }
-                            if (ENDPLAYER.equals(data)) {
-                                break;
-                            }
-                            readPlayerInfo(player, data, game);
-                        }
-                    }
-                }
-                Map<String, Tile> tileMap = new HashMap<>();
-                try {
-                    while (myReader.hasNextLine()) {
-                        String tileData = myReader.nextLine();
-                        if (TILE.equals(tileData)) {
-                            continue;
-                        }
-                        if (ENDTILE.equals(tileData)) {
-                            continue;
-                        }
-                        if (tileData.isEmpty()) {
-                            continue;
-                        }
-                        Tile tile = readTile(tileData);
-                        if (tile != null) {
-                            tileMap.put(tile.getPosition(), tile);
-                        } else {
-                            BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `"
-                                + tileData + "` - tile will be skipped - check save file");
-                        }
-
-                        while (myReader.hasNextLine()) {
-                            String tmpData = myReader.nextLine();
-                            if (UNITHOLDER.equals(tmpData)) {
-                                continue;
-                            }
-                            if (ENDUNITHOLDER.equals(tmpData)) {
-                                break;
-                            }
-                            String spaceHolder = null;
-                            while (myReader.hasNextLine()) {
-                                String data = tmpData != null ? tmpData : myReader.nextLine();
-                                tmpData = null;
-                                if (UNITS.equals(data)) {
-                                    spaceHolder = myReader.nextLine().toLowerCase();
-                                    if (tile != null) {
-                                        if (Constants.MIRAGE.equals(spaceHolder)) {
-                                            Helper.addMirageToTile(tile);
-                                        } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                            BotLogger.log(game.getName() + ": Not valid space holder detected: "
-                                                + spaceHolder);
-                                        }
+                            if (UNITS.equals(data)) {
+                                spaceHolder = gameFileLines.next().toLowerCase();
+                                if (tile != null) {
+                                    if (Constants.MIRAGE.equals(spaceHolder)) {
+                                        Helper.addMirageToTile(tile);
+                                    } else if (!tile.isSpaceHolderValid(spaceHolder)) {
+                                        BotLogger.log(game.getName() + ": Not valid space holder detected: "
+                                            + spaceHolder);
                                     }
-                                    continue;
                                 }
-                                if (ENDUNITS.equals(data)) {
-                                    break;
-                                }
-                                readUnit(tile, data, spaceHolder);
-                            }
-
-                            while (myReader.hasNextLine()) {
-                                String data = myReader.nextLine();
-                                if (UNITDAMAGE.equals(data)) {
-                                    continue;
-                                }
-                                if (ENDUNITDAMAGE.equals(data)) {
-                                    break;
-                                }
-                                readUnitDamage(tile, data, spaceHolder);
-                            }
-
-                            while (myReader.hasNextLine()) {
-                                String data = myReader.nextLine();
-                                if (PLANET_TOKENS.equals(data)) {
-                                    continue;
-                                }
-                                if (PLANET_ENDTOKENS.equals(data)) {
-                                    break;
-                                }
-                                readPlanetTokens(tile, data, spaceHolder);
-                            }
-                        }
-
-                        while (myReader.hasNextLine()) {
-                            String data = myReader.nextLine();
-                            if (TOKENS.equals(data)) {
                                 continue;
                             }
-                            if (ENDTOKENS.equals(data)) {
+                            if (ENDUNITS.equals(data)) {
                                 break;
                             }
-                            readTokens(tile, data);
+                            readUnit(tile, data, spaceHolder);
+                        }
+
+                        while (gameFileLines.hasNext()) {
+                            String data = gameFileLines.next();
+                            if (UNITDAMAGE.equals(data)) {
+                                continue;
+                            }
+                            if (ENDUNITDAMAGE.equals(data)) {
+                                break;
+                            }
+                            readUnitDamage(tile, data, spaceHolder);
+                        }
+
+                        while (gameFileLines.hasNext()) {
+                            String data = gameFileLines.next();
+                            if (PLANET_TOKENS.equals(data)) {
+                                continue;
+                            }
+                            if (PLANET_ENDTOKENS.equals(data)) {
+                                break;
+                            }
+                            readPlanetTokens(tile, data, spaceHolder);
                         }
                     }
-                } catch (Exception e) {
-                    BotLogger.log("Data read error: " + mapFile.getName(), e);
+
+                    while (gameFileLines.hasNext()) {
+                        String data = gameFileLines.next();
+                        if (TOKENS.equals(data)) {
+                            continue;
+                        }
+                        if (ENDTOKENS.equals(data)) {
+                            break;
+                        }
+                        // readTokens(tile, data);
+                    }
                 }
-                game.setTileMap(tileMap);
-            } catch (FileNotFoundException e) {
-                BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
             } catch (Exception e) {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
-
+            game.setTileMap(tileMap);
             game.endGameIfOld();
             return game;
-        } else {
-            BotLogger.log("Could not save map, error creating save file");
+        } catch (Exception e) {
+            BotLogger.log("Data read error: " + mapFile.getName(), e);
         }
         return null;
     }
@@ -1494,9 +1471,8 @@ public class GameSaveLoadManager {
                 case Constants.EVENT_DECK_ID -> game.setEventDeckID(info);
                 case Constants.EXPLORATION_DECK_ID -> game.setExplorationDeckID(info);
                 case Constants.STRATEGY_CARD_SET -> {
-                    String scSetID = info;
-                    if (Mapper.isValidStrategyCardSet(scSetID)) {
-                        game.setScSetID(scSetID);
+                    if (Mapper.isValidStrategyCardSet(info)) {
+                        game.setScSetID(info);
                     } else {
                         // BotLogger.log("Invalid strategy card set ID found: `" + scSetID + "` Game: `" + game.getName() + "`");
                         game.setScSetID("pok");
@@ -1974,6 +1950,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -2309,6 +2286,7 @@ public class GameSaveLoadManager {
                 case Constants.AFK_HOURS -> player.setHoursThatPlayerIsAFK(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
+                case Constants.NOTEPAD -> player.setNotes(tokenizer.nextToken());
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
@@ -2586,14 +2564,6 @@ public class GameSaveLoadManager {
                 tile.addToken(token, unitHolderName);
             }
         }
-    }
-
-    private static void readTokens(Tile tile, String data) {
-        if (tile == null)
-            return;
-        // StringTokenizer tokenizer = new StringTokenizer(data, " ");
-        // tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
-        // todo implement token read
     }
 
     private static void savePeekedPublicObjectives(Writer writer, final String constant, Map<String, List<String>> peekedPOs) {
