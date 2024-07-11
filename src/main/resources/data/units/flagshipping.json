@@ -110,7 +110,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When a hit is produced against your units in this system, you may assign that hit to any of your units in this system, regardless of type. When this ship is destroyed, destroy all ships in this system."
-        "unlock": "After 1 of your units is destroyed, place 1 control token on this card.\nUNLOCK: Have 4 control tokens on this card."
+        "unlock": "After 1 of your units is destroyed, place 1 control token on this card.\nUNLOCK: Have 12 control tokens on this card."
     },
     
     {
@@ -147,7 +147,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When 1 of your war suns in this system would be destroyed, you may damage or destroy this ship instead.\nACTION: Spend f1 token from your strategy pool to resolve your STAR FORGE faction ability in this system twice, then gain 1 trade good."
+        "ability": "When 1 of your war suns in this system would be destroyed, you may damage or destroy this ship instead.\nACTION: Spend 1 token from your strategy pool to resolve your STAR FORGE faction ability in this system twice, then gain 1 trade good."
         "unlock": "UNLOCK: Have 2 of your war suns in or adjacent to the system that contains The Inferno I"
     },
     
@@ -209,7 +209,7 @@
         "ability": "Hits produced by this ship must be assigned to non-fighter ships if able.",
         "bombardHitsOn": 8,
         "bombardDieCount": 1,
-        "unlock": "UNLOCK: Win a space combat.",
+        "unlock": "UNLOCK: produce 3 BOMBARDMENT hits during 1 invasion.",
         "homebrewReplacesID": "l1z1x_flagship"
     },
     {
@@ -230,7 +230,7 @@
         "ability": "Hits produced by this ship and by your dreadnoughts in or adjacent to this system must be assigned to non-fighter ships if able, and cannot be canceled."
         "bombardHitsOn": 4,
         "bombardDieCount": 2,
-        "unlock": "UNLOCK: Win a space combat that the [0.0.1] α participated in."
+        "unlock": "UNLOCK: produce 6 BOMBARDMENT hits during 1 invasion.",
     },
     
     {
@@ -286,7 +286,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During space combat in this system, you may assign hits to your ground forces in this system as though they were ships participating in that combat.",
+        "ability": "At the start of a space combat, choose any number of your ground forces in the space area of this system to participate in that combat as though they were fighters.",
         "unlock": "UNLOCK: When you would gain a technology from a player with their Flagship I unlocked using 1 of your faction abilities, you may instead unlock this unit.",
         "homebrewReplacesID": "nekro_flagship"
     },
@@ -395,7 +395,7 @@
         "combatHitsOn": 5,
         "combatDieCount": 2,
         "sustainDamage": true,
-        "canBeDirectHit": true,
+        "canBeDirectHit": false,
         "isShip": true,
         "ability": "At the start of each space combat round in this system, repair this ship, then place 1 fighter for every 8 resources in the combined cost of your non-fighter ships in this system. This unit cannot be destroyed by \"Direct Hit\" action cards.",
         "unlock": "When 1 of your opponent's non-fighter ships is destroyed during space combat, place a number of control tokens on this card equal to that ship's cost.\nUNLOCK: Have 20 control tokens on this card."
@@ -416,7 +416,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During your actions, this ship may transport structions as though they were ground forces; they lose all abilities and attributes until the end of the action. If any of your PDS are in the space area of a system at the end of the action, they are destroyed.",
+        "ability": "During your actions, this ship may transport structures as though they were ground forces; they lose all abilities and attributes until the end of the action. If any of your PDS are in the space area of a system at the end of the action, they are destroyed.",
         "unlock": "UNLOCK: Participate in a space combat in a system containing 1 or more of your space docks.",
         "homebrewReplacesID": "saar_flagship"
     },
@@ -429,13 +429,13 @@
         "faction": "Saar",
         "moveValue": 2,
         "capacityValue": 4,
-        "cost": 8,
+        "cost": 6,
         "combatHitsOn": 7,
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During your actions, this ship may transport structions as though they were ground forces; they lose all abilities and attributes until the end of the action. If any of your PDS are in the space area of a system at the end of the action, they are destroyed.",
+        "ability": "During your actions, this ship may transport structures as though they were ground forces; they lose all abilities and attributes until the end of the action. If any of your PDS are in the space area of a system at the end of the action, they are destroyed.",
         "unlock": "UNLOCK: 1 of your structures is destroyed."
     },
     
@@ -454,7 +454,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When making combat rolls for this ship, each result of 9 or 10, before applying modifiers, produces 1 additional hit.",
+        "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that die immediately.",
         "unlock": "UNLOCK: Control a planet with a technology speciality.",
         "homebrewReplacesID": "jolnar_flagship"
     },
@@ -473,7 +473,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When making combat rolls for this ship, each result of 8, 9 or 10, before applying modifiers, produces 2 additional hits.",
+        "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that die immediately.",
         "unlock": "If you control a planet with a technology speciality, or own 4 technologies of 1 color, place the technology token of the corresponding color on this card.\nUNLOCK: Have 4 tokens on this card."
     },
     
@@ -533,7 +533,7 @@
         "ability": ""
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 2,
-        "unlock": "When you perform the primary or secondary ability of a strategy card, place the corresponding token on this card. UNLOCK: Have 4 tokens on this card.",
+        "unlock": "When you perform the primary or secondary ability of a strategy card, place the corresponding token on this card.\nUNLOCK: Have 4 tokens on this card.",
         "homebrewReplacesID": "xxcha_flagship"
     },
     {
@@ -554,7 +554,8 @@
         "ability": "You may use this ship's SPACE CANNON against ships that are in adjacent systems. Each hit produced from your space cannon rolls against ships in or adjacent to this system must be assigned to a different type of ship if possible."
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 4,
-        "unlock": "When you perform the primary or secondary ability of a strategy card, place the corresponding token on this card. UNLOCK: Have 8 tokens on this card."
+        "deepSpaceCannon": true,
+        "unlock": "When you perform the primary or secondary ability of a strategy card, place the corresponding token on this card.\nUNLOCK: Have 8 tokens on this card."
     },
     
     {
@@ -592,7 +593,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "This ship can move through systems that contain other player's units, and ignores the movement effects of anomalies."
-        "unlock": "UNLOCK: Move the Y'sia Y'ssrila I through a system that contains another player's ships, and into a system that does not contain your ships."
+        "unlock": "UNLOCK: Gain control of a planet in a system that is not adjacent to another planet you control or any of your units."
     },
     
     {
@@ -611,7 +612,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may spend any number of trade goods to cancel 1 hit each, produced against your units in this system; the player that produced the hit gains the trade good.",
-        "unlock": "UNLOCK ACTION: Spend 4 trade goods.",
+        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card.\nUNLOCK: Have a control token from each other player on this card.",
         "homebrewReplacesID": "hacan_flagship"
     },
     {
@@ -630,7 +631,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may spend any number of trade goods to cancel up to 3 hits each, all produced by the same player against your units in this system; that player gains the trade good.",
-        "unlock": "UNLOCK ACTION: With the Wrath of Keneara I unlocked, spend 4 trade goods."
+        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card. UNLOCK: Have 3 control tokens for each other player in the game on this card."
     },
     
     {
@@ -648,8 +649,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You treat this systems as if it contained a delta wormhole. During movement, this ship may move before or after your other ships, and does not roll for gravity rifts.",
-        "unlock": "UNLOCK: Have 1 or more ships in a system that contains 2 or more wormholes.",
+        "ability": "You treat this systems as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts.",
+        "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 4 or more wormholes.",
         "homebrewReplacesID": "ghost_flagship"
     },
     {
@@ -667,8 +668,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You treat this systems as if it contained a delta wormhole. During movement, this ship may move before or after your other ships, and does not roll for gravity rifts. You may move this ship to an adjacent system at the start of a space combat in that system.",
-        "unlock": "UNLOCK: Have 1 or more ships in 2 systems that each contain 2 or more wormholes."
+        "ability": "You treat this systems as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts. You may move this ship to an adjacent system at the start of a space combat there.",
+        "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 6 or more wormholes.",
     },
     
     {
@@ -705,7 +706,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "During a combat against a player without a command token in your fleet pool, apply +2 to the result of this unit's combat rolls. When you win a combat against a player with a command token in your fleet pool, gain 1 command token.",
+        "ability": "During a combat against a player without a command token in your fleet pool, apply +2 to the result of this unit's combat rolls. When you win a combat in this system, place 1 command token from your opponent's reinforcements in this system.",
         "unlock": "UNLOCK: Have 2 Supports Fors Thes Thrones in your play area."
     },
     
@@ -748,7 +749,7 @@
         "ability": "You may tread this unit as though it were adjacent to systems that contain 1 or more of your mechs."
         "afbHitsOn": 6,
         "afbDieCount": 3,
-        "unlock": "UNLOCK: Spend 8 resources after you produce the Memoria I or 1 or more units in or adjacent to its system."
+        "unlock": "UNLOCK: When you would score a public objective or draw a secret objective, you may instead unlock the Memoria II."
     },
     {
         "id": "sigma_nomad_flagship_3",
@@ -769,7 +770,7 @@
         "afbHitsOn": 4,
         "afbDieCount": 4,
         "productionValue": 1,
-        "unlock": "UNLOCK: Spend 8 resources after you produce the Memoria II or 1 or more units in or adjacent to its system."
+        "unlock": "UNLOCK: With the Memoria II unlocked, when you would score a public objective or draw a secret objective, you may instead unlock the Memoria III."
     },
     
     {
@@ -826,7 +827,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "DEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
-        "unlock": "UNLOCK: Have 5 sleeper tokens on the game board.",
+        "unlock": "UNLOCK: Control 2 attachments amongst planets you control.",
         "homebrewReplacesID": "titans_flagship"
     },
     {
@@ -845,7 +846,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "When this ship is destroyed, place a ship with a cost of 4 or less from your reinforcements in this system. DEPLOY: After you activate a system that contains 1 of your PDS, you may replace that PDS with this ship.",
-        "unlock": "UNLOCK: Control the planet that \"Terraform\" is attached to."
+        "unlock": "UNLOCK: Control 5 attachments amongst planets you control.",
     },
     
     {
@@ -940,7 +941,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players apply -2 to the result of each dice roll when they use SPACE CANNON against your ships in this system.",
-        "unlock": "When you destroy a unit using a unit ability, place a control token on this card. UNLOCK: Have 8 control tokens on this card.",
+        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 8 control tokens on this card.",
         "homebrewReplacesID": "argent_flagship"
     },
     {
@@ -959,7 +960,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Other players apply -2 to the result of each dice roll when they use SPACE CANNON against your ships in adjacent systems, and cannot use SPACE CANNON against your ships in this system. This ship may transport other non-fighter ships when moving.",
-        "unlock": "When you destroy a unit using a unit ability, place a control token on this card. UNLOCK: Have 20 control tokens on this card."
+        "unlock": "When you destroy a unit using a unit ability, place a control token on this card.\nUNLOCK: Have 20 control tokens on this card."
     },
     
     {

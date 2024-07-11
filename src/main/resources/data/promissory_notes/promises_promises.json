@@ -6,7 +6,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, when the Sol player places ground forces on the game board, place 1 infantry from your reinforcements on a planet you control for every 2 ground forces they placed. If you activate a system that contains 1 or more of the Sol player's units, return this card to the Sol player",
+        "text": "Action: Place this card faceup in your play area. While this card is in your play area, when the Sol player places ground forces on the game board, place 1 infantry from your reinforcements on a planet you control for every 2 ground forces they placed. If you activate a system that contains 1 of the Sol player's structures or ground forces on your turn, return this card to them.",
         "homebrewReplacesID": "ms"
     },
     {
@@ -19,17 +19,27 @@
         "text": "At the start of a ground combat against a player other than the Sol player: Remove 1 token from the Sol player's strategy pool, and return it to their reinforcements. Then, place 1 mech from your reinforcements on the planet where the combat is occurring. Then, return this card to the Sol player."
     },
     {
+        "alias": "sigma_promise_of_protection",
+        "name": "Promise of Protection",
+        "faction": "mentak",
+        "color": "",
+        "playArea": "true",
+        "source": "promises_promises",
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their PILLAGE faction ability against you. If you gain control of 1 of the Mentak player's readied planets, return this card to them.",
+        "homebrewReplacesID": "pop"
+    },
+    {
         "alias": "sigma_hamstring",
         "name": "Hamstring",
         "faction": "mentak",
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "At the start of a space combat against a player other than the Mentak player: Your opponent cannot use the SUSTAIN DAMAGE ability of their ships during the first round of combat, and cannot use the SUSTAIN DAMAGE ability of more than 2 of their ships during each subsequent combat round. Then, return this card to the Mentak player."
+        "text": "At the start of a space combat against a player other than the Mentak player: Your opponent cannot use the SUSTAIN DAMAGE ability of their ships during the first round of combat, and cannot use the SUSTAIN DAMAGE ability of more than 2 of their ships during each subsequent combat round. Return this card to the Mentak player and the end of the combat."
     },
     {
         "alias": "sigma_surprise",
-        "name": "Surprise",
+        "name": "Surprise!!!",
         "faction": "yin",
         "color": "",
         "playArea": "false",
@@ -62,7 +72,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "When you resolve the secondary ability of the \"Warfare\" strategy card: Apply +1 to the PRODUCITON value of your space dock for each face up public objective card in the common play area. At the end of the strategic action, return this card to the Arborec player."
+        "text": "When you resolve the secondary ability of the \"Warfare\" strategy card: Apply +1 to the PRODUCTION value of your space dock for each face up public objective card in the common play area. At the end of the strategic action, return this card to the Arborec player."
     },
     {
         "alias": "sigma_cyber",
@@ -71,7 +81,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "At the end of the strategy phase: Place this card faceup in your play area. While this card is in your play area, the resource and influence values of planets you control with a technology speciality are each increased by 2. At the end of the status phase, return this card to the L1Z1X player.",
+        "text": "At the end of the strategy phase: Place this card faceup in your play area. While this card is in your play area, the resource and influence values of planets you control with a technology speciality are each increased by 2. Return this card to the L1Z1X player at the end of the status phase.",
         "homebrewReplacesID": "ce"
     },
     {
@@ -99,7 +109,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "At the start of a combat against the Nekro player: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their TECHNOLOGICAL SINGULARITY faction ability against you. If you activate a system that contains 1 or more of the Nekro player's units, return this card to the Nekro player.",
+        "text": "At the start of a combat against the Nekro player: Place this card faceup in your play area. While this card is in your play area, the Nekro player cannot use their TECHNOLOGICAL SINGULARITY faction ability against you. If you activate the home system of the Nekro player, or a system that contains a planet they control with a technology specialty, return this card to them.",
 		"homebrewReplacesID": "antivirus"
     },
     {
@@ -109,7 +119,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. When you vote for an outcome that the Nekro player predicted with their GALACTIC THREAT faction ability, your may exhaust the Nekro player's planets as if they were your own, using the influence values to cast votes. If you activate a system that contains the Nekro player's units, return this card to the Nekro player."
+        "text": "Action: Place this card faceup in your play area. When you vote for an outcome that the Nekro player predicted with their GALACTIC THREAT faction ability, your may exhaust the Nekro player's planets as if they were your own, using the influence values to cast votes. If you win a combat against the Nekro player on your turn, return this card to them."
     },
     {
         "alias": "sigma_pilot_conditioning",
@@ -146,7 +156,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Saar player cannot resolve their SCAVANGE faction ability when they gain control of planets from you, or move their Floating Factories into systems that contain your ships. If you activate a system that contains 1 or more Floating Factories, return this card to the Saar player."
+        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Saar player cannot resolve their SCAVENGE faction ability when they gain control of planets from you, or move their Floating Factories into systems that contain your ships. If you activate a system that contains 1 or more Floating Factories, return this card to the Saar player."
     },
     {
         "alias": "sigma_open_source",
@@ -202,7 +212,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, when another player activates a system that contains your units, they must give you 1 random action card from their hand, if able. If you activate a system that contains the Yssaril player's units, return this card to the Yssaril player.",
+        "text": "Action: Place this card faceup in your play area. While this card is in your play area, before another player activates a system that contains your units, they must give you 1 random action card from their hand, if able. Before you activate a system that contains the Yssaril player's units give the Yssaril player 2 random action cards from your hand, return this card to them.",
 		"homebrewReplacesID": "spynet"
     },
     {
@@ -213,6 +223,16 @@
         "playArea": "false",
         "source": "promises_promises",
         "text": "When you resolve the primary or secondary ability of the \"Politics\" strategy card: Draw 1 additional action card. At the end of the strategic action, return this card to the Yssaril player.",
+    },
+    {
+        "alias": "sigma_trade_convoys",
+        "name": "Trade Convoys",
+        "faction": "hacan",
+        "color": "",
+        "playArea": "true",
+        "source": "promises_promises",
+        "text": "Action: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbor. If you destroy 1 of the Hacan player's ships with a capacity value, return this card to them.",
+		"homebrewReplacesID": "convoys"
     },
     {
         "alias": "sigma_commander_of_trade",
@@ -231,7 +251,7 @@
         "playArea": "true",
         "attachment": "weirdway",
         "source": "promises_promises",
-        "text": "Action: Attach this card to a planet you control. Its system contains an alpha and beta wormhole. When a player activates this planet's system, if they do not control it, they apply -1 to the move value of each of their ships during this action."
+        "text": "Action: Attach this card to a planet you control. Its system contains an alpha and beta wormhole. When another player activates this system, they apply -1 to the move value of each of their ships during this action. When another player gains control of this planet, detach this card and return it to the Creuss player."
     },
     {
         "alias": "sigma_poisoned_chalice",
@@ -240,7 +260,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "This card can only be given as part of a transaction. When you receive this card, place it faceup in your play area; the Mahact player gains 1 victory point. If you activate a system that contains the Mahact player's units, purge this card. If the Mahact player activates a system that contains your units, they lose 2 victory points; then, purge this card.",
+        "text": "This card can only be given as part of a transaction. When you receive this card, place it faceup in your play area; the Mahact player gains 1 victory point. If you activate a system that contains the Mahact player's units, purge this card. If the Mahact player activates a system that contains your units, they lose 2 victory points. Then, purge this card.",
     },
     {
         "alias": "sigma_machinations",
@@ -258,7 +278,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "Action: Remove 1 or more of your non-structure units from the game board and give them to the Vuil'raith player; they are captured. Your must remove an even number of fighters and infantry. Then, gain trade goods equal to the combined cost of the removed units. Then, return this card to the Vuil'raith player.",
+        "text": "At the start of a combat against the Vuil'raith player: Remove 1 or more of your non-structure units from the game board and give them to the Vuil'raith player; they are captured. Your must remove an even number of fighters and infantry. Then, gain trade goods equal to the combined cost of the removed units. Then, return this card to the Vuil'raith player.",
     },
     {
         "alias": "sigma_shield_array",
@@ -267,7 +287,16 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "At the start of an invasion: Choose 1 of your units in the active system, That unit gains PLANETARY SHIELD until the end of the invasion. Then, return this card to the Ul player.",
+        "text": "At the start of an invasion: Choose 1 of your units in the active system, That unit gains PLANETARY SHIELD until the end of the invasion. At the end of the invasion, return this card to the Ul player.",
+    },
+    {
+        "alias": "sigma_night_pact",
+        "name": "Night Pact",
+        "faction": "empyrean",
+        "color": "",
+        "playArea": "true",
+        "source": "promises_promises",
+        "text": "Action: Place this card faceup in your play area. When the Empyrean player performs the secondary ability of your strategy card, draw 1 action card. When you perform the secondary ability of the Empyrean player's strategy card, they draw 1 action card. If you activate a system that contains the Empyrean player's units, return this card to them.",
     },
     {
         "alias": "sigma_soul_pact",
@@ -276,7 +305,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. When you or the Empyrean player spends resources to research a technology that the other player owns, reduce the resources spent by 2. If you activate a system that contains the Empyrean player's units, return this card to the Empyrean player.",
+        "text": "Action: Place this card faceup in your play area. When you or the Empyrean player spends resources to research a technology that the other player owns, reduce the resources spent by 2. If you activate a system that contains the Empyrean player's units, return this card to them.",
     },
     {
         "alias": "sigma_star_pact",
@@ -285,7 +314,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. During combat against other players, you and the Empyrean player apply +2 to the each of your respective combat rolls in systems that contained the other's command token at the start of the action. If you activate a system that contains the Empyrean player's units, return this card to the Empyrean player.",
+        "text": "Action: Place this card faceup in your play area. During combat against other players, you and the Empyrean player apply +1 to the result of each of your respective unit's combat rolls for each adjacent system that contains the other's units. If you activate a system that contains the Empyrean player's units, return this card to them.",
     },
     {
         "alias": "sigma_excavation_experts",
@@ -313,7 +342,7 @@
         "playArea": "true",
         "attachment": "senate_sanctuary",
         "source": "promises_promises",
-        "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players must spend 2 influence to activate this system, and must spend 1 influence to commit ground forces to this planet."
+        "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players cannot active this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     },
     {
         "alias": "sigma_senate_sanctuary",
@@ -323,7 +352,7 @@
         "playArea": "true",
         "attachment": "senate_sanctuary",
         "source": "promises_promises",
-        "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players must spend 2 influence to activate this system, and must spend 1 influence to commit ground forces to this planet."
+        "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players cannot active this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     },
     {
         "alias": "sigma_senate_sanctuary",
@@ -333,7 +362,7 @@
         "playArea": "true",
         "attachment": "senate_sanctuary",
         "source": "promises_promises",
-        "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players must spend 2 influence to activate this system, and must spend 1 influence to commit ground forces to this planet."
+        "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players cannot active this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     }
 	
 ]
