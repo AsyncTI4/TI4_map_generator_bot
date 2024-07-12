@@ -7224,7 +7224,7 @@ public class ButtonHelper {
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.");
             if (game.isShowBanners()) {
-                MapGenerator.drawPhaseBanner("action", game.getRound(), event);
+                MapGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
             ListTurnOrder.turnOrder(event, game);
             if (!msgExtra.isEmpty()) {
@@ -7411,7 +7411,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Started Round " + round);
         if (game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("strategy", round, event);
+            MapGenerator.drawPhaseBanner("strategy", round, game.getActionsChannel());
         }
         if (game.getRealPlayers().size() == 6) {
             game.setStrategyCardsPerPlayer(1);

@@ -54,6 +54,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -544,7 +545,7 @@ public class MapGenerator {
 
     }
 
-    public static void drawPhaseBanner(String phase, int round, GenericInteractionCreateEvent event) {
+    public static void drawPhaseBanner(String phase, int round, TextChannel channel) {
         BufferedImage bannerImage = new BufferedImage(511, 331, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile(phase + "banner.png"), 511, 331);
 
@@ -554,34 +555,14 @@ public class MapGenerator {
         bannerG.setColor(Color.WHITE);
         superDrawString(bannerG, phase.toUpperCase() + " PHASE", 255, 110, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke8, Color.BLACK);
         bannerG.setFont(Storage.getFont32());
-        switch (round) {
-            case 1:
-                superDrawString(bannerG, "ROUND ONE", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 2:
-                superDrawString(bannerG, "ROUND TWO", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 3:
-                superDrawString(bannerG, "ROUND THREE", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 4:
-                superDrawString(bannerG, "ROUND FOUR", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 5:
-                superDrawString(bannerG, "ROUND FIVE", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 6:
-                superDrawString(bannerG, "ROUND SIX", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 7:
-                superDrawString(bannerG, "ROUND SEVEN", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 8:
-                superDrawString(bannerG, "ROUND EIGHT", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
-            case 9:
-                superDrawString(bannerG, "ROUND NINE", 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
-                break;
+        if (0 <= round && round <= 20) {
+            String[] numbers = {"ZERO", "ONE", "TWO", "THREE", "FOUR",
+                                "FIVE", "SIX", "SEVEN", "EIGHT", "NINE",
+                                "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN",
+                                "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN", "TWENTY"};
+            superDrawString(bannerG, "ROUND " + numbers[round], 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
+        } else {
+            superDrawString(bannerG, "ROUND " + round, 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
         }
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -603,7 +584,7 @@ public class MapGenerator {
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload", e);
         }
-        MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
+        MessageHelper.sendFileUploadToChannel(channel, fileUpload);
 
     }
 
