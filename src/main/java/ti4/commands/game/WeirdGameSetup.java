@@ -37,7 +37,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         if (communityMode != null) game.setCommunityMode(communityMode);
 
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
-        if (fowMode != null) game.setFoWMode(fowMode);
+        if (fowMode != null) game.setFowMode(fowMode);
 
         String customGameName = event.getOption(Constants.GAME_CUSTOM_NAME, null, OptionMapping::getAsString);
         if (customGameName != null) {
@@ -78,7 +78,7 @@ public class WeirdGameSetup extends GameSubcommandData {
     public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
         boolean isTIGLGame) {
         if (isTIGLGame
-            && (baseGameMode || absolMode || discordantStarsMode || game.isHomeBrewSCMode() || game.isFoWMode() || game.isAllianceMode() || game.isCommunityMode())) {
+            && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {

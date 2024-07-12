@@ -82,7 +82,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
             ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
         }
         MessageChannel channel = game.getMainGameChannel();
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannel(channel, message.toString());

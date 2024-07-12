@@ -179,7 +179,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     buttons.add(Button.success(
                         "mercenariesStep4_" + pos2 + "_" + pos + "_" + fighters + "_" + p2.getFaction(),
                         StringUtils.capitalize(p2.getColor())));
@@ -226,7 +226,7 @@ public class ButtonHelperAbilities {
             + ButtonHelper.getIdentOrColor(vaden, game)
             + "to get 2 debt tokens cleared via the binding debts ability";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), msg);
         }
     }
@@ -309,7 +309,7 @@ public class ButtonHelperAbilities {
     public static void setTrapStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("setTrapStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("setTrapStep2_" + p2.getFaction(), " ");
@@ -1125,7 +1125,7 @@ public class ButtonHelperAbilities {
             String playerIdent = player.getFlexibleDisplayName();
             player.getDisplayName();
             MessageChannel channel = game.getMainGameChannel();
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 playerIdent = StringUtils.capitalize(player.getColor());
                 channel = pillager.getPrivateChannel();
             }

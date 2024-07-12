@@ -235,7 +235,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
-        newGame.setMainGameChannelID(actionsChannel.getId());
+        newGame.setMainChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = null;
@@ -282,9 +282,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         buttons.add(Button.success("anonDeclare_Friendly", "Friendly"));
         buttons.add(Button.primary("anonDeclare_No Strong Preference", "No Strong Preference"));
         buttons.add(Button.danger("anonDeclare_Aggressive", "Aggressive"));
-        newGame.setUndoButton(false);
+        newGame.setUndoButtonOffered(false);
         MessageHelper.sendMessageToChannel(actionsChannel, agressionMsg, buttons);
-        newGame.setUndoButton(true);
+        newGame.setUndoButtonOffered(true);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         List<Button> buttons2 = new ArrayList<>();

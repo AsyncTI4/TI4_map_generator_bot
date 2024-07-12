@@ -69,7 +69,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
                 continue;
 
             Button transact;
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 transact = Button.success("resolvePNPlay_" + pnShortHand,
                     "Play " + owner.getColor() + " " + promissoryNote.getName());
             } else {
@@ -149,7 +149,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         String pnText = pnModel.getText();
         Player pnOwner = game.getPNOwner(pnID);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
-            if (!game.isFoWMode()) sb.append(pnOwner.getFactionEmoji());
+            if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
             sb.append(Emojis.getColorEmojiWithName(pnOwner.getColor()));
             pnText = pnText.replaceAll(pnOwner.getColor(), Emojis.getColorEmojiWithName(pnOwner.getColor()));
         }

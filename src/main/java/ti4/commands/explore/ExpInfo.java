@@ -83,11 +83,11 @@ public class ExpInfo extends ExploreSubcommandData {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFoWMode()) {
+            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), info.toString());
             }
         }
-        if (player != null && "action".equalsIgnoreCase(game.getCurrentPhase()) && game.isFoWMode() && !overRide) {
+        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && game.isFowMode() && !overRide) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }

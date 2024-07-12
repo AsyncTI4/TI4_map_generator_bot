@@ -299,7 +299,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         Button listGames = Button.secondary("searchMyGames", "List All My Games");
         buttons.add(listGames);
         buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             buttons.add(Button.secondary("checkWHView", "Check Wormholes"));
         }
         boolean hadAnyUnplayedSCs = false;
@@ -319,7 +319,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
             if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty())
                 hasSummary = true;
         }
-        if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getCurrentPhase()) || hasSummary) {
+        if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getPhaseOfGame()) || hasSummary) {
             // after the action phase round 1, show the edit summary button by default
             buttons.add(Buttons.EDIT_SUMMARIES);
         }
