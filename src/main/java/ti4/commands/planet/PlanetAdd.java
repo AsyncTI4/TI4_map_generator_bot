@@ -74,7 +74,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 game.scorePublicObjective(player.getUserID(), 0);
                 MessageChannel channel = game.getMainGameChannel();
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
@@ -198,7 +198,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
             alreadyOwned = false;
         }
-        if (!game.getCurrentPhase().contains("agenda")) {
+        if (!game.getPhaseOfGame().contains("agenda")) {
             game.setStoredValue("planetsTakenThisRound",
                 game.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
@@ -304,7 +304,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
         if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
-            || game.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
+            || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("saarMechRes_" + planet,

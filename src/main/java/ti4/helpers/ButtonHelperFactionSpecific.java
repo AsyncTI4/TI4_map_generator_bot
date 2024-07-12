@@ -137,7 +137,7 @@ public class ButtonHelperFactionSpecific {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, p2.getColor()));
             } else {
                 Button button = Button.secondary("edynAgendaStuffStep3_" + p2.getFaction() + "_" + pos, " ");
@@ -405,7 +405,7 @@ public class ButtonHelperFactionSpecific {
         String message = player.getRepresentation()
             + " Use the buttons to produce."
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
@@ -730,7 +730,7 @@ public class ButtonHelperFactionSpecific {
         player.setTg(oldTg + 2);
         String message = player.getFactionEmojiOrColor() + " gained " + Emojis.tg(2) + " due to " + Emojis.Hacan + Emojis.BioticTech + "Production Biomes (" + oldTg + "->" + player.getTg() + ")";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message);
         }
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -759,7 +759,7 @@ public class ButtonHelperFactionSpecific {
             if (p2 == hacan) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("productionBiomes_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("productionBiomes_" + p2.getFaction(), " ");
@@ -802,7 +802,7 @@ public class ButtonHelperFactionSpecific {
                 continue;
             }
             if (p2.getSCs().size() > 1) {
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     buttons.add(Button.secondary("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, p2.getColor()));
                 } else {
                     Button button = Button.secondary("selectBeforeSwapSCs_" + p2.getFaction() + "_" + type, " ");
@@ -811,7 +811,7 @@ public class ButtonHelperFactionSpecific {
                     buttons.add(button);
                 }
             } else {
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     buttons.add(Button.secondary("swapSCs_" + p2.getFaction() + "_" + type + "_"
                         + p2.getSCs().toArray()[0] + "_" + hacan.getSCs().toArray()[0], p2.getColor()));
                 } else {
@@ -900,7 +900,7 @@ public class ButtonHelperFactionSpecific {
         String message2 = ident + " moved the ground forces on the planet "
             + Helper.getPlanetRepresentation(origPlanet, game) + " to "
             + Helper.getPlanetRepresentation(newPlanet, game);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message2);
             MessageHelper.sendMessageToChannel(saar.getPrivateChannel(), message2);
         } else {
@@ -946,8 +946,8 @@ public class ButtonHelperFactionSpecific {
         goAgainButtons.add(done);
         goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), message2);
-        if (game.isFoWMode() || !game.getWhetherNewTransactionMethod()) {
-            if (game.isFoWMode()) {
+        if (game.isFowMode() || !game.isNewTransactionMethod()) {
+            if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(hacan.getPrivateChannel(),
                     ident + " Use Buttons To Complete Transaction", goAgainButtons);
                 MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
@@ -1062,7 +1062,7 @@ public class ButtonHelperFactionSpecific {
                     if (player.unitBelongsToPlayer(unitKey)) {
                         String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                         String buttonID = "cabalRelease_" + player.getFaction() + "_" + unitName;
-                        if (game.isFoWMode()) {
+                        if (game.isFowMode()) {
                             buttons.add(Button.secondary(buttonID, player.getColor() + " " + unitName));
                         } else {
                             buttons.add(Button.secondary(buttonID, unitName)
@@ -1539,7 +1539,7 @@ public class ButtonHelperFactionSpecific {
 
             new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount + " " + unit, game);
         }
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
         } else {
             MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
@@ -1570,7 +1570,7 @@ public class ButtonHelperFactionSpecific {
                 && game.getPNOwner(pn).getFaction().equalsIgnoreCase(receiver.getFaction())) {
                 if (numOfComms == sender.getCommoditiesTotal()) {
                     MessageChannel channel = game.getActionsChannel();
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         channel = sender.getPrivateChannel();
                     }
                     String message = sender.getRepresentation(true, true)
@@ -1582,7 +1582,7 @@ public class ButtonHelperFactionSpecific {
                         + " Dark Pact triggered, your tgs have increased by 1 (" + receiver.getTg() + "->"
                         + (receiver.getTg() + 1) + ")";
                     receiver.setTg(receiver.getTg() + 1);
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         channel = receiver.getPrivateChannel();
                     }
                     MessageHelper.sendMessageToChannel(channel, message);
@@ -1819,7 +1819,7 @@ public class ButtonHelperFactionSpecific {
                 acID = so.getKey();
             }
         }
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             message2 = "Someone took AC #" + acNum + " from " + player2.getColor();
             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), message2);
             MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), message2);
@@ -2100,7 +2100,7 @@ public class ButtonHelperFactionSpecific {
         String tokenName = "creuss" + type;
         Tile tile = game.getTileByPosition(pos);
         String msg;
-        if (game.isFoWMode() && !isTileCreussIFFSuitable(game, player, tile)) {
+        if (game.isFowMode() && !isTileCreussIFFSuitable(game, player, tile)) {
             msg = "Tile was not suitable for the iff.";
             if (player.getTg() > 0) {
                 player.setTg(player.getTg() - 1);
@@ -2140,7 +2140,7 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getCreusIFFLocationOptions(Game game, @NotNull Player player, String type) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (isTileCreussIFFSuitable(game, player, tile) || (game.isFoWMode()
+            if (isTileCreussIFFSuitable(game, player, tile) || (game.isFowMode()
                 && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition()))) {
                 buttons.add(Button.success("creussIFFResolve_" + type + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));

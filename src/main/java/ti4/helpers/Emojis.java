@@ -1772,7 +1772,7 @@ public class Emojis {
     public static String getTGorNomadCoinEmoji(Game game) {
         if (game == null)
             return tg;
-        return game.getNomadCoin() ? nomadcoin : tg;
+        return game.isNomadCoin() ? nomadcoin : tg;
     }
 
     public static String getLeaderTypeEmoji(String type) {

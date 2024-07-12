@@ -93,7 +93,7 @@ public class Info extends GameSubcommandData {
         if (game.getTableTalkChannel() != null) sb.append("Table Talk Channel: ").append(game.getTableTalkChannel().getAsMention()).append(NEW_LINE);
         if (game.getActionsChannel() != null) sb.append("Actions Channel: ").append(game.getActionsChannel().getAsMention()).append(NEW_LINE);
         if (game.getBotMapUpdatesThread() != null) sb.append("Bot Map Thread: ").append(game.getBotMapUpdatesThread().getAsMention()).append(NEW_LINE);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             sb.append("FoW Options:");
             for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
                 sb.append(" " + entry.getKey() + ":" + entry.getValue());
@@ -122,7 +122,7 @@ public class Info extends GameSubcommandData {
         }
 
         sb.append("### Other Stats: ").append(NEW_LINE);
-        sb.append("Current Phase: ").append(game.getCurrentPhase()).append(NEW_LINE);
+        sb.append("Current Phase: ").append(game.getPhaseOfGame()).append(NEW_LINE);
         sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append(NEW_LINE);
         sb.append("Game Real Player Count: ").append(game.getRealPlayers().size()).append(NEW_LINE);
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append(NEW_LINE);

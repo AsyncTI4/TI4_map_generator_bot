@@ -105,7 +105,7 @@ public class StellarConverter extends SpecialSubcommandData {
     }
 
     public static void postTileInDisasterWatch(Game game, Tile tile, Integer rings, String message) {
-        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFoWMode()) {
+        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
             TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, rings, tile.getPosition(), null);
             MessageHelper.sendMessageWithFile(watchPary, systemWithContext, message, false);

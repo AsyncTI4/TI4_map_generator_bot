@@ -40,7 +40,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
             user = playerOption.getAsUser();
         }
         if (optionPurge != null && "YES".equals(optionPurge.getAsString())) {
-            if (game.purgeSpecificSecretObjective(option.getAsString())) {
+            if (game.removeSOFromGame(option.getAsString())) {
                 MessageHelper.sendMessageToEventChannel(event, "Purged specified SO");
             } else {
                 MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified SO");

@@ -130,7 +130,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
 
         // FoW logic, specific for players with visilibty, generic for the rest
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             FoWHelper.pingPlayersDifferentMessages(game, event, player, message.toString(), "Scores changed");
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }

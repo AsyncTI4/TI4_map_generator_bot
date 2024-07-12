@@ -60,18 +60,18 @@ public class CustomizationOptions extends CustomSubcommandData {
         if (ccNPlastic != null) {
             String ccNP = ccNPlastic.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setCCNPlasticLimit(true);
+                game.setCcNPlasticLimit(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setCCNPlasticLimit(false);
+                game.setCcNPlasticLimit(false);
             }
         }
         OptionMapping factReacts = event.getOption(Constants.BOT_FACTION_REACTS);
         if (factReacts != null) {
             String ccNP = factReacts.getAsString();
             if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setBotFactionReactions(true);
+                game.setBotFactionReacts(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setBotFactionReactions(false);
+                game.setBotFactionReacts(false);
             }
         }
         OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
@@ -114,7 +114,7 @@ public class CustomizationOptions extends CustomSubcommandData {
 
         Boolean transMethod = event.getOption(Constants.TRANSACTION_METHOD, null, OptionMapping::getAsBoolean);
         if (transMethod != null)
-            game.setTransactionMethod(transMethod);
+            game.setNewTransactionMethod(transMethod);
 
         Boolean showG = event.getOption(Constants.SHOW_GEARS, null, OptionMapping::getAsBoolean);
         if (showG != null)
@@ -133,7 +133,7 @@ public class CustomizationOptions extends CustomSubcommandData {
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
         if (homebrew != null)
-            game.setHomeBrew(homebrew);
+            game.setHomebrew(homebrew);
 
         Boolean injectRules = event.getOption(Constants.INJECT_RULES_LINKS, null, OptionMapping::getAsBoolean);
         if (injectRules != null)
@@ -154,7 +154,7 @@ public class CustomizationOptions extends CustomSubcommandData {
 
         Boolean undo = event.getOption(Constants.UNDO_BUTTON, null, OptionMapping::getAsBoolean);
         if (undo != null)
-            game.setUndoButton(undo);
+            game.setUndoButtonOffered(undo);
 
         Integer fast = event.getOption(Constants.FAST_SC_FOLLOW, null, OptionMapping::getAsInt);
         if (fast != null) {

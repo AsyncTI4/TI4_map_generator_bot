@@ -304,7 +304,7 @@ public class Setup extends PlayerSubcommandData {
         }
         CardsInfo.sendVariousAdditionalButtons(game, player);
 
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "Player: " + player.getRepresentation() + " has been set up");
         } else {
@@ -325,7 +325,7 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName(), false);
             if (!sb.toString().contains("No titles yet")) {
                 String msg = "In previous games, " + player.getUserName() + " has earned the titles of: \n" + sb;

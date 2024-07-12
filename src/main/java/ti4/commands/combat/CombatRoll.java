@@ -242,7 +242,7 @@ public class CombatRoll extends CombatSubcommandData {
         if (message.contains("at the risk of your troops lives")) {
             MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos,", Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         }
-        if (!game.isFoWMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
+        if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h + " hit(s) in round #" + round2;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (!automated) {
@@ -294,7 +294,7 @@ public class CombatRoll extends CombatSubcommandData {
                 }
             }
         } else {
-            if (!game.isFoWMode() && rollType == CombatRollType.combatround && opponent != null && opponent != player) {
+            if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != null && opponent != player) {
 
                 List<Button> buttons = new ArrayList<>();
                 if (round2 > round) {
@@ -331,7 +331,7 @@ public class CombatRoll extends CombatSubcommandData {
 
             }
         }
-        if (!game.isFoWMode() && rollType == CombatRollType.AFB && opponent != null && opponent != player) {
+        if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != null && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true) + " suffered " + h + " hit(s) from AFB";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
@@ -344,7 +344,7 @@ public class CombatRoll extends CombatSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
             }
         }
-        if (!game.isFoWMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != null && opponent != player) {
+        if (!game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != null && opponent != player) {
             String msg = "\n" + opponent.getRepresentation(true, true) + " suffered " + h + " hit(s) from space cannon offense";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> buttons = new ArrayList<>();
@@ -357,7 +357,7 @@ public class CombatRoll extends CombatSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
         }
-        if (!game.isFoWMode() && rollType == CombatRollType.bombardment && h > 0) {
+        if (!game.isFowMode() && rollType == CombatRollType.bombardment && h > 0) {
 
             List<Button> buttons = new ArrayList<>();
 

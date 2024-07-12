@@ -103,7 +103,7 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         MessageEmbed pnEmbed = pnModel.getRepresentationEmbed();
-        String emojiToUse = game.isFoWMode() || pnOwner == null ? "" : pnOwner.getFactionEmoji();
+        String emojiToUse = game.isFowMode() || pnOwner == null ? "" : pnOwner.getFactionEmoji();
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentation()).append(" played promissory note: ");
         sb.append(emojiToUse).append(Emojis.PN).append("**").append(pnName).append("**\n");
@@ -113,7 +113,7 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         //Fog of war ping
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             // Add extra message for visibility
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, sb.toString());
         }
