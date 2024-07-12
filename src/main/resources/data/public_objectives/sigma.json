@@ -1,0 +1,98 @@
+[
+  {
+    "alias": "sigma_unorthodox",
+    "name": "Unorthodox Approach",
+    "phase": "",
+    "text": "When this objective is revealed, attach a secret objective from the deck to this card. This objective has the requirements of the attached objective.",
+    "points": 1,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_synergy",
+    "name": "Evolve Synergy",
+    "phase": "Status",
+    "text": "When this objective is revealed, attach 2 Stage I public objectives from the deck to this card. This objective has the requirement of both of the attached objectives.",
+    "points": 2,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_wherewithal",
+    "name": "Acquire Wherewithal",
+    "phase": "Status",
+    "text": "Control 4 planets outside your home system that each have a resource value of 2 or more.",
+    "points": 1,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_abundance",
+    "name": "Gather Abundance",
+    "phase": "Status",
+    "text": "Control 6 planets outside your home system that each have a resource value of 2 or more.",
+    "points": 2,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_parade",
+    "name": "Conduct Military Parade",
+    "phase": "Status",
+    "text": "Have non-fighter ships with a combined cost of 15 or more in 1 system.",
+    "points": 1,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_ozymandias",
+    "name": "Look On My Works, Ye Mighty, And Despair",
+    "phase": "Status",
+    "text": "Have non-fighter ships with a combined cost of 24 or more in 1 system.",
+    "points": 2,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_provinces",
+    "name": "Engage Provinces",
+    "phase": "Status",
+    "text": "Exhaust 3 planets outside your home system.",
+    "points": 1,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_colonies",
+    "name": "Exploit Colonies",
+    "phase": "Status",
+    "text": "Exhaust 5 planets outside your home system.",
+    "points": 2,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_network",
+    "name": "Launch Contact Network",
+    "phase": "Status",
+    "text": "Control 4 planets outside your home system that each have an influence value of 2 or more.",
+    "points": 1,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_institute",
+    "name": "Institute Institute",
+    "phase": "Status",
+    "text": "Control 6 planets outside your home system that each have an influence value of 2 or more.",
+    "points": 2,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_final_frontier",
+    "name": "The Final Frontier",
+    "phase": "Status",
+    "text": "Remove 3 of your cruisers from the game board.",
+    "points": 1,
+    "source": "sigma"
+  },
+  {
+    "alias": "sigma_boldy",
+    "name": "To Boldly Go",
+    "phase": "Status",
+    "text": "Remove 6 of your cruisers from the game board.",
+    "points": 2,
+    "source": "sigma"
+  }
+]

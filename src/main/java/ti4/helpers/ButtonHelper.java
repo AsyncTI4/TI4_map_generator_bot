@@ -7573,6 +7573,9 @@ public class ButtonHelper {
                 }
             }
         }
+        if (game.getTile("SIG02") != null && !game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Please destroy all units in the pulsar.");
+        }
     }
 
     public static List<Button> getMawButtons() {

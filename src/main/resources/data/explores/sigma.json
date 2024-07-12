@@ -1,0 +1,119 @@
+[
+    {
+        "id": "sigma_ancient_hall",
+        "name": "Ancient Hall",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "This planet is not exhausted when used to cast votes.",
+        "attachmentId": "sigma_ancient_hall",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_deserted_factories",
+        "name": "Deserted Factories",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "This planet gains the PRODUCTION 2 ability as if it were a unit.",
+        "attachmentId": "sigma_deserted_factories",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_unwelcoming",
+        "name": "Unwelcoming Fauna",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "When this is attached, destroy 1 unit on this planet. During an invasion, this planet gains the SPACE CANNON 8 (xX) ability as if it were a unit, rolling 1 dice for each unit committed by another player to this planet. Game effects cannot prevent or modify this space cannon roll.",
+        "attachmentId": "sigma_unwelcoming",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_lapis_fortitudinis",
+        "name": "Lapis Fortitudinis",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place this card readied in your play area.\nA player gains this card after they gain control of an industrial player from this card's owner.\nWhen you exhaust a Lapis, gain 2 action cards.\nACTION: Exhaust this card.",
+        "flavorText": "*Originally found when it fell out of a tree and into the hand of the Hero of Twilight.*",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_lapis_sapientiae",
+        "name": "Lapis Sapientiae",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Place this card readied in your play area.\nA player gains this card after they gain control of a cultual player from this card's owner.\nWhen you exhaust a Lapis, gain 3 trade goods.\nACTION: Exhaust this card.",
+        "flavorText": "*Originally found on the sea floor of an ocean planet, this gem once allowed the legendary Princess of Destiny to peacefully cecede her realm from the Lazax Empire.*",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_lapis_virtutis",
+        "name": "Lapis Virtutis",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card readied in your play area.\nA player gains this card after they gain control of a hazardous player from this card's owner.\nWhen you exhaust a Lapis, gain 1 command token.\nACTION: Exhaust this card.",
+        "flavorText": "*Originally found in an active volcano, this gem once allowed the legendary King of Thieves to oppose (though not defeat) the Lazax Empire, at least for some time.*",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_palace_diplomats",
+        "name": "Palace of the Diplomats",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "This card is attached exhausted.\nWhen the owner of this card resolved the primary ability of the \"Diplomacy\" strategy card, they may exhaust this card to gain 1 victory point. The owner of this card does not have to spend a command token to resolve the secondary ability of the \"Diplomacy\" strategy card.",
+        "attachmentId": "sigma_palace_diplomats",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_palace_politicians",
+        "name": "Palace of the Politicians",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "This card is attached exhausted.\nWhen the owner of this card resolved the primary ability of the \"Politics\" strategy card, they may exhaust this card to gain 1 victory point. The owner of this card does not have to spend a command token to resolve the secondary ability of the \"Politics\" strategy card.",
+        "attachmentId": "sigma_palace_politicians",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_palace_architects",
+        "name": "Palace of the Architects",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "This card is attached exhausted.\nWhen the owner of this card resolved the primary ability of the \"Construction\" strategy card, they may exhaust this card to gain 1 victory point. The owner of this card does not have to spend a command token to resolve the secondary ability of the \"Construction\" strategy card.",
+        "attachmentId": "sigma_palace_architects",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_palace_merchants",
+        "name": "Palace of the Merchants",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "This card is attached exhausted.\nWhen the owner of this card resolved the primary ability of the \"Trade\" strategy card, they may exhaust this card to gain 1 victory point. When resolving the secondary ability of the \"Trade\" strategy card, the owner of this card may either not spend a command token, or convert their commodities.",
+        "attachmentId": "sigma_palace_merchants",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_palace_admirals",
+        "name": "Palace of the Admirals",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "This card is attached exhausted.\nWhen the owner of this card resolved the primary ability of the \"Warfare\" strategy card, they may exhaust this card to gain 1 victory point. The owner of this card does not have to spend a command token to resolve the secondary ability of the \"Warfare\" strategy card.",
+        "attachmentId": "sigma_palace_admirals",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_palace_scientists",
+        "name": "Palace of the Scientists",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "This card is attached exhausted.\nWhen the owner of this card resolved the primary ability of the \"Technology\" strategy card, they may exhaust this card to gain 1 victory point. The owner of this card does not have to spend a command token to resolve the secondary ability of the \"Technology\" strategy card.",
+        "attachmentId": "sigma_palace_scientists",
+        "source": "sigma"
+    },
+    {
+        "id": "sigma_palace_emperors",
+        "name": "Palace of Emperors",
+        "type": "Frontier",
+        "resolution": "Token",
+        "text": "Exhaust and gain this card and place the \"Palace of Emperors\" token in this system system.\nIf exactly 1 player has ships in the the system with the \"Palace of Emperors\" token, they gain this card.\nWhen the owner of this card resolved the primary ability of the \"Imperial\" strategy card, they may exhaust this card to gain 1 victory point. The owner of this card does not have to spend a command token to resolve the secondary ability of the \"Imperial\" strategy card.",
+        "attachmentId": "sigma_palace_emperors",
+        "source": "sigma"
+    }
+]
