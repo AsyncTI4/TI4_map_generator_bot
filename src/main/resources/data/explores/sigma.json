@@ -22,7 +22,7 @@
         "name": "Unwelcoming Fauna",
         "type": "Hazardous",
         "resolution": "Attach",
-        "text": "When this is attached, destroy 1 unit on this planet. During an invasion, this planet gains the SPACE CANNON 8 (xX) ability as if it were a unit, rolling 1 dice for each unit committed by another player to this planet. Game effects cannot prevent or modify this space cannon roll.",
+        "text": "When this is attached, assign 1 hit to a ground force on this planet. During an invasion, this planet gains the SPACE CANNON 8 (xX) ability as if it were a unit, rolling 1 dice for each unit committed by another player to this planet. Game effects cannot prevent, modify or reroll this space cannon roll.",
         "attachmentId": "sigma_unwelcoming",
         "source": "sigma"
     },
