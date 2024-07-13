@@ -109,6 +109,8 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setStoredValue("lawsDisabled", "no");
         game.setStoredValue("endTurnWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
+        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "sol", event);
+        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "hacan", event);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -166,6 +168,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
+        ButtonHelper.fullCommanderUnlockCheck(nextPlayer, game, "sol", event);
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);
