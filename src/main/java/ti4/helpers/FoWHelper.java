@@ -33,7 +33,6 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
-import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 
 public class FoWHelper {
@@ -687,9 +686,8 @@ public class FoWHelper {
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {
-			if (unitKey != null && unitKey.getColorID().equals(colorID)) {
-				UnitModel model = player.getUnitFromAsyncID(unitKey.asyncID());
-				return model != null && model.getIsShip();
+			if (unitKey != null && unitKey.getColorID().equals(colorID) && player.getUnitFromAsyncID(unitKey.asyncID()) != null && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
+				return true;
 			}
 		}
 		return false;
