@@ -19,7 +19,7 @@
   },
   {
     "alias": "sigma_propulsion_break",
-    "name": "Biotic Breakthrough",
+    "name": "Propulsion Breakthrough",
     "phase": "Action",
     "window": "When you research a technology",
     "text": "Ignore 1 of that technology's blue prerequisites.",
@@ -41,7 +41,7 @@
     "phase": "Action",
     "window": "At the end of a round of space combat",
     "text": "Place 2 fighters from your reinforcements into the active system.",
-    "flavorText": "This is what we've waited for; This is it, boys, this is war.",
+    "flavorText": "This is what we've waited for;\nThis is it, boys, this is war.",
     "source": "sigma"
   },
   {
