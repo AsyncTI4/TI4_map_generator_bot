@@ -1787,7 +1787,10 @@ public class Helper {
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
-        if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(false)) {
+        if (!player.getPlanets().contains(uH.getName())) {
+            return productionValueTotal;
+        }
+        if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(true)) {
             productionValueTotal = productionValueTotal + 3;
             planetUnitVal = 3;
         }

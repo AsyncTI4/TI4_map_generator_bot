@@ -2353,7 +2353,7 @@ public class ButtonHelper {
 
     public static void fullCommanderUnlockCheck(Player player, Game game, String faction,
         GenericInteractionCreateEvent event) {
-        if (player.getLeaderIDs().contains(faction + "commander") && !player.hasLeaderUnlocked(faction + "commander")) {
+        if (player != null && player.isRealPlayer() && player.getLeaderIDs().contains(faction + "commander") && !player.hasLeaderUnlocked(faction + "commander")) {
             commanderUnlockCheck(player, game, faction, event);
         }
     }
