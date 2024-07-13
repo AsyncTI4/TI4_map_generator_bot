@@ -240,7 +240,7 @@ public class TurnEnd extends PlayerSubcommandData {
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("status", game.getRound(), event);
+            MapGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
         }
         String message = "Please score objectives, " + game.getPing() + ".";
 

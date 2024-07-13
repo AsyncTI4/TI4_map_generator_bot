@@ -62,7 +62,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         game.setStoredValue("agendaCount", aCount + "");
         if (aCount == 1 && game.isShowBanners()) {
-            MapGenerator.drawPhaseBanner("agenda", game.getRound(), event);
+            MapGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
         }
 
         game.setStoredValue("noWhenThisAgenda", "");
