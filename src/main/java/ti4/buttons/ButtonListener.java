@@ -2937,7 +2937,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("flipIonStorm_")) {
             ButtonHelper.flipIonStorm(game, buttonID, event);
         } else if (buttonID.startsWith("terraformPlanet_")) {
-            ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, game);
+            ButtonHelperFactionSpecific.terraformPlanet(player, buttonID, event, game);
         } else if (buttonID.startsWith("automatonsPlanet_")) {// "bentorPNPlanet_"
             ButtonHelperFactionSpecific.automatonsPlanet(buttonID, event, game);
         } else if (buttonID.startsWith("bentorPNPlanet_")) {// "bentorPNPlanet_"
