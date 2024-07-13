@@ -379,5 +379,50 @@
         "id": "custodiavigilia2",
         "imagePath": "attachment_custodiavigilia_2.png",
         "isFakeAttachment": true
+    },
+    {
+        "id": "sigma_ancient_hall",
+        "imagePath": "attachment_sigma_ancient_hall.png",
+        "token": "sigma_ancient_hall"
+    },
+    {
+        "id": "sigma_deserted_factories",
+        "imagePath": "attachment_sigma_deserted_factories.png",
+        "token": "sigma_deserted_factories"
+    },
+    {
+        "id": "sigma_unwelcoming",
+        "imagePath": "attachment_sigma_unwelcoming.png",
+        "token": "sigma_unwelcoming"
+    },
+    {
+        "id": "sigma_palace_diplomats",
+        "imagePath": "attachment_sigma_palace_diplomats.png",
+        "token": "sigma_palace_diplomats"
+    },
+    {
+        "id": "sigma_palace_politicians",
+        "imagePath": "attachment_sigma_palace_politicians.png",
+        "token": "sigma_palace_politicians"
+    },
+    {
+        "id": "sigma_palace_architects",
+        "imagePath": "attachment_sigma_palace_architects.png",
+        "token": "sigma_palace_architects"
+    },
+    {
+        "id": "sigma_palace_merchants",
+        "imagePath": "attachment_sigma_palace_merchants.png",
+        "token": "sigma_palace_merchants"
+    },
+    {
+        "id": "sigma_palace_admirals",
+        "imagePath": "attachment_sigma_palace_admirals.png",
+        "token": "sigma_palace_admirals"
+    },
+    {
+        "id": "sigma_palace_scientists",
+        "imagePath": "attachment_sigma_palace_scientists.png",
+        "token": "sigma_palace_scientists"
     }
 ]
