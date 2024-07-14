@@ -327,8 +327,7 @@ public class ButtonHelperTacticalAction {
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
-        event.getMessage().delete().queue();
-
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void buildWithTacticalAction(Player player, Game game, ButtonInteractionEvent event,
@@ -353,7 +352,7 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void finishMovingForTacticalAction(Player player, Game game, ButtonInteractionEvent event,
@@ -478,7 +477,7 @@ public class ButtonHelperTacticalAction {
             StartCombat.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game,
                 player, tile);
         }
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void finishMovingFromOneTile(Player player, Game game, ButtonInteractionEvent event,
@@ -494,8 +493,7 @@ public class ButtonHelperTacticalAction {
         game.resetCurrentMovedUnitsFrom1System();
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        event.getMessage().delete().queue();
-
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void selectTileToMoveFrom(Player player, Game game, ButtonInteractionEvent event,
@@ -507,7 +505,7 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Chose to move from "
             + game.getTileByPosition(pos).getRepresentationForButtons(game, player)
             + ". Use buttons to select the units you want to move.", systemButtons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void selectRingThatActiveSystemIsIn(Player player, Game game, ButtonInteractionEvent event) {
@@ -575,7 +573,7 @@ public class ButtonHelperTacticalAction {
 
         String message = "Doing a tactical action. Please select the tile you want to activate";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -698,8 +696,7 @@ public class ButtonHelperTacticalAction {
         game.setStoredValue("crucibleBoost", "");
         game.setStoredValue("flankspeedBoost", "");
 
-        event.getMessage().delete().queue();
-
+        ButtonHelper.deleteMessage(event);
     }
 
 }
