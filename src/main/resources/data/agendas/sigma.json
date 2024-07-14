@@ -41,7 +41,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: Each player that voted \"For\" draws 1 action card for each player that voted \"Against\".",
-        "text1": "Against: Each player that voted \"Against\" draws 1 action card for each player that voted \"For\".",
+        "text2": "Against: Each player that voted \"Against\" draws 1 action card for each player that voted \"For\".",
         "source": "sigma"
     },
     {
