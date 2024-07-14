@@ -2782,7 +2782,7 @@ public class ButtonListener extends ListenerAdapter {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " your offer to "
                 + player.getRepresentation(false, false) + " has been rejected.");
-            event.getMessage().delete().queue();
+            ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("rescindOffer_")) {
             Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the latest offer from "
@@ -2790,11 +2790,11 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "you rescinded the latest offer to "
                 + p2.getRepresentation(false, false));
             player.clearTransactionItemsWith(p2);
-            event.getMessage().delete().queue();
+            ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("acceptOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             Helper.acceptTransactionOffer(p1, player, game, event);
-            event.getMessage().delete().queue();
+            ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("sendOffer_")) {
             ButtonHelper.sendOffer(game, player, buttonID, event);
         } else if (buttonID.startsWith("offerToTransact_")) {

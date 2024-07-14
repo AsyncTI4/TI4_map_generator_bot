@@ -57,6 +57,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -463,8 +465,9 @@ public class MapGenerator {
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
         if (player.hasCustomFactionEmoji() && factionEmoji instanceof CustomEmoji factionCustomEmoji) {
             int urlImagePadding = 5;
-            return ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), width - urlImagePadding,
-                height - urlImagePadding);
+            return ImageHelper.readURLScaled(factionCustomEmoji.getImageUrl(), width - urlImagePadding, height - urlImagePadding);
+        } else if (player.hasCustomFactionEmoji() && factionEmoji instanceof UnicodeEmoji uni) {
+            return ImageHelper.readUnicodeScaled(uni.getFormatted(), width, height);
         }
 
         return getFactionIconImageScaled(player.getFaction(), width, height);

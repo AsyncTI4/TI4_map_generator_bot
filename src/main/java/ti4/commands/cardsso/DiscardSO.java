@@ -89,7 +89,7 @@ public class DiscardSO extends SOCardsSubcommandData {
             return;
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
         SOInfo.sendSecretObjectiveInfo(game, player);
     }
 }

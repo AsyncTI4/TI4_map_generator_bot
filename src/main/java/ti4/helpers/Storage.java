@@ -22,6 +22,8 @@ public class Storage {
     private static String resourcePath = null;
     private static String storagePath = null;
 
+    private static Font EMOJI_FONT_40;
+
     private static Font TI_FONT_8;
     private static Font TI_FONT_12;
     private static Font TI_FONT_13;
@@ -44,6 +46,12 @@ public class Storage {
     private static Font TI_FONT_90;
     private static Font TI_FONT_100;
     private static Font TI_FONT_110;
+
+    public static Font getEmojiFont() {
+        if (EMOJI_FONT_40 != null)
+            return EMOJI_FONT_40;
+        return EMOJI_FONT_40 = getEmojiFont(40f);
+    }
 
     public static Font getFont8() {
         if (TI_FONT_8 != null) {
@@ -233,6 +241,20 @@ public class Storage {
             BotLogger.log("Could not load font", e);
         }
         return tiFont;
+    }
+
+    private static Font getEmojiFont(float size) {
+        Font font = null;
+        String resource = getResourcePath();
+        if (resource == null) return null;
+        File file = new File(resource + "/font/NotoEmoji-Regular.ttf");
+        try (InputStream inputStream = new FileInputStream(file)) {
+            font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            font = font.deriveFont(size);
+        } catch (Exception e) {
+            BotLogger.log("Could not load font", e);
+        }
+        return font;
     }
 
     @NotNull
