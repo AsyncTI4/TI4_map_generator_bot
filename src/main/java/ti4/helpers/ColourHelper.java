@@ -28,6 +28,8 @@ public class ColourHelper {
         switch (factionId)
         {
             case "arborec":
+            case "pi_arborec":
+            case "miltymodarborec":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -109,8 +111,10 @@ public class ColourHelper {
                         return 21;
                     case "splitrbw":
                         return 1;
-            }
+                }
             case "ghost":
+            case "pi_ghost":
+            case "miltymodghost":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -192,8 +196,10 @@ public class ColourHelper {
                         return 33;
                     case "splitrbw":
                         return 3;
-            }
+                }
             case "hacan":
+            case "pi_hacan":
+            case "miltymodhacan":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -275,8 +281,10 @@ public class ColourHelper {
                         return 29;
                     case "splitrbw":
                         return 9;
-            }
+                }
             case "jolnar":
+            case "pi_jolnar":
+            case "miltymodjolnar":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -358,8 +366,11 @@ public class ColourHelper {
                         return 25;
                     case "splitrbw":
                         return 5;
-            }
+                }
             case "l1z1x":
+            case "lazax":
+            case "pi_l1z1x":
+            case "miltymodl1z1x":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -441,8 +452,10 @@ public class ColourHelper {
                         return 21;
                     case "splitrbw":
                         return 1;
-            }
+                }
             case "letnev":
+            case "pi_letnev":
+            case "miltymodletnev":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -524,8 +537,10 @@ public class ColourHelper {
                         return 21;
                     case "splitrbw":
                         return 1;
-            }
+                }
             case "mentak":
+            case "pi_mentak":
+            case "miltymodmentak":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -607,8 +622,10 @@ public class ColourHelper {
                         return 25;
                     case "splitrbw":
                         return 5;
-            }
+                }
             case "muaat":
+            case "pi_muaat":
+            case "miltymodmuaat":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -690,8 +707,10 @@ public class ColourHelper {
                         return 29;
                     case "splitrbw":
                         return 9;
-            }
+                }
             case "naalu":
+            case "pi_naalu":
+            case "miltymodnaalu":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -773,8 +792,10 @@ public class ColourHelper {
                         return 29;
                     case "splitrbw":
                         return 9;
-            }
+                }
             case "nekro":
+            case "pi_nekro":
+            case "miltymodnekro":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -856,8 +877,10 @@ public class ColourHelper {
                         return 21;
                     case "splitrbw":
                         return 1;
-            }
+                }
             case "saar":
+            case "pi_saar":
+            case "miltymodsaar":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -939,8 +962,10 @@ public class ColourHelper {
                         return 25;
                     case "splitrbw":
                         return 5;
-            }
+                }
             case "sardakk":
+            case "pi_sardakk":
+            case "miltymodsardakk":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1022,8 +1047,10 @@ public class ColourHelper {
                         return 21;
                     case "splitrbw":
                         return 1;
-            }
+                }
             case "sol":
+            case "pi_sol":
+            case "miltymodsol":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1105,8 +1132,10 @@ public class ColourHelper {
                         return 29;
                     case "splitrbw":
                         return 9;
-            }
+                }
             case "winnu":
+            case "pi_winnu":
+            case "miltymodwinnu":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1188,8 +1217,10 @@ public class ColourHelper {
                         return 33;
                     case "splitrbw":
                         return 13;
-            }
+                }
             case "xxcha":
+            case "pi_xxcha":
+            case "miltymodxxcha":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1271,8 +1302,10 @@ public class ColourHelper {
                         return 29;
                     case "splitrbw":
                         return 9;
-            }
+                }
             case "yin":
+            case "pi_yin":
+            case "miltymodyin":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1354,8 +1387,10 @@ public class ColourHelper {
                         return 25;
                     case "splitrbw":
                         return 5;
-            }
+                }
             case "yssaril":
+            case "pi_yssaril":
+            case "miltymodyssaril":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1437,8 +1472,9 @@ public class ColourHelper {
                         return 21;
                     case "splitrbw":
                         return 1;
-            }
+                }
             case "argent":
+            case "pi_argent":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1520,8 +1556,9 @@ public class ColourHelper {
                         return 25;
                     case "splitrbw":
                         return 5;
-            }
+                }
             case "cabal":
+            case "pi_cabal":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1603,8 +1640,9 @@ public class ColourHelper {
                         return 25;
                     case "splitrbw":
                         return 5;
-            }
+                }
             case "empyrean":
+            case "pi_empyrean":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1686,8 +1724,9 @@ public class ColourHelper {
                         return 33;
                     case "splitrbw":
                         return 13;
-            }
+                }
             case "mahact":
+            case "pi_mahact":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1769,8 +1808,9 @@ public class ColourHelper {
                         return 33;
                     case "splitrbw":
                         return 13;
-            }
+                }
             case "nomad":
+            case "pi_nomad":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1852,8 +1892,9 @@ public class ColourHelper {
                         return 33;
                     case "splitrbw":
                         return 13;
-            }
+                }
             case "naaz":
+            case "pi_naaz":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -1935,8 +1976,9 @@ public class ColourHelper {
                         return 29;
                     case "splitrbw":
                         return 9;
-            }
+                }
             case "titans":
+            case "pi_titans":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -2018,10 +2060,14 @@ public class ColourHelper {
                         return 25;
                     case "splitrbw":
                         return 5;
-            }
+                }
             case "keleresa":
             case "keleresm":
             case "keleresx":
+            case "keleresplus":
+            case "pi_keleresm":
+            case "pi_keleresx":
+            case "pi_keleresa":
                 switch (colour.getAlias())
                 {
                     case "lgy":
@@ -2103,7 +2149,720 @@ public class ColourHelper {
                         return 37;
                     case "splitrbw":
                         return 7;
-            }
+                }
+            // Discordant Stars
+            case "augers":
+                switch (colour.getAlias())
+                {
+                    case "lvn":
+                    case "ppl":
+                    case "sns":
+                        return 35;
+                    case "splitlvn":
+                    case "splitppl":
+                    case "splitsns":
+                        return 15;
+                }
+            case "axis":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 35;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 15;
+                    case "red":
+                    case "bld":
+                        return 30;
+                    case "splitred":
+                    case "splitbld":
+                        return 10;
+                }
+            case "bentor":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 30;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 10;
+                    case "lvn":
+                    case "ppl":
+                    case "sns":
+                        return 35;
+                    case "splitlvn":
+                    case "splitppl":
+                    case "splitsns":
+                        return 15;
+                }
+            case "celdauri":
+                switch (colour.getAlias())
+                {
+                    case "spr":
+                    case "ylw":
+                    case "gld":
+                    case "crm":
+                        return 35;
+                    case "splitspr":
+                    case "splitylw":
+                    case "splitgld":
+                    case "splitcrm":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                }
+            case "cheiran":
+                switch (colour.getAlias())
+                {
+                    case "tan":
+                    case "bwn":
+                    case "chk":
+                        return 35;
+                    case "splittan":
+                    case "splitbwn":
+                    case "splitchk":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                }
+            case "cymiae":
+                switch (colour.getAlias())
+                {
+                    case "org":
+                        return 35;
+                    case "splitorg":
+                        return 15;
+                }
+            case "dihmohn":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 30;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 10;
+                    case "lvn":
+                    case "ppl":
+                    case "sns":
+                        return 35;
+                    case "splitlvn":
+                    case "splitppl":
+                    case "splitsns":
+                        return 15;
+                }
+            case "edyn":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 35;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 15;
+                    case "spr":
+                    case "ylw":
+                    case "gld":
+                    case "crm":
+                        return 30;
+                    case "splitspr":
+                    case "splitylw":
+                    case "splitgld":
+                    case "splitcrm":
+                        return 10;
+                }
+            case "florzen":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 35;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                }
+            case "freesystems":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 30;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 10;
+                    case "lvn":
+                    case "ppl":
+                    case "sns":
+                        return 35;
+                    case "splitlvn":
+                    case "splitppl":
+                    case "splitsns":
+                        return 15;
+                }
+            case "ghemina":
+                switch (colour.getAlias())
+                {
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 35;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 15;
+                }
+            case "ghoti":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 30;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 35;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 15;
+                }
+            case "gledge":
+                switch (colour.getAlias())
+                {
+                    case "org":
+                        return 35;
+                    case "splitorg":
+                        return 15;
+                    case "tan":
+                    case "bwn":
+                    case "chk":
+                        return 30;
+                    case "splittan":
+                    case "splitbwn":
+                    case "splitchk":
+                        return 10;
+                }
+            case "khrask":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 35;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 15;
+                    case "org":
+                        return 30;
+                    case "splitorg":
+                        return 10;
+                }
+            case "kjalengard":
+                switch (colour.getAlias())
+                {
+                    case "lvn":
+                    case "ppl":
+                    case "sns":
+                        return 35;
+                    case "splitlvn":
+                    case "splitppl":
+                    case "splitsns":
+                        return 15;
+                    case "red":
+                    case "bld":
+                        return 30;
+                    case "splitred":
+                    case "splitbld":
+                        return 10;
+                }
+            case "kollecc":
+                switch (colour.getAlias())
+                {
+                    case "tan":
+                    case "bwn":
+                    case "chk":
+                        return 35;
+                    case "splittan":
+                    case "splitbwn":
+                    case "splitchk":
+                        return 15;
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 30;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 10;
+                }
+            case "kolume":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 35;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 15;
+                    case "tan":
+                    case "bwn":
+                    case "chk":
+                        return 30;
+                    case "splittan":
+                    case "splitbwn":
+                    case "splitchk":
+                        return 10;
+                }
+            case "kortali":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 35;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 15;
+                }
+            case "kyro":
+                switch (colour.getAlias())
+                {
+                    case "spr":
+                    case "ylw":
+                    case "gld":
+                    case "crm":
+                        return 35;
+                    case "splitspr":
+                    case "splitylw":
+                    case "splitgld":
+                    case "splitcrm":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                }
+            case "lanefir":
+                switch (colour.getAlias())
+                {
+                    case "org":
+                        return 35;
+                    case "splitorg":
+                        return 15;
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 30;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 10;
+                }
+            case "lizho":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 30;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 10;
+                    case "tan":
+                    case "bwn":
+                    case "chk":
+                        return 35;
+                    case "splittan":
+                    case "splitbwn":
+                    case "splitchk":
+                        return 15;
+                }
+            case "mirveda":
+                switch (colour.getAlias())
+                {
+                    case "lvn":
+                    case "ppl":
+                    case "sns":
+                        return 35;
+                    case "splitlvn":
+                    case "splitppl":
+                    case "splitsns":
+                        return 15;
+                    case "rse":
+                    case "pnk":
+                        return 30;
+                    case "splitrse":
+                    case "splitpnk":
+                        return 10;
+                }
+            case "mortheus":
+                switch (colour.getAlias())
+                {
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                    case "rse":
+                    case "pnk":
+                        return 30;
+                    case "splitrse":
+                    case "splitpnk":
+                        return 10;
+                    case "rbw":
+                        return 35;
+                    case "splitrbw":
+                        return 15;
+                }
+            case "mykomentori":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 30;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 10;
+                    case "rse":
+                    case "pnk":
+                        return 30;
+                    case "splitrse":
+                    case "splitpnk":
+                        return 10;
+                    case "rbw":
+                        return 35;
+                    case "splitrbw":
+                        return 15;
+                }
+            case "nivyn":
+                switch (colour.getAlias())
+                {
+                    case "lgy":
+                    case "gry":
+                    case "blk":
+                        return 30;
+                    case "splitlgy":
+                    case "splitgry":
+                    case "splitblk":
+                    case "orca":
+                        return 10;
+                    case "spr":
+                    case "ylw":
+                    case "gld":
+                    case "crm":
+                        return 35;
+                    case "splitspr":
+                    case "splitylw":
+                    case "splitgld":
+                    case "splitcrm":
+                        return 15;
+                }
+            case "nokar":
+                switch (colour.getAlias())
+                {
+                    case "org":
+                        return 35;
+                    case "splitorg":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                }
+            case "olradin":
+                switch (colour.getAlias())
+                {
+                    case "org":
+                        return 35;
+                    case "splitorg":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                }
+            case "rohdhna":
+                switch (colour.getAlias())
+                {
+                    case "lvn":
+                    case "ppl":
+                    case "sns":
+                        return 35;
+                    case "splitlvn":
+                    case "splitppl":
+                    case "splitsns":
+                        return 15;
+                }
+            case "tnelis":
+                switch (colour.getAlias())
+                {
+                    case "red":
+                    case "bld":
+                        return 30;
+                    case "splitred":
+                    case "splitbld":
+                        return 10;
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 35;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 15;
+                }
+            case "vaden":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 35;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 15;
+                }
+            case "vaylerian":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 35;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 15;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 30;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 10;
+                }
+            case "veldyr":
+                switch (colour.getAlias())
+                {
+                    case "lme":
+                    case "grn":
+                    case "tqs":
+                    case "frs":
+                    case "eme":
+                        return 30;
+                    case "splitlme":
+                    case "splitgrn":
+                    case "splittqs":
+                    case "splitfrs":
+                    case "spliteme":
+                        return 10;
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 35;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 15;
+                }
+            case "zealots":
+                switch (colour.getAlias())
+                {
+                    case "tea":
+                    case "ptr":
+                    case "eth":
+                    case "blu":
+                    case "nvy":
+                        return 35;
+                    case "splittea":
+                    case "splitptr":
+                    case "spliteth":
+                    case "splitblu":
+                    case "splitnvy":
+                        return 15;
+                }
+            case "zelian":
+                switch (colour.getAlias())
+                {
+                    case "red":
+                    case "bld":
+                        return 35;
+                    case "splitred":
+                    case "splitbld":
+                        return 15;
+                }
+            // other homebrew
+            case "drahn":
+                switch (colour.getAlias())
+                {
+                    case "red":
+                    case "bld":
+                        return 35;
+                    case "splitred":
+                    case "splitbld":
+                        return 15;
+                    case "spr":
+                    case "ylw":
+                    case "gld":
+                    case "crm":
+                        return 30;
+                    case "splitspr":
+                    case "splitylw":
+                    case "splitgld":
+                    case "splitcrm":
+                        return 10;
+                }
         }
         if (colour.getAlias().startsWith("split") || colour.getAlias().equals("orca"))
         {
