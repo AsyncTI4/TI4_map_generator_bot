@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -2227,7 +2227,11 @@ public class Game extends GameProperties {
 
         // If deck is empty after draw, auto refresh deck from discard
         if (getExplores(reqType, explore).isEmpty()) {
-            shuffleDiscardsIntoExploreDeck(reqType);
+            if (getName().equalsIgnoreCase("pbd1000")) {
+                resetExploresOfCertainType(reqType);
+            } else {
+                shuffleDiscardsIntoExploreDeck(reqType);
+            }
         }
         return result;
     }
@@ -2268,8 +2272,49 @@ public class Game extends GameProperties {
     public void resetExplore() {
         explore.clear();
         discardExplore.clear();
-        Set<String> exp = Mapper.getExplores().keySet();
+        List<String> exp = Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck();
         explore.addAll(exp);
+    }
+
+    public void resetExploresOfCertainType(String reqType) {
+        List<String> deck = new ArrayList<>();
+        deck.addAll(explore);
+        for (String id : deck) {
+            ExploreModel card = Mapper.getExplore(id);
+            if (card != null) {
+                String type = card.getType();
+                if (reqType.equalsIgnoreCase(type)) {
+                    explore.remove(id);
+                }
+            }
+        }
+        deck = new ArrayList<>();
+        deck.addAll(discardExplore);
+        for (String id : deck) {
+            ExploreModel card = Mapper.getExplore(id);
+            if (card != null) {
+                String type = card.getType();
+                if (reqType.equalsIgnoreCase(type)) {
+                    discardExplore.remove(id);
+                }
+            }
+        }
+        deck = new ArrayList<>();
+        deck.addAll(Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
+        List<String> deck2 = new ArrayList<>();
+        deck2.addAll(Mapper.getDecks().get(getExplorationDeckID()).getNewShuffledDeck());
+        for (String id : deck2) {
+            ExploreModel card = Mapper.getExplore(id);
+            if (card != null) {
+                String type = card.getType();
+                if (!reqType.equalsIgnoreCase(type)) {
+                    deck.remove(id);
+                }
+            }
+        }
+        Collections.shuffle(deck);
+        explore.addAll(deck);
+
     }
 
     public void triplicateExplores() {
@@ -2687,7 +2732,7 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean islandMode() {
-        boolean otherThings = getName().contains("island") || getMapTemplateID().equals("1pIsland");
+        boolean otherThings = getName().contains("island") || (getMapTemplateID() != null && getMapTemplateID().equals("1pIsland"));
         if (otherThings) setStoredValue("IslandMode", "true");
         return getStoredValue("IslandMode").equals("true");
     }

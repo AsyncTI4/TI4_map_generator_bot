@@ -2717,7 +2717,7 @@ public class AgendaHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Argent));
             planetButtons.add(button);
         }
-        if (player.hasTechReady("pi")) {
+        if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
             Button button = Button.primary("exhaust_predictive", "Use Predictive Votes (3)")
                 .withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
             planetButtons.add(button);
@@ -2883,7 +2883,7 @@ public class AgendaHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.Argent));
             planetButtons.add(button);
         }
-        if (player.hasTechReady("pi")) {
+        if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
             Button button = Button.primary("exhaustForVotes_predictive_3", "Use Predictive Votes (3)")
                 .withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
             planetButtons.add(button);
@@ -3360,7 +3360,7 @@ public class AgendaHelper {
         }
 
         // Predictive Intelligence
-        if (player.hasTechReady("pi")) {
+        if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
             additionalVotesAndSources.put(Emojis.CyberneticTech + "Predictive Intelligence", 3);
         }
 

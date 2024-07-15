@@ -441,6 +441,9 @@ public class ButtonHelperCommanders {
                             "# " + player.getRepresentation(true, true)
                                 + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
                     }
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        player.getRepresentation(true, true)
+                            + " You gained tech while having Nekro commander, but since it is a faction tech and you used valefars, you didnt technically gain a new tech and therefore do not draw an AC ");
                 }
             }
         }
