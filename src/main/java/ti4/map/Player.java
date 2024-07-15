@@ -1741,7 +1741,7 @@ public class Player {
     }
 
     public void setFleetCC(int fleetCC) {
-        if (fleetCC > 0) {
+        if (fleetCC > -1) {
             this.fleetCC = fleetCC;
         }
     }
@@ -1838,7 +1838,7 @@ public class Player {
     }
 
     public void setTg(int tg) {
-        if (tg > 0) {
+        if (tg > -1) {
             this.tg = tg;
         }
     }
