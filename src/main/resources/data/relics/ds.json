@@ -26,7 +26,7 @@
     {
         "alias": "starfall_array",
         "name": "Starfall Array",
-        "text": "Apply +1 to the results of each of your unit's ability rolls.",
+        "text": "When 1 or more of your units roll dice for a unit ability, you may add +1 to the result of each of those dice, and 1 of those units may roll 1 additional die.",
         "source": "ds"
     },
     {
