@@ -773,6 +773,34 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus1_roll_starfall_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "plus1_roll_starfall_spacecannondefence",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
         "alias": "plus_1_always_space_cannon_defence",
         "type": "mods",
         "value": "+1",
@@ -809,6 +837,20 @@
         "forCombatAbility": "SpaceCannonOffence"
     },
     {
+        "alias": "plus1_roll_starfall_spacecannonoffence",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
         "alias": "plus_0_always_space_cannon_offense",
         "type": "mods",
         "value": "+0",
@@ -833,6 +875,20 @@
                 "type": "leader",
                 "alias": "kolumecommander"
             },
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "plus1_roll_starfall_bombardment",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
             {
                 "type": "relic",
                 "alias": "starfall_array"

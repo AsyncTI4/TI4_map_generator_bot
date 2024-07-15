@@ -2,6 +2,7 @@ package ti4.commands.cardsso;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -36,6 +37,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to plausible deniability, you were dealt an extra SO. You must also discard an extra SO");
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player, event);
             }
