@@ -171,7 +171,7 @@ public class TechExhaust extends TechAddRemove {
                     buttonEvent.getMessage().editMessage(exhaustedMessage).queue();
                 }
             }
-            case "pi" -> { // Predictive Intelligence
+            case "pi", "absol_pi" -> { // Predictive Intelligence
                 deleteTheOneButtonIfButtonEvent(event);
                 Button deleteButton = Button.danger("FFCC_" + player.getFaction() + "_deleteButtons",
                     "Delete These Buttons");
