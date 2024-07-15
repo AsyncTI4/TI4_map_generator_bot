@@ -3726,6 +3726,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
             endButtons.add(Button.danger(finChecker + "exhaustTech_pi", "Exhaust Predictive Intelligence"));
         }
+        if (player.getTechs().contains("absol_pi") && !player.getExhaustedTechs().contains("absol_pi")) {
+            endButtons.add(Button.danger(finChecker + "exhaustTech_absol_pi", "Exhaust Predictive Intelligence"));
+        }
         if (!player.hasAbility("arms_dealers")) {
             for (String shipOrder : getPlayersShipOrders(player)) {
                 if (Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought",
@@ -8603,11 +8606,14 @@ public class ButtonHelper {
         }
 
         // Legendary Planets
-        List<String> implementedLegendaryPlanets = List.of("prism");
-        for (String planet : implementedLegendaryPlanets) {
-            String prettyPlanet = Mapper.getPlanet(planet).getName();
-            if (p1.getPlanets().contains(planet) && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
-                compButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
+        //1721048219
+        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1721048723431L)) > 0) {
+            List<String> implementedLegendaryPlanets = List.of("prism");
+            for (String planet : implementedLegendaryPlanets) {
+                String prettyPlanet = Mapper.getPlanet(planet).getName();
+                if (p1.getPlanets().contains(planet) && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
+                    compButtons.add(Button.success(finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
+                }
             }
         }
 
