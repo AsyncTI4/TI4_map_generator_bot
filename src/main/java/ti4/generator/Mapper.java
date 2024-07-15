@@ -1,7 +1,5 @@
 package ti4.generator;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,8 +20,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -32,10 +35,36 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.message.BotLogger;
-import ti4.model.*;
-import ti4.model.Source.ComponentSource;
-import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.AbilityModel;
+import ti4.model.ActionCardModel;
+import ti4.model.AgendaModel;
+import ti4.model.AttachmentModel;
+import ti4.model.ColorModel;
+import ti4.model.ColorableModelInterface;
+import ti4.model.CombatModifierModel;
+import ti4.model.DeckModel;
+import ti4.model.DraftErrataModel;
+import ti4.model.EventModel;
+import ti4.model.ExploreModel;
+import ti4.model.FactionModel;
+import ti4.model.GenericCardModel;
 import ti4.model.GenericCardModel.CardType;
+import ti4.model.LeaderModel;
+import ti4.model.MapTemplateModel;
+import ti4.model.ModelInterface;
+import ti4.model.PlanetModel;
+import ti4.model.PromissoryNoteModel;
+import ti4.model.PublicObjectiveModel;
+import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
+import ti4.model.Source.ComponentSource;
+import ti4.model.StrategyCardModel;
+import ti4.model.StrategyCardSetModel;
+import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.TileModel;
+import ti4.model.UnitModel;
+import ti4.model.WormholeModel;
 
 public class Mapper {
     //private static final Properties colors = new Properties();
@@ -317,7 +346,7 @@ public class Mapper {
     }
 
     public static Set<String> getWormholes(String tileID) {
-        if (TileHelper.getAllTiles().get(tileID).getWormholes() == null) {
+        if (tileID == null || TileHelper.getAllTiles().get(tileID) == null || TileHelper.getAllTiles().get(tileID).getWormholes() == null) {
             return new HashSet<>();
         }
         return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
