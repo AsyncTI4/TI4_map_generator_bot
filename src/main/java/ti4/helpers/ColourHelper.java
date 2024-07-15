@@ -2868,6 +2868,6 @@ public class ColourHelper {
         {
             return 5;
         }
-    return 15;
+        return 15;
     }
 }
