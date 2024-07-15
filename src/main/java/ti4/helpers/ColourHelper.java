@@ -13,10 +13,12 @@ public class ColourHelper {
         newcolours.sort((c1, c2) -> c1.getAlias().compareTo(c2.getAlias()));
         // sort by colour
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
-        // for each "page" of colours, 
+        // for each "page" of colours, randomise
+        // this process means widows and orphans will never cross page boundaries
         for (int x = 0; x < newcolours.size(); x+=22) {
             Collections.shuffle(newcolours.subList(x, Math.min(x+22, newcolours.size())));
         }
+        // resort by colour
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         return newcolours;
     }
