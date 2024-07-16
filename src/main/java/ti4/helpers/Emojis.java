@@ -386,6 +386,7 @@ public class Emojis {
     public static final String Meer = "<:Meer:1159512956778856519>";
     public static final String MeharXull = "<:MeharXull:1159512958821466243>";
     public static final String Mellon = "<:Mellon:1159512961006714951>";
+    public static final String Mirage = "<:Mirage:1262599635676041357>";
     public static final String MollPrimus = "<:MollPrimus:1159512963347132436>";
     public static final String Mordai = "<:Mordai:1159512965398138960>";
     public static final String PlanetMuaat = "<:Muaat:1159512985757307030>";
@@ -1093,6 +1094,7 @@ public class Emojis {
             case "meer" -> Meer;
             case "meharxull" -> MeharXull;
             case "mellon" -> Mellon;
+            case "mirage" -> Mirage;
             case "mollprimus", "mollprimusk" -> MollPrimus;
             case "mordaiii", "mordai" -> Mordai;
             case "muaat" -> PlanetMuaat;
