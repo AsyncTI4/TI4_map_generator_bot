@@ -96,21 +96,16 @@ public class ButtonHelperActionCardsWillHomebrew {
 
     public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        boolean chaining = true;
         int hits = 1;
         StringBuilder msg = new StringBuilder("The chain reaction rolled: ");
-        int limit = 200;
-        while (chaining && limit > 0) {
-            Die d1 = new Die(6);
-            msg.append(d1.getResult()).append(" ");
-            if (!d1.isSuccess()) {
-                chaining = false;
-            } else {
-                hits++;
-                msg.append(":boom:");
-            }
-            limit--;
+        int currentRequirement = 7;
+        Die die;
+        while ((die = new Die(currentRequirement)).isSuccess()) {
+            hits++;
+            currentRequirement++;
+            msg.append(die.getResult()).append(" :boom: ");
         }
+        msg.append(die.getResult());
         List<Button> buttons = new ArrayList<>();
         if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
             buttons.add(Button.danger("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hits"));
@@ -119,7 +114,6 @@ public class ButtonHelperActionCardsWillHomebrew {
     }
 
     public static void resolveFlawlessStrategy(Player player, Game game, ButtonInteractionEvent event) {
-
         List<Button> scButtons = new ArrayList<>();
         event.getMessage().delete().queue();
         if (player.getSCs().contains(2)) {
@@ -213,12 +207,10 @@ public class ButtonHelperActionCardsWillHomebrew {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
-        List<Button> buttons = new ArrayList<>();
-        buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
+        List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
         buttons.add(Button.danger("deleteButtons", "Dont place"));
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
-        buttons = new ArrayList<>();
-        buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
+        buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
         buttons.add(Button.danger("deleteButtons", "Dont place"));
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
         event.getMessage().delete().queue();
@@ -392,7 +384,6 @@ public class ButtonHelperActionCardsWillHomebrew {
     }
 
     public static void resolveBrutalOccupationStep1(Player player, Game game, ButtonInteractionEvent event) {
-
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             buttons.add(Button.success("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
