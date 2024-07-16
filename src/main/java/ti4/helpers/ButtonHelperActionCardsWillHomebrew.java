@@ -250,7 +250,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveTechnologicalBreakthrough(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveBreakthrough(Player player, Game game, ButtonInteractionEvent event) {
         for (String planet : player.getPlanetsAllianceMode()) {
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 player.refreshPlanet(planet);
