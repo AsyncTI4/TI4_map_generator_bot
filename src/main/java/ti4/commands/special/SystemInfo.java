@@ -153,7 +153,7 @@ public class SystemInfo extends SpecialSubcommandData {
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event);
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, "System", false);
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 for (Player player : game.getRealPlayers()) {
 
                     if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {

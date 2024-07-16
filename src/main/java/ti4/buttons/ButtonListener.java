@@ -598,7 +598,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                         message = "Wants to score a PO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their PO when everyone ahead of them is clear. ";
-                        if (!game.isFoWMode()) {
+                        if (!game.isFowMode()) {
                             message = message + player2.getRepresentation(true, true)
                                 + " is the one the game is currently waiting on";
                         }
@@ -644,10 +644,10 @@ public class ButtonListener extends ListenerAdapter {
                         String message = Emojis.SpeakerToken + " Speaker assigned to: "
                             + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                        if (game.isFoWMode() && player != player_) {
+                        if (game.isFowMode() && player != player_) {
                             MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
                         }
-                        if (!game.isFoWMode()) {
+                        if (!game.isFowMode()) {
                             ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
                         }
                     }
@@ -656,14 +656,14 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("assignSpeaker_")) {
             String faction = StringUtils.substringAfter(buttonID, "assignSpeaker_");
-            if (game != null && !game.isFoWMode()) {
+            if (game != null && !game.isFowMode()) {
                 for (Player player_ : game.getPlayers().values()) {
                     if (player_.getFaction().equals(faction)) {
                         game.setSpeaker(player_.getUserID());
                         String message = Emojis.SpeakerToken + " Speaker assigned to: "
                             + player_.getRepresentation(false, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                        if (!game.isFoWMode()) {
+                        if (!game.isFowMode()) {
                             ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
                         }
                     }
@@ -1262,7 +1262,7 @@ public class ButtonListener extends ListenerAdapter {
                 buttons = Helper.getTechButtons(techs, player, "nekro");
             }
 
-            if (game.getComponentAction()) {
+            if (game.isComponentAction()) {
                 buttons.add(Button.secondary("acquireATech", "Get Tech of a Different Type"));
             } else {
                 buttons.add(Button.secondary("acquireATechWithSC", "Get Tech of a Different Type"));
@@ -1905,7 +1905,7 @@ public class ButtonListener extends ListenerAdapter {
             String message = trueIdentity + " Click the name of the planet you wish to put your "
                 + Emojis.getEmojiFromDiscord(unit) + " on for construction";
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             } else {
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
@@ -1916,7 +1916,7 @@ public class ButtonListener extends ListenerAdapter {
                 String message = trueIdentity + " Click the name of the planet you wish to put your unit on";
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit,
                     "placeOneNDone_dontskip");
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                 } else {
                     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
@@ -2066,7 +2066,7 @@ public class ButtonListener extends ListenerAdapter {
             Player yssaril = game.getPlayerFromColorOrFaction(yssarilFaction);
             if (yssaril != null) {
                 String offerName = player.getFaction();
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     offerName = player.getColor();
                 }
                 ButtonHelper.deleteMessage(event);
@@ -2097,7 +2097,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("statusInfRevival_")) {
             ButtonHelper.placeInfantryFromRevival(game, event, player, buttonID);
         } else if (buttonID.startsWith("genericReact")) {
-            String message = game.isFoWMode() ? "Turned down window" : null;
+            String message = game.isFowMode() ? "Turned down window" : null;
             ButtonHelper.addReaction(event, false, false, message, "");
         } else if (buttonID.startsWith("placeOneNDone_")) {
             ButtonHelperModifyUnits.placeUnitAndDeleteButton(buttonID, event, game, player, ident, trueIdentity);
@@ -2424,7 +2424,7 @@ public class ButtonListener extends ListenerAdapter {
             String message = player.getRepresentation() + " purged fragments: "
                 + fragmentsToPurge;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-            if (!game.isFoWMode() && event.getMessageChannel() instanceof ThreadChannel) {
+            if (!game.isFowMode() && event.getMessageChannel() instanceof ThreadChannel) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
 
@@ -2768,7 +2768,7 @@ public class ButtonListener extends ListenerAdapter {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             player.clearTransactionItemsWith(p2);
             List<Button> buttons = ButtonHelper.getStuffToTransButtonsOld(game, player, p2);
-            if (!game.isFoWMode() && game.getWhetherNewTransactionMethod()) {
+            if (!game.isFowMode() && game.isNewTransactionMethod()) {
                 buttons = ButtonHelper.getStuffToTransButtonsNew(game, player, player, p2);
             }
             String message = player.getRepresentation()
@@ -2782,7 +2782,7 @@ public class ButtonListener extends ListenerAdapter {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " your offer to "
                 + player.getRepresentation(false, false) + " has been rejected.");
-            event.getMessage().delete().queue();
+            ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("rescindOffer_")) {
             Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the latest offer from "
@@ -2790,11 +2790,11 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "you rescinded the latest offer to "
                 + p2.getRepresentation(false, false));
             player.clearTransactionItemsWith(p2);
-            event.getMessage().delete().queue();
+            ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("acceptOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             Helper.acceptTransactionOffer(p1, player, game, event);
-            event.getMessage().delete().queue();
+            ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("sendOffer_")) {
             ButtonHelper.sendOffer(game, player, buttonID, event);
         } else if (buttonID.startsWith("offerToTransact_")) {
@@ -2859,7 +2859,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         game.getPing()
                             + " The conspirators ability has been used, which means the player will vote after the speaker. This ability can be used once per agenda phase");
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
                     }
                 } else {
@@ -2937,7 +2937,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("flipIonStorm_")) {
             ButtonHelper.flipIonStorm(game, buttonID, event);
         } else if (buttonID.startsWith("terraformPlanet_")) {
-            ButtonHelperFactionSpecific.terraformPlanet(buttonID, event, game);
+            ButtonHelperFactionSpecific.terraformPlanet(player, buttonID, event, game);
         } else if (buttonID.startsWith("automatonsPlanet_")) {// "bentorPNPlanet_"
             ButtonHelperFactionSpecific.automatonsPlanet(buttonID, event, game);
         } else if (buttonID.startsWith("bentorPNPlanet_")) {// "bentorPNPlanet_"
@@ -3155,10 +3155,10 @@ public class ButtonListener extends ListenerAdapter {
                 case Constants.PO_NO_SCORING -> {
                     String message = player.getRepresentation()
                         + " - no Public Objective scored.";
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), message);
                     }
-                    String reply = game.isFoWMode() ? "No public objective scored" : null;
+                    String reply = game.isFowMode() ? "No public objective scored" : null;
                     ButtonHelper.addReaction(event, false, false, reply, "");
                     String key2 = "queueToScorePOs";
                     String key3 = "potentialScorePOBlockers";
@@ -3223,7 +3223,7 @@ public class ButtonListener extends ListenerAdapter {
                         message = message
                             + "Reminder that you have prophecy of Ixth and should produce 2 fighters if you want to keep it. Its removal is not automated";
                     }
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units",
                             buttons);
@@ -3304,7 +3304,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 // AFTER AN ACTION CARD HAS BEEN PLAYED
                 case "no_sabotage" -> {
-                    String message = game.isFoWMode() ? "No sabotage" : null;
+                    String message = game.isFowMode() ? "No sabotage" : null;
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "titansCommanderUsage" -> ButtonHelperCommanders.titansCommanderUsage(buttonID, event, game, player, ident);
@@ -3372,7 +3372,7 @@ public class ButtonListener extends ListenerAdapter {
                         "Reset CCs");
                     List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
                     List<Button> buttons2 = Collections.singletonList(exhaust);
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Exhaust using this",
                             buttons2);
@@ -3408,7 +3408,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
                     Button doneRefreshing = Button.danger("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
                     buttons.add(doneRefreshing);
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(
                             player.getCardsInfoThread(), message, buttons);
                     } else {
@@ -3432,7 +3432,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                     Button doneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
                     buttons.add(doneExhausting);
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
@@ -3443,7 +3443,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
                     Button doneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
                     buttons.add(doneExhausting);
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
@@ -3492,21 +3492,21 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, loseTactic, loseFleet,
                         loseStrat,
                         doneGainingCC, resetCC);
-                    if (player.hasAbility("deliberate_action") && game.getCurrentPhase().contains("status")) {
+                    if (player.hasAbility("deliberate_action") && game.getPhaseOfGame().contains("status")) {
                         buttons = Arrays.asList(getTactic, getFleet, getStrat,
                             doneGainingCC, resetCC);
                     }
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
 
-                    if (!game.isFoWMode() && "statusHomework".equalsIgnoreCase(game.getCurrentPhase())) {
+                    if (!game.isFowMode() && "statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
                         ButtonHelper.addReaction(event, false, false, "", "");
                     }
 
-                    if ("statusHomework".equalsIgnoreCase(game.getCurrentPhase())) {
+                    if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
                         boolean cyber = false;
                         for (String pn : player.getPromissoryNotes().keySet()) {
                             if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
@@ -3553,7 +3553,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                     Button doneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
                     buttons.add(doneExhausting);
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
@@ -3574,7 +3574,7 @@ public class ButtonListener extends ListenerAdapter {
                     Button resetCC = Button.secondary(finsFactionCheckerPrefix + "resetCCs",
                         "Reset CCs");
                     List<Button> buttons2 = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons2);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons2);
@@ -3729,7 +3729,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                         if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                             message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear. They can cancel this by hitting 'No Follow'";
-                            if (!game.isFoWMode()) {
+                            if (!game.isFowMode()) {
                                 message = message + player2.getRepresentation(true, true)
                                     + " is the one the game is currently waiting on";
                             }
@@ -3822,7 +3822,7 @@ public class ButtonListener extends ListenerAdapter {
 
                 }
                 case "hack_election" -> {
-                    game.setHackElectionStatus(false);
+                    game.setHasHackElectionBeenPlayed(false);
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Set Order Back To Normal.");
                     ButtonHelper.deleteMessage(event);
                 }
@@ -3988,7 +3988,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "no_when" -> {
-                    String message = game.isFoWMode() ? "No whens" : null;
+                    String message = game.isFowMode() ? "No whens" : null;
                     if (game.getStoredValue("noWhenThisAgenda") == null) {
                         game.setStoredValue("noWhenThisAgenda", "");
                     }
@@ -3998,14 +3998,14 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.offerPlayerPreferences(player, event);
                 }
                 case "no_after" -> {
-                    String message = game.isFoWMode() ? "No afters" : null;
+                    String message = game.isFowMode() ? "No afters" : null;
                     if (game.getStoredValue("noAfterThisAgenda") == null) {
                         game.setStoredValue("noAfterThisAgenda", "");
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "no_after_persistent" -> {
-                    String message = game.isFoWMode() ? "No afters (locked in)" : null;
+                    String message = game.isFowMode() ? "No afters (locked in)" : null;
                     game.addPlayersWhoHitPersistentNoAfter(player.getFaction());
                     if (game.getStoredValue("noAfterThisAgenda") == null) {
                         game.setStoredValue("noAfterThisAgenda", "");
@@ -4021,7 +4021,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "no_when_persistent" -> {
-                    String message = game.isFoWMode() ? "No whens (locked in)" : null;
+                    String message = game.isFowMode() ? "No whens (locked in)" : null;
                     game.addPlayersWhoHitPersistentNoWhen(player.getFaction());
                     if (game.getStoredValue("noWhenThisAgenda") == null) {
                         game.setStoredValue("noWhenThisAgenda", "");
@@ -4133,7 +4133,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     ButtonHelper.addReaction(event, false, false, message, "");
                     ButtonHelper.deleteMessage(event);
-                    if (!game.isFoWMode() && (event.getChannel() != game.getActionsChannel())) {
+                    if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                     }
@@ -4158,7 +4158,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false,
                         "Spent 1 " + commOrTg + " for a mech on " + planetName, "");
                     ButtonHelper.deleteMessage(event);
-                    if (!game.isFoWMode() && (event.getChannel() != game.getActionsChannel())) {
+                    if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(mainGameChannel,
                             pF + " Spent 1 " + commOrTg + " for a mech on " + planetName);
@@ -4315,7 +4315,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, message, "");
                     if (!failed) {
                         ButtonHelper.deleteMessage(event);
-                        if (!game.isFoWMode() && (event.getChannel() != game.getActionsChannel())) {
+                        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
                             String pF = player.getFactionEmoji();
                             MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                         }
@@ -4338,7 +4338,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
                     ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
-                    if (!game.isFoWMode() && event.getMessageChannel() != game.getMainGameChannel()) {
+                    if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -4352,7 +4352,7 @@ public class ButtonListener extends ListenerAdapter {
                         + player.getTg() + "->" + (player.getTg() + player.getCommodities()) + ").";
                     player.setTg(player.getTg() + player.getCommodities());
                     player.setCommodities(0);
-                    if (!game.isFoWMode() && event.getMessageChannel() != game.getMainGameChannel()) {
+                    if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -4361,7 +4361,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "decline_explore" -> {
                     ButtonHelper.addReaction(event, false, false, "Declined Explore", "");
                     ButtonHelper.deleteMessage(event);
-                    if (!game.isFoWMode() && (event.getChannel() != game.getActionsChannel())) {
+                    if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
                         String pF = player.getFactionEmoji();
                         MessageHelper.sendMessageToChannel(mainGameChannel, pF + " declined explore");
                     }
@@ -4529,7 +4529,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Use Buttons to decide what kind of component action you want to do";
                     List<Button> systemButtons = ButtonHelper.getAllPossibleCompButtons(game, player, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         ButtonHelper.deleteMessage(event);
                     }
 
@@ -4714,7 +4714,7 @@ public class ButtonListener extends ListenerAdapter {
                     playerUsedSC.put(messageID, players);
                 }
                 case "turnEnd" -> {
-                    if (game.isFoWMode() && !player.equals(game.getActivePlayer())) {
+                    if (game.isFowMode() && !player.equals(game.getActivePlayer())) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "You are not the active player. Force End Turn with /player turn_end.");
                         return;
@@ -4735,7 +4735,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.rematch(game, event);
                 }
                 case "enableAidReacts" -> {
-                    game.setBotFactionReactions(true);
+                    game.setBotFactionReacts(true);
                     ButtonHelper.deleteMessage(event);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Reacts have been enabled");
                 }
@@ -4831,7 +4831,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "Leader was not purged - something went wrong");
                     }
-                    if (!game.getNaaluAgent()) {
+                    if (!game.isNaaluAgent()) {
                         player.setTacticalCC(player.getTacticalCC() - 1);
                         AddCC.addCC(event, player.getColor(),
                             game.getTileByPosition(game.getActiveSystem()));
@@ -4921,7 +4921,7 @@ public class ButtonListener extends ListenerAdapter {
                         finsFactionCheckerPrefix);
                     poButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                     MessageChannel channel = event.getMessageChannel();
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         channel = player.getPrivateChannel();
                     }
                     MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to score an objective",
@@ -4964,7 +4964,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                 }
                 case "ultimateUndo" -> {
-                    if (game.getSavedButtons().size() > 0 && !game.getCurrentPhase().contains("status")) {
+                    if (game.getSavedButtons().size() > 0 && !game.getPhaseOfGame().contains("status")) {
                         String buttonString = game.getSavedButtons().get(0);
                         if (game.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
                             boolean showGame = false;
@@ -4984,8 +4984,8 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                     GameSaveLoadManager.undo(game, event);
-                    if ("action".equalsIgnoreCase(game.getCurrentPhase())
-                        || "agendaVoting".equalsIgnoreCase(game.getCurrentPhase())) {
+                    if ("action".equalsIgnoreCase(game.getPhaseOfGame())
+                        || "agendaVoting".equalsIgnoreCase(game.getPhaseOfGame())) {
                         if (!event.getMessage().getContentRaw().contains(finsFactionCheckerPrefix)) {
                             List<ActionRow> actionRow2 = new ArrayList<>();
                             boolean dontDelete = false;
@@ -5041,7 +5041,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "eraseMyVote" -> {
                     String pfaction = player.getFaction();
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         pfaction = player.getColor();
                     }
                     Helper.refreshPlanetsOnTheRevote(player, game);
@@ -5087,7 +5087,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, message, "");
                     if (!failed && !event.getMessage().getContentRaw().contains("fragment")) {
                         ButtonHelper.deleteMessage(event);
-                        if (!game.isFoWMode() && (event.getChannel() != game.getActionsChannel())) {
+                        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
                             String pF = player.getFactionEmoji();
                             MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
                         }
@@ -5126,7 +5126,7 @@ public class ButtonListener extends ListenerAdapter {
         MessageChannel actionsChannel, String ident) {
         String soID = buttonID.replace("SODISCARD_", "");
         MessageChannel channel;
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             channel = privateChannel;
         } else if (game.isCommunityMode() && game.getMainGameChannel() != null) {
             channel = mainGameChannel;
@@ -5157,7 +5157,7 @@ public class ButtonListener extends ListenerAdapter {
         MessageChannel actionsChannel) {
         String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
         MessageChannel channel;
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             channel = privateChannel;
         } else if (game.isCommunityMode() && game.getMainGameChannel() != null) {
             channel = mainGameChannel;
@@ -5195,7 +5195,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                         message = player.getRepresentation()
                             + " Wants to score an SO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
-                        if (!game.isFoWMode()) {
+                        if (!game.isFowMode()) {
                             message = message + player2.getRepresentation(true, true)
                                 + " is the one the game is currently waiting on";
                         }
@@ -5259,7 +5259,7 @@ public class ButtonListener extends ListenerAdapter {
                     "Discarded Action Card:" + "\n" +
                     Mapper.getActionCard(acID).getRepresentation() + "\n";
                 MessageChannel channel2 = game.getMainGameChannel();
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     channel2 = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel2, sb);
@@ -5398,7 +5398,7 @@ public class ButtonListener extends ListenerAdapter {
                         cyber = true;
                     }
                 }
-                if ("statusHomework".equalsIgnoreCase(game.getCurrentPhase())) {
+                if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
                     if (player.hasAbility("versatile") || player.hasTech("hm") || cyber) {
                         int properGain = 2;
                         String reasons = "";
@@ -5647,7 +5647,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
 
-                if (game.getNaaluAgent()) {
+                if (game.isNaaluAgent()) {
                     player = game.getPlayer(game.getActivePlayerID());
                     game.setNaaluAgent(false);
                 }
@@ -5732,7 +5732,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 Message mainMessage = event.getMessage();
                 Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     int index = 0;
                     for (Player player_ : game.getPlayers().values()) {
                         if (player_ == player)
@@ -5752,7 +5752,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 Message mainMessage = event.getMessage();
                 Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     int index = 0;
                     for (Player player_ : game.getPlayers().values()) {
                         if (player_ == player)
@@ -5803,7 +5803,7 @@ public class ButtonListener extends ListenerAdapter {
                     String faction = "bob_" + game.getStoredValue(messageId) + "_";
                     faction = faction.split("_")[1];
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null && !game.isFoWMode()) {
+                    if (p2 != null && !game.isFowMode()) {
                         msg2 = p2.getRepresentation() + " " + msg2;
                     }
                     // }
@@ -5826,7 +5826,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             game.getMainGameChannel().retrieveMessageById(messageId).queue(mainMessage -> {
                 Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     int index = 0;
                     for (Player player_ : game.getPlayers().values()) {
                         if (player_ == player)
@@ -5863,7 +5863,7 @@ public class ButtonListener extends ListenerAdapter {
         switch (buttonID) {
             case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_trade_follow" -> {
                 String message = "All players have reacted to this Strategy Card";
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     event.getInteraction().getMessage().reply(message).queueAfter(1, TimeUnit.SECONDS);
                 } else {
                     GuildMessageChannel guildMessageChannel = Helper.getThreadChannelIfExists(event);
@@ -5886,7 +5886,7 @@ public class ButtonListener extends ListenerAdapter {
                     String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
                     faction = faction.split("_")[1];
                     Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null && !game.isFoWMode()) {
+                    if (p2 != null && !game.isFowMode()) {
                         msg = p2.getRepresentation() + " " + msg;
                     }
                     game.removeMessageIDForSabo(event.getMessageId());

@@ -235,7 +235,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
-        newGame.setMainGameChannelID(actionsChannel.getId());
+        newGame.setMainChannelID(actionsChannel.getId());
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = null;
@@ -282,24 +282,26 @@ public class CreateGameChannels extends BothelperSubcommandData {
         buttons.add(Button.success("anonDeclare_Friendly", "Friendly"));
         buttons.add(Button.primary("anonDeclare_No Strong Preference", "No Strong Preference"));
         buttons.add(Button.danger("anonDeclare_Aggressive", "Aggressive"));
-        newGame.setUndoButton(false);
+        newGame.setUndoButtonOffered(false);
         MessageHelper.sendMessageToChannel(actionsChannel, agressionMsg, buttons);
-        newGame.setUndoButton(true);
+        newGame.setUndoButtonOffered(true);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Button.success("getHomebrewButtons", "Yes, have homebrew"));
         buttons2.add(Button.danger("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannel(actionsChannel,
-            "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons",
-            buttons2);
+        MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons", buttons2);
 
         List<Button> buttons3 = new ArrayList<>();
         buttons3.add(Button.success("enableAidReacts", "Yes, Enable Aid Reacts"));
         buttons3.add(Button.danger("deleteButtons", "No Aid Reacts"));
-        MessageHelper.sendMessageToChannel(actionsChannel,
-            "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember your faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under /custom customization",
-            buttons3);
+        MessageHelper.sendMessageToChannel(actionsChannel, "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember your faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under `/custom customization`", buttons3);
+
+        List<Button> hexBorderButtons = new ArrayList<>();
+        hexBorderButtons.add(Button.success("showHexBorders_dash", "Dashed line"));
+        hexBorderButtons.add(Button.primary("showHexBorders_solid", "Solid line"));
+        hexBorderButtons.add(Button.danger("showHexBorders_off", "Off (default)"));
+        MessageHelper.sendMessageToChannel(actionsChannel, "Show borders around systems with player's ships, either a dashed line or a solid line. You can also control this setting with `/custom customization`", hexBorderButtons);
 
         // INTRODUCTION TO BOT-MAP THREAD
         String botGetStartedMessage = role.getAsMention() + " - bot/map channel\n" +

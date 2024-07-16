@@ -26,7 +26,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game, true);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #1", buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #2 (different planet from #1)", buttons);
-        if (game.getCurrentPhase().toLowerCase().contains("agenda")) {
+        if (game.getPhaseOfGame().toLowerCase().contains("agenda")) {
             for (String planet : player.getPlanets()) {
                 player.exhaustPlanet(planet);
             }
@@ -162,7 +162,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("ancientTradeRoutesStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("ancientTradeRoutesStep2_" + p2.getFaction(), " ");
@@ -188,7 +188,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("armsDealStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("armsDealStep2_" + p2.getFaction(), " ");

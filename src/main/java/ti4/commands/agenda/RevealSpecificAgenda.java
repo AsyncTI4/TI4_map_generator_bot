@@ -61,7 +61,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             return;
         }
 
-        game.setCurrentPhase("agendawaiting");
+        game.setPhaseOfGame("agendawaiting");
         AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
         String agendaTarget = agendaDetails.getTarget();
         String agendaType = agendaDetails.getType();
@@ -135,7 +135,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         }
 
         game.resetCurrentAgendaVotes();
-        game.setHackElectionStatus(false);
+        game.setHasHackElectionBeenPlayed(false);
         game.setPlayersWhoHitPersistentNoAfter("");
         game.setPlayersWhoHitPersistentNoWhen("");
         game.setLatestOutcomeVotedFor("");

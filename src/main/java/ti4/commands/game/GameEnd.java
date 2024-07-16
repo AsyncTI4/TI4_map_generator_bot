@@ -139,7 +139,7 @@ public class GameEnd extends GameSubcommandData {
                         BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
                         return;
                     }
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         // INFORM PLAYERS
                         pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
                             m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
@@ -199,7 +199,7 @@ public class GameEnd extends GameSubcommandData {
                         MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
                     }
                 }
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).get(0);
                     if (fogCategory != null) {
                         List<TextChannel> channels = new ArrayList<>();

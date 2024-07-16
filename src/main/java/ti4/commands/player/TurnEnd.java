@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.ListUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,14 +20,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.ListUtils;
-
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.status.ListPlayerInfoButton;
-import ti4.generator.Mapper;
 import ti4.generator.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -65,7 +65,7 @@ public class TurnEnd extends PlayerSubcommandData {
             return;
         }
 
-        if (game.isFoWMode() && !mainPlayer.equals(game.getActivePlayer())) {
+        if (game.isFowMode() && !mainPlayer.equals(game.getActivePlayer())) {
             OptionMapping confirm = event.getOption(Constants.CONFIRM);
             if (confirm == null || !"YES".equals(confirm.getAsString())) {
                 MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
@@ -109,6 +109,8 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setStoredValue("lawsDisabled", "no");
         game.setStoredValue("endTurnWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
+        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "sol", event);
+        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "hacan", event);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -122,11 +124,11 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         game.setStoredValue("mahactHeroTarget", "");
         game.setActiveSystem("");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
                 + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation() + " ended turn");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn");
         }
 
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
@@ -146,7 +148,7 @@ public class TurnEnd extends PlayerSubcommandData {
         }
 
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             String lastTransaction = game.getLatestTransactionMsg();
             try {
                 if (lastTransaction != null && !"".equals(lastTransaction)) {
@@ -166,6 +168,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
+        ButtonHelper.fullCommanderUnlockCheck(nextPlayer, game, "sol", event);
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);
@@ -228,7 +231,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFoWMode()) {
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
                 poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
                 break;
             }
@@ -239,12 +242,12 @@ public class TurnEnd extends PlayerSubcommandData {
 
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
-        if (game.getShowBanners()) {
-            MapGenerator.drawPhaseBanner("status", game.getRound(), event);
+        if (game.isShowBanners()) {
+            MapGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
         }
         String message = "Please score objectives, " + game.getPing() + ".";
 
-        game.setCurrentPhase("statusScoring");
+        game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", new Date().getTime() + "");
         for (Player player : game.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(game, player);
@@ -456,7 +459,7 @@ public class TurnEnd extends PlayerSubcommandData {
                             unitHolder.addUnit(infKey, 1);
                             String genesisMessage = solPlayer.getRepresentation(true, true)
                                 + " an infantry was added to the space area of your flagship automatically.";
-                            if (game.isFoWMode()) {
+                            if (game.isFowMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
                             } else {
                                 MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);

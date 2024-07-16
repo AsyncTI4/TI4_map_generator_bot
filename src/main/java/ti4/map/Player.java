@@ -53,7 +53,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
@@ -490,7 +489,7 @@ public class Player {
     public ThreadChannel getCardsInfoThread() {
         Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFoWMode() || game.isCommunityMode())
+        if (game.isFowMode() || game.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
             actionsChannel = game.getMainGameChannel();
@@ -504,7 +503,7 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
             + getUserName().replaceAll("/", "");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
 
@@ -576,7 +575,7 @@ public class Player {
 
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!game.isFoWMode());
+        boolean isPrivateChannel = (!game.isFowMode());
         if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
@@ -595,7 +594,7 @@ public class Player {
     public ThreadChannel getCardsInfoThreadWithoutCompletes() {
         Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFoWMode() || game.isCommunityMode())
+        if (game.isFowMode() || game.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
             actionsChannel = game.getMainGameChannel();
@@ -609,7 +608,7 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
             + getUserName().replaceAll("/", "");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
 
@@ -1445,7 +1444,7 @@ public class Player {
 
     @JsonIgnore
     public String getFactionEmojiOrColor() {
-        if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
+        if (getGame().isFowMode() || FoWHelper.isPrivateGame(getGame())) {
             return Emojis.getColorEmojiWithName(getColor());
         }
         return getFactionEmoji();
@@ -1742,7 +1741,9 @@ public class Player {
     }
 
     public void setFleetCC(int fleetCC) {
-        this.fleetCC = fleetCC;
+        if (fleetCC > -1) {
+            this.fleetCC = fleetCC;
+        }
     }
 
     public int getStrategicCC() {
@@ -1837,7 +1838,9 @@ public class Player {
     }
 
     public void setTg(int tg) {
-        this.tg = tg;
+        if (tg > -1) {
+            this.tg = tg;
+        }
     }
 
     @JsonIgnore
@@ -1885,7 +1888,7 @@ public class Player {
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
                 TurnEnd.pingNextPlayer(event, game, p2);
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round " + game.getRound() + " for " + p2.getFactionEmoji());
                 }
             }
@@ -2838,7 +2841,7 @@ public class Player {
      */
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
-        if (getGame().isFoWMode()) {
+        if (getGame().isFowMode()) {
             return getPrivateChannel();
         } else {
             return getGame().getMainGameChannel();

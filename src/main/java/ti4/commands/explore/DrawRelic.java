@@ -82,7 +82,7 @@ public class DrawRelic extends GenericRelicAction {
         RelicModel relicModel = Mapper.getRelic(relicID);
 
         String message = player.getRepresentation() + " drew a Relic:";
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
@@ -101,7 +101,7 @@ public class DrawRelic extends GenericRelicAction {
             case "obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
 
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
                 }
 

@@ -59,7 +59,7 @@ public class GameCommand implements Command {
             && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
             fileFuture.thenAccept(fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     Button linkToWebsite = Button.link(
                         "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
                     buttons.add(linkToWebsite);

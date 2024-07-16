@@ -34,6 +34,7 @@ public class RunManualDataMigration extends DeveloperSubcommandData {
         try {
             Class<?>[] paramTypes = { Game.class };
             Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
+            method.setAccessible(true);
             Boolean changesMade = (Boolean) method.invoke(null, game);
             if (changesMade) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + game.getName());
