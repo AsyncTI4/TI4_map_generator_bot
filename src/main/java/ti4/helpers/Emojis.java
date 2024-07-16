@@ -1064,7 +1064,7 @@ public class Emojis {
             case "centauri" -> Centauri;
             case "cormund" -> Cormund;
             case "corneeq" -> Corneeq;
-            case "creuss" -> Creuss;
+            case "creuss", "hexcreuss" -> Creuss;
             case "dalbootha" -> DalBootha;
             case "darien" -> Darien;
             case "druaa" -> Druaa;
@@ -1088,7 +1088,7 @@ public class Emojis {
             case "loki" -> Loki;
             case "lor" -> Lor;
             case "maaluuk" -> Maaluuk;
-            case "mallice", "lockedmallice" -> Mallice;
+            case "mallice", "lockedmallice", "hexmallice", "hexlockedmalice" -> Mallice;
             case "mr" -> Mecatol;
             case "meer" -> Meer;
             case "meharxull" -> MeharXull;
