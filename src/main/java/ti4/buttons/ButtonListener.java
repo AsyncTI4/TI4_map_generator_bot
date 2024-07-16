@@ -4386,7 +4386,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "miningInitiative" -> ButtonHelperActionCards.miningInitiative(player, game, event);
                 case "forwardSupplyBase" -> ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, game, event, buttonID);
                 case "economicInitiative" -> ButtonHelperActionCards.economicInitiative(player, game, event);
-                case "technologicalBreakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveTechnologicalBreakthrough(player, game, event);
+                case "breakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveBreakthrough(player, game, event);
                 case "sideProject" -> ButtonHelperActionCardsWillHomebrew.resolveSideProject(player, game, event, buttonID);
                 case "brutalOccupation" -> ButtonHelperActionCardsWillHomebrew.resolveBrutalOccupationStep1(player, game, event);
                 case "getRepealLawButtons" -> {
@@ -4783,8 +4783,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveSisterShip" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveSisterShip(player, game, event);
                 }
-                case "resolveBoardingTorpedoes" -> {
-                    ButtonHelperActionCardsWillHomebrew.resolveBoardingTorpedoes(player, game, event);
+                case "resolveBoardingParty" -> {
+                    ButtonHelperActionCardsWillHomebrew.resolveBoardingParty(player, game, event);
                 }
                 case "resolveMercenaryContract" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveMercenaryContract(player, game, event);
