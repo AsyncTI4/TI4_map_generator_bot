@@ -45,7 +45,7 @@ public class DrawAC extends ACCardsSubcommandData {
             return;
         }
         String message = player.getRepresentation() + " Drew " + count + " AC";
-        if (addScheming) {
+        if (addScheming && player.hasAbility("scheming")) {
             message = "Drew [" + count + "+1=" + ++count + "] AC (Scheming)";
         }
 
@@ -54,7 +54,7 @@ public class DrawAC extends ACCardsSubcommandData {
         }
         ACInfo.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, null, player);
-        if (addScheming) ACInfo.sendDiscardActionCardButtons(game, player, false);
+        if (addScheming && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(game, player, false);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "yssaril", null);
         }
