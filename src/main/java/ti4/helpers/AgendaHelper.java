@@ -851,21 +851,39 @@ public class AgendaHelper {
                 }
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
-                int tg = 0;
-                if ("for".equalsIgnoreCase(winner)) {
-                    for (Player playerB : game.getRealPlayers()) {
-                        playerB.setTg(5);
-                        ButtonHelperAgents.resolveArtunoCheck(playerB, game, 5);
-                        ButtonHelperAbilities.pillageCheck(playerB, game);
+                int finalTG = "for".equalsIgnoreCase(winner) ? 5 : 0;
+                int maxLoss = 11;
+                List<Player> comrades = new ArrayList<>();
+                for (Player playerB : game.getRealPlayers()) {
+                    if (playerB.getTg() > maxLoss)
+                    {
+                        maxLoss = playerB.getTg();
+                        comrades = new ArrayList<>();
+                        comrades.add(playerB);
                     }
-                    tg = 5;
-                } else {
-                    for (Player playerB : game.getRealPlayers()) {
-                        playerB.setTg(0);
+                    else if (playerB.getTg() == maxLoss)
+                    {
+                        comrades.add(playerB);
+                    }
+                    playerB.setTg(finalTG);
+                    if (finalTG > 0)
+                    {
+                        ButtonHelperAgents.resolveArtunoCheck(playerB, game, finalTG);
+                        ButtonHelperAbilities.pillageCheck(playerB, game);
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    game.getPing() + " Set everyone's tgs to " + tg);
+                    game.getPing() + " Set everyone's tgs to " + finalTG);
+                if (maxLoss > 11)
+                {
+                    if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
+                        TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
+                        for (Player playerB : comrades) {
+                            MessageHelper.sendMessageToChannel(watchPary, 
+                                "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + "TGs to the less economically fortunate citizens of the galaxy.");
+                        }
+                    }
+                }
             }
             if ("crisis".equalsIgnoreCase(agID)) {
                 if (!game.isHomebrewSCMode()) {
