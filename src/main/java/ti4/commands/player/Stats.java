@@ -401,7 +401,7 @@ public class Stats extends PlayerSubcommandData {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scNumber);
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
                     + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scNumber;
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
