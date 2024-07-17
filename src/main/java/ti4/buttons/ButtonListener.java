@@ -50,6 +50,7 @@ import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
+import ti4.commands.cardsso.DrawSO;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.combat.StartCombat;
@@ -5125,6 +5126,11 @@ public class ButtonListener extends ListenerAdapter {
         MessageChannel privateChannel, MessageChannel mainGameChannel,
         MessageChannel actionsChannel, String ident) {
         String soID = buttonID.replace("SODISCARD_", "");
+        boolean drawReplacement = false;
+        if (soID.endsWith("redraw")) {
+            soID.replace("redraw", "");
+            drawReplacement = true;
+        }
         MessageChannel channel;
         if (game.isFowMode()) {
             channel = privateChannel;
@@ -5137,13 +5143,14 @@ public class ButtonListener extends ListenerAdapter {
         if (channel != null) {
             try {
                 int soIndex = Integer.parseInt(soID);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ident + " discarded an SO");
-                new DiscardSO().discardSO(event, player, soIndex, game);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " discarded an SO");
+                DiscardSO.discardSO(event, player, soIndex, game);
+                if (drawReplacement) {
+                    DrawSO.drawSO(event, game, player);
+                }
             } catch (Exception e) {
                 BotLogger.log(event, "Could not parse SO ID: " + soID, e);
-                event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please discard manually.")
-                    .queue();
+                event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please discard manually.").queue();
                 return;
             }
         } else {
@@ -5228,9 +5235,14 @@ public class ButtonListener extends ListenerAdapter {
         MessageChannel actionsChannel) {
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
         boolean stalling = false;
+        boolean drawReplacement = false;
         if (acIndex.contains("stall")) {
             acIndex = acIndex.replace("stall", "");
             stalling = true;
+        }
+        if (acIndex.endsWith("redraw")) {
+            acIndex.replace("redraw", "");
+            drawReplacement = true;
         }
 
         MessageChannel channel;
@@ -5273,6 +5285,9 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                }
+                if (drawReplacement) {
+                    DrawAC.drawActionCards(game, player, 1, true);
                 }
                 ButtonHelper.checkACLimit(game, event, player);
                 ButtonHelper.deleteMessage(event);

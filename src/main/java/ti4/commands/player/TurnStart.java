@@ -273,8 +273,7 @@ public class TurnStart extends PlayerSubcommandData {
         Button tacticalAction = Button.success(finChecker + "tacticalAction",
             "Tactical Action (" + player.getTacticalCC() + ")");
         int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
-        Button componentAction = Button.success(finChecker + "componentAction",
-            "Component Action (" + numOfComponentActions + ")");
+        Button componentAction = Button.success(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
         startButtons.add(tacticalAction);
         startButtons.add(componentAction);

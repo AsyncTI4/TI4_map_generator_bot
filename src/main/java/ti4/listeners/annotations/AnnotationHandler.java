@@ -21,6 +21,7 @@ import ti4.helpers.async.CustomizationsHelper;
 import ti4.helpers.async.NotepadHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.helpers.async.WhisperHelper;
+import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
 import ti4.listeners.context.ModalContext;
@@ -36,6 +37,8 @@ public class AnnotationHandler {
         // Async
         classesWithHandlers.addAll(List.of(RoundSummaryHelper.class, WhisperHelper.class, NotepadHelper.class, CustomizationsHelper.class));
 
+        // Homebrew
+        classesWithHandlers.addAll(List.of(IgnisAuroraHelperTechs.class));
         return classesWithHandlers;
     }
 

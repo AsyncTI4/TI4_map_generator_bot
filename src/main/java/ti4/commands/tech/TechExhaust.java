@@ -26,6 +26,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -45,8 +46,7 @@ public class TechExhaust extends TechAddRemove {
         checkAndApplyCombatMods(event, player, techID);
     }
 
-    public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player,
-        String tech) {
+    public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         String pos = "";
         if (tech.contains("dskortg")) {
             pos = tech.split("_")[1];
@@ -55,12 +55,19 @@ public class TechExhaust extends TechAddRemove {
         TechnologyModel techModel = Mapper.getTech(tech);
         String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
         if (game.isShowFullComponentTextEmbeds()) {
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage,
-                techModel.getRepresentationEmbed());
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), exhaustMessage);
         }
+
         player.exhaustTech(tech);
+
+        // Handle Ignis Aurora Techs
+        if (tech.startsWith("baldrick_")) {
+            IgnisAuroraHelperTechs.handleExhaustIgnisAuroraTech(event, game, player, tech);
+            return;
+        }
+
         switch (tech) {
             case "bs" -> { // Bio-stims
                 ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(game, event, player, false);

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.uncategorized.InfoThreadCommand;
+import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -191,21 +192,27 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
+    public static void sendDiscardAndDrawActionCardButtons(Game game, Player player) {
+        List<Button> buttons = getDiscardActionCardButtonsWithSuffix(game, player, "redraw");
+        String msg = player.getRepresentation(true, true) + " use buttons to discard. A new action card will be automatically drawn afterwards.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
     public static List<Button> getDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
+        return getDiscardActionCardButtonsWithSuffix(game, player, doingAction ? "stall" : "");
+    }
+
+    public static List<Button> getDiscardActionCardButtonsWithSuffix(Game game, Player player, String suffix) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
-        String stall = "";
-        if (doingAction) {
-            stall = "stall";
-        }
+
         if (actionCards != null && !actionCards.isEmpty()) {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Button.primary("ac_discard_from_hand_" + value + stall, "(" + value + ") " + ac_name)
-                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Buttons.blue("ac_discard_from_hand_" + value + suffix, "(" + value + ") " + ac_name, Emojis.ActionCard));
                 }
             }
         }

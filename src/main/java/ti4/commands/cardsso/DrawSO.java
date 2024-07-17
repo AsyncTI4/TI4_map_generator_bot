@@ -1,5 +1,6 @@
 package ti4.commands.cardsso;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -31,10 +32,24 @@ public class DrawSO extends SOCardsSubcommandData {
             int providedCount = option.getAsInt();
             count = providedCount > 0 ? providedCount : 1;
         }
+        drawSO(event, game, player, count, false);
+    }
+
+    public static void drawSO(GenericInteractionCreateEvent event, Game game, Player player) {
+        drawSO(event, game, player, 1, true);
+    }
+
+    public static void drawSO(GenericInteractionCreateEvent event, Game game, Player player, int count, boolean useTnelis) {
+        String output = Integer.toString(count) + "SO" + (count > 1 ? "s" : "");
+        if (useTnelis && player.hasAbility("plausible_deniability")) {
+            output = "[" + count + " + 1 = " + (count + 1) + "] SOs (plausible deniability)";
+            count++;
+        }
+
         for (int i = 0; i < count; i++) {
             game.drawSecretObjective(player.getUserID());
         }
-        MessageHelper.sendMessageToEventChannel(event, "Drew " + count + " SO");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " Drew " + output);
         SOInfo.sendSecretObjectiveInfo(game, player, event);
     }
 }

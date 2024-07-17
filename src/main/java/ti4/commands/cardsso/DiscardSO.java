@@ -42,7 +42,7 @@ public class DiscardSO extends SOCardsSubcommandData {
         discardSO(event, player, option.getAsInt(), game);
     }
 
-    public void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Game game) {
+    public static void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Game game) {
         String soIDString = "";
         for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(SOID)) {
