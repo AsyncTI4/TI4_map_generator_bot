@@ -873,7 +873,7 @@ public class AgendaHelper {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                game.getPing() + " Set everyone's TGs to " + tg);
+                game.getPing() + " Set everyone's TGs to " + finalTG);
                 if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
                     TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
                     for (Player playerB : comrades) {
