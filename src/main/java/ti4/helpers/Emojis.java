@@ -386,6 +386,7 @@ public class Emojis {
     public static final String Meer = "<:Meer:1159512956778856519>";
     public static final String MeharXull = "<:MeharXull:1159512958821466243>";
     public static final String Mellon = "<:Mellon:1159512961006714951>";
+    public static final String Mirage = "<:Mirage:1262599635676041357>";
     public static final String MollPrimus = "<:MollPrimus:1159512963347132436>";
     public static final String Mordai = "<:Mordai:1159512965398138960>";
     public static final String PlanetMuaat = "<:Muaat:1159512985757307030>";
@@ -885,6 +886,8 @@ public class Emojis {
     public static final String TI4BaseGame = "<:TI4BaseGame:1181341816688222378>";
     public static final String TI4PoK = "<:TI4PoK:1181341818676334683>";
     public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff https://discord.com/channels/743629929484386395/1023681580989939712
+    public static final String Flagshipping = "<:Flagshipping:1261527033834373203>";
+    public static final String PromisesPromises = "<:PromisesPromises:1261526966499283054>";
     public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars https://discord.com/channels/743629929484386395/990061481238364160
     public static final String UnchartedSpace = "<:UnchartedSpace:1250241051755544657>";
     public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2 mod https://discord.com/channels/743629929484386395/1111799687184396338
@@ -1064,7 +1067,7 @@ public class Emojis {
             case "centauri" -> Centauri;
             case "cormund" -> Cormund;
             case "corneeq" -> Corneeq;
-            case "creuss" -> Creuss;
+            case "creuss", "hexcreuss" -> Creuss;
             case "dalbootha" -> DalBootha;
             case "darien" -> Darien;
             case "druaa" -> Druaa;
@@ -1088,11 +1091,12 @@ public class Emojis {
             case "loki" -> Loki;
             case "lor" -> Lor;
             case "maaluuk" -> Maaluuk;
-            case "mallice", "lockedmallice" -> Mallice;
+            case "mallice", "lockedmallice", "hexmallice", "hexlockedmalice" -> Mallice;
             case "mr" -> Mecatol;
             case "meer" -> Meer;
             case "meharxull" -> MeharXull;
             case "mellon" -> Mellon;
+            case "mirage" -> Mirage;
             case "mollprimus", "mollprimusk" -> MollPrimus;
             case "mordaiii", "mordai" -> Mordai;
             case "muaat" -> PlanetMuaat;

@@ -53,7 +53,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.StringHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
@@ -1742,7 +1741,9 @@ public class Player {
     }
 
     public void setFleetCC(int fleetCC) {
-        this.fleetCC = fleetCC;
+        if (fleetCC > -1) {
+            this.fleetCC = fleetCC;
+        }
     }
 
     public int getStrategicCC() {
@@ -1837,7 +1838,9 @@ public class Player {
     }
 
     public void setTg(int tg) {
-        this.tg = tg;
+        if (tg > -1) {
+            this.tg = tg;
+        }
     }
 
     @JsonIgnore

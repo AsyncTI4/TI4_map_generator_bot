@@ -185,6 +185,20 @@
         ]
     },
     {
+        "alias": "minus2_mod_pds_off_opponent_antimass",
+        "type": "mods",
+        "value": "-1",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonOffence",
+        "related": [
+            {
+                "type": "opponent_tech",
+                "alias": "baldrick_amd"
+            }
+        ]
+    },
+    {
         "alias": "jolnar_bonus_hits_9_10",
         "type": "bonus_hits",
         "value": "+1",
@@ -213,6 +227,10 @@
             {
                 "type": "tech",
                 "alias": "absol_ps"
+            },
+            {
+                "type": "tech",
+                "alias": "baldrick_ps"
             }
         ],
         "forCombatAbility": "SpaceCannonOffence"
@@ -236,6 +254,20 @@
         ]
     },
     {
+        "alias": "minus2_mod_pds_def_opponent_antimass",
+        "type": "mods",
+        "value": "-1",
+        "persistenceType": "ALWAYS",
+        "scope": "",
+        "forCombatAbility": "SpaceCannonDefence",
+        "related": [
+            {
+                "type": "opponent_tech",
+                "alias": "baldrick_amd"
+            }
+        ]
+    },
+    {
         "alias": "plus1_roll_plasmascoring_spacecannon_def",
         "type": "extrarolls",
         "value": "+1",
@@ -249,6 +281,10 @@
             {
                 "type": "tech",
                 "alias": "absol_ps"
+            },
+            {
+                "type": "tech",
+                "alias": "baldrick_ps"
             }
         ],
         "forCombatAbility": "SpaceCannonDefence"
@@ -381,6 +417,20 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus1_roll_plasmascoring_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "tech",
+                "alias": "baldrick_ps"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
         "alias": "minus1_roll_tnelis_flagship",
         "type": "extrarolls",
         "value": "-1",
@@ -467,6 +517,10 @@
             {
                 "type": "tech",
                 "alias": "absol_ps"
+            },
+            {
+                "type": "tech",
+                "alias": "baldrick_ps"
             }
         ],
         "forCombatAbility": "bombardment"
@@ -773,6 +827,34 @@
         "forCombatAbility": "AFB"
     },
     {
+        "alias": "plus1_roll_starfall_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
+        "alias": "plus1_roll_starfall_spacecannondefence",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonDefence"
+    },
+    {
         "alias": "plus_1_always_space_cannon_defence",
         "type": "mods",
         "value": "+1",
@@ -809,6 +891,20 @@
         "forCombatAbility": "SpaceCannonOffence"
     },
     {
+        "alias": "plus1_roll_starfall_spacecannonoffence",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "SpaceCannonOffence"
+    },
+    {
         "alias": "plus_0_always_space_cannon_offense",
         "type": "mods",
         "value": "+0",
@@ -833,6 +929,20 @@
                 "type": "leader",
                 "alias": "kolumecommander"
             },
+            {
+                "type": "relic",
+                "alias": "starfall_array"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "plus1_roll_starfall_bombardment",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "scope": "_best_",
+        "related": [
             {
                 "type": "relic",
                 "alias": "starfall_array"

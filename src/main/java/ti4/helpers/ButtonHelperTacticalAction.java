@@ -301,7 +301,7 @@ public class ButtonHelperTacticalAction {
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
-                        + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place an SD for 2tg/2comm",
+                        + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent) to place 1 space dock for 2TGs/2comm",
                     buttons);
             }
         }
@@ -327,8 +327,7 @@ public class ButtonHelperTacticalAction {
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
-        event.getMessage().delete().queue();
-
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void buildWithTacticalAction(Player player, Game game, ButtonInteractionEvent event,
@@ -343,7 +342,7 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + ". You also have " + Emojis.Cabal + " commander which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that dont count towards production limit. ";
+                + ". You also have " + Emojis.Cabal + " commander which allows you to produce 2 " + Emojis.fighter + "/" + Emojis.infantry + " that don't count towards production limit. ";
         }
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
@@ -353,7 +352,7 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void finishMovingForTacticalAction(Player player, Game game, ButtonInteractionEvent event,
@@ -478,24 +477,22 @@ public class ButtonHelperTacticalAction {
             StartCombat.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game,
                 player, tile);
         }
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void finishMovingFromOneTile(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String pos = buttonID.replace("doneWithOneSystem_", "");
         Tile tile = game.getTileByPosition(pos);
+        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "
-            + tile.getRepresentationForButtons(game, player) + " (**"
-            + CheckDistance.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem())
-            + " tile(s) away**)\n"
+            + tile.getRepresentationForButtons(game, player) + " (**" + distance + " tile" + (distance == 1 ? "" : "s") + " away**)\n"
             + event.getMessage().getContentRaw());
         String message = "Choose a different system to move from, or finalize movement.";
         game.resetCurrentMovedUnitsFrom1System();
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        event.getMessage().delete().queue();
-
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void selectTileToMoveFrom(Player player, Game game, ButtonInteractionEvent event,
@@ -507,7 +504,7 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Chose to move from "
             + game.getTileByPosition(pos).getRepresentationForButtons(game, player)
             + ". Use buttons to select the units you want to move.", systemButtons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void selectRingThatActiveSystemIsIn(Player player, Game game, ButtonInteractionEvent event) {
@@ -575,7 +572,7 @@ public class ButtonHelperTacticalAction {
 
         String message = "Doing a tactical action. Please select the tile you want to activate";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -614,7 +611,7 @@ public class ButtonHelperTacticalAction {
                 .withEmoji(Emoji.fromFormatted(Emojis.comm));
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
-                + " you have Celdauri Commander and activated a system with your SD. Please hit button to get a commodity";
+                + " you have Celdauri Commander and activated a system with your space dock. Please hit button to get a commodity.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         }
 
@@ -647,7 +644,7 @@ public class ButtonHelperTacticalAction {
         List<Button> button2 = ButtonHelper.scanlinkResolution(player, game, event);
         if ((player.getTechs().contains("sdn") || player.getTechs().contains("absol_sdn")) && !button2.isEmpty()
             && !game.isL1Hero()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Please resolve scanlink",
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", Please resolve Scanlink Drone Network.",
                 button2);
             if (player.hasAbility("awaken") || player.hasUnit("titans_flagship")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, game, game.getTileByPosition(pos),
@@ -697,9 +694,9 @@ public class ButtonHelperTacticalAction {
         }
         game.setStoredValue("crucibleBoost", "");
         game.setStoredValue("flankspeedBoost", "");
+        game.setStoredValue("baldrickGDboost", "");
 
-        event.getMessage().delete().queue();
-
+        ButtonHelper.deleteMessage(event);
     }
 
 }
