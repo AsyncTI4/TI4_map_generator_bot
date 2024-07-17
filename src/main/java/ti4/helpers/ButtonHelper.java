@@ -94,6 +94,7 @@ import ti4.generator.TileHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.ColourHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -6365,6 +6366,7 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         List<ColorModel> unusedColors = game.getUnusedColors();
+        unusedColors = ColourHelper.sortColours(factionId, unusedColors);
         for (ColorModel color : unusedColors) {
             String colorName = color.getName();
             Emoji colorEmoji = color.getEmoji();
@@ -6630,8 +6632,15 @@ public class ButtonHelper {
                     newButtons.add(buttons.get(x));
                 }
             }
-            newButtons
-                .add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
+            int additionalMax = Math.min(buttons.size(), maxBefore + 22);
+            if (additionalMax != buttons.size()) {
+                newButtons
+                    .add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
+            }
+            else {
+                newButtons
+                    .add(Button.secondary("setupStep2_" + userId + "_-1!", "Go back"));
+            }
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                 "Please tell the bot the desired faction", newButtons);
             return;
@@ -6700,6 +6709,10 @@ public class ButtonHelper {
             if (additionalMax != buttons.size()) {
                 newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!",
                     "Get more colors"));
+            }
+            else {
+                newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_-1!",
+                    "Go back"));
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired color",
                 newButtons);
