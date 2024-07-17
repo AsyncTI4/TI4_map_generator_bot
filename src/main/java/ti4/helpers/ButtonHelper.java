@@ -4667,16 +4667,17 @@ public class ButtonHelper {
 
         if (player.hasUnexhaustedLeader("ghostagent")
             && FoWHelper.doesTileHaveWHs(game, game.getActiveSystem())) {
-            Button ghostButton = Button.secondary("exhaustAgent_ghostagent",
-                "Use Creuss Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+            Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Creuss Agent").withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
-        if (player.hasTech("as")
-            && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
-            Button ghostButton = Button.secondary("declareUse_Aetherstream", "Declare Aetherstream")
-                .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
-            buttons.add(ghostButton);
+        if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
+            buttons.add(Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", Emojis.Empyrean));
+        }
+        if (player.hasTech("baldrick_gd")) {
+            buttons.add(Buttons.gray("exhaustTech_baldrick_gd", "Exhaust Gravity Drive", Emojis.IgnisAurora));
+        }
+        if (player.hasTech("baldrick_lwd")) {
+            buttons.add(Buttons.gray("exhaustTech_baldrick_lwd", "Exhaust Light/Wave Deflector", Emojis.IgnisAurora));
         }
         if (player.getTechs().contains("dsgledb")) {
             buttons.add(Button.success(finChecker + "declareUse_Lightning", "Declare Lightning Drives").withEmoji(Emoji.fromFormatted(Emojis.gledge)));
@@ -5285,8 +5286,7 @@ public class ButtonHelper {
                         if (tile.isNebula() && !player.hasAbility("voidborn")) {
                             moveValue = 1;
                         }
-                        if (player.hasTech("as")
-                            && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
+                        if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
                             moveValue++;
                         }
                         if (player.hasAbility("slipstream") && (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition()) || tile == player.getHomeSystemTile())) {
@@ -5299,6 +5299,9 @@ public class ButtonHelper {
                             moveValue = moveValue + 2;
                         }
                         if (!game.getStoredValue("flankspeedBoost").isEmpty()) {
+                            moveValue = moveValue + 1;
+                        }
+                        if (!game.getStoredValue("baldrickGDboost").isEmpty()) {
                             moveValue = moveValue + 1;
                         }
 
@@ -6550,15 +6553,31 @@ public class ButtonHelper {
             getUserSetupButtons(game));
     }
 
+    public static List<Button> getGainAndLoseCCButtons(Player player) {
+        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+        buttons.removeIf(b -> !b.getId().startsWith("increase_")); // remove the wiring buttons
+        buttons.addAll(ButtonHelper.getLoseCCButtons(player)); // add the redistro buttons
+        return buttons;
+    }
+
     public static List<Button> getGainCCButtons(Player player) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "increase_tactic_cc", "Gain 1 Tactic CC"));
         buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "increase_fleet_cc", "Gain 1 Fleet CC"));
-        buttons.add(
-            Button.success(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc", "Gain 1 Strategy CC"));
+        buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc", "Gain 1 Strategy CC"));
         buttons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Done Gaining CCs"));
-        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "resetCCs",
-            "Reset CCs"));
+        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset CCs"));
+        player.getGame().setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        return buttons;
+    }
+
+    public static List<Button> getLoseCCButtons(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "decrease_tactic_cc", "Lose 1 Tactic CC"));
+        buttons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "decrease_fleet_cc", "Lose 1 Fleet CC"));
+        buttons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "decrease_strategy_cc", "Lose 1 Strategy CC"));
+        buttons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Done Gaining CCs"));
+        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset CCs"));
         player.getGame().setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         return buttons;
     }

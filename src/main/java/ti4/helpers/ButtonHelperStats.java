@@ -1,7 +1,10 @@
 package ti4.helpers;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -99,6 +102,17 @@ public class ButtonHelperStats {
         if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", null);
         }
+    }
+
+    public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {
+        List<Button> buttons = null;
+        if (redistribute) buttons = ButtonHelper.getGainAndLoseCCButtons(player);
+        if (!redistribute) buttons = ButtonHelper.getGainCCButtons(player);
+        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation()); // redundant
+
+        String message = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". ";
+        message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " CCs";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
 }

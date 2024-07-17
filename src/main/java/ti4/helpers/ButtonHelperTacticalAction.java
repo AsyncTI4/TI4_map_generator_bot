@@ -695,6 +695,7 @@ public class ButtonHelperTacticalAction {
         }
         game.setStoredValue("crucibleBoost", "");
         game.setStoredValue("flankspeedBoost", "");
+        game.setStoredValue("baldrickGDboost", "");
 
         ButtonHelper.deleteMessage(event);
     }
