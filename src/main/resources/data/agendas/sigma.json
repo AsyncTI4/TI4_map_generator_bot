@@ -1,0 +1,218 @@
+[
+    {
+        "alias": "sigma_a_new_age",
+        "name": "A New Age",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Shuffle the agenda discard pile into the agenda deck.",
+        "text2": "Against: Shuffle all laws in play into the agenda deck.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_changing_times",
+        "name": "Changing Times",
+        "type": "Directive",
+        "target": "Elect Public Objective",
+        "text1": "Discard the elected objective card, return any control tokens on it to their owners' reinforcements, and replace the card with a new random objective card from the same deck.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_leadership_resolution",
+        "name": "Leadership Resolution",
+        "type": "Directive",
+        "target": "Elect Command Token Pool",
+        "text1": "Each player gains 3 command tokens, and places them in the elected pool.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_diplomacy_resolution",
+        "name": "Diplomacy Resolution",
+        "type": "Directive",
+        "target": "Elect Non-Home System Other Than the Mecatol Rex System",
+        "text1": "Each play places a command token from their reinforcements in the elected system.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_politics_resolution",
+        "name": "Politics Resolution",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player that voted \"For\" draws 1 action card for each player that voted \"Against\".",
+        "text2": "Against: Each player that voted \"Against\" draws 1 action card for each player that voted \"For\".",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_construction_resolution",
+        "name": "Construction Resolution",
+        "type": "Directive",
+        "target": "Elect Planet",
+        "text1": "The owner of the elected planet places 1 space dock and 1 PDS from their reinforcements on that planet.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_trade_resolution",
+        "name": "Trade Resolution",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player replenishes their commodities, then chooses any number of other players; they replenish their commodities.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_warfare_resolution",
+        "name": "Warfare Resolution",
+        "type": "Directive",
+        "target": "Elect Non-Structure Unit Type",
+        "text1": "Each player may use the PRODUCTION ability of 1 of their space docks; they may only produce units of the elected type.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_technology_resolution",
+        "name": "Technology Resolution",
+        "type": "Directive",
+        "target": "Elect Non-Faction Technology",
+        "text1": "Each player that owns the elected technology gains 1 command token for each player that does not own that technology. Then, each player that does not own that technology gains that technology.",
+        "text2": "(Players treat a faction unit upgrade as though it were the non-faction unit upgrade when resolving this agenda.)",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_imperial_resolution",
+        "name": "Imperial Resolution",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "During the next strategy phase, the elected player chooses strategy cards for each player.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_expedited_paperwork",
+        "name": "Expedited Paperwork",
+        "type": "Law",
+        "target": "Elect Public Objective",
+        "text1": "During the status phase, players may score the elected objective, in addition to another public objective.",
+        "text2": "",
+        "mapText": "During the status phase, players may score the elected objective, in addition to another public objective.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_exploit_colonies",
+        "name": "Exploit Colonies",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player removes ground forces on planets they control outside their home system until the number of ground forces on that planet equals the resource value of that planet.",
+        "text2": "Against: Each player places infantry on planets they control outside their home system until the number of ground forces on that planet equals the resource value of that planet.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_coalitions",
+        "name": "Form Coalitions",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Reveal the top card of the agenda deck. Each player that voted \"For\" may cast 1 vote on this agenda. Players cannot cast additional votes.",
+        "text2": "Against: Reveal the top card of the agenda deck. Each player that voted \"Against\" may cast 1 vote on this agenda. Players cannot cast additional votes.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_ixthian",
+        "name": "Ixthian Artifact",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: The speaker rolls 1 die. If the result is odd, each player may research a number of technologies equal to half the die result, rounded up. If the result is even, destroy all units in the Mecatol Rex system, and each player with units in systems adjacent to Mecatol Rex destroys a number of their own units equal to half the die result in each of those systems.",
+        "text2": "Against: Shuffle this card and the top 5 cards of the agenda deck together, and place them on top of the agenda deck.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_keleres_funding",
+        "name": "Keleres Funding",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: All players' commodity values are reduced by 1.",
+        "text2": "Against: Each player return all of their trade goods to the supply.",
+        "mapText": "All players' commodity values are reduced by 1.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_marriage_treaty",
+        "name": "Marriage Treaty",
+        "type": "Directive",
+        "target": "Elect Player\nWhen this agenda is revealed, the speaker reveals the commander of a faction not in play, at random.",
+        "text1": "The elected player gains the revealed commander, unlocked. Another player with the elected player's Alliance promissory note may also use the ability of the gained commander.",
+        "text2": "",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_minister_of_energy",
+        "name": "Minister of Energy",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.",
+        "text2": "The influence and resource value of each of this card's owner's industrial planets is increased by 1.",
+        "mapText": "Increase the influence and resource values of your industrial planets by 1",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_minister_of_health",
+        "name": "Minister of Health",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.",
+        "text2": "The influence and resource value of each of this card's owner's hazardous planets is increased by 1.",
+        "mapText": "Increase the influence and resource values of your hazardous planets by 1",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_minister_of_sport",
+        "name": "Minister of Sport and Recreation",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.",
+        "text2": "The influence and resource value of each of this card's owner's cultural planets is increased by 1.",
+        "mapText": "Increase the influence and resource values of your cultural planets by 1",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_minister_of_industry",
+        "name": "Minister of Industry",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.",
+        "text2": "The resource value of each of this card's owner's planets is increased by 1.",
+        "mapText": "Increase the resource value of your planets by 1",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_minister_of_arts",
+        "name": "Minister of Arts",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card.",
+        "text2": "The influence value of each of this card's owner's planets is increased by 1.",
+        "mapText": "Increase the influence value of your planets by 1",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_resonance_cascade",
+        "name": "Resonance Cascade",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Place the 3 lambda wormhole tokens in the Mecatol Rex system. At the end of a player's tactical action, that player must remove 1 lambda wormhole token from the game board, and place it in the active system.",
+        "text2": "Against: Flip the wormhole nexus to its inactive side, and destroy all units in systems that contain a gamma wormhole.",
+        "mapText": "After a tactical action, move 1 lambda wormhole token into the active system.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_strike_negotiations",
+        "name": "Strike Negotiations",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The PRODUCTION value of each space dock is reduced by 2.",
+        "text2": "Against: Each player destroys 1 space dock.",
+        "mapText": "The PRODUCTION value of each space dock is reduced by 2.",
+        "source": "sigma"
+    }
+]

@@ -120,12 +120,29 @@ public class SCPlay extends PlayerSubcommandData {
         StringBuilder message = new StringBuilder();
         message.append(Helper.getSCRepresentation(game, scToPlay));
         message.append(" played");
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             message.append(" by ").append(player.getRepresentation());
         }
         message.append(".\n\n");
 
         String gamePing = game.getPing();
+        List<Player> playersToFollow = game.getRealPlayers();
+        if (game.getName().equalsIgnoreCase("pbd1000")) {
+            playersToFollow = new ArrayList<>();
+            String num = scToPlay + "";
+            num = num.substring(num.length() - 1, num.length());
+            gamePing = "";
+            for (Player p2 : game.getRealPlayers()) {
+                for (Integer sc : p2.getSCs()) {
+                    String num2 = sc + "";
+                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    if (num2.equalsIgnoreCase(num) || num.equalsIgnoreCase("0") || num2.equalsIgnoreCase("0")) {
+                        gamePing = p2.getRepresentation() + " ";
+                        playersToFollow.add(p2);
+                    }
+                }
+            }
+        }
         if (!gamePing.isEmpty()) {
             message.append(gamePing).append("\n");
         }
@@ -139,13 +156,10 @@ public class SCPlay extends PlayerSubcommandData {
 
         TextChannel textChannel = (TextChannel) mainGameChannel;
 
-        for (Player player2 : game.getPlayers().values()) {
-            if (!player2.isRealPlayer() || winnuHero) {
+        for (Player player2 : playersToFollow) {
+            if (winnuHero) {
                 continue;
             }
-            String faction = player2.getFaction();
-            if (faction == null || faction.isEmpty() || "null".equals(faction))
-                continue;
             player2.removeFollowedSC(scToPlay);
         }
 
@@ -161,11 +175,11 @@ public class SCPlay extends PlayerSubcommandData {
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
-        if (scModel.usesAutomationForSCID("pok7technology") && !game.isFoWMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
+        if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
 
-        if (scModel.usesAutomationForSCID("pok4construction") && !game.isFoWMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
+        if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Button.secondary("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
 
@@ -181,8 +195,8 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay, event);
             }
-            game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl().replace(":", "666fin"));
-            game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId().replace(":", "666fin"));
+            game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl());
+            game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId());
             game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction())
@@ -190,7 +204,7 @@ public class SCPlay extends PlayerSubcommandData {
                     game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());
                 }
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 // in fow, send a message back to the player that includes their emoji
                 String response = "SC played.";
                 response += reactionEmoji != null ? " " + reactionEmoji.getFormatted()
@@ -208,7 +222,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
                                 MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, game));
                             }
-                            if (scToPlay == 5) {
+                            if (scModel.usesAutomationForSCID("pok5trade")) {
                                 Button transaction = Button.primary("transaction", "Transaction");
                                 scButtons.add(transaction);
                                 scButtons.add(Button.success("sendTradeHolder_tg", "Send 1TG"));
@@ -279,11 +293,11 @@ public class SCPlay extends PlayerSubcommandData {
         if (scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
                 + " you can force players to refresh, normally done in order to trigger a trade agreement. This is not required and not advised if you are offering them a conditional refresh.";
-            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player);
+            List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage2, forceRefresh);
 
-            for (Player p2 : game.getRealPlayers()) {
+            for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
                     String message2 = p2.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
@@ -303,7 +317,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         if (!scModel.usesAutomationForSCID("pok1leadership")) {
             Button emelpar = Button.danger("scepterE_follow_" + scToPlay, "Exhaust Scepter of Emelpar");
-            for (Player player3 : game.getRealPlayers()) {
+            for (Player player3 : playersToFollow) {
                 if (player3 == player) {
                     continue;
                 }
@@ -338,7 +352,7 @@ public class SCPlay extends PlayerSubcommandData {
         conclusionButtons.add(deleteButton);
         conclusionButtons.add(Button.danger("endTurnWhenAllReactedTo_" + scToPlay, "End turn When All Have Reacted"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
-        if (!game.isHomeBrewSCMode() && player.hasAbility("grace")
+        if (!game.isHomebrewSCMode() && player.hasAbility("grace")
             && !player.getExhaustedAbilities().contains("grace")
             && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
             List<Button> graceButtons = new ArrayList<>();
@@ -348,8 +362,8 @@ public class SCPlay extends PlayerSubcommandData {
                 player.getRepresentation(true, true) + " you can resolve grace with the buttons",
                 graceButtons);
         }
-        if (player.ownsPromissoryNote("acq") && scToPlay != 1 && !winnuHero) {
-            for (Player player2 : game.getPlayers().values()) {
+        if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
+            for (Player player2 : playersToFollow) {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {
@@ -409,7 +423,7 @@ public class SCPlay extends PlayerSubcommandData {
         game.setStoredValue(key, "");
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
-        if (game.getQueueSO()) {
+        if (game.isQueueSO()) {
             for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
                     || player.getSoScored() == player.getMaxSOCount()
@@ -453,7 +467,7 @@ public class SCPlay extends PlayerSubcommandData {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));

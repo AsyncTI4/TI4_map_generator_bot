@@ -62,7 +62,7 @@ public class SendTG extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
         }
 
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             String fail = "Could not notify receiving player.";
             String success = "The other player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(player_, game, event.getChannel(), message, fail, success);

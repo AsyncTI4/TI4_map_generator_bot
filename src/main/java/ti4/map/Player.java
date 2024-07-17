@@ -152,6 +152,9 @@ public class Player {
     private List<String> exhaustedPlanets = new ArrayList<>();
     private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
     private List<String> mahactCC = new ArrayList<>();
+    @Getter
+    @Setter
+    private String notes = "";
 
     @JsonProperty("leaders")
     private List<Leader> leaders = new ArrayList<>();
@@ -486,7 +489,7 @@ public class Player {
     public ThreadChannel getCardsInfoThread() {
         Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFoWMode() || game.isCommunityMode())
+        if (game.isFowMode() || game.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
             actionsChannel = game.getMainGameChannel();
@@ -500,7 +503,7 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
             + getUserName().replaceAll("/", "");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
 
@@ -572,7 +575,7 @@ public class Player {
 
         // CREATE NEW THREAD
         // Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!game.isFoWMode());
+        boolean isPrivateChannel = (!game.isFowMode());
         if (game.getName().contains("pbd100") || game.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
@@ -591,7 +594,7 @@ public class Player {
     public ThreadChannel getCardsInfoThreadWithoutCompletes() {
         Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFoWMode() || game.isCommunityMode())
+        if (game.isFowMode() || game.isCommunityMode())
             actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
             actionsChannel = game.getMainGameChannel();
@@ -605,7 +608,7 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
             + getUserName().replaceAll("/", "");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
 
@@ -1060,6 +1063,7 @@ public class Player {
         removePromissoryNotesInPlayArea(id);
     }
 
+    @JsonIgnore
     public int getMaxSOCount() {
         int maxSOCount = getGame().getMaxSOCountPerPlayer();
         if (hasRelic("obsidian"))
@@ -1357,6 +1361,7 @@ public class Player {
         return getRepresentation(false, false);
     }
 
+    @JsonIgnore
     public String getRepresentation(boolean overrideFow, boolean ping) {
         Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
@@ -1439,7 +1444,7 @@ public class Player {
 
     @JsonIgnore
     public String getFactionEmojiOrColor() {
-        if (getGame().isFoWMode() || FoWHelper.isPrivateGame(getGame())) {
+        if (getGame().isFowMode() || FoWHelper.isPrivateGame(getGame())) {
             return Emojis.getColorEmojiWithName(getColor());
         }
         return getFactionEmoji();
@@ -1736,7 +1741,9 @@ public class Player {
     }
 
     public void setFleetCC(int fleetCC) {
-        this.fleetCC = fleetCC;
+        if (fleetCC > -1) {
+            this.fleetCC = fleetCC;
+        }
     }
 
     public int getStrategicCC() {
@@ -1831,7 +1838,9 @@ public class Player {
     }
 
     public void setTg(int tg) {
-        this.tg = tg;
+        if (tg > -1) {
+            this.tg = tg;
+        }
     }
 
     @JsonIgnore
@@ -1879,7 +1888,7 @@ public class Player {
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
                 TurnEnd.pingNextPlayer(event, game, p2);
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round " + game.getRound() + " for " + p2.getFactionEmoji());
                 }
             }
@@ -1943,6 +1952,7 @@ public class Player {
         SCs.clear();
     }
 
+    @JsonIgnore
     public int getLowestSC() {
         try {
             int min = 100;
@@ -2831,7 +2841,7 @@ public class Player {
      */
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
-        if (getGame().isFoWMode()) {
+        if (getGame().isFowMode()) {
             return getPrivateChannel();
         } else {
             return getGame().getMainGameChannel();
@@ -2840,7 +2850,7 @@ public class Player {
 
     public String getFlexibleDisplayName() {
         String name = faction;
-        if (displayName != null && !displayName.isEmpty()) {
+        if (displayName != null && !displayName.isEmpty() && !displayName.equals("null")) {
             name = displayName;
         }
         return StringUtils.capitalize(name);
@@ -2926,7 +2936,7 @@ public class Player {
         StringBuilder foot = new StringBuilder();
         eb.setFooter(foot.toString());
 
-        eb.setColor(ColorModel.primaryColor(color));
+        eb.setColor(Mapper.getColor(color).primaryColor());
         return eb.build();
     }
 

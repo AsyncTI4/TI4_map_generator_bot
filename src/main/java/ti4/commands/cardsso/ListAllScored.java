@@ -9,7 +9,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListAllScored extends SOCardsSubcommandData{
+public class ListAllScored extends SOCardsSubcommandData {
     public ListAllScored() {
         super(Constants.SO_LIST_SCORED, "Displays scored secret objectives");
     }
@@ -23,9 +23,9 @@ public class ListAllScored extends SOCardsSubcommandData{
         List<Player> players = game.getPlayers().values().stream().toList();
         Player currentPlayer = game.getPlayer(getUser().getId());
         for (Player player : players) {
-          if (!game.isFoWMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer)) {
-              for (String objective : player.getSecretsScored().keySet()) {
-                  sb.append(player.getFactionEmoji()).append(SOInfo.getSecretObjectiveRepresentation(objective));
+            if (!game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer)) {
+                for (String objective : player.getSecretsScored().keySet()) {
+                    sb.append(player.getFactionEmoji()).append(SOInfo.getSecretObjectiveRepresentation(objective));
                 }
             }
         }

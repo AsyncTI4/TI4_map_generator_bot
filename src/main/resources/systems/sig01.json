@@ -29,5 +29,6 @@
     "planets": [
         "garbozia"
     ],
-    "source": "sigma"
+    "source": "sigma",
+    "tileBack": "blue"
 }

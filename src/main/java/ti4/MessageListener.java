@@ -41,6 +41,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -109,7 +110,7 @@ public class MessageListener extends ListenerAdapter {
                 } else {
                     harmless = true;
                 }
-                if (userActiveGame != null && !userActiveGame.isFoWMode() && !harmless
+                if (userActiveGame != null && !userActiveGame.isFowMode() && !harmless
                     && userActiveGame.getName().contains("pbd")) {
                     if (event.getMessageChannel() instanceof ThreadChannel thread) {
                         if (!thread.isPublic()) {
@@ -323,10 +324,7 @@ public class MessageListener extends ListenerAdapter {
                                                 .append(
                                                     " has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                                                sb.append("Message link is: ")
-                                                    .append(game.getStoredValue("scPlay" + sc)
-                                                        .replace("666fin", ":"))
-                                                    .append("\n");
+                                                sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                                             }
                                             sb.append("You currently have ").append(p2.getStrategicCC())
                                                 .append(" CC in your strategy pool.");
@@ -399,7 +397,7 @@ public class MessageListener extends ListenerAdapter {
                         spacer = player.getPersonalPingInterval();
                     }
                 }
-                if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase()) && spacer != 0) {
+                if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame()) && spacer != 0) {
                     spacer = spacer / 3;
                     spacer = Math.max(spacer, 1);
                 }
@@ -410,10 +408,10 @@ public class MessageListener extends ListenerAdapter {
                         ButtonHelper.postTechSummary(game);
                     }
                 }
-                if (game.getAutoPingStatus() && spacer != 0 && !game.getTemporaryPingDisable()) {
-                    if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                if (game.getAutoPingStatus() && spacer != 0 && !game.isTemporaryPingDisable()) {
+                    if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
 
-                        if (player != null || "agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                        if (player != null || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                             long milliSinceLastPing = new Date().getTime()
                                 - game.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (60 * 60 * multiplier * spacer)
@@ -440,7 +438,7 @@ public class MessageListener extends ListenerAdapter {
                                         }
                                     }
                                 }
-                                if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                                if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                     AgendaHelper.pingMissingPlayers(game);
                                 } else {
                                     long milliSinceLastTurnChange = new Date().getTime()
@@ -621,10 +619,10 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity
                                             + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time.";
                                     }
-                                    if (pingNumber > maxSoFar + 1 && !game.isFoWMode()) {
+                                    if (pingNumber > maxSoFar + 1 && !game.isFowMode()) {
                                         continue;
                                     }
-                                    if (pingNumber == maxSoFar + 2 && !game.isFoWMode()) {
+                                    if (pingNumber == maxSoFar + 2 && !game.isFowMode()) {
                                         ping = realIdentity
                                             + " this is your final reminder. Stopping pinging now so we don't come back in 2 months and find 600+ messages.";
                                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -632,7 +630,7 @@ public class MessageListener extends ListenerAdapter {
                                                 + " the game has stalled on a player, and autoping will now stop pinging them.");
                                     }
 
-                                    if (game.isFoWMode()) {
+                                    if (game.isFowMode()) {
                                         MessageHelper.sendPrivateMessageToPlayer(player, game, ping);
                                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                                             "Active player has been pinged. This is ping #" + pingNumber);
@@ -663,7 +661,7 @@ public class MessageListener extends ListenerAdapter {
                     } else {
                         long milliSinceLastPing = new Date().getTime() - game.getLastActivePlayerPing().getTime();
                         if (milliSinceLastPing > (60 * 60 * multiplier * game.getAutoPingSpacer())) {
-                            if ("agendawaiting".equalsIgnoreCase(game.getCurrentPhase())) {
+                            if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                 AgendaHelper.pingMissingPlayers(game);
                                 game.setLastActivePlayerPing(new Date());
                                 GameSaveLoadManager.saveMap(game, "Auto Ping");
@@ -710,7 +708,7 @@ public class MessageListener extends ListenerAdapter {
             String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
             Game game = GameManager.getInstance().getGame(gameName);
-            if (game != null && game.getBotFactionReacts() && !game.isFoWMode()) {
+            if (game != null && game.isBotFactionReacts() && !game.isFowMode()) {
                 Player player = game.getPlayer(event.getAuthor().getId());
                 if (game.isCommunityMode()) {
 
@@ -790,7 +788,7 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
 
-            if (game.isFoWMode() &&
+            if (game.isFowMode() &&
                 ((player3 != null && player3.isRealPlayer()
                     && event.getChannel().getName().contains(player3.getColor()) && !event.getAuthor().isBot())
                     || (event.getAuthor().isBot() && messageText.contains("Total hits ")))) {
@@ -906,24 +904,12 @@ public class MessageListener extends ListenerAdapter {
                 } else if (messageToMyself) {
                     String previousThoughts = "";
                     if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
-                        previousThoughts = game
-                            .getStoredValue("futureMessageFor" + player.getFaction()) + "; ";
+                        previousThoughts = game.getStoredValue("futureMessageFor" + player.getFaction()) + "\n\n";
                     }
-                    game.setStoredValue("futureMessageFor" + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
+                    game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
                 } else if (endOfRoundSummery) {
-                    String previousThoughts = "";
-                    if (!game.getStoredValue(messageBeginning.toLowerCase() + player.getFaction()).isEmpty()) {
-                        previousThoughts = game
-                            .getStoredValue(messageBeginning.toLowerCase() + player.getFaction()) + "; ";
-                    }
-                    game.setStoredValue(messageBeginning.toLowerCase() + player.getFaction(),
-                        previousThoughts + messageContent.replace(":", "666fin").replace(",", "667fin").replace("\n", ". "));
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        player.getFactionEmoji() + " stored an end of round summary");
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Someone stored an end of round summary");
+                    RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true);
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);
@@ -938,10 +924,8 @@ public class MessageListener extends ListenerAdapter {
                             break;
                         }
                     }
-                    game.setStoredValue("futureMessageFor_" + player_.getFaction() + "_" + player.getFaction(),
-                        game.getStoredValue(
-                            "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction()) + " "
-                            + messageContent.replace(":", "666fin").replace(",", "").replace("\n", ". "));
+                    String futureMsgKey = "futureMessageFor_" + player_.getFaction() + "_" + player.getFaction();
+                    game.setStoredValue(futureMsgKey, game.getStoredValue(futureMsgKey) + "\n\n" + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent someone else a future message");
                 }
                 msg.delete().queue();

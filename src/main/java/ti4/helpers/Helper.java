@@ -385,18 +385,18 @@ public class Helper {
                 game.setStoredValue(key2,
                     game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
                 }
             }
             if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                 && game.getStoredValue(key2).length() > 2) {
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "imperial");
                 }
                 break;
@@ -445,7 +445,7 @@ public class Helper {
                     && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -456,7 +456,7 @@ public class Helper {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
                     break;
@@ -486,7 +486,7 @@ public class Helper {
                     && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
                         + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring";
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -550,7 +550,7 @@ public class Helper {
             if (!ButtonListener.checkForASpecificPlayerReact(messageID, player, game)) {
                 game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                     Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         int index = 0;
                         for (Player player_ : game.getPlayers().values()) {
                             if (player_ == player)
@@ -584,12 +584,12 @@ public class Helper {
             if (shouldDoIt || !canPlayerConceivablySabo(player, game)) {
                 for (String messageID : messageIDs) {
                     if (shouldPlayerLeaveAReact(player, game, messageID)) {
-                        String message = game.isFoWMode() ? "No Sabotage" : null;
+                        String message = game.isFowMode() ? "No Sabotage" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
                     }
                 }
             }
-            if ("agendawaiting".equals(game.getCurrentPhase())) {
+            if ("agendawaiting".equals(game.getPhaseOfGame())) {
                 int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
                 int result2 = ThreadLocalRandom.current().nextInt(1, highNum2 + 1);
                 boolean shouldDoIt2 = result2 == highNum2;
@@ -597,13 +597,13 @@ public class Helper {
                     String whensID = game.getLatestWhenMsg();
                     if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
                         && !ButtonListener.checkForASpecificPlayerReact(whensID, player, game)) {
-                        String message = game.isFoWMode() ? "No whens" : null;
+                        String message = game.isFowMode() ? "No whens" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, whensID, game);
                     }
                     String aftersID = game.getLatestAfterMsg();
                     if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
                         && !ButtonListener.checkForASpecificPlayerReact(aftersID, player, game)) {
-                        String message = game.isFoWMode() ? "No afters" : null;
+                        String message = game.isFowMode() ? "No afters" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, aftersID, game);
                     }
                 }
@@ -753,7 +753,7 @@ public class Helper {
 
     public static String getSCAsMention(int sc, Game game) {
         //StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
-        if (game.isHomeBrewSCMode()) {
+        if (game.isHomebrewSCMode()) {
             return getSCName(sc, game);
         }
         return switch (sc) {
@@ -770,7 +770,7 @@ public class Helper {
     }
 
     public static String getSCRepresentation(Game game, int sc) {
-        if (game.isHomeBrewSCMode())
+        if (game.isHomebrewSCMode())
             return "SC #" + sc + " " + getSCName(sc, game);
         return getSCAsMention(sc, game);
     }
@@ -822,7 +822,7 @@ public class Helper {
         emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
         String messageId = message.getId();
 
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             int index = 0;
             for (Player player_ : game.getPlayers().values()) {
                 if (player_ == player)
@@ -875,7 +875,7 @@ public class Helper {
 
     public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
 
-        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted:\n" + buildTransactionOffer(p1, p2, game);
+        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted:\n" + buildTransactionOffer(p1, p2, game, false);
         List<String> transactionItems = p1.getTransactionItems();
         List<Player> players = new ArrayList<Player>();
         players.add(p1);
@@ -960,7 +960,7 @@ public class Helper {
         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), summary);
     }
 
-    public static String buildTransactionOffer(Player p1, Player p2, Game game) {
+    public static String buildTransactionOffer(Player p1, Player p2, Game game, boolean publiclyShared) {
         List<String> transactionItems = p1.getTransactionItems();
         String wholeSummary = "";
         List<Player> players = new ArrayList<Player>();
@@ -971,7 +971,12 @@ public class Helper {
             if (sender == p2) {
                 receiver = p1;
             }
+            int num = 1;
             String summary = "**" + sender.getRepresentation(false, false) + " gives " + receiver.getRepresentation(false, false) + " the following:**\n";
+            if (publiclyShared) {
+                summary = sender.getFactionEmoji() + " gives " + receiver.getFactionEmoji() + ": ";
+                num = 0;
+            }
             for (String item : transactionItems) {
                 if (item.contains("sending" + sender.getFaction()) && item.contains("receiving" + receiver.getFaction())) {
                     String thingToTransact = item.split("_")[2];
@@ -1019,7 +1024,11 @@ public class Helper {
                                             acID = ac.getKey();
                                         }
                                     }
-                                    summary = summary + Emojis.ActionCard + " " + Mapper.getActionCard(acID).getName() + "\n";
+                                    if (publiclyShared) {
+                                        summary = summary + Emojis.ActionCard + "\n";
+                                    } else {
+                                        summary = summary + Emojis.ActionCard + " " + Mapper.getActionCard(acID).getName() + "\n";
+                                    }
                                 }
                             }
                         }
@@ -1044,7 +1053,11 @@ public class Helper {
                                     if (id == null) {
                                         continue;
                                     }
-                                    summary = summary + Emojis.PN + " " + StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")) + " " + Mapper.getPromissoryNote(id).getName() + "\n";
+                                    if (publiclyShared) {
+                                        summary = summary + Emojis.PN + "\n";
+                                    } else {
+                                        summary = summary + Emojis.PN + " " + StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")) + " " + Mapper.getPromissoryNote(id).getName() + "\n";
+                                    }
                                 }
                             }
                         }
@@ -1061,10 +1074,15 @@ public class Helper {
 
                 }
             }
-            if (StringUtils.countMatches(summary, "\n") > 1) {
+            if (StringUtils.countMatches(summary, "\n") > num) {
+                if (publiclyShared) {
+                    summary = summary.replace("\n", "; ");
+                    summary = summary.substring(0, summary.length() - 2);
+                }
                 wholeSummary = wholeSummary + "\n" + summary;
+
             } else {
-                wholeSummary = wholeSummary + "\n" + summary + getNothingMessage() + "\n";
+                wholeSummary = wholeSummary + "\n" + summary + getNothingMessage();
             }
         }
 
@@ -1189,7 +1207,7 @@ public class Helper {
     public static String getPlayerDependingOnFog(Game game, Player player) {
         String ident;
 
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             ident = player.getColor();
         } else {
             ident = player.getFactionEmoji();
@@ -1209,7 +1227,7 @@ public class Helper {
                 if (player == null || player.getFaction() == null) {
                     continue;
                 }
-                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFoWMode()) {
+                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
                     held = true;
                     break;
                 }
@@ -1219,14 +1237,14 @@ public class Helper {
             Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = " ";
-            if (game.getScTradeGoods().get(sc) > 0 && !game.isFoWMode()) {
+            if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
                 label = "[has " + game.getScTradeGoods().get(sc) + " TG" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
             }
             if (sc == ButtonHelper.getKyroHeroSC(game)) {
                 label = label + " Kyro Hero Cursed";
             }
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomeBrewSCMode()) {
+                && !game.isHomebrewSCMode()) {
 
                 button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label)
                     .withEmoji(scEmoji);
@@ -1449,8 +1467,13 @@ public class Helper {
 
             }
         }
-        msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
-            + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
+        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor()) != null) {
+            msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
+                + Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor());
+        } else {
+            msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
+                + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
+        }
         if (justVoteTotal) {
             return "" + votes;
         }
@@ -1764,7 +1787,10 @@ public class Helper {
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
-        if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(false)) {
+        if (!player.getPlanets().contains(uH.getName())) {
+            return productionValueTotal;
+        }
+        if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(true)) {
             productionValueTotal = productionValueTotal + 3;
             planetUnitVal = 3;
         }
@@ -2344,7 +2370,7 @@ public class Helper {
     private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Game game, String color,
         int ccCount) {
         boolean ccCountIsOver = ccCount > 16;
-        if (ccCountIsOver && game.getCCNPlasticLimit()) {
+        if (ccCountIsOver && game.isCcNPlasticLimit()) {
             Player player = null;
             String factionColor = AliasHandler.resolveColor(color.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
@@ -2356,7 +2382,7 @@ public class Helper {
             }
 
             String msg = game.getPing() + " ";
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 if (player != null) {
                     msg += player.getFactionEmoji() + " " + player.getFaction() + " ";
                     msg += player.getPing() + " ";
@@ -2686,7 +2712,7 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
-        if (!game.isFoWMode() && !game.isCommunityMode()) {
+        if (!game.isFowMode() && !game.isCommunityMode()) {
             String gameName = game.getName();
             List<Role> roles = guild.getRolesByName(gameName, true);
             Role role = null;
@@ -3018,7 +3044,7 @@ public class Helper {
         } else {
             msg = "Detected an abnormal map, so did not assign speaker order automatically. Set the speaker order with /game set_order, with the speaker as the first player";
         }
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
         }
         List<Tile> tiles = new ArrayList<>();

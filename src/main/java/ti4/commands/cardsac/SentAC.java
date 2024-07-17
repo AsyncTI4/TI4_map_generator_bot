@@ -62,7 +62,7 @@ public class SentAC extends ACCardsSubcommandData {
         }
 
         // FoW specific pinging
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
         }
 

@@ -95,7 +95,7 @@ public class TurnStart extends PlayerSubcommandData {
             : game.getMainGameChannel();
 
         game.updateActivePlayer(player);
-        game.setCurrentPhase("action");
+        game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
@@ -136,7 +136,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
         } else {
             //checkhere
-            if (game.getShowBanners()) {
+            if (game.isShowBanners()) {
                 MapGenerator.drawBanner(player);
             }
             MessageHelper.sendMessageToChannel(gameChannel, text);
@@ -167,8 +167,7 @@ public class TurnStart extends PlayerSubcommandData {
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 player.getRepresentation(true, true) + " you left yourself the following message: \n"
-                    + game.getStoredValue("futureMessageFor" + player.getFaction())
-                        .replace("666fin", ":"));
+                    + game.getStoredValue("futureMessageFor" + player.getFaction()));
             game.setStoredValue("futureMessageFor" + player.getFaction(), "");
         }
         for (Player p2 : game.getRealPlayers()) {
@@ -176,8 +175,7 @@ public class TurnStart extends PlayerSubcommandData {
                 .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
                 .isEmpty()) {
                 String msg2 = "This is a message sent from the past:\n" + game
-                    .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction())
-                    .replace("666fin", ":");
+                    .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction());
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                     p2.getRepresentation(true, true) + " your future message got delivered");
                 Whisper.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
@@ -233,11 +231,21 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(" Please resolve these before doing anything else:\n");
         int count = 0;
         for (int sc : game.getPlayedSCsInOrder(player)) {
+            if (game.getName().equalsIgnoreCase("pbd1000")) {
+                String num = sc + "";
+                num = num.substring(num.length() - 1, num.length());
+                for (Integer sc2 : player.getSCs()) {
+                    String num2 = sc2 + "";
+                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    if (!num2.equalsIgnoreCase(num) && !player.hasFollowedSC(sc)) {
+                        player.addFollowedSC(sc);
+                    }
+                }
+            }
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(game, sc));
                 if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                    sb.append(" ")
-                        .append(game.getStoredValue("scPlay" + sc).replace("666fin", ":"));
+                    sb.append(" ").append(game.getStoredValue("scPlay" + sc));
                 }
                 sb.append("\n");
                 sendReminder = true;
@@ -265,8 +273,7 @@ public class TurnStart extends PlayerSubcommandData {
         Button tacticalAction = Button.success(finChecker + "tacticalAction",
             "Tactical Action (" + player.getTacticalCC() + ")");
         int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
-        Button componentAction = Button.success(finChecker + "componentAction",
-            "Component Action (" + numOfComponentActions + ")");
+        Button componentAction = Button.success(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
         startButtons.add(tacticalAction);
         startButtons.add(componentAction);
@@ -274,7 +281,7 @@ public class TurnStart extends PlayerSubcommandData {
         for (Integer SC : player.getSCs()) {
             if (!game.getPlayedSCs().contains(SC)) {
                 hadAnyUnplayedSCs = true;
-                if (game.isHomeBrewSCMode()) {
+                if (game.isHomebrewSCMode()) {
                     Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC);
                     startButtons.add(strategicAction);
                 } else {
@@ -293,7 +300,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
 
             startButtons.add(pass);
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
@@ -302,9 +309,7 @@ public class TurnStart extends PlayerSubcommandData {
                             .append(
                                 " has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                            sb.append("Message link is: ").append(
-                                game.getStoredValue("scPlay" + sc).replace("666fin", ":"))
-                                .append("\n");
+                            sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                         }
                         sb.append("You currently have ").append(p2.getStrategicCC())
                             .append(" CC in your strategy pool.");
@@ -326,7 +331,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (ButtonHelper.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Button.secondary(finChecker + "ministerOfWar", "Use Minister of War"));
             }
-            if (!game.getJustPlayedComponentAC()) {
+            if (!game.isJustPlayedComponentAC()) {
                 player.setWhetherPlayerShouldBeTenMinReminded(true);
             }
         } else {
@@ -448,7 +453,7 @@ public class TurnStart extends PlayerSubcommandData {
         // startButtons.addAll(getButtonsToSwitchWithAllianceMembers(player, game,
         // false));
         // }
-        if (!doneActionThisTurn && game.isFoWMode()) {
+        if (!doneActionThisTurn && game.isFowMode()) {
             startButtons.add(Button.secondary("showGameAgain", "Show Game"));
         }
 

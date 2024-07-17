@@ -1,7 +1,5 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,10 +11,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
+
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -26,7 +28,6 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
-import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
@@ -358,7 +359,7 @@ public class Tile {
     @JsonIgnore
     public String getRepresentationForButtons(Game game, Player player) {
         try {
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 if (player == null)
                     return getPosition();
 
@@ -568,20 +569,20 @@ public class Tile {
             return true;
         }
 
-        TileModel model = getTileModel();
-        if (model != null) {
-            if (StringUtils.isNotBlank(model.getTileBack())) {
-                // if the tile back is defined, that is the source of truth
-                return "green".equals(model.getTileBack());
-            }
-            for (String p : model.getPlanets()) {
-                PlanetModel planet = Mapper.getPlanet(p);
-                if (StringUtils.isNotBlank(planet.getFactionHomeworld())) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        //TileModel model = getTileModel();
+        // if (model != null) {
+        //     if (StringUtils.isNotBlank(model.getTileBack())) {
+        //         // if the tile back is defined, that is the source of truth
+        //         return "green".equals(model.getTileBack());
+        //     }
+        //     for (String p : model.getPlanets()) {
+        //         PlanetModel planet = Mapper.getPlanet(p);
+        //         if (StringUtils.isNotBlank(planet.getFactionHomeworld())) {
+        //             return true;
+        //         }
+        //     }
+        //     return false;
+        // }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
                 boolean oneOfThree = planetHolder.getOriginalPlanetType() != null

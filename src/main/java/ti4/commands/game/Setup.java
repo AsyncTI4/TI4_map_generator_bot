@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import java.util.ArrayList;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -126,7 +127,7 @@ public class Setup extends GameSubcommandData {
     public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
         boolean isTIGLGame) {
         if (isTIGLGame
-            && (baseGameMode || absolMode || discordantStarsMode || game.isHomeBrewSCMode() || game.isFoWMode() || game.isAllianceMode() || game.isCommunityMode())) {
+            && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
@@ -136,12 +137,12 @@ public class Setup extends GameSubcommandData {
         }
 
         if (miltyModMode && !baseGameMode) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Milty Mod Mode can only be combined with Base Game Mode. Please set the game to Base Game Mode first.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Milty Mod Mode can only be combined with No Expansion Mode. Please set the game to No Expansion Mode first.");
             return false;
         }
 
         if (baseGameMode && (absolMode || discordantStarsMode)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Base Game Mode is not supported with Discordant Stars or Absol Mode");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Expansion Mode is not supported with Discordant Stars or Absol Mode");
             return false;
         } else if (baseGameMode && miltyModMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_miltymod"))) return false;

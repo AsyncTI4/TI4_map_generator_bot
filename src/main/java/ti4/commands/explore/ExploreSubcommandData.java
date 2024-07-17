@@ -137,7 +137,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
         String message = null;
 
-        if (game != null && !game.isFoWMode() && (event.getChannel() != game.getActionsChannel())) {
+        if (game != null && !game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             if (planetID != null) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(),
                     player.getFactionEmoji() + " found a " + exploreModel.getName() + " on "
@@ -291,7 +291,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         game.drawActionCard(player.getUserID());
                     }
 
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2ACs");
                     }
                     ACInfo.sendActionCardInfo(game, player, event);
@@ -308,7 +308,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective";
                 game.drawSecretObjective(player.getUserID());
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
                 }
                 if (player.hasAbility("plausible_deniability")) {
@@ -345,7 +345,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     return;
                 }
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
-                    || game.getCurrentPhase().contains("agenda")) && player.hasAbility("scavenge")
+                    || game.getPhaseOfGame().contains("agenda")) && player.hasAbility("scavenge")
                     && event != null) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1TG from Scavenge ("
@@ -357,7 +357,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
 
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
-                    || game.getCurrentPhase().contains("agenda")) && player.hasUnit("saar_mech")
+                    || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")
                     && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Button.success("saarMechRes_" + "mirage",

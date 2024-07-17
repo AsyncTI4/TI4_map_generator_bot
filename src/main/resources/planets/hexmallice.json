@@ -1,0 +1,126 @@
+{
+    "id": "hexmallice",
+    "tileId": "82bh",
+    "name": "Mallice (Hexagon)",
+    "shortName": null,
+    "aliases": [
+        "hexmallice",
+        "hexmellice",
+        "hexmalice",
+        "hexmalis",
+        "hexmallis",
+        "hexmallic",
+        "hexnexus",
+        "82h_1",
+        "82bh_1",
+        "hex82_1",
+        "hex82b_1",
+        "mallice(hexagon)"
+    ],
+    "positionInTile": {
+        "x": 204.0,
+        "y": 116.0
+    },
+    "resources": 0,
+    "influence": 3,
+    "factionHomeworld": null,
+    "planetType": "CULTURAL",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Exterrix Headquarters",
+    "legendaryAbilityText": "You may exhaust this card at the end of your turn to gain 2 trade goods or convert all of your commodities to trade goods.",
+    "legendaryAbilityFlavourText": "*Founded by black market traders that fled through a wormhole and ended up in the space between.*",
+    "unitPositions": {
+        "unitHolderName": "hexmallice",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 162.0,
+                    "y": 104.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 222.0,
+                    "y": 140.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 168.0,
+                    "y": 132.0
+                },
+                {
+                    "x": 184.0,
+                    "y": 132.0
+                },
+                {
+                    "x": 202.0,
+                    "y": 132.0
+                },
+                {
+                    "x": 176.0,
+                    "y": 142.0
+                },
+                {
+                    "x": 194.0,
+                    "y": 142.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 170.0,
+                    "y": 60.0
+                },
+                {
+                    "x": 188.0,
+                    "y": 60.0
+                },
+                {
+                    "x": 162.0,
+                    "y": 74.0
+                },
+                {
+                    "x": 180.0,
+                    "y": 74.0
+                },
+                {
+                    "x": 198.0,
+                    "y": 74.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 182.0,
+                    "y": 102.0
+                },
+                {
+                    "x": 148.0,
+                    "y": 102.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 106.0,
+                    "y": 94.0
+                },
+                {
+                    "x": 114.0,
+                    "y": 62.0
+                },
+                {
+                    "x": 232.0,
+                    "y": 94.0
+                },
+                {
+                    "x": 224.0,
+                    "y": 62.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "contrastColor": "orange",
+    "flavourText": "*Trapped in a space believed to be beyond our universe, a shimmering world of strange energies and disconcerting warping of physical laws sitting at the heart of a strategically vital wormhole nexus.*",
+    "source": "dane_leaks"
+}

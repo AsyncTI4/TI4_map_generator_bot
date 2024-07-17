@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.message.BotLogger;
 
@@ -20,6 +21,8 @@ public class Storage {
 
     private static String resourcePath = null;
     private static String storagePath = null;
+
+    private static Font EMOJI_FONT_40;
 
     private static Font TI_FONT_8;
     private static Font TI_FONT_12;
@@ -43,6 +46,12 @@ public class Storage {
     private static Font TI_FONT_90;
     private static Font TI_FONT_100;
     private static Font TI_FONT_110;
+
+    public static Font getEmojiFont() {
+        if (EMOJI_FONT_40 != null)
+            return EMOJI_FONT_40;
+        return EMOJI_FONT_40 = getEmojiFont(40f);
+    }
 
     public static Font getFont8() {
         if (TI_FONT_8 != null) {
@@ -234,52 +243,66 @@ public class Storage {
         return tiFont;
     }
 
-    @Nullable
+    private static Font getEmojiFont(float size) {
+        Font font = null;
+        String resource = getResourcePath();
+        if (resource == null) return null;
+        File file = new File(resource + "/font/NotoEmoji-Regular.ttf");
+        try (InputStream inputStream = new FileInputStream(file)) {
+            font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            font = font.deriveFont(size);
+        } catch (Exception e) {
+            BotLogger.log("Could not load font", e);
+        }
+        return font;
+    }
+
+    @NotNull
     public static File getMapUndoStorage(String mapName) {
         return new File(getStoragePath() + MAPS_UNDO + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapUndoDirectory() {
         return new File(getStoragePath() + MAPS_UNDO);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapImageStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapImageDirectory() {
         return new File(getStoragePath() + MAPS);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getDeletedMapStorage(String mapName) {
         return new File(getStoragePath() + DELETED_MAPS + mapName);
     }
 
-    @Nullable
+    @NotNull
     public static File getTTPGExportDirectory() {
         return new File(getStoragePath() + TTPG_EXPORTS);
     }
 
-    @Nullable
+    @NotNull
     public static File getTTPGExportStorage(String fileName) {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapsJSONDirectory() {
         return new File(getStoragePath() + MAPS_JSON);
     }
 
-    @Nullable
+    @NotNull
     public static File getMapsJSONStorage(String fileName) {
         return new File(getStoragePath() + MAPS_JSON + fileName);
     }

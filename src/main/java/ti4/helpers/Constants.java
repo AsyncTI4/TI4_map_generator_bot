@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.User;
 import ti4.AsyncTI4DiscordBot;
 
 public class Constants {
@@ -16,11 +17,13 @@ public class Constants {
     public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     public static String jazzPing() {
-        return AsyncTI4DiscordBot.jda.getUserById(jazzId).getAsMention();
+        User jazz = AsyncTI4DiscordBot.jda.getUserById(jazzId);
+        return jazz == null ? "" : jazz.getAsMention();
     }
 
     public static String bltPing() {
-        return AsyncTI4DiscordBot.jda.getUserById(bltId).getAsMention();
+        User blt = AsyncTI4DiscordBot.jda.getUserById(bltId);
+        return blt == null ? "" : blt.getAsMention();
     }
 
     // Tourney Winners
@@ -76,10 +79,13 @@ public class Constants {
     public static final String SLASH_COMMAND_STRING = "slash_command_string";
     public static final String ACS_SABOD = "acs_sabod";
     public static final String ABSOL_MODE = "absol_mode";
+    public static final String PROMISES_PROMISES = "promises_promises";
+    public static final String FLAGSHIPPING = "flagshipping";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
+    public static final String NOTEPAD = "notepad";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String CONFIRM = "confirm";
     public static final String PUBLISH = "publish";
@@ -91,6 +97,7 @@ public class Constants {
     public static final String TRANSACTION_METHOD = "transaction_method";
     public static final String SHOW_GEARS = "show_gears";
     public static final String SHOW_BANNERS = "show_banners";
+    public static final String SHOW_HEX_BORDERS = "show_hex_borders";
     public static final String HOMEBREW_MODE = "homebrew_mode";
     public static final String UNDO_BUTTON = "undo_button";
     public static final String FAST_SC_FOLLOW = "fast_sc_follow";

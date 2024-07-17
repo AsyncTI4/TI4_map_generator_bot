@@ -138,7 +138,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " TG" + (count == 1 ? "" : "s") + " via a trap";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public void steal3Comm(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -150,6 +150,6 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         String msg2 = player.getRepresentation(true, true) + " you stole " + count + " comm" + (count == 1 ? "" : "s") + " via a trap";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 }

@@ -78,7 +78,7 @@ public class SCPick extends PlayerSubcommandData {
         boolean pickSuccessful = stats.pickSC(event, game, player, option);
         Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 String[] scs = { Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6 };
                 int c = 0;
                 while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
@@ -123,7 +123,7 @@ public class SCPick extends PlayerSubcommandData {
                 continue;
             }
             if (p2.getSCs().size() < maxSCsPerPlayer) {
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     buttons.add(Button.secondary("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
                 } else {
                     buttons.add(Button.secondary("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
@@ -152,7 +152,7 @@ public class SCPick extends PlayerSubcommandData {
             int tg = player.getTg();
             tg += tgCount;
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scPicked);
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scPicked;
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
@@ -179,10 +179,10 @@ public class SCPick extends PlayerSubcommandData {
         Stats.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentation(true, true) + " was given SC #" + scpick
-            + (!game.isFoWMode() ? " by " + player.getFactionEmoji() : "");
+            + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getColor() + " was given SC #" + scpick);
 
         }
@@ -219,7 +219,7 @@ public class SCPick extends PlayerSubcommandData {
             if (privatePlayer == null) {
                 privatePlayer = game.getRealPlayers().get(0);
             }
-            game.setCurrentPhase("strategy");
+            game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                 privatePlayer.getRepresentation(true, true) + "Use Buttons to Pick Which SC you want to give someone", Helper.getRemainingSCButtons(event, game, privatePlayer));
@@ -253,7 +253,7 @@ public class SCPick extends PlayerSubcommandData {
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
                 msgExtra += player_.getRepresentation(true, true) + " To Pick SC";
-                game.setCurrentPhase("strategy");
+                game.setPhaseOfGame("strategy");
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -313,12 +313,12 @@ public class SCPick extends PlayerSubcommandData {
                 game.updateActivePlayer(nextPlayer);
                 ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
                 ButtonHelperFactionSpecific.resolveKolleccAbilities(nextPlayer, game);
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
                 }
 
-                game.setCurrentPhase("action");
-                if (!game.isFoWMode()) {
+                game.setPhaseOfGame("action");
+                if (!game.isFowMode()) {
                     ButtonHelper.updateMap(game, event,
                         "Start of Action Phase For Round #" + game.getRound());
                 }
@@ -336,7 +336,7 @@ public class SCPick extends PlayerSubcommandData {
             game.updateActivePlayer(privatePlayer);
 
             if (!allPicked) {
-                game.setCurrentPhase("strategy");
+                game.setPhaseOfGame("strategy");
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, game, privatePlayer));
             } else {
                 privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
@@ -365,7 +365,7 @@ public class SCPick extends PlayerSubcommandData {
                 if (!allPicked) {
                     game.updateActivePlayer(privatePlayer);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, game, privatePlayer));
-                    game.setCurrentPhase("strategy");
+                    game.setPhaseOfGame("strategy");
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
                     privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
@@ -383,7 +383,7 @@ public class SCPick extends PlayerSubcommandData {
 
                         }
                     }
-                    game.setCurrentPhase("action");
+                    game.setPhaseOfGame("action");
                 }
             }
         }

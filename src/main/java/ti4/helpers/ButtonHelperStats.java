@@ -1,7 +1,10 @@
 package ti4.helpers;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -23,7 +26,7 @@ public class ButtonHelperStats {
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }
-        if (game.isFoWMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
         if (event.getMessage().getContentRaw().toLowerCase().contains("space station")) {
             ButtonHelper.deleteMessage(event);
@@ -55,7 +58,7 @@ public class ButtonHelperStats {
         int finalComm = player.getCommodities();
 
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
-        if (game.isFoWMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
         if (deleteMsg) ButtonHelper.deleteMessage(event);
         afterGainCommsChecks(game, player, finalComm - initComm);
@@ -73,7 +76,7 @@ public class ButtonHelperStats {
         int finalComm = player.getCommodities();
 
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
-        if (game.isFoWMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
         afterGainCommsChecks(game, player, finalComm - initComm);
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
@@ -88,7 +91,7 @@ public class ButtonHelperStats {
 
         String message = "has gained " + amt + " trade goods (" + init + "->" + player.getTg() + ")";
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
-        if (game.isFoWMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
+        if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
         // After gain tg checks
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -103,6 +106,17 @@ public class ButtonHelperStats {
         if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", null);
         }
+    }
+
+    public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {
+        List<Button> buttons = null;
+        if (redistribute) buttons = ButtonHelper.getGainAndLoseCCButtons(player);
+        if (!redistribute) buttons = ButtonHelper.getGainCCButtons(player);
+        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation()); // redundant
+
+        String message = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". ";
+        message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " CCs";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
 }

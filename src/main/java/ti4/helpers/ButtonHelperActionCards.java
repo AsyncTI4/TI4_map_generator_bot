@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -236,7 +237,7 @@ public class ButtonHelperActionCards {
             + ButtonHelper.getIdentOrColor(p2, game) + " in tile " + tile.getRepresentationForButtons(game, player)
             + " was removed via the Lucky Shot AC";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
         }
         event.getMessage().delete().queue();
@@ -475,7 +476,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdentOrColor(player, game) + " gained 1TG due to Forward Supply Base (" + oldTg
                 + "->" + player.getTg() + ")");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained 1TG due to Forward Supply Base");
         }
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -496,7 +497,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("forwardSupplyBaseStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("forwardSupplyBaseStep2_" + p2.getFaction(), " ");
@@ -527,7 +528,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("reparationsStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("reparationsStep2_" + p2.getFaction(), " ");
@@ -548,7 +549,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("diplomaticPressureStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("diplomaticPressureStep2_" + p2.getFaction(), " ");
@@ -570,7 +571,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("reactorMeltdownStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("reactorMeltdownStep2_" + p2.getFaction(), " ");
@@ -619,7 +620,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("uprisingStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("uprisingStep2_" + p2.getFaction(), " ");
@@ -641,7 +642,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("assRepsStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("assRepsStep2_" + p2.getFaction(), " ");
@@ -662,7 +663,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("signalJammingStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("signalJammingStep2_" + p2.getFaction(), " ");
@@ -684,7 +685,7 @@ public class ButtonHelperActionCards {
             if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(
                     Button.secondary("seizeArtifactStep2_" + p2.getFaction() + "_" + kolleccTech, p2.getColor()));
             } else {
@@ -707,7 +708,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("plagueStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("plagueStep2_" + p2.getFaction(), " ");
@@ -754,7 +755,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("micrometeoroidStormStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("micrometeoroidStormStep2_" + p2.getFaction(), " ");
@@ -820,7 +821,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("crippleStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("crippleStep2_" + p2.getFaction(), " ");
@@ -842,7 +843,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("infiltrateStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("infiltrateStep2_" + p2.getFaction(), " ");
@@ -863,7 +864,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("spyStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("spyStep2_" + p2.getFaction(), " ");
@@ -888,7 +889,7 @@ public class ButtonHelperActionCards {
             Button button;
             String label = " ";
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomeBrewSCMode()) {
+                && !game.isHomebrewSCMode()) {
                 button = Button.secondary("psStep2_" + sc, label).withEmoji(scEmoji);
             } else {
                 button = Button.secondary("psStep2_" + sc, "" + sc + label);
@@ -939,7 +940,7 @@ public class ButtonHelperActionCards {
             if (p2 == player || p2.getTacticalCC() < 1) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("insubStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("insubStep2_" + p2.getFaction(), " ");
@@ -962,7 +963,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("unstableStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("unstableStep2_" + p2.getFaction(), " ");
@@ -983,7 +984,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("absStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("absStep2_" + p2.getFaction(), " ");
@@ -1005,7 +1006,7 @@ public class ButtonHelperActionCards {
             if (p2 == player) {
                 continue;
             }
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 buttons.add(Button.secondary("salvageStep2_" + p2.getFaction(), p2.getColor()));
             } else {
                 Button button = Button.secondary("salvageStep2_" + p2.getFaction(), " ");
@@ -1401,7 +1402,7 @@ public class ButtonHelperActionCards {
                 Button button;
                 String label = " ";
                 if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                    && !game.isHomeBrewSCMode()) {
+                    && !game.isHomebrewSCMode()) {
                     button = Button.secondary("resolvePreassignment_Coup_" + sc, label).withEmoji(scEmoji);
                 } else {
                     button = Button.secondary("resolvePreassignment_Coup_" + sc, "" + sc + label);
@@ -1461,7 +1462,7 @@ public class ButtonHelperActionCards {
                 Button button;
                 String label = " ";
                 if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                    && !game.isHomeBrewSCMode()) {
+                    && !game.isHomebrewSCMode()) {
                     button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, label).withEmoji(scEmoji);
                 } else {
                     button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, "" + sc + label);
@@ -1714,7 +1715,7 @@ public class ButtonHelperActionCards {
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
             for (int x = 0; x < amount; x++) {
-                Die d1 = new Die(7);
+                Die d1 = new Die(6);
                 msg.append(d1.getResult()).append(", ");
                 if (d1.isSuccess()) {
                     hits++;
@@ -1809,7 +1810,7 @@ public class ButtonHelperActionCards {
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " repealed " + Mapper.getAgendaTitle(name));
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 Mapper.getAgendaTitle(name) + " was repealed");
         }

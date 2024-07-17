@@ -61,7 +61,7 @@ public class FoWHelper {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
-			return game.isFoWMode();
+			return game.isFowMode();
 		}
 		if (game == null) {
 			String gameName = channel.getName();
@@ -72,7 +72,7 @@ public class FoWHelper {
 				return false;
 			}
 		}
-		if (game.isFoWMode() && channel_ != null || event != null) {
+		if (game.isFowMode() && channel_ != null || event != null) {
 			return channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
 		}
 		return false;
@@ -197,7 +197,7 @@ public class FoWHelper {
 		}
 	}
 
-	private static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
+	public static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
 		@NotNull Player viewingPlayer) {
 		Tile tile = player.getHomeSystemTile();
 		if (tile != null && !tile.hasFog(viewingPlayer)) {
@@ -361,7 +361,7 @@ public class FoWHelper {
 				position_ = override;
 			}
 
-			if ("x".equals(position_) || (hyperlaneData != null && !hyperlaneData.get(i))) {
+			if ("x".equals(position_) || (hyperlaneData != null && !hyperlaneData.isEmpty() && !hyperlaneData.get(i))) {
 				// the hyperlane doesn't exist & doesn't go that direction, skip.
 				continue;
 			}
@@ -686,7 +686,7 @@ public class FoWHelper {
 		Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
 		for (UnitKey unitKey : units.keySet()) {
-			if (unitKey != null && unitKey.getColorID().equals(colorID) && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
+			if (unitKey != null && unitKey.getColorID().equals(colorID) && player.getUnitFromAsyncID(unitKey.asyncID()) != null && player.getUnitFromAsyncID(unitKey.asyncID()).getIsShip()) {
 				return true;
 			}
 		}

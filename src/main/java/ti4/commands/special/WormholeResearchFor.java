@@ -49,7 +49,7 @@ public class WormholeResearchFor extends SpecialSubcommandData {
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Removed all ships from alphas/betas\nYou can use the button to get your tech", List.of(Buttons.GET_A_TECH));
         String msg = " can research tech due to Wormhole Research";
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             for (Player p2 : players) {
                 MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), p2.getRepresentation() + msg);
             }

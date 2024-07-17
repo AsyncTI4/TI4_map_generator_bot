@@ -139,7 +139,7 @@ public class GameEnd extends GameSubcommandData {
                         BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
                         return;
                     }
-                    if (!game.isFoWMode()) {
+                    if (!game.isFowMode()) {
                         // INFORM PLAYERS
                         pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
                             m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
@@ -151,8 +151,9 @@ public class GameEnd extends GameSubcommandData {
                                     for (int x = 1; x < game.getRound() + 1; x++) {
                                         String summary = "";
                                         for (Player player : game.getRealPlayers()) {
-                                            if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
-                                                summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()).replace("666fin", ":").replace("667fin", ",") + "\n";
+                                            String summaryKey = "endofround" + x + player.getFaction();
+                                            if (!game.getStoredValue(summaryKey).isEmpty()) {
+                                                summary += player.getFactionEmoji() + ": " + game.getStoredValue(summaryKey) + "\n";
                                             }
                                         }
                                         if (!summary.isEmpty()) {
@@ -198,7 +199,7 @@ public class GameEnd extends GameSubcommandData {
                         MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
                     }
                 }
-                if (game.isFoWMode()) {
+                if (game.isFowMode()) {
                     Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).get(0);
                     if (fogCategory != null) {
                         List<TextChannel> channels = new ArrayList<>();
@@ -241,6 +242,7 @@ public class GameEnd extends GameSubcommandData {
                 }
 
                 // send game json file to s3
+                GameSaveLoadManager.saveMapJson(game);
                 File jsonGameFile = Storage.getMapsJSONStorage(game.getName() + ".json");
                 boolean isWon = game.getWinner().isPresent() && game.isHasEnded();
                 if (isWon) {

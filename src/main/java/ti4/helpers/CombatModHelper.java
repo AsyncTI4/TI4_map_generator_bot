@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -222,6 +224,9 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_OPPONENT_STOLEN_TECH -> {
+                if (ButtonHelper.isLawInPlay(game, "articles_war")) {
+                    return false;
+                }
                 if (opponent != null) {
                     String opponentFaction = opponent.getFaction();
                     if (opponentFaction.contains("keleres")) {
