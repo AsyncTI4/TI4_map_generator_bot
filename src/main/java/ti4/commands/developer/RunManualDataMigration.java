@@ -27,7 +27,7 @@ public class RunManualDataMigration extends DeveloperSubcommandData {
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
         Game game = GameManager.getInstance().getGame(gameName);
         if (game == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cant find map for game name" + gameName);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Can't find map for game name" + gameName);
             return;
         }
 

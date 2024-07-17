@@ -460,7 +460,7 @@ public class StartMilty extends MiltySubcommandData {
         MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
 
         if (validTemplates.size() == 0) {
-            String msg = "Milty draft in this bot does not know about any map layouts that support " + players + " player(s) yet.";
+            String msg = "Milty draft in this bot does not know about any map layouts that support " + players + " player" + (players == 1 ? "" : "s") + " yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;
         }

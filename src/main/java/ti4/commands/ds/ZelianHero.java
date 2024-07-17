@@ -80,7 +80,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
             resourcesSum += p.getResources();
         }
         StringBuilder tgGainMsg = new StringBuilder(player.getFactionEmoji());
-        tgGainMsg.append(" gained ").append(resourcesSum).append("tg from Celestial Impact (");
+        tgGainMsg.append(" gained ").append(resourcesSum).append("TG" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (");
         tgGainMsg.append(player.getTg()).append("->").append(player.getTg() + resourcesSum).append(").");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg.toString());
         player.gainTG(resourcesSum);

@@ -16,11 +16,15 @@ public class ButtonHelperStats {
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
-            message = "Converted " + amt + " Commodities to " + amt + " tg";
-        } else {
+            message = "Converted " + amt + " Commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " TG" + (amt == 1 ? "" : "s");
+        } else if (player.getCommodities() == 1) {
+            message = "Converted their last remaining commodity (less than " + amt + ") into 1TG";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
-            message = "Converted all remaining commodities (less than " + amt + ") into tg";
+        } else {
+            message = "Converted their " +  player.getCommodities() + " remaining commodities (less than " + amt + ") into TGs";
+            player.setTg(player.getTg() + player.getCommodities());
+            player.setCommodities(0);
         }
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
