@@ -3892,6 +3892,8 @@ public class Game extends GameProperties {
             || isFrankenGame()
             || isMiltyModMode()
             || isAbsolMode()
+            || isPromisesPromisesMode()
+            || isFlagshippingMode()
             || isAllianceMode()
             || isSpinMode()
             || isHomebrewSCMode()

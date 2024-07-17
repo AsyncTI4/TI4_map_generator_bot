@@ -1,0 +1,10 @@
+[
+    {
+        "alias": "CoW",
+        "name": "The Changer of Ways",
+        "types": ["WARFARE"],
+        "requirements": "RR",
+        "source": "flagshipping",
+        "text": "At the start of any space combat, you may choose 1 participating unit with the SUSTAIN DAMAGE ability; repair or damage that unit."
+    }
+]
