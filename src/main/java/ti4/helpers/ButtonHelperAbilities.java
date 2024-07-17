@@ -1423,6 +1423,11 @@ public class ButtonHelperAbilities {
             Tile tile = game.getTileFromPlanet("lockedmallice");
             tile = MoveUnits.flipMallice(event, tile, game);
         }
+        else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
+            planet = "hexmallice";
+            Tile tile = game.getTileFromPlanet("hexlockedmallice");
+            tile = MoveUnits.flipMallice(event, tile, game);
+        }
         PlanetAdd.doAction(player, planet, game, event, false);
         String planetRepresentation2 = Helper.getPlanetRepresentation(planet, game);
         String msg = ident + " claimed the planet " + planetRepresentation2 + " using the peace accords ability. ";

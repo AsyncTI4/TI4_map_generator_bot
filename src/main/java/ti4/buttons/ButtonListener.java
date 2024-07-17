@@ -364,6 +364,11 @@ public class ButtonListener extends ListenerAdapter {
                 planet = "mallice";
                 tile = MoveUnits.flipMallice(event, tile, game);
             }
+            else if (planet.equalsIgnoreCase("hexlockedmallice")) {
+                Tile tile = game.getTileFromPlanet("hexlockedmallice");
+                planet = "hexmallice";
+                tile = MoveUnits.flipMallice(event, tile, game);
+            }
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 trueIdentity + " Chose to invade " + Helper.getPlanetRepresentation(planet, game));
             List<Button> buttons = new ArrayList<>();

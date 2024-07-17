@@ -14,9 +14,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.sticker.Sticker;
+import net.dv8tion.jda.api.entities.sticker.StickerUnion;
+import ti4.AsyncTI4DiscordBot;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Emojis;
+import ti4.helpers.Stickers;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 
@@ -110,7 +114,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (includeAliases) sb.append("\nAliases: ").append(getAliases());
         eb.setFooter(sb.toString());
 
-        if (getEmojiURL() != null) eb.setThumbnail(getEmojiURL());
+        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
 
         return eb.build();
     }
@@ -129,7 +133,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
         eb.setDescription(getLegendaryAbilityText());
         //if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
-        if (getEmojiURL() != null) eb.setThumbnail(getEmojiURL());
+        if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
 
         // footer can have some of the planet info
         //eb.setFooter(getName());
@@ -206,6 +210,16 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             return customEmoji.getImageUrl();
         }
         return null;
+    }
+
+    @JsonIgnore
+    public String getStickerOrEmojiURL() {
+        long ident = Stickers.getPlanetSticker(getId());
+        if (ident == -1)
+        {
+            return getEmojiURL();
+        }
+        return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();
     }
 
     public boolean search(String searchString) {

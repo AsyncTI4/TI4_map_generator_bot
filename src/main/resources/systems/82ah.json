@@ -3,13 +3,14 @@
     "name": "Mallice (Locked) (Hexagon)",
     "aliases": [
         "82ah",
-        "mallicelocked hex",
-        "nexuslocked hex",
-        "whnexsuslocked hex",
-        "nexusstarting hex",
-        "nexusstart hex",
-        "nexusinactive hex",
-        "nexusnew hex"
+        "hex82a",
+        "hexmallicelocked",
+        "hexnexuslocked",
+        "hexwhnexsuslocked",
+        "hexnexusstarting",
+        "hexnexusstart",
+        "hexnexusinactive",
+        "hexnexusnew"
     ],
     "imagePath": "82ah_Mallice_locked.png",
     "shipPositionsType": "TYPE05",
