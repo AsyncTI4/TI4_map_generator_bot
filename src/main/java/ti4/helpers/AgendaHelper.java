@@ -852,7 +852,7 @@ public class AgendaHelper {
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
                 int finalTG = "for".equalsIgnoreCase(winner) ? 5 : 0;
-                int maxLoss = 11;
+                int maxLoss = 12;
                 List<Player> comrades = new ArrayList<>();
                 for (Player playerB : game.getRealPlayers()) {
                     if (playerB.getTg() > maxLoss)
