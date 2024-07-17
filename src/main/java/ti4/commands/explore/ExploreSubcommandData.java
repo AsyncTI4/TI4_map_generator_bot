@@ -251,7 +251,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         message = "Card has been discarded. Resolve effects manually.";
-        String planetName = Mapper.getPlanet(planetID).getName();
+        String planetName = planetID == null ? "" : Mapper.getPlanet(planetID).getName();
 
         // Specific Explore Handling
         switch (cardID) {
