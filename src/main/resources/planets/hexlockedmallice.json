@@ -4,9 +4,11 @@
     "name": "Locked Mallice (Hexagon)",
     "shortName": null,
     "aliases": [
-        "lockedmallice hex",
-        "locked_mallice hex",
         "hexlockedmallice",
+        "hexlocked_mallice",
+        "hexlockednexus",
+        "82ah_1",
+        "hex82a_1",
         "lockedmallice(hexagon)"
     ],
     "positionInTile": {

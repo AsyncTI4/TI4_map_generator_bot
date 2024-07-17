@@ -5,15 +5,16 @@
     "shortName": null,
     "aliases": [
         "hexmallice",
-        "mallice hex",
-        "mellice hex",
-        "malice hex",
-        "malis hex",
-        "mallis hex",
-        "mallic hex",
-        "nexus hex",
+        "hexmellice",
+        "hexmalice",
+        "hexmalis",
+        "hexmallis",
+        "hexmallic",
+        "hexnexus",
         "82h_1",
         "82bh_1",
+        "hex82_1",
+        "hex82b_1",
         "mallice(hexagon)"
     ],
     "positionInTile": {
