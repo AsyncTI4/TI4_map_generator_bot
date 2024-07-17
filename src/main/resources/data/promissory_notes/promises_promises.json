@@ -184,7 +184,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "When you would resolve the secondary ability of the \"Technology\" strategy card: Instead, gain 1 command token and 4 trade goods. At the end of the strategic action, return this card to the N'orr player.",
+        "text": "When you would resolve the secondary ability of the \"Technology\" strategy card: Instead, gain 1 command token and 4 trade goods. At the end of the strategic action, return this card to the N'orr player."
     },
     {
         "alias": "sigma_political_favor",
@@ -203,7 +203,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "When you resolve the primary or secondary ability of the \"Diplomacy\" strategy card: Ready 1 additional planet. At the end of the strategic action, return this card to the Xxcha player.",
+        "text": "When you resolve the primary or secondary ability of the \"Diplomacy\" strategy card: Ready 1 additional planet. At the end of the strategic action, return this card to the Xxcha player."
     },
     {
         "alias": "sigma_spy_net",
@@ -222,7 +222,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "When you resolve the primary or secondary ability of the \"Politics\" strategy card: Draw 1 additional action card. At the end of the strategic action, return this card to the Yssaril player.",
+        "text": "When you resolve the primary or secondary ability of the \"Politics\" strategy card: Draw 1 additional action card. At the end of the strategic action, return this card to the Yssaril player."
     },
     {
         "alias": "sigma_trade_convoys",
@@ -241,7 +241,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "When you resolve the primary ability of the \"Trade\" strategy card: Gain 3 additional trade goods. Then, return this card to the Hacan player.",
+        "text": "When you resolve the primary ability of the \"Trade\" strategy card: Gain 3 additional trade goods. Then, return this card to the Hacan player."
     },
     {
         "alias": "sigma_weirdway",
@@ -260,7 +260,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "This card can only be given as part of a transaction. When you receive this card, place it faceup in your play area; the Mahact player gains 1 victory point. If you activate a system that contains the Mahact player's units, purge this card. If the Mahact player activates a system that contains your units, they lose 2 victory points. Then, purge this card.",
+        "text": "This card can only be given as part of a transaction. When you receive this card, place it faceup in your play area; the Mahact player gains 1 victory point. If you activate a system that contains the Mahact player's units, purge this card. If the Mahact player activates a system that contains your units, they lose 2 victory points. Then, purge this card."
     },
     {
         "alias": "sigma_machinations",
@@ -269,7 +269,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "At the start of the agenda phase: Place this card faceup in your play area. While this card is in your play area, gain 1 trade good if an outcome that the Nomad player predicted or voted for is resolved. At the end of the agenda phase, return this card to the Nomad player.",
+        "text": "At the start of the agenda phase: Place this card faceup in your play area. While this card is in your play area, gain 1 trade good if an outcome that the Nomad player predicted or voted for is resolved. At the end of the agenda phase, return this card to the Nomad player."
     },
     {
         "alias": "sigma_offering",
@@ -278,7 +278,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "At the start of a combat against the Vuil'raith player: Remove 1 or more of your non-structure units from the game board and give them to the Vuil'raith player; they are captured. Your must remove an even number of fighters and infantry. Then, gain trade goods equal to the combined cost of the removed units. Then, return this card to the Vuil'raith player.",
+        "text": "At the start of a combat against the Vuil'raith player: Remove 1 or more of your non-structure units from the game board and give them to the Vuil'raith player; they are captured. Your must remove an even number of fighters and infantry. Then, gain trade goods equal to the combined cost of the removed units. Then, return this card to the Vuil'raith player."
     },
     {
         "alias": "sigma_shield_array",
@@ -287,7 +287,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "At the start of an invasion: Choose 1 of your units in the active system, That unit gains PLANETARY SHIELD until the end of the invasion. At the end of the invasion, return this card to the Ul player.",
+        "text": "At the start of an invasion: Choose 1 of your units in the active system, That unit gains PLANETARY SHIELD until the end of the invasion. At the end of the invasion, return this card to the Ul player."
     },
     {
         "alias": "sigma_night_pact",
@@ -296,7 +296,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. When the Empyrean player performs the secondary ability of your strategy card, draw 1 action card. When you perform the secondary ability of the Empyrean player's strategy card, they draw 1 action card. If you activate a system that contains the Empyrean player's units, return this card to them.",
+        "text": "Action: Place this card faceup in your play area. When the Empyrean player performs the secondary ability of your strategy card, draw 1 action card. When you perform the secondary ability of the Empyrean player's strategy card, they draw 1 action card. If you activate a system that contains the Empyrean player's units, return this card to them."
     },
     {
         "alias": "sigma_soul_pact",
@@ -305,7 +305,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. When you or the Empyrean player spends resources to research a technology that the other player owns, reduce the resources spent by 2. If you activate a system that contains the Empyrean player's units, return this card to them.",
+        "text": "Action: Place this card faceup in your play area. When you or the Empyrean player spends resources to research a technology that the other player owns, reduce the resources spent by 2. If you activate a system that contains the Empyrean player's units, return this card to them."
     },
     {
         "alias": "sigma_star_pact",
@@ -314,7 +314,7 @@
         "color": "",
         "playArea": "true",
         "source": "promises_promises",
-        "text": "Action: Place this card faceup in your play area. During combat against other players, you and the Empyrean player apply +1 to the result of each of your respective unit's combat rolls for each adjacent system that contains the other's units. If you activate a system that contains the Empyrean player's units, return this card to them.",
+        "text": "Action: Place this card faceup in your play area. During combat against other players, you and the Empyrean player apply +1 to the result of each of your respective unit's combat rolls for each adjacent system that contains the other's units. If you activate a system that contains the Empyrean player's units, return this card to them."
     },
     {
         "alias": "sigma_excavation_experts",
@@ -323,7 +323,7 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "When you resolve the primary ability of the \"Leadership\" strategy card: Explore each planet that contains 1 or more of your mechs. At the end of the strategic action, return this card to the Naaz-Rokha player.",
+        "text": "When you resolve the primary ability of the \"Leadership\" strategy card: Explore each planet that contains 1 or more of your mechs. At the end of the strategic action, return this card to the Naaz-Rokha player."
     },
     {
         "alias": "sigma_eagles_eyes",
@@ -332,10 +332,10 @@
         "color": "",
         "playArea": "false",
         "source": "promises_promises",
-        "text": "Before you assign hits produced by another player's SPACE CANNON roll, other than the Argent player: Cancel 1 hit. Then, return this card tot the Argent player.",
+        "text": "Before you assign hits produced by another player's SPACE CANNON roll, other than the Argent player: Cancel 1 hit. Then, return this card tot the Argent player."
     },
     {
-        "alias": "sigma_senate_sanctuary",
+        "alias": "sigma_senate_sanctuary_a",
         "name": "Senate Sanctuary",
         "faction": "keleresa",
         "color": "",
@@ -345,7 +345,7 @@
         "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players cannot active this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     },
     {
-        "alias": "sigma_senate_sanctuary",
+        "alias": "sigma_senate_sanctuary_m",
         "name": "Senate Sanctuary",
         "faction": "keleresm",
         "color": "",
@@ -355,7 +355,7 @@
         "text": "Action: Attach this card to a planet you control other than Mecatol Rex. Other players cannot active this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     },
     {
-        "alias": "sigma_senate_sanctuary",
+        "alias": "sigma_senate_sanctuary_x",
         "name": "Senate Sanctuary",
         "faction": "keleresx",
         "color": "",
