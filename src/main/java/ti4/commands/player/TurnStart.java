@@ -123,7 +123,7 @@ public class TurnStart extends PlayerSubcommandData {
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -156,7 +156,7 @@ public class TurnStart extends PlayerSubcommandData {
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -192,7 +192,7 @@ public class TurnStart extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()
-                    + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
+                    + " since you have AI Development Algorithm, you can research 1 Unit Upgrade here for 6 influence";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -210,7 +210,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
                 String msg = player.getRepresentation()
-                    + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
+                    + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain 1 CC to that pool";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
@@ -307,7 +307,7 @@ public class TurnStart extends PlayerSubcommandData {
                         sb.append(p2.getRepresentation(true, true));
                         sb.append(" You are getting this ping because SC #").append(sc)
                             .append(
-                                " has been played and now it is their turn again and you still havent reacted. If you already reacted, check if your reaction got undone");
+                                " has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                         }

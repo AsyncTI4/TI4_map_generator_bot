@@ -173,8 +173,8 @@ public class ExpPlanet extends ExploreSubcommandData {
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
             if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                 if (!NRACheck) {
-                    String message = "Please decide whether or not to use your " + Emojis.gledge + "**Deep Mining** (gain tg instead of explore) ability.";
-                    Button resolveExplore1 = Button.success("deep_mining_accept", "Choose to Gain Tg instead of exploring");
+                    String message = "Please decide whether or not to use your " + Emojis.gledge + "**Deep Mining** (gain 1TG instead of explore) ability.";
+                    Button resolveExplore1 = Button.success("deep_mining_accept", "Choose to Gain 1TG instead of exploring");
                     Button resolveExplore2 = Button.danger("deep_mining_decline_" + planetName + "_" + drawColor, "Choose to Explore");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -214,9 +214,9 @@ public class ExpPlanet extends ExploreSubcommandData {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
             Button resolveExplore1 = Button.success("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
-            Button resolveExplore2 = Button.success("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1tg");
+            Button resolveExplore2 = Button.success("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1TG");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentation(true, true) + " You have Absol Scanlink, and thus can decline this explore to get a tg.";
+            String message = player.getRepresentation(true, true) + " You have Scanlink Drone Network, and thus can decline this explore to get 1TG.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
@@ -235,7 +235,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planetName, game);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord FS. Technically happens after exploring");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord flagship. Technically happens after exploring");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
             new PlanetRefresh().doAction(player, planetName, game);
@@ -246,11 +246,11 @@ public class ExpPlanet extends ExploreSubcommandData {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             Tile tileWithPlanet = game.getTileFromPlanet(planetName);
             if (tileWithPlanet == null) {
-                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing an infantry. Resolve manually.");
+                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing 1 infantry. Resolve manually.");
                 return;
             }
             tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added infantry to planet because of Lanefir Commander");
         }
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + numExplores);
@@ -263,7 +263,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                     buttons.add(Button.success("exhaustAgent_augersagent_" + player.getFaction(),
                         "Use Augers Agent on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    String msg2 = p2.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Clodho (Augers Agent) on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2tg";
+                    String msg2 = p2.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Clodho (Augers Agent) on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2TGs";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }
             }

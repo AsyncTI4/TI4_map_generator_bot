@@ -22,7 +22,7 @@ import ti4.model.UnitModel;
 
 public class FighterConscription extends SpecialSubcommandData {
     public FighterConscription() {
-        super(Constants.FIGHTER_CONSCRIPTION, "Fighter conscription +1 fighter in each space area");
+        super(Constants.FIGHTER_CONSCRIPTION, "Fighter Conscription +1 fighter in each space area");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -89,7 +89,7 @@ public class FighterConscription extends SpecialSubcommandData {
             }
         }
 
-        String msg = "Added " + tilesAffected.size() + " fighters.";
+        String msg = "Added " + tilesAffected.size() + " fighter" + (tilesAffected.size() == 1 ? "" : "s") + ".";
         if (tilesAffected.size() > 0) {
             msg += " Please check fleet size and capacity in each of the systems: ";
         }

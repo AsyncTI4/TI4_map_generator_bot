@@ -49,7 +49,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         if (!game.getStoredValue("lastAgendaReactTime").isEmpty()
             && ((new Date().getTime()) - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if theres no button and this was a mistake");
+                "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if there's no button and this was a mistake.");
             return;
         }
 

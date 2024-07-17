@@ -46,7 +46,7 @@ public class DrawAgenda extends AgendaSubcommandData {
 
     public static void drawAgenda(int count, boolean fromBottom, Game game, @NotNull Player player, boolean discard) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" here are the agenda(s) you have drawn:");
+        sb.append(player.getRepresentation(true, true)).append(" here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have drawn:");
         Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);
         if (realPlayer == null || game == null) return;
 
@@ -66,7 +66,7 @@ public class DrawAgenda extends AgendaSubcommandData {
 
     public static void drawSpecificAgenda(String agendaID, Game game, @NotNull Player player) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" here are the agenda(s) you have drawn:");
+        sb.append(player.getRepresentation(true, true)).append(" here is the agenda you have drawn:");
         Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);
         if (realPlayer == null || game == null) return;
 

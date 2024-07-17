@@ -345,7 +345,7 @@ public class CombatModHelper {
     /// The amount of the mod is usually static (eg +2 fighters)
     /// But for some (mostly flagships), the value is scaled depending on game state
     /// like how many fragments you have
-    /// or how many POs the opponent has scored that you havent etc.
+    /// or how many POs the opponent has scored that you haven't etc.
     ///
     public static Integer GetVariableModValue(CombatModifierModel mod, Player player, Player opponent,
         Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit) {
@@ -454,7 +454,7 @@ public class CombatModHelper {
             }
             value = value * multiplier * scalingCount.doubleValue();
         }
-        value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesnt return 2.5 etc
+        value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesn't return 2.5 etc
         return (int) value;
     }
 

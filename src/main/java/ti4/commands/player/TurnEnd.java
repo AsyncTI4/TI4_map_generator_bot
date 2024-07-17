@@ -262,9 +262,9 @@ public class TurnEnd extends PlayerSubcommandData {
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You can pay 1tg to get 2 debt tokens forgiven. ";
+                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You can pay 1TG to get 2 debt tokens forgiven. ";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 tg"));
+                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
@@ -309,7 +309,7 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " tg and " + numScoredPos + " commodities due to Vaden Commander");
+                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Vaden Commander");
             }
         }
         // if(maxVP+4 > game.getVp()){
@@ -339,7 +339,7 @@ public class TurnEnd extends PlayerSubcommandData {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentation(true, true) + " you can use the button to pay 3TGs and get a tech, using your Sentient Datapool technology", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
@@ -411,6 +411,7 @@ public class TurnEnd extends PlayerSubcommandData {
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), ms2);
             }
+
             Button editSummary = RoundSummaryHelper.editSummaryButton(game, p2, game.getRound());
             String endOfRoundMessage = p2.getRepresentation();
             endOfRoundMessage += " you can write down your end of round thoughts, to be shared at the end of the game.";
@@ -458,7 +459,7 @@ public class TurnEnd extends PlayerSubcommandData {
                         if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
                             String genesisMessage = solPlayer.getRepresentation(true, true)
-                                + " an infantry was added to the space area of your flagship automatically.";
+                                + " 1 infantry was added to the space area of your flagship automatically.";
                             if (game.isFowMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
                             } else {

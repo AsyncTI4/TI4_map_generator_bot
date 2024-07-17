@@ -74,13 +74,13 @@ public class TechExhaust extends TechAddRemove {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "gls" -> { // Graviton
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted graviton. The auto assign hit buttons for PDS fire will now kill fighters last");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted Graviton Laser System. The auto assign hit buttons for PDS fire will now kill fighters last");
                 game.setStoredValue(player.getFaction() + "graviton", "true");
                 deleteTheOneButtonIfButtonEvent(event);
             }
 
             case "dsbenty" -> {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted merged replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted Merged Replicators to increase the production value of one of their units by 2, or to match the largest value on the board");
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsceldr" -> {
@@ -141,7 +141,7 @@ public class TechExhaust extends TechAddRemove {
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getFactionEmojiOrColor() + " use button to gain a CC:", List.of(gainCC));
+                    player.getFactionEmojiOrColor() + " use button to gain 1 CC:", List.of(gainCC));
             }
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
@@ -163,7 +163,7 @@ public class TechExhaust extends TechAddRemove {
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor()
-                    + " use button to gain a CC or spend a strat CC to ready your agent", buttons);
+                    + " use button to gain 1 CC or spend 1 strat CC to ready your agent", buttons);
             }
             case "aida", "sar", "htp" -> {
                 if (event instanceof ButtonInteractionEvent) {
@@ -215,7 +215,7 @@ public class TechExhaust extends TechAddRemove {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "sd",
                     "placeOneNDone_skipbuild");
                 String message = player.getRepresentation(true, true)
-                    + " select the planet you would like to place or move a spacedock to.";
+                    + " select the planet you would like to place or move a space dock to.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
