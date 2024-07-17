@@ -763,8 +763,15 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             } else {
+                String scepterName = "Scepter of Emelpar";
+                switch (ThreadLocalRandom.current().nextInt(20))
+                {
+                    case 1: scepterName = "Scepter of Empelar"; break;
+                    case 2: scepterName = "Scepter of Silly Spelling"; break;
+                    case 3: scepterName = "Sceptre of Emelpar"; break;
+                }
                 MessageHelper.sendMessageToChannel(channel,
-                    trueIdentity + " exhausted Scepter of Silly Spelling to follow SC#" + scnum);
+                    trueIdentity + " exhausted " + scepterName + " to follow SC#" + scnum);
                 player.addExhaustedRelic("emelpar");
             }
             Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
