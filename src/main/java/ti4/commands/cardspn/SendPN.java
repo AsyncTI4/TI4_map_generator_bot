@@ -89,7 +89,7 @@ public class SendPN extends PNCardsSubcommandData {
 		Player pnOwner = game.getPNOwner(id);
 		if (player.getPromissoryNotesInPlayArea().contains(id)) {
 			if (!targetPlayer.equals(pnOwner)) {
-				MessageHelper.sendMessageToEventChannel(event, "Promissory Notes in Play Area can only be sent to the owner of the PN");
+				MessageHelper.sendMessageToEventChannel(event, "Promissory Notes in Play Area may only be sent to the owner of the PN.");
 				return;
 			}
 		}

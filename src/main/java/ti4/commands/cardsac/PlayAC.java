@@ -112,11 +112,11 @@ public class PlayAC extends ACCardsSubcommandData {
             }
         }
         if ("Action".equalsIgnoreCase(actionCardWindow) && game.getPlayer(activePlayerID) != player) {
-            return "You are trying to play a component action AC and the game does not think you are the active player. You can fix this with /player turn_start. Until then, you are #denied";
+            return "You are trying to play a component action AC and the game does not think you are the active player. You may fix this with /player turn_start. Until then, you are #denied.";
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
             return player.getRepresentation(true, true)
-                + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. You can discard the AC and manually resolve if you need to";
+                + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. You may discard the AC and manually resolve if you need to.";
         }
 
         if (player.hasAbility("cybernetic_madness")) {
@@ -784,10 +784,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander")
                     && !player.hasLeaderUnlocked("kelerescommander")) {
+                    boolean unleash = ThreadLocalRandom.current().nextInt(20) == 0;
                     String message2 = player.getRepresentation(true, true)
-                        + " you can " + (ThreadLocalRandom.current().nextInt(20) == 0 ? "unleash" : "unlock") + " Suffi An by paying 1TG (if the AC isn't Sabo'd).";
+                        + " you may " + (unleash ? "unleash" : "unlock") + " Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Button.success("pay1tgforKeleres", "Pay 1TG to Unlock Commander"));
+                    buttons2.add(Button.success("pay1tgforKeleres"+(unleash ? "U" : ""), "Pay 1TG to " + (unleash ? "Unleash" : "Unlock") + " Suffi An (Keleres Commander)"));
                     buttons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
@@ -807,7 +808,7 @@ public class PlayAC extends ACCardsSubcommandData {
                         }
                         reverseButtons.add(Button.danger("deleteButtons", "Decline"));
                         String cyberMessage = "" + p2.getRepresentation(true, true)
-                            + " reminder that you can use Reverse Engineer on " + actionCardTitle;
+                            + " reminder that you may use Reverse Engineer on " + actionCardTitle + ".";
                         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                             cyberMessage, reverseButtons);
                     }
@@ -824,11 +825,12 @@ public class PlayAC extends ACCardsSubcommandData {
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             List<Button> buttons2 = new ArrayList<>();
             Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
-                "Use Cymiae Agent")
+                "Use Skhot Unit X-12 (Cymiae Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Skhot Unit X-12 (Cymiae Agent) to draw 1AC",
+                player.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") 
+                    + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC.",
                 buttons2);
         }
 

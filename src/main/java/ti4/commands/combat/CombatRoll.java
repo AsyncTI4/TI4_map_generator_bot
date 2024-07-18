@@ -247,7 +247,7 @@ public class CombatRoll extends CombatSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (!automated) {
                 if (h > 0) {
-                    String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit" + (h == 1 ? "" : "s");
+                    String msg = opponent.getRepresentation(true, true) + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
                     List<Button> buttons = new ArrayList<>();
                     if (opponent.isDummy()) {
                         if (round2 > round) {
@@ -265,7 +265,7 @@ public class CombatRoll extends CombatSubcommandData {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                     if (opponent.hasTech("vpw")) {
-                        msg = player.getRepresentation(true, true) + " you got hit by Valkyrie Particle Weave. You can autoassign 1 hit";
+                        msg = player.getRepresentation(true, true) + " you got hit by Valkyrie Particle Weave. You may autoassign 1 hit.";
                         buttons = new ArrayList<>();
                         buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -273,7 +273,7 @@ public class CombatRoll extends CombatSubcommandData {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                     }
                 } else {
-                    String msg = opponent.getRepresentation(true, true) + " you can roll dice for Combat Round #" + (round + 1);
+                    String msg = opponent.getRepresentation(true, true) + " you may roll dice for Combat Round #" + (round + 1) + ".";
                     List<Button> buttons = new ArrayList<>();
                     if (opponent.isDummy()) {
                         if (round2 > round) {
@@ -317,10 +317,10 @@ public class CombatRoll extends CombatSubcommandData {
                         buttons.add(Button.secondary(finChecker + "cancelSpaceHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
                     }
 
-                    String msg2 = opponent.getFactionEmoji() + " can automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
+                    String msg2 = opponent.getFactionEmoji() + " may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
                 } else {
-                    String msg2 = opponent.getRepresentation(true, true) + " you can roll dice for Combat Round #" + (round + 1);
+                    String msg2 = opponent.getRepresentation(true, true) + " you may roll dice for Combat Round #" + (round + 1) + ".";
                     if (round2 > round) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
                     }
@@ -333,11 +333,11 @@ public class CombatRoll extends CombatSubcommandData {
                             buttons.add(Button.primary(opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                         }
                         buttons.add(Button.success(opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                        String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit" + (h == 1 ? "" : "s");
+                        String msg = opponent.getRepresentation(true, true) + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                     } else {
                         buttons.add(Button.success(opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hits For Dummy"));
-                        String msg2 = opponent.getFactionEmoji() + " can automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
+                        String msg2 = opponent.getFactionEmoji() + " may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
                     }
                 }
@@ -347,7 +347,7 @@ public class CombatRoll extends CombatSubcommandData {
             String msg2 = "\n" + opponent.getRepresentation(true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from AFB";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
-                String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit" + (h == 1 ? "" : "s");
+                String msg = opponent.getRepresentation(true, true) + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
                 List<Button> buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + opponent.getFaction() + "_";
                 buttons.add(Button.success(finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s")));
@@ -365,7 +365,7 @@ public class CombatRoll extends CombatSubcommandData {
                 buttons.add(Button.success(finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "deleteThis_pds", "Manually Assign Hit" + (h == 1 ? "" : "s")));
                 buttons.add(Button.secondary(finChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-                String msg2 = opponent.getFactionEmoji() + " can automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
+                String msg2 = opponent.getFactionEmoji() + " may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
             }
         }
@@ -375,7 +375,7 @@ public class CombatRoll extends CombatSubcommandData {
 
             buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s") + ""));
 
-            String msg2 = " you can use this button to assign " + (h == 1 ? "the bombardment hit" : "bombardment hits");
+            String msg2 = " you may use this button to assign " + (h == 1 ? "the bombardment hit" : "bombardment hits") + ".";
             boolean someone = false;
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {

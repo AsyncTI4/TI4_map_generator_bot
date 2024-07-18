@@ -124,7 +124,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             String msg = "User " + user.getName() + " has left the server " + guild.getName() + " with the following in-progress games:";
             for (Game g : gamesQuit) {
                 String gameMessage = "Attention " + g.getPing() + ": " + user.getName();
-                if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you can make ";
+                if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you may make ";
                 if (!voluntary) gameMessage += " was removed from the server.\n> Make ";
                 gameMessage += "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player";
                 MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);

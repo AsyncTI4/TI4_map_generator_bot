@@ -2391,7 +2391,7 @@ public class Game extends GameProperties {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
             String msg = player.getRepresentation(true, true) + " you have more SOs than the limit ("
                 + player.getMaxSOCount()
-                + ") and should discard one. If your game is playing with a higher SO limit, you can change that in /game setup.";
+                + ") and should discard one. If your game is playing with a higher SO limit, you may change that in /game setup.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             String secretScoreMsg = "Click a button below to discard your Secret Objective";
             List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
