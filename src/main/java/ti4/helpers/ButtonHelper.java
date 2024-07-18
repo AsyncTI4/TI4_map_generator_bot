@@ -9404,6 +9404,7 @@ public class ButtonHelper {
                     String secretScoreMsg = "_ _\n" + p1.getRepresentation(true, true)
                         + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ACInfo.getDiscardActionCardButtons(game, p1, true);
+                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentation() + " is resolving their stall tactics ability");
                     if (!acButtons.isEmpty()) {
                         List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg,
                             acButtons);
