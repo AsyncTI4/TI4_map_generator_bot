@@ -251,8 +251,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         message = "Card has been discarded. Resolve effects manually.";
-        String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
-
+        //String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
+        String planetName = planetID;
         // Specific Explore Handling
         switch (cardID) {
             case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> {
@@ -587,7 +587,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG" 
+                    ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG"
                         + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
