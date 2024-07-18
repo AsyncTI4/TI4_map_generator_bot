@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 public class SleeperToken extends SpecialSubcommandData {
 
     public SleeperToken() {
-        super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove sleeper tokens");
+        super(Constants.SLEEPER_TOKEN, "Select planets were to add/remove Sleeper tokens");
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "2nd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET3, "3rd Planet").setAutoComplete(true));
@@ -85,7 +85,7 @@ public class SleeperToken extends SpecialSubcommandData {
             tile.addToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
             String ident = player.getFactionEmoji();
             if (game.getSleeperTokensPlacedCount() > 5) {
-                String message2 = ident + " has more than 5 sleepers out. Use buttons to remove a sleeper token";
+                String message2 = ident + " has more than 5 Sleeper tokens out. Use buttons to remove a Sleeper token.";
                 List<Button> buttons = ButtonHelper.getButtonsForRemovingASleeper(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
             }
