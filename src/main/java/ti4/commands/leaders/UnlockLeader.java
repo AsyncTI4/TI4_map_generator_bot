@@ -56,6 +56,12 @@ public class UnlockLeader extends LeaderAction {
             MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " you can use Naalu Commander via button in your cards info thread");
 
         }
+        if (leaderID.contains("xxchahero")) {
+            MessageHelper.sendMessageToChannel(channel,
+                "Reminder, " + player.getRepresentation(true, true) + ", that Xxekir Grom remains locked until after " + (game.getPhaseOfGame().contains("status") ? "both objectives" : "the objective") + " has been scored;"
+                + " you cannot use the ability to pay for any requirements of the objective.");
+
+        }
 
         if (playerLeader.isExhausted()) {
             MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
