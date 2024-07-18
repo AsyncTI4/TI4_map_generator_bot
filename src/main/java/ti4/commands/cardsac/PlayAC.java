@@ -213,14 +213,14 @@ public class PlayAC extends ACCardsSubcommandData {
                 List<Button> scButtons = ButtonHelperActionCards.getArcExpButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     player.getRepresentation()
-                        + " After checking for sabos, use buttons to explore a planet type x 3 and gain any frags",
+                        + " After checking for Sabos, use buttons to explore a planet type thrice and gain any fragments.",
                     scButtons);
             }
             if (actionCardTitle.contains("Planetary Rigs")) {
                 List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
 
                 String msg = player.getRepresentation()
-                    + " After checking for sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve";
+                    + " After checking for Sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve.";
                 if (acbuttons.size() == 0) {
                     msg = player.getRepresentation() + " there were no attachments found in the applicable exploration decks.";
                 }
@@ -229,7 +229,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
             String codedName = "Plagiarize";
             String codedMessage = player.getRepresentation()
-                + " After checking for sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
+                + " After checking for Sabos, use buttons to resolve. Reminder that all card targets (besides tech RESEARCH) should be declared now, before people decide on sabos. Resolve ";
             List<Button> codedButtons = new ArrayList<>();
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "getPlagiarizeButtons",

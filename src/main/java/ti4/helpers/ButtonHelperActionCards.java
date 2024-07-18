@@ -1157,7 +1157,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the relic frag you want to grab", buttons);
+            player.getRepresentation(true, true) + " select the relic fragment you want to grab", buttons);
         if (buttonID.split("_").length > 2 && buttonID.split("_")[2].contains("yes")) {
             p2.setTg(p2.getTg() + 2);
             ButtonHelperAbilities.pillageCheck(p2, game);

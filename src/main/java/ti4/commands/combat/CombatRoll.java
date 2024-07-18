@@ -332,12 +332,12 @@ public class CombatRoll extends CombatSubcommandData {
                         if (round2 > round) {
                             buttons.add(Button.primary(opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                         }
-                        buttons.add(Button.success(opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h, "Auto-assign Hits For Dummy"));
-                        String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit(s)";
+                        buttons.add(Button.success(opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
+                        String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit" + (h == 1 ? "" : "s");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                     } else {
                         buttons.add(Button.success(opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hits For Dummy"));
-                        String msg2 = opponent.getFactionEmoji() + " can automatically assign hits. The hits would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
+                        String msg2 = opponent.getFactionEmoji() + " can automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
                     }
                 }

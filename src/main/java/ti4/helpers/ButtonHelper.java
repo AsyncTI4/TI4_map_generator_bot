@@ -8833,7 +8833,7 @@ public class ButtonHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasUnit("lanefir_mech") && p1.getFragments().size() > 0 && getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
-            Button abilityButton = Button.success(finChecker + prefix + "ability_lanefirMech", "Purge Frag For Mech")
+            Button abilityButton = Button.success(finChecker + prefix + "ability_lanefirMech", "Purge 1 Fragment For Mech")
                 .withEmoji(Emoji.fromFormatted(Emojis.lanefir));
             compButtons.add(abilityButton);
         }
@@ -8849,7 +8849,7 @@ public class ButtonHelper {
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("fabrication") && p1.getFragments().size() > 0) {
-            Button abilityButton = Button.success(finChecker + prefix + "ability_fabrication", "Purge 1 Frag for 1 CC")
+            Button abilityButton = Button.success(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC")
                 .withEmoji(Emoji.fromFormatted(Emojis.Naaz));
             compButtons.add(abilityButton);
         }
@@ -8867,7 +8867,7 @@ public class ButtonHelper {
         if (p1.enoughFragsForRelic()) {
             Button getRelicButton = Button.success(finChecker + prefix + "getRelic_", "Get Relic");
             if (p1.hasAbility("a_new_edifice")) {
-                getRelicButton = Button.success(finChecker + prefix + "getRelic_", "Purge Frags to Explore");
+                getRelicButton = Button.success(finChecker + prefix + "getRelic_", "Purge Fragments to Explore");
             }
             compButtons.add(getRelicButton);
         }
@@ -9404,7 +9404,7 @@ public class ButtonHelper {
                     String secretScoreMsg = "_ _\n" + p1.getRepresentation(true, true)
                         + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ACInfo.getDiscardActionCardButtons(game, p1, true);
-                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentation() + " is resolving their stall tactics ability");
+                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentation() + " is resolving their Stall Tactics ability");
                     if (!acButtons.isEmpty()) {
                         List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg,
                             acButtons);
