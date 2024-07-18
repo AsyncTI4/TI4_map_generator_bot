@@ -13,7 +13,7 @@ public class Source {
         ds, absol, franken, uncharted_space,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth,
+        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises, 
 
         // async homebrew
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
@@ -75,6 +75,8 @@ public class Source {
                 case ignis_aurora, pbd2000 -> Emojis.IgnisAurora;
                 case keleresplus -> Emojis.KeleresPlus;
                 case project_pi -> Emojis.ProjectPi;
+                case flagshipping -> Emojis.Flagshipping;
+                case promises_promises -> Emojis.PromisesPromises;
                 case miltymod -> Emojis.MiltyMod;
                 case lazax -> Emojis.Lazax;
                 case neutral -> Emojis.Neutral;
@@ -92,6 +94,8 @@ public class Source {
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
                 case ds -> "Discordant Stars [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
+                case flagshipping -> "Flagshipping";
+                case promises_promises -> "Promises Promises";
                 case franken -> "Franken Draft [Homebrew Game Mode]";
                 default -> toString();
             };

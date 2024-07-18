@@ -2,6 +2,7 @@ package ti4.commands.franken;
 
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -39,18 +40,16 @@ public class SetFactionIcon extends FrankenSubcommandData {
         String factionEmojiString = event.getOption(Constants.FACTION_EMOJI, null, OptionMapping::getAsString);
 
         Emoji factionEmoji = Emoji.fromFormatted(factionEmojiString);
-        if (!(factionEmoji instanceof CustomEmoji)) {
-            MessageHelper.sendMessageToEventChannel(event, factionEmojiString + " is not a custom emoji. Resetting to default.");
+        if (!(factionEmoji instanceof CustomEmoji || factionEmoji instanceof UnicodeEmoji)) {
+            MessageHelper.sendMessageToEventChannel(event, factionEmojiString + " is not a supported emoji. Resetting to default.");
             player.setFactionEmoji(null);
             return;
         }
-        if (AsyncTI4DiscordBot.jda.getEmojiById(((CustomEmoji) factionEmoji).getId()) == null) {
+        if (!(factionEmoji instanceof UnicodeEmoji) && AsyncTI4DiscordBot.jda.getEmojiById(((CustomEmoji) factionEmoji).getId()) == null) {
             MessageHelper.sendMessageToEventChannel(event, "The bot cannot load " + factionEmojiString + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
             player.setFactionEmoji(null);
             return;
         }
         player.setFactionEmoji(factionEmojiString);
-
     }
-
 }

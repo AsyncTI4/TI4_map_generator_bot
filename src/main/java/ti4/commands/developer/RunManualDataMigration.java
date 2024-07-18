@@ -27,13 +27,14 @@ public class RunManualDataMigration extends DeveloperSubcommandData {
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
         Game game = GameManager.getInstance().getGame(gameName);
         if (game == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cant find map for game name" + gameName);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Can't find map for game name" + gameName);
             return;
         }
 
         try {
             Class<?>[] paramTypes = { Game.class };
             Method method = DataMigrationManager.class.getMethod(migrationName, paramTypes);
+            method.setAccessible(true);
             Boolean changesMade = (Boolean) method.invoke(null, game);
             if (changesMade) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully run migration " + migrationName + " for map " + game.getName());

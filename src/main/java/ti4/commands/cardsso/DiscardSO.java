@@ -42,7 +42,7 @@ public class DiscardSO extends SOCardsSubcommandData {
         discardSO(event, player, option.getAsInt(), game);
     }
 
-    public void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Game game) {
+    public static void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Game game) {
         String soIDString = "";
         for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(SOID)) {
@@ -89,7 +89,7 @@ public class DiscardSO extends SOCardsSubcommandData {
             return;
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
         SOInfo.sendSecretObjectiveInfo(game, player);
     }
 }

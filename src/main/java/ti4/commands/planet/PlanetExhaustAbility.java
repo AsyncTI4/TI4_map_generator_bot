@@ -56,17 +56,17 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         switch (planet) {
             // Prophecy of Kings
             case "mallice" -> {
-                output = "Use buttons to gain 2 tg or wash your commodities";
-                buttons.add(Button.success("mallice_2_tg", "Gain 2tg"));
+                output = "Use buttons to gain 2TGs or wash your commodities";
+                buttons.add(Button.success("mallice_2_tg", "Gain 2TGs"));
                 buttons.add(Button.success("mallice_convert_comm", "Convert Commodities"));
             }
             case "hopesend" -> {
-                output = "Use buttons to drop a mech on a planet or draw an AC";
+                output = "Use buttons to drop 1 mech on a planet or draw 1AC";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2ACs (With Scheming)"));
                 } else {
-                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1AC"));
                 }
             }
             case "primor" -> {

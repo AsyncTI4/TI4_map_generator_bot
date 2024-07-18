@@ -297,7 +297,7 @@ public class ButtonHelperHeroes {
         // "dn,cv,dd,2 ff,mech a,2 inf g,sd a"
         buttons.addAll(Helper.getTileForCheiranHeroPlaceUnitButtons(player, game, "dreadnought",
             "placeOneNDone_skipbuild"));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 dreadnough", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 dreadnought", buttons);
         buttons = new ArrayList<>();
         buttons.addAll(
             Helper.getTileWithTrapsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
@@ -319,7 +319,7 @@ public class ButtonHelperHeroes {
         buttons = new ArrayList<>();
         buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, game, "sd", "placeOneNDone_skipbuild"));
         buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "sd", "placeOneNDone_skipbuild"));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 spacedock", buttons);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Place 1 space dock", buttons);
 
         buttons = new ArrayList<>();
         buttons.addAll(Helper.getTileWithTrapsPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
@@ -354,7 +354,7 @@ public class ButtonHelperHeroes {
         }
         int size = revealedRelics.size();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
-            player.getFactionEmoji() + " can gain " + size + " CCs");
+            player.getFactionEmoji() + " can gain " + size + " CC" + (size == 1 ? "" : "s"));
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
@@ -594,7 +594,7 @@ public class ButtonHelperHeroes {
         StringBuilder sb = new StringBuilder();
         MessageChannel channel = ButtonHelper.getCorrectChannel(player, game);
         if (!doesExploreDeckHaveAnAttachmentLeft(type, game)) {
-            MessageHelper.sendMessageToChannel(channel, "The " + type + " deck doesnt have any attachments left in it");
+            MessageHelper.sendMessageToChannel(channel, "The " + type + " deck doesn't have any attachments left in it.");
             return;
         } else {
             event.getMessage().delete().queue();
@@ -952,7 +952,7 @@ public class ButtonHelperHeroes {
 
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                         p2.getRepresentation()
-                            + " heads up, a tile with your units in it got hit with a saar hero, removing all fighters and infantry.");
+                            + " heads up, a tile with your units in it got Armageddon'd by the Saar hero, removing all fighters and infantry.");
                 }
 
             }
@@ -997,7 +997,7 @@ public class ButtonHelperHeroes {
         Leader playerLeader = player.unsafeGetLeader("celdaurihero");
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                player.getFactionEmoji() + "You dont have this hero");
+                player.getFactionEmoji() + "You don't have this hero");
         }
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
             .append(Helper.getLeaderFullRepresentation(playerLeader));
@@ -1017,13 +1017,13 @@ public class ButtonHelperHeroes {
             if (player.getPlanets().contains(uH.getName())) {
                 String planet = uH.getName();
                 Button sdButton = Button.success("winnuStructure_sd_" + planet,
-                    "Place A SD on " + Helper.getPlanetRepresentation(planet, game));
+                    "Place 1 space dock on " + Helper.getPlanetRepresentation(planet, game));
                 buttons.add(sdButton);
             }
         }
         buttons.add(tgButton);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " Use buttons to place a SD on a planet you control", buttons);
+            player.getRepresentation(true, true) + " Use buttons to place 1 space dock on a planet you control", buttons);
         List<Button> buttons2 = Helper.getPlaceUnitButtons(event, player, game, tile, "celdauriHero", "place");
         String message2 = player.getRepresentation() + " Use the buttons to produce units. ";
         String message3 = "You have " + Helper.getProductionValue(player, game, tile, false)
@@ -1031,7 +1031,7 @@ public class ButtonHelperHeroes {
         if (Helper.getProductionValue(player, game, tile, false) > 0
             && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message3 = message3
-                + ". You also have cabal commander which allows you to produce 2 ff/inf that dont count towards production limit.\n";
+                + ". You also have the Vuil'raith commander which allows you to produce 2 fighters/infantry that don't count towards production limit.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message.toString());
@@ -1046,7 +1046,7 @@ public class ButtonHelperHeroes {
         Leader playerLeader = player.unsafeGetLeader("mentakhero");
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                player.getFactionEmoji() + "You dont have this hero");
+                player.getFactionEmoji() + "You don't have this hero");
         }
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
             .append(Helper.getLeaderFullRepresentation(playerLeader));
@@ -1095,7 +1095,7 @@ public class ButtonHelperHeroes {
         int count = planetHolder.getResources() + planetHolder.getInfluence();
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + count + " tgs (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
+            player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         game.setComponentAction(true);
@@ -1548,7 +1548,7 @@ public class ButtonHelperHeroes {
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                 "Cymiae hero gave " + Mapper.getActionCard(acID).getName()
-                    + " to you and you now have to discard an AC");
+                    + " to you and you now have to discard 1AC");
             String msg = p2.getRepresentation(true, true) + " use buttons to discard";
             List<Button> buttons = ACInfo.getDiscardActionCardButtons(game, p2, false);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
@@ -1571,7 +1571,7 @@ public class ButtonHelperHeroes {
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                + " Reminder that Yin Hero skips pds fire.");
+                + " Reminder that Yin Hero skips space cannon fire.");
             StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
 
@@ -1817,7 +1817,7 @@ public class ButtonHelperHeroes {
         Player target = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         if (target.getTg() > 0) {
-            buttons.add(Button.success("sendVadenHeroSomething_" + vaden.getFaction() + "_tg", "Send 1 tg"));
+            buttons.add(Button.success("sendVadenHeroSomething_" + vaden.getFaction() + "_tg", "Send 1TG"));
         }
         if (target.getCommodities() > 1) {
             buttons.add(Button.secondary("sendVadenHeroSomething_" + vaden.getFaction() + "_comms", "Send 2 comms"));
@@ -1842,13 +1842,13 @@ public class ButtonHelperHeroes {
 
         String msg = player.getRepresentation(false, true) + " sent ";
         if ("tg".equalsIgnoreCase(tgOrComm)) {
-            msg = msg + " 1 tg to " + vaden.getRepresentation(false, true) + " as a result of Vaden Hero play";
+            msg = msg + " 1TG to " + vaden.getRepresentation(false, true) + " as a result of Vaden Hero play";
             if (player.getTg() > 0) {
                 vaden.setTg(vaden.getTg() + 1);
                 player.setTg(player.getTg() - 1);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getRepresentation(true, true) + " you had no tg to send, no tg sent.");
+                    player.getRepresentation(true, true) + " you had no TGs to send, so no TGs have been sent.");
                 return;
             }
         } else {
@@ -1859,7 +1859,7 @@ public class ButtonHelperHeroes {
                     player.setCommodities(player.getCommodities() - 2);
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        player.getRepresentation(true, true) + " you didnt have 2 comms to send, no comms sent.");
+                        player.getRepresentation(true, true) + " you didn't have 2 comms to send, so no comms were sent.");
                     return;
                 }
             } else {
@@ -1905,7 +1905,7 @@ public class ButtonHelperHeroes {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         new SCPlay().playSC(event, sc, game, game.getMainGameChannel(), player, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
-            + " reminder that the winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
+            + " reminder that the Winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
         event.getMessage().delete().queue();
     }
 
@@ -1992,8 +1992,8 @@ public class ButtonHelperHeroes {
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {
             scButtons.add(
-                Button.success("construction_spacedock", "Place A SD").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Button.success("construction_pds", "Place a PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+                Button.success("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+            scButtons.add(Button.success("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
         }
         if (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5)) {
             scButtons.add(Button.secondary("sc_refresh", "Replenish Commodities")

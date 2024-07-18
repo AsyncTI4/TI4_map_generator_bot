@@ -85,8 +85,8 @@ public class NaaluCommander extends SpecialSubcommandData {
         MessageEmbed embed = null;
         if (game.getSentAgendas().get(agendaID) != null) {
             if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
-                sb.append("You are currently voting on covert legislation and the top agenda is in the speaker's hand.");
-                sb.append(" Showing the next agenda because thats how it should be by the RULEZ\n");
+                sb.append("You are currently voting on Covert Legislation and the top agenda is in the speaker's hand.");
+                sb.append(" Showing the next agenda because that's how it should be by the RULEZ\n");
                 agendaID = game.lookAtTopAgenda(1);
 
                 if (game.getSentAgendas().get(agendaID) != null) {

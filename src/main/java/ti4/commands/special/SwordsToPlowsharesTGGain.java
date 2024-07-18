@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 
 public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
     public SwordsToPlowsharesTGGain() {
-        super(Constants.SWORDS_TO_PLOWSHARES, "Swords to plowshares, kill half your infantry to get that many tgs");
+        super(Constants.SWORDS_TO_PLOWSHARES, "Swords to Plowshares, kill half your infantry to get that many TGs");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -64,7 +64,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                         int fTG = cTG + numTG;
                         player.setTg(fTG);
                         message.append(ident).append(" removed ").append(numTG).append(" infantry from ").append(Helper.getPlanetRepresentation(unitHolder.getName(), game))
-                            .append(" and gained that many tg (").append(cTG).append("->").append(fTG).append("). \n");
+                            .append(" and gained that many TGs (").append(cTG).append("->").append(fTG).append("). \n");
                         tile.removeUnit(unitHolder.getName(), infKey, numTG);
                         if (player.hasInf2Tech()) {
                             ButtonHelper.resolveInfantryDeath(game, player, numTG);

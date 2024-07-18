@@ -718,5 +718,104 @@
     "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that strategy card is readied, do not spend or place a command token to resolve that ability.",
     "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
     "source": "action_deck_2_old"
+  },
+  {
+    "alias": "averted_crisis",
+    "name": "Averted Crisis",
+    "phase": "Action",
+    "window": "After you pass",
+    "text": "Perform the secondary ability of 1 readied or unchosen strategy card; if that strategy card is readied, do not spend or place a command token to resolve that ability.",
+    "flavorText": "\"Their greed blinds them. With every imaginable incarnation of death at our doorsteps, they still reach for more,\" Rinn sighed. \"We must remain focused. Steady.\"",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "technological_breakthrough",
+    "name": "Technological Breakthrough",
+    "phase": "Any",
+    "window": "When or after you research a technology",
+    "text": "Ready each of your planets that have a technology specialty.",
+    "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "demoralization",
+    "name": "Demoralization",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome destroys 3 of their infantry on the game board.",
+    "flavorText": "The past flooded Ahk-Syl Siven's thoughts upon seeing the Mahact, and the memory of his essence being rewritten on a subatomic level surged involuntarily to the forefront of his consciousness.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "derelict_space_station",
+    "name": "Derelict Station",
+    "phase": "Action",
+    "window": "After your ships move out of, into, or through a system that does not contain a planet",
+    "text": "Explore a frontier token that is in that system or gain 2 trade goods.",
+    "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "drop_pods",
+    "name": "Drop Pods",
+    "phase": "Action",
+    "window": "After your units use BOMBARDMENT against a planet",
+    "text": "Place 1 infantry from your reinforcements on that planet for each die result that did not produce a hit.",
+    "flavorText": "The brood swarmed around the planet, a tendril-like formation made entirely of ships. It whipped furiously as it released thousands of kin towards the surface, seeding the planet. It would be the home of a new generation of warriors.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "risky_jump",
+    "name": "Risky Jump",
+    "phase": "Action",
+    "window": "After you activate a system",
+    "text": "Apply +2 to the move value of 1 of your ships during this tactical action. When that ship moves into the active system, roll 1 die; on a result of 1 or 2, remove that ship from the game board, along with any units it is transporting.",
+    "flavorText": "They were alive and ahead of schedule, but Mendosa had no intention of allowing his pilot to \"eyeball it\" ever again.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "timely_reinforcements",
+    "name": "Reinforcements",
+    "phase": "Action",
+    "window": "After 1 of your non-fighter ships is destroyed during a space combat",
+    "text": "Place 3 fighters in the active system.",
+    "flavorText": "Many researchers have questioned why the Naalu's prescience did not lead them toward a path of excessive caution. Ta Zern postulated that it was linked to their excessive confidence.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "virulent_gas",
+    "name": "Virulent Gas",
+    "phase": "Action",
+    "window": "After your SPACE CANNON or BOMBARDMENT roll produces hits against another player's units on a planet",
+    "text": "Produce 1 additional hit. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
+    "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "tributes",
+    "name": "Tributes",
+    "phase": "Action",
+    "window": "Action",
+    "text": "Exhaust 1 non-home planet you control other than Mecatol Rex to gain trade goods equal to the combined value of its resources and influence.",
+    "flavorText": "Berekar excelled at leveraging prestige to attain economic goals. The worlds governed by his people had become lavishly rich through tourism, fueled by their impressive collection of Lazax artifacts.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "final_mission",
+    "name": "Final Mission",
+    "phase": "Action",
+    "window": "After 1 of your mechs is destroyed during a ground combat",
+    "text": "Roll 1 die for each of up to 3 of your opponent's ground forces; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
+    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
+    "source": "action_deck_2_old"
+  },
+  {
+    "alias": "boarding_torpedoes",
+    "name": "Boarding Torpedoes",
+    "phase": "Action",
+    "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
+    "text": "Replace that ship with a matching ship from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+    "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
+    "source": "action_deck_2_old"
   }
 ]

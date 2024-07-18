@@ -98,6 +98,8 @@ public class GameProperties {
     private @ExportableField boolean absolMode;
     private @ExportableField boolean discordantStarsMode;
     private @ExportableField boolean miltyModMode;
+    private @ExportableField boolean promisesPromisesMode;
+    private @ExportableField boolean flagshippingMode;
     private @ExportableField boolean redTapeMode;
     private @ExportableField boolean homebrew;
     private @ExportableField boolean homebrewSCMode;

@@ -7,7 +7,12 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +29,7 @@ import java.util.function.Function;
 import javax.imageio.ImageIO;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
+import ti4.generator.MapGenerator;
 import ti4.message.BotLogger;
 
 public class ImageHelper {
@@ -108,6 +114,25 @@ public class ImageHelper {
         if (Emoji.fromFormatted(emoji) instanceof CustomEmoji e)
             return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
         return null;
+    }
+
+    @Nullable
+    public static BufferedImage readUnicodeScaled(String unicode, int width, int height) {
+        if (unicode == null) {
+            return null;
+        }
+        return getOrLoadExpiringImage(width + "x" + height + unicode, k -> {
+            BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = img.createGraphics();
+            g2.setFont(Storage.getEmojiFont());
+            BasicStroke stroke4 = new BasicStroke(4.0f);
+            MapGenerator.superDrawString(g2, unicode, 20, 60, Color.white, null, null, stroke4, Color.black);
+            GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), unicode);
+            Rectangle rect = gv.getGlyphPixelBounds(0, g2.getFontRenderContext(), 20, 60);
+            int pad = 5;
+            BufferedImage img2 = img.getSubimage(rect.x - pad, rect.y - pad, rect.width + pad * 2, rect.height + pad * 2);
+            return ImageHelper.scale(ImageHelper.square(img2), width, height);
+        });
     }
 
     @Nullable

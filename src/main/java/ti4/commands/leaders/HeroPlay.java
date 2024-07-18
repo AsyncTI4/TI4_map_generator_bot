@@ -219,7 +219,7 @@ public class HeroPlay extends LeaderAction {
             case "lizhohero" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                     "You can use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters",
-                    Button.success("lizhoHeroFighterResolution", "Distrubute 12 fighters"));
+                    Button.success("lizhoHeroFighterResolution", "Distribute 12 fighters"));
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -244,7 +244,9 @@ public class HeroPlay extends LeaderAction {
             }
             case "l1z1xhero" -> {
                 String message = player.getRepresentation()
-                    + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules. The game will know not to take a tactical CC from you, and will allow you to move out of locked systems. Reminder that you can carry infantry/ff with your dreads/flagship, and that they cant move into supernovas(or asteroid fields if you dont have antimass.)";
+                    + " Resolving L1 Hero. L1 Hero is at the moment implemented as a sort of tactical action, relying on the player to follow the rules."
+                    + " The game will know not to take a tactical CC from you, and will allow you to move out of locked systems."
+                    + " Reminder that you can carry ground forces and fighters with your dreadnoughts/flagship, and that they can't move into supernovae (or asteroid fields if you don't have Antimass Deflectors).";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                 game.setL1Hero(true);
                 game.resetCurrentMovedUnitsFrom1TacticalAction();
@@ -254,7 +256,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay a CC for resolving it.",
+                    + " use the button to pick which SC you'd like to do the primary of. Reminder you can allow others to do the secondary, but they should still pay 1 CC for resolving it.",
                     buttons);
             }
             case "gheminaherolady" -> {
@@ -282,14 +284,15 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getSaarHeroButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
-                        + " use the buttons to select the system to remove all opposing ff and inf from",
+                        + " use the buttons to select the system to remove all opposing fighters and infantry from",
                     buttons);
             }
             case "edynhero" -> {
                 int size = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                     .getFactionEmoji() + " can resolve " + size
-                    + " agendas cause thats how many sigils they got. After putting the agendas on top in the order you want (dont bottom any), please press the button to reveal an agenda");
+                    + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
+                    + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
                 DrawAgenda.drawAgenda(event, size, game, player);
                 Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
@@ -308,7 +311,7 @@ public class HeroPlay extends LeaderAction {
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getFactionEmoji() + " can gain " + size + " CCs");
+                    player.getFactionEmoji() + " can gain " + size + " CC" + (size == 1 ? "" : "s"));
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
                 String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
@@ -362,7 +365,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getNekroHeroButtons(player, game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which planet youd like to get a tech and tgs from (and kill any opponent units)",
+                    + " use the button to pick which planet you'd like to get a tech and TGs from (and kill any opponent units)",
                     buttons);
             }
             case "bentorhero" -> {
@@ -451,7 +454,7 @@ public class HeroPlay extends LeaderAction {
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
-                        + " sent everyone a ping in their private threads with buttons to send you an AC");
+                        + " sent everyone a ping in their private threads with buttons to send you 1AC");
             }
             case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(game, player, event);
         }

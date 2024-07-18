@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
@@ -174,7 +175,26 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         return soButtons;
     }
 
+    public static void sendSODiscardButtons(Game game, Player player) {
+        sendSODiscardButtons(game, player, "");
+    }
+
+    public static void sendSODiscardButtons(Game game, Player player, String suffix) {
+        List<Button> buttons = getSODiscardButtonsWithSuffix(game, player, suffix);
+        String message = "Use buttons to discard a Secret Objective:";
+        if ("redraw".equals(suffix)) {
+            message += "\n> - A new secret will be automatically drawn for you";
+        } else if (!"".equals(suffix)) {
+            suffix = "";
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+    }
+
     public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Game game, Player player) {
+        return getSODiscardButtonsWithSuffix(game, player, "");
+    }
+
+    public static List<Button> getSODiscardButtonsWithSuffix(Game game, Player player, String suffix) {
         Map<String, Integer> secretObjectives = player.getSecrets();
         List<Button> soButtons = new ArrayList<>();
         if (secretObjectives != null && !secretObjectives.isEmpty()) {
@@ -183,7 +203,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Button.danger("SODISCARD_" + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+                    soButtons.add(Buttons.red("SODISCARD_" + idValue + suffix, "(" + idValue + ") " + soName, Emojis.SecretObjective));
                 }
             }
         }

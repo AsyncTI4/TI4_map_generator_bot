@@ -311,7 +311,7 @@ public class CombatHelper {
                     unitsOnTile.put(starfallFakeUnit, count);
                 }
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " this is a reminder that due to the starfall gunnery ability, only space cannon of 1 unit should be counted at this point. Hopefully you declared beforehand what that unit was, but by default its probably the best one. Only look at/count the rolls of that one unit");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " this is a reminder that due to the Starfall Gunnery ability, only Space Cannon of 1 unit should be counted at this point. Hopefully you declared beforehand what that unit was, but by default it's probably the best one. Only look at/count the rolls of that one unit");
             }
         }
 
@@ -460,7 +460,7 @@ public class CombatHelper {
                         player.setTg(player.getTg() + 1);
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1tg due to hitting on a bombardment roll with their flagship");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1TG due to hitting on a bombardment roll with their flagship");
                         break;
 
                     }
@@ -492,7 +492,7 @@ public class CombatHelper {
                             if (player.hasTech("sar")) {
                                 for (int x = 0; x < misses; x++) {
                                     player.setTg(player.getTg() + 1);
-                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1tg (" + (player.getTg() - 1)
+                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
                                         + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
