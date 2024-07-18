@@ -443,7 +443,7 @@ public class ButtonHelperCommanders {
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentation(true, true)
-                            + " You gained tech while having Nekro commander, but since it is a faction tech and you used valefars, you didnt technically gain a new tech and therefore do not draw an AC ");
+                            + " You gained tech while having Nekro Acidos, the Nekro commander, but since it is a faction tech and you used Valefars, you didn't technically \"gain\" a new tech and therefore you do not draw an AC.");
                 }
             }
         }
