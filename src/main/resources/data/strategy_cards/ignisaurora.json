@@ -3,24 +3,41 @@
         "id": "ignisaurora3",
         "initiative": 3,
         "name": "Politics",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Ready the speaker token.",
+            "Choose a player other than the speaker. That player gains the speaker token.",
+            "Draw 2 action cards and gain 2 vote tokens.",
+            "Look at the top 3 cards of the agenda deck. Place 2 on the top and 1 on the bottom of the deck."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 2 action cards and one vote token."
+        ],
         "source": "base"
     },
     {
         "id": "ignisaurora8",
         "initiative": 8,
         "name": "Antiquities",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Gain a relic.",
+            "Reveal an Event card and resolve the event."
+        ],
+        "secondaryTexts": [
+            "-Spend 1 token from your strategy pool to gain an unknown fragment."
+        ],
         "source": "base"
     },
     {
         "id": "ignisaurora9",
         "initiative": 9,
         "name": "Imperial",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements.",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 1 secret objective."
+        ],
         "source": "base"
     }
 ]
