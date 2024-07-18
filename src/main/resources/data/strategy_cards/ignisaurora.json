@@ -23,7 +23,7 @@
             "Reveal an Event card and resolve the event."
         ],
         "secondaryTexts": [
-            "-Spend 1 token from your strategy pool to gain an unknown fragment."
+            "Spend 1 token from your strategy pool to gain an unknown fragment."
         ],
         "source": "base"
     },
@@ -38,6 +38,7 @@
         "secondaryTexts": [
             "Spend 1 token from your strategy pool to draw 1 secret objective."
         ],
+        "botSCAutomationID": "pok8imperial",
         "source": "base"
     }
 ]
