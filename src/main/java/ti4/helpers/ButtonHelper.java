@@ -1,6 +1,11 @@
 package ti4.helpers;
 
+import java.io.File;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -8,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +35,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -44,7 +51,6 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -6251,78 +6257,97 @@ public class ButtonHelper {
     }
 
     public static void rematch(Game game, GenericInteractionCreateEvent event) {
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + game.getName() + "` has ended!**");
-        game.setHasEnded(true);
-        game.setEndedDate(new Date().getTime());
-        GameSaveLoadManager.saveMap(game, event);
-        String gameEndText = GameEnd.getGameEndText(game, event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
-        game.setAutoPing(false);
-        game.setAutoPingSpacer(0);
-        ButtonHelper.offerEveryoneTitlePossibilities(game);
-        MapGenerator.saveImage(game, DisplayType.all, event)
-            .thenAccept(fileUpload -> {
-                StringBuilder message = new StringBuilder();
-                for (String playerID : game.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
-                    Member member = event.getGuild().getMemberById(playerID);
-                    if (member != null)
-                        message.append(member.getAsMention());
-                }
-                message.append("\nPlease provide a summary of the game below:");
-                if (!game.isFowMode() && !AsyncTI4DiscordBot.guildPrimary
-                    .getTextChannelsByName("the-pbd-chronicles", true).isEmpty()) {
-                    TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary
-                        .getTextChannelsByName("the-pbd-chronicles", true).get(0);
-                    String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles"
-                        : pbdChroniclesChannel.getAsMention();
-                    if (pbdChroniclesChannel == null) {
-                        BotLogger.log(event,
-                            "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
-                        return;
-                    }
-                    if (!game.isFowMode()) {
-                        // INFORM PLAYERS
-                        pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
-                            m.editMessageAttachments(fileUpload).queue(Consumers.nop(), BotLogger::catchRestError); // ADD
-                                                                                                                    // MAP
-                                                                                                                    // FILE
-                                                                                                                    // TO
-                                                                                                                    // MESSAGE
-                            m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS,
-                                t -> {
-                                    t.sendMessage(message.toString()).queue(null,
-                                        (error) -> BotLogger.log("Failure to create Game End thread for **"
-                                            + game.getName() + "** in PBD Chronicles:\n> "
-                                            + error.getMessage()));
-                                    String endOfGameSummary = "";
-
-                                    for (int x = 1; x < game.getRound() + 1; x++) {
-                                        String summary = "";
-                                        for (Player player : game.getRealPlayers()) {
-                                            if (!game.getStoredValue("endofround" + x + player.getFaction())
-                                                .isEmpty()) {
-                                                summary = summary + player.getFactionEmoji() + ": " + game
-                                                    .getStoredValue("endofround" + x + player.getFaction())
-                                                    + "\n";
-                                            }
-                                        }
-                                        if (!summary.isEmpty()) {
-                                            summary = "**__Round " + x + " Secret Summary__**\n" + summary;
-                                            endOfGameSummary = endOfGameSummary + summary;
-                                        }
-                                    }
-                                    if (!endOfGameSummary.isEmpty()) {
-                                        MessageHelper.sendMessageToChannel(t, endOfGameSummary);
-                                    }
-                                }); // CREATE THREAD AND POST FOLLOW UP
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                                "Game summary has been posted in the " + channelMention + " channel: "
-                                    + m.getJumpUrl());
-                        }, BotLogger::catchRestError);
-                    }
-                }
-            });
+        GameEnd.gameEndStuff(game, event, true);
         secondHalfOfRematch(event, game);
+    }
+
+    public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
+        String name = game.getName();
+        GameSaveLoadManager.saveMap(game, event);
+        String newName = name + "clone";
+        Guild guild = game.getGuild();
+        Role gameRole = null;
+        String gameName = newName;
+        String gameFunName = game.getCustomName();
+        String newChatChannelName = gameName + "-" + gameFunName;
+        String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
+        String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
+
+        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+
+        gameRole = guild.createRole()
+            .setName(newName)
+            .setMentionable(true)
+            .complete();
+        for (Player player : game.getRealPlayers()) {
+            Member member = guild.getMemberById(player.getUserID());
+            if (member != null) {
+                guild.addRoleToMember(member, gameRole).complete();
+            }
+        }
+        Category category = game.getMainGameChannel().getParentCategory();
+        long gameRoleID = gameRole.getIdLong();
+        // CREATE TABLETALK CHANNEL
+        TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
+
+        // CREATE ACTIONS CHANNEL
+        TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
+
+        String undoFileToRestorePath = game.getName() + "_" + 1 + ".txt";
+        File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
+
+        File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
+
+        File mapUndoDirectory = Storage.getMapUndoDirectory();
+        if (mapUndoDirectory == null) {
+            return;
+        }
+        if (!mapUndoDirectory.exists()) {
+            return;
+        }
+
+        String mapName = game.getName();
+        String mapNameForUndoStart = mapName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name2) -> name2.startsWith(mapNameForUndoStart));
+        if (mapUndoFiles != null && mapUndoFiles.length > 0) {
+            try {
+                List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                    .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                    .map(fileName -> fileName.replace(Constants.TXT, ""))
+                    .map(Integer::parseInt).toList();
+                int maxNumber = numbers.isEmpty() ? 0
+                    : numbers.stream().mapToInt(value -> value)
+                        .max().orElseThrow(NoSuchElementException::new);
+
+                File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
+                Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
+                Game gameToRestore = GameSaveLoadManager.loadMap(originalMapFile);
+                gameToRestore.setTableTalkChannelID(chatChannel.getId());
+                gameToRestore.setMainChannelID(actionsChannel.getId());
+                gameToRestore.setName(newName);
+                gameToRestore.shuffleDecks();
+                GameManager.getInstance().addGame(gameToRestore);
+                // CREATE BOT/MAP THREAD
+                ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+                    .complete();
+                gameToRestore.setBotMapUpdatesThreadID(botThread.getId());
+                for (Player player : gameToRestore.getRealPlayers()) {
+                    player.setCardsInfoThreadID(null);
+                }
+                GameSaveLoadManager.saveMap(gameToRestore, event);
+            } catch (Exception e) {
+
+            }
+
+        }
+
     }
 
     public static void secondHalfOfRematch(GenericInteractionCreateEvent event, Game game) {
@@ -6732,7 +6757,8 @@ public class ButtonHelper {
             newButtons);
     }
 
-    public static void resolveSetupStep2(Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
+    public static void resolveSetupStep2(Player player, Game game, GenericInteractionCreateEvent event,
+        String buttonID) {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         if (event instanceof ButtonInteractionEvent) {
@@ -6749,11 +6775,13 @@ public class ButtonHelper {
             }
             int additionalMax = Math.min(buttons.size(), maxBefore + 22);
             if (additionalMax != buttons.size()) {
-                newButtons.add(Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
+                newButtons.add(
+                    Button.secondary("setupStep2_" + userId + "_" + (maxBefore + 22) + "!", "Get more factions"));
             } else {
                 newButtons.add(Button.secondary("setupStep2_" + userId + "_-1!", "Go back"));
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired faction", newButtons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                "Please tell the bot the desired faction", newButtons);
             return;
         }
         if ("keleres".equalsIgnoreCase(factionId)) {
@@ -6761,10 +6789,12 @@ public class ButtonHelper {
             newButtons.add(Buttons.green("setupStep2_" + userId + "_keleresa", "Keleres Argent", Emojis.Argent));
             newButtons.add(Buttons.green("setupStep2_" + userId + "_keleresm", "Keleres Mentak", Emojis.Mentak));
             newButtons.add(Buttons.green("setupStep2_" + userId + "_keleresx", "Keleres Xxcha", Emojis.Xxcha));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot which flavor of keleres you are", newButtons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                "Please tell the bot which flavor of keleres you are", newButtons);
             return;
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setting up as faction: " + Mapper.getFaction(factionId).getFactionName());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            "Setting up as faction: " + Mapper.getFaction(factionId).getFactionName());
         offerColorSetupButtons(game, event, buttonID, userId, factionId);
     }
 
@@ -6778,8 +6808,10 @@ public class ButtonHelper {
                 newButtons.add(buttons.get(x));
             }
         }
-        newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!", "Get more colors"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired player color", newButtons);
+        newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!",
+            "Get more colors"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            "Please tell the bot the desired player color", newButtons);
     }
 
     public static List<Button> getSpeakerSetupButtons(Game game, String buttonID) {
@@ -6810,7 +6842,8 @@ public class ButtonHelper {
             }
             int additionalMax = Math.min(buttons.size(), maxBefore + 22);
             if (additionalMax != buttons.size()) {
-                newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!", "Get more colors"));
+                newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!",
+                    "Get more colors"));
             } else {
                 newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_-1!",
                     "Go back"));
