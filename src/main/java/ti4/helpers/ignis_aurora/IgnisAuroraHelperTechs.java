@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -26,11 +24,15 @@ import ti4.message.MessageHelper;
 
 public class IgnisAuroraHelperTechs {
     public static void handleExhaustIgnisAuroraTech(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
+        boolean deleteMsg = true, deleteButton = true;
         switch (tech) {
             case "baldrick_nm" -> DrawAC.drawActionCards(game, player, 1, true);
             case "baldrick_hm" -> ButtonHelperStats.sendGainCCButtons(game, player, false);
-            case "baldrick_lwd" -> Consumers.nop();
-            case "baldrick_gd" -> game.setStoredValue("baldrickGDboost", "1");
+            case "baldrick_lwd" -> deleteMsg = false;
+            case "baldrick_gd" -> {
+                deleteMsg = false;
+                game.setStoredValue("baldrickGDboost", "1");
+            }
             case "fabrilerealignment" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.red("fibrileRealign_AC", "Discard/draw Action Card", Emojis.ActionCard));
@@ -42,17 +44,21 @@ public class IgnisAuroraHelperTechs {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "> This tech is not automated. Please resolve manually.");
             }
         }
-        ButtonHelper.deleteMessage(event);
+        if (deleteMsg) {
+            ButtonHelper.deleteMessage(event);
+        } else if (deleteButton) {
+            ButtonHelper.deleteTheOneButton(event);
+        }
     }
 
     @ButtonHandler("fibrileRealign_AC")
-    private static void handleFibrileAC(ButtonInteractionEvent event, Game game, Player player) {
+    public static void handleFibrileAC(ButtonInteractionEvent event, Game game, Player player) {
         ACInfo.sendDiscardAndDrawActionCardButtons(game, player);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("fibrileRealign_SO")
-    private static void handleFibrileSO(ButtonInteractionEvent event, Game game, Player player) {
+    public static void handleFibrileSO(ButtonInteractionEvent event, Game game, Player player) {
         SOInfo.sendSODiscardButtons(game, player, "redraw");
         ButtonHelper.deleteMessage(event);
     }

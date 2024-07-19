@@ -1,15 +1,14 @@
 package ti4.commands.map;
 
+import java.util.Map;
+
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-
-import java.util.Map;
-
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 public class AddTile extends AddRemoveTile {
     public AddTile() {
@@ -19,9 +18,13 @@ public class AddTile extends AddRemoveTile {
     }
 
     @Override
-    protected void tileAction(Tile tile, String position, Game userActiveGame) {
-        userActiveGame.removeTile(position); //remove old tile first to clean up associated planet ownership
-        userActiveGame.setTile(tile);
+    protected void tileAction(Tile tile, String position, Game game) {
+        addTile(game, tile);
+    }
+
+    public static void addTile(Game game, Tile tile) {
+        game.removeTile(tile.getPosition()); //remove old tile first to clean up associated planet ownership
+        game.setTile(tile);
         addCustodianToken(tile);
     }
 
