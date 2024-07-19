@@ -105,5 +105,13 @@
         "text": "**Oathkeeper Objective:** After a command token is added to the Emperor player's fleet pool, they place this card into their play area. When this card is in the Emperor's play area, once per phase when an objective is scored a Citizen player it can be scored by the Emperor player as well. After the Emperor player passes during the action phase, if they do not have a number of non-fighter ships equal to their fleet pool in their home system, they return this card to the board. Return this card to the board at the end of every Status Phase. **Successor Objective:** When the Emperor player would hit the goal Victory Points; if a Citizen has the most un-exhausted planets out of any faction, they gain 2 Victory Points first.",
         "isFakeRelic": true,
         "source": "oath_of_kings"
+    },
+    {
+        "alias": "votetoken",
+        "name": "Vote Token",
+        "shortName": "Vote\nToken",
+        "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
+        "isFakeRelic": true,
+        "source": "ignis_aurora"       
     }
 ]
