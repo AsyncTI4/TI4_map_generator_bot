@@ -57,7 +57,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -559,10 +558,10 @@ public class MapGenerator {
         superDrawString(bannerG, phase.toUpperCase() + " PHASE", 255, 110, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke8, Color.BLACK);
         bannerG.setFont(Storage.getFont32());
         if (0 <= round && round <= 20) {
-            String[] numbers = {"ZERO", "ONE", "TWO", "THREE", "FOUR",
-                                "FIVE", "SIX", "SEVEN", "EIGHT", "NINE",
-                                "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN",
-                                "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN", "TWENTY"};
+            String[] numbers = { "ZERO", "ONE", "TWO", "THREE", "FOUR",
+                "FIVE", "SIX", "SEVEN", "EIGHT", "NINE",
+                "TEN", "ELEVEN", "TWELVE", "THIRTEEN", "FOURTEEN",
+                "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN", "NINETEEN", "TWENTY" };
             superDrawString(bannerG, "ROUND " + numbers[round], 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
         } else {
             superDrawString(bannerG, "ROUND " + round, 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
@@ -4318,6 +4317,7 @@ public class MapGenerator {
                     tileGraphics.drawImage(distanceColor, TILE_PADDING, TILE_PADDING, null);
                 }
                 if (FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
+                    int count = 0;
                     for (String wh : FoWHelper.getTileWHs(game, tile.getPosition())) {
 
                         String whFile = ResourceHelper.getInstance().getTokenFile("token_wh" + wh + ".png");
@@ -4326,8 +4326,9 @@ public class MapGenerator {
                         }
                         if (whFile != null) {
                             BufferedImage bufferedImage = ImageHelper.readScaled(whFile, 3);
-                            tileGraphics.drawImage(bufferedImage, TILE_PADDING + 70, TILE_PADDING + 70, null);
+                            tileGraphics.drawImage(bufferedImage, TILE_PADDING + 70 + (count * 30), TILE_PADDING + 70 + (count * 30), null);
                         }
+                        count++;
                     }
                 }
             }
