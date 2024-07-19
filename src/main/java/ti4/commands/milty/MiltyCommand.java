@@ -70,10 +70,10 @@ public class MiltyCommand implements Command {
     private Collection<MiltySubcommandData> getSubcommands() {
         Collection<MiltySubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DebugMilty());
+        subcommands.add(new ForcePick());
         subcommands.add(new SetupMilty());
-        // subcommands.add(new StartMilty()); // Disable in favor of /setup milty
+        subcommands.add(new StartMilty());
         subcommands.add(new ShowMilty());
-
         return subcommands;
     }
 

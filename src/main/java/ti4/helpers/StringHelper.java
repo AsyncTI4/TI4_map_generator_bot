@@ -14,6 +14,13 @@ public final class StringHelper {
         };
     }
 
+    public static String numberToWords(int i) {
+        String[] first20 = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+            "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty" };
+        if (i >= 0 && i <= 20) return first20[i];
+        return Integer.toString(i);
+    }
+
     private static Map<String, String> escapables() {
         Map<String, String> escape = new LinkedHashMap<>();
         // Do not simply change these values.

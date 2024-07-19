@@ -196,11 +196,18 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         // Then check for prefix match
+        String longestPrefixMatch = null;
         for (String key : knownButtons.keySet()) {
             if (buttonID.startsWith(key)) {
-                knownButtons.get(key).accept(context);
-                return true;
+                if (longestPrefixMatch == null || key.length() > longestPrefixMatch.length()) {
+                    longestPrefixMatch = key;
+                }
             }
+        }
+
+        if (longestPrefixMatch != null) {
+            knownButtons.get(longestPrefixMatch).accept(context);
+            return true;
         }
         return false;
     }

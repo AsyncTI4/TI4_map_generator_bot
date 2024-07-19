@@ -25,6 +25,7 @@ import ti4.MessageListener;
 import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
+import ti4.commands.milty.ForcePick;
 import ti4.commands.player.ChangeUnitDecal;
 import ti4.commands.statistics.GameStats.GameStatistics;
 import ti4.commands.statistics.PlayerStats;
@@ -788,6 +789,20 @@ public class AutoCompleteProvider {
                     .limit(25)
                     .sorted(Comparator.comparing(FrankenDraftMode::getAutoCompleteName))
                     .map(mode -> new Command.Choice(mode.getAutoCompleteName(), mode.toString()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case ForcePick.PICK -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                if (game == null) {
+                    event.replyChoices(Collections.emptyList()).queue();
+                    return;
+                }
+                List<String> availablePicks = game.getMiltyDraftManager().allRemainingOptionsForActive();
+                List<Command.Choice> options = availablePicks.stream()
+                    .filter(pick -> pick.toLowerCase().contains(enteredValue.toLowerCase()))
+                    .limit(25)
+                    .map(pick -> new Command.Choice(pick, pick))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
