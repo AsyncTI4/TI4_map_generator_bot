@@ -315,15 +315,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "foreign_aid",
-    "name": "Foreign Aid",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "Spend 8 resources and choose up to 2 other players. You and each of those players gain 1 command token.",
-    "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "freedom_fighters",
     "name": "Freedom Fighters",
     "phase": "Action",
@@ -825,6 +816,15 @@
     "window": "Action",
     "text": "For each exploration deck, look at the top card of that deck; if it is a relic fragment, gain that card.",
     "flavorText": "As her hostages hurled insults, S'ula began to laugh. \"This artifact was the property of countless civilizations. You thought its journey would end with yours?\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "unexpected_strategy",
+    "name": "Unexpected Strategy",
+    "phase": "Any",
+    "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
+    "text": "That command token is not spent and/or placed on the game board.",
+    "flavorText": "Despite their best syllogisms and heuristics, A6AH3 could not discern whether the Creuss operated primarily on reason or a strange mechanism of cause and effect.",
     "source": "action_deck_2"
   },
   {

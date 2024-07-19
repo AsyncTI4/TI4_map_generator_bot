@@ -817,5 +817,14 @@
         "text": "Replace that ship with a matching ship from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
         "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "foreign_aid",
+        "name": "Foreign Aid",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Spend 8 resources and choose up to 2 other players. You and each of those players gain 1 command token.",
+        "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
+        "source": "action_deck_2_old"
     }
 ]
