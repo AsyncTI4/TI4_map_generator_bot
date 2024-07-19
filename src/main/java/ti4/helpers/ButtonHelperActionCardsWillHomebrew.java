@@ -120,7 +120,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));
         }
         if (player.getSCs().contains(3)) {
-            scButtons.add(Button.secondary("draw2ac", "Draw 2 Action Cards")
+            scButtons.add(Button.secondary("draw2 AC", "Draw 2 Action Cards")
                 .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
         }
         if (player.getSCs().contains(4)) {

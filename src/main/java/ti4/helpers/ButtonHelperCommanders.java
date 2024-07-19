@@ -19,6 +19,7 @@ import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
@@ -103,7 +104,7 @@ public class ButtonHelperCommanders {
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " will discard 1AC to move or place 1 mech on "
+        String msg = player.getFactionEmoji() + " will discard 1 AC to move or place 1 mech on "
             + Helper.getPlanetRepresentation(planet, game);
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet,
             game);
@@ -415,9 +416,9 @@ public class ButtonHelperCommanders {
                 || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2ACs (With Scheming)"));
+                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
                 } else {
-                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1AC"));
+                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
                 }
                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -513,6 +514,10 @@ public class ButtonHelperCommanders {
         new RemoveUnits().unitParsing(event, p1.getColor(),
             game.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2,
             game);
+
+        Tile tile = game.getTileFromPlanet(planet1);
+        tile = MoveUnits.flipMallice(event, tile, game);
+        planet1 = planet1.replace("lockedm", "m");
         new AddUnits().unitParsing(event, p1.getColor(),
             game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1,
             game);

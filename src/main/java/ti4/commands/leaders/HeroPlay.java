@@ -2,6 +2,7 @@ package ti4.commands.leaders;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -454,7 +455,7 @@ public class HeroPlay extends LeaderAction {
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
-                        + " sent everyone a ping in their private threads with buttons to send you 1AC");
+                        + " sent everyone a ping in their private threads with buttons to send you 1 AC");
             }
             case "keleresheroharka" -> KeleresHeroMentak.resolveKeleresHeroMentak(game, player, event);
         }

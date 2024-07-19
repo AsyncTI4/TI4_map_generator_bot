@@ -222,7 +222,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 "Use Vaylerian Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            String msg2 = player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent) to draw 1AC";
+            String msg2 = player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent) to draw 1 AC";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
@@ -234,7 +234,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
-                + " if you have not already used Scour this tactical action, you can discard 1AC to ready the planet "
+                + " if you have not already used Scour this tactical action, you can discard 1 AC to ready the planet "
                 + Helper.getPlanetRepresentation(planet, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
@@ -261,7 +261,7 @@ public class PlanetAdd extends PlanetAddRemove {
             saarButton.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " due to Cymiae Commander, you can discard 1AC here to place or move 1 mech on "
+                    + " due to Cymiae Commander, you can discard 1 AC here to place or move 1 mech on "
                     + Helper.getPlanetRepresentation(planet, game)
                     + ". Do not do this prior to exploring. It is an after, while exploring is a when",
                 saarButton);
