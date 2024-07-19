@@ -160,6 +160,15 @@ public class CombatRoll extends CombatSubcommandData {
                         "Skipping " + Emojis.Xxcha + " mechs due to Articles of War agenda.");
                 }
             }
+            if (rollType == CombatRollType.bombardment) {
+                if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "l1z1x_mech".equals(unit.getAlias()))) {
+                    playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
+                        .filter(e -> !"l1z1x_mech".equals(e.getKey().getAlias()))
+                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Skipping " + Emojis.L1Z1X + " mechs due to Articles of War agenda.");
+                }
+            }
 
         }
 
