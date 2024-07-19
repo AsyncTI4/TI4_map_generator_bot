@@ -199,7 +199,7 @@ public class MiltyDraftManager {
                     remaining.add(faction);
         }
         if (active.getPosition() == null) {
-            for (int i = 0; i < players.size(); i++)
+            for (int i = 1; i <= players.size(); i++)
                 if (!isOrderTaken(i))
                     remaining.add(StringHelper.ordinal(i) + " pick");
         }
