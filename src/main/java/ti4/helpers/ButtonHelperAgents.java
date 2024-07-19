@@ -312,7 +312,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         String message = p2.getRepresentation(true, true) + " increased your TGs by 2 (" + (p2.getTg() - 2) + "->"
             + p2.getTg()
-            + "). Use buttons in your cards info thread to discard 1AC, or lose 1 CC";
+            + "). Use buttons in your cards info thread to discard 1 AC, or lose 1 CC";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentation(true, true) + " use buttons to discard",
@@ -470,7 +470,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)");
+                ButtonHelper.getIdentOrColor(p2, game) + " gained 1 AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)");
         }
         event.getMessage().delete().queue();
     }
@@ -542,7 +542,7 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC due to agent usage");
+                        ButtonHelper.getIdentOrColor(p2, game) + " gained 1 AC due to agent usage");
                 }
             } else {
                 String message = trueIdentity + " select faction you wish to use " + ssruu + "Yvin Korduul (Vaylerian Agent) on";
@@ -770,7 +770,7 @@ public class ButtonHelperAgents {
             if (p2 == null)
                 return;
             String message = "";
-            String successMessage2 = ButtonHelper.getIdent(p2) + " drew 1AC due to " + ssruu + "Skhot Unit X-12 (Cymiae Agent).";
+            String successMessage2 = ButtonHelper.getIdent(p2) + " drew 1 AC due to " + ssruu + "Skhot Unit X-12 (Cymiae Agent).";
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
                 successMessage2 += " Drew another AC for scheming. Please discard 1";
@@ -785,7 +785,7 @@ public class ButtonHelperAgents {
                 game.drawActionCard(p2.getUserID());
             }
             ButtonHelper.checkACLimit(game, event, p2);
-            String headerText2 = p2.getRepresentation(true, true) + " you got 1AC due to " + ssruu + "Skhot Unit X-12 (Cymiae Agent)";
+            String headerText2 = p2.getRepresentation(true, true) + " you got 1 AC due to " + ssruu + "Skhot Unit X-12 (Cymiae Agent)";
             MessageHelper.sendMessageToPlayerCardsInfoThread(p2, game, headerText2);
             ACInfo.sendActionCardInfo(game, p2);
             if (p2.hasAbility("scheming")) {
@@ -803,8 +803,8 @@ public class ButtonHelperAgents {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
-            String successMessage = ident + " drew 1AC.";
-            String successMessage2 = ButtonHelper.getIdent(p2) + " drew 1AC.";
+            String successMessage = ident + " drew 1 AC.";
+            String successMessage2 = ButtonHelper.getIdent(p2) + " drew 1 AC.";
             String message = "";
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
@@ -835,10 +835,10 @@ public class ButtonHelperAgents {
 
             ButtonHelper.checkACLimit(game, event, player);
             ButtonHelper.checkACLimit(game, event, p2);
-            String headerText = player.getRepresentation(true, true) + " you got 1AC from " + ssruu + "Suffi An (Mentak Agent)";
+            String headerText = player.getRepresentation(true, true) + " you got 1 AC from " + ssruu + "Suffi An (Mentak Agent)";
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
             ACInfo.sendActionCardInfo(game, player);
-            String headerText2 = p2.getRepresentation(true, true) + " you got 1AC from " + ssruu + "Suffi An (Mentak Agent)";
+            String headerText2 = p2.getRepresentation(true, true) + " you got 1 AC from " + ssruu + "Suffi An (Mentak Agent)";
             MessageHelper.sendMessageToPlayerCardsInfoThread(p2, game, headerText2);
             ACInfo.sendActionCardInfo(game, p2);
             if (p2.hasAbility("scheming")) {
@@ -1831,7 +1831,7 @@ public class ButtonHelperAgents {
         ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, game, "celdauri", event);
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
-        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }

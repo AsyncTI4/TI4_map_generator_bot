@@ -847,7 +847,7 @@ public class AgendaHelper {
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "Drew 2ACs for each of the players who voted for");
+                        "Drew 2 ACs for each of the players who voted for");
                 }
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
@@ -855,29 +855,25 @@ public class AgendaHelper {
                 int maxLoss = 12;
                 List<Player> comrades = new ArrayList<>();
                 for (Player playerB : game.getRealPlayers()) {
-                    if (playerB.getTg() > maxLoss)
-                    {
+                    if (playerB.getTg() > maxLoss) {
                         maxLoss = playerB.getTg();
                         comrades = new ArrayList<>();
                         comrades.add(playerB);
-                    }
-                    else if (playerB.getTg() == maxLoss)
-                    {
+                    } else if (playerB.getTg() == maxLoss) {
                         comrades.add(playerB);
                     }
                     playerB.setTg(finalTG);
-                    if (finalTG > 0)
-                    {
+                    if (finalTG > 0) {
                         ButtonHelperAgents.resolveArtunoCheck(playerB, game, finalTG);
                         ButtonHelperAbilities.pillageCheck(playerB, game);
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                game.getPing() + " Set everyone's TGs to " + finalTG);
+                    game.getPing() + " Set everyone's TGs to " + finalTG);
                 if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
                     TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
                     for (Player playerB : comrades) {
-                        MessageHelper.sendMessageToChannel(watchPary, 
+                        MessageHelper.sendMessageToChannel(watchPary,
                             "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + "TGs to the less economically fortunate citizens of the galaxy.");
                     }
                 }
