@@ -3969,7 +3969,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (!player.controlsMecatol(true)) {
                         MessageHelper.sendMessageToChannel(privateChannel,
-                            "Only the player who controls Rex may score the Imperial point");
+                            "Only the player who controls Mecatol Rex may score the Imperial point.");
                         break;
                     }
                     boolean used = addUsedSCPlayer(messageID + "score_imperial", game, player, event,
@@ -4545,7 +4545,8 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperTacticalAction.selectRingThatActiveSystemIsIn(player, game, event);
                 }
                 case "ChooseDifferentDestination" -> {
-                    String message = "Choosing a different system to activate. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
+                    String message = "Choosing a different system to activate. Please select the ring of the map that the system you want to activate is located in."
+                        + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
                     ButtonHelper.deleteMessage(event);

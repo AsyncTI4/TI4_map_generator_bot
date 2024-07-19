@@ -318,7 +318,7 @@ public class AgendaHelper {
                         if (tile != null) {
                             String tokenFilename = Mapper.getTokenID("gamma");
                             tile.addToken(tokenFilename, Constants.SPACE);
-                            MessageHelper.sendMessageToChannel(actionsChannel, "Added Gamma to Rex");
+                            MessageHelper.sendMessageToChannel(actionsChannel, "Added gamma wormhole to the Mecatol Rex system.");
                         }
                     }
                 }
@@ -1167,7 +1167,7 @@ public class AgendaHelper {
         } else if (!d1.isSuccess() && !game.isFowMode()) {
             Button modify = Button.secondary("getModifyTiles", "Modify Units");
             MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(),
-                "Remove units on or adjacent to mecatol please", modify);
+                "Remove units on or adjacent to Mecatol Rex, please.", modify);
         }
     }
 
@@ -3268,9 +3268,9 @@ public class AgendaHelper {
         if (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government")) {
             sb = new StringBuilder();
             if (game.getLaws().containsKey("absol_government") && player.controlsMecatol(false)) {
-                sb.append(" vote count (Rep Gov while controlling rex): **2**");
+                sb.append(" vote count (Representative Government while controlling Mecatol Rex): **2**");
             } else {
-                sb.append(" vote count (Rep Gov): **1**");
+                sb.append(" vote count (Representative Government): **1**");
             }
 
         }

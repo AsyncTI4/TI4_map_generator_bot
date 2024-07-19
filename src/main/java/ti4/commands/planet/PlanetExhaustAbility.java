@@ -79,7 +79,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             // Homebrew
             case "mr" -> {
-                output = "Use buttons to destroy a ground force on a legendary or planet adjacent to rex";
+                output = "Use buttons to destroy a ground force on a legendary or planet adjacent to Mecatol Rex.";
                 buttons.addAll(ButtonHelper.customRexLegendary(player, game));
             }
             case "silence" -> {
