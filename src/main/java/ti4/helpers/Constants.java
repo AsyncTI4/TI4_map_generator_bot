@@ -331,6 +331,7 @@ public class Constants {
     public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String REMATCH = "rematch";
+    public static final String CLONE_GAME = "clone_game";
     public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String LIZHO_TRAP = "lizho_trap";
