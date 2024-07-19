@@ -293,7 +293,7 @@ public class Setup extends PlayerSubcommandData {
                 "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                     + " due to the teeming ability");
         }
-        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }

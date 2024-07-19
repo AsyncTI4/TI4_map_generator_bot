@@ -251,8 +251,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         message = "Card has been discarded. Resolve effects manually.";
-        //String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
-        String planetName = planetID;
+        String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
+
         // Specific Explore Handling
         switch (cardID) {
             case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> {
@@ -292,7 +292,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
 
                     if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2ACs");
+                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
                     }
                     ACInfo.sendActionCardInfo(game, player, event);
                 }
@@ -388,7 +388,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
-                Button getACButton = Button.success("comm_for_AC", "Spend 1TG or 1 Commodity For 1AC")
+                Button getACButton = Button.success("comm_for_AC", "Spend 1TG or 1 Commodity For 1 AC")
                     .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
                     .withEmoji(Emoji.fromFormatted(Emojis.comm));
@@ -471,8 +471,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
-                // TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
-                Button getMechButton = Button.success("comm_for_mech", "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                Button getMechButton = Button.success("resolveLocalFab_" + planetID, "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -513,7 +512,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";
-                Button ReadyPlanet = Button.success("planet_ready", "Ready " + planetName + " by removing 1 infantry from or having mech on planet.");
+                Button ReadyPlanet = Button.success("resolveExpedition_" + planetID, "Ready " + planetName + " by removing 1 infantry from or having mech on planet.");
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ReadyPlanet, Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -527,7 +526,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainTG = Button.success("gain_1_tg", "Gain 1TG by removing infantry or having mech on " + planetName)
+                Button gainTG = Button.success("resolveCoreMine_" + planetID, "Gain 1TG by removing infantry or having mech on " + planetName)
                     .withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG, Decline2);
@@ -535,7 +534,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainCC = Button.success("gain_CC", "Gain 1CC by removing 1 infantry or having mech on " + planetName);
+                Button gainCC = Button.success("resolveVolatile_" + planetID, "Gain 1CC by removing 1 infantry or having mech on " + planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
