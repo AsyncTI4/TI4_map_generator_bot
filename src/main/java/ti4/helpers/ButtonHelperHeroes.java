@@ -1544,7 +1544,7 @@ public class ButtonHelperHeroes {
         event.getMessage().delete().queue();
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                "The Voice United, theCymiae hero, has given " + Mapper.getActionCard(acID).getName()
+                "The Voice United, the Cymiae hero, has given " + Mapper.getActionCard(acID).getName()
                     + " to you and you now have to discard 1A.C");
             String msg = p2.getRepresentation(true, true) + " use buttons to discard.";
             List<Button> buttons = ACInfo.getDiscardActionCardButtons(game, p2, false);
@@ -1984,7 +1984,7 @@ public class ButtonHelperHeroes {
             scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));
         }
         if (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3)) {
-            scButtons.add(Button.secondary("draw2ac", "Draw 2 Action Cards")
+            scButtons.add(Button.secondary("draw2 AC", "Draw 2 Action Cards")
                 .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
         }
         if (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4)) {

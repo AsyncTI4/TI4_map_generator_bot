@@ -374,12 +374,12 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolvePreparation(Game game, Player player, ButtonInteractionEvent event) {
-        String message = "Use button to draw " + (player.hasAbility("scheming") ? "2ACs" : "1AC");
+        String message = "Use button to draw " + (player.hasAbility("scheming") ? "2 ACs" : "1 AC");
         List<Button> buttons = new ArrayList<>();
         if (player.hasAbility("scheming")) {
-            buttons.add(Button.success("draw_2_ACDelete", "Draw 2ACs (With Scheming)"));
+            buttons.add(Button.success("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
         } else {
-            buttons.add(Button.success("draw_1_ACDelete", "Draw 1AC"));
+            buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, buttons);
     }
@@ -1080,7 +1080,7 @@ public class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " since stealing 1AC reveals secret info, extra precaution has been taken and a button has been sent to "
+                + " since stealing 1 AC reveals secret info, extra precaution has been taken and a button has been sent to "
                 + ButtonHelper.getIdentOrColor(p2, game)
                 + " cards info thread, they may press this button to send a random AC to you.");
         List<Button> buttons = new ArrayList<>();
@@ -1679,28 +1679,19 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " you Plague'd " + planetRep + " and got " + hits + " hit" + (hits == 1 ? "" : ""));
         String adjective = "";
-        if (amount <= 3)
-        {
-        }
-        else if (hits == 0)
-        {
+        if (amount <= 3) {
+        } else if (hits == 0) {
             adjective = "n inconsequential";
-        }
-        else if (hits == amount)
-        {
+        } else if (hits == amount) {
             adjective = " catastrophic";
-        }
-        else if (hits <= amount/3)
-        {
+        } else if (hits <= amount / 3) {
             adjective = " minor";
-        }
-        else if (hits <= 2*amount/3)
-        {
+        } else if (hits <= 2 * amount / 3) {
             adjective = " major";
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
             p2.getRepresentation(true, true) + " your planet " + planetRep + " suffered a"
-            + adjective + " Plague and you lost " + hits + " infantry.");
+                + adjective + " Plague and you lost " + hits + " infantry.");
     }
 
     public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event,

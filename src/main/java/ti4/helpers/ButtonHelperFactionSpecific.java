@@ -532,14 +532,14 @@ public class ButtonHelperFactionSpecific {
         Player yssaril = findPNOwner("spynet", game);
         String buttonID = "transact_ACs_" + player.getFaction();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-            "Sent Yssaril buttons so that they may send you 1AC.");
+            "Sent Yssaril buttons so that they can send you 1AC.");
         ButtonHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
 
     public static void resolveSpyNetPlayerChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1AC",
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC",
             ACInfo.getToBeStolenActionCardButtons(game, yssaril));
         event.getMessage().delete().queue();
     }
@@ -932,19 +932,12 @@ public class ButtonHelperFactionSpecific {
                 amount + " " + unitName + " " + origPlanet, game);
             new AddUnits().unitParsing(event, hacan.getColor(), game.getTileFromPlanet(newPlanet),
                 amount + " " + unitName + " " + newPlanet, game);
-            if (unitGroupRef.equalsIgnoreCase("units"))
-            {
-            }
-            else if (!unitName.equalsIgnoreCase("mech"))
-            {
+            if (unitGroupRef.equalsIgnoreCase("units")) {
+            } else if (!unitName.equalsIgnoreCase("mech")) {
                 unitGroupRef = "units";
-            }
-            else if (unitGroupRef.equalsIgnoreCase("mech"))
-            {
+            } else if (unitGroupRef.equalsIgnoreCase("mech")) {
                 unitGroupRef = "mechs";
-            }
-            else
-            {
+            } else {
                 unitGroupRef = "mech";
             }
         }
@@ -1237,7 +1230,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji()
                 + " deployed 1 space dock on " + planet + " by removing " + requiredNum + " infantry");
             event.getMessage().delete().queue();
-            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
+            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
                 player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                     Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
             }
@@ -1766,7 +1759,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveScour(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " used the Scour ability to discard 1AC and ready "
+        String msg = player.getFactionEmoji() + " used the Scour ability to discard 1 AC and ready "
             + Helper.getPlanetRepresentation(planet, game);
         player.refreshPlanet(planet);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
