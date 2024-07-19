@@ -377,7 +377,7 @@ public class Constants {
 
     // milty draft stuff
     public static final String MILTY = "milty";
-    public static final String START = "start";
+    public static final String QUICKSTART = "quickstart";
     public static final String SLICE_COUNT = "slice_count";
     public static final String FACTION_COUNT = "faction_count";
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
