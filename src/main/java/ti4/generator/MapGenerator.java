@@ -387,7 +387,7 @@ public class MapGenerator {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, 0.75f, game.getName());
+        FileUpload fileUpload = uploadToDiscord(mainImage, 0.15f, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
