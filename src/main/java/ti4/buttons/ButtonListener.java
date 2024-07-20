@@ -769,10 +769,10 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             } else {
-                string empelar = "";
-                list<character> letters = arrays.aslist('m','e','l','p','a');
-                collections.shuffle(letters);
-                for (character c: letters)
+                String empelar = "";
+                List<Character> letters = Arrays.asList('m','e','l','p','a');
+                Collections.shuffle(letters);
+                for (Character c: letters)
                 {
                     empelar += c;
                 }
