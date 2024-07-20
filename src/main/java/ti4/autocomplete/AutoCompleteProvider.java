@@ -807,7 +807,7 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = ServerPromote.Servers.keySet().stream()
                     .filter(key -> ServerPromote.Ranks.get(key).toLowerCase().contains(enteredValue))
                     .limit(25)
-                    .map(key -> new Command.Choice(key, ServerPromote.Ranks.get(key)))
+                    .map(key -> new Command.Choice(key, ServerPromote.Ranks.get(key)));
             }
             case ForcePick.PICK -> {
                 String enteredValue = event.getFocusedOption().getValue();
