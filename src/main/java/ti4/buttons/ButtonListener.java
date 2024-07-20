@@ -770,7 +770,7 @@ public class ButtonListener extends ListenerAdapter {
                 {
                     empelar += c;
                 }
-                empelar = "E" + empelar + "r"
+                empelar = "E" + empelar + "r";
                 MessageHelper.sendMessageToChannel(channel,
                     trueIdentity + " exhausted Scepter of " + empelar + " to follow SC#" + scnum);
                 player.addExhaustedRelic("emelpar");
