@@ -151,6 +151,9 @@ public class Constants {
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
     public static final String SWAP = "swap";
+    public static final String PROMOTE_TARGET = "promote_target";
+    public static final String PROMOTE_RANK = "promote_rank";
+    public static final String PROMOTE_DEMOTE = "promote_demote";
 
     public static final String SET_SETTING = "setting";
     public static final String SET_UNIT_CAP = "set_unit_cap";
@@ -331,6 +334,7 @@ public class Constants {
     public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String REMATCH = "rematch";
+    public static final String CLONE_GAME = "clone_game";
     public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String LIZHO_TRAP = "lizho_trap";
@@ -830,6 +834,7 @@ public class Constants {
     public static final String SWAP_SC = "swap_sc";
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";
     public static final String BOTHELPER = "bothelper";
+    public static final String SERVERPROMOTE = "server_promote";
     public static final String CREATE_GAME_CHANNELS = "create_game_channels";
     public static final String CREATE_GAME_BUTTON = "create_game_button";
     public static final String CREATE_FOW_GAME_CHANNELS = "create_fow_game_channels";
