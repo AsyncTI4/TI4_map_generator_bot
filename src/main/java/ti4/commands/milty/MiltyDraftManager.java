@@ -21,10 +21,11 @@ import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.map.AddTileList;
 import ti4.commands.player.Setup;
@@ -106,20 +107,22 @@ public class MiltyDraftManager {
     }
 
     public String getCurrentDraftPlayer() {
+        if (draftOrder.size() < draftIndex) return null;
         return draftOrder.get(draftIndex);
     }
 
     public String getNextDraftPlayer() {
-        if (draftOrder.size() <= draftIndex + 1) return null;
+        if (draftOrder.size() < draftIndex + 1) return null;
         return draftOrder.get(draftIndex + 1);
     }
 
     public Player getCurrentDraftPlayer(Game game) {
+        if (draftOrder.size() < draftIndex) return null;
         return game.getPlayer(draftOrder.get(draftIndex));
     }
 
     public Player getNextDraftPlayer(Game game) {
-        if (draftOrder.size() <= draftIndex + 1) return null;
+        if (draftOrder.size() < draftIndex + 1) return null;
         return game.getPlayer(draftOrder.get(draftIndex + 1));
     }
 
@@ -180,6 +183,27 @@ public class MiltyDraftManager {
     public void setFactionDraft(List<String> factions) {
         factionDraft.clear();
         factionDraft.addAll(factions);
+    }
+
+    public List<String> allRemainingOptionsForActive() {
+        PlayerDraft active = getPlayerDraft(getCurrentDraftPlayer());
+        List<String> remaining = new ArrayList<>();
+        if (active.getSlice() == null) {
+            for (MiltyDraftSlice slice : slices)
+                if (!isSliceTaken(slice.getName()))
+                    remaining.add("Slice " + slice.getName());
+        }
+        if (active.getFaction() == null) {
+            for (String faction : factionDraft)
+                if (!isFactionTaken(faction))
+                    remaining.add(faction);
+        }
+        if (active.getPosition() == null) {
+            for (int i = 1; i <= players.size(); i++)
+                if (!isOrderTaken(i))
+                    remaining.add(StringHelper.ordinal(i) + " pick");
+        }
+        return remaining;
     }
 
     public List<FactionModel> remainingFactions() {
@@ -286,7 +310,7 @@ public class MiltyDraftManager {
     }
 
     @JsonIgnore
-    public void doMiltyPick(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
+    public void doMiltyPick(GenericInteractionCreateEvent event, Game game, String buttonID, Player player) {
         String userId = player.getUserID();
         MessageChannel mainGameChannel = game.getMainGameChannel();
         if (draftIndex >= draftOrder.size()) {
@@ -294,12 +318,17 @@ public class MiltyDraftManager {
             return;
         }
         if (!userId.equals(getCurrentDraftPlayer())) {
-            event.getHook().sendMessage("You are not up to draft").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+            if (event instanceof ButtonInteractionEvent bevent) {
+                bevent.getHook().sendMessage("You are not up to draft").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+            } else {
+                event.getMessageChannel().sendMessage("Something went wrong").queue();
+            }
             return;
         }
 
         boolean auto = buttonID.startsWith("miltyAuto_");
-        String draftPick = buttonID.replace("milty_", "").replace("miltyAuto_", "");
+        boolean force = buttonID.startsWith("miltyForce_");
+        String draftPick = buttonID.replace("milty_", "").replace("miltyAuto_", "").replace("miltyForce_", "");
         String category = draftPick.substring(0, draftPick.indexOf("_"));
         String item = draftPick.substring(draftPick.indexOf("_") + 1);
 
@@ -312,12 +341,18 @@ public class MiltyDraftManager {
 
         //Oopsiedoops
         if (errorMessage != null) {
-            event.getHook().sendMessage(errorMessage).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+            if (event instanceof ButtonInteractionEvent bevent) {
+                bevent.getHook().sendMessage(errorMessage).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+            } else {
+                event.getMessageChannel().sendMessage(errorMessage).queue();
+            }
             return;
         }
 
         // Send success message
-        String middle = auto ? " only had one option available to draft, so they were given " : " drafted ";
+        String middle = " drafted ";
+        if (auto) middle = " only had one option available to draft, so they were given ";
+        if (force) middle = " was forced to take ";
         try {
             String drafted = player.getPing() + middle + switch (category) {
                 case "slice" -> "Slice " + item;
@@ -368,7 +403,7 @@ public class MiltyDraftManager {
         return null;
     }
 
-    private void finishDraft(Game game, ButtonInteractionEvent event) {
+    private void finishDraft(Game game, GenericInteractionCreateEvent event) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
@@ -377,7 +412,7 @@ public class MiltyDraftManager {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = getPlayerDraft(playerId);
                 String color = player.getNextAvailableColour();
-                if (playerId.equals(Constants.chassitId) && game.getUnusedColors().contains("lightgray")) {
+                if (playerId.equals(Constants.chassitId) && game.getUnusedColors().contains(Mapper.getColor("lightgray"))) {
                     color = "lightgray";
                 }
                 String faction = picks.getFaction();

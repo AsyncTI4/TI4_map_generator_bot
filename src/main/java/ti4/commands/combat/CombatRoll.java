@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,8 +16,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
-import org.apache.commons.lang3.StringUtils;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
@@ -160,6 +160,15 @@ public class CombatRoll extends CombatSubcommandData {
                         "Skipping " + Emojis.Xxcha + " mechs due to Articles of War agenda.");
                 }
             }
+            if (rollType == CombatRollType.bombardment) {
+                if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "l1z1x_mech".equals(unit.getAlias()))) {
+                    playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
+                        .filter(e -> !"l1z1x_mech".equals(e.getKey().getAlias()))
+                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        "Skipping " + Emojis.L1Z1X + " mechs due to Articles of War agenda.");
+                }
+            }
 
         }
 
@@ -294,14 +303,11 @@ public class CombatRoll extends CombatSubcommandData {
                 }
             }
         } else {
+            List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != null && opponent != player) {
-
-                List<Button> buttons = new ArrayList<>();
                 if (round2 > round) {
                     if (opponent.isDummy()) {
-
                         buttons.add(Button.primary(opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Dummy For Combat Round #" + (round + 1)));
-
                     } else {
                         buttons.add(Button.primary("combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Combat Round #" + (round + 1)));
                     }
@@ -329,6 +335,21 @@ public class CombatRoll extends CombatSubcommandData {
                     }
                 }
 
+            } else {
+                if (game.isFowMode() && opponent != null && opponent.isDummy() && h > 0) {
+                    if (combatOnHolder instanceof Planet) {
+                        if (round2 > round) {
+                            buttons.add(Button.primary(opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Dummy for Combat Round #" + (round + 1)));
+                        }
+                        buttons.add(Button.success(opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h, "Auto-assign Hits For Dummy"));
+                        String msg = opponent.getRepresentation(true, true) + " you can autoassign " + h + " hit(s)";
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
+                    } else {
+                        buttons.add(Button.success(opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hits For Dummy"));
+                        String msg2 = opponent.getFactionEmoji() + " can automatically assign hits. The hits would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                    }
+                }
             }
         }
         if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != null && opponent != player) {

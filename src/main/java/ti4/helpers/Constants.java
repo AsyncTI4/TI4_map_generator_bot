@@ -334,6 +334,7 @@ public class Constants {
     public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String REMATCH = "rematch";
+    public static final String CLONE_GAME = "clone_game";
     public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String LIZHO_TRAP = "lizho_trap";
@@ -380,7 +381,7 @@ public class Constants {
 
     // milty draft stuff
     public static final String MILTY = "milty";
-    public static final String START = "start";
+    public static final String QUICKSTART = "quickstart";
     public static final String SLICE_COUNT = "slice_count";
     public static final String FACTION_COUNT = "faction_count";
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
