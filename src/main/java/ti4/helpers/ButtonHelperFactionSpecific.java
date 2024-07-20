@@ -113,7 +113,7 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
 
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to your mech ability, you can explore " + Helper.getPlanetRepresentation(planet, game) + " twice now");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to your mech ability, you may explore " + Helper.getPlanetRepresentation(planet, game) + " twice now.");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Explore #1", buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Explore #2", buttons);
         event.getMessage().delete().queue();
@@ -287,9 +287,9 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
         player.getLeader("yssarilagent").get().setExhausted(true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " is using Clever Clever JR-XS455-O (Relic Agent)");
+            player.getFactionEmoji() + " is using Clever Clever JR-XS455-O, the Relic/Yssaril agent.");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use buttons to decide who to use Clever Clever JR-XS455-O (Relic Agent) on", buttons2);
+            "Use buttons to decide on whom to use Clever Clever JR-XS455-O, the Relic/Yssaril agent.", buttons2);
         event.getMessage().delete().queue();
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
@@ -300,7 +300,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " you have all your mechs out and can't deploy more");
+                player.getRepresentation(true, true) + " you have all your mechs out and can't deploy more.");
             return;
         }
         for (String planet : player.getPlanets()) {
@@ -520,8 +520,8 @@ public class ButtonHelperFactionSpecific {
 
     public static void offerSpyNetOptions(Player player) {
         String msg = player.getRepresentation()
-            + " you have a choice now as to how you want to resolve Spy Net. You can do it the traditional way of accepting a card Yssaril chooses, without looking"
-            + " at the other cards. Or you can look at all of Yssaril's cards and choose one.";
+            + " you have a choice now as to how you want to resolve Spy Net. You may do it the traditional way of accepting a card Yssaril chooses, without looking"
+            + " at the other cards. Or you may look at all of Yssaril's cards and choose one.";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("spyNetYssarilChooses", "Have Yssaril Choose For You"));
         buttons.add(Button.secondary("spyNetPlayerChooses", "Look And Choose Yourself"));
@@ -532,14 +532,14 @@ public class ButtonHelperFactionSpecific {
         Player yssaril = findPNOwner("spynet", game);
         String buttonID = "transact_ACs_" + player.getFaction();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-            "Sent Yssaril buttons so that they can send you 1AC");
+            "Sent Yssaril buttons so that they can send you 1AC.");
         ButtonHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
 
     public static void resolveSpyNetPlayerChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1AC",
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC",
             ACInfo.getToBeStolenActionCardButtons(game, yssaril));
         event.getMessage().delete().queue();
     }
@@ -932,19 +932,12 @@ public class ButtonHelperFactionSpecific {
                 amount + " " + unitName + " " + origPlanet, game);
             new AddUnits().unitParsing(event, hacan.getColor(), game.getTileFromPlanet(newPlanet),
                 amount + " " + unitName + " " + newPlanet, game);
-            if (unitGroupRef.equalsIgnoreCase("units"))
-            {
-            }
-            else if (!unitName.equalsIgnoreCase("mech"))
-            {
+            if (unitGroupRef.equalsIgnoreCase("units")) {
+            } else if (!unitName.equalsIgnoreCase("mech")) {
                 unitGroupRef = "units";
-            }
-            else if (unitGroupRef.equalsIgnoreCase("mech"))
-            {
+            } else if (unitGroupRef.equalsIgnoreCase("mech")) {
                 unitGroupRef = "mechs";
-            }
-            else
-            {
+            } else {
                 unitGroupRef = "mech";
             }
         }
@@ -1131,7 +1124,7 @@ public class ButtonHelperFactionSpecific {
         Player player,
         String ident) {
         MessageHelper.sendMessageToChannel(event.getChannel(), game.getPing()
-            + " Dih-Mohn Flagship is producing units. They can produce up to 2 units with a combined cost of 4.");
+            + " the Maximus (the Dih-Mohn flagship) is producing units. They may produce up to 2 units with a combined cost of 4.");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff
@@ -1216,7 +1209,7 @@ public class ButtonHelperFactionSpecific {
                 if (amount > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation(true, true) + " you have " + amount
-                            + " mech" + (amount == 1 ? "" : "s") + " that can replace infantry",
+                            + " mech" + (amount == 1 ? "" : "s") + " that may replace infantry.",
                         buttons);
                 }
             }
@@ -1237,7 +1230,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji()
                 + " deployed 1 space dock on " + planet + " by removing " + requiredNum + " infantry");
             event.getMessage().delete().queue();
-            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
+            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
                 player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                     Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
             }
@@ -1525,9 +1518,8 @@ public class ButtonHelperFactionSpecific {
             || (mentak.getAllianceMembers().contains(player.getFaction()))) {
             return;
         }
-        String msg = mentak.getRepresentation(true, true) + " placed " + amount + " of the " + unit
-            + "s which "
-            + player.getRepresentation() + " just had destroyed in the active system using Mentak Hero.";
+        String msg = mentak.getRepresentation(true, true) + " placed " + amount + " of the " + unit + (amount == 1 ? "" : "s") + " which "
+            + player.getRepresentation() + " just had destroyed in the active system using Ipswitch, Loose Cannon, the Mentak Hero.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         new AddUnits().unitParsing(event, mentak.getColor(), tile, amount + " " + unit, game);
     }
@@ -1767,7 +1759,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveScour(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " used the Scour ability to discard 1AC and ready "
+        String msg = player.getFactionEmoji() + " used the Scour ability to discard 1 AC and ready "
             + Helper.getPlanetRepresentation(planet, game);
         player.refreshPlanet(planet);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),

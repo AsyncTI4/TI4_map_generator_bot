@@ -263,7 +263,7 @@ public class ButtonHelperModifyUnits {
                         ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
                     }
                     if (player.hasUnit("sardakk_mech")) {
-                        msg = msg + "> Sardakk mech generated " + min + " hit" + (min == 1 ? "" : "s") + " \n";
+                        msg = msg + "> Valkyrie Exoskeleton mech generated " + min + " hit" + (min == 1 ? "" : "s") + " \n";
                         sardakkMechHits = min;
                     }
                 }
@@ -1005,7 +1005,7 @@ public class ButtonHelperModifyUnits {
                 b2s.add(Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     true)
-                    + " you can use this button to return Naalu fighters to space after combat concludes. This only needs to be done once. Reminder you can't take over a planet with only fighters.",
+                    + " you may use this button to return Naalu fighters to space after combat concludes. This only needs to be done once. Reminder you can't take over a planet with only fighters.",
                     b2s);
             }
         }
@@ -1237,7 +1237,7 @@ public class ButtonHelperModifyUnits {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander") && !buttonID.contains("skilled")
             && !AddCC.hasCC(event, player.getColor(), tile1)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
-                + " did not place a CC in the retreat system due to Kollecc commander");
+                + " did not place a CC in the retreat system due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
             AddCC.addCC(event, player.getColor(), tile2, true);
         }
@@ -1431,7 +1431,7 @@ public class ButtonHelperModifyUnits {
                             Button.success("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You can use your cloaked fleets ability to capture this produced ship",
+                            "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
                     if (player.hasAbility("cloaked_fleets")) {
@@ -1440,7 +1440,7 @@ public class ButtonHelperModifyUnits {
                             Button.success("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You can use your cloaked fleets ability to capture this produced ship",
+                            "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1461,7 +1461,7 @@ public class ButtonHelperModifyUnits {
                             "Capture 1 " + ButtonHelper.getUnitName(unit)));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You can use your cloaked fleets ability to capture this produced ship",
+                            "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
 
@@ -1479,7 +1479,7 @@ public class ButtonHelperModifyUnits {
                     "construction");
             }
             if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
-                String message = playerRep + " Please tell the bot if you used Mahact's agent and should place the active player's (construction holder) CC or if you followed normally and should place your own CC from reinforcements";
+                String message = playerRep + " Please tell the bot if you used Mahact's agent and should place the active player's (Construction holder) CC or if you followed normally and should place your own CC from reinforcements.";
                 Button placeCCInSystem = Button.success(
                     finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
                     "Place 1 CC from reinforcements");
@@ -1517,7 +1517,7 @@ public class ButtonHelperModifyUnits {
                         }
                     } else {
                         msg = playerRep
-                            + " has Rohdhna Commander and is thus doing the Primary which does not place a CC";
+                            + " has B-Unit 205643a, the Roh'Dhna Commander and is thus doing the Primary which does not place a CC.";
                     }
 
                     if (game.isFowMode()) {
@@ -1573,7 +1573,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, game, "celdauri", event);
         ButtonHelper.fullCommanderUnlockCheck(player, game, "gledge", event);
-        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
@@ -1620,7 +1620,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " captured 1 newly produced " + ButtonHelper.getUnitName(unit)
                 + " in " + tile.getRepresentationForButtons(game, player)
-                + " using the Cloaked Fleets abiility (limit of 2 ships can be captured per build)");
+                + " using the Cloaked Fleets ability (limit of 2 ships may be captured per build).");
         new AddUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, game);
         event.getMessage().delete().queue();
     }
@@ -1747,14 +1747,15 @@ public class ButtonHelperModifyUnits {
                             "Capture 1 " + ButtonHelper.getUnitName(unit)));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You can use your cloaked fleets ability to capture this produced ship",
+                            "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
                     if (tile2 != null && !"skipbuild".equalsIgnoreCase(skipbuild) && player.hasAbility("rally_to_the_cause")
                         && player.getHomeSystemTile() == tile2
                         && ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).size() > 0) {
                         String msg = player.getRepresentation()
-                            + " due to your Rally to the Cause ability, if you just produced a ship in your HS, you can produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units. Press button to resolve";
+                            + " due to your Rally to the Cause ability, if you just produced a ship in your HS, you may produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units."
+                            + " Press button to resolve.";
                         List<Button> buttons2 = new ArrayList<>();
                         buttons2.add(Button.success("startRallyToTheCause", "Rally To The Cause"));
                         buttons2.add(Button.danger("deleteButtons", "Decline"));
@@ -1798,14 +1799,14 @@ public class ButtonHelperModifyUnits {
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_" + player.getFaction(),
-                "Use Ghoti Agent")
+                "Use Becece (Ghoti Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
             buttons.add(winnuButton);
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             Button winnuButton = Button
                 .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
-                    "Use Mortheus Agent")
+                    "Use Walik (Mortheus Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
             buttons.add(winnuButton);
         }
@@ -1836,7 +1837,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.fullCommanderUnlockCheck(player, game, "rohdhna", event);
         ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
         ButtonHelper.fullCommanderUnlockCheck(player, game, "celdauri", event);
-        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5) {
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
@@ -1934,7 +1935,7 @@ public class ButtonHelperModifyUnits {
         List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "spacecombat");
         if (cause.contains("dihmohn")) {
             msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
-                + " used Dihmohn Commander to generate a hit against you. Please assign it with buttons";
+                + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
             buttons = getOpposingUnitsToHit(player, game, event, tile);
             msg = player.getRepresentation() + " choose which opposing unit to hit";

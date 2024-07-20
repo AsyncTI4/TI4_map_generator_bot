@@ -56,7 +56,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     private Game game;
     private User user;
     protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
-    protected final OptionData idOption = new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card id sent between (). Can include multiple comma-separated ids.");
+    protected final OptionData idOption = new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card id sent between (). May include multiple comma-separated ids.");
 
     public String getActionID() {
         return getName();
@@ -251,7 +251,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         message = "Card has been discarded. Resolve effects manually.";
-        String planetName = Mapper.getPlanet(planetID).getName();
+        String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
 
         // Specific Explore Handling
         switch (cardID) {
@@ -292,7 +292,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
 
                     if (game.isFowMode()) {
-                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2ACs");
+                        FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew 2 ACs");
                     }
                     ACInfo.sendActionCardInfo(game, player, event);
                 }
@@ -306,14 +306,14 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelper.checkACLimit(game, event, player);
             }
             case "dv1", "dv2" -> {
-                message = "Drew Secret Objective";
+                message = "Drew Secret Objective.";
                 game.drawSecretObjective(player.getUserID());
                 if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + ". Drew a second SO due to plausible deniability";
+                    message = message + " Drew a second SO due to Plausible Deniability.";
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player, event);
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
@@ -325,7 +325,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "ms1", "ms2" -> {
                 message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()
-                    + "). Reminder that this is optional, and that you can instead convert your existing comms.";
+                    + "). Reminder that this is optional, and that you may instead convert your existing commodities.";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 ButtonHelperStats.replenishComms(event, game, player, true);
             }
@@ -365,7 +365,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     saarButton.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation(true, true)
-                            + " you can pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
+                            + " you may pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
                         saarButton);
                 }
 
@@ -388,7 +388,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
-                Button getACButton = Button.success("comm_for_AC", "Spend 1TG or 1 Commodity For 1AC")
+                Button getACButton = Button.success("comm_for_AC", "Spend 1TG or 1 Commodity For 1 AC")
                     .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
                     .withEmoji(Emoji.fromFormatted(Emojis.comm));
@@ -446,7 +446,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 discardButtons.add(Button.danger("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation()
-                        + " you can use the buttons to discard the top of the explore decks if you choose",
+                        + " you may use the buttons to discard the top of the explore decks if you choose.",
                     discardButtons);
                 List<Button> buttonsAll = new ArrayList<>();
                 for (String planet : player.getPlanetsAllianceMode()) {
@@ -471,8 +471,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
-                // TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
-                Button getMechButton = Button.success("comm_for_mech", "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                Button getMechButton = Button.success("resolveLocalFab_" + planetID, "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -513,7 +512,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";
-                Button ReadyPlanet = Button.success("planet_ready", "Ready " + planetName + " by removing 1 infantry from or having mech on planet.");
+                Button ReadyPlanet = Button.success("resolveExpedition_" + planetID, "Ready " + planetName + " by removing 1 infantry from or having mech on planet.");
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ReadyPlanet, Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -527,7 +526,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainTG = Button.success("gain_1_tg", "Gain 1TG by removing infantry or having mech on " + planetName)
+                Button gainTG = Button.success("resolveCoreMine_" + planetID, "Gain 1TG by removing infantry or having mech on " + planetName)
                     .withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG, Decline2);
@@ -535,7 +534,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainCC = Button.success("gain_CC", "Gain 1CC by removing 1 infantry or having mech on " + planetName);
+                Button gainCC = Button.success("resolveVolatile_" + planetID, "Gain 1CC by removing 1 infantry or having mech on " + planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -587,7 +586,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG" 
+                    ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG"
                         + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
@@ -607,9 +606,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
             gainComm.add(Button.danger("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
-            sb.append(player.getFactionEmoji()).append(" can use their **Fortune Seekers** ability\n");
+            sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability\n");
             sb.append(player.getRepresentation(true, true)).append(
-                " After resolving the explore, you can use this button to get your commodity from your fortune seekers ability");
+                " After resolving the explore, you may use this button to get your commodity from your fortune seekers ability.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);
             game.setStoredValue("fortuneSeekers", "Used");
         }

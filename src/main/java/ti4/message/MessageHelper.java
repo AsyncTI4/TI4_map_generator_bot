@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.messages.MessagePoll.LayoutType;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -252,6 +253,18 @@ public class MessageHelper {
 		replyToMessage(event, fileUpload, forceShowMap, null, false);
 	}
 
+	public static void editMessageWithButtons(ButtonInteractionEvent event, String message, List<Button> buttons) {
+		editMessageWithButtonsAndFiles(event, message, buttons, Collections.emptyList());
+	}
+
+	public static void editMessageWithButtonsAndFiles(ButtonInteractionEvent event, String message, List<Button> buttons, List<FileUpload> files) {
+		editMessageWithActionRowsAndFiles(event, message, ActionRow.partitionOf(buttons), files);
+	}
+
+	public static void editMessageWithActionRowsAndFiles(ButtonInteractionEvent event, String message, List<ActionRow> rows, List<FileUpload> files) {
+		event.getHook().editOriginal(message).setComponents(rows).setFiles(files).queue();
+	}
+
 	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap,
 		String messageText, boolean pinMessage) {
 		try {
@@ -310,6 +323,20 @@ public class MessageHelper {
 		if (channel == null) {
 			return;
 		}
+
+		if (channel instanceof ThreadChannel thread) {
+			if (thread.isArchived() && !thread.isLocked()) {
+				String txt = messageText;
+				List<Button> butts = buttons;
+				thread.getManager().setArchived(false).queue((v) -> {
+					splitAndSentWithAction(txt, channel, restAction, embeds, butts);
+				}, BotLogger::catchRestError);
+				return;
+			} else if (thread.isLocked()) {
+				BotLogger.log("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
+			}
+		}
+
 		buttons = sanitizeButtons(buttons, channel);
 
 		Game game = getGameFromChannelName(channel.getName());

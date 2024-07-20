@@ -192,11 +192,11 @@ public class TurnStart extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()
-                    + " since you have AI Development Algorithm, you can research 1 Unit Upgrade here for 6 influence";
+                    + " since you have AI Development Algorithm, you may research 1 Unit Upgrade now for 6 influence.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you can use the button to get your tech",
+                        player.getRepresentation(true, true) + " you may use the button to get your tech.",
                         List.of(Buttons.GET_A_TECH));
                 } else {
                     List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
@@ -210,7 +210,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
                 String msg = player.getRepresentation()
-                    + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain 1 CC to that pool";
+                    + " since you have deliberate action ability and passed while one of your pools was at 0, you may gain 1 CC to that pool.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
@@ -282,10 +282,10 @@ public class TurnStart extends PlayerSubcommandData {
             if (!game.getPlayedSCs().contains(SC)) {
                 hadAnyUnplayedSCs = true;
                 if (game.isHomebrewSCMode()) {
-                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC);
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + Helper.getSCName(SC, game));
                     startButtons.add(strategicAction);
                 } else {
-                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC)
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + Helper.getSCName(SC, game))
                         .withEmoji(Emoji.fromFormatted(Emojis.getSCEmojiFromInteger(SC)));
                     startButtons.add(strategicAction);
                 }
@@ -305,9 +305,7 @@ public class TurnStart extends PlayerSubcommandData {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentation(true, true));
-                        sb.append(" You are getting this ping because SC #").append(sc)
-                            .append(
-                                " has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
+                        sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                         }
@@ -350,12 +348,12 @@ public class TurnStart extends PlayerSubcommandData {
                 && ButtonHelperAgents.getAttachments(game, player).size() > 0) {
                 startButtons.add(Button
                     .success(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(),
-                        "Use Florzen Agent")
+                        "Use Sal Gavda (Florzen Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.florzen)));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
                 Button chaos = Button.secondary("exhaustAgent_vadenagent_" + player.getFaction(),
-                    "Use Vaden Agent")
+                    "Use Yudri Sukhov (Vaden Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.vaden));
                 startButtons.add(chaos);
             }
@@ -371,7 +369,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
                 Button nekroButton = Button.secondary("exhaustAgent_kolleccagent",
-                    "Use Kollecc Agent")
+                    "Use Captain Dust (Kollecc Agent)")
                     .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
                 startButtons.add(nekroButton);
             }
@@ -414,7 +412,7 @@ public class TurnStart extends PlayerSubcommandData {
                     }
                 } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
                     && ButtonHelper.getTilesWithYourCC(p1, game, event).size() > 0) {
-                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use Mahact Commander")
+                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use Il Na Viroset (Mahact Commander)")
                         .withEmoji(Emoji.fromFormatted(factionEmoji));
                     startButtons.add(lButton);
                 }
@@ -427,7 +425,7 @@ public class TurnStart extends PlayerSubcommandData {
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent",
-                "Use Hacan Agent")
+                "Use Carth of Golden Sands (Hacan Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             startButtons.add(hacanButton);
         }
@@ -436,7 +434,7 @@ public class TurnStart extends PlayerSubcommandData {
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent",
-                "Use Nekro Agent")
+                "Use Nekro Malleon (Nekro Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             startButtons.add(nekroButton);
         }
