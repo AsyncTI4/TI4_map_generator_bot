@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class LeaderAdd extends LeaderAddRemove {
     public LeaderAdd() {
         super(Constants.LEADER_ADD, "Add a leader to your faction");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FAKE_COMMANDERS, "Any of these added commanders do not apply to alliance or imperia", false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FAKE_COMMANDERS, "Any of these added commanders do not apply to Alliance or Imperia", false));
     }
 
     @Override

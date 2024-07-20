@@ -379,7 +379,7 @@ public class Helper {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + ". Drew a second SO due to plausible deniability";
+                    message = message + " Drew a second SO due to Plausible Deniability";
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
@@ -393,7 +393,7 @@ public class Helper {
                 && game.getStoredValue(key2).length() > 2) {
                 if (!game.isFowMode()) {
                     message = player.getRepresentation(true, true)
-                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
+                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (!game.isFowMode()) {
@@ -2100,7 +2100,7 @@ public class Helper {
             if (player.hasUnexhaustedLeader("argentagent")) {
                 Button argentButton = Button.success(
                     "FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(),
-                    "Use Argent Agent");
+                    "Use Trillossa Aun Mirik (Argent Agent)");
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.Argent));
                 unitButtons.add(argentButton);
             }
@@ -2211,7 +2211,7 @@ public class Helper {
                 unitButtons2.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
                     .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you can use this to Yin Spin", unitButtons2);
+                    player.getRepresentation(true, true) + " you may use this to Yin Spin.", unitButtons2);
             } else {
                 unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
                     .withEmoji(Emoji.fromFormatted(Emojis.Yin)));

@@ -81,7 +81,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             game.shuffleActionCardBackIntoDeck(cardID);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.KeleresHeroHarka);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " uses **Keleres (Mentak) Hero** to Reveal " + Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " uses Harka Leeds, the Keleres (Mentak) hero, to reveal " + Emojis.ActionCard + "action cards, until drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "All non-component action cards have been reshuffled back into the deck.");

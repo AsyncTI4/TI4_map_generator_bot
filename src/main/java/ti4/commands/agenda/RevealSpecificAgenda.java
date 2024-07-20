@@ -143,7 +143,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         game.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));
         String text = game.getPing()
-            + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you can simply play it.";
+            + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you may simply play it.";
 
         Date newTime = new Date();
         game.setLastActivePlayerPing(newTime);
@@ -170,7 +170,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you have Florzen commander and can thus explore and ready a planet",
+                    player.getRepresentation(true, true) + " you have Florzen commander and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
         }

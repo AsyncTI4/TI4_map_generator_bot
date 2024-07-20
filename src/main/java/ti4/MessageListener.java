@@ -234,7 +234,7 @@ public class MessageListener extends ListenerAdapter {
                     Game mapreference = GameManager.getInstance().getGame("finreference");
                     if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
                         mapreference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will create a button that you can press to launch the game after confirming the members are correct.");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
                     }
                 }
             }
@@ -320,9 +320,7 @@ public class MessageListener extends ListenerAdapter {
                                             StringBuilder sb = new StringBuilder();
                                             Player p2 = player;
                                             sb.append(p2.getRepresentation(true, true));
-                                            sb.append(" You are getting this ping because SC #").append(sc)
-                                                .append(
-                                                    " has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
+                                            sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                                                 sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                                             }
@@ -341,9 +339,7 @@ public class MessageListener extends ListenerAdapter {
                                             StringBuilder sb = new StringBuilder();
                                             Player p2 = player;
                                             sb.append(p2.getRepresentation(true, true));
-                                            sb.append(" SC #").append(sc)
-                                                .append(
-                                                    " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n");
+                                            sb.append(Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n");
 
                                             //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
                                             ButtonHelper.sendMessageToRightStratThread(player, game, sb.toString(), ButtonHelper.getStratName(sc));
@@ -468,7 +464,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 7) {
                                         ping = realIdentity
-                                            + " I can write whatever I want here, not like you've checked in to read any of it anyways.";
+                                            + " I may write whatever I want here, not like you've checked in to read any of it anyways.";
                                     }
                                     if (pingNumber == 8) {
                                         ping = realIdentity
@@ -611,7 +607,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 42) {
                                         ping = realIdentity
-                                            + " They say money can't buy happiness, but I hear that trade goods can buy a war sun, which is basically the same thing.";
+                                            + " They say money can't buy happiness, but I hear that trade goods may buy a war sun, which is basically the same thing.";
                                     }
 
                                     int maxSoFar = 42;
@@ -644,7 +640,7 @@ public class MessageListener extends ListenerAdapter {
                                                     "Disable Pings For Turn"));
                                                 buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
                                                 MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
-                                                    + " if the game is not waiting on you, you can disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
+                                                    + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                                                     buttons);
                                             }
                                         }

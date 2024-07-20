@@ -35,12 +35,12 @@ public class NaaluCommander extends SpecialSubcommandData {
     public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
 
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
-            MessageHelper.sendMessageToEventChannel(event, "Only players with access to an unlocked Naalu Commander can use this ability");
+            MessageHelper.sendMessageToEventChannel(event, "Only players with access to M'aban, the Naalu Commander, unlocked may use this ability.");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" you are using the Naalu Commander:");
+        sb.append(player.getRepresentation(true, true)).append(" you are using the M'aban, the Naalu Commander:");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
 
         // Top Agenda
@@ -74,7 +74,7 @@ public class NaaluCommander extends SpecialSubcommandData {
         }
 
         if (!game.isFowMode()) MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
+            player.getRepresentation() + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
     }
 

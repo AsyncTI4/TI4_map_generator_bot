@@ -90,7 +90,7 @@ public class ScorePublic extends StatusSubcommandData {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);
                     String msg = p2.getRepresentation(true, true)
-                        + " you gained 1TG due to your neighbor scoring a PO while you have syndicate commander. Your TGs went from "
+                        + " you gained 1TG due to your neighbor scoring a PO while you have Fillipo Rois, the Tnelis commander. Your TGs went from "
                         + (p2.getTg() - 1) + " -> " + p2.getTg();
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
                     ButtonHelperAbilities.pillageCheck(p2, game);

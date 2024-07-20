@@ -15,8 +15,8 @@ import ti4.message.MessageHelper;
 public class KyroHero extends DiscordantStarsSubcommandData {
 
     public KyroHero() {
-        super(Constants.KYRO_HERO, "Mark an SC as the target of Kyro Hero");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "SC #").setRequired(true));
+        super(Constants.KYRO_HERO, "Mark a strategy card as the target of Speygh, the Kyro Hero.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number").setRequired(true));
         // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async blue back tiles in this list (not just PoK + DS). Default: false)"));
     }
 
@@ -33,7 +33,7 @@ public class KyroHero extends DiscordantStarsSubcommandData {
         int dieResult = event.getOption(Constants.SC, 1, OptionMapping::getAsInt);
         game.setStoredValue("kyroHeroSC", dieResult + "");
         game.setStoredValue("kyroHeroPlayer", player.getFaction());
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Marked the Blex Hero Target as SC #" + dieResult + " and the faction that played the hero as " + player.getFaction());
+        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getSCName(dieResult, game) + " has been marked with Speygh, the Kyro hero, and the faction that played the hero as " + player.getFaction() + ".");
         ListTurnOrder.turnOrder(event, game);
     }
 

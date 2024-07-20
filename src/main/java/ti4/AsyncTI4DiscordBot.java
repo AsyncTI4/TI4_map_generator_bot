@@ -350,9 +350,9 @@ public class AsyncTI4DiscordBot {
     /**
      * Initializes the whitelisted roles for the bot, including admin, developer, and bothelper roles.
      * <ul>
-     * <li>Admins can execute /admin, /developer, and /bothelper commands</li>
-     * <li>Developers can execute /developer commands</li>
-     * <li>Bothelpers can execute /bothelper commands</li>
+     * <li>Admins may execute /admin, /developer, and /bothelper commands</li>
+     * <li>Developers may execute /developer commands</li>
+     * <li>Bothelpers may execute /bothelper commands</li>
      * </ul>
      *
      * Add your test server's role ID to enable access to these commands on your server
@@ -383,7 +383,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
-        developerRoles.addAll(adminRoles); //admins can also execute developer commands
+        developerRoles.addAll(adminRoles); //admins may also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async Primary (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary (Stroter's Paradise)
         developerRoles.add(jda.getRoleById("1146529125184581733")); // Async Tertiary (Dreadn't)

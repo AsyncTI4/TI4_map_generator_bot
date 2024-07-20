@@ -219,10 +219,11 @@ public class PlanetAdd extends PlanetAddRemove {
             && player.hasUnexhaustedLeader("vaylerianagent") && !setUP) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_vaylerianagent_" + player.getFaction(),
-                "Use Vaylerian Agent")
+                "Use Yvin Korduul (Vaylerian Agent)")
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            String msg2 = player.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent) to draw 1 AC";
+            String msg2 = player.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
@@ -234,7 +235,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
-                + " if you have not already used Scour this tactical action, you can discard 1 AC to ready the planet "
+                + " if you have not already used Scour this tactical action, you may discard 1AC to ready the planet "
                 + Helper.getPlanetRepresentation(planet, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
@@ -248,7 +249,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 .withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
-                + " you can produce 1 ship in the system due to Free Systems Commander";
+                + " you may produce 1 ship in the system due to President Cyhn, the Free Systems Commander.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
@@ -261,9 +262,9 @@ public class PlanetAdd extends PlanetAddRemove {
             saarButton.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " due to Cymiae Commander, you can discard 1 AC here to place or move 1 mech on "
+                    + " due to Koryl Ferax, the Cymiae Commander, you may discard 1AC here to place or move 1 mech on "
                     + Helper.getPlanetRepresentation(planet, game)
-                    + ". Do not do this prior to exploring. It is an after, while exploring is a when",
+                    + ". Do not do this prior to exploring. It is an after, while exploring is a when.",
                 saarButton);
         }
 
@@ -276,7 +277,7 @@ public class PlanetAdd extends PlanetAddRemove {
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
-                        + " if you have the correct amount of infantry (3 or 4), you can remove them and deploy 1 space dock on "
+                        + " if you have the correct amount of infantry (3 or 4), you may remove them and deploy 1 space dock on "
                         + planet + " using the buttons.",
                     buttons);
 
@@ -312,7 +313,7 @@ public class PlanetAdd extends PlanetAddRemove {
             saarButton.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " you can pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when",
+                    + " you may pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
                 saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {

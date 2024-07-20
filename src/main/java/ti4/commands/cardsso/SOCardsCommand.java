@@ -63,7 +63,7 @@ public class SOCardsCommand implements Command {
                 return false;
             }
             if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
-                MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
+                MessageHelper.replyToMessage(event, "Commands may be executed only in game specific channels.");
                 return false;
             }
             return true;
