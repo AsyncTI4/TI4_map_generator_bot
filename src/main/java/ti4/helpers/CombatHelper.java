@@ -460,7 +460,7 @@ public class CombatHelper {
                         player.setTg(player.getTg() + 1);
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1TG due to hitting on a bombardment roll with their flagship");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1TG due to hitting on a bombardment roll with the Aurum Vadra (the Vaden flagship).");
                         break;
 
                     }
@@ -470,7 +470,7 @@ public class CombatHelper {
             totalMisses = totalMisses + misses;
 
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + " due to Thalnos misses";
+                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + (misses == 1 ? "" : "s") + " due to " + (misses  == 1 ? "a Thalnos miss" : "Thalnos misses");
                 for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
@@ -505,7 +505,9 @@ public class CombatHelper {
 
             } else {
                 if (misses > 0 && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " had " + misses + " " + unit.getName() + " misses on a thalnos roll, but no units were removed due to extra rolls being unaccounted for");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                        player.getFactionEmoji() + " had " + misses + " " + unit.getName() + (misses == 1 ? "" : "s") + " miss" + (misses == 1 ? "" : "es")
+                        + " on a Thalnos roll, but no units were removed due to extra rolls being unaccounted for.");
                 }
             }
 
@@ -522,7 +524,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Rerolling " + numMisses + " misses due to Jol-Nar Commander:\n " + unitRoll2);
+                resultBuilder.append("Rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + " due to Ta Zern, the Jol-Nar Commander:\n " + unitRoll2);
             }
 
             if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround && numMisses > 0) {
@@ -532,7 +534,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Munitions rerolling " + numMisses + " misses: " + unitRoll2);
+                resultBuilder.append("Munitions rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + ": " + unitRoll2);
             }
 
             int argentInfKills = 0;
@@ -561,10 +563,11 @@ public class CombatHelper {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have crown of thalnos and can reroll misses (adding +1) at the risk of your troops lives";
+            result = result + "\n" + player.getFactionEmoji() + " You have the Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses") 
+                + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
         }
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have shard volley and thus should produce an additional hit to the ones rolled above";
+            result = result + "\n" + player.getFactionEmoji() + " You have Shard Volley and thus should produce an additional hit to the ones rolled above.";
         }
         if (!extra.isEmpty()) {
             result = result + "\n\n" + extra;

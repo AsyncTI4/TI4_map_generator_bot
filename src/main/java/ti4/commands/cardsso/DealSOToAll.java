@@ -37,7 +37,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to plausible deniability, you were dealt an extra SO. You must also discard an extra SO");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to Plausible Deniability, you were dealt an extra SO. You must also discard an extra SO.");
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player, event);
             }

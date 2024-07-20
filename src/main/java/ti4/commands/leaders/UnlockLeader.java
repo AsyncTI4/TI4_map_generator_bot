@@ -53,7 +53,7 @@ public class UnlockLeader extends LeaderAction {
         if (leaderID.contains("naalucommander")) {
             //PNInfo.sendPromissoryNoteInfo(game, player, false);
             CardsInfo.sendVariousAdditionalButtons(game, player);
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " you can use Naalu Commander via button in your cards info thread");
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " you may use M'aban, the Naalu Commander, via button in your cards info thread");
 
         }
         if (leaderID.contains("xxchahero")) {

@@ -368,7 +368,7 @@ public class ButtonHelperActionCards {
             .withEmoji(Emoji.fromFormatted(Emojis.comm));
         List<Button> buttons = List.of(convert2CommButton, get2CommButton,
             Button.danger("deleteButtons", "Done resolving"));
-        String message = "Use buttons to gain or convert comms as appropriate. You can trade in this window/in between gaining comms.";
+        String message = "Use buttons to gain or convert commodities as appropriate. You may trade in this window/in between gaining commodities.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
@@ -907,11 +907,11 @@ public class ButtonHelperActionCards {
     public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        String message = player.getFactionEmoji() + " Drew Secret Objective";
+        String message = player.getFactionEmoji() + " Drew Secret Objective.";
         game.drawSecretObjective(player.getUserID());
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
-            message = message + ". Drew a second SO due to plausible deniability.";
+            message = message + " Drew a second SO due to Plausible Deniability.";
         }
         SOInfo.sendSecretObjectiveInfo(game, player, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -1082,7 +1082,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true)
                 + " since stealing 1 AC reveals secret info, extra precaution has been taken and a button has been sent to "
                 + ButtonHelper.getIdentOrColor(p2, game)
-                + " cards info thread, they can press this button to send a random AC to you.");
+                + " cards info thread, they may press this button to send a random AC to you.");
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success("spyStep3_" + player.getFaction(), "Send random AC"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
@@ -1157,7 +1157,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the relic frag you want to grab", buttons);
+            player.getRepresentation(true, true) + " select the relic fragment you want to grab", buttons);
         if (buttonID.split("_").length > 2 && buttonID.split("_")[2].contains("yes")) {
             p2.setTg(p2.getTg() + 2);
             ButtonHelperAbilities.pillageCheck(p2, game);
@@ -1779,7 +1779,7 @@ public class ButtonHelperActionCards {
         ButtonInteractionEvent event) {
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you can use the button to get your tech",
+                player.getRepresentation(true, true) + " you may use the button to get your tech.",
                 List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);

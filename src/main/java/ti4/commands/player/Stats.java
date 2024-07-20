@@ -40,7 +40,7 @@ public class Stats extends PlayerSubcommandData {
             .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "# turns this round"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #"))
+            .addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #."))
             .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
             .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
             .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
@@ -373,14 +373,14 @@ public class Stats extends PlayerSubcommandData {
         for (Player playerStats : players.values()) {
             if (playerStats.getSCs().contains(scNumber)) {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                    "SC #" + scNumber + " is already picked.");
+                    Helper.getSCName(scNumber, game) + " is already picked.");
                 return false;
             }
         }
 
         player.addSC(scNumber);
         if (game.isFowMode()) {
-            String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " picked SC #" + scNumber;
+            String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " picked " + Helper.getSCName(scNumber, game);
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
         }
 
@@ -400,10 +400,10 @@ public class Stats extends PlayerSubcommandData {
             int tg = player.getTg();
             tg += tgCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scNumber);
+                player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game));
             if (game.isFowMode()) {
                 String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                    + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scNumber;
+                    + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game);
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

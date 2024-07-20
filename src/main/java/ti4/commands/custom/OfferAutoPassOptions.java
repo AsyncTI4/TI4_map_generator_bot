@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 
 public class OfferAutoPassOptions extends CustomSubcommandData {
     public OfferAutoPassOptions() {
-        super(Constants.OFFER_AUTOPASS_OPTIONS, "Offer auto pass on sabos to every player in the game");
+        super(Constants.OFFER_AUTOPASS_OPTIONS, "Offer auto pass on Sabotages to every player in the game.");
     }
 
     @Override

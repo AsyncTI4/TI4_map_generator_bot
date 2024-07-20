@@ -107,7 +107,7 @@ public class SCPlay extends PlayerSubcommandData {
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
-                        + " you have been Coup'd due to attempting to play SC #" + scToPlay + ". If this is a mistake or the Coup is Sabo'd, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
+                        + " you have been Coup'd due to attempting to play " + Helper.getSCName(scToPlay, game) + ". If this is a mistake or the Coup is Sabo'd, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
                     return;
                 }
             }
@@ -292,7 +292,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         if (scModel.usesAutomationForSCID("pok5trade")) {
             String assignSpeakerMessage2 = player.getRepresentation()
-                + " you can force players to refresh, normally done in order to trigger a trade agreement. This is not required and not advised if you are offering them a conditional refresh.";
+                + " you may force players to refresh, normally done in order to trigger a Trade Agreement. This is not required and not advised if you are offering them a conditional refresh.";
             List<Button> forceRefresh = ButtonHelper.getForcedRefreshButtons(game, player, playersToFollow);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage2, forceRefresh);
@@ -306,7 +306,7 @@ public class SCPlay extends PlayerSubcommandData {
                             continue;
                         }
                         if (p3.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                            String message3 = p3.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they can force the player to replenish and then you will be prompted to play the TA. ";
+                            String message3 = p3.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they may force the player to replenish and then you will be prompted to play the TA. ";
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }
                     }
@@ -327,16 +327,16 @@ public class SCPlay extends PlayerSubcommandData {
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.add(0, emelpar);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentation(true, true) + " You can follow SC #" + scToPlay
-                            + " with the Scepter of Emelpar",
+                        player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with the Scepter of Emelpar.",
                         empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, game, event).size() > 0 && !winnuHero) {
                     Button mahactA = Button.danger("mahactA_follow_" + scToPlay,
-                        "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
+                        "Use Jae Mir Kan (Mahact Agent)").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
                     empNMahButtons.add(0, mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentation(true, true) + " You can follow SC #" + scToPlay + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Jae Mir Kan (Mahact Agent)", empNMahButtons);
+                        player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                            + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.", empNMahButtons);
                 }
             }
         }
@@ -359,7 +359,7 @@ public class SCPlay extends PlayerSubcommandData {
             graceButtons.add(Button.success("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you can resolve grace with the buttons",
+                player.getRepresentation(true, true) + " you may resolve Grace with the buttons.",
                 graceButtons);
         }
         if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
@@ -368,7 +368,7 @@ public class SCPlay extends PlayerSubcommandData {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {
                             String acqMessage = player2.getRepresentation(true, true)
-                                + " you can use this button to play Winnu PN!";
+                                + " you may use this button to play Winnu PN!";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Button.success("winnuPNPlay_" + scToPlay, "Use Acquisence"));
                             buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -412,7 +412,7 @@ public class SCPlay extends PlayerSubcommandData {
 
     private static void handleSOQueueing(Game game, boolean winnuHero) {
         if (winnuHero) {
-            String message = "# Since this is a Winnu Hero play, SO draws will not be queued or resolved in a particular order";
+            String message = "# Since this is the result of playing Mathis Mathinus, the Winnu hero, SO draws will not be queued or resolved in a particular order.";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
             return;
         }
