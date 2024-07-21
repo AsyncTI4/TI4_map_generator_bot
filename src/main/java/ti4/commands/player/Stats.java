@@ -267,7 +267,7 @@ public class Stats extends PlayerSubcommandData {
                 }
             } else {
                 message.append(
-                    "> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an SC (SC = 0)");
+                    "> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an strategy card (SC = 0).");
             }
             MessageHelper.sendMessageToEventChannel(event, message.toString());
         }
@@ -360,7 +360,7 @@ public class Stats extends PlayerSubcommandData {
         Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
         if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                "Can only pick SC if both Faction and Color have been picked");
+                "Can only pick strategy card if both faction and color have been picked.");
             return false;
         }
         if (!scTradeGoods.containsKey(scNumber)) {

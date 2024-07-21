@@ -837,11 +837,11 @@ public class ButtonHelperFactionSpecific {
         for (Integer sc : p2.getSCs()) {
             for (Integer sc2 : player.getSCs()) {
                 buttons.add(Button.secondary("swapSCs_" + p2.getFaction() + "_" + type + "_" + sc + "_" + sc2,
-                    "Swap " + sc2 + " with " + sc));
+                    "Swap " + Helper.getSCName(sc2, game) + " with " + Helper.getSCName(sc, game)));
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " choose which SC you want to swap with",
+            player.getRepresentation(true, true) + " choose which strategy card you want to swap with.",
             buttons);
     }
 
@@ -866,7 +866,7 @@ public class ButtonHelperFactionSpecific {
         player1.removeSC(player1SC);
         player2.addSC(player1SC);
         player2.removeSC(player2SC);
-        String sb = player1.getRepresentation() + " swapped SC with " + player2.getRepresentation() + "\n" +
+        String sb = player1.getRepresentation() + " swapped strategy card with " + player2.getRepresentation() + "\n" +
             "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:"
             + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
             "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:"
@@ -2060,7 +2060,7 @@ public class ButtonHelperFactionSpecific {
         player.addFollowedSC(sc, event);
         ButtonHelper.resolvePNPlay("acq", player, game, event);
         String msg = player.getRepresentation(true, true) + " you will be marked as having followed " + sc
-            + " without having needed to spend a CC. Please still use the SC buttons to resolve the SC effect";
+            + " without having needed to spend a CC. Please still use the strategy card buttons to resolve the strategy card effect";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 

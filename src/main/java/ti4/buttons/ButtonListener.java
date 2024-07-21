@@ -779,7 +779,7 @@ public class ButtonListener extends ListenerAdapter {
                 game.getActionsChannel().addReactionById(channel.getId(), emojiToUse).queue();
             } else {
                 MessageHelper.sendMessageToChannel(channel,
-                    "Hey, something went wrong leaving a react, please just hit the no follow button on the SC to do so.");
+                    "Hey, something went wrong leaving a react, please just hit the no follow button on the strategy card to do so.");
             }
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("spendAStratCC")) {
@@ -1164,7 +1164,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             buttons = new ArrayList<>();
             buttons.add(
-                Button.success("cymiaeHeroStep1_" + (game.getRealPlayers().size()), "Resolve The Voice United (Cymiae Hero)"));
+                Button.success("cymiaeHeroStep1_" + (game.getRealPlayers().size()), "Resolve Cymiae Hero"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " resolve hero after doing Autonetic Memory steps", buttons);
             ButtonHelper.deleteMessage(event);
@@ -2304,7 +2304,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             player.getRepresentation()
                                 + " you have been Public Disgrace'd because someone preset it to occur when the number " + scpick
-                                + " was chosen. If this is a mistake or the Public Disgrace is Sabo'd, feel free to pick the SC again. Otherwise, pick a different SC.");
+                                + " was chosen. If this is a mistake or the Public Disgrace is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
                         return;
                     }
                 }
@@ -4298,7 +4298,7 @@ public class ButtonListener extends ListenerAdapter {
                     String labelP = event.getButton().getLabel();
                     String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1);
                     boolean failed = false;
-                    if (labelP.contains("Inf") && labelP.contains("Mech")) {
+                    if (labelP.contains("inf") && labelP.contains("mech")) {
                         message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
                         failed = message.contains("Please try again.");
                     }
@@ -5278,7 +5278,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons2 = new ArrayList<>();
                     Button hacanButton = Button
                         .secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
-                            "Skhot Unit X-12 (Cymiae Agent)")
+                            "Use Cymiae Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
                     buttons2.add(hacanButton);
                     MessageHelper.sendMessageToChannelWithButtons(
@@ -5479,7 +5479,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                     && !buttonID.contains("integrated")) {
-                    Button sar2 = Button.success("titansCommanderUsage", "Use Tungstantus (Ul Commander)")
+                    Button sar2 = Button.success("titansCommanderUsage", "Use Ul Commander")
                         .withEmoji(Emoji.fromFormatted(Emojis.Titans));
                     buttons.add(sar2);
                 }
@@ -5515,7 +5515,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.hasUnexhaustedLeader("winnuagent") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button.danger("exhaustAgent_winnuagent",
-                        "Use Berekar Berekon (Winnu Agent)")
+                        "Use Winnu Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.Winnu));
                     buttons.add(winnuButton);
                 }
@@ -5523,21 +5523,21 @@ public class ButtonListener extends ListenerAdapter {
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_gledgeagent_" + player.getFaction(),
-                            "Use Durran (Gledge Agent)")
+                            "Use Gledge Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.gledge));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_ghotiagent_" + player.getFaction(),
-                            "Use Becece (Ghoti Agent)")
+                            "Use Ghoti Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
                     buttons.add(winnuButton);
                 }
                 if (player.hasUnexhaustedLeader("mortheusagent")) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
-                            "Use Walik (Mortheus Agent)")
+                            "Use Mortheus Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
                     buttons.add(winnuButton);
                 }
@@ -5545,13 +5545,13 @@ public class ButtonListener extends ListenerAdapter {
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     Button winnuButton = Button
                         .danger("exhaustAgent_rohdhnaagent_" + player.getFaction(),
-                            "Use Rond Bri'ay (Roh'Dhna Agent)")
+                            "Use Roh'Dhna Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.rohdhna));
                     buttons.add(winnuButton);
                 }
                 if (player.hasLeaderUnlocked("hacanhero") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button hacanButton = Button.danger("purgeHacanHero", "Purge Harrugh Gefhara (Hacan Hero)")
+                    Button hacanButton = Button.danger("purgeHacanHero", "Purge Hacan Hero")
                         .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
                     buttons.add(hacanButton);
                 }
@@ -5607,7 +5607,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (player.hasUnexhaustedLeader("celdauriagent")) {
                     List<Button> buttons = new ArrayList<>();
                     Button hacanButton = Button
-                        .secondary("exhaustAgent_celdauriagent_" + player.getFaction(), "Use George Nobin (Celdauri Agent)")
+                        .secondary("exhaustAgent_celdauriagent_" + player.getFaction(), "Use Celdauri Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                     buttons.add(hacanButton);
                     buttons.add(Button.danger("deleteButtons", "Decline"));
@@ -5697,11 +5697,11 @@ public class ButtonListener extends ListenerAdapter {
         int strategicCC = player.getStrategicCC();
         String message;
         if (strategicCC == 0) {
-            message = "Have 0 CC in Strategy, can't follow";
+            message = " have 0 command tokens in strategy pool, can't follow.";
         } else {
             strategicCC--;
             player.setStrategicCC(strategicCC);
-            message = " following SC, deducted 1 CC from Strategy Tokens";
+            message = " following strategy card, deducted 1 command tokens from strategy pool.";
         }
         return message;
     }
