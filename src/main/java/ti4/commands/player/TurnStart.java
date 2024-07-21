@@ -348,12 +348,12 @@ public class TurnStart extends PlayerSubcommandData {
                 && ButtonHelperAgents.getAttachments(game, player).size() > 0) {
                 startButtons.add(Button
                     .success(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(),
-                        "Use Sal Gavda (Florzen Agent)")
+                        "Use Florzen Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.florzen)));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
                 Button chaos = Button.secondary("exhaustAgent_vadenagent_" + player.getFaction(),
-                    "Use Yudri Sukhov (Vaden Agent)")
+                    "Use Vaden Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.vaden));
                 startButtons.add(chaos);
             }
@@ -369,7 +369,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
                 Button nekroButton = Button.secondary("exhaustAgent_kolleccagent",
-                    "Use Captain Dust (Kollecc Agent)")
+                    "Use Kollecc Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.kollecc));
                 startButtons.add(nekroButton);
             }
@@ -398,7 +398,7 @@ public class TurnStart extends PlayerSubcommandData {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
                                 .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Z'eu (Naalu Agent)")
+                                    "Use " + leaderName + " as Naalu Agent")
                                 .withEmoji(Emoji.fromFormatted(factionEmoji));
                             startButtons.add(lButton);
                         }
@@ -412,7 +412,7 @@ public class TurnStart extends PlayerSubcommandData {
                     }
                 } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
                     && ButtonHelper.getTilesWithYourCC(p1, game, event).size() > 0) {
-                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use Il Na Viroset (Mahact Commander)")
+                    Button lButton = Button.secondary(finChecker + "mahactCommander", "Use Mahact Commander")
                         .withEmoji(Emoji.fromFormatted(factionEmoji));
                     startButtons.add(lButton);
                 }
@@ -425,7 +425,7 @@ public class TurnStart extends PlayerSubcommandData {
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
             Button hacanButton = Button.secondary("exhaustAgent_hacanagent",
-                "Use Carth of Golden Sands (Hacan Agent)")
+                "Use Hacan Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Hacan));
             startButtons.add(hacanButton);
         }
@@ -434,7 +434,7 @@ public class TurnStart extends PlayerSubcommandData {
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent",
-                "Use Nekro Malleon (Nekro Agent)")
+                "Use Nekro Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Nekro));
             startButtons.add(nekroButton);
         }

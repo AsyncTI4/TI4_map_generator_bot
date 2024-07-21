@@ -464,7 +464,7 @@ public class StartCombat extends CombatSubcommandData {
                 buttons = new ArrayList<>();
                 buttons.add(Button
                     .secondary(finChecker + "mentakCommander_" + otherPlayer.getColor(),
-                        "Resolve S'ula Mentarion (Mentak Commander), on " + otherPlayer.getColor())
+                        "Resolve Mentak Commander on " + otherPlayer.getColor())
                     .withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                     + " this is a reminder that if you win the combat, you may use the button to resolve S'ula Mentarion, the Mentak commander.",
@@ -501,7 +501,7 @@ public class StartCombat extends CombatSubcommandData {
             if (techOrLegendary && player.getLeaderIDs().contains("augerscommander")
                 && !player.hasLeaderUnlocked("augerscommander")) {
                 buttons = new ArrayList<>();
-                buttons.add(Button.success("unlockCommander_augers", "Unlock Lachis (Augurs Commander)")
+                buttons.add(Button.success("unlockCommander_augers", "Unlock Augurs Commander")
                     .withEmoji(Emoji.fromFormatted(Emojis.augers)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                     + " this is a reminder that if you win the combat here, you may use the button to unlock Lachis, the Augurs commander.",
@@ -510,7 +510,7 @@ public class StartCombat extends CombatSubcommandData {
             if (player.getLeaderIDs().contains("kortalicommander")
                 && !player.hasLeaderUnlocked("kortalicommander")) {
                 buttons = new ArrayList<>();
-                buttons.add(Button.success("unlockCommander_kortali", "Unlock Queen Lorena (Kortali commander)")
+                buttons.add(Button.success("unlockCommander_kortali", "Unlock Kortali commander")
                     .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                     + " this is a reminder that if you destroy all of the opponent's units in this system, you may use the button to unlock Queen Lorena, the Kortali commander.",
@@ -590,7 +590,7 @@ public class StartCombat extends CombatSubcommandData {
             && ButtonHelper.checkNumberNonFighterShips(p1, game, tile) > 2)
             || (game.playerHasLeaderUnlockedOrAlliance(p2, "dihmohncommander")
                 && ButtonHelper.checkNumberNonFighterShips(p2, game, tile) > 2)) {
-            buttons.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Clona Bathru (Dih-Mohn Commander)")
+            buttons.add(Button.primary("assCannonNDihmohn_dihmohn_" + tile.getPosition(), "Use Dih-Mohn Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
         }
 
@@ -601,7 +601,7 @@ public class StartCombat extends CombatSubcommandData {
         }
 
         if ((p1.hasLeaderUnlocked("mentakhero")) || p2.hasLeaderUnlocked("mentakhero")) {
-            buttons.add(Button.secondary("purgeMentakHero_" + tile.getPosition(), "Purge Ipswitch, Loose Cannon (Mentak Hero)")
+            buttons.add(Button.secondary("purgeMentakHero_" + tile.getPosition(), "Purge Mentak Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.Mentak)));
         }
 
@@ -671,7 +671,7 @@ public class StartCombat extends CombatSubcommandData {
         if (!game.isFowMode() && titans != null && titans.hasUnexhaustedLeader("titansagent")) {
             String finChecker = "FFCC_" + titans.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_titansagent",
-                "Use Tellurian (Ul Agent)")
+                "Use Ul Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
@@ -686,7 +686,7 @@ public class StartCombat extends CombatSubcommandData {
         if (!game.isFowMode() && ghemina != null && ghemina.hasUnexhaustedLeader("gheminaagent")) {
             String finChecker = "FFCC_" + ghemina.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_gheminaagent",
-                "Use Skarvald & Torvar (Ghemina Agents)")
+                "Use Ghemina Agents")
                 .withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
         }
 
@@ -694,7 +694,7 @@ public class StartCombat extends CombatSubcommandData {
         if (!game.isFowMode() && khal != null && khal.hasUnexhaustedLeader("kjalengardagent")) {
             String finChecker = "FFCC_" + khal.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kjalengardagent",
-                "Use Merkismathr Asvand (Kjalengard Agent)")
+                "Use Kjalengard Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
         }
 
@@ -702,14 +702,14 @@ public class StartCombat extends CombatSubcommandData {
         if (!game.isFowMode() && sol != null && sol.hasUnexhaustedLeader("solagent") && isGroundCombat) {
             String finChecker = "FFCC_" + sol.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_solagent",
-                "Use Evelyn Delouis (Sol Agent)")
+                "Use Sol Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
         }
         Player kyro = Helper.getPlayerFromUnlockedLeader(game, "kyroagent");
         if (!game.isFowMode() && kyro != null && kyro.hasUnexhaustedLeader("kyroagent") && isGroundCombat) {
             String finChecker = "FFCC_" + kyro.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_kyroagent",
-                "Use Tox (Kyro Agent)")
+                "Use Kyro Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.blex)));
 
         }
@@ -719,14 +719,14 @@ public class StartCombat extends CombatSubcommandData {
             && "space".equalsIgnoreCase(groundOrSpace)) {
             String finChecker = "FFCC_" + letnev.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "getAgentSelection_letnevagent",
-                "Use Viscount Unlenn (Letnev Agent)")
+                "Use Letnev Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
 
         Player nomad = Helper.getPlayerFromUnlockedLeader(game, "nomadagentthundarian");
         if ((!game.isFowMode() || nomad == p1) && nomad != null && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {
             String finChecker = "FFCC_" + nomad.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Use The Thundarian (Nomad Agent)")
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Use The Thundarian)")
                 .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
         }
 
@@ -734,7 +734,7 @@ public class StartCombat extends CombatSubcommandData {
         if ((!game.isFowMode() || yin == p1) && yin != null && yin.hasUnexhaustedLeader("yinagent")) {
             String finChecker = "FFCC_" + yin.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "yinagent_" + pos,
-                "Use Brother Milor (Yin Agent)")
+                "Use Yin Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
         }
 
@@ -766,12 +766,12 @@ public class StartCombat extends CombatSubcommandData {
             && p1.getFragments().size() > 0) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
-                "Use Queen Lucreia (Kortali Agent)").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+                "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
         if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && p2.getFragments().size() > 0) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
-                "Use Queen Lucreia (Kortali Agent)").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
+                "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
 
         // if ((p2.hasAbility("edict") || p2.hasAbility("imperia")) &&
@@ -864,12 +864,12 @@ public class StartCombat extends CombatSubcommandData {
         if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p2, "mykomentoricommander")
             && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Amanita Muscaria (Myko-Mentori Commander)")
+            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Spend For Myko-Mentori Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
         if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p1, "mykomentoricommander")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Amanita Muscaria (Myko-Mentori Commander)")
+            buttons.add(Button.secondary(finChecker + "resolveMykoCommander", "Spend For Myko-Mentori Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
 
@@ -920,47 +920,47 @@ public class StartCombat extends CombatSubcommandData {
         if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p2, "gheminacommander")
             && gheminaCommanderApplicable && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.danger(finChecker + "declareUse_Ghemina Commander", "Use Jarl Vel & Jarl Jotrun (Ghemina Commanders)")
+            buttons.add(Button.danger(finChecker + "declareUse_Ghemina Commander", "Use Ghemina Commanders")
                 .withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
         }
         if (isSpaceCombat && game.playerHasLeaderUnlockedOrAlliance(p1, "gheminacommander")
             && gheminaCommanderApplicable) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.danger(finChecker + "declareUse_Ghemina Commander", "Use Jarl Vel & Jarl Jotrun (Ghemina Commanders)")
+            buttons.add(Button.danger(finChecker + "declareUse_Ghemina Commander", "Use Ghemina Commanders")
                 .withEmoji(Emoji.fromFormatted(Emojis.ghemina)));
         }
         if (p1.hasLeaderUnlocked("keleresherokuuasi") && isSpaceCombat
             && ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, p1, game)) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "purgeKeleresAHero", "Purge Kuuasi Aun Jalatai (Keleres (Argent) Hero)")
+            buttons.add(Button.secondary(finChecker + "purgeKeleresAHero", "Purge Keleres (Argent) Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.Keleres)));
         }
         if (p2.hasLeaderUnlocked("keleresherokuuasi") && !game.isFowMode() && isSpaceCombat
             && ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, p1, game)) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "purgeKeleresAHero", "Purge Kuuasi Aun Jalatai (Keleres (Argent) Hero)")
+            buttons.add(Button.secondary(finChecker + "purgeKeleresAHero", "Purge Keleres (Argent) Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.Keleres)));
         }
 
         if (p1.hasLeaderUnlocked("dihmohnhero") && isSpaceCombat) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "purgeDihmohnHero", "Purge Verrisus Ypru (Dih-Mohn Hero)")
+            buttons.add(Button.secondary(finChecker + "purgeDihmohnHero", "Purge Dih-Mohn Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
         }
         if (p2.hasLeaderUnlocked("dihmohnhero") && !game.isFowMode() && isSpaceCombat) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "purgeDihmohnHero", "Purge Verrisus Ypru (Dih-Mohn Hero)")
+            buttons.add(Button.secondary(finChecker + "purgeDihmohnHero", "Purge Dih-Mohn Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
         }
 
         if (p1.hasLeaderUnlocked("kortalihero")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Queen Nadalia (Kortali Hero)")
+            buttons.add(Button.secondary(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Kortali Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.dihmohn)));
         }
         if (p2.hasLeaderUnlocked("kortalihero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "purgeKortaliHero_" + p1.getFaction(), "Purge Queen Nadalia (Kortali Hero)")
+            buttons.add(Button.secondary(finChecker + "purgeKortaliHero_" + p1.getFaction(), "Purge Kortali Hero")
                 .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
 
@@ -979,14 +979,14 @@ public class StartCombat extends CombatSubcommandData {
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "cheirancommander") && isGroundCombat
             && p1 != game.getActivePlayer()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Block with Spc. Phquaiset (Cheiran Commander)")
+            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Block with Cheiran Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
         }
         if (!game.isFowMode() && game.playerHasLeaderUnlockedOrAlliance(p2, "cheirancommander")
             && isGroundCombat
             && p2 != game.getActivePlayer()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Block with Spc. Phquaiset (Cheiran Commander)")
+            buttons.add(Button.secondary(finChecker + "cheiranCommanderBlock_hm", "Block with Cheiran Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
         }
         if (p1.hasTechReady("absol_x89") && isGroundCombat && p1 != game.getActivePlayer()) {
@@ -1002,12 +1002,12 @@ public class StartCombat extends CombatSubcommandData {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(p1, "kortalicommander")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm", "Block with Queen Lorena (Kortali Commander)")
+            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm", "Block with Kortali Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
         if (!game.isFowMode() && game.playerHasLeaderUnlockedOrAlliance(p2, "kortalicommander")) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm", "Block with Queen Lorena (Kortali Commander)")
+            buttons.add(Button.secondary(finChecker + "kortaliCommanderBlock_hm", "Block with Kortali Commander")
                 .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
         for (UnitHolder unitH : tile.getUnitHolders().values()) {
@@ -1019,7 +1019,7 @@ public class StartCombat extends CombatSubcommandData {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "utilizeSolCommander_" + unitH.getName(),
-                            "Claire Gibson (Sol Commander) on " + nameOfHolder)
+                            "Use Sol Commander on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
                 }
                 if (p1.hasUnit("vaden_mech")
@@ -1044,7 +1044,7 @@ public class StartCombat extends CombatSubcommandData {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "utilizeSolCommander_" + unitH.getName(),
-                            "Claire Gibson (Sol Commander) on " + nameOfHolder)
+                            "Use Sol Commander on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.Sol)));
                 }
                 if (p1.hasAbility("indoctrination") && isGroundCombat) {

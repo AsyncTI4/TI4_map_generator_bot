@@ -332,7 +332,7 @@ public class SCPlay extends PlayerSubcommandData {
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, game, event).size() > 0 && !winnuHero) {
                     Button mahactA = Button.danger("mahactA_follow_" + scToPlay,
-                        "Use Jae Mir Kan (Mahact Agent)").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
+                        "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
                     empNMahButtons.add(0, mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")

@@ -1236,7 +1236,7 @@ public class Helper {
                 continue;
             Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
-            String label = " ";
+            String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
                 label = "[has " + game.getScTradeGoods().get(sc) + " TG" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
             }
@@ -2100,7 +2100,7 @@ public class Helper {
             if (player.hasUnexhaustedLeader("argentagent")) {
                 Button argentButton = Button.success(
                     "FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(),
-                    "Use Trillossa Aun Mirik (Argent Agent)");
+                    "Use Argent Agent");
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.Argent));
                 unitButtons.add(argentButton);
             }
