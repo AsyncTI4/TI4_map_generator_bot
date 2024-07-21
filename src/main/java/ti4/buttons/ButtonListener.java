@@ -779,7 +779,7 @@ public class ButtonListener extends ListenerAdapter {
                 game.getActionsChannel().addReactionById(channel.getId(), emojiToUse).queue();
             } else {
                 MessageHelper.sendMessageToChannel(channel,
-                    "Hey, something went wrong leaving a react, please just hit the no follow button on the SC to do so.");
+                    "Hey, something went wrong leaving a react, please just hit the no follow button on the strategy card to do so.");
             }
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("spendAStratCC")) {
@@ -2304,7 +2304,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             player.getRepresentation()
                                 + " you have been Public Disgrace'd because someone preset it to occur when the number " + scpick
-                                + " was chosen. If this is a mistake or the Public Disgrace is Sabo'd, feel free to pick the SC again. Otherwise, pick a different SC.");
+                                + " was chosen. If this is a mistake or the Public Disgrace is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
                         return;
                     }
                 }
@@ -5697,11 +5697,11 @@ public class ButtonListener extends ListenerAdapter {
         int strategicCC = player.getStrategicCC();
         String message;
         if (strategicCC == 0) {
-            message = "Have 0 CC in Strategy, can't follow";
+            message = " have 0 command tokens in strategy pool, can't follow.";
         } else {
             strategicCC--;
             player.setStrategicCC(strategicCC);
-            message = " following SC, deducted 1 CC from Strategy Tokens";
+            message = " following strategy card, deducted 1 command tokens from strategy pool.";
         }
         return message;
     }

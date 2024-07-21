@@ -812,7 +812,7 @@ public class Helper {
         String scImagePath = scModel.getImageFilePath();
         if (scImagePath == null)
             scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png",
-                "Could not find SC image!");
+                "Could not find strategy card image!");
 
         return new File(scImagePath);
     }
@@ -1249,7 +1249,7 @@ public class Helper {
                 button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label)
                     .withEmoji(scEmoji);
             } else {
-                button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, "" + sc + label);
+                button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, "" + sc + " " + label);
             }
             scButtons.add(button);
         }

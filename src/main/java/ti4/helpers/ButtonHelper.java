@@ -6680,7 +6680,7 @@ public class ButtonHelper {
             }
             case "homebrewSCs" -> {
                 game.setHomebrewSCMode(true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to homebrew SC mode");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to homebrew strategy card mode");
             }
             case "redTape" -> {
                 game.setRedTapeMode(true);
@@ -7380,7 +7380,7 @@ public class ButtonHelper {
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(),
-                    "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                    "Use buttons to pick a strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
             } else {
 
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(),
@@ -7700,7 +7700,7 @@ public class ButtonHelper {
                 "# Exhausted all cultural planets of those who voted against on that one agenda");
         }
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick SC.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player speaker;
         if (game.getPlayer(game.getSpeaker()) != null) {
@@ -7713,9 +7713,9 @@ public class ButtonHelper {
             + " UP TO PICK SC\n";
         game.updateActivePlayer(speaker);
         game.setPhaseOfGame("strategy");
-        String pickSCMsg = "Use Buttons to Pick SC";
+        String pickSCMsg = "Use buttons to pick a strategy card.";
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
-            pickSCMsg = "Use Buttons to Pick the SC you want to give someone";
+            pickSCMsg = "Use buttons to pick the strategy card you want to give someone else.";
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", new Date().getTime() + "");

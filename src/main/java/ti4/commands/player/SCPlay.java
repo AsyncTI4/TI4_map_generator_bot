@@ -33,9 +33,9 @@ import ti4.model.StrategyCardModel;
 
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
-        super(Constants.SC_PLAY, "Play SC");
+        super(Constants.SC_PLAY, "Play a Strategy Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD,
-            "Which SC to play. If you have more than 1 SC, this is mandatory"));
+            "Which strategy card to play. If you have more than 1 strategy card, this is mandatory"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(
             new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
@@ -62,12 +62,12 @@ public class SCPlay extends PlayerSubcommandData {
 
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No SC has been selected");
+            MessageHelper.sendMessageToEventChannel(event, "No strategy card has been selected.");
             return;
         }
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { // Only one SC selected
-            MessageHelper.sendMessageToEventChannel(event, "Player has more than one SC. Please try again, using the `strategy_card` option.");
+            MessageHelper.sendMessageToEventChannel(event, "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
             return;
         }
 
@@ -86,7 +86,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         if (game.getPlayedSCs().contains(scToPlay) && !winnuHero) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "SC already played");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Strategy card already played.");
             return;
         }
 
@@ -102,12 +102,12 @@ public class SCPlay extends PlayerSubcommandData {
                     PlayAC.playAC(event, game, p2, "coup", game.getMainGameChannel());
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
-                    String message = "Use buttons to end turn or play your SC (assuming Coup is Sabo'd)";
+                    String message = "Use buttons to end turn, or (if Coup is Sabo'd) play your strategy card.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
-                        + " you have been Coup'd due to attempting to play " + Helper.getSCName(scToPlay, game) + ". If this is a mistake or the Coup is Sabo'd, feel free to play the SC again. Otherwise, end turn after doing any end of turn abilities you have.");
+                        + " you have been Coup'd due to attempting to play " + Helper.getSCName(scToPlay, game) + ". If this is a mistake or the Coup is Sabo'd, feel free to play the strategy card again. Otherwise, end turn after doing any end of turn abilities you have.");
                     return;
                 }
             }
@@ -206,7 +206,7 @@ public class SCPlay extends PlayerSubcommandData {
             }
             if (game.isFowMode()) {
                 // in fow, send a message back to the player that includes their emoji
-                String response = "SC played.";
+                String response = "Strategy card played.";
                 response += reactionEmoji != null ? " " + reactionEmoji.getFormatted()
                     : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
                 MessageHelper.sendPrivateMessageToPlayer(player, game, response);
@@ -272,7 +272,7 @@ public class SCPlay extends PlayerSubcommandData {
             && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation()
-                    + " this is a reminder that this SC is kyro cursed and therefore you should only do 1 of its clauses. ");
+                    + " this is a reminder that this strategy card is Kyro Cursed and therefore you should only do 1 of its clauses. ");
         }
 
         if (scModel.usesAutomationForSCID("pok3politics")) {
