@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 public class SCUnplay extends PlayerSubcommandData {
     public SCUnplay() {
-        super(Constants.SC_UNPLAY, "Unplay an SC");
+        super(Constants.SC_UNPLAY, "Unplay a Strategy Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -29,18 +29,18 @@ public class SCUnplay extends PlayerSubcommandData {
         player = Helper.getPlayer(game, player, event);
 
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game.");
             return;
         }
 
         Set<Integer> playersSCs = player.getSCs();
         if (playersSCs.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No SC has been selected");
+            MessageHelper.sendMessageToEventChannel(event, "No strategy card has been selected.");
             return;
         }
 
         if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { //Only one SC selected
-            MessageHelper.sendMessageToEventChannel(event, "Player has more than one SC. Please try again, using the `strategy_card` option.");
+            MessageHelper.sendMessageToEventChannel(event, "Player has more than one strategy card. Please try again, using the `strategy_card` option.");
             return;
         }
 
@@ -57,7 +57,7 @@ public class SCUnplay extends PlayerSubcommandData {
             player_.addFollowedSC(scToUnplay);
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "SC has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed)");
+        MessageHelper.sendMessageToEventChannel(event, "Strategy card has been flipped: " + Emojis.getSCBackEmojiFromInteger(scToUnplay) + " to " + Emojis.getSCEmojiFromInteger(scToUnplay) + " (unplayed).");
     }
 
 }

@@ -345,7 +345,7 @@ public class TurnEnd extends PlayerSubcommandData {
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
                 && playerLeader != null && !playerLeader.isLocked()) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("kyroHeroInitiation", "Play Speygh (Kyro Hero)"));
+                buttons.add(Button.success("kyroHeroInitiation", "Play Kyro Hero"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentation()

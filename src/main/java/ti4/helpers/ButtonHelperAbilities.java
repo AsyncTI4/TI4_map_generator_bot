@@ -630,11 +630,12 @@ public class ButtonHelperAbilities {
                     .success(
                         "FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_"
                             + pillaged.getFaction(),
-                        "Use Suffi An (Mentak Agent)")
+                        "Use Mentak Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                 buttons.add(winnuButton);
                 buttons.add(Button.danger("deleteButtons", "Done"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2,
+                    "Wanna use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An, the Mentak" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent?", buttons);
             }
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != pillaged && p2 != player && p2.hasUnexhaustedLeader("yssarilagent")
@@ -644,7 +645,7 @@ public class ButtonHelperAbilities {
                         .success(
                             "FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_"
                                 + pillaged.getFaction(),
-                            "Use Suffi An (Mentak Agent)")
+                            "Use Mentak Agent")
                         .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));

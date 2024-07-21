@@ -196,7 +196,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             String name1 = exploreModel.getName();
             Button resolveExplore1 = Button.success("lanefirAgentRes_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Choose " + name1);
             Button resolveExplore2 = Button.success("lanefirAgentRes_Accept_" + drawColor + "_" + planetName,
-                "Use Vassa Hagi (Lanefir Agent)");
+                "Use Lanefir Agent");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentation(true, true) + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Vassa Hagi, the Lanefir" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, and thus may decline this explore to draw another one instead.";
@@ -262,7 +262,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Button.success("exhaustAgent_augersagent_" + player.getFaction(),
-                        "Use Clodho (Augers Agent) on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
+                        "Use Augers Agent on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     String msg2 = p2.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") 
                         + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2TGs.";

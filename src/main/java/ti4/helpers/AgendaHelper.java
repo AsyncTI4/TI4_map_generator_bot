@@ -1810,7 +1810,7 @@ public class AgendaHelper {
         if (Helper.getPlayerFromUnlockedLeader(game, "keleresheroodlynn") != null) {
             Player keleresX = Helper.getPlayerFromUnlockedLeader(game, "keleresheroodlynn");
             String finChecker = "FFCC_" + keleresX.getFaction() + "_";
-            Button playKeleresHero = Button.secondary(finChecker + "play_after_Keleres Xxcha Hero", "Play Odlynn Myrr (Keleres (Xxcha) Hero)")
+            Button playKeleresHero = Button.secondary(finChecker + "play_after_Keleres Xxcha Hero", "Play Keleres (Xxcha)")
                 .withEmoji(Emoji.fromFormatted(Emojis.Keleres));
             afterButtons.add(playKeleresHero);
         }
@@ -2915,7 +2915,7 @@ public class AgendaHelper {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
             int count = player.getTechs().size() / 2;
             Button button = Button
-                .secondary("exhaustForVotes_augerscommander_" + count, "Use Lachis (Augurs Commander) Votes (" + count + ")")
+                .secondary("exhaustForVotes_augerscommander_" + count, "Use Augurs Commander Votes (" + count + ")")
                 .withEmoji(Emoji.fromFormatted(Emojis.augers));
             planetButtons.add(button);
         }
@@ -3412,7 +3412,7 @@ public class AgendaHelper {
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
             int count = player.getTechs().size() / 2;
-            additionalVotesAndSources.put(Emojis.augers + "Lachis  (Augers Commander)", count);
+            additionalVotesAndSources.put(Emojis.augers + "Augers Commander", count);
         }
 
         // Ghoti Wayfarer Tech

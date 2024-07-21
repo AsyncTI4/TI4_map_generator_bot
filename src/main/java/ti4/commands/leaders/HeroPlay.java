@@ -211,7 +211,7 @@ public class HeroPlay extends LeaderAction {
             case "cymiaehero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
-                    Button.success("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve The Voice United (Cymiae Hero)"));
+                    Button.success("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve Cymiae Hero"));
                 buttons.add(Button.primary("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
 
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -258,7 +258,7 @@ public class HeroPlay extends LeaderAction {
                 List<Button> buttons = ButtonHelperHeroes.getWinnuHeroSCButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
-                    + " use the button to pick which SC you'd like to do the primary of. Reminder you may allow others to do the secondary, but they should still pay 1 CC for resolving it.",
+                    + " use the button to pick which strategy card you'd like to do the primary of. Reminder you may allow others to do the secondary, but they should still pay 1 CC for resolving it.",
                     buttons);
             }
             case "gheminaherolady" -> {
@@ -390,7 +390,7 @@ public class HeroPlay extends LeaderAction {
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
-                    "Invade a planet with Dannel of the Tenth (Yin Hero)"));
+                    "Invade A Planet With Yin Hero"));
                 buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
@@ -422,9 +422,9 @@ public class HeroPlay extends LeaderAction {
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
-                    "Resolve Atropha (Ilyxum Hero) on Stage 1 Deck"));
+                    "Resolve Ilyxum Hero on Stage 1 Deck"));
                 buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
-                    "Resolve Atropha (Ilyxum Hero) on Stage 2 Deck"));
+                    "ResolveIlyxum Hero on Stage 2 Deck"));
                 buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)

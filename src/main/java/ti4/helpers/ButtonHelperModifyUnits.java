@@ -1799,14 +1799,14 @@ public class ButtonHelperModifyUnits {
         }
         if (player.hasUnexhaustedLeader("ghotiagent")) {
             Button winnuButton = Button.danger("exhaustAgent_ghotiagent_" + player.getFaction(),
-                "Use Becece (Ghoti Agent)")
+                "Use Ghoti Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.ghoti));
             buttons.add(winnuButton);
         }
         if (player.hasUnexhaustedLeader("mortheusagent")) {
             Button winnuButton = Button
                 .danger("exhaustAgent_mortheusagent_" + player.getFaction(),
-                    "Use Walik (Mortheus Agent)")
+                    "Use Mortheus Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.mortheus));
             buttons.add(winnuButton);
         }

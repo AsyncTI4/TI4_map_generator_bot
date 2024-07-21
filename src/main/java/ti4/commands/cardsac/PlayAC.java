@@ -789,7 +789,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     String message2 = player.getRepresentation(true, true)
                         + " you may " + (unleash ? "unleash" : "unlock") + " Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Button.success("pay1tgforKeleres"+(unleash ? "U" : ""), "Pay 1TG to " + (unleash ? "Unleash" : "Unlock") + " Suffi An (Keleres Commander)"));
+                    buttons2.add(Button.success("pay1tgforKeleres"+(unleash ? "U" : ""), "Pay 1TG to " + (unleash ? "Unleash" : "Unlock") + " Suffi An"));
                     buttons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }
@@ -826,7 +826,7 @@ public class PlayAC extends ACCardsSubcommandData {
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             List<Button> buttons2 = new ArrayList<>();
             Button hacanButton = Button.secondary("exhaustAgent_cymiaeagent_" + player.getFaction(),
-                "Use Skhot Unit X-12 (Cymiae Agent)")
+                "Use Cymiae Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.cymiae));
             buttons2.add(hacanButton);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
