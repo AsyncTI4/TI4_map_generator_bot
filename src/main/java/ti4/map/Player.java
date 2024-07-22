@@ -2297,12 +2297,11 @@ public class Player {
     }
 
     public void refreshTech(String tech) {
-        boolean isRemoved = exhaustedTechs.remove(tech);
-        if (isRemoved)
-            refreshTech(tech);
+        exhaustedTechs.removeAll(Collections.singleton(tech));
     }
 
     public void removeTech(String tech) {
+        exhaustedTechs.remove(tech);
         techs.remove(tech);
         doAdditionalThingsWhenRemovingTech(tech);
     }
