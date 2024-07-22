@@ -310,7 +310,7 @@ public class FrankenDraftHelper {
         if (skipped) {
             sb.append("\nSome players were skipped. Please confirm they are set up as an empty franken shell faction before proceeding with the draft");
         }
-        sb.append("\nFranken faction setup finished.\nUse `/franken set_faction_icon` to change your faction symbol. You can use any emoji the bot can use (`/search emojis`)");
+        sb.append("\nFranken faction setup finished.\nUse `/franken set_faction_icon` to change your faction symbol. You may use any emoji the bot can use (`/search emojis`).");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 

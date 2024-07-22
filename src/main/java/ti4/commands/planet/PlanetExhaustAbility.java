@@ -79,7 +79,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             // Homebrew
             case "mr" -> {
-                output = "Use buttons to destroy a ground force on a legendary or planet adjacent to rex";
+                output = "Use buttons to destroy a ground force on a legendary or planet adjacent to Mecatol Rex.";
                 buttons.addAll(ButtonHelper.customRexLegendary(player, game));
             }
             case "silence" -> {
@@ -149,7 +149,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         player.removeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " removed the tech " + techM1.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of pre-requisites", Buttons.GET_A_FREE_TECH);
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of prerequisites", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);

@@ -264,7 +264,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " use buttons to resolve Grace, reminder you have to spend a strat CC if applicable, and that you can only do one of these.",
+                + " use buttons to resolve Grace, reminder you have to spend a strat CC if applicable, and that you may only do one of these.",
             getGraceButtons(game, player, scPlayed));
     }
 
@@ -548,7 +548,7 @@ public class ButtonHelperAbilities {
 
     public static void offerOmenDiceButtons(Game game, Player player) {
         String msg = player.getRepresentation(true, true)
-            + " you can play an omen die with the following buttons. Duplicate dice are not shown.";
+            + " you may play an omen die with the following buttons. Duplicate dice are not shown.";
         List<Button> buttons = new ArrayList<>();
         List<Integer> dice = new ArrayList<>();
         for (int die : getAllOmenDie(game)) {
@@ -634,7 +634,8 @@ public class ButtonHelperAbilities {
                     .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
                 buttons.add(winnuButton);
                 buttons.add(Button.danger("deleteButtons", "Done"));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, "Wanna use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2,
+                    "Wanna use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An, the Mentak" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent?", buttons);
             }
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != pillaged && p2 != player && p2.hasUnexhaustedLeader("yssarilagent")
@@ -649,7 +650,8 @@ public class ButtonHelperAbilities {
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
-                        p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Suffi An (Mentak Agent)?", buttons);
+                        p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") 
+                        + "Suffi An, the Mentak" + (p2.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent?", buttons);
                 }
             }
         }
@@ -879,7 +881,7 @@ public class ButtonHelperAbilities {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2
                     .getRepresentation(true, true)
                     + " a player has resolved an Axis Order (" + Mapper.getRelic(order).getName()
-                    + ") and you can use the button to gain the corresponding unit upgrade tech if you pay 6r",
+                    + ") and you may use the button to gain the corresponding unit upgrade tech if you pay 6 resources.",
                     buttons2);
             }
         }
@@ -1079,7 +1081,7 @@ public class ButtonHelperAbilities {
 
                 String msg = player.getRepresentation() + " Due to your exhausting of "
                     + Helper.getPlanetRepresentation(planet, game)
-                    + " you can resolve the following ability: **The Environment - Plunder (-)**: Once per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.";
+                    + " you may resolve the following ability: **The Environment - Plunder (-)**: Once per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 Button remove = Button.danger("getDamageButtons_" + game.getTileFromPlanet(planet).getPosition() + "_remove",
                     "Remove units in "

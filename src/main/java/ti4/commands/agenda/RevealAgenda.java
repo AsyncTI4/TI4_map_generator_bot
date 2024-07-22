@@ -167,9 +167,9 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
 
         StringBuilder whensAftersMessage = new StringBuilder(
-            "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you can simply play it.");
+            "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you may simply play it.");
         if (action) {
-            whensAftersMessage.append("\nYou can play afters during this agenda");
+            whensAftersMessage.append("\nYou may play afters during this agenda.");
         }
         game.setLastActivePlayerPing(new Date());
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
@@ -187,7 +187,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         String msg;
 
         if (action) {
-            msg = "It seems likely you are resolving Edyn hero, you can use this button to skip straight to the resolution";
+            msg = "It seems likely you are resolving Midir, the Edyn hero, you may use this button to skip straight to the resolution.";
             proceedButtons.add(Button.danger("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             ListVoteCount.turnOrder(event, game, channel);
@@ -224,7 +224,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                 && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0 && aCount == 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
-                        + " you have Florzen commander and can thus explore and ready a planet",
+                        + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
         }

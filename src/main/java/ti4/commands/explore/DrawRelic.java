@@ -105,10 +105,10 @@ public class DrawRelic extends GenericRelicAction {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
                 }
 
-                helpMessage.append("\nAn SO has been automatically drawn");
+                helpMessage.append("\nAn SO has been automatically drawn.");
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    helpMessage.append(". Drew a second SO due to plausible deniability");
+                    helpMessage.append(" Drew a second SO due to Plausible Deniability.");
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player, event);
             }
