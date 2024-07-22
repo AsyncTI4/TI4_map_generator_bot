@@ -477,7 +477,7 @@ public class ButtonHelperAgents {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
+                    + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         }
         event.getMessage().delete().queue();
     }
@@ -952,9 +952,10 @@ public class ButtonHelperAgents {
             List<Button> buttons = new ArrayList<>();
             buttons.addAll(ButtonHelper.getDomnaStepOneTiles(p2, game));
             String message = p2.getRepresentation(true, true)
-                + " use buttons to select which system the ship you just produced is in.";
+                + " use buttons to select which system the ship you just produced is in.. \n\n You need to tell the bot which system the unit was produced in first, after which it will give tiles to move it to. ";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), message,
                 buttons);
+
         }
         if ("cheiranagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Operator Kkavras, the Cheiran" + ssruuSlash + " agent.";
@@ -2176,7 +2177,8 @@ public class ButtonHelperAgents {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             trueIdentity + " Use buttons to select faction to give " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.", buttons);
+                + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.",
+            buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
         if (exhaustedMessage.length() < 1) {
             exhaustedMessage = "Combat";

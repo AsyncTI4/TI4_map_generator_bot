@@ -1216,7 +1216,7 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " the map is a big place. Please tell the bot where the origin of the signal jam is coming from (a tile where your ships are)",
+                + " the map is a big place, too big for the bot to offer all the options. Please tell the bot where the origin of the signal jam is coming from, to narrow it down a bit (origin must be a tile where your ships are) \n\n This tile you're selecting is the origin tile, after which you will be offered buttons to select that system or adjacent systems",
             buttons);
     }
 
