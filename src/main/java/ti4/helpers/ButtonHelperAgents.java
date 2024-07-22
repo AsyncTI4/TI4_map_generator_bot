@@ -88,7 +88,7 @@ public class ButtonHelperAgents {
                     + ButtonHelper.getIdentOrColor(p2, game) + " who has "
                     + p2.getCommoditiesTotal() + " commodities";
                 buttons.add(Button.success("exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(),
-                    "Use The Stillness of Stars (Vuil'raith Agent)"));
+                    "Use Vuil'raith Agent"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
@@ -462,7 +462,7 @@ public class ButtonHelperAgents {
             }
         }
         unitButtons.add(Button.danger("deleteButtons_spitItOut",
-            "Done With Trillossa Aun Mirik (Argent Agent)"));
+            "Argent Agent"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " use buttons to place ground forces via " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Trillossa Aun Mirik, the Argent" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
@@ -477,7 +477,7 @@ public class ButtonHelperAgents {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
+                    + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         }
         event.getMessage().delete().queue();
     }
@@ -952,9 +952,10 @@ public class ButtonHelperAgents {
             List<Button> buttons = new ArrayList<>();
             buttons.addAll(ButtonHelper.getDomnaStepOneTiles(p2, game));
             String message = p2.getRepresentation(true, true)
-                + " use buttons to select which system the ship you just produced is in.";
+                + " use buttons to select which system the ship you just produced is in.. \n\n You need to tell the bot which system the unit was produced in first, after which it will give tiles to move it to. ";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), message,
                 buttons);
+
         }
         if ("cheiranagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Operator Kkavras, the Cheiran" + ssruuSlash + " agent.";
@@ -2012,7 +2013,7 @@ public class ButtonHelperAgents {
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
             buttons.add(Button
                 .success("exhaustAgent_sardakkagent_" + game.getActiveSystem() + "_" + planetId,
-                    "Use T'ro (N'orr Agent) on " + planetRepresentation)
+                    "Use N'orr Agent on " + planetRepresentation)
                 .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
             //}
         }
@@ -2058,7 +2059,7 @@ public class ButtonHelperAgents {
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
                 buttons.add(Button
                     .success("exhaustAgent_l1z1xagent_" + game.getActiveSystem() + "_" + planetId,
-                        "Use I48S (L1Z1X Agent) on " + planetRepresentation)
+                        "Use L1Z1X Agent on " + planetRepresentation)
                     .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
             }
         }
@@ -2161,7 +2162,7 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust Artuno the Betrayer (Nomad Agent) With " + tg + " TG" + (tg == 1 ? "" : "s")));
+                "Exhaust Artuno the Betrayer With " + tg + " TG" + (tg == 1 ? "" : "s")));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
@@ -2176,7 +2177,8 @@ public class ButtonHelperAgents {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             trueIdentity + " Use buttons to select faction to give " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.", buttons);
+                + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.",
+            buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
         if (exhaustedMessage.length() < 1) {
             exhaustedMessage = "Combat";

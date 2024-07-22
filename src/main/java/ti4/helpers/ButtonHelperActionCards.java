@@ -887,12 +887,12 @@ public class ButtonHelperActionCards {
                 continue; // some older games have a 0 in the list of SCs
             Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
-            String label = " ";
+            String label = Helper.getSCName(sc, game);
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
                 && !game.isHomebrewSCMode()) {
                 button = Button.secondary("psStep2_" + sc, label).withEmoji(scEmoji);
             } else {
-                button = Button.secondary("psStep2_" + sc, "" + sc + label);
+                button = Button.secondary("psStep2_" + sc, "" + sc + " " + label);
             }
             buttons.add(button);
         }
@@ -901,7 +901,7 @@ public class ButtonHelperActionCards {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which SC(s) you used to have", buttons);
+            player.getRepresentation(true, true) + " tell the bot which strategy card(s) you used to have.", buttons);
     }
 
     public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event,
@@ -925,7 +925,7 @@ public class ButtonHelperActionCards {
         int scNum = Integer.parseInt(buttonID.split("_")[1]);
         player.addSC(scNum);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you retained the SC " + scNum);
+            player.getRepresentation(true, true) + " you retained " + Helper.getSCName(scNum, game) + ".");
         if (game.getRealPlayers().size() < 5) {
             ButtonHelper.deleteTheOneButton(event);
         } else {
@@ -1216,7 +1216,7 @@ public class ButtonHelperActionCards {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " the map is a big place. Please tell the bot where the origin of the signal jam is coming from (a tile where your ships are)",
+                + " the map is a big place, too big for the bot to offer all the options. Please tell the bot where the origin of the signal jam is coming from, to narrow it down a bit (origin must be a tile where your ships are) \n\n This tile you're selecting is the origin tile, after which you will be offered buttons to select that system or adjacent systems",
             buttons);
     }
 
@@ -1393,19 +1393,19 @@ public class ButtonHelperActionCards {
         if (player.getActionCards().containsKey("coup")) {
             game.setStoredValue("Coup", "");
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which SC you will Coup. Coup is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-assign which strategy card you will Coup. Coup is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
                     continue; // some older games have a 0 in the list of SCs
                 Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                 Button button;
-                String label = " ";
+                String label = Helper.getSCName(sc, game);
                 if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
                     && !game.isHomebrewSCMode()) {
                     button = Button.secondary("resolvePreassignment_Coup_" + sc, label).withEmoji(scEmoji);
                 } else {
-                    button = Button.secondary("resolvePreassignment_Coup_" + sc, "" + sc + label);
+                    button = Button.secondary("resolvePreassignment_Coup_" + sc, "" + sc + " " + label);
                 }
                 scButtons.add(button);
             }
@@ -1452,7 +1452,7 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("disgrace")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which SC you will Public Disgrace. Public Disgrace is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " you have the option to pre-assign which strategy card you will Public Disgrace. Public Disgrace is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                 + " Feel free to ignore this message if you don't intend to play it or are unsure of the target. You will be given the option for it to only trigger on a particular person";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
@@ -1460,12 +1460,12 @@ public class ButtonHelperActionCards {
                     continue; // some older games have a 0 in the list of SCs
                 Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                 Button button;
-                String label = " ";
+                String label = Helper.getSCName(sc, game);
                 if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
                     && !game.isHomebrewSCMode()) {
                     button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, label).withEmoji(scEmoji);
                 } else {
-                    button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, "" + sc + label);
+                    button = Button.secondary("resolvePreassignment_Public Disgrace_" + sc, "" + sc + " " + label);
                 }
                 scButtons.add(button);
             }
