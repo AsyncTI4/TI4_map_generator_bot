@@ -938,9 +938,10 @@ public class ButtonHelperAgents {
             List<Button> buttons = new ArrayList<>();
             buttons.addAll(ButtonHelper.getDomnaStepOneTiles(p2, game));
             String message = p2.getRepresentation(true, true)
-                + " use buttons to select which system the ship you just produced is in";
+                + " use buttons to select which system the ship you just produced is in. \n\n You need to tell the bot which system the unit was produced in first, after which it will give tiles to move it to. ";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), message,
                 buttons);
+
         }
         if ("cheiranagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Operator Kkavras (Cheiran Agent)";

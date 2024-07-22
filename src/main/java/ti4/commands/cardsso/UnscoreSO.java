@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -17,6 +16,8 @@ public class UnscoreSO extends SOCardsSubcommandData {
     public UnscoreSO() {
         super(Constants.UNSCORE_SO, "Unscore Secret Objective");
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Scored Secret objective ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+            .setAutoComplete(true));
     }
 
     @Override
@@ -24,6 +25,7 @@ public class UnscoreSO extends SOCardsSubcommandData {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
