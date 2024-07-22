@@ -869,6 +869,10 @@ public class Game extends GameProperties {
         if (prevPlayer != null && !factionsInCombat.contains(prevPlayer.getFaction()) && !isTemporaryPingDisable()) {
             long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
             prevPlayer.updateTurnStats(elapsedTime);
+        } else {
+            if (prevPlayer != null) {
+                prevPlayer.updateTurnStatsWithAverage();
+            }
         }
         setStoredValue("factionsInCombat", "");
 

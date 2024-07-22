@@ -2485,6 +2485,12 @@ public class Player {
         totalTimeSpent += turnTime;
     }
 
+    public void updateTurnStatsWithAverage() {
+        long averagetime = (totalTimeSpent / numberOfTurns);
+        numberOfTurns++;
+        totalTimeSpent += averagetime;
+    }
+
     public int getNumberTurns() {
         return numberOfTurns;
     }
