@@ -34,7 +34,7 @@ import ti4.message.MessageHelper;
 
 public class SCPick extends PlayerSubcommandData {
     public SCPick() {
-        super(Constants.SC_PICK, "Pick SC");
+        super(Constants.SC_PICK, "Pick a Strategy Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC2, "2nd choice"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd"));
@@ -67,7 +67,7 @@ public class SCPick extends PlayerSubcommandData {
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
-            MessageHelper.sendMessageToEventChannel(event, "Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
+            MessageHelper.sendMessageToEventChannel(event, "Player may not pick another strategy card. Max strategy cards per player for this game is " + maxSCsPerPlayer + ".");
             return;
         }
 
@@ -95,7 +95,7 @@ public class SCPick extends PlayerSubcommandData {
         }
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No SC picked.");
+            MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
             return;
         }
         secondHalfOfSCPick(event, player, game, scPicked);
@@ -143,7 +143,7 @@ public class SCPick extends PlayerSubcommandData {
 
         for (Player playerStats : game.getRealPlayers()) {
             if (playerStats.getSCs().contains(scPicked)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "SC #" + scPicked + " is already picked.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getSCName(scPicked, game) + " is already picked.");
                 return;
             }
         }
@@ -151,9 +151,9 @@ public class SCPick extends PlayerSubcommandData {
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
             tg += tgCount;
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scPicked);
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game));
             if (game.isFowMode()) {
-                String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking SC #" + scPicked;
+                String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game);
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
@@ -166,7 +166,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " chose which player to give this SC", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " chose which player to give this stratgy card to.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -178,12 +178,12 @@ public class SCPick extends PlayerSubcommandData {
 
         Stats.secondHalfOfPickSC(event, game, p2, scpick);
 
-        String recipientMessage = p2.getRepresentation(true, true) + " was given SC #" + scpick
+        String recipientMessage = p2.getRepresentation(true, true) + " was given " + Helper.getSCName(scpick, game)
             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getColor() + " was given SC #" + scpick);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
 
         }
         event.getMessage().delete().queue();
@@ -222,7 +222,7 @@ public class SCPick extends PlayerSubcommandData {
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                privatePlayer.getRepresentation(true, true) + "Use Buttons to Pick Which SC you want to give someone", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                privatePlayer.getRepresentation(true, true) + "Use buttons to pick which strategy card you want to give someone else.", Helper.getRemainingSCButtons(event, game, privatePlayer));
         }
     }
 
@@ -252,7 +252,7 @@ public class SCPick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentation(true, true) + " To Pick SC";
+                msgExtra += player_.getRepresentation(true, true) + " to pick strategy card.";
                 game.setPhaseOfGame("strategy");
                 privatePlayer = player_;
                 allPicked = false;
@@ -278,7 +278,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
 
-            msgExtra += "\nAll players picked SC";
+            msgExtra += "\nAll players picked strategy cards.";
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
@@ -337,7 +337,7 @@ public class SCPick extends PlayerSubcommandData {
 
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
             } else {
                 privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
@@ -364,7 +364,7 @@ public class SCPick extends PlayerSubcommandData {
             if (!msgExtra.isEmpty()) {
                 if (!allPicked) {
                     game.updateActivePlayer(privatePlayer);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse buttons to pick your strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
                     game.setPhaseOfGame("strategy");
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);

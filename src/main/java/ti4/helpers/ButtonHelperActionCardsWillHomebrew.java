@@ -241,7 +241,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             } else {
-                sb.append("Looked at the top of the ").append(type).append(" deck and saw that it was not a relic frag.\n");
+                sb.append("Looked at the top of the ").append(type).append(" deck and saw that it was not a relic fragment.\n");
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
             }
         }

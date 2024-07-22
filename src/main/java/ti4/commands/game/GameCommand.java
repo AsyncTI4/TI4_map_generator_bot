@@ -56,7 +56,8 @@ public class GameCommand implements Command {
         CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(game, event);
         if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
             && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
-            && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
+            && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)
+            && !Constants.OBSERVER.equalsIgnoreCase(subcommandName)) {
             fileFuture.thenAccept(fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {
