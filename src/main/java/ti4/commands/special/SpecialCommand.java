@@ -1,8 +1,10 @@
 package ti4.commands.special;
 
-import net.dv8tion.jda.api.entities.User;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
@@ -12,11 +14,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class SpecialCommand implements Command {
 
@@ -91,6 +88,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new StellarConverter());
         subcommands.add(new RiseOfMessiah());
         subcommands.add(new Rematch());
+        subcommands.add(new CloneGame());
         subcommands.add(new SwordsToPlowsharesTGGain());
         subcommands.add(new WormholeResearchFor());
         subcommands.add(new FighterConscription());

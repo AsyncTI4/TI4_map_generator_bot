@@ -631,6 +631,9 @@ public class Mapper {
         AttachmentModel model = attachments.get(id);
         if (model != null) return model;
         id = id.replace("attachment_", "").replace(".png", "");
+        if (attachments.get(id) == null) {
+            id = "lloyd_" + id;
+        }
         return attachments.get(id);
     }
 

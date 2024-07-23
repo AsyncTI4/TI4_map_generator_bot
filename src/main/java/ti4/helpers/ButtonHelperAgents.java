@@ -56,7 +56,7 @@ public class ButtonHelperAgents {
         event.getMessage().delete().queue();
         new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "1 infantry " + planet, game);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), player.getRepresentation(true, true) + " you removed 1 infantry from " + planetRep);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " 1 infantry of yours on " + planetRep + " was removed via the Xxcha agent.");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " 1 infantry of yours on " + planetRep + " was removed via the Ggrocuto Rinn, the Xxcha agent.");
     }
 
     public static List<Button> getTilesToArboAgent(Player player, Game game,
@@ -83,11 +83,12 @@ public class ButtonHelperAgents {
             }
             if (cabal.hasUnexhaustedLeader("cabalagent")) {
                 List<Button> buttons = new ArrayList<>();
-                String msg = cabal.getRepresentation(true, true) + " you have the ability to use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + " The Stillness of Stars (Vuil'raith Agent) on "
+                String msg = cabal.getRepresentation(true, true) + " you have the ability to use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + " The Stillness of Stars, the Vuil'raith" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
                     + ButtonHelper.getIdentOrColor(p2, game) + " who has "
                     + p2.getCommoditiesTotal() + " commodities";
                 buttons.add(Button.success("exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(),
-                    "Use Cabal Agent"));
+                    "Use Vuil'raith Agent"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
@@ -170,7 +171,8 @@ public class ButtonHelperAgents {
         Integer commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
             p2.getRepresentation(true, true) + " a " + unit
-                + " of yours has been captured by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "The Stillness of Stars (Vuil'Raith Agent). "
+                + " of yours has been captured by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "The Stillness of Stars, the Vuil'raith" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent. "
                 + "Rejoice, for your " + commodities.toString() + " commodities been washed.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);
@@ -246,7 +248,7 @@ public class ButtonHelperAgents {
         new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), damaged, game);
         String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " was removed by "
             + ButtonHelper.getIdent(player)
-            + ". A ship costing up to 2 more than it can now be placed";
+            + ". A ship costing up to 2 more than it may now be placed.";
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
@@ -277,17 +279,17 @@ public class ButtonHelperAgents {
         if (playerLeader == null) {
             if (agent.contains("titanprototype")) {
                 player.removeExhaustedRelic("titanprototype");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " spent a strat CC and readied " + agent);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " spent a strategy CC and readied " + agent);
             }
             if (agent.contains("absol")) {
                 player.removeExhaustedRelic("absol_jr");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + "  spent a strat CC and readied " + agent);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + "  spent a strategy CC and readied " + agent);
             }
             return;
         }
         RefreshLeader.refreshLeader(player, playerLeader, game);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " used " + Emojis.BioticTech + "Hypermetabolism" + Emojis.Absol + " to spend a strat CC and ready " + agent);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " used " + Emojis.BioticTech + "Hypermetabolism" + Emojis.Absol + " to spend a strategy CC and ready " + agent);
     }
 
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game game, Player player,
@@ -308,7 +310,8 @@ public class ButtonHelperAgents {
         ButtonHelperAbilities.pillageCheck(p2, game);
         resolveArtunoCheck(p2, game, 2);
         String msg2 = ButtonHelper.getIdentOrColor(player, game) + " selected "
-            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Nekro Malleon (Nekro Agent)";
+            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Nekro Malleon, the Nekro" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         String message = p2.getRepresentation(true, true) + " increased your TGs by 2 (" + (p2.getTg() - 2) + "->"
             + p2.getTg()
@@ -342,7 +345,8 @@ public class ButtonHelperAgents {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String msg2 = ButtonHelper.getIdentOrColor(player, game) + " selected "
-            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Captain Dust (Kollecc Agent)";
+            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Captain Dust, the Kollecc" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = getKolleccAgentButtons(game, p2);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -386,7 +390,8 @@ public class ButtonHelperAgents {
             ButtonHelperStats.gainComms(event, game, player, 2, false, true);
         } else {
             message = "Refreshed " + ButtonHelper.getIdentOrColor(p2, game) + "'s commodities";
-            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " your commodities were refreshed by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Carth of Golden Sands (Hacan Agent)");
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " your commodities were refreshed by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Carth of Golden Sands, the Hacan" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             ButtonHelperStats.replenishComms(event, game, p2, true);
         }
 
@@ -457,9 +462,10 @@ public class ButtonHelperAgents {
             }
         }
         unitButtons.add(Button.danger("deleteButtons_spitItOut",
-            "Done With Argent Agent"));
+            "Argent Agent"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " use buttons to place ground forces via " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Trillossa Aun Mirik (Argent Agent)",
+            player.getRepresentation(true, true) + " use buttons to place ground forces via " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Trillossa Aun Mirik, the Argent" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
             unitButtons);
     }
 
@@ -470,7 +476,8 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                ButtonHelper.getIdentOrColor(p2, game) + " gained 1 AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yvin Korduul (Vaylerian Agent)");
+                ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         }
         event.getMessage().delete().queue();
     }
@@ -495,46 +502,48 @@ public class ButtonHelperAgents {
         playerLeader.setExhausted(true);
 
         MessageHelper.sendMessageToChannel(channel2, Emojis.getFactionLeaderEmoji(playerLeader));
-        String ssruu = "";
+        String ssruuClever = "";
+        String ssruuSlash = "";
         if ("yssarilagent".equalsIgnoreCase(playerLeader.getId())) {
-            ssruu = "Clever Clever ";
+            ssruuClever = "Clever Clever ";
+            ssruuSlash = "/Yssaril";
         }
         String messageText2 = player.getRepresentation() + " exhausted " + Helper.getLeaderFullRepresentation(playerLeader);
         MessageHelper.sendMessageToChannel(channel2, messageText2);
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Artuno the Betrayer (Nomad Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             playerLeader.setTgCount(Integer.parseInt(rest.split("_")[1]));
             String messageText = player.getRepresentation() + " placed " + rest.split("_")[1] + " " + Emojis.getTGorNomadCoinEmoji(game)
-                + " on top of " + ssruu + "Artuno the Betrayer (Nomad Agent)";
+                + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, messageText);
         }
         if ("naazagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Garv and Gunn (Naaz-Rokha Agents)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Garv and Gunn, the Naaz-Rokha" + ssruuSlash + " agents.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
         }
 
         if ("augersagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Clodho (Augers Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Clodho, the Augers" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
             int oldTg = p2.getTg();
             p2.setTg(oldTg + 2);
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
-                ButtonHelper.getIdentOrColor(player, game) + " gained 2TGs from " + ssruu + "Clodho (Augers Agent) being used ("
-                    + oldTg + "->" + p2.getTg() + ")");
+                ButtonHelper.getIdentOrColor(player, game) + " gained 2TGs from " + ssruuClever + "Clodho, the Augers" + ssruuSlash + " agent, being used ("
+                    + oldTg + "->" + p2.getTg() + ").");
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ButtonHelper.getIdentOrColor(p2, game) + " gained 2TGs due to agent usage");
+                    ButtonHelper.getIdentOrColor(p2, game) + " gained 2TGs due to agent usage.");
             }
             ButtonHelperAbilities.pillageCheck(p2, game);
             resolveArtunoCheck(p2, game, 2);
         }
 
         if ("vaylerianagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Yvin Korduul (Vaylerian Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Yvin Korduul, the Vaylerian" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             if (rest.contains("_")) {
                 Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
@@ -542,16 +551,16 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message);
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        ButtonHelper.getIdentOrColor(p2, game) + " gained 1 AC due to agent usage");
+                        ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC due to agent usage.");
                 }
             } else {
-                String message = trueIdentity + " select faction you wish to use " + ssruu + "Yvin Korduul (Vaylerian Agent) on";
+                String message = trueIdentity + " select the faction on which you wish to use " + ssruuClever + "Yvin Korduul, the Vaylerian" + ssruuSlash + " agent.";
                 List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "vaylerianAgent", null);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
             }
         }
         if ("kjalengardagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Merkismathr Asvand (Kjalengard Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Merkismathr Asvand, the Kjalengard" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             Player activePlayer = game.getActivePlayer();
             if (activePlayer != null) {
@@ -563,8 +572,8 @@ public class ButtonHelperAgents {
                 activePlayer.setCommodities(newComms);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     ButtonHelper.getIdent(player)
-                        + " exhausted " + ssruu + "Merkismathr Asvand (Kjalengard Agent) to potentially move a glory token into the system. "
-                        + ButtonHelper.getIdent(activePlayer) + " comms went from " + oldComms + " -> "
+                        + " exhausted " + ssruuClever + "Merkismathr Asvand, the Kjalengard" + ssruuSlash + " agent, to potentially move a glory token into the system. "
+                        + ButtonHelper.getIdent(activePlayer) + " commodities went from " + oldComms + " -> "
                         + newComms + ".");
             }
             if (getGloryTokenTiles(game).size() > 0) {
@@ -573,114 +582,114 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     ButtonHelper.getIdent(player)
                         + " there were no glory tokens on the board to move. Go win some battles and earn some, or your ancestors will laugh at ya when "
-                        + (ThreadLocalRandom.current().nextInt(20) == 0 ? "(if) " : "") + "you reach Valhalla");
+                        + (ThreadLocalRandom.current().nextInt(20) == 0 ? "(if) " : "") + "you reach Valhalla.");
 
             }
         }
         if ("cabalagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "The Stillness of Stars (Vuil'Raith Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "The Stillness of Stars, the Vuil'Raith" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             startCabalAgent(player, game, rest.replace("cabalagent_", ""), event);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Doctor Sucaban (Jol-Nar Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Doctor Sucaban, the Jol-Nar" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
-            String msg = player.getRepresentation(true, true) + " you can use the buttons to remove infantry.";
+            String msg = player.getRepresentation(true, true) + " you may use the buttons to remove infantry.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
                 getJolNarAgentButtons(player, game));
         }
 
         if ("empyreanagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Acamar (Empyrean Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Acamar, the Empyrean" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
-                + ". Use buttons to gain CCs";
+                + ". Use buttons to gain CCs.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         if ("mykomentoriagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Lactarius Indigo (Myko-Mentori Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Lactarius Indigo, the Myko-Mentori" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             ButtonHelperAbilities.offerOmenDiceButtons(game, player);
         }
         if ("gledgeagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Durran (Gledge Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
-            p2.addSpentThing("Exhausted " + ssruu + "Durran (Gledge Agent) for +3 Production Capacity");
+            p2.addSpentThing("Exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent, for +3 Production Capacity.");
         }
         if ("khraskagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Udosh B'rtul (Khrask Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Udosh B'rtul, the Khrask" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
-            p2.addSpentThing("Exhausted " + ssruu + "Udosh B'rtul (Khrask Agent) to spend 1 non-home planet's Resources as additional Influence");
+            p2.addSpentThing("Exhausted " + ssruuClever + "Udosh B'rtul, the Khrask" + ssruuSlash + " agent, to spend 1 non-home planet's resources as additional influence.");
         }
         if ("rohdhnaagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Rond Bri'ay (Roh'Dhna Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Rond Bri'ay, the Roh'Dhna" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
-            p2.addSpentThing("Exhausted " + ssruu + "Rond Bri'ay (Roh'Dhna Agent) for 1 CC");
+            p2.addSpentThing("Exhausted " + ssruuClever + "Rond Bri'ay, the Roh'Dhna" + ssruuSlash + " agent, for 1 CC");
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String trueIdentity2 = p2.getRepresentation(true, true);
             String message2 = trueIdentity2 + "! Your current CCs are " + p2.getCCRepresentation()
-                + ". Use buttons to gain CCs";
+                + ". Use buttons to gain CCs.";
             game.setStoredValue("originalCCsFor" + p2.getFaction(), p2.getCCRepresentation());
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), message2,
                 buttons);
         }
         if ("veldyragent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Solis Morden (Veldyr Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Solis Morden, the Veldyr" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
-            p2.addSpentThing("Exhausted " + ssruu + "Solis Morden (Veldyr Agent) to pay with one planets influence instead of resources");
+            p2.addSpentThing("Exhausted " + ssruuClever + "Solis Morden, the Veldyr" + ssruuSlash + " agent, to pay with one planets influence instead of resources.");
         }
         if ("winnuagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Berekar Berekon (Winnu Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Berekar Berekon, the Winnu" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
-            player.addSpentThing("Exhausted " + ssruu + "Berekar Berekon (Winnu Agent) for 2 resources");
+            player.addSpentThing("Exhausted " + ssruuClever + "Berekar Berekon, the Winnu" + ssruuSlash + " agent, for 2 resources.");
         }
         if ("lizhoagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Vasra Ivo (Li-Zho Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Vasra Ivo, the Li-Zho" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             List<Button> buttons = new ArrayList<>(
                 Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
-            String message = "Use buttons to put 2 fighters with your ships";
+            String message = "Use buttons to put 2 fighters with your ships.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                 buttons);
         }
 
         if ("nekroagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Nekro Malleon (Nekro Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Nekro Malleon, the Nekro" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
-            String message = trueIdentity + " select faction you wish to use " + ssruu + "Nekro Malleon (Nekro Agent) on";
+            String message = trueIdentity + " select the faction on which you wish to use " + ssruuClever + "Nekro Malleon, the Nekro" + ssruuSlash + " agent.";
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "nekroAgentRes", null);
             MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
         }
         if ("kolleccagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Captain Dust (Kollecc Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Captain Dust, the Kollecc" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
-            String message = trueIdentity + " select faction you wish to use " + ssruu + "Captain Dust (Kollecc Agent) on";
+            String message = trueIdentity + " select the faction on which you wish to use " + ssruuClever + "Captain Dust, the Kollecc" + ssruuSlash + " agent.";
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "kolleccAgentRes", null);
             MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
         }
 
         if ("hacanagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Carth of Golden Sands (Hacan Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
-            String message = trueIdentity + " select faction you wish to use " + ssruu + "Carth of Golden Sands (Hacan Agent) on";
+            String message = trueIdentity + " select the faction on which you wish to use " + ssruuClever + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
             List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "hacanAgentRefresh", null);
             MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
         }
@@ -689,7 +698,7 @@ public class ButtonHelperAgents {
         }
 
         if ("xxchaagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Ggrocuto Rinn (Xxcha Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Ggrocuto Rinn, the Xxcha" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("xxchaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -704,7 +713,7 @@ public class ButtonHelperAgents {
         }
 
         if ("yinagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Brother Milor (Yin Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Brother Milor, the Yin" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String posNFaction = rest.replace("yinagent_", "");
             String pos = posNFaction.split("_")[0];
@@ -713,12 +722,12 @@ public class ButtonHelperAgents {
             if (p2 == null)
                 return;
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                p2.getRepresentation(true, true) + " Use buttons to resolve " + ssruu + "Brother Milor (Yin Agent)",
+                p2.getRepresentation(true, true) + " Use buttons to resolve " + ssruuClever + "Brother Milor, the Yin" + ssruuSlash + " agent.",
                 getYinAgentButtons(p2, game, pos));
         }
 
         if ("naaluagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Z'eu (Naalu Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Z'eu, the Naalu" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("naaluagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -730,52 +739,54 @@ public class ButtonHelperAgents {
                 channel = p2.getPrivateChannel();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
             }
-            String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
+            String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in."
+                + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
             List<Button> ringButtons = ButtonHelper.getPossibleRings(p2, game);
             game.resetCurrentMovedUnitsFrom1TacticalAction();
             MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentation(true, true)
-                + " Use buttons to resolve tactical action from " + ssruu + "Z'eu (Naalu Agent). Reminder it is not legal to do a tactical action in a home system.\n"
+                + " Use buttons to resolve tactical action from " + ssruuClever + "Z'eu, the Naalu" + ssruuSlash + " agent. Reminder it is not legal to do a tactical action in a home system.\n"
                 + message, ringButtons);
         }
 
         if ("olradinagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Baggil Wildpaw (Olradin Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Baggil Wildpaw, the Olradin" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             resolveOlradinAgentStep2(game, p2);
         }
         if ("solagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Evelyn Delouis (Sol Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Evelyn Delouis, the Sol" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdentOrColor(p2, game) + " will receive " + ssruu + "Evelyn Delouis (Sol Agent) on their next roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdentOrColor(p2, game) + " will receive " + ssruuClever + "Evelyn Delouis, the Sol" + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("solagent", p2.getFaction());
         }
         if ("letnevagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Viscount Unlenn (Letnev Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Viscount Unlenn, the Letnev" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdentOrColor(p2, game) + " will receive " + ssruu + "Viscount Unlenn (Letnev Agent) on their next roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdentOrColor(p2, game) + " will receive " + ssruuClever + "Viscount Unlenn, the Letnev" + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("letnevagent", p2.getFaction());
         }
 
         if ("cymiaeagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Skhot Unit X-12 (Cymiae Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Skhot Unit X-12, the Cymiae" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
             String message = "";
-            String successMessage2 = ButtonHelper.getIdent(p2) + " drew 1 AC due to " + ssruu + "Skhot Unit X-12 (Cymiae Agent).";
+            String successMessage2 = ButtonHelper.getIdent(p2) + " drew 1AC due to " + ssruuClever
+                + "Skhot Unit X-12, the Cymiae" + ssruuSlash + " agent.";
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
                 successMessage2 += " Drew another AC for scheming. Please discard 1";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-                    player.getRepresentation(true, true) + " use buttons to discard",
+                    player.getRepresentation(true, true) + " use buttons to discard.",
                     ACInfo.getDiscardActionCardButtons(game, player, false));
             }
             if (p2.hasAbility("autonetic_memory")) {
@@ -785,19 +796,20 @@ public class ButtonHelperAgents {
                 game.drawActionCard(p2.getUserID());
             }
             ButtonHelper.checkACLimit(game, event, p2);
-            String headerText2 = p2.getRepresentation(true, true) + " you got 1 AC due to " + ssruu + "Skhot Unit X-12 (Cymiae Agent)";
+            String headerText2 = p2.getRepresentation(true, true) + " you got 1AC due to "
+                + ssruuClever + "Skhot Unit X-12, the Cymiae" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToPlayerCardsInfoThread(p2, game, headerText2);
             ACInfo.sendActionCardInfo(game, p2);
             if (p2.hasAbility("scheming")) {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-                    p2.getRepresentation(true, true) + " use buttons to discard",
+                    p2.getRepresentation(true, true) + " use buttons to discard.",
                     ACInfo.getDiscardActionCardButtons(game, p2, false));
             }
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), successMessage2);
         }
 
         if ("mentakagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Suffi An (Mentak Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Suffi An, the Mentak" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("mentakagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -815,30 +827,32 @@ public class ButtonHelperAgents {
             }
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
-                successMessage2 += " Drew another AC for scheming. Please discard 1";
+                successMessage2 += " Drew another AC for scheming. Please discard 1.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                     p2.getRepresentation(true, true) + " use buttons to discard",
                     ACInfo.getDiscardActionCardButtons(game, p2, false));
             }
             if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-                message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option";
+                message = ButtonHelper.getIdent(player) + " Triggered Autonetic Memory Option.";
             } else {
                 game.drawActionCard(player.getUserID());
             }
             if (p2.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
-                message = ButtonHelper.getIdent(p2) + " Triggered Autonetic Memory Option";
+                message = ButtonHelper.getIdent(p2) + " Triggered Autonetic Memory Option.";
             } else {
                 game.drawActionCard(p2.getUserID());
             }
 
             ButtonHelper.checkACLimit(game, event, player);
             ButtonHelper.checkACLimit(game, event, p2);
-            String headerText = player.getRepresentation(true, true) + " you got 1 AC from " + ssruu + "Suffi An (Mentak Agent)";
+            String headerText = player.getRepresentation(true, true) + " you got 1AC from "
+                + ssruuClever + "Suffi An, the Mentak" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
             ACInfo.sendActionCardInfo(game, player);
-            String headerText2 = p2.getRepresentation(true, true) + " you got 1 AC from " + ssruu + "Suffi An (Mentak Agent)";
+            String headerText2 = p2.getRepresentation(true, true) + " you got 1AC from "
+                + ssruuClever + "Suffi An, the Mentak" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToPlayerCardsInfoThread(p2, game, headerText2);
             ACInfo.sendActionCardInfo(game, p2);
             if (p2.hasAbility("scheming")) {
@@ -856,7 +870,7 @@ public class ButtonHelperAgents {
         }
 
         if ("sardakkagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "T'ro An (N'orr Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "T'ro An, the N'orr" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String posNPlanet = rest.replace("sardakkagent_", "");
             String pos = posNPlanet.split("_")[0];
@@ -868,14 +882,14 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         }
         if ("argentagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Trillossa Aun Mirik (Argent Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Trillossa Aun Mirik, the Argent" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String pos = rest.replace("argentagent_", "");
             Tile tile = game.getTileByPosition(pos);
             addArgentAgentButtons(tile, player, game);
         }
         if ("nomadagentmercer".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Field Marshal Mercer (Nomad Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Field Marshal Mercer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String posNPlanet = rest.replace("nomadagentmercer_", "");
             String planetName = posNPlanet.split("_")[1];
@@ -883,11 +897,11 @@ public class ButtonHelperAgents {
                 player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " use buttons to resolve move of ground forces to this planet with" + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Field Marshal Mercer (Nomad Agent)",
+                    + " use buttons to resolve move of ground forces to this planet with " + ssruuClever + "Field Marshal Mercer, a Nomad" + ssruuSlash + " agent.",
                 buttons);
         }
         if ("l1z1xagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "I48S (L1Z1X Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "I48S, the L1Z1X" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String posNPlanet = rest.replace("l1z1xagent_", "");
             String pos = posNPlanet.split("_")[0];
@@ -902,14 +916,14 @@ public class ButtonHelperAgents {
         }
 
         if ("muaatagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Umbat (Muaat Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Umbat, the Muaat" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("muaatagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
             MessageChannel channel = ButtonHelper.getCorrectChannel(p2, game);
-            String message = "Use buttons to select which tile to " + ssruu + "Umbat (Muaat Agent) in";
+            String message = "Use buttons to select which tile to " + ssruuClever + "Umbat, the Muaat" + ssruuSlash + " agent, in";
             List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Warsun,
                 UnitType.Flagship);
             List<Button> buttons = new ArrayList<>();
@@ -921,54 +935,55 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentation(true, true) + message, buttons);
         }
         if ("bentoragent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "C.O.O. Mgur (Bentor Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "C.O.O. Mgur, the Bentor" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveBentorAgentStep2(player, game, event, rest);
         }
         if ("kortaliagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Queen Lucreia (Kortali Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Queen Lucreia, the Kortali" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveKortaliAgentStep2(player, game, event, rest);
         }
         if ("mortheusagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Walik (Mortheus Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Walik, the Mortheus" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             List<Button> buttons = new ArrayList<>();
             buttons.addAll(ButtonHelper.getDomnaStepOneTiles(p2, game));
             String message = p2.getRepresentation(true, true)
-                + " use buttons to select which system the ship you just produced is in";
+                + " use buttons to select which system the ship you just produced is in.. \n\n You need to tell the bot which system the unit was produced in first, after which it will give tiles to move it to. ";
             MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(p2, game), message,
                 buttons);
+
         }
         if ("cheiranagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Operator Kkavras (Cheiran Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Operator Kkavras, the Cheiran" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveCheiranAgentStep1(player, game, event, rest);
         }
         if ("freesystemsagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Cordo Haved (Free Systems Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Cordo Haved, the Free Systems" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveFreeSystemsAgentStep1(player, game, event, rest);
         }
         if ("florzenagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Sal Gavda (Florzen Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Sal Gavda, the Florzen" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveFlorzenAgentStep1(player, game, event, rest);
         }
         if ("dihmohnagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Jgin Faru (Dih-Mohn Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Jgin Faru, the Dih-Mohn" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String planet = rest.split("_")[1];
             new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
                 "1 inf " + planet, game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ButtonHelper.getIdent(player) + " landed 1 extra infantry on "
-                    + Helper.getPlanetRepresentation(planet, game) + " using " + ssruu + "Jgin Faru (Dih-Mohn Agent) [Note, you need to commit something else to the planet besides this extra infantry in order to use this agent]");
+                    + Helper.getPlanetRepresentation(planet, game) + " using " + ssruuClever + "Jgin Faru, the Dih-Mohn" + ssruuSlash + " agent [Note, you need to commit something else to the planet besides this extra infantry in order to use this agent].");
         }
         if ("tnelisagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + " Tnelis Agent";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Davish S’Norri, the Tnelis" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             game.setStoredValue("tnelisAgentFaction", player.getFaction());
             ButtonHelper.resolveCombatRoll(player, game, event,
@@ -976,12 +991,12 @@ public class ButtonHelperAgents {
             game.setStoredValue("tnelisAgentFaction", "");
         }
         if ("vadenagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Yudri Sukhov (Vaden Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Yudri Sukhov, the Vaden" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveVadenAgentStep2(player, game, event, rest);
         }
         if ("celdauriagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "George Nobin (Muaat Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "George Nobin, the Muaat" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveCeldauriAgentStep2(player, game, event, rest);
         }
@@ -989,22 +1004,22 @@ public class ButtonHelperAgents {
         // resolveCeldauriAgentStep2(player, game, event, rest);
         // }
         if ("zealotsagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Priestess Tuh (Zealots Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Priestess Tuh, the Rhodun" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveZealotsAgentStep2(player, game, event, rest);
         }
         if ("nokaragent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Sal Sparrow (Nokar Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Sal Sparrow, the Nokar" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveNokarAgentStep2(player, game, event, rest);
         }
         if ("zelianagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Zelian A (Zelian Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Zelian A, the Zelian" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             resolveZelianAgentStep2(player, game, event, rest);
         }
         if ("mirvedaagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Logic Machina (Mirveda  Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Logic Machina, the Mirveda" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1020,14 +1035,14 @@ public class ButtonHelperAgents {
             MessageChannel channel = p2.getCorrectChannel();
             ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, game, event, Emojis.mirveda + " Agent");
             String message0 = p2.getRepresentation(true, true)
-                + "1 CC has been subtracted from your strat pool due to use of " + ssruu + "Logic Machina (Mirveda  Agent). You can add it back if you didn't agree to the agent.";
+                + "1 CC has been subtracted from your strat pool due to use of " + ssruuClever + "Logic Machina, the Mirveda" + ssruuSlash + " agent. You may add it back if you didn't agree to the agent.";
             String message = p2.getRepresentation(true, true)
-                + " Use buttons to get a tech of a color which matches one of the unit upgrades pre-reqs";
+                + " Use buttons to get a tech of a color which matches one of the unit upgrades prerequisites";
             MessageHelper.sendMessageToChannel(channel, message0);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if ("ghotiagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Becece (Ghoti Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Becece, the Ghoti" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1043,19 +1058,19 @@ public class ButtonHelperAgents {
         }
 
         if ("arborecagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Letani Ospha (Arborec Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Letani Ospha, the Arborec" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("arborecagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
             MessageChannel channel = ButtonHelper.getCorrectChannel(p2, game);
-            String message = "Use buttons to select which tile to use " + ssruu + "Letani Ospha (Arborec Agent) in";
+            String message = "Use buttons to select which tile to use " + ssruuClever + "Letani Ospha, the Arborec" + ssruuSlash + " agent, in";
             List<Button> buttons = getTilesToArboAgent(p2, game, event);
             MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentation(true, true) + message, buttons);
         }
         if ("kolumeagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Disciple Fran (Kolume Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Disciple Fran, the Kolume" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("kolumeagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1069,11 +1084,11 @@ public class ButtonHelperAgents {
             redistributeButton.add(deleButton);
             MessageHelper.sendMessageToChannelWithButtons(channel,
                 p2.getRepresentation(true, true)
-                    + " use buttons to redistribute 1 CC (the bot allows more but " + ssruu + "Disciple Fran (Kolume Agent) is restricted to 1)",
+                    + " use buttons to redistribute 1 CC (the bot allows more but " + ssruuClever + "Disciple Fran, the Kolume" + ssruuSlash + " agent, is restricted to 1)",
                 redistributeButton);
         }
         if ("axisagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruu + "Shipmonger Zsknck (Axis Agent)";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Shipmonger Zsknck, the Axis" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
             String faction = rest.replace("axisagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -1168,7 +1183,7 @@ public class ButtonHelperAgents {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.danger("removePreset_" + messageID, "Remove The Preset"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentation() + " you can use this button to undo the preset. Ignore it otherwise",
+            player.getRepresentation() + " you may use this button to undo the preset. Ignore it otherwise.",
             buttons);
     }
 
@@ -1188,7 +1203,8 @@ public class ButtonHelperAgents {
                     List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, game, true, event);
                     MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(newActivePlayer, game),
                         newActivePlayer.getRepresentation(true, true)
-                            + " you can take 1 action now due to " + (edyn.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Allant (Edyn Agent)",
+                            + " you may take 1 action now due to " + (edyn.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                            + "Allant, the Edyn" + (edyn.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
                         buttons);
                     game.updateActivePlayer(newActivePlayer);
                     return true;
@@ -1251,14 +1267,14 @@ public class ButtonHelperAgents {
                     && game.getPhaseOfGame().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Planet has been refreshed because of Florzen Commander");
+                        "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                     ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
                     game.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Added 1 infantry to planet because of Lanefir Commander");
+                        "Added 1 infantry to planet because of Master Halbert, the Lanefir Commander.");
                 }
                 if (player.hasTech("dslaner")) {
                     player.setAtsCount(player.getAtsCount() + 1);
@@ -1291,14 +1307,14 @@ public class ButtonHelperAgents {
                     && game.getPhaseOfGame().contains("agenda")) {
                     new PlanetRefresh().doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Planet has been refreshed because of Florzen Commander");
+                        "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
                     ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
                     game.getTileFromPlanet(planetName).getUnitHolders().get(planetName).addUnit(infKey, 1);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Added 1 infantry to planet because of Lanefir Commander");
+                        "Added 1 infantry to planet because of Master Halbert, the Lanefir Commander.");
                 }
                 if (player.hasTech("dslaner")) {
                     player.setAtsCount(player.getAtsCount() + 1);
@@ -1435,7 +1451,7 @@ public class ButtonHelperAgents {
         new PlanetRefresh().doAction(p2, planetName, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " readied " + Helper.getPlanetRepresentation(planetName, game)
-                + " with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw (Olradin Agent)");
+                + " with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Baggil Wildpaw, the Olradin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         event.getMessage().delete();
 
     }
@@ -1508,7 +1524,8 @@ public class ButtonHelperAgents {
         PlanetExhaustAbility.doAction(event, player, planet, game, false);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " chose to use " + Helper.getPlanetRepresentation(planet, game)
-                + " ability. This did not exhaust the ability since it was done with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Cordo Haved (Free Systems Agent).");
+                + " ability. This did not exhaust the ability since it was done with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Cordo Haved , the Free Systems" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         event.getMessage().delete().queue();
     }
 
@@ -1519,7 +1536,8 @@ public class ButtonHelperAgents {
         RemoveCC.removeCC(event, player.getColor(), origTile, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             ButtonHelper.getIdent(player) + " removed 1 CC from "
-                + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)");
+                + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"
+                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : getAdjacentTilesWithStructuresInThemAndNoCC(player, game, origTile)) {
             buttons.add(Button.success("cheiranAgentStep3_" + tile.getPosition(),
@@ -1541,7 +1559,8 @@ public class ButtonHelperAgents {
         AddCC.addCC(event, player.getColor(), origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             ButtonHelper.getIdent(player) + " placed 1 CC in "
-                + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras (Cheiran Agent)");
+                + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"
+                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         event.getMessage().delete().queue();
     }
 
@@ -1563,14 +1582,15 @@ public class ButtonHelperAgents {
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, game);
         resolveArtunoCheck(player, game, 1);
-        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent) to gain 1TG (" + cTG + "->" + fTG + "). ";
+        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to gain 1TG (" + cTG + "->" + fTG + "). ";
         player.addSpentThing(msg);
         event.getMessage().delete().queue();
     }
 
     public static void ghotiAgentForProduction(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
-        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece (Ghoti Agent) to gain the ability to produce 2 more units. ";
+        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti"
+            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to gain the ability to produce 2 more units. ";
         player.addSpentThing(msg);
         event.getMessage().delete().queue();
     }
@@ -1598,7 +1618,8 @@ public class ButtonHelperAgents {
 
         String msg = ButtonHelper.getIdentOrColor(player, game) + " max influence planet had " + maxInfluence
             + " influence, so they gained " + commGain + " comms (" + initComm + "->"
-            + player.getCommodities() + ") due to " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yudri Sukhov (Vaden Agent)";
+            + player.getCommodities() + ") due to " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Yudri Sukhov, the Vaden" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && vaden != player) {
@@ -1622,7 +1643,8 @@ public class ButtonHelperAgents {
         bentor.addFragment(frag);
         ExploreModel cardInfo = Mapper.getExplore(frag);
         String msg = ButtonHelper.getIdentOrColor(player, game) + " lost a " + cardInfo.getName() + " to "
-            + ButtonHelper.getIdentOrColor(bentor, game) + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Queen Lucreia (Kortali Agent)";
+            + ButtonHelper.getIdentOrColor(bentor, game) + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Queen Lucreia, the Kortali" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && bentor != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
@@ -1655,7 +1677,8 @@ public class ButtonHelperAgents {
             }
         }
         String msg = ButtonHelper.getIdentOrColor(player, game)
-            + " can produce a unit in their HS or in a system with a tech skip planet due to " + (zealots.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh (Zealots Agent)";
+            + " may produce a unit in their HS or in a system with a tech skip planet due to " + (zealots.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Priestess Tuh, the Zealots" + (zealots.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         if (game.isFowMode() && zealots != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(zealots, game), msg);
@@ -1684,8 +1707,8 @@ public class ButtonHelperAgents {
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 destroyer", game);
         String msg = ButtonHelper.getIdentOrColor(player, game) + " place 1 destroyer in "
             + tile.getRepresentationForButtons(game, player)
-            + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Sparrow (Nokar Agent). "
-            + "A transaction can be done with transaction buttons.";
+            + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Sal Sparrow, the Nokar" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent. "
+            + "A transaction may be done with transaction buttons.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && bentor != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
@@ -1715,7 +1738,7 @@ public class ButtonHelperAgents {
         new AddUnits().unitParsing(event, player.getColor(), tile, "1 mech", game);
         String msg = ButtonHelper.getIdentOrColor(player, game) + " replace 1 infantry with 1 mech in "
             + tile.getRepresentationForButtons(game, player)
-            + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Zelian A (Zelian Agent).";
+            + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Zelian A, the Zelian" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && bentor != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(bentor, game), msg);
@@ -1739,7 +1762,8 @@ public class ButtonHelperAgents {
                 "Could not resolve target player, please resolve manually.");
             return;
         }
-        String msg = ButtonHelper.getIdentOrColor(player, game) + " replenished comms due to " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Tox (Kyro Agent).";
+        String msg = ButtonHelper.getIdentOrColor(player, game) + " replenished commodities due to " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Tox, the Kyro" + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         Player p2 = player;
         p2.setCommodities(p2.getCommoditiesTotal());
         ButtonHelper.resolveMinisterOfCommerceCheck(game, p2, event);
@@ -1810,7 +1834,8 @@ public class ButtonHelperAgents {
         String buttonID) {
         String planet = buttonID.split("_")[1];
         String msg = ButtonHelper.getIdent(player) + " put 1 space dock on "
-            + Helper.getPlanetRepresentation(planet, game) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "George Nobin (Celdauri Agent)";
+            + Helper.getPlanetRepresentation(planet, game) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "George Nobin, the Celdauri" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "1 sd " + planet,
             game);
         if (player.getCommodities() > 1) {
@@ -1858,7 +1883,9 @@ public class ButtonHelperAgents {
         ButtonHelperStats.gainTGs(event, game, player, tgGain, true);
 
         String msg = ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG" + (tgGain == 1 ? "" : "s") + " (" + oldTg + "->"
-            + player.getTg() + ") and " + commGain + " commodit" + (commGain == 1 ? "y" : "ies") + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "C.O.O. Mgur (Bentor Agent)";
+            + player.getTg() + ") and " + commGain + " commodit" + (commGain == 1 ? "y" : "ies") + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "C.O.O. Mgur, the Bentor" + (bentor.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
+
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && bentor != player) {
             msg = player.getRepresentation() + " has finished resolving.";
@@ -1955,7 +1982,7 @@ public class ButtonHelperAgents {
         if (player == game.getActivePlayer()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getFactionEmoji()
-                    + " can spend 4TGs to RESEARCH a unit upgrade of one of their units in the system",
+                    + " may spend 4TGs to RESEARCH a unit upgrade of one of their units in the system.",
                 List.of(Buttons.GET_A_TECH));
         }
         event.getMessage().delete().queue();
@@ -1986,7 +2013,7 @@ public class ButtonHelperAgents {
             String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
             buttons.add(Button
                 .success("exhaustAgent_sardakkagent_" + game.getActiveSystem() + "_" + planetId,
-                    "Use Sardakk Agent on " + planetRepresentation)
+                    "Use N'orr Agent on " + planetRepresentation)
                 .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
             //}
         }
@@ -2009,7 +2036,7 @@ public class ButtonHelperAgents {
                 String planetRepresentation = Helper.getPlanetRepresentation(planetId, game);
                 buttons.add(Button
                     .success("exhaustAgent_nomadagentmercer_" + game.getActiveSystem() + "_" + planetId,
-                        "Use Mercer (Nomad Agent) on " + planetRepresentation)
+                        "Use Field Marshal Mercer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on " + planetRepresentation)
                     .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
             }
         }
@@ -2113,13 +2140,15 @@ public class ButtonHelperAgents {
         String message;
         if ("cruiser".equalsIgnoreCase(buttonID.split("_")[1])) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                ButtonHelper.getIdent(player) + " Chose to place 1 cruiser with their ships from " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Shipmonger Zsknck (Axis Agent)");
+                ButtonHelper.getIdent(player) + " Chose to place 1 cruiser with their ships from " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Shipmonger Zsknck, the Axis" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             buttons.addAll(
                 Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
             message = " Use buttons to put 1 cruiser with your ships";
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                ButtonHelper.getIdent(player) + " Chose to place 1 destroyer with their ships from " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Shipmonger Zsknck (Axis Agent)");
+                ButtonHelper.getIdent(player) + " Chose to place 1 destroyer with their ships from " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Shipmonger Zsknck, the Axis" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             buttons.addAll(
                 Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
             message = " Use buttons to put 1 destroyer with your ships";
@@ -2133,12 +2162,12 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust Artuno (Nomad Agent) With " + tg + " TG" + (tg == 1 ? "" : "s")));
+                "Exhaust Artuno the Betrayer With " + tg + " TG" + (tg == 1 ? "" : "s")));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
                     + " you have the opportunity to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Artuno the Betrayer (Nomad Agent) and place " + tg + " TG" + (tg == 1 ? "" : "s") + " on her.",
+                    + "Artuno the Betrayer the Betrayer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, and place " + tg + " TG" + (tg == 1 ? "" : "s") + " on her.",
                 buttons);
         }
     }
@@ -2147,7 +2176,9 @@ public class ButtonHelperAgents {
         String ident, String trueIdentity) {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            trueIdentity + " Use buttons to select faction to give " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Brother Milor (Yin Agent) to.", buttons);
+            trueIdentity + " Use buttons to select faction to give " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.",
+            buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
         if (exhaustedMessage.length() < 1) {
             exhaustedMessage = "Combat";
@@ -2192,7 +2223,8 @@ public class ButtonHelperAgents {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             ButtonHelper.getIdent(player) + " removed 1 infantry from "
-                + ButtonHelper.getUnitHolderRep(unitHolder, tile, game) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Doctor Sucaban (Jol-Nar Agent)");
+                + ButtonHelper.getUnitHolderRep(unitHolder, tile, game) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Doctor Sucaban, the Jol-Nar" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + unitHName, game);
         if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
             ButtonHelper.deleteTheOneButton(event);

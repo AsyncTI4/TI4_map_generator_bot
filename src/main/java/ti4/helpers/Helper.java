@@ -379,7 +379,7 @@ public class Helper {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + ". Drew a second SO due to plausible deniability";
+                    message = message + " Drew a second SO due to Plausible Deniability";
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
@@ -393,7 +393,7 @@ public class Helper {
                 && game.getStoredValue(key2).length() > 2) {
                 if (!game.isFowMode()) {
                     message = player.getRepresentation(true, true)
-                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows";
+                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (!game.isFowMode()) {
@@ -812,7 +812,7 @@ public class Helper {
         String scImagePath = scModel.getImageFilePath();
         if (scImagePath == null)
             scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png",
-                "Could not find SC image!");
+                "Could not find strategy card image!");
 
         return new File(scImagePath);
     }
@@ -905,7 +905,7 @@ public class Helper {
                             switch (furtherDetail) {
                                 case "generic" -> {
                                     for (int x = 0; x < amountToTransact; x++) {
-                                        String buttonID = "transact_ACs_" + sender.getFaction();
+                                        String buttonID = "transact_ACs_" + receiver.getFaction();
                                         ButtonHelper.resolveSpecificTransButtonsOld(game, sender, buttonID, event);
                                     }
                                 }
@@ -917,7 +917,7 @@ public class Helper {
                         case "PNs" -> {
                             switch (furtherDetail) {
                                 case "generic" -> {
-                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, p2);
+                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, receiver);
                                     String message = sender.getRepresentation(true, true)
                                         + "Please select the PN you would like to send";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
@@ -1236,7 +1236,7 @@ public class Helper {
                 continue;
             Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
-            String label = " ";
+            String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
                 label = "[has " + game.getScTradeGoods().get(sc) + " TG" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
             }
@@ -1249,7 +1249,7 @@ public class Helper {
                 button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label)
                     .withEmoji(scEmoji);
             } else {
-                button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, "" + sc + label);
+                button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, "" + sc + " " + label);
             }
             scButtons.add(button);
         }
@@ -2211,7 +2211,7 @@ public class Helper {
                 unitButtons2.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
                     .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you can use this to Yin Spin", unitButtons2);
+                    player.getRepresentation(true, true) + " you may use this to Yin Spin.", unitButtons2);
             } else {
                 unitButtons.add(Button.secondary("startYinSpinner", "Yin Spin 2 Duders")
                     .withEmoji(Emoji.fromFormatted(Emojis.Yin)));

@@ -47,7 +47,7 @@ public class Setup extends PlayerSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position (Ghosts choose position of gate)").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position (Creuss choose position of gate)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SPEAKER, "True to set player as speaker."));
@@ -253,7 +253,7 @@ public class Setup extends PlayerSubcommandData {
                 ButtonHelperFactionSpecific.offerArgentStartingTech(player, game);
             } else {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you can use the button to get your starting tech",
+                    player.getRepresentation(true, true) + " you may use the button to get your starting tech.",
                     List.of(Buttons.GET_A_TECH));
             }
         }
@@ -300,7 +300,7 @@ public class Setup extends PlayerSubcommandData {
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " you can peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded");
+                    + " you may peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded.");
         }
         CardsInfo.sendVariousAdditionalButtons(game, player);
 
