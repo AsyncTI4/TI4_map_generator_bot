@@ -440,7 +440,8 @@ public class GameStats extends StatisticsSubcommandData {
         for (Game game : mapList.values()) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
-                double turnCount = player.getTurnCount() - game.getDiscardAgendas().size() - game.getRound();
+                double turnCount = player.getNumberTurns() - game.getDiscardAgendas().size() - game.getRound();
+                System.out.println(player.getNumberTurns());
                 if (turnCount < 10 || turnCount > 200) {
                     continue;
                 }
@@ -463,7 +464,7 @@ public class GameStats extends StatisticsSubcommandData {
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
             .forEach(entry -> sb.append("`")
                 .append(StringUtils.leftPad(String.format("%.2f", (factionTurnCount.get(entry.getKey().getAlias()) / entry.getValue())), 4))
-                .append(" turns from an average taken from " + entry.getValue() + "games`")
+                .append(" turns from " + entry.getValue() + " games`")
                 .append(entry.getKey().getFactionEmoji()).append(" ")
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
                 .append("\n"));
