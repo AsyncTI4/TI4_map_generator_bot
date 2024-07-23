@@ -94,7 +94,7 @@
     "name": "Bounty",
     "phase": "Action",
     "window": "After a player destroys 1 or more of another player's units that have a combined cost of 4 or more",
-    "text": "The player that destroyed those units gains 4 trade goods. [Note: This can be played after a round of combat, as assigning hits/destruction happens simultaneously.]",
+    "text": "The player that destroyed those units gains 3 trade goods. [Note: This can be played after a round of combat, as assigning hits/destruction happens simultaneously.]",
     "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship towards Arcturus.",
     "source": "action_deck_2"
   },
@@ -121,7 +121,7 @@
     "name": "Chain Reaction",
     "phase": "Action",
     "window": "After you destroy another player's non-fighter ship in the active system",
-    "text": "Produce 1 hit against that player's ships in that system. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
+    "text": "Produce 1 hit against that player's ships in that system. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your future die rolls during this ability and repeat its effect.",
     "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
     "source": "action_deck_2"
   },
@@ -247,7 +247,7 @@
     "name": "Diverse Strategies",
     "phase": "Action",
     "window": "When you would perform the primary ability of your strategy card",
-    "text": "Perform the secondary ability of that strategy card and 2 others instead; do not spend or place command tokens to resolve these abilities.",
+    "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place command tokens to resolve these abilities.",
     "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
     "source": "action_deck_2"
   },
@@ -634,7 +634,7 @@
     "name": "Reinforcements",
     "phase": "Action",
     "window": "After 1 of your non-fighter ships is destroyed during a space combat",
-    "text": "Place 3 fighters from your reinforcements in the active system.",
+    "text": "Place 2 fighters from your reinforcements in the active system.",
     "flavorText": "\"We're too late!\" the rookie pilot cried as a war sun tore through their fleets. \"No, sonny, this fight has just begun,\" Jace bellowed. \"4th Legion, with me! We're sending that hunk of scrap back to the void.\"",
     "source": "action_deck_2"
   },
