@@ -462,8 +462,8 @@ public class GameStats extends StatisticsSubcommandData {
             .sorted(Map.Entry.comparingByValue())
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
             .forEach(entry -> sb.append("`")
-                .append(StringUtils.leftPad(String.format("%.2f", (factionTurnCount.get(entry.getKey()) / entry.getValue())), 4))
-                .append("x` ")
+                .append(StringUtils.leftPad(String.format("%.2f", (factionTurnCount.get(entry.getKey().getAlias()) / entry.getValue())), 4))
+                .append(" turns from an average taken from " + entry.getValue() + "games`")
                 .append(entry.getKey().getFactionEmoji()).append(" ")
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
                 .append("\n"));
