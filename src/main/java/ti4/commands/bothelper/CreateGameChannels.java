@@ -1,5 +1,6 @@
 package ti4.commands.bothelper;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -30,16 +31,21 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
+import ti4.ResourceHelper;
 import ti4.commands.game.GameCreate;
+import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Helper;
+import ti4.helpers.ImageHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -246,6 +252,39 @@ public class CreateGameChannels extends BothelperSubcommandData {
             newGame.setBotMapUpdatesThreadID(botThread.getId());
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(newGame.getMainGameChannel(), "You will need to make your own bot-map-updates thread. Ping bothelper if you don't know how");
+        }
+        List<Player> newPlayers = new ArrayList<>();
+        ThreadChannel introThread = null;
+        for (Player player : newGame.getPlayers().values()) {
+            if (ButtonHelper.isPlayerNew(newGame, player)) {
+                newPlayers.add(player);
+            }
+        }
+        if (!newPlayers.isEmpty()) {
+            introThread = chatChannel.createThreadChannel("Info for new players")
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+                .complete();
+            String msg = "";
+            for (Player p : newPlayers) {
+                msg = msg + p.getRepresentation();
+            }
+            msg = msg + "\nHullo there and welcome to TI4 async! Below are some non-obvious things you should be aware of as you embark upon your first game:\n\n";
+
+            msg = msg + "## 1. Viewing The Map. \n As the game progresses, the bot will share images of the map in " + botThread.getJumpUrl()
+                + ". These images are snapshots of the map at the moment they were created. Below each map, you'll find a \"Website View\" button that takes you to a site where you can see the images in higher resolution than what Discord allows (you can also open the images in your browser for higher resolution). The Website View always shows the most recently generated map, the same one that would be at the bottom of the bot-map-thread. Please note that not every change in the game will result in a new map being created, as we want to save bot resources. This means that sometimes the latest map may not reflect the most current game state. To ensure you're viewing the most up-to-date image, you can refresh the map at any time by clicking the \"Show Game\" button located beneath each generated map. This will generate a new map in the thread and update Website View";
+
+            msg = msg
+                + "\n## 2. Finding Hidden Buttons\n To save space, some buttons are not immediately visible and require you to click on others to access them. Many actions, such as those related to agents, heroes, or miscellaneous tasks, can be found under the \"Component Action\" button that appears at the start of your turn. Some agents or abilities with unique timing can be accessed through a button in your cards info thread. Additionally, you can find a lot of information about abilities and the game state by clicking the \"Player Info\" button located beneath each generated map in the [bot-map-thread link here]. If your cards info thread disappears due to thread limitations, you can bring it back by clicking the \"Cards Info\" button next to the \"Player Info\" button.";
+            msg = msg
+                + "\n## 3. The UNDO Button. \nEvery time you press a button, it creates a new save point for the game. If you make a mistake or misclick, you can use the \"UNDO\" button to revert the game to the last save point. However, this button only works if you were the last person to press a button, to prevent undoing someone else’s actions by mistake. If you want to undo an action but multiple players have pressed buttons at the same time, we recommend pinging Bothelper for help or asking an experienced player to use /slash commands to resolve the issue without undoing. For more information on /slash commands, you can refer to this guide: https://docs.google.com/document/d/1yrVH0lEzYj1MbXNzQIK3thgBWAVIZmErluPHLot-OQg/edit#heading=h.ycxk8j7mf3c";
+            msg = msg
+                + "\n## 4. Whispers. \nThe bot has a whisper function that allows you to send private messages. To use it, start your message with the keyphrase \"to\" followed by the color or faction of the player you want to contact. For example, if you want to message the Sol player who is blue, you would type \"tosol Hello there\" or \"toblue Hello there\" (note that the quotes should not be included, and the keyphrase is not case sensitive, so ToSol, TOSOL, toSol, or Tosol all work). Make sure to send these messages in your cards info thread, not in the public channel, as the bot will provide a summary of your message afterward. Keep in mind that not all games allow whispers, so check with your group to see if they are permitted.";
+            msg = msg
+                + "\n## 5.Changing Colors \nPlayers often setup with similar colors, which can be confusing when their units are close together. Fortunately, you can easily change your color at any time using the /player change color command. A picture of available colors is provided below. Additionally, you can give your units patterns to differentiate them from other players' units by using the /player change_unit_decal command. If you encounter any issues with these commands, experienced players or Bothelper can assist you by giving advice or doing the commands for you";
+            BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
+            MessageHelper.sendMessageToChannel(introThread, msg);
+            FileUpload fileUpload = MapGenerator.uploadToDiscord(colorsImage, 1.0f, "colors");
+            MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
         }
 
         // INTRODUCTION TO TABLETALK CHANNEL

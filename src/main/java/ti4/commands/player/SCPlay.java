@@ -137,7 +137,7 @@ public class SCPlay extends PlayerSubcommandData {
                     String num2 = sc + "";
                     num2 = num2.substring(num2.length() - 1, num2.length());
                     if (num2.equalsIgnoreCase(num) || num.equalsIgnoreCase("0") || num2.equalsIgnoreCase("0")) {
-                        gamePing = p2.getRepresentation() + " ";
+                        gamePing = gamePing + p2.getRepresentation() + " ";
                         playersToFollow.add(p2);
                     }
                 }
