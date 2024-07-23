@@ -2311,7 +2311,7 @@ public class Game extends GameProperties {
             ExploreModel card = Mapper.getExplore(id);
             if (card != null) {
                 String type = card.getType();
-                if (!reqType.equalsIgnoreCase(type)) {
+                if (!reqType.equalsIgnoreCase(type) || id.contains("starchart") || id.contains("mirage")) {
                     deck.remove(id);
                 }
             }
