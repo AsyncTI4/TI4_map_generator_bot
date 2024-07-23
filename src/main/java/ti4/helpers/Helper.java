@@ -422,7 +422,7 @@ public class Helper {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     int poIndex = Integer
                         .parseInt(game.getStoredValue(player.getFaction() + "queuedPOScore"));
-                    ScorePublic.scorePO(event, game.getMainGameChannel(), game, player, poIndex);
+                    ScorePublic.scorePO(event, player.getCorrectChannel(), game, player, poIndex);
                     game.setStoredValue(key2,
                         game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3,
@@ -434,7 +434,7 @@ public class Helper {
                 if (game.getStoredValue(key2b).contains(player.getFaction() + "*")) {
                     int soIndex = Integer
                         .parseInt(game.getStoredValue(player.getFaction() + "queuedSOScore"));
-                    ScoreSO.scoreSO(event, game, player, soIndex, game.getMainGameChannel());
+                    ScoreSO.scoreSO(event, game, player, soIndex, player.getCorrectChannel());
                     game.setStoredValue(key2b,
                         game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3b,
