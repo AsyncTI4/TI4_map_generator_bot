@@ -201,7 +201,7 @@ public class GenerateTile {
 
     @NotNull
     public static String getTimeStamp() {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss.SSS");
         return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
