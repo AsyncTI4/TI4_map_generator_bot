@@ -905,7 +905,7 @@ public class Helper {
                             switch (furtherDetail) {
                                 case "generic" -> {
                                     for (int x = 0; x < amountToTransact; x++) {
-                                        String buttonID = "transact_ACs_" + sender.getFaction();
+                                        String buttonID = "transact_ACs_" + receiver.getFaction();
                                         ButtonHelper.resolveSpecificTransButtonsOld(game, sender, buttonID, event);
                                     }
                                 }
@@ -917,7 +917,7 @@ public class Helper {
                         case "PNs" -> {
                             switch (furtherDetail) {
                                 case "generic" -> {
-                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, p2);
+                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, receiver);
                                     String message = sender.getRepresentation(true, true)
                                         + "Please select the PN you would like to send";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
