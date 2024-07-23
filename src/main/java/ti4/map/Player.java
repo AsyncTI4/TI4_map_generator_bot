@@ -136,6 +136,7 @@ public class Player {
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> spentThingsThisWindow = new ArrayList<>();
+    private List<String> bombardUnits = new ArrayList<>();
     private List<String> teamMateIDs = new ArrayList<>();
     private Map<String, Integer> producedUnits = new HashMap<>();
     @Getter
@@ -262,6 +263,10 @@ public class Player {
         spentThingsThisWindow = new ArrayList<>();
     }
 
+    public void resetBombardUnits() {
+        bombardUnits = new ArrayList<>();
+    }
+
     public Map<String, Integer> getCurrentProducedUnits() {
         return producedUnits;
     }
@@ -270,12 +275,24 @@ public class Player {
         return spentThingsThisWindow;
     }
 
+    public List<String> getBombardUnits() {
+        return bombardUnits;
+    }
+
     public void addSpentThing(String thing) {
         spentThingsThisWindow.add(thing);
     }
 
+    public void addBombardUnit(String thing) {
+        bombardUnits.add(thing);
+    }
+
     public void removeSpentThing(String thing) {
         spentThingsThisWindow.remove(thing);
+    }
+
+    public void removeBombardUnit(String thing) {
+        bombardUnits.remove(thing);
     }
 
     public int getSpentTgsThisWindow() {
@@ -351,6 +368,32 @@ public class Player {
 
     public void setSpentThings(List<String> things) {
         spentThingsThisWindow = things;
+    }
+
+    public void setBombardUnits(List<String> things) {
+        bombardUnits = things;
+    }
+
+    public void fillUpBombardUnits(Tile tile) {
+        for (UnitHolder uH : tile.getUnitHolders().values()) {
+            Map<UnitKey, Integer> units = uH.getUnits();
+            for (UnitKey unit : units.keySet()) {
+                if (unitBelongsToPlayer(unit) && getUnitFromUnitKey(unit).getBombardDieCount() > 0) {
+                    if (ButtonHelper.isLawInPlay(getGame(), "articles_war") && getUnitFromUnitKey(unit).getBaseType().equalsIgnoreCase("mech")) {
+                        continue;
+                    }
+                    for (int x = 0; x < units.get(unit); x++) {
+                        addBombardUnit(getUnitFromUnitKey(unit).getAsyncId());
+                    }
+                }
+            }
+        }
+        if (hasTech("aida") || hasTech("absol_aida")) {
+            addBombardUnit("aida");
+        }
+        if (getGame().playerHasLeaderUnlockedOrAlliance(this, "argentcommander")) {
+            addBombardUnit("argentcommander");
+        }
     }
 
     public void setProducedUnit(String unit, int count) {
@@ -2483,6 +2526,12 @@ public class Player {
     public void updateTurnStats(long turnTime) {
         numberOfTurns++;
         totalTimeSpent += turnTime;
+    }
+
+    public void updateTurnStatsWithAverage() {
+        long averagetime = (totalTimeSpent / numberOfTurns);
+        numberOfTurns++;
+        totalTimeSpent += averagetime;
     }
 
     public int getNumberTurns() {
