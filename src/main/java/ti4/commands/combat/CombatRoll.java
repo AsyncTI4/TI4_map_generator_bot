@@ -393,10 +393,15 @@ public class CombatRoll extends CombatSubcommandData {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
                     msg2 = p2.getRepresentation() + msg2;
                     someone = true;
+                    if (game.isFowMode()) {
+                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2, buttons);
+                    }
                 }
             }
             if (someone) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                if (!game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                }
             }
 
         }

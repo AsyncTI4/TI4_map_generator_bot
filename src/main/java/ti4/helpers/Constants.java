@@ -544,6 +544,7 @@ public class Constants {
     public static final String PLANET6 = "planet6";
     public static final String TECH = "tech";
     public static final String SPENT_THINGS = "spent_things";
+    public static final String BOMBARD_UNITS = "bombard_units";
     public static final String TRANSACTION_ITEMS = "transaction_items";
     public static final String TEAMMATE_IDS = "teammate_ids";
     public static final String TECH_EXHAUSTED = "tech_exhausted";
