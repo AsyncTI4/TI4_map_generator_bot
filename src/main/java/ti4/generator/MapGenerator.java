@@ -4876,6 +4876,9 @@ public class MapGenerator {
                 }
 
                 unitImage = ImageHelper.read(unitPath);
+                if (bulkUnitCount != null && bulkUnitCount > 9) {
+                    unitImage = ImageHelper.readScaled(unitPath, 1.2f);
+                }
             } catch (Exception e) {
                 BotLogger.log("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
                 continue;
@@ -4889,6 +4892,7 @@ public class MapGenerator {
 
             if (bulkUnitCount != null && bulkUnitCount > 0) {
                 unitCount = 1;
+
             }
 
             BufferedImage spoopy = null;
@@ -4970,16 +4974,6 @@ public class MapGenerator {
                     tileGraphics.drawImage(spoopy, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 }
 
-                if (bulkUnitCount != null) {
-                    tileGraphics.setFont(Storage.getFont24());
-                    tileGraphics.setColor(groupUnitColor);
-                    int scaledNumberPositionX = numberPositionPoint.x;
-                    int scaledNumberPositionY = numberPositionPoint.y;
-                    tileGraphics.drawString(Integer.toString(bulkUnitCount),
-                        TILE_PADDING + imageX + scaledNumberPositionX,
-                        TILE_PADDING + imageY + scaledNumberPositionY);
-                }
-
                 // UNIT TAGS
                 if (i == 0 && !(UnitType.Infantry.equals(unitKey.getUnitType())) && game.isShowUnitTags()) { // DRAW TAG
                     UnitModel unitModel = game.getUnitFromUnitKey(unitKey);
@@ -5002,6 +4996,21 @@ public class MapGenerator {
                                 TILE_PADDING + imageY + plaquetteOffset.y + 17, 40, 13),
                             Storage.getFont13());
                     }
+                }
+                if (bulkUnitCount != null) {
+                    tileGraphics.setFont(Storage.getFont24());
+                    tileGraphics.setColor(groupUnitColor);
+
+                    int scaledNumberPositionX = numberPositionPoint.x;
+                    int scaledNumberPositionY = numberPositionPoint.y;
+                    if (bulkUnitCount > 9) {
+                        tileGraphics.setFont(Storage.getFont28());
+                        scaledNumberPositionX = scaledNumberPositionX + 5;
+                        scaledNumberPositionY = scaledNumberPositionY + 5;
+                    }
+                    tileGraphics.drawString(Integer.toString(bulkUnitCount),
+                        TILE_PADDING + imageX + scaledNumberPositionX,
+                        TILE_PADDING + imageY + scaledNumberPositionY);
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
