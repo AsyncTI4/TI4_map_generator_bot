@@ -432,12 +432,12 @@ public class GameStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
 
-    private static void showAverageTurnsInAGameByFaction(GenericInteractionCreateEvent event) {
+    private static void showAverageTurnsInAGameByFaction(SlashCommandInteractionEvent event) {
         Map<String, Double> factionCount = new HashMap<>();
         Map<String, Double> factionTurnCount = new HashMap<>();
 
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
+        List<Game> mapList = GameStatisticFilterer.getFilteredGames(event);
+        for (Game game : mapList) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
                 double turnCount = player.getNumberTurns() - game.getDiscardAgendas().size() - game.getRound();
