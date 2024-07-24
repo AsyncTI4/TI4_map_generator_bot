@@ -301,8 +301,8 @@ public class ButtonHelper {
 
     public static boolean canTheseTwoTransact(Game game, Player player, Player player2) {
         return player == player2 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
-            || player.hasAbility("guild_ships") || player.getPromissoryNotes().containsKey("convoys")
-            || player2.getPromissoryNotes().containsKey("convoys") || player2.hasAbility("guild_ships")
+            || player.hasAbility("guild_ships") || player.getPromissoryNotesInPlayArea().contains("convoys")
+            || player2.getPromissoryNotesInPlayArea().contains("convoys") || player2.hasAbility("guild_ships")
             || player2.getNeighbouringPlayers().contains(player)
             || player.getNeighbouringPlayers().contains(player2);
     }

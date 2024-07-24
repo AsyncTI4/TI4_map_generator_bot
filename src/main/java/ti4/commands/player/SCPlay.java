@@ -243,7 +243,7 @@ public class SCPlay extends PlayerSubcommandData {
                                         neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
                                     }
                                 }
-                                if (!player.getPromissoryNotes().containsKey("convoys") && !player.hasAbility("guild_ships")) {
+                                if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
                                     MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg);
                                     MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2);
                                 }
@@ -336,7 +336,8 @@ public class SCPlay extends PlayerSubcommandData {
                     empNMahButtons.add(0, mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.", empNMahButtons);
+                            + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
+                        empNMahButtons);
                 }
             }
         }
