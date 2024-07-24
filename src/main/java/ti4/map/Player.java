@@ -2529,8 +2529,8 @@ public class Player {
     }
 
     public void updateTurnStatsWithAverage() {
-        long averagetime = (totalTimeSpent / numberOfTurns);
         numberOfTurns++;
+        long averagetime = (totalTimeSpent / numberOfTurns);
         totalTimeSpent += averagetime;
     }
 
