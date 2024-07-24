@@ -1468,7 +1468,7 @@ public class AgendaHelper {
 
             while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor()))
                 || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
-                String skippedMessage = realIdentity2
+                String skippedMessage = nextInLine.getRepresentation(true, false)
                     + "You are being skipped because you cannot vote";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity2
@@ -1941,7 +1941,7 @@ public class AgendaHelper {
             while ((voteInfo[0] < 1
                 || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()))
                 && counter < game.getRealPlayers().size()) {
-                String skippedMessage = realIdentity + "You are being skipped because the bot thinks you can't vote.";
+                String skippedMessage = nextInLine.getRepresentation(true, false) + "You are being skipped because the bot thinks you can't vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity
                         + "You are being skipped because you told the bot you wanted to preset an abstain";

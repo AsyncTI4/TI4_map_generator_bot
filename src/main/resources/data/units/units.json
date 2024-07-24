@@ -378,7 +378,7 @@
         "source": "base",
         "faction": "L1Z1X",
         "moveValue": 1,
-        "capacityValue": 6,
+        "capacityValue": 5,
         "capacityUsed": 1,
         "cost": 8,
         "combatHitsOn": 5,
