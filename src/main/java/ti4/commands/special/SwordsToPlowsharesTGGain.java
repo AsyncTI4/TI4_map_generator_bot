@@ -81,11 +81,8 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
         if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
         }
-        MessageChannel channel = game.getMainGameChannel();
-        if (game.isFowMode()) {
-            channel = player.getPrivateChannel();
-        }
-        MessageHelper.sendMessageToChannel(channel, message.toString());
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
         ButtonHelperAbilities.pillageCheck(player, game);
 
