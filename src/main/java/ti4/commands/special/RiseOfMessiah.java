@@ -73,7 +73,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
         } else if (count > 5) {
             sb.append("\n> Total of ").append(count);
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
     }
 
     @Override
