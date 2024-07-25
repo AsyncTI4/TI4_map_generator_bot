@@ -3855,7 +3855,6 @@ public class Game extends GameProperties {
     public boolean hasHomebrew() {
         // needs to check for homebrew tiles still
         // Decks
-
         List<String> deckIDs = new ArrayList<>();
         deckIDs.add(getAcDeckID());
         deckIDs.add(getSoDeckID());
@@ -3917,8 +3916,8 @@ public class Game extends GameProperties {
             || Mapper.getLeaders().values().stream()
                 .filter(leader -> !leader.getSource().isPok())
                 .anyMatch(leader -> isLeaderInGame(leader.getID()))
-            || publicObjectives1.size() < 5 && getRound() >= 4
-            || publicObjectives2.size() < (getRound() - 4)
+            || (publicObjectives1!= null && publicObjectives1.size() < 5 && getRound() >= 4)
+            || (publicObjectives2!= null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()
                 .anyMatch(player -> player.getSecretVictoryPoints() > 3
                     && !player.getRelics().contains("obsidian"))
