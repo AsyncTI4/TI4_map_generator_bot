@@ -95,6 +95,9 @@ public final class GameStatisticFilterer {
             case "minor_factions" -> {
                 return game.isMinorFactionsMode();
             }
+            case "alliance" -> {
+                return game.isAllianceMode();
+            }
             default -> {
                 return false;
             }
