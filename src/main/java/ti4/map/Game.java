@@ -3853,6 +3853,41 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean hasHomebrew() {
+        return isExtraSecretMode()
+            || isHomebrew()
+            || isFowMode()
+            || isLightFogMode()
+            || isRedTapeMode()
+            || isDiscordantStarsMode()
+            || isFrankenGame()
+            || isMiltyModMode()
+            || isAbsolMode()
+            || isPromisesPromisesMode()
+            || isFlagshippingMode()
+            || isAllianceMode()
+            || isSpinMode()
+            || isHomebrewSCMode()
+            || isCommunityMode()
+            || !checkAllDecksAreOfficial()
+            || !checkAllTilesAreOfficial()
+            || Mapper.getFactions().stream()
+                .filter(faction -> !faction.getSource().isPok())
+                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
+            || Mapper.getLeaders().values().stream()
+                .filter(leader -> !leader.getSource().isPok())
+                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || (publicObjectives1!= null && publicObjectives1.size() < 5 && getRound() >= 4)
+            || (publicObjectives2!= null && publicObjectives2.size() < (getRound() - 4))
+            || getRealPlayers().stream()
+                .anyMatch(player -> player.getSecretVictoryPoints() > 3
+                    && !player.getRelics().contains("obsidian"))
+            || getPlayerCountForMap() < 3
+            || getRealAndEliminatedAndDummyPlayers().size() < 3
+            || getPlayerCountForMap() > 8
+            || getRealAndEliminatedAndDummyPlayers().size() > 8;
+    }
+
+    private boolean checkAllDecksAreOfficial() {
         // needs to check for homebrew tiles still
         // Decks
         List<String> deckIDs = new ArrayList<>();
@@ -3874,11 +3909,13 @@ public class Game extends GameProperties {
         StrategyCardSetModel scset = Mapper.getStrategyCardSets().get(getScSetID());
         if (scset == null || !scset.getSource().isOfficial()) {
             allDecksOfficial = false;
-
         }
+        return allDecksOfficial;
+    }
 
+    private boolean checkAllTilesAreOfficial() {
         // Tiles
-        boolean allTilesOfficial = getTileMap().values().stream().allMatch(tile -> {
+        return getTileMap().values().stream().allMatch(tile -> {
             if (tile == null || tile.getTileModel() == null) {
                 return true;
             }
@@ -3888,43 +3925,6 @@ public class Game extends GameProperties {
             }
             return tileSource != null && tileSource.isOfficial();
         });
-
-        if (!allDecksOfficial) {
-            System.out.println("here4");
-        }
-
-        return isExtraSecretMode()
-            || isHomebrew()
-            || isFowMode()
-            || isLightFogMode()
-            || isRedTapeMode()
-            || isDiscordantStarsMode()
-            || isFrankenGame()
-            || isMiltyModMode()
-            || isAbsolMode()
-            || isPromisesPromisesMode()
-            || isFlagshippingMode()
-            || isAllianceMode()
-            || isSpinMode()
-            || isHomebrewSCMode()
-            || isCommunityMode()
-            || !allDecksOfficial
-            || !allTilesOfficial
-            || Mapper.getFactions().stream()
-                .filter(faction -> !faction.getSource().isPok())
-                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
-            || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isPok())
-                .anyMatch(leader -> isLeaderInGame(leader.getID()))
-            || (publicObjectives1!= null && publicObjectives1.size() < 5 && getRound() >= 4)
-            || (publicObjectives2!= null && publicObjectives2.size() < (getRound() - 4))
-            || getRealPlayers().stream()
-                .anyMatch(player -> player.getSecretVictoryPoints() > 3
-                    && !player.getRelics().contains("obsidian"))
-            || getPlayerCountForMap() < 3
-            || getRealAndEliminatedAndDummyPlayers().size() < 3
-            || getPlayerCountForMap() > 8
-            || getRealAndEliminatedAndDummyPlayers().size() > 8;
     }
 
     public void setStrategyCardSet(String scSetID) {
