@@ -3274,7 +3274,7 @@ public class Game extends GameProperties {
         }
 
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
-        if (Helper.findDuplicateInList(allPlayerHandPromissoryNotes).size() > 0) {
+        if (!Helper.findDuplicateInList(allPlayerHandPromissoryNotes).isEmpty()) {
             BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
                 + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
@@ -3284,7 +3284,7 @@ public class Game extends GameProperties {
         // Find PNs that are extra - players have them but nobody "owns" them
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
-        if (unOwnedPromissoryNotes.size() > 0) {
+        if (!unOwnedPromissoryNotes.isEmpty()) {
             BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
                 + unOwnedPromissoryNotes + "`");
             getPurgedPN().removeAll(unOwnedPromissoryNotes);
@@ -3305,7 +3305,7 @@ public class Game extends GameProperties {
         // Report PNs that are missing from the game
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
-        if (missingPromissoryNotes.size() > 0) {
+        if (!missingPromissoryNotes.isEmpty()) {
             BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `"
                 + missingPromissoryNotes + "`");
         }
@@ -3856,6 +3856,8 @@ public class Game extends GameProperties {
         return isExtraSecretMode()
             || isHomebrew()
             || isFowMode()
+            || isAgeOfExplorationMode()
+            || isMinorFactionsMode()
             || isLightFogMode()
             || isRedTapeMode()
             || isDiscordantStarsMode()

@@ -457,14 +457,14 @@ public class GameStats extends StatisticsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Average Turns per Faction:").append("\n");
-        sb.append("All Factions Combined:" + String.format("%.2f", factionTurnCount.get("allFactions") / factionCount.get("allFactions"))).append("\n");
+        sb.append("All Factions Combined:").append(String.format("%.2f", factionTurnCount.get("allFactions") / factionCount.get("allFactions"))).append("\n");
         factionCount.entrySet().stream()
             .filter(entry -> Mapper.isValidFaction(entry.getKey()))
             .sorted(Map.Entry.comparingByValue())
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
             .forEach(entry -> sb.append("`")
                 .append(StringUtils.leftPad(String.format("%.2f", (factionTurnCount.get(entry.getKey().getAlias()) / entry.getValue())), 4))
-                .append(" turns from " + entry.getValue() + " games`")
+                .append(" turns from ").append(entry.getValue()).append(" games`")
                 .append(entry.getKey().getFactionEmoji()).append(" ")
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
                 .append("\n"));
