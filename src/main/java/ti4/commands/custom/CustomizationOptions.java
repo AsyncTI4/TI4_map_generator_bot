@@ -129,10 +129,8 @@ public class CustomizationOptions extends CustomSubcommandData {
             game.setShowBanners(showBa);
 
         String hexStyle = event.getOption(Constants.SHOW_HEX_BORDERS, null, OptionMapping::getAsString).toLowerCase();
-        if (hexStyle != null) {
-            if (hexStyle.equals("dash") || hexStyle.equals("off") || hexStyle.equals("solid")) {
-                game.setHexBorderStyle(hexStyle);
-            }
+        if (hexStyle.equals("dash") || hexStyle.equals("off") || hexStyle.equals("solid")) {
+            game.setHexBorderStyle(hexStyle);
         }
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
