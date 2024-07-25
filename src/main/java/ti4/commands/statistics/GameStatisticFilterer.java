@@ -80,6 +80,21 @@ public final class GameStatisticFilterer {
             case "little_omega" -> {
                 return game.isLittleOmega();
             }
+            case "franken" -> {
+                return game.isFrankenGame();
+            }
+            case "milty_mod" -> {
+                return game.isMiltyModMode();
+            }
+            case "red_tape" -> {
+                return game.isRedTapeMode();
+            }
+            case "age_of_exploration" -> {
+                return game.isAgeOfExplorationMode();
+            }
+            case "minor_factions" -> {
+                return game.isMinorFactionsMode();
+            }
             default -> {
                 return false;
             }
