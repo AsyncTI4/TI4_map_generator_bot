@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 
 public class ListTurnOrder extends StatusSubcommandData {
     public ListTurnOrder() {
-        super(Constants.TURN_ORDER, "List Turn order with SC played and Player passed status");
+        super(Constants.TURN_ORDER, "List turn order, with strategy card played and player passed status.");
     }
 
     @Override

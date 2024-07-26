@@ -277,7 +277,7 @@ public class MessageHelper {
 			}
 
 		} catch (Exception e) {
-			replyToMessage(event, "Could not send response, use /show_game or contact Admins or Bothelper");
+			replyToMessage(event, "Could not send response, use `/show_game` or contact Admins or Bothelper.");
 		}
 	}
 

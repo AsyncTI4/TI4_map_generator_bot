@@ -33,7 +33,7 @@ public class SCUnpick extends PlayerSubcommandData {
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
@@ -66,7 +66,7 @@ public class SCUnpick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentation(true, true) + " To Pick Strategy Card.";
+                msgExtra += player_.getRepresentation(true, true) + " to pick strategy card.";
                 privatePlayer = player_;
                 allPicked = false;
                 break;

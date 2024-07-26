@@ -44,7 +44,7 @@ public class ShowAllAC extends ACCardsSubcommandData {
         sa.append("Your cards were presented in the order below. You may reference the number listed when discussing the cards:\n");
         sb.append("Game: ").append(game.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Action Cards, they were also presented the cards in the order you see them so you may reference the number when talking to them:").append("\n");
+        sb.append("Shown all action cards. They were also presented the cards in the order you see them so you may reference the number when talking to them:").append("\n");
         List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
         Collections.shuffle(actionCards);
         int index = 1;

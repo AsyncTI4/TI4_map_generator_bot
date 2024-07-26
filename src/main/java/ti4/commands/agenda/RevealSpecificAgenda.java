@@ -71,7 +71,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         //EMERGENCY SESSION
         if ("Emergency Session".equalsIgnoreCase(agendaName)) {
             MessageHelper.sendMessageToChannel(channel, "# " + game.getPing()
-                + " Emergency Session revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
+                + " Emergency Session revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda.");
             agendaID = game.revealAgenda(false);
             revealAgenda(event, game, channel, agendaID);
             return;
@@ -80,7 +80,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         //ELECT LAW BUT NO LAWS IN PLAY
         if (agendaTarget.toLowerCase().contains("elect law") && game.getLaws().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel,
-                game.getPing() + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play, flipping next agenda");
+                game.getPing() + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play. Flipping next agenda.");
             agendaID = game.revealAgenda(false);
             revealAgenda(event, game, channel, agendaID);
             return;
@@ -143,7 +143,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         game.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));
         String text = game.getPing()
-            + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you may simply play it.";
+            + " Please indicate whether you abstain from playing \"when\"s or \"after\"s below. If you have an action card with those windows, you may simply play it.";
 
         Date newTime = new Date();
         game.setLastActivePlayerPing(newTime);
@@ -156,16 +156,16 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
 
         ListVoteCount.turnOrder(event, game, channel);
-        Button proceed = Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone");
+        Button proceed = Button.danger("proceedToVoting", "Skip Waiting And Start The Voting For Everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         Button transaction = Button.primary("transaction", "Transaction");
         proceedButtons.add(transaction);
-        proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
-        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
+        proceedButtons.add(Button.danger("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
+        proceedButtons.add(Button.danger("eraseMyRiders", "Erase My Riders"));
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last player forgot to react, but verbally said \"No Whens/Afters\".", proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
-                "# " + game.getPing() + " the agenda target is " + agendaTarget + ". Sent the agenda to the speakers cards info");
+                "# " + game.getPing() + " the agenda target is " + agendaTarget + ". Sent the agenda to the speaker's `#Cards Info` thread.");
         }
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0) {

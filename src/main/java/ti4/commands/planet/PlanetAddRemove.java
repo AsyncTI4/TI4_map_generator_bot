@@ -78,7 +78,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                     MessageHelper.sendMessageToEventChannel(event, "> No matching Planet '" + planetID + "'' found - please try again.");
                     return;
                 } else if (possiblePlanets.size() > 1) {
-                    MessageHelper.sendMessageToEventChannel(event, "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
+                    MessageHelper.sendMessageToEventChannel(event, "> More than one planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
                     return;
                 }
                 String planet = possiblePlanets.get(0);

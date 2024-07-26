@@ -12,8 +12,8 @@ import ti4.message.MessageHelper;
 
 public class DrawSpecificAC extends ACCardsSubcommandData {
     public DrawSpecificAC() {
-        super(Constants.DRAW_SPECIFIC_AC, "Draw Specific Action Card");
-        addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the card you want to draw").setRequired(true));
+        super(Constants.DRAW_SPECIFIC_AC, "Draw a specific action card.");
+        addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the action card you wish to draw").setRequired(true));
     }
 
     @Override
@@ -22,7 +22,7 @@ public class DrawSpecificAC extends ACCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
         OptionMapping option = event.getOption(Constants.AC_ID);
@@ -32,7 +32,8 @@ public class DrawSpecificAC extends ACCardsSubcommandData {
             game.drawSpecificActionCard(providedID, player.getUserID());
         }
         if (ac == player.getAc()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID. Remember, you need the word ID (i.e scramble for Scramble Frequency) and not the number ID. You may find the word ID by proper usage of the /search command.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID."
+                + " Remember, you need the word ID (e.g. `scramble` for Scramble Frequency) and not the number ID. You may find the word ID by proper usage of the `/search action_cards` command.");
             return;
         }
         ACInfo.sendActionCardInfo(game, player);

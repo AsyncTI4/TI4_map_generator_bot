@@ -49,7 +49,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         if (!game.getStoredValue("lastAgendaReactTime").isEmpty()
             && ((new Date().getTime()) - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if there's no button and this was a mistake.");
+                "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do `/agenda reveal` if there's no button and this was a mistake.");
             return;
         }
 
@@ -167,9 +167,9 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
 
         StringBuilder whensAftersMessage = new StringBuilder(
-            "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you may simply play it.");
+            "Please indicate whether you abstain from playing \"when\"s or \"after\"s below.\nIf you have an action card with those windows, you may simply play it.");
         if (action) {
-            whensAftersMessage.append("\nYou may play afters during this agenda.");
+            whensAftersMessage.append("\nYou may play \"after\"s during this agenda.");
         }
         game.setLastActivePlayerPing(new Date());
         List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
@@ -191,18 +191,18 @@ public class RevealAgenda extends AgendaSubcommandData {
             proceedButtons.add(Button.danger("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             ListVoteCount.turnOrder(event, game, channel);
-            msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
-            proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
+            msg = "Press this button if the last player forgot to react, but verbally said \"No Whens/Afters\".";
+            proceedButtons.add(Button.danger("proceedToVoting", "Skip Waiting And Start The Voting For Everyone"));
             proceedButtons.add(Button.primary("transaction", "Transaction"));
-            proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
-            proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
+            proceedButtons.add(Button.danger("eraseMyVote", "Erase M Vote And Have Me Vote Again"));
+            proceedButtons.add(Button.danger("eraseMyRiders", "Erase My Riders"));
             proceedButtons.add(Button.secondary("refreshAgenda", "Refresh Agenda"));
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
                 "# " + game.getPing() + " the agenda target is " + agendaTarget
-                    + ". Sent the agenda to the speakers cards info");
+                    + ". Sent the agenda to the speaker's `#Cards Info` thread.");
         }
         MessageHelper.sendMessageToChannel(channel,
             "The game believes this is agenda #" + aCount + " of this agenda phase");

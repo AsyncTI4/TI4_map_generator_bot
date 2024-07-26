@@ -52,20 +52,20 @@ public class Pass extends PlayerSubcommandData {
             if (!player.hasAbility("propagation")) {
                 MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use the button to get your tech.",
+                    player.getRepresentation(true, true) + " you may use the button to get your technology.",
                     Collections.singletonList(Buttons.GET_A_TECH));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+                String message2 = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
         if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
-            String msg = player.getRepresentation() + " since you have deliberate action ability and passed while one of your pools was at 0, you may gain 1 CC to that pool.";
+            String msg = player.getRepresentation() + " since you have the Deliberate Action faction ability and passed while one of your command pools was at 0, you may gain 1 command token to that pool.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+            String message2 = player.getRepresentation(true, true) + "! Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         if (player.hasTech("dskolug")) {
@@ -80,7 +80,7 @@ public class Pass extends PlayerSubcommandData {
                 }
             }
             if (player.getCommodities() > oldComm) {
-                String msg = player.getRepresentation() + " since you have Applied Biothermics, you gained 1 comm for each passed player (Comms went from " + oldComm + " -> " + player.getCommodities() + ")";
+                String msg = player.getRepresentation() + " since you have Applied Biothermics, you gained 1 commodity for each passed player (commodities went from " + oldComm + " -> " + player.getCommodities() + ")";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

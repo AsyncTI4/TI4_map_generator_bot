@@ -17,8 +17,8 @@ import ti4.message.MessageHelper;
 
 public class ClearDebt extends PlayerSubcommandData {
     public ClearDebt() {
-        super(Constants.CLEAR_DEBT, "Clear debt tokens (control token) for player/faction");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear").setRequired(true));
+        super(Constants.CLEAR_DEBT, "Clear debt chits for player/faction");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of chit to clear").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color having their debt cleared ").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_1, "Faction or Color clearing the debt").setAutoComplete(true));
     }
@@ -60,12 +60,12 @@ public class ClearDebt extends PlayerSubcommandData {
         }
 
         if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearedPlayer.getColor())) {
-            MessageHelper.sendMessageToEventChannel(event, "You cannot clear more debt tokens than you have");
+            MessageHelper.sendMessageToEventChannel(event, "You cannot clear more debt chits than you have");
             return;
         }
 
         clearDebt(clearingPlayer, clearedPlayer, debtCountToClear);
-        MessageHelper.sendMessageToEventChannel(event, clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt tokens owned by " + clearedPlayer.getRepresentation());
+        MessageHelper.sendMessageToEventChannel(event, clearingPlayer.getRepresentation() + " cleared " + debtCountToClear + " debt chit" + (debtCountToClear == 1 ? "" : "s") + " owned by " + clearedPlayer.getRepresentation());
     }
 
     public static void clearDebt(Player clearingPlayer, Player clearedPlayer, int debtCountToClear) {

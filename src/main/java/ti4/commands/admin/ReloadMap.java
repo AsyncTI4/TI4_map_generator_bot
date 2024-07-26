@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class ReloadMap extends AdminSubcommandData {
 
     public ReloadMap() {
-        super(Constants.RELOAD_GAME, "Reload game from save file");
+        super(Constants.RELOAD_GAME, "Reload game from save file.");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to reload").setRequired(true).setAutoComplete(true));
     }
 
@@ -24,7 +24,7 @@ public class ReloadMap extends AdminSubcommandData {
         if (option != null) {
             String mapName = option.getAsString();
             if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
+                MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use `/list_games`.");
 
                 return;
             }
@@ -34,7 +34,7 @@ public class ReloadMap extends AdminSubcommandData {
             ShowGame.simpleShowGame(game, event);
 
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "No Game specified.");
+            MessageHelper.sendMessageToEventChannel(event, "No game specified.");
         }
     }
 }

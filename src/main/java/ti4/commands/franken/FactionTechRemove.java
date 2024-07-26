@@ -21,7 +21,7 @@ public class FactionTechRemove extends FactionTechAddRemove {
     }
 
     public static void removeFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed faction techs:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed faction technologies:\n");
         for (String techID : techIDs ){
             if (!player.getFactionTechs().contains(techID)) {
                 sb.append("> ").append(techID).append(" (player did not have this tech)");

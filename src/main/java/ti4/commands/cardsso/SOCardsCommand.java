@@ -39,7 +39,7 @@ public class SOCardsCommand implements Command {
             String userID = event.getUser().getId();
             GameManager gameManager = GameManager.getInstance();
             if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+                MessageHelper.replyToMessage(event, "Set your active game using: `/set_game gameName`.");
                 return false;
             }
             Member member = event.getMember();
@@ -55,11 +55,11 @@ public class SOCardsCommand implements Command {
             if (userActiveGame.isCommunityMode()) {
                 Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
                 if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                    MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                    MessageHelper.replyToMessage(event, "You're not a player of the game, please call function `/join gameName`.");
                     return false;
                 }
             } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function `/join gameName`.");
                 return false;
             }
             if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {

@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 public class ShowAllSOToAll extends SOCardsSubcommandData {
     public ShowAllSOToAll() {
-        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players");
+        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all secret objectives to all players.");
     }
 
     @Override
@@ -24,7 +24,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
 

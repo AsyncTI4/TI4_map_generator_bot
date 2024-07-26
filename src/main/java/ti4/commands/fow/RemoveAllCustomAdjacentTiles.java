@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class RemoveAllCustomAdjacentTiles extends FOWSubcommandData {
     public RemoveAllCustomAdjacentTiles() {
-        super(Constants.REMOVE_ALL_CUSTOM_ADJACENT_TILES, "Remove Custom Adjacent Tiles. ");
+        super(Constants.REMOVE_ALL_CUSTOM_ADJACENT_TILES, "Remove all custom adjacent tiles.");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -19,7 +19,7 @@ public class RemoveAllCustomAdjacentTiles extends FOWSubcommandData {
         Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
         game.clearCustomAdjacentTiles();

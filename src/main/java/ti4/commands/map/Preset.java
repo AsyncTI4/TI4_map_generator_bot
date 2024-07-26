@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 public class Preset extends MapSubcommandData {
     public Preset() {
         super(Constants.PRESET, "Create a map from a template");
-        addOption(OptionType.STRING, Constants.MAP_TEMPLATE, "Which map template do you want to use", true, true);
+        addOption(OptionType.STRING, Constants.MAP_TEMPLATE, "Which map template do you wish to use", true, true);
         addOption(OptionType.STRING, Constants.SLICE_1, "Player 1's milty draft slice", false);
         addOption(OptionType.STRING, Constants.SLICE_2, "Player 2's slice", false);
         addOption(OptionType.STRING, Constants.SLICE_3, "Player 3's slice", false);

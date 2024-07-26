@@ -48,8 +48,8 @@ public class AddFrontierTokens implements Command {
         }
         if (game.getRound() == 1) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("deal2SOToAll", "Deal 2 SO To All"));
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after every player is setup", buttons);
+            buttons.add(Button.success("deal2SOToAll", "Deal 2 Secret Objectives To All"));
+            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after every player is setup.", buttons);
         }
     }
 
@@ -58,7 +58,7 @@ public class AddFrontierTokens implements Command {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
         if (!gameManager.isUserWithActiveGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+            MessageHelper.replyToMessage(event, "Set your active game using: `/set_game gameName`.");
         } else {
             Game game = gameManager.getUserActiveGame(userID);
             parsingForTile(event, game);
@@ -72,7 +72,7 @@ public class AddFrontierTokens implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Add Frontier tokens to all possible tiles")
+            Commands.slash(getActionID(), "Add a frontier token to each eligible tile.")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                     .setRequired(true))
 

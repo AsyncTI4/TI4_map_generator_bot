@@ -16,13 +16,13 @@ public class ButtonHelperStats {
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
-            message = "Converted " + amt + " Commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " TG" + (amt == 1 ? "" : "s");
+            message = "Converted " + amt + " Commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good" + (amt == 1 ? "" : "s");
         } else if (player.getCommodities() == 1) {
-            message = "Converted their last remaining commodity (less than " + amt + ") into 1TG";
+            message = "Converted their last remaining commodity (less than " + amt + ") to 1 trade good.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         } else {
-            message = "Converted their " +  player.getCommodities() + " remaining commodities (less than " + amt + ") into TGs";
+            message = "Converted their " +  player.getCommodities() + " remaining commodities (less than " + amt + ") to trade goods.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }
@@ -114,8 +114,8 @@ public class ButtonHelperStats {
         if (!redistribute) buttons = ButtonHelper.getGainCCButtons(player);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation()); // redundant
 
-        String message = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". ";
-        message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " CCs";
+        String message = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation() + ". ";
+        message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " command tokens.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

@@ -12,14 +12,14 @@ import ti4.message.MessageHelper;
 
 public class ReverseSpeakerOrder extends GameSubcommandData {
     public ReverseSpeakerOrder() {
-        super(Constants.REVERSE_SPEAKER_ORDER, "Change the speaker order from clockwise to counterclockwise or vice versa");
+        super(Constants.REVERSE_SPEAKER_ORDER, "Change the speaker order from clockwise to counterclockwise or vice versa.");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         if (!"YES".equals(event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString))) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must confirm with YES");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Must confirm with `YES`.");
             return;
         }
         User user = event.getUser();

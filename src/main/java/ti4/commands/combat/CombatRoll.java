@@ -44,16 +44,16 @@ public class CombatRoll extends CombatSubcommandData {
 
     public CombatRoll() {
         super(Constants.COMBAT_ROLL,
-            "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
+            "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*.");
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/tile name").setRequired(true)
             .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET,
-            "(optional) Planet to have combat on. Default is space combat.").setAutoComplete(true)
+            "Location (space or planet name) where combat is taking place (default: space)").setAutoComplete(true)
                 .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_ROLL_TYPE,
-            "switch to afb/bombardment/spacecannonoffence")
+            "Switch to afb/bombardment/spacecannonoffence")
                 .setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (default you)")
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Player to roll for (default: you)")
             .setAutoComplete(true).setRequired(false));
     }
 
@@ -353,7 +353,7 @@ public class CombatRoll extends CombatSubcommandData {
             }
         }
         if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != null && opponent != player) {
-            String msg2 = "\n" + opponent.getRepresentation(true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from AFB";
+            String msg2 = "\n" + opponent.getRepresentation(true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from anti-fighter barrage.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
                 String msg = opponent.getRepresentation(true, true) + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";

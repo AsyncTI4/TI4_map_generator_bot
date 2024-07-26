@@ -15,10 +15,10 @@ import java.util.Map;
 public class DrawSpecificSO extends SOCardsSubcommandData {
 
     public DrawSpecificSO() {
-        super(Constants.DRAW_SPECIFIC_SO, "Draw specific SO");
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "SO ID").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do draw SO. Default yourself").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge SO instead of drawing it").setRequired(false));
+        super(Constants.DRAW_SPECIFIC_SO, "Draw a specific secret objective.");
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "ID of the secret objective to draw").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player that will draw the secret objective (default: you)").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge the secret objective instead of drawing it").setRequired(false));
     }
 
     @Override
@@ -28,7 +28,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         OptionMapping option = event.getOption(Constants.SO_ID);
         OptionMapping optionPurge = event.getOption(Constants.PURGE_SO);
         if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "SO ID needs to be specified");
+            MessageHelper.sendMessageToEventChannel(event, "Secret objective ID needs to be specified.");
             return;
         }
         User user;
@@ -41,20 +41,20 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
         }
         if (optionPurge != null && "YES".equals(optionPurge.getAsString())) {
             if (game.removeSOFromGame(option.getAsString())) {
-                MessageHelper.sendMessageToEventChannel(event, "Purged specified SO");
+                MessageHelper.sendMessageToEventChannel(event, "Purged the specified secret objective.");
             } else {
-                MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified SO");
+                MessageHelper.sendMessageToEventChannel(event, "Failed to purge the specified secret objective.");
             }
             return;
         }
 
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(option.getAsString(), user.getId());
         if (secrets == null) {
-            MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
+            MessageHelper.sendMessageToEventChannel(event, "Secret objective could not be retrieved.");
             return;
         }
         GameSaveLoadManager.saveMap(game, event);
-        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
+        MessageHelper.sendMessageToEventChannel(event, "Secret objective sent to player's hand - please check `/so info`.");
         SOInfo.sendSecretObjectiveInfo(game, game.getPlayer(user.getId()));
     }
 }

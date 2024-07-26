@@ -16,9 +16,9 @@ import ti4.model.TechnologyModel;
 
 public class TechChangeType extends TechSubcommandData {
     public TechChangeType() {
-        super(Constants.CHANGE_TYPE, "Change what color a tech displays as");
+        super(Constants.CHANGE_TYPE, "Change what color a technology displays as");
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The type you're setting the tech to").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The type you're setting the technology to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
@@ -46,10 +46,10 @@ public class TechChangeType extends TechSubcommandData {
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
                     .map(Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()) {
-                    MessageHelper.sendMessageToEventChannel(event, "No matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "No matching Technology found.");
                     return;
                 } else if (possibleTechs.size() > 1) {
-                    MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "More that one matching Technology found.");
                     return;
                 }
                 game.setStoredValue("colorChange" + techID, techType.getAsString());

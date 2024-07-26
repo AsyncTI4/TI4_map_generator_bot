@@ -295,11 +295,11 @@ public class Helper {
 
     public static void giveMeBackMyAgendaButtons(Game game) {
         List<Button> proceedButtons = new ArrayList<>();
-        String msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
-        proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
+        String msg = "Press this button if the last player forgot to react, but verbally said \"No Whens or Afters\".";
+        proceedButtons.add(Button.danger("proceedToVoting", "Skip Waiting And Start The Voting For Everyone"));
         proceedButtons.add(Button.primary("transaction", "Transaction"));
-        proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
-        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
+        proceedButtons.add(Button.danger("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
+        proceedButtons.add(Button.danger("eraseMyRiders", "Erase My Riders"));
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
     }
 
@@ -379,7 +379,7 @@ public class Helper {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second SO due to Plausible Deniability";
+                    message = message + " Drew a second secret objective due to Plausible Deniability";
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
@@ -393,7 +393,7 @@ public class Helper {
                 && game.getStoredValue(key2).length() > 2) {
                 if (!game.isFowMode()) {
                     message = player.getRepresentation(true, true)
-                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued Imperial follows.";
+                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued Imperial follows.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 if (!game.isFowMode()) {
@@ -444,9 +444,9 @@ public class Helper {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
-                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued PO Scores";
+                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued public objective scpring.";
                     if (game.isFowMode()) {
-                        message = "Waiting on someone else before proceeding with scoring";
+                        message = "Waiting on someone else before proceeding with scoring.";
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     break;
@@ -454,10 +454,10 @@ public class Helper {
                 if (game.getStoredValue(key3b).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
-                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     if (game.isFowMode()) {
-                        message = "Waiting on someone else before proceeding with scoring";
+                        message = "Waiting on someone else before proceeding with scoring.";
                     }
                     break;
                 }
@@ -485,9 +485,9 @@ public class Helper {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
-                        + " is the one the game is currently waiting on before advancing to the next person, with regards to queued SO Scores";
+                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
                     if (game.isFowMode()) {
-                        message = "Waiting on someone else before proceeding with scoring";
+                        message = "Waiting on someone else before proceeding with scoring.";
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     break;
@@ -919,7 +919,7 @@ public class Helper {
                                 case "generic" -> {
                                     List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, p2);
                                     String message = sender.getRepresentation(true, true)
-                                        + "Please select the PN you would like to send";
+                                        + "Please select the promissory note you would like to send.";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
                                 }
                                 default -> {
@@ -1238,10 +1238,10 @@ public class Helper {
             Button button;
             String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
-                label = "[has " + game.getScTradeGoods().get(sc) + " TG" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
+                label += " [has " + game.getScTradeGoods().get(sc) + " Trade Good" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
             }
             if (sc == ButtonHelper.getKyroHeroSC(game)) {
-                label = label + " Kyro Hero Cursed";
+                label += " - Kyro Hero Cursed";
             }
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
                 && !game.isHomebrewSCMode()) {
@@ -1422,7 +1422,7 @@ public class Helper {
             msg = msg + "> ";
             switch (flavor) {
                 case "tg" -> {
-                    msg = msg + "Spent " + tg + " TG" + (tg == 1 ? "" : "s") + " for " + tg * 2 + " votes.\n";
+                    msg = msg + "Spent " + tg + " trade good" + (tg == 1 ? "" : "s") + " for " + tg * 2 + " votes.\n";
                 }
                 case "infantry" -> {
                     msg = msg + "Spent " + player.getSpentInfantryThisWindow() + " infantry for "
@@ -1435,7 +1435,7 @@ public class Helper {
                     msg = msg + "Used Absol Shard of the Throne for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "dsghotg" -> {
-                    msg = msg + "Exhausted some silly Ghoti Tech for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
+                    msg = msg + "Exhausted some silly Ghoti Technology for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
                 }
                 case "absolsyncretone" -> {
                     msg = msg + "Used Syncretone for " + count + " vote" + (count == 1 ? "" : "s") + ".\n";
@@ -1456,7 +1456,7 @@ public class Helper {
                     msg = msg + "Got 1 vote for Representative Government.\n";
                 }
                 case "distinguished" -> {
-                    msg = msg + "Used the AC Distinguished Councillor for 5 votes.\n";
+                    msg = msg + "Used the action card Distinguished Councillor for 5 votes.\n";
                 }
                 case "absolRexControlRepresentative" -> {
                     msg = msg + "Got 1 vote for controlling Mecatol Rex while Representative Government is in play.\n";
@@ -1634,9 +1634,9 @@ public class Helper {
                         res = res + ButtonHelper.getNumberOfUnitUpgrades(player);
                         msg = msg + " for " + ButtonHelper.getNumberOfUnitUpgrades(player) + " resources ";
                     } else {
-                        msg = msg + " for a tech skip on a unit upgrade ";
+                        msg = msg + " for a technology skip on a unit upgrade ";
                     }
-                    msg = msg + Emojis.WarfareTech + "\n";
+                    msg = msg + Emojis.WarfareTech + ".\n";
                 }
                 if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg = msg + "> " + thing + "\n";
@@ -1663,7 +1663,7 @@ public class Helper {
         res = res + tg + keleresAgent;
         inf = inf + tg + keleresAgent;
         if (tg > 0) {
-            msg = msg + "> Spent " + tg + "TG" + (tg == 1 ? "" : "s") + " " + Emojis.getTGorNomadCoinEmoji(game) + " ("
+            msg = msg + "> Spent " + tg + "trade good" + (tg == 1 ? "" : "s") + " " + Emojis.getTGorNomadCoinEmoji(game) + " ("
                 + (player.getTg() + tg) + "->" + player.getTg() + ") \n";
             if (player.hasTech("mc")) {
                 res = res + tg + keleresAgent;
@@ -2287,16 +2287,24 @@ public class Helper {
         String leaderUnlockCondition = leaderModel.getUnlockCondition();
 
         StringBuilder representation = new StringBuilder();
-        representation.append(Emojis.getFactionLeaderEmoji(leader)).append(" **").append(leaderName).append("**");
+        representation.append(Emojis.getFactionLeaderEmoji(leader)).append(" __**").append(leaderName).append("**");
         if (includeTitle)
-            representation.append(": ").append(leaderTitle); // add title
+            representation.append(" - ").append(leaderTitle).append("__"); // add title
         if (includeAbility && Constants.HERO.equals(leader.getType()))
-            representation.append(" - ").append("__**").append(heroAbilityName).append("**__"); // add hero ability name
+            representation.append("\n").append("**").append(heroAbilityName).append("**"); // add hero ability name
         if (includeAbility)
-            representation.append(" - *").append(leaderAbilityWindow).append("* ").append(leaderAbilityText); // add
-                                                                                                                                  // ability
+            if (leaderAbilityWindow.equalsIgnoreCase("action:"))
+            {
+                representation.append("\n*ACTION:*").append(leaderAbilityText); // add ability
+            }
+            else
+            {
+                representation.append("\n*").append(leaderAbilityWindow).append("*\n").append(leaderAbilityText); // add ability
+            }
         if (includeUnlockCondition)
-            representation.append(" *Unlock:* ").append(leaderUnlockCondition);
+        {
+            representation.append("\n*UNLOCK:* ").append(leaderUnlockCondition);
+        }
 
         return representation.toString();
     }
@@ -2389,7 +2397,7 @@ public class Helper {
                 }
             }
 
-            msg += "(" + color + ") is over the CC limit of 16. CC used: " + ccCount;
+            msg += "(" + color + ") is over the command token limit of 16. Command tokens used: " + ccCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
@@ -3042,7 +3050,7 @@ public class Helper {
                 game.setPlayers(playersBackup);
             }
         } else {
-            msg = "Detected an abnormal map, so did not assign speaker order automatically. Set the speaker order with /game set_order, with the speaker as the first player";
+            msg = "Detected an abnormal map, so did not assign speaker order automatically. Set the speaker order with `/game set_order`, with the speaker as the first player.";
         }
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);

@@ -213,7 +213,7 @@ public class ButtonHelperHeroes {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " tell the bot who's planet you want to exhaust or ready",
+            player.getRepresentation(true, true) + " tell the bot who's planet you wish to exhaust or ready",
             buttons);
     }
 
@@ -225,7 +225,7 @@ public class ButtonHelperHeroes {
         buttons.add(Button.danger("khraskHeroStep3Exhaust_" + faction, "Exhaust a Planet"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " tell the bot if you want to exhaust or ready a planet",
+            player.getRepresentation(true, true) + " tell the bot if you wish to exhaust or ready a planet",
             buttons);
     }
 
@@ -245,7 +245,7 @@ public class ButtonHelperHeroes {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " select the planet you want to exhaust", buttons);
+            player.getRepresentation(true, true) + " select the planet you wish to exhaust", buttons);
     }
 
     public static void resolveKhraskHeroStep4Exhaust(Player player, Game game, ButtonInteractionEvent event,
@@ -354,11 +354,11 @@ public class ButtonHelperHeroes {
         }
         int size = revealedRelics.size();
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
-            player.getFactionEmoji() + " may gain " + size + " CC" + (size == 1 ? "" : "s") + ".");
+            player.getFactionEmoji() + " may gain " + size + " command token" + (size == 1 ? "" : "s") + ".");
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         String trueIdentity = player.getRepresentation(true, true);
-        String message2 = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
-            + ". Use buttons to gain CCs";
+        String message2 = trueIdentity + "! Your current command tokens are " + player.getCCRepresentation()
+            + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         MessageHelper.sendMessageToChannelWithButtons(
             ButtonHelper.getCorrectChannel(player, game), message2, buttons);
@@ -438,7 +438,7 @@ public class ButtonHelperHeroes {
         List<Button> buttons = new ArrayList<>();
         String shipOrder = buttonID.split("_")[1];
         String message = player.getRepresentation()
-            + " Click the player you would like to give the order to and force them to give you a PN";
+            + " Click the player you would like to give the order to, and force them to give you a promissory note.";
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
@@ -464,11 +464,11 @@ public class ButtonHelperHeroes {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String message = player.getRepresentation() + " sent " + Mapper.getRelic(shipOrder).getName() + " to "
             + ButtonHelper.getIdentOrColor(p2, game)
-            + " who now owes a PN. Buttons have been sent to the players cards info thread to resolve";
+            + " who now owes a promissory note. Buttons have been sent to the player's `#Cards Info` thread to resolve";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), message);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message2 = p2.getRepresentation(true, true)
-            + " You have been given an axis order by Demi-Queen Mdcksssk, the Axis hero, and now must send a PN. Please select the PN you would like to send.";
+            + " You have been given an Axis Order by Demi-Queen Mdcksssk, the Axis hero, and now must send a promissory note in return. Please select the promissory note you would like to send.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message2, stuffToTransButtons);
         event.getMessage().delete().queue();
     }
@@ -489,7 +489,7 @@ public class ButtonHelperHeroes {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " select the planet you want to ready", buttons);
+            player.getRepresentation(true, true) + " select the planet you wish to ready", buttons);
     }
 
     public static void resolveKhraskHeroStep4Ready(Player player, Game game, ButtonInteractionEvent event,
@@ -500,10 +500,10 @@ public class ButtonHelperHeroes {
         event.getMessage().delete().queue();
         p2.refreshPlanet(planet);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " you refreshed " + planetRep);
+            player.getRepresentation(true, true) + " you readied " + planetRep);
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game),
-                p2.getRepresentation(true, true) + " your planet " + planetRep + " was refreshed.");
+                p2.getRepresentation(true, true) + " your planet " + planetRep + " was readied.");
             if (player.hasLeader("xxchaagent")) {
                 UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                 if (uH != null && uH.getUnitCount(UnitType.Infantry, p2) > 0) {
@@ -514,7 +514,7 @@ public class ButtonHelperHeroes {
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Button.danger("xxchaAgentRemoveInfantry_" + p2.getFaction() + "_" + planet, "Remove Infantry"));
                             buttons.add(Button.secondary("deleteButtons", "Decline"));
-                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you have the opportunity to remove 1 of the infantry on the refreshed planet if you want", buttons);
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you have the opportunity to remove 1 of the infantry on the readied planet if you want", buttons);
 
                             return;
                         }
@@ -606,10 +606,10 @@ public class ButtonHelperHeroes {
             ExploreModel explore = Mapper.getExplore(cardID);
             if ("attach".equalsIgnoreCase(explore.getResolution())) {
                 foundOne = true;
-                sb.append(player.getRepresentation()).append(" Found attachment " + explore.getName());
+                sb.append(player.getRepresentation()).append(" Found attachment " + explore.getName() + ".");
                 game.purgeExplore(cardID);
                 MessageHelper.sendMessageToChannel(channel, sb.toString());
-                String msg = player.getRepresentation() + " tell the bot what planet this should be attached too";
+                String msg = player.getRepresentation() + " tell the bot what planet this should be attached too.";
                 MessageHelper.sendMessageToChannel(channel, msg,
                     getAttachmentAttach(game, player, type, explore.getAttachmentId().get()));
                 return;
@@ -656,7 +656,7 @@ public class ButtonHelperHeroes {
                 Helper.getPlanetRepresentation(planet2, game)));
         }
 
-        String msg = player.getRepresentation(true, true) + " choose the HS planet you wish to put the attachment on";
+        String msg = player.getRepresentation(true, true) + " choose the home system planet you wish to put the attachment on.";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg, buttons);
         event.getMessage().delete().queue();
     }
@@ -667,16 +667,16 @@ public class ButtonHelperHeroes {
         for (String customPO : customPOs.keySet()) {
             if (customPO.contains("Tnelis Hero")) {
                 game.removeCustomPO(customPOs.get(customPO));
-                String sb = "Removed Turra Sveyar, the Tnelis hero, from an SO.";
+                String sb = "Removed Turra Sveyar, the Tnelis hero, from a secret objective.";
                 MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(tnelis, game), sb);
             }
         }
         Integer poIndex = game
             .addCustomPO("Tnelis Hero (" + Mapper.getSecretObjectivesJustNames().get(soID) + ")", 1);
-        String sb = tnelis.getRepresentation() + " Attached Turra Sveyar, the Tnelis hero, to an SO ("
+        String sb = tnelis.getRepresentation() + " Attached Turra Sveyar, the Tnelis hero, to a secret objective ("
             + Mapper.getSecretObjectivesJustNames().get(soID)
-            + "). This is represented in the bot as a custom PO (" + poIndex
-            + ") and should only be scored by them. This PO will be removed/changed automatically if the hero is attached to another SO via button.";
+            + "). This is represented in the bot as a custom public objective (" + poIndex
+            + ") and should only be scored by them. This public objective will be removed/changed automatically if the hero is attached to another secret objective via button.";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(tnelis, game), sb);
         event.getMessage().delete().queue();
     }
@@ -1004,7 +1004,7 @@ public class ButtonHelperHeroes {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                message + " - Titus Flavius, the Celdauri hero, has been purged.");
+                message + "\n(Titus Flavius, the Celdauri hero, has been purged.)");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Titus Flavius, the Celdauri hero, was not purged - something went wrong.");
@@ -1053,7 +1053,7 @@ public class ButtonHelperHeroes {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                message + " - Ipswitch, Loose Cannon, the Mentak hero, has been purged.");
+                message + "\n(Ipswitch, Loose Cannon, the Mentak hero, has been purged.)");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Ipswitch, Loose Cannon, the Mentak hero, was not purged - something went wrong.");
@@ -1079,7 +1079,7 @@ public class ButtonHelperHeroes {
         Planet unitHolder = game.getPlanetsInfo().get(planet);
         Set<String> techTypes = unitHolder.getTechSpecialities();
         if (techTypes.isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No tech skips found");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "No technology skips found");
             return;
         }
         for (Player p2 : game.getRealPlayers()) {
@@ -1095,7 +1095,8 @@ public class ButtonHelperHeroes {
         int count = planetHolder.getResources() + planetHolder.getInfluence();
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from selecting the planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
+            player.getFactionEmoji() + " gained " + count + "trade good" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from selecting the planet "
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetHolder.getName(), game));
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         game.setComponentAction(true);
@@ -1103,7 +1104,7 @@ public class ButtonHelperHeroes {
         for (String type : techTypes)
             techs.addAll(Helper.getAllTechOfAType(game, type, player));
         List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
-        String message = player.getRepresentation() + " Use the buttons to get the tech you want";
+        String message = player.getRepresentation() + " Use the buttons to get the technology you want.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
@@ -1196,7 +1197,7 @@ public class ButtonHelperHeroes {
         }
         if (id == null) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, game),
-                "Could not resolve PN, PN not sent.");
+                "Could not resolve promissory note; promissory note not sent.");
             return;
         }
         p1.removePromissoryNote(id);
@@ -1223,7 +1224,7 @@ public class ButtonHelperHeroes {
         PNInfo.sendPromissoryNoteInfo(game, p1, false);
         PNInfo.sendPromissoryNoteInfo(game, p2, false);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-        message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "PN to " + ident2;
+        message2 = p1.getRepresentation() + " sent " + Emojis.PN + text + "promissory note to " + ident2;
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, game), message2);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p1, game), message2);
@@ -1270,7 +1271,7 @@ public class ButtonHelperHeroes {
             buttons.add(Button.success("stealRelic_" + victim.getFaction() + "_" + relic,
                 "Steal " + Mapper.getRelic(relic).getName()));
         }
-        String msg = player.getRepresentation(true, true) + " choose the relic you want to steal";
+        String msg = player.getRepresentation(true, true) + " choose the relic you wish to steal";
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game), msg, buttons);
 
     }
@@ -1364,7 +1365,7 @@ public class ButtonHelperHeroes {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
-                message2 + " - The Oracle, the Naalu hero, has been purged. \n\n Sent buttons to resolve to everyone's channels");
+                message2 + "\n(The Oracle, the Naalu hero, has been purged.)\n\n Sent buttons to resolve to everyone's channels");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "The Oracle, the Naalu hero, was not purged - something went wrong");
@@ -1375,7 +1376,7 @@ public class ButtonHelperHeroes {
             }
             List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p1);
             String message = p1.getRepresentation(true, true)
-                + " The Oracle, the Naalu hero, has been played and you must send a PN. Please select the PN you would like to send.";
+                + " The Oracle, the Naalu hero, has been played and you must send a promissory note. Please select the promissory note you would like to send.";
             MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
         }
         event.getMessage().delete().queue();
@@ -1388,7 +1389,7 @@ public class ButtonHelperHeroes {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, game),
-                message2 + " - Speygh, the Kyro hero, has been purged. \n\n");
+                message2 + "\n(Speygh, the Kyro hero, has been purged.)");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Speygh, the Kyro hero, was not purged - something went wrong");
@@ -1503,7 +1504,7 @@ public class ButtonHelperHeroes {
             buttons.add(Button.success("cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " use the buttons to give out ACs to players", buttons);
+            player.getRepresentation() + " use the buttons to give out action cards to players", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -1523,7 +1524,7 @@ public class ButtonHelperHeroes {
         }
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to give "
+            player.getRepresentation(true, true) + " tell the bot who you wish to give "
                 + Mapper.getActionCard(acID).getName(),
             buttons);
     }
@@ -1668,7 +1669,7 @@ public class ButtonHelperHeroes {
 
     public static void resolveAJolNarSwapStep1(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = getJolNarHeroSwapInOptions(player, game, buttonID);
-        String message = player.getRepresentation(true, true) + " select the tech you would like to acquire";
+        String message = player.getRepresentation(true, true) + " select the technology you would like to acquire.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -1680,7 +1681,7 @@ public class ButtonHelperHeroes {
         TechnologyModel techM2 = Mapper.getTech(techIn);
         player.addTech(techIn);
         player.removeTech(techOut);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " swapped the tech '" + techM1.getName() + "' for the tech '" + techM2.getName() + "'");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " swapped the technology '" + techM1.getName() + "' for the technology '" + techM2.getName() + "'.");
         event.getMessage().delete().queue();
     }
 
@@ -1782,7 +1783,7 @@ public class ButtonHelperHeroes {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, game),
-            player.getRepresentation(true, true) + " Chose the tile you want to swap places with "
+            player.getRepresentation(true, true) + " Chose the tile you wish to swap places with "
                 + tile1.getRepresentationForButtons(game, player),
             buttons);
         event.getMessage().delete().queue();
@@ -1814,16 +1815,16 @@ public class ButtonHelperHeroes {
         Player target = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         if (target.getTg() > 0) {
-            buttons.add(Button.success("sendVadenHeroSomething_" + vaden.getFaction() + "_tg", "Send 1TG"));
+            buttons.add(Button.success("sendVadenHeroSomething_" + vaden.getFaction() + "_tg", "Send 1 Trade Good"));
         }
         if (target.getCommodities() > 1) {
             buttons.add(Button.secondary("sendVadenHeroSomething_" + vaden.getFaction() + "_comms", "Send 2 Commodities"));
         }
-        buttons.add(Button.danger("sendVadenHeroSomething_" + vaden.getFaction() + "_pn", "Send 1 PN"));
+        buttons.add(Button.danger("sendVadenHeroSomething_" + vaden.getFaction() + "_pn", "Send 1 Promissory Note"));
         ClearDebt.clearDebt(vaden, target, 1);
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(vaden, game),
             vaden.getRepresentation() + " returned 1 debt tokens owned by " + target.getRepresentation(false, true)
-                + " using Putriv Sirvonsk, the Vaden hero. Buttons have been sent to their cards info to resolve.");
+                + " using Putriv Sirvonsk, the Vaden hero. Buttons have been sent to their `#Cards Info` thread to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(target.getCardsInfoThread(), target.getRepresentation(true, true)
             + " please select something to give due to Putriv Sirvonsk, the Vaden hero, returning one of your tokens.", buttons);
         if (vaden.getDebtTokenCount(target.getColor()) == 0) {
@@ -1839,13 +1840,13 @@ public class ButtonHelperHeroes {
 
         String msg = player.getRepresentation(false, true) + " sent ";
         if ("tg".equalsIgnoreCase(tgOrComm)) {
-            msg = msg + " 1TG to " + vaden.getRepresentation(false, true) + " as a result of playing Putriv Sirvonsk, the Vaden Hero.";
+            msg = msg + " 1 trade good to " + vaden.getRepresentation(false, true) + " as a result of playing Putriv Sirvonsk, the Vaden Hero.";
             if (player.getTg() > 0) {
                 vaden.setTg(vaden.getTg() + 1);
                 player.setTg(player.getTg() - 1);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getRepresentation(true, true) + " you had no TGs to send, so no TGs have been sent.");
+                    player.getRepresentation(true, true) + " you had no trade goods to send, so no trade goods have been sent.");
                 return;
             }
         } else {
@@ -1860,10 +1861,10 @@ public class ButtonHelperHeroes {
                     return;
                 }
             } else {
-                msg = player.getRepresentation(false, true) + " will send 1 PN as a result of playing Putriv Sirvonsk, the Vaden Hero.";
+                msg = player.getRepresentation(false, true) + " will send 1 promissory note as a result of playing Putriv Sirvonsk, the Vaden Hero.";
                 List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, vaden, player);
                 String message = player.getRepresentation(true, true)
-                    + " Please select the PN you would like to send";
+                    + " Please select the promissory note you would like to send.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message,
                     stuffToTransButtons);
             }
@@ -1902,7 +1903,8 @@ public class ButtonHelperHeroes {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
         new SCPlay().playSC(event, sc, game, game.getMainGameChannel(), player, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
-            + " reminder that the Winnu player has to allow you to follow this, and that when you do follow, you must pay strategy CCs like normal. ");
+            + " reminder that the Winnu player has to allow you to follow this, and that when you do follow, you must spend a commend token from your strategy pool like normal"
+            + " (unless you're following Leadership, if you're following Construction, the command token is placed in the system).");
         event.getMessage().delete().queue();
     }
 
@@ -1977,7 +1979,7 @@ public class ButtonHelperHeroes {
     public static List<Button> getNRAHeroButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         if (game.getScPlayed().get(1) == null || !game.getScPlayed().get(1)) {
-            scButtons.add(Button.success("leadershipGenerateCCButtons", "Spend & Gain CCs"));
+            scButtons.add(Button.success("leadershipGenerateCCButtons", "Spend And Gain Command Tokens"));
             //scButtons.add(Button.danger("leadershipExhaust", "Exhaust Planets"));
         }
         if (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2)) {

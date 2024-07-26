@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 public class Whisper extends FOWSubcommandData {
 
     public Whisper() {
-        super(Constants.WHISPER, "Send a private message to a player in fog mode");
+        super(Constants.WHISPER, "Send a private message to a player in fog of war mode.");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
@@ -30,16 +30,17 @@ public class Whisper extends FOWSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found.");
             return;
         }
         Player player_ = Helper.getPlayer(game, player, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found.");
             return;
         }
         if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog of war mode, and should not use this command."
+                + " Instead whisper by beginning your message with to[color] or to[faction] from inside your `#Cards Info` thread (for instance saying `toblue hi`).");
             return;
         }
         OptionMapping whisperms = event.getOption(Constants.MSG);
@@ -61,7 +62,8 @@ public class Whisper extends FOWSubcommandData {
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
         if (!game.isFowMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();
-            MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your cards info channel, and do not need to use the /fow whisper command, you can just start a message with toblue or something");
+            MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your `#Cards Info` thread,"
+                + " and do not need to use the `/fow whisper` command, you can just start a message with `toblue` or something.");
         }
         if (!game.isFowMode()) {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
@@ -86,7 +88,7 @@ public class Whisper extends FOWSubcommandData {
             }
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
             if (!player.getNeighbouringPlayers().contains(player_)) {
-                MessageHelper.sendMessageToChannel(feedbackChannel, "In FoW, communicate only to your neighbours, which " + player2 + " isn't.");
+                MessageHelper.sendMessageToChannel(feedbackChannel, "In fog of war, you can communicate only to your neighbours, which " + player2 + " isn't.");
             }
         } else {
             String fail = "Could not notify receiving player.";

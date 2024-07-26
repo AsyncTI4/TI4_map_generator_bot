@@ -8,12 +8,12 @@ import ti4.message.MessageHelper;
 public class SaveMaps extends AdminSubcommandData {
 
     public SaveMaps() {
-        super(Constants.SAVE_GAMES, "Save all games");
+        super(Constants.SAVE_GAMES, "Save all games.");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         GameSaveLoadManager.saveMaps();
-        MessageHelper.sendMessageToEventChannel(event, "Saved all maps");
+        MessageHelper.sendMessageToEventChannel(event, "Saved all maps.");
     }
 }

@@ -7,7 +7,7 @@ import ti4.message.MessageHelper;
 
 public class TechButton extends TechSubcommandData {
     public TechButton() {
-        super(Constants.BUTTON, "Force the add tech button to display");
+        super(Constants.BUTTON, "Force the add technology button to display");
     }
 
     @Override

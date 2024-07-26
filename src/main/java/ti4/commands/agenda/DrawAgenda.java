@@ -27,9 +27,9 @@ import ti4.model.AgendaModel;
 public class DrawAgenda extends AgendaSubcommandData {
 
     public DrawAgenda() {
-        super(Constants.DRAW, "Draw Agenda");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
-        addOptions(new OptionData(OptionType.BOOLEAN, "from_bottom", "Whether to draw from bottom, default false"));
+        super(Constants.DRAW, "Draw an agenda card.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many agenda cards to draw (default: 1)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, "from_bottom", "Whether to draw from bottom (default: False)"));
     }
 
     public static void drawAgenda(GenericInteractionCreateEvent event, int count, Game game, @NotNull Player player) {

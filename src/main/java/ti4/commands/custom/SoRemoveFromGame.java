@@ -10,8 +10,8 @@ import ti4.message.MessageHelper;
 
 public class SoRemoveFromGame extends CustomSubcommandData {
     public SoRemoveFromGame() {
-        super(Constants.REMOVE_SO_FROM_GAME, "SO remove from game");
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret ID").setRequired(true).setAutoComplete(true));
+        super(Constants.REMOVE_SO_FROM_GAME, "Remove a secret objective from the game.");
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -20,14 +20,14 @@ public class SoRemoveFromGame extends CustomSubcommandData {
 
         OptionMapping soOption = event.getOption(Constants.SO_ID);
         if (soOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify SO");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify secret objective.");
             return;
         }
         boolean removed = game.removeSOFromGame(soOption.getAsString());
         if (removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO removed from game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective was removed from game deck.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO not found in game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective was not found in game deck.");
         }
     }
 }

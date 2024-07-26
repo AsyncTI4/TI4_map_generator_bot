@@ -30,7 +30,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_ID, "The reference ID for the planet, generally the name in all lowercase without spaces").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_TILE_ID, "The tile this planet belongs to").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "The planet's display name").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_ALIASES, "A comma-separated list of any aliases you want to set for the planet.").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_ALIASES, "A comma-separated list of any aliases you wish to set for the planet.").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLANET_POSITION_X, "The x-coordinate of the planet's position in the tile image").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLANET_POSITION_Y, "The y-coordinate of the planet's position in the tile image").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLANET_RESOURCES, "The planet's resource value").setRequired(true));

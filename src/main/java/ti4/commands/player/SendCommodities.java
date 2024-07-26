@@ -17,9 +17,9 @@ import ti4.message.MessageHelper;
 
 public class SendCommodities extends PlayerSubcommandData {
     public SendCommodities() {
-        super(Constants.SEND_COMMODITIES, "Sent Commodities to player/faction");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send Commodities").setAutoComplete(true).setRequired(true));
+        super(Constants.SEND_COMMODITIES, "Sent commodities to a player");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Number of commodities to send").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send commodities").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
     }
 
@@ -30,17 +30,17 @@ public class SendCommodities extends PlayerSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         Player player_ = Helper.getPlayer(game, player, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player to send TG/Commodities could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to send commodities to could not be found.");
             return;
         }
         if (player.hasAbility("military_industrial_complex")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true)
-                + " since you cannot send players commodities due to your faction ability, sending comms here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
+                + " since you cannot send players commodities due to your faction ability, sending commodities here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong.");
             return;
         }
 
@@ -66,7 +66,7 @@ public class SendCommodities extends PlayerSubcommandData {
         String p1 = player.getRepresentation();
         String p2 = player_.getRepresentation();
         String commString = sendCommodities + " " + Emojis.comm + " commodities";
-        String message = p1 + " sent " + commString + " to " + p2;
+        String message = p1 + " sent " + commString + " to " + p2 + ".";
         MessageHelper.sendMessageToEventChannel(event, message);
         ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, player_, sendCommodities);
         ButtonHelperAbilities.pillageCheck(player_, game);
@@ -74,12 +74,12 @@ public class SendCommodities extends PlayerSubcommandData {
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
             ClearDebt.clearDebt(player_, player, sendCommodities);
-            MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendCommodities + " debt tokens owned by " + player.getRepresentation());
+            MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendCommodities + " debt chit" + (sendCommodities == 1 ? "" : "s") + " owned by " + player.getRepresentation()+ ".");
         }
 
         if (game.isFowMode()) {
             String fail = "Could not notify receiving player.";
-            String success = "The other player has been notified";
+            String success = "The other player has been notified.";
             MessageHelper.sendPrivateMessageToPlayer(player_, game, event.getChannel(), message, fail, success);
 
             // Add extra message for transaction visibility

@@ -21,10 +21,10 @@ public class FactionTechAdd extends FactionTechAddRemove {
     }
 
     public static void addFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added techs:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added technologies:\n");
         for (String techID : techIDs) {
             if (player.getFactionTechs().contains(techID)) {
-                sb.append("> ").append(techID).append(" (player had this faction tech)");
+                sb.append("> ").append(techID).append(" (player had this faction techology)");
             } else {
                 sb.append("> ").append(Mapper.getTech(techID).getRepresentation(true));
             }

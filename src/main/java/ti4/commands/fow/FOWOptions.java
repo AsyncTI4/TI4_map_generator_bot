@@ -13,9 +13,9 @@ public class FOWOptions extends FOWSubcommandData {
     public static final String HIDE_TOTAL_VOTES = "hide_total_votes";
 
     public FOWOptions() {
-        super(Constants.FOW_OPTIONS, "Change options for FoW game");
-        addOptions(new OptionData(OptionType.BOOLEAN, HIDE_NAMES, "Completely hide player discord names - Default: false"));
-        addOptions(new OptionData(OptionType.BOOLEAN, HIDE_TOTAL_VOTES, "Don't show total votes amount in agenda - Default: false"));
+        super(Constants.FOW_OPTIONS, "Change options for fog of war game.");
+        addOptions(new OptionData(OptionType.BOOLEAN, HIDE_NAMES, "Completely hide player Discord names (default: False)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, HIDE_TOTAL_VOTES, "Don't show total votes amount in agenda (default: False)"));
     }
 
      @Override

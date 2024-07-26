@@ -21,8 +21,8 @@ import ti4.message.MessageHelper;
 
 public class DiscardSO extends SOCardsSubcommandData {
     public DiscardSO() {
-        super(Constants.DISCARD_SO, "Discard Secret Objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+        super(Constants.DISCARD_SO, "Discard a secret objective.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID to discard").setRequired(true));
     }
 
     @Override
@@ -31,12 +31,12 @@ public class DiscardSO extends SOCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "Please select what Secret Objective to discard");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "Please select which secret objective to discard.");
             return;
         }
         discardSO(event, player, option.getAsInt(), game);
@@ -51,14 +51,15 @@ public class DiscardSO extends SOCardsSubcommandData {
         }
         boolean removed = game.discardSecretObjective(player.getUserID(), SOID);
         if (!removed) {
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "No such secret objective ID found, please retry.");
             return;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "SO Discarded");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "Secret objective has been discarded.");
 
         SOInfo.sendSecretObjectiveInfo(game, player);
         if (!soIDString.isEmpty()) {
-            String msg = "You discarded the SO " + Mapper.getSecretObjective(soIDString).getName() + ". If this was an accident, you can get it back with the below button. This will tell everyone that you made a mistake discarding and are picking back up the secret.";
+            String msg = "You discarded the secret objectives " + Mapper.getSecretObjective(soIDString).getName() + ". If this was an accident, you can get it back with the below button."
+                + " This will tell everyone that you made a mistake discarding and are picking back up the secret.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.secondary("drawSpecificSO_" + soIDString, "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
             buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
@@ -82,10 +83,10 @@ public class DiscardSO extends SOCardsSubcommandData {
     }
 
     public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String soID, Game game) {
-        String publicMsg = game.getPing() + " this is a public notice that " + ButtonHelper.getIdentOrColor(player, game) + " is picking up a secret that they accidentally discarded.";
+        String publicMsg = game.getPing() + " this is a public notice that " + ButtonHelper.getIdentOrColor(player, game) + " is picking up a secret objective that they accidentally discarded.";
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(soID, player.getUserID());
         if (secrets == null) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "SO not retrieved, most likely because someone else has it in hand. Ping a bothelper to help.");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Secret objectives not retrieved, most likely because someone else has it in hand. Ping a bothelper to help.");
             return;
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);

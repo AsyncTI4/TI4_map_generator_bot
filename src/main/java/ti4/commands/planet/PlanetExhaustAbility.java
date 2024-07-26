@@ -56,17 +56,17 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         switch (planet) {
             // Prophecy of Kings
             case "mallice" -> {
-                output = "Use buttons to gain 2TGs or wash your commodities";
-                buttons.add(Button.success("mallice_2_tg", "Gain 2TGs"));
+                output = "Use buttons to gain 2 trade goods or wash your commodities.";
+                buttons.add(Button.success("mallice_2_tg", "Gain 2 Trade Goods"));
                 buttons.add(Button.success("mallice_convert_comm", "Convert Commodities"));
             }
             case "hopesend" -> {
-                output = "Use buttons to drop 1 mech on a planet or draw 1 AC";
+                output = "Use buttons to drop 1 mech on a planet or draw 1 action card.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
+                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 Action Cards (With Scheming)"));
                 } else {
-                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 Action Card"));
                 }
             }
             case "primor" -> {
@@ -92,7 +92,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
                     List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
                     MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), "Please select your target", game, player, riderButtons);
-                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate no afters again.", game, afterButtons, "after");
+                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"No Afters\" again.", game, afterButtons, "after");
                 } else {
                     DrawAgenda.drawAgenda(1, game, player);
                 }
@@ -101,7 +101,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 if (!game.isFowMode() && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1705824000011L)) > 0) {
                     resolvePrismStep1(player, game);
                 } else {
-                    output = player.getFactionEmoji() + " choose a tech to return";
+                    output = player.getFactionEmoji() + " choose a technology to return.";
                     buttons.addAll(getNewPrismLoseTechOptions(player, game));
                 }
             }
@@ -110,7 +110,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(ButtonHelper.getEchoAvailableSystems(game, player));
             }
             case "domna" -> {
-                output = "Use buttons to select which system the ship you want to move is in";
+                output = "Use buttons to select which system the ship you wish to move is in";
                 buttons.addAll(ButtonHelper.getDomnaStepOneTiles(player, game));
             }
             case "eko" -> output = "blank";
@@ -148,8 +148,8 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         String techOut = buttonID.split("@")[1];
         player.removeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " removed the tech " + techM1.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech with the same number of prerequisites", Buttons.GET_A_FREE_TECH);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " removed the technology " + techM1.getName() + ".");
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a technology with the same number of prerequisites.", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
@@ -172,21 +172,21 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to force into giving you a PN or AC", buttons);
+            player.getRepresentation(true, true) + " tell the bot who you wish to force into giving you an action card or a promissory note.", buttons);
     }
 
     public static void resolvePrismStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
 
-        buttons.add(Button.secondary("prismStep3_" + player.getFaction() + "_AC", "Send AC"));
-        buttons.add(Button.secondary("prismStep3_" + player.getFaction() + "_PN", "Send PN"));
+        buttons.add(Button.secondary("prismStep3_" + player.getFaction() + "_AC", "Send Action Card"));
+        buttons.add(Button.secondary("prismStep3_" + player.getFaction() + "_PN", "Send Promissory Note"));
 
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " chose " + ButtonHelper.getIdentOrColor(p2, game) + " as the target of the prism ability. The target has been sent buttons to resolve.");
+            player.getFactionEmoji() + " chose " + ButtonHelper.getIdentOrColor(p2, game) + " as the target of the Prism legendary ability. The target has been sent buttons to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-            p2.getRepresentation(true, true) + " you have had the Prism ability hit you. Please tell the bot if you wish to send an AC or a PN", buttons);
+            p2.getRepresentation(true, true) + " you have been hit by the Prism legendary ability. Please tell the bot if you wish to send an action card or a promissory note.", buttons);
     }
 
     public static void resolvePrismStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {

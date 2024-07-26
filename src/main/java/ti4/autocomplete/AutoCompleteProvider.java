@@ -506,7 +506,7 @@ public class AutoCompleteProvider {
                 }
                 String latestCommand;
                 if (game.isFowMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
-                    latestCommand = "Game is Fog of War mode - last command is hidden.";
+                    latestCommand = "Game is fog of war mode; last command is hidden.";
                 } else {
                     latestCommand = StringUtils.left(game.getLatestCommand(), 100);
                 }
@@ -518,7 +518,7 @@ public class AutoCompleteProvider {
                     return;
                 }
                 if (game.isFowMode()) {
-                    event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
+                    event.replyChoiceStrings("Game is fog of war mode; you can't see what you are undoing.").queue();
                 }
                 long datetime = new Date().getTime();
                 List<Command.Choice> options = Undo.getAllUndoSavedGames(game).entrySet().stream()
@@ -1194,7 +1194,7 @@ public class AutoCompleteProvider {
         if (subCommandName.equals(Constants.USE)) {
             if (optionName.equals(Constants.EXPLORE_CARD_ID)) {
                 if (game.isFowMode()) {
-                    event.replyChoice("You can not see the autocomplete in Fog of War", "[error]").queue();
+                    event.replyChoice("You cannot see the autocomplete in fog of war"., "[error]").queue();
                     return;
                 }
 

@@ -33,12 +33,12 @@ public class CaptureCommand implements Command {
             GameManager gameManager = GameManager.getInstance();
 
             if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+                MessageHelper.replyToMessage(event, "Set your active game using: `/set_game gameName`.");
                 return false;
             }
             Game userActiveGame = gameManager.getUserActiveGame(userID);
             if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function `/join gameName`.");
                 return false;
             }
             return true;

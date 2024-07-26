@@ -13,7 +13,7 @@ import java.util.*;
 
 public class ShowAllSO extends SOCardsSubcommandData {
     public ShowAllSO() {
-        super(Constants.SHOW_ALL_SO, "Show all Secret Objectives to one player");
+        super(Constants.SHOW_ALL_SO, "Show all secret objectives to one player.");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
@@ -23,13 +23,13 @@ public class ShowAllSO extends SOCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
 
         Player player_ = Helper.getPlayer(game, null, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found.");
             return;
         }
         showAll(player, player_, game);
@@ -46,6 +46,6 @@ public class ShowAllSO extends SOCardsSubcommandData {
             sb.append(SOInfo.getSecretObjectiveRepresentation(id)).append("\n");
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All SOs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All secret objectives shown to player.");
     }
 }

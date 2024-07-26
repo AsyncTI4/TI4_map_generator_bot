@@ -36,6 +36,6 @@ public class PNReset extends PNCardsSubcommandData {
         }
         PNInfo.checkAndAddPNs(game, player);
         PNInfo.sendPromissoryNoteInfo(game, player, true, event);
-        MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "Promissory note info sent.");
     }
 }

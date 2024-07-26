@@ -31,7 +31,7 @@ import ti4.message.MessageHelper;
 
 public class CreateFOWGameChannels extends BothelperSubcommandData {
     public CreateFOWGameChannels() {
-        super(Constants.CREATE_FOW_GAME_CHANNELS, "Create Role and Game Channels for a New FOW Game");
+        super(Constants.CREATE_FOW_GAME_CHANNELS, "Create role and game channels for a new fog of war game.");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
@@ -40,7 +40,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.FOWGM, "Default GM is whoever runs this command"));
+        addOptions(new OptionData(OptionType.USER, Constants.FOWGM, "Game master (default: you)"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next fow###)"));
     }
 
@@ -73,7 +73,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return;
         }
 

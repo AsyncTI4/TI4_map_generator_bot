@@ -448,7 +448,7 @@ public class MiltyDraftManager {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " be sure to wait for keleres to get set up before dealing out secrets.");
             }
         } catch (Exception e) {
-            String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ";
+            String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you wish to try doing it manually: ";
             List<PlayerDraft> speakerOrdered = getDraft().values().stream()
                 .sorted(Comparator.comparing(PlayerDraft::getPosition))
                 .toList();

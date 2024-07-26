@@ -11,10 +11,10 @@ import ti4.message.MessageHelper;
 
 public class ExploreAndDiscard extends ExploreSubcommandData {
     public ExploreAndDiscard() {
-        super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.");
+        super(Constants.DRAW_AND_DISCARD, "Draw from a specified exploration deck.");
         addOptions(
             typeOption.setRequired(true),
-            new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
+            new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default: 1)"));
     }
 
     @Override

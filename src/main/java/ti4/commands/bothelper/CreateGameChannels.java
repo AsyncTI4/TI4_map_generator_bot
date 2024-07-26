@@ -131,7 +131,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
-            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -174,7 +174,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+                "Server **" + guild.getName() + "** cannot host a new game - please contact @Admin to resolve.");
             return;
         }
 
@@ -259,7 +259,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             role.getAsMention() +
             " if you are playing with strangers, you should take a few moments at the start here to discuss how you're going handle disputes and take-backs. Async is an odd format, it can get messy "
             +
-            "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you want to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n"
+            "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you wish to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n"
             +
             "Regarding disputes, playing a diplomatic game with strangers online, with no tone to go off of or human face to empathize with, can often lead to harsh words and hurt feelings. No matter what happens mechanically in the game, you should always "
             +
@@ -275,7 +275,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // MESSAGE ABOUT AGGRESSION METAS
         String agressionMsg = "Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta."
             + " Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line"
-            + ". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
+            + ". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a player's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
             + "\n- No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2."
             + "\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
         List<Button> buttons = new ArrayList<>();

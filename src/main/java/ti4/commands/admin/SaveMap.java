@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 public class SaveMap extends AdminSubcommandData {
 
     public SaveMap() {
-        super(Constants.SAVE_GAME, "Save game");
+        super(Constants.SAVE_GAME, "Save game.");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to reload").setRequired(true).setAutoComplete(true));
     }
 
@@ -24,7 +24,7 @@ public class SaveMap extends AdminSubcommandData {
         if (option != null) {
             String mapName = option.getAsString();
             if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
+                MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use `/list_games`.");
                 return;
             }
             Game game = GameManager.getInstance().getGame(mapName);
@@ -32,7 +32,7 @@ public class SaveMap extends AdminSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Save map: " + game.getName());
 
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "No Game specified.");
+            MessageHelper.sendMessageToEventChannel(event, "No game specified.");
         }
     }
 }

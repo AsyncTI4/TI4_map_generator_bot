@@ -13,8 +13,8 @@ import ti4.model.PublicObjectiveModel;
 
 public class RevealSpecificStage2 extends CustomSubcommandData {
     public RevealSpecificStage2() {
-        super(Constants.REVEAL_SPECIFIC_STAGE2, "PO to reveal");
-        addOptions(new OptionData(OptionType.STRING, Constants.PO_ID, "Public ID").setRequired(true).setAutoComplete(true));
+        super(Constants.REVEAL_SPECIFIC_STAGE2, "Reveal a specific stage II public objective.");
+        addOptions(new OptionData(OptionType.STRING, Constants.PO_ID, "ID of the public objective to reveal").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -22,12 +22,12 @@ public class RevealSpecificStage2 extends CustomSubcommandData {
         Game game = getActiveGame();
         OptionMapping poOption = event.getOption(Constants.PO_ID);
         if (poOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify PO");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a public objective.");
             return;
         }
         Map.Entry<String, Integer> objective = game.revealSpecificStage2(poOption.getAsString());
         if (objective == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "PO not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective not found.");
             return;
         }
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());

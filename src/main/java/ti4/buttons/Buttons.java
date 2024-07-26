@@ -12,7 +12,7 @@ import ti4.message.BotLogger;
 public class Buttons {
     public static final Button GET_A_TECH = green("acquireATech", "Get a Tech");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Tech");
-    public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute CCs");
+    public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
 

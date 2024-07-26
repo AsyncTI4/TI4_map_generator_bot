@@ -18,10 +18,10 @@ import ti4.message.MessageHelper;
 
 public class SendDebt extends PlayerSubcommandData {
     public SendDebt() {
-        super(Constants.SEND_DEBT, "Send a debt token (control token) to player/faction");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color receiving the debt token").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_1, "Faction or Color sending the debt token").setAutoComplete(true));
+        super(Constants.SEND_DEBT, "Send debt chits to player/faction as a reminder of what is owed.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of chit to send").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color receiving the debt chit").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_1, "Faction or Color sending the debt chit").setAutoComplete(true));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class SendDebt extends PlayerSubcommandData {
 
         ButtonHelper.fullCommanderUnlockCheck(receivingPlayer, game, "vaden", event);
 
-        MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
+        MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt chit" + (debtCountToSend == 1 ? "" : "s") + " to " + receivingPlayer.getRepresentation());
 
     }
 

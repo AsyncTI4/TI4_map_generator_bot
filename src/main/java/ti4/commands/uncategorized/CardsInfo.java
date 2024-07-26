@@ -80,10 +80,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
         PNInfo.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game,
-            "You may whisper to people from here by starting a message with to[color] or to[faction]." +
+            "You may whisper to players from here by starting a message with to[color] or to[faction]." +
                 "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme"
-                +
-                "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]");
+                + "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]");
 
     }
 
@@ -239,7 +238,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
             buttons.add(release);
         }
         if (player.hasRelicReady("e6-g0_network")) {
-            buttons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
+            buttons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Action Card"));
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
             Button psycho = Button.success("getPsychoButtons", "Use Psychoarcheology");
@@ -332,7 +331,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
     }
 
     protected String getActionDescription() {
-        return "Send to your Cards Info thread: Scored & Unscored SOs, ACs, and PNs in both hand and Play Area";
+        return "Send your secret objectives, action cards, and promissory notes to your `#Cards Info` thread.";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -19,7 +19,7 @@ public class RemoveAllAdjacencyOverrides extends FOWSubcommandData {
         Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
         game.clearAdjacentTileOverrides();

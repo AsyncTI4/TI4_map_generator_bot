@@ -36,13 +36,13 @@ public class ShowGame implements Command {
         if (option != null) {
             String mapName = option.getAsString();
             if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
+                MessageHelper.replyToMessage(event, "Game with such name does not exists, use `/list_games`.");
                 return false;
             }
         } else {
             Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
             if (userActiveGame == null) {
-                MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
+                MessageHelper.replyToMessage(event, "No active game set, need to specify which map to show.");
                 return false;
             }
         }
@@ -103,7 +103,7 @@ public class ShowGame implements Command {
             MessageChannel channel = event.getMessageChannel();
             if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
                 channel = game.getBotMapUpdatesThread();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
             }
 
             MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
@@ -115,8 +115,8 @@ public class ShowGame implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Shows selected map")
+            Commands.slash(getActionID(), "Shows a selected map.")
                 .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
+                .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format; all, map, stats").setAutoComplete(true)));
     }
 }

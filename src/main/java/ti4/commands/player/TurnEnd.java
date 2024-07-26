@@ -48,9 +48,9 @@ import ti4.model.PromissoryNoteModel;
 
 public class TurnEnd extends PlayerSubcommandData {
     public TurnEnd() {
-        super(Constants.TURN_END, "End Turn");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In FoW, confirm with YES if you are not the active player").setRequired(false));
+        super(Constants.TURN_END, "End a player's turn.");
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color of the player whose turn to end").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "In fog of war, confirm with YES if you are not the active player").setRequired(false));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (game.isFowMode() && !mainPlayer.equals(game.getActivePlayer())) {
             OptionMapping confirm = event.getOption(Constants.CONFIRM);
             if (confirm == null || !"YES".equals(confirm.getAsString())) {
-                MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
+                MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm end turn with `YES`..");
                 return;
             }
         }
@@ -162,7 +162,7 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {
-            FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
+            FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn.");
         }
         ButtonHelper.checkFleetInEveryTile(mainPlayer, game, event);
         if (mainPlayer != nextPlayer) {
@@ -232,7 +232,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
-                poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
+                poButtons.add(Button.secondary("edynCommanderSODraw", "Draw Secret Objectives Instead Of Scoring Public Objective").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
                 break;
             }
         }
@@ -262,17 +262,17 @@ public class TurnEnd extends PlayerSubcommandData {
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
+                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off Binding Debts here. You may pay 1 trade good to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
+                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 Trade Good"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
         }
         List<Button> poButtons = getScoreObjectiveButtons(event, game);
-        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
-        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
+        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "Not Scoring Public Objective");
+        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "Not Scoring Secret Objective");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
@@ -309,7 +309,8 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " trade good" + (numScoredSOs == 1 ? "" : "s") + " and " 
+                        + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
         }
         // if(maxVP+4 > game.getVp()){
@@ -339,7 +340,7 @@ public class TurnEnd extends PlayerSubcommandData {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use the button to pay 3TGs and get a tech, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentation(true, true) + " you may use the button to pay 3 trade goods and research a technology, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()

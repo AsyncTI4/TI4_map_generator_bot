@@ -24,11 +24,11 @@ import ti4.model.ExploreModel;
 public class SendFragments extends ExploreSubcommandData {
 
 	public SendFragments() {
-		super(Constants.SEND_FRAGMENT, "Send a number of relic fragments (default 1) to another player");
+		super(Constants.SEND_FRAGMENT, "Send a number of relic fragments to another player");
 		addOptions(
 			typeOption.setRequired(true),
 			new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true),
-			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)"));
+			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of relic fragments (default: 1)"));
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class SendFragments extends ExploreSubcommandData {
 				receiver.addFragment(fragID);
 			}
 		} else {
-			MessageHelper.sendMessageToEventChannel(event, "Not enough fragments of the specified trait");
+			MessageHelper.sendMessageToEventChannel(event, "Not enough relic fragments of the specified trait.");
 			return;
 		}
 

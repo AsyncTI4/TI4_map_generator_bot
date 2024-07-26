@@ -13,9 +13,9 @@ import ti4.model.EventModel;
 
 public class RevealEvent extends EventSubcommandData {
     public RevealEvent() {
-        super(Constants.REVEAL, "Reveal top Agenda from deck");
-        addOption(OptionType.INTEGER, Constants.COUNT, "Number of cards to reveal (Default = 1)");
-        addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM, "Reveal the agenda from the bottom of the deck instead of the top");
+        super(Constants.REVEAL, "Reveal the event card on top of the deck");
+        addOption(OptionType.INTEGER, Constants.COUNT, "Number of event cards to reveal (default: 1)");
+        addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM, "Reveal the event from the bottom of the deck instead of the top");
     }
 
     @Override

@@ -39,7 +39,7 @@ public abstract class FactionTechAddRemove extends FrankenSubcommandData {
         techIDs.removeIf(id -> !Mapper.isValidTech(id));
 
         if (techIDs.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No valid techs were provided. Please see `/search techs` for available choices.");
+            MessageHelper.sendMessageToEventChannel(event, "No valid technologies were provided. Please see `/search techs` for available choices.");
             return;
         }
 

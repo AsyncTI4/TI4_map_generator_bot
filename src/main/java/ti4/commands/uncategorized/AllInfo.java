@@ -44,7 +44,7 @@ public class AllInfo implements Command {
             String userID = event.getUser().getId();
             GameManager gameManager = GameManager.getInstance();
             if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+                MessageHelper.replyToMessage(event, "Set your active game using: `/set_game gameName`.");
                 return false;
             }
             Member member = event.getMember();
@@ -60,11 +60,11 @@ public class AllInfo implements Command {
             if (userActiveGame.isCommunityMode()) {
                 Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
                 if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                    MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                    MessageHelper.replyToMessage(event, "You're not a player of the game, please call function `/join gameName`.");
                     return false;
                 }
             } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function `/join gameName`.");
                 return false;
             }
             if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
@@ -82,13 +82,13 @@ public class AllInfo implements Command {
         GameManager gameManager = GameManager.getInstance();
         Game game;
         if (!gameManager.isUserWithActiveGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+            MessageHelper.replyToMessage(event, "Set your active game using: `/set_game gameName`.");
             return;
         } else {
             game = gameManager.getUserActiveGame(userID);
             String color = Helper.getColor(game, event);
             if (!Mapper.isValidColor(color)) {
-                MessageHelper.replyToMessage(event, "Color/Faction not valid");
+                MessageHelper.replyToMessage(event, "Color/Faction not valid.");
                 return;
             }
         }
@@ -96,7 +96,7 @@ public class AllInfo implements Command {
         Player player = game.getPlayer(userID);
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event) + "`";
@@ -113,7 +113,7 @@ public class AllInfo implements Command {
     }
 
     protected String getActionDescription() {
-        return "Send all available info to your Cards Info thread.";
+        return "Send all available info to your `#Cards Info` thread.";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

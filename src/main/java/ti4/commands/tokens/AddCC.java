@@ -57,11 +57,11 @@ public class AddCC extends AddRemoveToken {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Command token: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode() && ping) {
             String colorMention = Emojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a token in the system");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }
@@ -71,11 +71,11 @@ public class AddCC extends AddRemoveToken {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Command token: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode() && ping) {
             String colorMention = Emojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a token in the system");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }
@@ -84,7 +84,7 @@ public class AddCC extends AddRemoveToken {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command token: " + color + " is not valid and not supported.");
         }
         return tile.hasCC(ccID);
     }
@@ -110,7 +110,7 @@ public class AddCC extends AddRemoveToken {
 
     @Override
     protected String getActionDescription() {
-        return "Add CC to tile/system";
+        return "Add command token to tile/system.";
     }
 
     @Override

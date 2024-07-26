@@ -107,8 +107,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                 }
                                 if (p2.getPlanets().contains(planet)) {
                                     List<Button> buttons = new ArrayList<>();
-                                    buttons.add(Button.success("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + ButtonHelper.getIdentOrColor(p2, game)));
-                                    buttons.add(Button.primary("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    buttons.add(Button.success("steal2tg_" + p2.getFaction(), "Steal 2 Trade Goods From " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    buttons.add(Button.primary("steal3comm_" + p2.getFaction(), "Steal 3 Commodities From " + ButtonHelper.getIdentOrColor(p2, game)));
                                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " use buttons to resolve",
                                         buttons);
                                 }
@@ -134,8 +134,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         int count = Math.min(p2.getTg(), 2);
         p2.setTg(p2.getTg() - count);
         player.setTg(player.getTg() + count);
-        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " TG" + (count == 1 ? "" : "s") + " stolen by a trap";
-        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " TG" + (count == 1 ? "" : "s") + " via a trap";
+        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " trade good" + (count == 1 ? "" : "s") + " stolen by a trap";
+        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " trade good" + (count == 1 ? "" : "s") + " via a trap";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);
@@ -146,8 +146,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         int count = Math.min(p2.getCommodities(), 3);
         p2.setCommodities(p2.getCommodities() - count);
         player.setTg(player.getTg() + count);
-        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " comm" + (count == 1 ? "" : "s") + " stolen by a trap";
-        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " comm" + (count == 1 ? "" : "s") + " via a trap";
+        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " commodit" + (count == 1 ? "y" : "ies") + " stolen by a trap.";
+        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " commodit" + (count == 1 ? "y" : "ies") + " via a trap.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);

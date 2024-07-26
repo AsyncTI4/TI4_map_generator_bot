@@ -22,8 +22,8 @@ import ti4.model.TileModel;
 public class DrawRedBackTile extends DiscordantStarsSubcommandData {
 
     public DrawRedBackTile() {
-        super(Constants.DRAW_RED_BACK_TILE, "Draw a random red back tile (for Dane's mystery tweet)");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw? Default: 1"));
+        super(Constants.DRAW_RED_BACK_TILE, "Draw a random red back tile (for Dane's mystery Tweet).");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw (default: 1)"));
         // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async blue back tiles in this list (not just PoK + DS). Default: false)"));
     }
 

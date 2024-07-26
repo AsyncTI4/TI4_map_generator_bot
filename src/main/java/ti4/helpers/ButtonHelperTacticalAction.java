@@ -302,14 +302,14 @@ public class ButtonHelperTacticalAction {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
                         + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") 
-                        + "George Nobin, the Celdauri" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent to place 1 space dock for 2TGs or 2 commodities",
+                        + "George Nobin, the Celdauri" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent to place 1 space dock for 2 trade goods or 2 commodities.",
                     buttons);
             }
         }
 
         if (!game.isAbsolMode() && player.getRelics().contains("emphidia")
             && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation() + " You can use the button to explore a planet using the " + Emojis.Relic + "Crown of Emphidia";
+            String message = player.getRepresentation() + " You can use the button to explore a planet using the " + Emojis.Relic + "Crown of Emphidia.";
             List<Button> systemButtons2 = new ArrayList<>();
             systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
@@ -348,7 +348,7 @@ public class ButtonHelperTacticalAction {
         if (Helper.getProductionValue(player, game, game.getTileByPosition(pos), false) > 0
             && ButtonHelper.isPlayerElected(game, player, "prophecy")) {
             message3 = message3
-                + "Reminder that you have Prophecy of Ixth and should produce 2 " + Emojis.fighter + " if you want to keep it. Its removal is not automated.\n";
+                + "Reminder that you have Prophecy of Ixth and should produce 2 " + Emojis.fighter + " if you wish to keep it. Its removal is not automated.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game));
@@ -375,7 +375,7 @@ public class ButtonHelperTacticalAction {
             && !game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
             && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) < 1
             && tile.getUnitHolders().get("space").getUnitCount(UnitType.Mech, player) < 1) {
-            message = "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
+            message = "Nothing moved. Use buttons to decide if you wish to build (if you can) or finish the activation";
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
             needPDSCheck = true;
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
@@ -393,14 +393,15 @@ public class ButtonHelperTacticalAction {
 
                         if (game.isFowMode()) {
                             MessageHelper.sendMessageToChannel(nonActivePlayer.getCorrectChannel(),
-                                nonActivePlayer.getRepresentation() + " you triggered voidwatch");
+                                nonActivePlayer.getRepresentation() + " you triggered Voidwatch.");
                         }
                         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, nonActivePlayer, player);
                         String message2 = player.getRepresentation(true, true)
-                            + " You have triggered void watch. Please select the PN you would like to send";
+                            + " You have triggered Voidwatch. Please select the promissory note you would like to send."
+                            + (ThreadLocalRandom.current().nextInt(20) == 0 ? "  (\"Like to\" being relative.)" : "");
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2,
                             stuffToTransButtons);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you owe the defender one PN");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you owe the Voidwatch owner 1 promissory note.");
                     }
                 }
             }
@@ -488,7 +489,7 @@ public class ButtonHelperTacticalAction {
         Tile tile = game.getTileByPosition(pos);
         int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "
-            + tile.getRepresentationForButtons(game, player) + " (**" + distance + " tile" + (distance == 1 ? "" : "s") + " away**)\n"
+            + tile.getRepresentationForButtons(game, player) + " - **" + distance + " tile" + (distance == 1 ? "" : "s") + " away**.\n"
             + event.getMessage().getContentRaw());
         String message = "Choose a different system to move from, or finalize movement.";
         game.resetCurrentMovedUnitsFrom1System();
@@ -505,13 +506,13 @@ public class ButtonHelperTacticalAction {
         game.resetCurrentMovedUnitsFrom1System();
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Chose to move from "
             + game.getTileByPosition(pos).getRepresentationForButtons(game, player)
-            + ". Use buttons to select the units you want to move.", systemButtons);
+            + ". Use buttons to select the units you wish to move.", systemButtons);
         ButtonHelper.deleteMessage(event);
     }
 
     public static void selectRingThatActiveSystemIsIn(Player player, Game game, ButtonInteractionEvent event) {
         if (player.getTacticalCC() < 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " does not have any tactical CC.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " does not have any command tokens in their tactic pool.");
             return;
         }
         game.setNaaluAgent(false);
@@ -526,7 +527,7 @@ public class ButtonHelperTacticalAction {
         if (player.doesPlayerPreferDistanceBasedTacticalActions() && !game.isFowMode() && game.getRingCount() < 5) {
             alternateWayOfOfferingTiles(player, game);
         } else {
-            String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in."
+            String message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in."
                 + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
@@ -539,7 +540,7 @@ public class ButtonHelperTacticalAction {
         initialOffering.addAll(CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 0));
         int maxDistance = 0;
         List<Button> buttons = new ArrayList<>();
-        String message = "Doing a tactical action. Please select the tile you want to activate. Right now showing tiles ";
+        String message = "Doing a tactical action. Please select the tile you wish to activate. Right now showing tiles ";
         if (initialOffering.size()
             + CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 1).size() < 6) {
             initialOffering.addAll(CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 1));
@@ -573,7 +574,7 @@ public class ButtonHelperTacticalAction {
         }
         buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
 
-        String message = "Doing a tactical action. Please select the tile you want to activate";
+        String message = "Doing a tactical action. Please select the tile you wish to activate";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -663,7 +664,7 @@ public class ButtonHelperTacticalAction {
         }
 
         // Send buttons to move
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you want to move from", systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you wish to move from.", systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {

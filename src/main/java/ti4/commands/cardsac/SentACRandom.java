@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class SentACRandom extends ACCardsSubcommandData {
     public SentACRandom() {
-        super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player");
+        super(Constants.SEND_AC_RANDOM, "Send a random action card to a player.");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
@@ -65,7 +65,7 @@ public class SentACRandom extends ACCardsSubcommandData {
         player_.setActionCard(acID);
         ACInfo.sendActionCardInfo(game, player_);
         ACInfo.sendActionCardInfo(game, player);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# " + player.getRepresentation() + " you lost the AC " + Mapper.getActionCard(acID).getName());
-        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# " + player_.getRepresentation() + " you gained the AC " + Mapper.getActionCard(acID).getName());
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "# " + player.getRepresentation() + " you lost the action card " + Mapper.getActionCard(acID).getName() + ".");
+        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), "# " + player_.getRepresentation() + " you gained the action card " + Mapper.getActionCard(acID).getName() + ".");
     }
 }

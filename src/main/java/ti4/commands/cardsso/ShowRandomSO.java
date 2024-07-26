@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class ShowRandomSO extends SOCardsSubcommandData {
 
     public ShowRandomSO() {
-        super("show_random", "Show a Secret Objective to a player");
+        super("show_random", "Show a random secret objective to a player.");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
@@ -25,13 +25,13 @@ public class ShowRandomSO extends SOCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
 
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         if (secrets.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No secrets to reveal");
+            MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal.");
             return;
         }
         Collections.shuffle(secrets);
@@ -46,11 +46,11 @@ public class ShowRandomSO extends SOCardsSubcommandData {
 
         Player player_ = Helper.getPlayer(game, null, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found.");
             return;
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
+        MessageHelper.sendMessageToEventChannel(event, "Random secret objective shown to player.");
         SOInfo.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb);
     }

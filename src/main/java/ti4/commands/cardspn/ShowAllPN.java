@@ -16,9 +16,9 @@ import java.util.*;
 
 public class ShowAllPN extends PNCardsSubcommandData {
     public ShowAllPN() {
-        super(Constants.SHOW_ALL_PN, "Show Promissory Note to player");
+        super(Constants.SHOW_ALL_PN, "Show all promissory note to a player.");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, \"y\" or \"yes\" to enable").setRequired(false));
     }
 
     @Override
@@ -27,12 +27,12 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         Player targetPlayer = Helper.getPlayer(game, null, event);
         if (targetPlayer == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Target player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Target player not found.");
             return;
         }
 
@@ -54,11 +54,11 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Collections.shuffle(promissoryNotes);
         int index = 1;
         for (String id : promissoryNotes) {
-            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName() + " (original owner " + ButtonHelper.getIdentOrColor(game.getPNOwner(id), game) + ")").append("\n");
+            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName() + " (original owner " + ButtonHelper.getIdentOrColor(game.getPNOwner(id), game) + ").").append("\n");
             index++;
         }
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, game, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All PNs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "All promissory notes shown to a player.");
     }
 }

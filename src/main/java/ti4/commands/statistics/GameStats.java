@@ -56,7 +56,7 @@ public class GameStats extends StatisticsSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
-        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
+        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog of war game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setAutoComplete(true));
@@ -98,9 +98,9 @@ public class GameStats extends StatisticsSubcommandData {
      */
     public enum GameStatistics {
         // Add your new statistic here
-        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), PING_LIST("Ping List", "List of how many times people have been pinged"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour",
+        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), PING_LIST("Ping List", "List of how many times players have been pinged"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour",
             "Show colour play count"), FACTION_WINS("Wins per Faction",
-                "Show the wins per faction"), SOS_SCORED("Times an SO has been scored", "Show the amount of times each SO has been scored"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+                "Show the wins per faction"), SOS_SCORED("Times a secret objective has been scored", "Show the amount of times each secret objective has been scored"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
         // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 BP was scored but no winner was declared"),
         WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"), SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"), GAME_COUNT("Total game count", "Shows the total game count");
 
@@ -231,7 +231,7 @@ public class GameStats extends StatisticsSubcommandData {
             .collect(Collectors.toMap(
                 Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         int index = 1;
-        StringBuilder sb = new StringBuilder("List of times a particular secret has been scored\n");
+        StringBuilder sb = new StringBuilder("List of times a particular secret objective has been scored\n");
         for (String ket : topThousand.keySet()) {
 
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
@@ -240,7 +240,7 @@ public class GameStats extends StatisticsSubcommandData {
             sb.append("\n");
             index++;
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "Secret Score Counts", sb.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), "Secret Objective Score Counts", sb.toString());
 
         topThousand = publics.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).limit(3000)
             .collect(Collectors.toMap(

@@ -17,9 +17,9 @@ import java.util.StringTokenizer;
 abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandData {
     public AddRemoveFactionCCToFromFleet(String id, String description) {
         super(id, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction Color for CC")
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction Color for Command Tokens")
             .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set CC's").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction To Set Command Tokens For").setRequired(false));
     }
 
     @Override
@@ -51,7 +51,7 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
             }
             action(event, colors, game, player);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify CC's");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify command tokens.");
         }
     }
 

@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 
 public class RemoveFogTile extends FOWSubcommandData {
     public RemoveFogTile() {
-        super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.");
+        super(Constants.REMOVE_FOG_TILE, "Remove fog of war tiles from the map.");
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to remove from").setAutoComplete(true));
     }

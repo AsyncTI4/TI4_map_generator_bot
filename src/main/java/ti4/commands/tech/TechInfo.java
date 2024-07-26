@@ -19,7 +19,7 @@ import ti4.model.TechnologyModel;
 
 public class TechInfo extends TechSubcommandData {
     public TechInfo() {
-        super(Constants.INFO, "Send tech information to your Cards Info channel");
+        super(Constants.INFO, "Send technology information to your Cards Info channel");
     }
 
     @Override

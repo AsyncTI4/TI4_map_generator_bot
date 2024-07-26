@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 
 public class ShowUnScoredSOs extends SOCardsSubcommandData {
     public ShowUnScoredSOs() {
-        super(Constants.SHOW_UNSCORED_SOS, "List any SOs that are not scored yet");
+        super(Constants.SHOW_UNSCORED_SOS, "List any secret objectives that have not yet been scored.");
     }
 
     @Override
@@ -25,7 +25,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
 
     public static void showUnscored(Game game, GenericInteractionCreateEvent event) {
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog of war mode.");
             return;
         }
         List<String> defaultSecrets = Mapper.getDecks().get(game.getSoDeckID()).getNewShuffledDeck();

@@ -18,7 +18,7 @@ public class StellarConverter extends StatisticsSubcommandData {
 
     public StellarConverter() {
         super(Constants.STELLAR_CONVERTER, "Number of times each planet has been converted");
-        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
+        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default: False)"));
     }
 
     @Override

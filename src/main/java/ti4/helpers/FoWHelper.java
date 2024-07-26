@@ -930,7 +930,7 @@ public class FoWHelper {
 			.toList();
 		if (badEmojis.size() > 0) {
 			StringBuilder sb = new StringBuilder(Constants.jazzPing());
-			sb.append(" Bad emojis are being used for FOW reacts:\n");
+			sb.append(" Bad emojis are being used for fog of war reacts:\n");
 			for (String err : badEmojis) {
 				sb.append("```\n").append(err).append("\n```");
 			}

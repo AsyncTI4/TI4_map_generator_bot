@@ -18,8 +18,8 @@ import ti4.message.MessageHelper;
 
 public class DealSOToAll extends SOCardsSubcommandData {
     public DealSOToAll() {
-        super(Constants.DEAL_SO_TO_ALL, "Deal Secret Objective (count) to all game players");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        super(Constants.DEAL_SO_TO_ALL, "Deal secret objective(s) to all game players.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many secret objectives to deal (default: 1)"));
     }
 
     @Override
@@ -37,29 +37,29 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to Plausible Deniability, you were dealt an extra SO. You must also discard an extra SO.");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " due to Plausible Deniability, you were dealt an extra secret objectives. You must also discard an extra secret objective.");
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player, event);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your respective `#Cards Info` threads.");
         if (game.getRound() == 1) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));
-            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after everyone has discarded", buttons);
+            buttons.add(Button.success("startOfGameObjReveal", "Reveal Objectives And Start Strategy Phase"));
+            MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after everyone has discarded 1 of their starting secret objective.", buttons);
             Player speaker = null;
             if (game.getPlayer(game.getSpeaker()) != null) {
                 speaker = game.getPlayers().get(game.getSpeaker());
             }
             if (speaker == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Speaker is not yet assigned. Secrets have been dealt, but please assign speaker soon (command is /player stats speaker:y)");
+                    "Speaker is not yet assigned. Secrets have been dealt, but please assign speaker soon (command is `/player stats speaker:y`).");
             }
             // List<Button> buttons2 = new ArrayList<>();
             // buttons2.add(Button.success("setOrder", "Set Speaker Order"));
             // buttons2.add(Button.danger("deleteButtons", "Decline"));
             // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-            //     game.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
+            //     game.getPing() + " if your map has all players' home systems in the same ring, you should set speaker order using this button", buttons2);
             Helper.setOrder(game);
         }
     }

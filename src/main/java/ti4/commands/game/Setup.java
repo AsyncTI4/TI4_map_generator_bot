@@ -16,13 +16,13 @@ import ti4.message.MessageHelper;
 public class Setup extends GameSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Game Setup");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30. Default 6"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game VP count. Default is 10"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC_COUNT_FOR_MAP, "Number of strategy cards each player gets. Default 1"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_SO_COUNT, "Max Number of SO's per player. Default 3"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Number of players between 1 or 30 (default: 6)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Game victory point count (default: 10)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC_COUNT_FOR_MAP, "Number of strategy cards each player gets each round (default: 1)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_SO_COUNT, "Maximum number of secret objectives per player (default: 3)"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Custom description"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to mark the game as TIGL"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings; minimum 1; enter 0 to turn off"));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class Setup extends GameSubcommandData {
             game.setStoredValue(key2, "");
             game.setStoredValue(key3, "");
             if (game.getRound() > 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any SO queue has been erased due to the change in SO count. You can resolve the previously queued draws by just pressing draw again.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Any secret objective queue has been erased due to the change in secret objective count. You can resolve the previously queued draws by just pressing draw again.");
             }
 
         }
@@ -128,7 +128,7 @@ public class Setup extends GameSubcommandData {
         boolean isTIGLGame) {
         if (isTIGLGame
             && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode())) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games cannot be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
             game.setCompetitiveTIGLGame(true);

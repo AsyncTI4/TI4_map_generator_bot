@@ -20,8 +20,8 @@ import ti4.model.PromissoryNoteModel;
 
 public class SendPN extends PNCardsSubcommandData {
 	public SendPN() {
-		super(Constants.SEND_PN, "Send Promissory Note to player");
-		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
+		super(Constants.SEND_PN, "Send Promissory Note To Player");
+		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "ID, name, or partial name of the promissory note to send").setRequired(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
 	}
 
@@ -31,12 +31,12 @@ public class SendPN extends PNCardsSubcommandData {
 		Player player = game.getPlayer(getUser().getId());
 		player = Helper.getGamePlayer(game, player, event, null);
 		if (player == null) {
-			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+			MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
 			return;
 		}
 		OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
 		if (option == null) {
-			MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to send");
+			MessageHelper.sendMessageToEventChannel(event, "Please select which promissory note to send.");
 			return;
 		}
 
@@ -59,7 +59,7 @@ public class SendPN extends PNCardsSubcommandData {
 					pnName = pnName.toLowerCase();
 					if (pnName.contains(value) || pn.getKey().contains(value)) {
 						if (foundSimilarName && !cardName.equals(pnName)) {
-							MessageHelper.sendMessageToEventChannel(event, "Multiple cards with similar name founds, please use ID");
+							MessageHelper.sendMessageToEventChannel(event, "Multiple promissory notes with similar name founds, please use ID.");
 							return;
 						}
 						id = pn.getKey();
@@ -71,25 +71,25 @@ public class SendPN extends PNCardsSubcommandData {
 		}
 
 		if (id == null) {
-			MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+			MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
 			return;
 		}
 		PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(id);
 		if (pnModel == null) {
-			MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note found, please retry");
+			MessageHelper.sendMessageToEventChannel(event, "No such promissory note found, please retry.");
 			return;
 		}
 
 		Player targetPlayer = Helper.getPlayer(game, null, event);
 		if (targetPlayer == null) {
-			MessageHelper.sendMessageToEventChannel(event, "No such Player in game");
+			MessageHelper.sendMessageToEventChannel(event, "No such player in this game.");
 			return;
 		}
 
 		Player pnOwner = game.getPNOwner(id);
 		if (player.getPromissoryNotesInPlayArea().contains(id)) {
 			if (!targetPlayer.equals(pnOwner)) {
-				MessageHelper.sendMessageToEventChannel(event, "Promissory Notes in Play Area may only be sent to the owner of the PN.");
+				MessageHelper.sendMessageToEventChannel(event, "Promissory notes in play area may only be sent to the owner of the promissory note.");
 				return;
 			}
 		}
@@ -111,12 +111,12 @@ public class SendPN extends PNCardsSubcommandData {
 		PNInfo.sendPromissoryNoteInfo(game, player, false);
 
 		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.getName() + "**" : "";
-		String message = player.getRepresentation() + " sent " + Emojis.PN + extraText + " to " + targetPlayer.getRepresentation();
+		String message = player.getRepresentation() + " sent " + Emojis.PN + extraText + " to " + targetPlayer.getRepresentation() + ".";
 		if (game.isFowMode()) {
-			String fail = "User for faction not found. Report to ADMIN";
-			String success = message + "\nThe other player has been notified";
+			String fail = "User for faction not found. Report to ADMIN.";
+			String success = message + "\nThe other player has been notified.";
 			MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event, message, fail, success);
-			MessageHelper.sendMessageToEventChannel(event, "PN sent");
+			MessageHelper.sendMessageToEventChannel(event, "Promissory note sent.");
 		} else {
 			MessageHelper.sendMessageToEventChannel(event, message);
 		}

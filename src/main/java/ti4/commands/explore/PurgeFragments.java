@@ -19,9 +19,9 @@ import ti4.generator.Mapper;
 public class PurgeFragments extends ExploreSubcommandData {
 
 	public PurgeFragments() {
-		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).");
+		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic; may use unknown relic fragments).");
 		addOptions(typeOption.setRequired(true),
-			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."));
+			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default: 3; put 2 if using NRA Fabrication or Black Market Forgery)."));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
 	}
@@ -60,7 +60,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 		while (fragmentsToPurge.size() < count) {
 			if (unknowns.isEmpty()) {
-				MessageHelper.sendMessageToEventChannel(event, "Not enough fragments. Note that default count is 3.");
+				MessageHelper.sendMessageToEventChannel(event, "Not enough relic fragments. Note that default count is 3.");
 				return;
 			}
 			fragmentsToPurge.add(unknowns.remove(0));
@@ -77,7 +77,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		if (lanefirPlayer != null) {
 			ButtonHelper.commanderUnlockCheck(activePlayer, game, "lanefir", event);
 		}
-		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
+		String message = activePlayer.getRepresentation() + " purged relic fragments: " + fragmentsToPurge;
 		MessageHelper.sendMessageToEventChannel(event, message);
 
 		if (activePlayer.hasTech("dslaner")) {

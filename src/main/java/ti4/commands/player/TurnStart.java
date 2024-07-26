@@ -118,12 +118,12 @@ public class TurnStart extends PlayerSubcommandData {
             if (privatePlayer.getStasisInfantry() > 0) {
                 if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        "Use buttons to revive infantry II. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + " You had " + privatePlayer.getStasisInfantry() + " infantry II to be revived, but the bot couldn't find planets you own in your home system to place them, so per the rules they are now lost, like tears in rain.");
 
                 }
             }
@@ -151,12 +151,12 @@ public class TurnStart extends PlayerSubcommandData {
             if (privatePlayer.getStasisInfantry() > 0) {
                 if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        "Use buttons to revive infantry II. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
+                        + " You had " + privatePlayer.getStasisInfantry() + " infantry II to be revived, but the bot couldn't find planets you own in your home system to place them, so per the rules they are now lost, like tears in rain.");
 
                 }
             }
@@ -196,13 +196,13 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you may use the button to get your tech.",
+                        player.getRepresentation(true, true) + " you may use the button to get your technology.",
                         List.of(Buttons.GET_A_TECH));
                 } else {
                     List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
-                    String message2 = player.getRepresentation() + "! Your current CCs are "
+                    String message2 = player.getRepresentation() + "! Your current command tokens are "
                         + player.getCCRepresentation()
-                        + ". Use buttons to gain CCs";
+                        + ". Use buttons to gain command tokens.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         message2, buttons2);
                     game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -210,11 +210,11 @@ public class TurnStart extends PlayerSubcommandData {
             }
             if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
                 String msg = player.getRepresentation()
-                    + " since you have deliberate action ability and passed while one of your pools was at 0, you may gain 1 CC to that pool.";
+                    + " since you have the Deliberate Action faction  ability and passed while one of your pools was at 0, you may gain 1 command token to that pool.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                    + ". Use buttons to gain CCs";
+                String message2 = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons2);
             }
             TurnEnd.pingNextPlayer(event, game, player, true);
@@ -252,7 +252,7 @@ public class TurnStart extends PlayerSubcommandData {
                 count++;
             }
         }
-        sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");
+        sb.append("You currently have ").append(player.getStrategicCC()).append(" command token" + (player.getStrategicCC() == 1 ? "" : "s") + " in your strategy pool.");
         return sendReminder ? sb.toString() : null;
     }
 
@@ -310,7 +310,7 @@ public class TurnStart extends PlayerSubcommandData {
                             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                         }
                         sb.append("You currently have ").append(p2.getStrategicCC())
-                            .append(" CC in your strategy pool.");
+                            .append(" command token" + (p2.getStrategicCC() == 1 ? "" : "s") + " in your strategy pool.");
                         if (!p2.hasFollowedSC(sc)) {
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
                         }
@@ -430,7 +430,7 @@ public class TurnStart extends PlayerSubcommandData {
             startButtons.add(hacanButton);
         }
         if (player.hasRelicReady("e6-g0_network")) {
-            startButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw AC"));
+            startButtons.add(Button.success("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Action Card"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
             Button nekroButton = Button.secondary("exhaustAgent_nekroagent",

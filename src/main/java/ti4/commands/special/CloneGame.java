@@ -10,8 +10,8 @@ import ti4.message.MessageHelper;
 
 public class CloneGame extends SpecialSubcommandData {
     public CloneGame() {
-        super(Constants.CLONE_GAME, "Clone game in its current state");
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
+        super(Constants.CLONE_GAME, "Clone game in its current state.");
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm with YES").setRequired(true));
     }
 
     @Override
@@ -20,7 +20,7 @@ public class CloneGame extends SpecialSubcommandData {
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
             ButtonHelper.cloneGame(event, game);
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "Please type YES.");
+            MessageHelper.sendMessageToEventChannel(event, "Please confirm with `YES`.");
         }
 
     }

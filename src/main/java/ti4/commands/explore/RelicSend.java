@@ -20,10 +20,10 @@ import ti4.model.RelicModel;
 
 public class RelicSend extends GenericRelicAction {
     public RelicSend() {
-        super(Constants.RELIC_SEND, "Send a relic to another Player", true);
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to send from Target to Source").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Target Faction or Color").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source Faction or Color (default is you)").setAutoComplete(true));
+        super(Constants.RELIC_SEND, "Send a relic to another player.", true);
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic card to send").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Receiving Faction or Color").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Sending Faction or Color (default: you)").setAutoComplete(true));
     }
 
     public void doAction(Player player1, SlashCommandInteractionEvent event) {

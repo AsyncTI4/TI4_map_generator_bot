@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 public class SearchWarrant extends SpecialSubcommandData {
     public SearchWarrant() {
         super(Constants.SEARCH_WARRANT, "Search Warrant set on/off. ");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set CC's").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction who gains the Search Warrent").setRequired(false));
     }
 
     @Override
@@ -21,7 +21,7 @@ public class SearchWarrant extends SpecialSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
         player.setSearchWarrant();

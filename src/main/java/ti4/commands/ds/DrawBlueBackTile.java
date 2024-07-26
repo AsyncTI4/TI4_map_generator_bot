@@ -22,8 +22,8 @@ import ti4.model.TileModel;
 public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
 
     public DrawBlueBackTile() {
-        super(Constants.DRAW_BLUE_BACK_TILE, "Draw a random blue back tile (for Star Charts and Decrypted Cartoglyph)");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw? Default: 1"));
+        super(Constants.DRAW_BLUE_BACK_TILE, "Draw a random blue back tile (for Star Charts and Decrypted Cartoglyph).");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "How many to draw (default: 1)"));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
@@ -49,7 +49,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         Collections.shuffle(unusedBlueTiles);
 
         if (unusedBlueTiles.size() < count) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
             return;
         }
 
@@ -62,7 +62,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         }
         String tileString = String.join(",", tileToPullFromUnshuffled.stream().map(t -> t.getTile().getTileID()).toList());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use /map add_tile to add it to the map.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use `/map add_tile` to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
         if (ids.size() == 1) {

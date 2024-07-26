@@ -27,7 +27,7 @@ public class CreateTile extends BothelperSubcommandData {
         super(Constants.CREATE_TILE, "Permanently creates a new tile that can be used in future games.");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_ID, "The reference ID for the tile, generally the name in all lowercase without spaces").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "The tile's display name").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_ALIASES, "A comma-separated list of any aliases you want to set for the tile.").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_ALIASES, "A comma-separated list of any aliases you wish to set for the tile.").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_IMAGE, "The name of the tile's image file. Someone with access will need to add this to the bot").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_PLANET_IDS, "A comma-separated list of the IDs of the planets that are in the tile. Make sure to make the planets").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_TYPE, "The tile's layout type. If you don't know what this is, ask.").setRequired(true).setAutoComplete(true));

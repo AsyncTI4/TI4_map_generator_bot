@@ -49,7 +49,7 @@ public class ButtonHelperCommanders {
             oldThing = player.getTg();
             player.setTg(oldThing - 1);
             newThing = player.getTg();
-            msg2 = "TG (" + oldThing + "->" + newThing + ")";
+            msg2 = "trade good (" + oldThing + "->" + newThing + ")";
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "You can't afford the cost of Spc. Phquaiset, the Cheiran Commander, right now. Get more money ya broke crab.");
@@ -79,7 +79,7 @@ public class ButtonHelperCommanders {
         }
         buttons.add(Button.danger("deleteButtons", "Decline"));
         String msg = player.getRepresentation(true, true)
-            + " you may exhaust 1 planet to gain TGs equal to its influence or resources.";
+            + " you may exhaust 1 planet to gain trade goods equal to its influence or resources.";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -95,7 +95,7 @@ public class ButtonHelperCommanders {
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
         String msg = player.getRepresentation(true, true) + " used Knak Halfear , the Olradin Commander, to exhaust "
-            + Helper.getPlanetRepresentation(planet, game) + " and gain " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->"
+            + Helper.getPlanetRepresentation(planet, game) + " and gain " + count + "trade good" + (count == 1 ? "" : "s") + " (" + oldTg + "->"
             + player.getTg() + ")";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
@@ -104,13 +104,13 @@ public class ButtonHelperCommanders {
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " will discard 1 AC to move or place 1 mech on "
-            + Helper.getPlanetRepresentation(planet, game);
+        String msg = player.getFactionEmoji() + " will discard 1 action card to move or place 1 mech on "
+            + Helper.getPlanetRepresentation(planet, game) + ".";
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet,
             game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentation(true, true) + " use buttons to discard",
+            player.getRepresentation(true, true) + " use buttons to discard.",
             ACInfo.getDiscardActionCardButtons(game, player, false));
         event.getMessage().delete().queue();
     }
@@ -119,7 +119,7 @@ public class ButtonHelperCommanders {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             return;
         }
-        String summary = player.getRepresentation() + " you could potentially use Brother Omar, the Yin Commander, to sacrifice 1 infantry and ignore the prerequisites for these techs (the bot did not check if you have the prerequisites otherwise):\n";
+        String summary = player.getRepresentation() + " you could potentially use Brother Omar, the Yin Commander, to sacrifice 1 infantry and ignore the prerequisites for these technologies (the bot did not check if you have the prerequisites otherwise):\n";
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             for (String tech : p2.getTechs()) {
@@ -180,7 +180,7 @@ public class ButtonHelperCommanders {
             msg = msg + " commodity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
             player.setCommodities(player.getCommodities() - 1);
         } else {
-            msg = msg + "TG (" + player.getTg() + "->" + (player.getTg() - 1) + ") ";
+            msg = msg + "trade good (" + player.getTg() + "->" + (player.getTg() - 1) + ") ";
             player.setTg(player.getTg() - 1);
         }
         msg = msg + " to cancel one hit";
@@ -282,7 +282,7 @@ public class ButtonHelperCommanders {
 
             String fromLang = "from " + planetName + (planetName.equals("space") ? " in " + from.getRepresentationForButtons(game, player) : "");
             String toLang = planetNameTo.equals("space") ? "in space of tile " + to.getRepresentationForButtons(game, player) : "on " + planetNameTo;
-            String message = player.getRepresentation() + " your " + unitType.humanReadableName() + " successfully migrated " + fromLang + ", and has landed itself " + toLang;
+            String message = player.getRepresentation() + " your " + unitType.humanReadableName() + " successfully migrated " + fromLang + ", and has landed itself " + toLang + ".";
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.deleteMessage(context.getEvent());
@@ -301,7 +301,7 @@ public class ButtonHelperCommanders {
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-        String msg = "Used Tungstantus, the Ul commander, to gain 1TG (" + cTG + "->" + fTG + "). ";
+        String msg = "Used Tungstantus, the Ul commander, to gain 1 trade good (" + cTG + "->" + fTG + "). ";
         player.addSpentThing(msg);
         String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
         ButtonHelper.deleteTheOneButton(event);
@@ -316,16 +316,16 @@ public class ButtonHelperCommanders {
                 int newTg = player.getTg() + 1;
                 player.setTg(player.getTg() + 1);
                 String mMessage = player.getRepresentation(true, true)
-                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1TG has been added automatically (" + old
+                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1 trade good has been added automatically (" + old
                     + "->" + newTg + ").";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
             } else {
                 String mMessage = player.getRepresentation(true, true)
-                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
+                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1 trade good, but you are in Pillage range, so this has not been done automatiqcally.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("gain1tgFromLetnevCommander", "Gain 1TG"));
+                buttons.add(Button.success("gain1tgFromLetnevCommander", "Gain 1 Trade Good"));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
@@ -381,9 +381,9 @@ public class ButtonHelperCommanders {
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
             } else {
                 String mMessage = player.getRepresentation(true, true)
-                    + " you have Magmus, the Muaat Commander, unlocked, you may gain 1TG, but you are in Pillage range, so this has not been done automatically.";
+                    + " you have Magmus, the Muaat Commander, unlocked, you may gain 1 trade good, but you are in Pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("gain1tgFromMuaatCommander", "Gain 1TG").withEmoji(Emoji.fromFormatted(Emojis.tg)));
+                buttons.add(Button.success("gain1tgFromMuaatCommander", "Gain 1 Trade Good").withEmoji(Emoji.fromFormatted(Emojis.tg)));
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
@@ -393,7 +393,7 @@ public class ButtonHelperCommanders {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getUnitDamageCount(UnitType.Mech, player.getColorID()) > 0) {
                         uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColorID()));
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending 1 command token from their strategy pool.");
                     }
                 }
             }
@@ -403,7 +403,7 @@ public class ButtonHelperCommanders {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getUnitDamageCount(UnitType.Mech, player.getColor()) > 0) {
                         uH.removeUnitDamage(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getUnitDamageCount(UnitType.Mech, player.getColorID()));
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending 1 command token from their strategy pool.");
                     }
                 }
             }
@@ -416,14 +416,14 @@ public class ButtonHelperCommanders {
                 || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
+                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 Action Cards (With Scheming)"));
                 } else {
-                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 Action Card"));
                 }
                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
-                        + " You gained tech while having Nekro Acidos, the Nekro commander, use buttons to resolve. ",
+                        + " You gained a technology while having Nekro Acidos, the Nekro commander; use buttons to resolve. ",
                     buttons);
             } else {
                 if (player.hasAbility("technological_singularity")) {
@@ -440,11 +440,12 @@ public class ButtonHelperCommanders {
                     if (count > 2) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             "# " + player.getRepresentation(true, true)
-                                + " heads up, that was your 3rd faction tech, you may wanna lose one with /tech remove");
+                                + " heads up, that was your 3rd faction technology, you may wanna lose one with `/tech remove`.");
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentation(true, true)
-                            + " You gained tech while having Nekro Acidos, the Nekro commander, but since it is a faction tech and you used one of your Valefars, you didn't technically \"gain\" a new tech and therefore you do not draw an AC.");
+                            + " You gained technology while having Nekro Acidos, the Nekro commander, but since it is a faction technology and you used one of your Valefars,"
+                            + " you didn't technically \"gain\" a new technology and therefore you do not draw an action card.");
                 }
             }
         }
@@ -472,15 +473,15 @@ public class ButtonHelperCommanders {
         String type = buttonID.split("_")[0];
         if ("ac".equalsIgnoreCase(type)) {
             ShowAllAC.showAll(enemy, player, game);
-            message = " used So Ata, the Yssaril commander, to look at ACs";
+            message = " used So Ata, the Yssaril commander, to look at action cards.";
         }
         if ("so".equalsIgnoreCase(type)) {
             new ShowAllSO().showAll(enemy, player, game);
-            message = " used So Ata, the Yssaril commander, to look at SOs";
+            message = " used So Ata, the Yssaril commander, to look at secret objectives.";
         }
         if ("pn".equalsIgnoreCase(type)) {
             new ShowAllPN().showAll(enemy, player, game, false);
-            message = " used So Ata, the Yssaril commander, to look at PNs";
+            message = " used So Ata, the Yssaril commander, to look at promissory notes.";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + message);
         if (game.isFowMode()) {
@@ -489,14 +490,14 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
-    public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event, Boolean unleash) {
+    public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
         if (player.getTg() > 0) {
             player.setTg(oldTg - 1);
         }
         ButtonHelper.commanderUnlockCheck(player, game, "keleres", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdentOrColor(player, game) + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + "(" + oldTg + "->"
+            ButtonHelper.getIdentOrColor(player, game) + " paid 1 trade good to unleash Suffi An, the Keleres commander " + "(" + oldTg + "->"
                 + player.getTg() + ")");
         event.getMessage().delete().queue();
     }

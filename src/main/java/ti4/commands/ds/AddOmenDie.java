@@ -14,9 +14,9 @@ import ti4.message.MessageHelper;
 public class AddOmenDie extends DiscordantStarsSubcommandData {
 
     public AddOmenDie() {
-        super(Constants.ADD_OMEN_DIE, "Add a Omen Die");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.RESULT, "Number on the Omen Die").setRequired(true));
-        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async blue back tiles in this list (not just PoK + DS). Default: false)"));
+        super(Constants.ADD_OMEN_DIE, "Add a Myko-Mentori Omen die.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.RESULT, "Number on the Omen die").setRequired(true));
+        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async blue back tiles in this list (not just PoK + DS). Default: False)"));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class AddOmenDie extends DiscordantStarsSubcommandData {
         }
         int dieResult = event.getOption(Constants.RESULT, 1, OptionMapping::getAsInt);
         ButtonHelperAbilities.addOmenDie(game, dieResult);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Added an Omen Die with value " + dieResult);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Added an Omen die with value " + dieResult + ".");
     }
 
 }

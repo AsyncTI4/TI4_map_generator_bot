@@ -16,7 +16,7 @@ public class KyroHero extends DiscordantStarsSubcommandData {
 
     public KyroHero() {
         super(Constants.KYRO_HERO, "Mark a strategy card as the target of Speygh, the Kyro Hero.");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy card number").setRequired(true));
         // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALL_ASYNC_TILES, "True to include all async blue back tiles in this list (not just PoK + DS). Default: false)"));
     }
 

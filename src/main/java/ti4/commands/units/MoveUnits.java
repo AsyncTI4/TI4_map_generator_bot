@@ -210,7 +210,7 @@ public class MoveUnits extends AddRemoveUnits {
             if (color.equals(player.getColor())) {
                 int cc = player.getTacticalCC();
                 if (cc == 0) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have command token in your tactic pool.");
                     break;
                 } else if (!AddCC.hasCC(event, color, tile)) {
                     cc -= 1;
@@ -329,7 +329,7 @@ public class MoveUnits extends AddRemoveUnits {
                     new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                 .addOptions(
-                    new OptionData(OptionType.STRING, Constants.CC_USE, "Type t or tactics to add a CC from tactics, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
+                    new OptionData(OptionType.STRING, Constants.CC_USE, "t or tactics adds 1 tactic pool command token; r or retreat adds 1 reinforcements command token").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")));
     }

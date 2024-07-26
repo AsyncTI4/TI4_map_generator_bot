@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class ShuffleACDeck extends ACCardsSubcommandData {
     public ShuffleACDeck() {
-        super(Constants.SHUFFLE_AC_DECK, "Shuffle Action Card deck");
+        super(Constants.SHUFFLE_AC_DECK, "Shuffle the action card deck.");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
@@ -20,11 +20,11 @@ public class ShuffleACDeck extends ACCardsSubcommandData {
 
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
 
         game.shuffleActionCards();
-        MessageHelper.replyToMessage(event, "Action card deck was shuffled");
+        MessageHelper.replyToMessage(event, "Action card deck was shuffled.");
     }
 }

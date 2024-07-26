@@ -24,11 +24,11 @@ public class RemoveCC extends AddRemoveToken {
             String ccID = Mapper.getCCID(color);
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Command token: " + color + " is not valid and not supported.");
             }
             if (game.isFowMode()) {
                 String colorMention = Emojis.getColorEmojiWithName(color);
-                FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a token in the system");
+                FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a command token in the system");
             }
 
             tile.removeCC(ccID);
@@ -41,11 +41,11 @@ public class RemoveCC extends AddRemoveToken {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command token: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode()) {
             String colorMention = Emojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a token in the system");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a command token in the system");
         }
         tile.removeCC(ccID);
 
@@ -53,7 +53,7 @@ public class RemoveCC extends AddRemoveToken {
 
     @Override
     protected String getActionDescription() {
-        return "Remove CCs from tile/system";
+        return "Remove command tokens from tile/system.";
     }
 
     @Override

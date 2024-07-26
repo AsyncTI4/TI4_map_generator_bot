@@ -11,8 +11,8 @@ import ti4.message.MessageHelper;
 public class SCAddToGame extends CustomSubcommandData {
 
     public SCAddToGame() {
-        super(Constants.ADD_SC_TO_GAME, "Add a Stategy Card # to the game");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to add").setRequired(true));
+        super(Constants.ADD_SC_TO_GAME, "Add a strategy card to the game.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Initiative value of strategy card to add").setRequired(true));
     }
 
     @Override
@@ -21,14 +21,14 @@ public class SCAddToGame extends CustomSubcommandData {
 
         Integer sc = event.getOption(Constants.STRATEGY_CARD, null, OptionMapping::getAsInt);
         if (sc == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "SC was null?");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No initiative value given.");
             return;
         }
 
         if (game.addSC(sc)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Added Strategy Card: " + sc);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Added strategy card: " + sc);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card already exists: " + sc);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card already exists: " + sc);
         }
     }
 

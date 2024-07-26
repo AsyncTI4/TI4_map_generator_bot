@@ -37,7 +37,7 @@ import ti4.model.TemporaryCombatModifierModel;
 
 public class TechExhaust extends TechAddRemove {
     public TechExhaust() {
-        super(Constants.TECH_EXHAUST, "Exhaust Tech");
+        super(Constants.TECH_EXHAUST, "Exhaust Technology");
     }
 
     @Override
@@ -53,7 +53,7 @@ public class TechExhaust extends TechAddRemove {
             tech = "dskortg";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
-        String exhaustMessage = player.getRepresentation() + " exhausted tech " + techModel.getRepresentation(false);
+        String exhaustMessage = player.getRepresentation() + " exhausted technology " + techModel.getRepresentation(false);
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {
@@ -130,7 +130,7 @@ public class TechExhaust extends TechAddRemove {
                 if (tile != null) {
                     String tileRep = tile.getRepresentationForButtons(game, player);
                     String ident = player.getFactionEmoji();
-                    String msg = ident + " removed CC from " + tileRep;
+                    String msg = ident + " removed command token from " + tileRep;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     RemoveCC.removeCC(event, player.getColor(), tile, game);
                 }
@@ -139,13 +139,13 @@ public class TechExhaust extends TechAddRemove {
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
             }
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
-                Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
+                Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain 1 Command Token");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getFactionEmojiOrColor() + " use button to gain 1 CC:", List.of(gainCC));
+                    player.getFactionEmojiOrColor() + " use button to gain 1 command token:", List.of(gainCC));
             }
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC"));
+                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain 1 Command Token"));
                 if (player.getStrategicCC() > 0) {
                     for (Leader leader : player.getLeaders()) {
                         if (leader.isExhausted() && leader.getId().contains("agent")) {
@@ -158,12 +158,12 @@ public class TechExhaust extends TechAddRemove {
                         if ("titanprototype".equalsIgnoreCase("relic") || "absol_jr".equalsIgnoreCase(relic)) {
                             buttons.add(Button.primary(
                                 player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + relic,
-                                "Ready JR"));
+                                "Ready JR-XS455-O"));
                         }
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor()
-                    + " use button to gain 1 CC or spend 1 strat CC to ready your agent", buttons);
+                    + " use button to gain 1 command token or spend 1 command token from your strategy pool to ready your agent.", buttons);
             }
             case "aida", "sar", "htp" -> {
                 if (event instanceof ButtonInteractionEvent) {
@@ -228,7 +228,7 @@ public class TechExhaust extends TechAddRemove {
             }
             case "dskolug" -> {
                 deleteIfButtonEvent(event);
-                String message = player.getRepresentation(true, true) + " stalled using the Applied Biothermics tech.";
+                String message = player.getRepresentation(true, true) + " stalled using the Applied Biothermics technology.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -314,13 +314,13 @@ public class TechExhaust extends TechAddRemove {
             }
             case "dsdihmy" -> { // Impressment Programs
                 List<Button> buttons = ButtonHelper.getButtonsToExploreReadiedPlanets(player, game);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select a planet to explore",
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select a planet to explore.",
                     buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             default -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "> This tech is not automated. Please resolve manually.");
+                    "> This technology is not automated. Please resolve manually.");
             }
         }
     }

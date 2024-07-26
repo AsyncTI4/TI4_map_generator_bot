@@ -39,7 +39,7 @@ public class UnlockLeader extends LeaderAction {
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
 
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " unlocked:");
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " un" + (leaderID.contains("kelerescommander") ? "leash" : "lock") + "ed:");
             channel.sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, true, showFlavourText)).queue();
         } else {
             MessageHelper.sendMessageToChannel(channel, Emojis.getFactionLeaderEmoji(playerLeader));
@@ -53,7 +53,7 @@ public class UnlockLeader extends LeaderAction {
         if (leaderID.contains("naalucommander")) {
             //PNInfo.sendPromissoryNoteInfo(game, player, false);
             CardsInfo.sendVariousAdditionalButtons(game, player);
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " you may use M'aban, the Naalu Commander, via button in your cards info thread");
+            MessageHelper.sendMessageToChannel(channel, player.getRepresentation(true, true) + " you may use M'aban, the Naalu Commander, via button in your `#Cards Info` thread.");
 
         }
         if (leaderID.contains("xxchahero")) {

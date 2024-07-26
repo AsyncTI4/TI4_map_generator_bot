@@ -647,7 +647,7 @@ public class Constants {
     public static final String REVEAL_STAGE1 = "po_reveal_stage1";
     public static final String REVEAL_SPECIFIC_STAGE1 = "reveal_specific_stage1";
     public static final String REVEAL_SPECIFIC_STAGE2 = "reveal_specific_stage2";
-    public static final String SETUP_PEAKABLE_OBJECTIVES = "setup_peakable_objectives";
+    public static final String SETUP_PEAKABLE_OBJECTIVES = "setup_peekable_objectives";
     public static final String NUMBER_OF_OBJECTIVES = "number_of_objectives";
     public static final String NUMBER_OF_STAGE1_OBJECTIVES = "number_of_stage1_objectives";
     public static final String NUMBER_OF_STAGE2_OBJECTIVES = "number_of_stage2_objectives";
@@ -657,8 +657,8 @@ public class Constants {
     public static final String STAGE_1_OR_2 = "stage_1_or_2";
     public static final String SHUFFLE_BACK_IN_UNREVEALED_OBJ = "shuffle_back_in_unrevealed_obj";
     public static final String LOCATION2 = "location2";
-    public static final String PEAK_AT_STAGE1 = "peak_at_stage1";
-    public static final String PEAK_AT_STAGE2 = "peak_at_stage2";
+    public static final String PEAK_AT_STAGE1 = "peek_at_stage1";
+    public static final String PEAK_AT_STAGE2 = "peek_at_stage2";
 
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
