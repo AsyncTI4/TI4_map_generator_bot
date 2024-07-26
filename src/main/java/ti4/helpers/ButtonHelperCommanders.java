@@ -94,7 +94,7 @@ public class ButtonHelperCommanders {
         PlanetExhaust.doAction(player, planet, game);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
-        String msg = player.getRepresentation(true, true) + " used Knak Halfear , the Olradin Commander, to exhaust "
+        String msg = player.getRepresentation(true, true) + " used Knak Halfear, the Olradin Commander, to exhaust "
             + Helper.getPlanetRepresentation(planet, game) + " and gain " + count + "trade good" + (count == 1 ? "" : "s") + " (" + oldTg + "->"
             + player.getTg() + ")";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -444,7 +444,7 @@ public class ButtonHelperCommanders {
                     }
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentation(true, true)
-                            + " You gained technology while having Nekro Acidos, the Nekro commander, but since it is a faction technology and you used one of your Valefars,"
+                            + " You gained technology while having Nekro Acidos, the Nekro commander, but since it is a faction technology and you used one of your Valefar Assimilators,"
                             + " you didn't technically \"gain\" a new technology and therefore you do not draw an action card.");
                 }
             }

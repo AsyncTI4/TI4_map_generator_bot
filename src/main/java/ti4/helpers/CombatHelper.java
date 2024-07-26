@@ -534,7 +534,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Munitions rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + ": " + unitRoll2);
+                resultBuilder.append("Munitions Reserves rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + ": " + unitRoll2);
             }
 
             int argentInfKills = 0;
@@ -563,7 +563,7 @@ public class CombatHelper {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have the Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses") 
+            result = result + "\n" + player.getFactionEmoji() + " You have The Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses") 
                 + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
         }
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {

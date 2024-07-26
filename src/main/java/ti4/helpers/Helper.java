@@ -207,7 +207,7 @@ public class Helper {
         return player;
     }
 
-    // TODO: Jazz: This method *should* include base game + pok tiles (+ DS tiles IFF DS mode is set)
+    // TODO: Jazz: This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
     //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
     //     - from every source available to the active game
     public static List<MiltyDraftTile> getUnusedTiles(Game game) {
@@ -379,7 +379,7 @@ public class Helper {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    message = message + " Drew a second secret objective due to Plausible Deniability";
+                    message = message + " Drew a second secret objective due to Plausible Deniability.";
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player);
                 game.setStoredValue(key2,
@@ -1456,7 +1456,7 @@ public class Helper {
                     msg = msg + "Got 1 vote for Representative Government.\n";
                 }
                 case "distinguished" -> {
-                    msg = msg + "Used the action card Distinguished Councillor for 5 votes.\n";
+                    msg = msg + "Used the action card Distinguished Councilor for 5 votes.\n";
                 }
                 case "absolRexControlRepresentative" -> {
                     msg = msg + "Got 1 vote for controlling Mecatol Rex while Representative Government is in play.\n";
@@ -2106,7 +2106,7 @@ public class Helper {
             }
             if (player.hasTechReady("sar")) {
                 Button argentButton = Button.success("sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff,
-                    "Use Self Assembly Routines");
+                    "Use Self-Assembly Routines");
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                 unitButtons.add(argentButton);
             }

@@ -25,7 +25,7 @@ import ti4.model.GenericCardModel;
 public class TrapReveal extends DiscordantStarsSubcommandData {
 
     public TrapReveal() {
-        super(Constants.LIZHO_REVEAL_TRAP, "Select planets were to reveal trap tokens");
+        super(Constants.LIZHO_REVEAL_TRAP, "Reveal a Li-Zho Trap token on a planet.");
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID").setRequired(true));
 
@@ -38,7 +38,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
         OptionMapping planetOption = event.getOption(Constants.PLANET);
@@ -47,7 +47,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         }
         String planetName = planetOption.getAsString();
         if (!game.getPlanets().contains(planetName)) {
-            MessageHelper.replyToMessage(event, "Planet not found in map");
+            MessageHelper.replyToMessage(event, "Planet not found in map.");
             return;
         }
 
@@ -59,7 +59,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         Collection<Integer> values = player.getTrapCards().values();
         int trapID = trapIDOption.getAsInt();
         if (!values.contains(trapID)) {
-            MessageHelper.replyToMessage(event, "Trap ID not found");
+            MessageHelper.replyToMessage(event, "Trap ID not found.");
             return;
         }
         String stringTrapID = "";
@@ -98,7 +98,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                 }
                                 new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet), "2 inf " + planet, game);
                             }
-                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation);
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Destroyed up to 2 enemy infantry from " + representation + ".");
                         }
                         if ("Account Siphon".equalsIgnoreCase(trapCard.getName())) {
                             for (Player p2 : game.getRealPlayers()) {
@@ -115,7 +115,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                             }
                         }
                     } else {
-                        String sb = "A trap has been removed from planet: " + representation;
+                        String sb = "A Trap has been removed from planet: " + representation + ".";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                     }
 
@@ -124,7 +124,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
             }
         } else {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " could not find a trap for the planet " + Helper.getPlanetRepresentation(planetName, game));
+                player.getRepresentation(true, true) + " could not find a Trap for the planet " + Helper.getPlanetRepresentation(planetName, game) + ".");
 
         }
     }
@@ -134,8 +134,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         int count = Math.min(p2.getTg(), 2);
         p2.setTg(p2.getTg() - count);
         player.setTg(player.getTg() + count);
-        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " trade good" + (count == 1 ? "" : "s") + " stolen by a trap";
-        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " trade good" + (count == 1 ? "" : "s") + " via a trap";
+        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " trade good" + (count == 1 ? "" : "s") + " stolen by an Account Siphon Trap.";
+        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " trade good" + (count == 1 ? "" : "s") + " via an Account Siphon Trap.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);
@@ -146,8 +146,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         int count = Math.min(p2.getCommodities(), 3);
         p2.setCommodities(p2.getCommodities() - count);
         player.setTg(player.getTg() + count);
-        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " commodit" + (count == 1 ? "y" : "ies") + " stolen by a trap.";
-        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " commodit" + (count == 1 ? "y" : "ies") + " via a trap.";
+        String msg1 = p2.getRepresentation(true, true) + " you had " + count + " commodit" + (count == 1 ? "y" : "ies") + " stolen by an Account Siphon Trap.";
+        String msg2 = player.getRepresentation(true, true) + " you stole " + count + " commodit" + (count == 1 ? "y" : "ies") + " via an Account Siphon Trap.";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         ButtonHelper.deleteMessage(event);

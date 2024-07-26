@@ -46,7 +46,7 @@ public class GameStats extends StatisticsSubcommandData {
     private static final String HAS_WINNER_FILTER = "has_winner";
 
     public GameStats() {
-        super(Constants.GAMES, "Game Statistics");
+        super(Constants.GAMES, "Game Statistics.");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
@@ -54,7 +54,7 @@ public class GameStats extends StatisticsSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog of war game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, HAS_WINNER_FILTER, "Filter by if the game has a winner"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want statistics for").setAutoComplete(true));
     }
 
     @Override

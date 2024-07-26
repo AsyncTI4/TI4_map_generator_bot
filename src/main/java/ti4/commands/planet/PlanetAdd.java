@@ -77,7 +77,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
+                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored with the Custodians token!");
                 String message2 = player.getRepresentation(true, true)
                     + " Click the names of the planets you wish to exhaust to spend 6 influence.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
@@ -106,9 +106,9 @@ public class PlanetAdd extends PlanetAddRemove {
                         if (relic.contains("shard")
                             && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
                             && !doubleCheck) {
-                            String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. "
+                            String msg2 = player_.getRepresentation() + " lost Shard of the Throne, and thus lost a victory point. "
                                 + player.getRepresentation()
-                                + " gained shard and a victory point.";
+                                + " gained Shard of the Throne, and thus gained a victory point.";
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                 msg2);
                             player_.removeRelic(relic);
@@ -317,9 +317,9 @@ public class PlanetAdd extends PlanetAddRemove {
                 saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {
-            String message = player.getRepresentation() + " Click the button to resolve an integrated build on " + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getRepresentation() + " Click the button to resolve an Integrated Economy build on " + Helper.getPlanetRepresentation(planet, game);
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.primary("integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Button.primary("integratedBuild_" + planet, "Integrated Economy On " + Helper.getPlanetRepresentation(planet, game)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }

@@ -368,7 +368,7 @@ public class ButtonHelperActionCards {
             .withEmoji(Emoji.fromFormatted(Emojis.comm));
         List<Button> buttons = List.of(convert2CommButton, get2CommButton,
             Button.danger("deleteButtons", "Done resolving"));
-        String message = "Use buttons to gain or convert commodities as appropriate. You may trade in this window/in between gaining commodities.";
+        String message = "Use buttons to gain or convert commodities as appropriate. You may transact in this window/in between gaining commodities.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
@@ -917,7 +917,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         buttons.add(Button.danger("deleteButtons_spitItOut", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            player.getRepresentation() + " , please pay 3 influence.", buttons);
+            player.getRepresentation() + ", please pay 3 influence.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -1396,7 +1396,7 @@ public class ButtonHelperActionCards {
         if (player.getActionCards().containsKey("coup")) {
             game.setStoredValue("Coup", "");
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which strategy card you will Coup."
+                + " you have the option to pre-assign which strategy card you will Coup D'etat."
                 + " Coup D'etat is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
                 + " Feel free to ignore this message if you don't intend to play it.";
             List<Button> scButtons = new ArrayList<>();
@@ -1800,7 +1800,7 @@ public class ButtonHelperActionCards {
         ButtonInteractionEvent event) {
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you may use the button to get your technology.",
+                player.getRepresentation(true, true) + " you may use the button to research your technology.",
                 List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);

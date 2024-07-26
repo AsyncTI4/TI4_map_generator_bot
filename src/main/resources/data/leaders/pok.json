@@ -800,7 +800,7 @@
         "id": "nekrohero",
         "faction": "nekro",
         "type": "hero",
-        "name": "UNIT.DSGN.FLAYESH",
+        "name": "unit.dsgn.FLAYESH",
         "title": "Recursive Tyrant",
         "abilityName": "Polymorphic Algorithm: Devour World",
         "abilityWindow": "ACTION:",

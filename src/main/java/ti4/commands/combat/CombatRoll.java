@@ -302,7 +302,7 @@ public class CombatRoll extends CombatSubcommandData {
                 }
             } else {
                 if (opponent.hasTech("vpw") && h > 0) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " suffered 1 hit due to valkyrie particle weave");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " suffered 1 hit due to Valkyrie Particle Weave.");
                 }
             }
         } else {

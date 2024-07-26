@@ -12,7 +12,7 @@ import ti4.model.UnitModel;
 
 public class FactionTechRemove extends FactionTechAddRemove {
     public FactionTechRemove() {
-        super(Constants.FACTION_TECH_REMOVE, "Remove a faction tech from your faction");
+        super(Constants.FACTION_TECH_REMOVE, "Remove a faction technology from your faction.");
     }
     
     @Override
@@ -24,7 +24,7 @@ public class FactionTechRemove extends FactionTechAddRemove {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed faction technologies:\n");
         for (String techID : techIDs ){
             if (!player.getFactionTechs().contains(techID)) {
-                sb.append("> ").append(techID).append(" (player did not have this tech)");
+                sb.append("> ").append(techID).append(" (player did not have this technology)");
             } else {
                 sb.append("> ").append(techID);
             }

@@ -278,9 +278,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
             buttons.add(nekroButton);
         }
         if (player.hasAbility("cunning")) {
-            buttons.add(Button.success("setTrapStep1", "Set a Trap"));
-            buttons.add(Button.danger("revealTrapStep1", "Reveal a Trap"));
-            buttons.add(Button.secondary("removeTrapStep1", "Remove a Trap"));
+            buttons.add(Button.success("setTrapStep1", "Set A Trap"));
+            buttons.add(Button.danger("revealTrapStep1", "Reveal A Trap"));
+            buttons.add(Button.secondary("removeTrapStep1", "Remove A Trap"));
         }
 
         if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(game).size() > 0) {
@@ -289,7 +289,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
                 omenDice.append(" ").append(omenDie);
             }
             omenDice = new StringBuilder(omenDice.toString().trim());
-            Button augers = Button.secondary("getOmenDice", "Use an omen die (" + omenDice + ")")
+            Button augers = Button.secondary("getOmenDice", "Use an Omen die (" + omenDice + ")")
                 .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             buttons.add(augers);
         }

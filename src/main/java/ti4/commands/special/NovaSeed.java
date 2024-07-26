@@ -14,10 +14,10 @@ import ti4.message.MessageHelper;
 
 public class NovaSeed extends SpecialSubcommandData {
     public NovaSeed() {
-        super(Constants.NOVA_SEED, "Nova seed a system");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player using nova seed").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using nova seed").setAutoComplete(true));
+        super(Constants.NOVA_SEED, "Nova Seed a system");
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/tile name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player using Nova Seed").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using Nova Seed").setAutoComplete(true));
     }
 
     @Override
@@ -68,7 +68,7 @@ public class NovaSeed extends SpecialSubcommandData {
 
         StringBuilder message2 = new StringBuilder();
         message2.append(tile.getRepresentation());
-        message2.append(" has been nova seeded by ");
+        message2.append(" has been Nova Seeded by ");
         message2.append(player.getRepresentation());
         StellarConverter.postTileInDisasterWatch(game, novaTile, 1, message2.toString());
 

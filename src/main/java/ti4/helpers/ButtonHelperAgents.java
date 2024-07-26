@@ -572,7 +572,7 @@ public class ButtonHelperAgents {
                 activePlayer.setCommodities(newComms);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     ButtonHelper.getIdent(player)
-                        + " exhausted " + ssruuClever + "Merkismathr Asvand, the Kjalengard" + ssruuSlash + " agent, to potentially move a glory token into the system. "
+                        + " exhausted " + ssruuClever + "Merkismathr Asvand, the Kjalengard" + ssruuSlash + " agent, to potentially move a Glory token into the system. "
                         + ButtonHelper.getIdent(activePlayer) + " commodities went from " + oldComms + " -> "
                         + newComms + ".");
             }
@@ -581,7 +581,7 @@ public class ButtonHelperAgents {
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     ButtonHelper.getIdent(player)
-                        + " there were no glory tokens on the board to move. Go win some battles and earn some, or your ancestors will laugh at ya when "
+                        + " there were no Glory tokens on the board to move. Go win some battles and earn some, or your ancestors will laugh at ya when "
                         + (ThreadLocalRandom.current().nextInt(20) == 0 ? "(if) " : "") + "you reach Valhalla.");
 
             }
@@ -1525,7 +1525,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdent(player) + " chose to use " + Helper.getPlanetRepresentation(planet, game)
                 + " ability. This did not exhaust the ability since it was done with " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Cordo Haved , the Free Systems" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
+                + "Cordo Haved, the Free Systems" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         event.getMessage().delete().queue();
     }
 
@@ -1943,7 +1943,7 @@ public class ButtonHelperAgents {
 
     public static void offerMoveGloryOptions(Game game, Player player, GenericInteractionCreateEvent event) {
 
-        String msg = player.getRepresentation(true, true) + " use buttons to select system to move glory from";
+        String msg = player.getRepresentation(true, true) + " use buttons to select the system to move a Glory token from.";
         Tile tileAS = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : getGloryTokenTiles(game)) {
@@ -1962,8 +1962,8 @@ public class ButtonHelperAgents {
             space.removeToken("token_ds_glory.png");
         }
         spaceAS.addToken("token_ds_glory.png");
-        String msg = ButtonHelper.getIdent(player) + " moved glory token from " + tile.getRepresentation() + " to "
-            + tileAS.getRepresentation();
+        String msg = ButtonHelper.getIdent(player) + " moved a Glory token from " + tile.getRepresentation() + " to "
+            + tileAS.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         event.getMessage().delete().queue();
     }
@@ -1973,7 +1973,7 @@ public class ButtonHelperAgents {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         space.addToken("token_ds_glory.png");
-        String msg = ButtonHelper.getIdent(player) + " added glory token to " + tile.getRepresentation();
+        String msg = ButtonHelper.getIdent(player) + " added a Glory token to " + tile.getRepresentation();
         if (player.getLeaderIDs().contains("kjalengardcommander") && !player.hasLeaderUnlocked("kjalengardcommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "kjalengard", event);
         }

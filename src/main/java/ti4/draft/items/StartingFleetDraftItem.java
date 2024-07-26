@@ -25,7 +25,7 @@ public class StartingFleetDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return getFaction().getFactionName() + " Starting Fleet";
+        return getFaction().getFactionName() + " Starting Units";
     }
 
     @JsonIgnore

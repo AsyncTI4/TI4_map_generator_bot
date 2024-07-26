@@ -20,10 +20,10 @@ import ti4.message.MessageHelper;
 public abstract class FactionTechAddRemove extends FrankenSubcommandData {
     public FactionTechAddRemove(String name, String description) {
         super(name, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Tech Name").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Tech Name").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "Tech Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Technology name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Technology name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "Technology name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 

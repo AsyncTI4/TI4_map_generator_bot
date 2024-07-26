@@ -364,11 +364,11 @@ public class TurnEnd extends PlayerSubcommandData {
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "Crown of Emphidia. You may purge " +
-                                    Emojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear.");
+                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "The Crown of Emphidia. You may purge " +
+                                    Emojis.Relic + "The Crown of Emphidia in the status homework phase, which is when buttons will appear.");
                         } else {
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + Emojis.Relic + "Crown of Emphidia.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + Emojis.Relic + "Crown of Emphidia.", ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + Emojis.Relic + "The Crown of Emphidia.");
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + Emojis.Relic + "The Crown of Emphidia.", ButtonHelper.getCrownButtons());
                         }
                     }
                 }
@@ -442,7 +442,7 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
         if (arborec != null) {
-            String mitosisMessage = arborec.getRepresentation(true, true) + " reminder to do mitosis!";
+            String mitosisMessage = arborec.getRepresentation(true, true) + " reminder to do Mitosis!";
             MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
         }
         Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");

@@ -2371,9 +2371,9 @@ public class Player {
             && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList().contains("attachment_nanoforge.png")
             && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
+            buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nano-Forge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), getRepresentation() + " You may choose to Exhaust Nanoforge Ability to ready the planet.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), getRepresentation() + " You may choose to exhaust the Nano-Forge legendary ability to ready the planet.", buttons);
         }
     }
 

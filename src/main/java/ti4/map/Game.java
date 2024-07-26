@@ -2764,7 +2764,7 @@ public class Game extends GameProperties {
         DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
 
         boolean success = true;
-        // &= is the "and operator". It will assign true to success iff success is true and the result is true. Otherwise it will propagate a false value to the end
+        // &= is the "and operator". It will assign true to success if and only if success is true and the result is true. Otherwise it will propagate a false value to the end
         success &= validateAndSetPublicObjectivesStage1Deck(event, deckSettings.getStage1().getValue());
         success &= validateAndSetPublicObjectivesStage2Deck(event, deckSettings.getStage2().getValue());
         success &= validateAndSetSecretObjectiveDeck(event, deckSettings.getSecrets().getValue());

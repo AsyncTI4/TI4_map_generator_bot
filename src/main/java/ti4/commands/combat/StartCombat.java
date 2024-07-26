@@ -1062,7 +1062,7 @@ public class StartCombat extends CombatSubcommandData {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "assimilate_" + unitH.getName(),
-                            "Assimilate Structures on " + nameOfHolder)
+                            "Assimilate structures on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
                 }
                 if (p1.hasUnit("letnev_mech") && isGroundCombat
@@ -1097,7 +1097,7 @@ public class StartCombat extends CombatSubcommandData {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "assimilate_" + unitH.getName(),
-                            "Assimilate Structures on " + nameOfHolder)
+                            "Assimilate structures on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
                 }
             }
@@ -1150,7 +1150,7 @@ public class StartCombat extends CombatSubcommandData {
     private static String getGroundCombatIntroMessage() {
         StringBuilder sb = new StringBuilder();
         sb.append("Steps for Invasion:\n");
-        sb.append("> 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)\n");
+        sb.append("> 1. Start of invasion abilities (Tekklar Legion, Blitz, Bunker, etc.)\n");
         sb.append("> 2. Bombardment\n");
         sb.append("> 3. Commit Ground Forces\n");
         sb.append("> 4. After commit window (Parley, Ghost Squad, etc.)\n");

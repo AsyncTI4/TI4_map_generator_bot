@@ -221,7 +221,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to ancient trade routes and is neighbors with " + ButtonHelper.getIdentOrColor(player, game) + " for this turn");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to Ancient Trade Routes and is neighbors with " + ButtonHelper.getIdentOrColor(player, game) + " for this turn");
         event.getMessage().delete().queue();
     }
 
@@ -257,7 +257,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " readied every technology specialty planet.");
+            player.getFactionEmoji() + " readied each of their planets with a technology specialty.");
         event.getMessage().delete().queue();
 
     }
@@ -267,7 +267,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to place a Ghost Ship in",
+            player.getRepresentation(true, true) + " tell the bot which tile you wish to summon a Ghost Ship into.",
             buttons);
     }
 

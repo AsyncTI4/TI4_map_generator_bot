@@ -110,7 +110,7 @@ public class AgendaHelper {
                 playerWL.exhaustTech("pi");
                 MessageHelper.sendMessageToChannel(playerWL.getCorrectChannel(),
                     playerWL.getRepresentation()
-                        + " Predictive Intelligence was exhausted since you voted the way that lost while using it");
+                        + " Predictive Intelligence was exhausted since you voted the way that lost while using it.");
             }
         }
         game.setStoredValue("riskedPredictive", "");
@@ -132,10 +132,10 @@ public class AgendaHelper {
                 if ("censure".equalsIgnoreCase(agID) || "absol_censure".equalsIgnoreCase(agID)) {
                     StringBuilder message = new StringBuilder();
                     Integer poIndex = game.addCustomPO("Political Censure", 1);
-                    message.append("Custom public objective 'Political Censure' has been added.\n");
+                    message.append("Custom public objective \"Political Censure\" has been added.\n");
                     game.scorePublicObjective(player2.getUserID(), poIndex);
                     if (!game.isFowMode()) {
-                        message.append(player2.getRepresentation()).append(" scored 'Political Censure'\n");
+                        message.append(player2.getRepresentation()).append(" scored \"Political Censure\".\n");
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
                     Helper.checkEndGame(game, player2);
@@ -387,7 +387,7 @@ public class AgendaHelper {
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player2.getUserID());
-                        message = message + " Drew a second secret objective due to Plausible Deniability";
+                        message = message + " Drew a second secret objective due to Plausible Deniability.";
                     }
                     SOInfo.sendSecretObjectiveInfo(game, player2, event);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
@@ -445,7 +445,7 @@ public class AgendaHelper {
                 if ("grant_reallocation".equalsIgnoreCase(agID)) {
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCorrectChannel(),
                         player2.getRepresentation()
-                            + " Use the button to get a technology. You will need to removed tokens from your fleet pool manually.",
+                            + " Use the button to gain a technology. You will need to removed tokens from your fleet pool manually.",
                         List.of(Buttons.GET_A_TECH));
                 }
 
@@ -724,7 +724,7 @@ public class AgendaHelper {
                     }
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
                     if (!game.isFowMode()) {
-                        message.append(playerWL.getRepresentation()).append(" scored 'Mutiny'\n");
+                        message.append(playerWL.getRepresentation()).append(" scored \"Mutiny\"\n");
                     }
                     Helper.checkEndGame(game, playerWL);
                     if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
@@ -1159,7 +1159,7 @@ public class AgendaHelper {
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
             MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(),
-                "You may use the button to get your technology.", Buttons.GET_A_TECH);
+                "You may use the button to research your technologies.", Buttons.GET_A_TECH);
         } else if (!d1.isSuccess() && !game.isFowMode()) {
             Button modify = Button.secondary("getModifyTiles", "Modify Units");
             MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(),
@@ -1296,8 +1296,8 @@ public class AgendaHelper {
             game.setStoredValue("Genetic Recombination " + player.getFaction(), "");
             if (player.hasTechReady("gr")) {
                 String msg = player.getRepresentation()
-                    + " you have the option to pre-assign the declaration of using genetic recombination on someone."
-                    + " When they are up to vote, it will ping them saying that you wish to use genetic recombination, and then it will be your job to clarify."
+                    + " you have the option to pre-assign the declaration of using Genetic Recombination on someone."
+                    + " When they are up to vote, it will ping them saying that you wish to use Genetic Recombination, and then it will be your job to clarify."
                     + " Feel free to not preassign if you don't wish to use it on this agenda.";
                 List<Button> buttons2 = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
@@ -2233,20 +2233,20 @@ public class AgendaHelper {
                                     techGiver, potentialTech, game);
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel,
-                                identity + " resolve Galactic Threat Rider using the buttons",
+                                identity + " resolve Galactic Threat using the buttons.",
                                 ButtonHelperAbilities.getButtonsForPossibleTechForNekro(winningR, potentialTech,
                                     game));
                         }
                         if (specificVote.contains("Technology Rider") && !winningR.hasAbility("propagation")) {
 
                             MessageHelper.sendMessageToChannelWithButtons(channel,
-                                identity + " resolve Technology Rider by using the button to get a technology.",
+                                identity + " resolve Technology Rider by using the button to research a technology.",
                                 List.of(Buttons.GET_A_TECH));
                         }
                         if (specificVote.contains("Schematics Rider")) {
 
                             MessageHelper.sendMessageToChannelWithButtons(channel,
-                                identity + " resolve Schematics Rider by using the button to get the pre-selected technology.",
+                                identity + " resolve Schematics Rider by using the button to gain the pre-selected technology.",
                                 List.of(Buttons.GET_A_TECH));
                         }
                         if (specificVote.contains("Leadership Rider")
@@ -2899,7 +2899,7 @@ public class AgendaHelper {
             planetButtons.add(button);
         }
         if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
-            Button button = Button.primary("exhaustForVotes_predictive_3", "Use Predictive Intelligence Votes For 3 Votes")
+            Button button = Button.primary("exhaustForVotes_predictive_3", "Use Predictive Intelligence For 3 Votes")
                 .withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
             planetButtons.add(button);
         }
@@ -2995,7 +2995,7 @@ public class AgendaHelper {
             + player.getRepresentation() + " you are currently voting " + votes
             + " vote" + (votes.equals("1") ? "" : "s") + ". You may confirm this or you may modify this number if the bot missed something.";
         if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
-            msg = msg + " Any Blood Pact Votes will be automatically added";
+            msg = msg + " Any Blood Pact votes will be automatically added.";
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_" + votes,

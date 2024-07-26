@@ -49,13 +49,13 @@ public class AbilityAdd extends AbilityAddRemove {
                 String unitID = AliasHandler.resolveUnit("destroyer");
                 player.setUnitCap(unitID, 12);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set destroyer max to 12 for " + player.getRepresentation() + " due to the private fleet ability");
+                    "Added 4 additional destroyers (total of 12) to the reinforcements of " + player.getRepresentation() + " due to the Private Fleet faction ability.");
             }
             if (abilityID.equalsIgnoreCase("industrialists")) {
                 String unitID = AliasHandler.resolveUnit("spacedock");
                 player.setUnitCap(unitID, 4);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set space dock max to 4 for " + player.getRepresentation() + " due to the industrialists ability");
+                    "Added 1 additional space dock (total of 4) to the reinforcements of " + player.getRepresentation() + " due to the Industrialists faction ability.");
             }
             if (abilityID.equalsIgnoreCase("teeming")) {
                 String unitID = AliasHandler.resolveUnit("dreadnought");
@@ -63,14 +63,14 @@ public class AbilityAdd extends AbilityAddRemove {
                 unitID = AliasHandler.resolveUnit("mech");
                 player.setUnitCap(unitID, 5);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
-                        + " due to the teeming ability");
+                    "Added 2 additional dreadnoughts (total of 7) and 1 additional mech (total of 5) to the reinforcements of "
+                    + player.getRepresentation() + " due to the Teeming faction ability.");
             }
             if (abilityID.equalsIgnoreCase("diplomats")) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set up Free People ability markers. " + player.getRepresentation(true, true)
-                        + " any planet with the Free People token on it will show up as spendable in your various spends. Once spent, the token will be removed");
+                    "Set up Free People faction ability markers. " + player.getRepresentation(true, true)
+                        + " any planet with the Free People token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

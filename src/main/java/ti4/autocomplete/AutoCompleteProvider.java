@@ -1194,7 +1194,7 @@ public class AutoCompleteProvider {
         if (subCommandName.equals(Constants.USE)) {
             if (optionName.equals(Constants.EXPLORE_CARD_ID)) {
                 if (game.isFowMode()) {
-                    event.replyChoice("You cannot see the autocomplete in fog of war"., "[error]").queue();
+                    event.replyChoice("You cannot see the autocomplete in fog of war.", "[error]").queue();
                     return;
                 }
 

@@ -606,9 +606,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             gainComm.add(Button.success("gain_1_comms", "Gain 1 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm)));
             gainComm.add(Button.danger("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
-            sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability\n");
+            sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability.\n");
             sb.append(player.getRepresentation(true, true)).append(
-                " After resolving the exploration, you may use this button to get your commodity from your fortune seekers ability.");
+                " After resolving the exploration, you may use this button to get your commodity from your Fortune Seekers ability.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);
             game.setStoredValue("fortuneSeekers", "Used");
         }

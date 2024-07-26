@@ -36,8 +36,8 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
     private static final String FACTION_WON_FILTER = "faction_won";
 
     public FactionRecordOfTech() {
-        super(Constants.FACTION_RECORD_OF_TECH, "# of times a tech has been acquired by a faction");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setRequired(true).setAutoComplete(true));
+        super(Constants.FACTION_RECORD_OF_TECH, "# of times a technology has been acquired by a faction.");
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want the technology history of").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
@@ -50,7 +50,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String text = getTechResearched(event);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Tech Acquisition Record", text);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Technology Acquisition Record", text);
     }
 
     private String getTechResearched(SlashCommandInteractionEvent event) {
@@ -93,7 +93,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Techs Researched By "+factionM.getFactionName()+" (From "+gamesThatHadThem+" Games)**__\n");
+        sb.append("## __**Technologies Researched By "+factionM.getFactionName()+" (From "+gamesThatHadThem+" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Entry<String, Integer>>  comparator = (o1, o2) -> {

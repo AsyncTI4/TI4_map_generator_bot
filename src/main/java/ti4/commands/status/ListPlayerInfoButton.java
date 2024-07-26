@@ -54,8 +54,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         buttons.add(Button.success("offerInfoButtonStep2_planet", "Planet Info"));
         buttons.add(Button.success("offerInfoButtonStep2_units", "Special Units"));
         buttons.add(Button.success("offerInfoButtonStep2_pn", "Faction PN"));
-        buttons.add(Button.success("offerInfoButtonStep2_tech", "Researched Tech"));
-        buttons.add(Button.success("offerInfoButtonStep2_ftech", "Faction Tech"));
+        buttons.add(Button.success("offerInfoButtonStep2_tech", "Researched Technology"));
+        buttons.add(Button.success("offerInfoButtonStep2_ftech", "Faction Technology"));
         buttons.add(Buttons.REFRESH_INFO);
         String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every factions";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);

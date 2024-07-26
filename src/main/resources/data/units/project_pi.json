@@ -450,7 +450,7 @@
         "id": "pi_l1z1x_mech",
         "baseType": "mech",
         "asyncId": "mf",
-        "name": "Anihilator",
+        "name": "Annihilator",
         "source": "project_pi",
         "faction": "L1Z1X",
         "capacityUsed": 1,

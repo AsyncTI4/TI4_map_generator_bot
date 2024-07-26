@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -285,7 +286,7 @@ public class ButtonHelperTacticalAction {
                 }
                 trapButtons.add(Button.danger("deleteButtons", "Decline"));
                 String msg = player.getRepresentation(true, true)
-                    + " you can use the buttons to place a trap on a planet";
+                    + " you can use the buttons to place a Trap on a planet";
                 if (trapButtons.size() > 1) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         msg, trapButtons);
@@ -309,9 +310,9 @@ public class ButtonHelperTacticalAction {
 
         if (!game.isAbsolMode() && player.getRelics().contains("emphidia")
             && !player.getExhaustedRelics().contains("emphidia")) {
-            String message = player.getRepresentation() + " You can use the button to explore a planet using the " + Emojis.Relic + "Crown of Emphidia.";
+            String message = player.getRepresentation() + " You can use the button to explore a planet using the " + Emojis.Relic + "The Crown of Emphidia.";
             List<Button> systemButtons2 = new ArrayList<>();
-            systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+            systemButtons2.add(Button.success("crownofemphidiaexplore", "Use The Crown of Emphidia To Explore"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
         }
         if (game.isNaaluAgent()) {
@@ -678,7 +679,7 @@ public class ButtonHelperTacticalAction {
             List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(game, player);
             if (buttons4.size() > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    "You can place down the plenary orbital",
+                    "You can place down the Plenary Orbital.",
                     buttons4);
             }
         }

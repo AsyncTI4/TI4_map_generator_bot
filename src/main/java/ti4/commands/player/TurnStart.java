@@ -192,7 +192,7 @@ public class TurnStart extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()
-                    + " since you have AI Development Algorithm, you may research 1 Unit Upgrade now for 6 influence.";
+                    + " since you have AI Development Algorithm, you may research 1 unit ppgrade now for 6 influence.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),

@@ -12,7 +12,7 @@ import ti4.model.UnitModel;
 
 public class FactionTechAdd extends FactionTechAddRemove {
     public FactionTechAdd() {
-        super(Constants.FACTION_TECH_ADD, "Add a faction tech to your faction");
+        super(Constants.FACTION_TECH_ADD, "Add a faction technology to your faction.");
     }
 
     @Override
@@ -24,7 +24,7 @@ public class FactionTechAdd extends FactionTechAddRemove {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added technologies:\n");
         for (String techID : techIDs) {
             if (player.getFactionTechs().contains(techID)) {
-                sb.append("> ").append(techID).append(" (player had this faction techology)");
+                sb.append("> ").append(techID).append(" (player had this faction technology)");
             } else {
                 sb.append("> ").append(Mapper.getTech(techID).getRepresentation(true));
             }

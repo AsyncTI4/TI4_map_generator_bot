@@ -102,12 +102,14 @@ public class SCPlay extends PlayerSubcommandData {
                     PlayAC.playAC(event, game, p2, "coup", game.getMainGameChannel());
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     game.setJustPlayedComponentAC(true);
-                    String message = "Use buttons to end turn, or (if Coup is Sabo'd) play your strategy card.";
+                    String message = "Use buttons to end turn, or (if Coup D'etat is Sabo'd) play your strategy card.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation()
-                        + " you have been Coup'd due to attempting to play " + Helper.getSCName(scToPlay, game) + ". If this is a mistake or the Coup is Sabo'd, feel free to play the strategy card again. Otherwise, end turn after doing any end of turn abilities you have.");
+                        + " you have been Coup'd due to attempting to play " + Helper.getSCName(scToPlay, game) + "."
+                        + " If this is a mistake or the Coup D'etat is Sabo'd, feel free to play the strategy card again."
+                        + " Otherwise, end turn after doing any end of turn abilities you have.");
                     return;
                 }
             }
@@ -231,13 +233,13 @@ public class SCPlay extends PlayerSubcommandData {
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
                                 "These buttons will work inside the thread", scButtons);
                             if (scToPlay == 5) {
-                                String neighborsMsg = "NOT neighbors with the trade holder:";
+                                String neighborsMsg = "NOT neighbors with the Trade holder:";
                                 for (Player p2 : game.getRealPlayers()) {
                                     if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
                                         neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
                                     }
                                 }
-                                String neighborsMsg2 = "Neighbors with the trade holder:";
+                                String neighborsMsg2 = "Neighbors with the Trade holder:";
                                 for (Player p2 : game.getRealPlayers()) {
                                     if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
                                         neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
@@ -299,14 +301,14 @@ public class SCPlay extends PlayerSubcommandData {
 
             for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                    String message2 = p2.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
+                    String message2 = p2.getRepresentation(true, true) + " heads up, Trade has just been played and this is a reminder that you do not hold your Trade Agreement";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
                     for (Player p3 : game.getRealPlayers()) {
                         if (p2 == p3) {
                             continue;
                         }
                         if (p3.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                            String message3 = p3.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that hold the Trade Agreement of " + p2.getColor() + "."
+                            String message3 = p3.getRepresentation(true, true) + " heads up, Trade has just been played and this is a reminder that hold the Trade Agreement of " + p2.getColor() + "."
                                 + " If you work out a deal with the trade holder, they may force the player to replenish and then you will be prompted to play the Trade Agreement.";
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }

@@ -1867,7 +1867,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (result.contains("committee")) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdentOrColor(player,
                         game)
-                        + " has chosen to discard Committee Formation to choose the winner. Note that \"after\"s may be played before this occurs, and that Confounding Legal Text may still be played.");
+                        + " has chosen to discard Committee Formation to choose the winner. Note that \"after\"s may be played before this occurs, and that Confounding (or Confusing) Legal Text may still be played.");
                     boolean success = game.removeLaw(game.getLaws().get("committee"));
                 }
                 String resMessage3 = "Please select the winner.";
@@ -1911,7 +1911,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.addFollowedSC(scModel.getInitiative(), event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
                 if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Construction");
                 }
                 String message = deductCC(player, event);
                 ButtonHelper.addReaction(event, false, false, message, "");
@@ -2693,7 +2693,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.addFollowedSC(scModel.getInitiative(), event);
                 ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
                 if (player.getStrategicCC() > 0) {
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Construction");
                 }
                 String message = deductCC(player, event);
                 ButtonHelper.addReaction(event, false, false, message, "");
@@ -2873,7 +2873,7 @@ public class ButtonListener extends ListenerAdapter {
                     game.setStoredValue("conspiratorsFaction", player.getFaction());
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         game.getPing()
-                            + " The conspirators ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
+                            + " The Conspirators faction ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
                     if (!game.isFowMode()) {
                         ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
                     }
@@ -2983,7 +2983,7 @@ public class ButtonListener extends ListenerAdapter {
                 String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
                 TechnologyModel techModel = Mapper.getTech(tech);
                 pnID = pnID.replace("_" + tech, "");
-                String message = ident + " Acquired The Technology " + techModel.getRepresentation(false)
+                String message = ident + " Acquired the technology " + techModel.getRepresentation(false)
                     + " via Research Agreement.";
                 player.addTech(tech);
                 String key = "RAForRound" + game.getRound() + player.getFaction();
@@ -3142,7 +3142,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.addNewTempCombatMod(combatModAC);
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     player.getFactionEmoji()
-                        + " +1 Modifier will be applied the next time you push the combat roll button due to supercharge.");
+                        + " +1 modifier will be applied the next time you push the combat roll button due to Supercharge.");
             }
             player.exhaustTech("sc");
             ButtonHelper.deleteTheOneButton(event);
@@ -3226,7 +3226,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.addFollowedSC(scNum, event);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
                         if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed warfare");
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Warfare");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3379,7 +3379,7 @@ public class ButtonListener extends ListenerAdapter {
                         player.addFollowedSC(scNum, event);
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
                         if (player.getStrategicCC() > 0) {
-                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed tech");
+                            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Technology");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3418,7 +3418,7 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
                         if (player.getStrategicCC() > 0) {
                             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event,
-                                "followed diplomacy");
+                                "followed Diplomacy");
                         }
                         String message = deductCC(player, event);
                         ButtonHelper.addReaction(event, false, false, message, "");
@@ -3444,7 +3444,7 @@ public class ButtonListener extends ListenerAdapter {
                         if (!buttons2.isEmpty()) {
                             MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCorrectChannel(),
-                                trueIdentity + " use buttons to resolve peace accords", buttons2);
+                                trueIdentity + " use buttons to resolve Peace Accords.", buttons2);
                         }
                     }
                 }
@@ -3663,14 +3663,14 @@ public class ButtonListener extends ListenerAdapter {
                         if (!buttons2.isEmpty()) {
                             MessageHelper.sendMessageToChannelWithButtons(
                                 player.getCardsInfoThread(),
-                                trueIdentity + " use buttons to resolve contagion", buttons2);
+                                trueIdentity + " use buttons to resolve Contagion.", buttons2);
 
                             if (Helper.getDateDifference(game.getCreationDate(),
                                 Helper.getDateRepresentation(1711997257707L)) > 0) {
                                 MessageHelper.sendMessageToChannelWithButtons(
                                     player.getCardsInfoThread(),
                                     trueIdentity
-                                        + " use buttons to resolve contagion planet #2 (should not be the same as planet #1)",
+                                        + " use buttons to resolve Contagion planet #2 (should not be the same as planet #1).",
                                     buttons2);
                             }
                         }
@@ -3992,7 +3992,7 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     boolean used = addUsedSCPlayer(messageID + "score_imperial", game, player, event,
-                        " scored Imperial");
+                        " gained 1 victory point with Imperial for controlling Mecatol Rex.");
                     if (used) {
                         break;
                     }
@@ -4410,7 +4410,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "brutalOccupation" -> ButtonHelperActionCardsWillHomebrew.resolveBrutalOccupationStep1(player, game, event);
                 case "getRepealLawButtons" -> {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                        "Use buttons to select Law to repeal",
+                        "Use buttons to select Law to Repeal.",
                         ButtonHelperActionCards.getRepealLawButtons(game, player));
                     ButtonHelper.deleteMessage(event);
                 }
@@ -4606,7 +4606,7 @@ public class ButtonListener extends ListenerAdapter {
                             buttons.add(Button.danger("deleteButtons", "I don't have to pay"));
                             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                                 player.getRepresentation()
-                                    + " reminder that your opponent has the cargo raiders ability, which means you might have to pay 1 trade good to announce a retreat if they choose.",
+                                    + " reminder that your opponent has the Cargo Raiders faction ability, which means you might have to pay 1 trade good to announce a retreat if they choose.",
                                 buttons);
                         }
 
@@ -4624,7 +4624,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "crownofemphidiaexplore" -> {
                     player.addExhaustedRelic("emphidia");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        ident + " Exhausted " + Emojis.Relic + "Crown of Emphidia");
+                        ident + " Exhausted " + Emojis.Relic + "The Crown of Emphidia");
                     List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore.",
                         buttons);
@@ -5471,7 +5471,7 @@ public class ButtonListener extends ListenerAdapter {
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
                 if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines")
+                    Button sar = Button.danger("exhaustTech_sar", "Exhaust Self-Assembly Routines")
                         .withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                     buttons.add(sar);
                 }
@@ -5604,7 +5604,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     trapButtons.add(Button.danger("deleteButtons", "Decline"));
                     String msg = player.getRepresentation(true, true)
-                        + " you may use the buttons to place a trap on a planet.";
+                        + " you may use the buttons to place a Trap on a planet.";
                     if (trapButtons.size() > 1) {
                         MessageHelper.sendMessageToChannelWithButtons(
                             player.getCorrectChannel(), msg, trapButtons);
@@ -5628,8 +5628,8 @@ public class ButtonListener extends ListenerAdapter {
                 if (!game.isAbsolMode() && player.getRelics().contains("emphidia")
                     && !player.getExhaustedRelics().contains("emphidia")) {
                     String message = trueIdentity + " You may use the button to explore a planet using " + Emojis.Relic
-                        + "Crown of Emphidia.";
-                    systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+                        + "The Crown of Emphidia.";
+                    systemButtons2.add(Button.success("crownofemphidiaexplore", "Use The Crown of Emphidia To Explore"));
                     systemButtons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
                 }
@@ -5803,7 +5803,7 @@ public class ButtonListener extends ListenerAdapter {
                     msg.reply("All players have indicated \"No Whens\".").queueAfter(10, TimeUnit.MILLISECONDS);
 
                 } else {
-                    String msg2 = "All players have indicated 'No Sabotage'";
+                    String msg2 = "All players have indicated \"No Sabotage\"";
                     // if (game.getMessageIDsForSabo().contains(messageId)) {
                     String faction = "bob_" + game.getStoredValue(messageId) + "_";
                     faction = faction.split("_")[1];
@@ -5886,7 +5886,7 @@ public class ButtonListener extends ListenerAdapter {
 
             }
             case "no_sabotage" -> {
-                String msg = "All players have indicated 'No Sabotage'";
+                String msg = "All players have indicated \"No Sabotage\"";
                 if (game.getMessageIDsForSabo().contains(event.getMessageId())) {
                     String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
                     faction = faction.split("_")[1];

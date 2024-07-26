@@ -42,7 +42,7 @@ public class DrawSO extends SOCardsSubcommandData {
     public static void drawSO(GenericInteractionCreateEvent event, Game game, Player player, int count, boolean useTnelis) {
         String output = Integer.toString(count) + "secret objective" + (count > 1 ? "s" : "");
         if (useTnelis && player.hasAbility("plausible_deniability")) {
-            output = "[" + count + " + 1 = " + (count + 1) + "] secret objectives (Plausible Deniability)";
+            output = "[" + count + " + 1 = " + (count + 1) + "] secret objectives (Plausible Deniability).";
             count++;
         }
 

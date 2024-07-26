@@ -351,13 +351,14 @@ public class HeroPlay extends LeaderAction {
             }
             case "veldyrhero" -> {
                 game.setComponentAction(true);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true)
+                    + " for each Branch Office attached to a planet, you may gain 1 unit upgrade owned by the player that controls that planet.");
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
                     for (int x = 0; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
                         if (ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game)
                             .size() > 0) {
-                            String msg = player.getRepresentation(true, true)
-                                + " you may retrieve a unit upgrade technology from players with branch offices, one for each branch office. Here is the possible technologies from "
-                                + ButtonHelper.getIdentOrColor(p2, game) + ".";
+                            String msg = "Here is the possible technologies from " + ButtonHelper.getIdentOrColor(p2, game)
+                                + ", who controls" + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) + " planets with a Branch Office.";
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
                                 ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
                         }
@@ -374,12 +375,12 @@ public class HeroPlay extends LeaderAction {
             case "bentorhero" -> {
                 ButtonHelperHeroes.resolveBentorHero(game, player);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getFactionEmoji() + " offered buttons to explore all planets");
+                    player.getFactionEmoji() + " offered buttons to explore all planets.");
             }
             case "nivynhero" -> {
                 ButtonHelperHeroes.resolveNivynHeroSustainEverything(game, player);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getFactionEmoji() + " sustained all units except their mechs");
+                    player.getFactionEmoji() + " sustained all units except their mechs.");
             }
             case "jolnarhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getJolNarHeroSwapOutOptions(player);

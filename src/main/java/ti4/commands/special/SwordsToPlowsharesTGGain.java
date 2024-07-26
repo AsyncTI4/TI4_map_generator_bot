@@ -24,9 +24,9 @@ import ti4.message.MessageHelper;
 
 public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
     public SwordsToPlowsharesTGGain() {
-        super(Constants.SWORDS_TO_PLOWSHARES, "Swords to Plowshares, kill half your infantry to get that many TGs");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        super(Constants.SWORDS_TO_PLOWSHARES, "Swords to Plowshares agenda. Kill half your infantry to gain that many trade goods.");
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player that's killing for money").setRequired(false));
+//        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
         doSwords(player, event, game);

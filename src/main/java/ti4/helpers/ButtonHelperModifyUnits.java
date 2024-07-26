@@ -966,7 +966,7 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
         }
 
-        String message = "Landed troops. Use buttons to decide if you wish to build or finish the activation";
+        String message = "Landed troops. Use buttons to decide if you wish to build or finish the activation.";
         ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
         Tile tile = null;
         if (buttonID.contains("_")) {
@@ -996,7 +996,7 @@ public class ButtonHelperModifyUnits {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentation(true, true) + " you must pay influence due to Keleres mech" + (mechCount == 1 ? "" : "s"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        "Click the names of the planets you wish to exhaust", buttons);
+                        "Click the names of the planets you wish to exhaust.", buttons);
                 }
             }
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
@@ -1054,7 +1054,7 @@ public class ButtonHelperModifyUnits {
     public static void startDevotion(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        String msg = player.getRepresentation() + " choose which unit of yours to destroy to";
+        String msg = player.getRepresentation() + " choose 1 of your units to destroy for Devotion.";
         List<Button> buttons = getUnitsToDevote(player, game, event, tile, "devote");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
@@ -1062,12 +1062,12 @@ public class ButtonHelperModifyUnits {
     public static void resolveDevote(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile);
-        String msg = player.getRepresentation() + " choose which opposing unit to hit";
+        String msg = player.getRepresentation() + " choose which opposing unit to hit.";
         String unit = buttonID.split("_")[2];
         Player p2 = player;
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
         new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), false, game);
-        String msg2 = player.getRepresentation() + "used devotion to destroy one of their " + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getRepresentation();
+        String msg2 = player.getRepresentation() + "used Devotion to destroy one of their " + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
         event.getMessage().delete().queue();
         String devoteOrNo = buttonID.split("_")[3];
@@ -1346,7 +1346,7 @@ public class ButtonHelperModifyUnits {
                     + planetName, "Replace Space Dock with War Sun");
 
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
-                    playerRep + "Industrious: You may spend 6 resources to replace 1 space dock with 1 war sun.", replace);
+                    playerRep + " Industrious: You may spend 6 resources to replace 1 space dock with 1 war sun.", replace);
             }
         } else if ("pds".equalsIgnoreCase(unitLong)) {
             new AddUnits().unitParsing(event, player.getColor(),
@@ -1431,7 +1431,7 @@ public class ButtonHelperModifyUnits {
                             Button.success("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You may use your cloaked fleets ability to capture this produced ship.",
+                            "You may use your Cloaked Fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
                     if (player.hasAbility("cloaked_fleets")) {
@@ -1440,7 +1440,7 @@ public class ButtonHelperModifyUnits {
                             Button.success("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You may use your cloaked fleets ability to capture this produced ship.",
+                            "You may use your Cloaked Fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1461,7 +1461,7 @@ public class ButtonHelperModifyUnits {
                             "Capture 1 " + ButtonHelper.getUnitName(unit)));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You may use your cloaked fleets ability to capture this produced ship.",
+                            "You may use your Cloaked Fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
 
@@ -1749,7 +1749,7 @@ public class ButtonHelperModifyUnits {
                             "Capture 1 " + ButtonHelper.getUnitName(unit)));
                         shroadedFleets.add(Button.danger("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannel(event.getChannel(),
-                            "You may use your cloaked fleets ability to capture this produced ship.",
+                            "You may use your Cloaked Fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
                     if (tile2 != null && !"skipbuild".equalsIgnoreCase(skipbuild) && player.hasAbility("rally_to_the_cause")

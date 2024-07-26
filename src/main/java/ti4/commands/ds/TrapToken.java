@@ -20,7 +20,7 @@ import ti4.message.MessageHelper;
 public class TrapToken extends DiscordantStarsSubcommandData {
 
     public TrapToken() {
-        super(Constants.LIZHO_TRAP, "Select planets were to add/remove trap tokens");
+        super(Constants.LIZHO_TRAP, "Add or remove a Li-Zho Trap token from a planet.");
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID").setRequired(true));
     }
@@ -32,7 +32,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
         OptionMapping planetOption = event.getOption(Constants.PLANET);
@@ -41,7 +41,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
         }
         String planetName = planetOption.getAsString();
         if (!game.getPlanets().contains(planetName)) {
-            MessageHelper.replyToMessage(event, "Planet not found in map");
+            MessageHelper.replyToMessage(event, "Planet not found in map.");
             return;
         }
 
@@ -53,7 +53,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
         Collection<Integer> values = player.getTrapCards().values();
         int trapID = trapIDOption.getAsInt();
         if (!values.contains(trapID)) {
-            MessageHelper.replyToMessage(event, "Trap ID not found");
+            MessageHelper.replyToMessage(event, "Trap ID not found.");
             return;
         }
         String stringTrapID = "";
@@ -72,16 +72,16 @@ public class TrapToken extends DiscordantStarsSubcommandData {
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
         String planetUnitHolderName = trapCardsPlanets.get(trap);
         if (planetUnitHolderName != null) {
-            MessageHelper.replyToMessage(event, "Trap used on other planet, please use trap swap or remove first");
+            MessageHelper.replyToMessage(event, "Trap used on other planet, please swap or remove that Trap first.");
             return;
         }
         ButtonHelperAbilities.addATrapToken(game, planetName);
         player.setTrapCardPlanet(trap, unitHolder.getName());
         player.setTrapCard(trap);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " put a trap on the planet " + Helper.getPlanetRepresentation(planetName, game));
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " set the trap " + ButtonHelperAbilities.translateNameIntoTrapIDOrReverse(trap)
-            + " on the planet " + Helper.getPlanetRepresentation(planetName, game));
+            player.getRepresentation(true, true) + " set a Trap on the planet " + Helper.getPlanetRepresentation(planetName, game) + ".");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " set the Trap " + ButtonHelperAbilities.translateNameIntoTrapIDOrReverse(trap)
+            + " on the planet " + Helper.getPlanetRepresentation(planetName, game) + ".");
         if (player.getLeaderIDs().contains("lizhocommander") && !player.hasLeaderUnlocked("lizhocommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "lizho", event);
         }

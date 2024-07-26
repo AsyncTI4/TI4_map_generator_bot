@@ -10,8 +10,8 @@ import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 
 public class Buttons {
-    public static final Button GET_A_TECH = green("acquireATech", "Get a Tech");
-    public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Tech");
+    public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");
+    public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
     public static final Button FACTION_EMBED = green("factionEmbedRefresh", "Refresh Faction Display");
@@ -29,7 +29,7 @@ public class Buttons {
     public static final Button REFRESH_LEADER_INFO = green(Constants.REFRESH_LEADER_INFO, "Leader Info");
     public static final Button REFRESH_UNIT_INFO = green(Constants.REFRESH_UNIT_INFO, "Unit Info");
     public static final Button REFRESH_ALL_UNIT_INFO = green(Constants.REFRESH_ALL_UNIT_INFO, "Show All Units");
-    public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Tech Info");
+    public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Technology Info");
     public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(

@@ -95,7 +95,7 @@ public class DrawRelic extends GenericRelicAction {
         StringBuilder helpMessage = new StringBuilder();
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> helpMessage.append("Run the following commands to use Nanoforge:\n")
+            case "nanoforge" -> helpMessage.append("Run the following commands to use Nano-Forge:\n")
                 .append("     `/explore relic_purge relic: nanoforge`\n")
                 .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {

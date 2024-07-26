@@ -263,7 +263,7 @@ public class ButtonHelperHeroes {
 
     public static void resolveAxisHeroStep1(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        String message = player.getRepresentation() + " Click the axis order you would like to send";
+        String message = player.getRepresentation() + " Click the Axis Order you would like to send.";
         for (String shipOrder : ButtonHelper.getPlayersShipOrders(player)) {
             Button transact = Button.success("axisHeroStep2_" + shipOrder, "" + Mapper.getRelic(shipOrder).getName());
             buttons.add(transact);

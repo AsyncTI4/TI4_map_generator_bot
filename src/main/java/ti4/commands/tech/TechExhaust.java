@@ -206,7 +206,7 @@ public class TechExhaust extends TechAddRemove {
                         buttons.add(button);
                     }
                 }
-                String message = player.getRepresentation(true, true) + " Select who you would like to Mageon.";
+                String message = player.getRepresentation(true, true) + " Select who you would like to Mageon Implant.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
