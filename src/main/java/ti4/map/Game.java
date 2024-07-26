@@ -869,6 +869,10 @@ public class Game extends GameProperties {
         if (prevPlayer != null && !factionsInCombat.contains(prevPlayer.getFaction()) && !isTemporaryPingDisable()) {
             long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
             prevPlayer.updateTurnStats(elapsedTime);
+        } else {
+            if (prevPlayer != null) {
+                prevPlayer.updateTurnStatsWithAverage();
+            }
         }
         setStoredValue("factionsInCombat", "");
 
@@ -2307,7 +2311,7 @@ public class Game extends GameProperties {
             ExploreModel card = Mapper.getExplore(id);
             if (card != null) {
                 String type = card.getType();
-                if (!reqType.equalsIgnoreCase(type)) {
+                if (!reqType.equalsIgnoreCase(type) || id.contains("starchart") || id.contains("mirage")) {
                     deck.remove(id);
                 }
             }
@@ -3270,7 +3274,7 @@ public class Game extends GameProperties {
         }
 
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
-        if (Helper.findDuplicateInList(allPlayerHandPromissoryNotes).size() > 0) {
+        if (!Helper.findDuplicateInList(allPlayerHandPromissoryNotes).isEmpty()) {
             BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
                 + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
@@ -3280,7 +3284,7 @@ public class Game extends GameProperties {
         // Find PNs that are extra - players have them but nobody "owns" them
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
-        if (unOwnedPromissoryNotes.size() > 0) {
+        if (!unOwnedPromissoryNotes.isEmpty()) {
             BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
                 + unOwnedPromissoryNotes + "`");
             getPurgedPN().removeAll(unOwnedPromissoryNotes);
@@ -3301,7 +3305,7 @@ public class Game extends GameProperties {
         // Report PNs that are missing from the game
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
-        if (missingPromissoryNotes.size() > 0) {
+        if (!missingPromissoryNotes.isEmpty()) {
             BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `"
                 + missingPromissoryNotes + "`");
         }
@@ -3849,9 +3853,45 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean hasHomebrew() {
+        return isExtraSecretMode()
+            || isHomebrew()
+            || isFowMode()
+            || isAgeOfExplorationMode()
+            || isMinorFactionsMode()
+            || isLightFogMode()
+            || isRedTapeMode()
+            || isDiscordantStarsMode()
+            || isFrankenGame()
+            || isMiltyModMode()
+            || isAbsolMode()
+            || isPromisesPromisesMode()
+            || isFlagshippingMode()
+            || isAllianceMode()
+            || isSpinMode()
+            || isHomebrewSCMode()
+            || isCommunityMode()
+            || !checkAllDecksAreOfficial()
+            || !checkAllTilesAreOfficial()
+            || Mapper.getFactions().stream()
+                .filter(faction -> !faction.getSource().isPok())
+                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
+            || Mapper.getLeaders().values().stream()
+                .filter(leader -> !leader.getSource().isPok())
+                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || (publicObjectives1!= null && publicObjectives1.size() < 5 && getRound() >= 4)
+            || (publicObjectives2!= null && publicObjectives2.size() < (getRound() - 4))
+            || getRealPlayers().stream()
+                .anyMatch(player -> player.getSecretVictoryPoints() > 3
+                    && !player.getRelics().contains("obsidian"))
+            || getPlayerCountForMap() < 3
+            || getRealAndEliminatedAndDummyPlayers().size() < 3
+            || getPlayerCountForMap() > 8
+            || getRealAndEliminatedAndDummyPlayers().size() > 8;
+    }
+
+    private boolean checkAllDecksAreOfficial() {
         // needs to check for homebrew tiles still
         // Decks
-
         List<String> deckIDs = new ArrayList<>();
         deckIDs.add(getAcDeckID());
         deckIDs.add(getSoDeckID());
@@ -3871,11 +3911,13 @@ public class Game extends GameProperties {
         StrategyCardSetModel scset = Mapper.getStrategyCardSets().get(getScSetID());
         if (scset == null || !scset.getSource().isOfficial()) {
             allDecksOfficial = false;
-
         }
+        return allDecksOfficial;
+    }
 
+    private boolean checkAllTilesAreOfficial() {
         // Tiles
-        boolean allTilesOfficial = getTileMap().values().stream().allMatch(tile -> {
+        return getTileMap().values().stream().allMatch(tile -> {
             if (tile == null || tile.getTileModel() == null) {
                 return true;
             }
@@ -3885,43 +3927,6 @@ public class Game extends GameProperties {
             }
             return tileSource != null && tileSource.isOfficial();
         });
-
-        if (!allDecksOfficial) {
-            System.out.println("here4");
-        }
-
-        return isExtraSecretMode()
-            || isHomebrew()
-            || isFowMode()
-            || isLightFogMode()
-            || isRedTapeMode()
-            || isDiscordantStarsMode()
-            || isFrankenGame()
-            || isMiltyModMode()
-            || isAbsolMode()
-            || isPromisesPromisesMode()
-            || isFlagshippingMode()
-            || isAllianceMode()
-            || isSpinMode()
-            || isHomebrewSCMode()
-            || isCommunityMode()
-            || !allDecksOfficial
-            || !allTilesOfficial
-            || Mapper.getFactions().stream()
-                .filter(faction -> !faction.getSource().isPok())
-                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
-            || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isPok())
-                .anyMatch(leader -> isLeaderInGame(leader.getID()))
-            || publicObjectives1.size() < 5 && getRound() >= 4
-            || publicObjectives2.size() < (getRound() - 4)
-            || getRealPlayers().stream()
-                .anyMatch(player -> player.getSecretVictoryPoints() > 3
-                    && !player.getRelics().contains("obsidian"))
-            || getPlayerCountForMap() < 3
-            || getRealAndEliminatedAndDummyPlayers().size() < 3
-            || getPlayerCountForMap() > 8
-            || getRealAndEliminatedAndDummyPlayers().size() > 8;
     }
 
     public void setStrategyCardSet(String scSetID) {

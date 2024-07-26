@@ -191,6 +191,9 @@ public class CombatRoll extends CombatSubcommandData {
             // Including space for finding opponents for pds - since people will fire before
             // landing sometimes
             // and fire after landing other times.
+            if (rollType == CombatRollType.SpaceCannonOffence) {
+                combatHoldersForOpponent = new ArrayList<>();
+            }
             combatHoldersForOpponent.add(tile.getUnitHolders().get(Constants.SPACE));
         }
         Player opponent = CombatHelper.GetOpponent(player, combatHoldersForOpponent, game);
@@ -248,7 +251,7 @@ public class CombatRoll extends CombatSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        if (message.contains("at the risk of your troops lives")) {
+        if (message.contains("adding +1, at the risk of your")) {
             MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos,", Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         }
         if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
@@ -393,10 +396,15 @@ public class CombatRoll extends CombatSubcommandData {
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
                     msg2 = p2.getRepresentation() + msg2;
                     someone = true;
+                    if (game.isFowMode()) {
+                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2, buttons);
+                    }
                 }
             }
             if (someone) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                if (!game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
+                }
             }
 
         }

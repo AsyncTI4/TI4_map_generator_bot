@@ -1,8 +1,7 @@
 package ti4.commands.statistics;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -10,12 +9,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -24,13 +23,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.K;
-
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -77,6 +72,7 @@ public class GameStats extends StatisticsSubcommandData {
             case GAME_LENGTH -> showGameLengths(event, null);
             case GAME_LENGTH_4MO -> showGameLengths(event, 120);
             case FACTIONS_PLAYED -> showMostPlayedFactions(event);
+            case AVERAGE_TURNS -> showAverageTurnsInAGameByFaction(event);
             case COLOURS_PLAYED -> showMostPlayedColour(event);
             case FACTION_WINS -> showMostWinningFactions(event);
             case SOS_SCORED -> listScoredSOsPulledRelicsRevealedPOs(event);
@@ -98,9 +94,10 @@ public class GameStats extends StatisticsSubcommandData {
      */
     public enum GameStatistics {
         // Add your new statistic here
-        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), PING_LIST("Ping List", "List of how many times players have been pinged"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)", "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour",
-            "Show colour play count"), FACTION_WINS("Wins per Faction",
-                "Show the wins per faction"), SOS_SCORED("Times a secret objective has been scored", "Show the amount of times each secret objective has been scored"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
+        UNLEASH_THE_NAMES("Unleash the Names", "Show all the names of the games"), AVERAGE_TURNS("Average Turn Amount", "Show the average turns for a faction in a game"), PING_LIST("Ping List", "List of how many times players have been pinged"), HIGHEST_SPENDERS("List Highest Spenders", "Show stats for spending on CCs/plastics that bot has"), GAME_LENGTH("Game Length", "Show game lengths"), GAME_LENGTH_4MO("Game Length (past 4 months)",
+            "Show game lengths from the past 4 months"), FACTIONS_PLAYED("Plays per Faction", "Show faction play count"), COLOURS_PLAYED("Plays per Colour",
+                "Show colour play count"), FACTION_WINS("Wins per Faction",
+                    "Show the wins per faction"), SOS_SCORED("Times a secret objective has been scored", "Show the amount of times each secret objective has been scored"), FACTION_WIN_PERCENT("Faction win percent", "Shows each faction's win percent rounded to the nearest integer"), COLOUR_WINS("Wins per Colour", "Show the wins per colour"),
         // UNFINISHED_GAMES("Unfinished games", "Show the games where at least 1 BP was scored but no winner was declared"),
         WINNING_PATH("Winners Path to Victory", "Shows a count of each game's path to victory"), SUPPORT_WIN_COUNT("Wins with SftT", "Shows a count of wins that occurred with SftT"), GAME_COUNT("Total game count", "Shows the total game count");
 
@@ -119,7 +116,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
-         * 
+         *
          * @param id the string identifier
          * @return the SimpleStatistics enum value, or null if not found
          */
@@ -134,7 +131,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         /**
          * Gets the name and description of the statistic for auto-complete suggestions.
-         * 
+         *
          * @return the auto-complete name
          */
         public String getAutoCompleteName() {
@@ -143,7 +140,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         /**
          * Searches for a given string within the name, description, or string representation of the statistic.
-         * 
+         *
          * @param searchString the string to search for
          * @return true if the string is found, false otherwise
          */
@@ -433,6 +430,45 @@ public class GameStats extends StatisticsSubcommandData {
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
+    }
+
+    private static void showAverageTurnsInAGameByFaction(SlashCommandInteractionEvent event) {
+        Map<String, Double> factionCount = new HashMap<>();
+        Map<String, Double> factionTurnCount = new HashMap<>();
+
+        List<Game> mapList = GameStatisticFilterer.getFilteredGames(event);
+        for (Game game : mapList) {
+            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+                String faction = player.getFaction();
+                double turnCount = player.getNumberTurns() - game.getDiscardAgendas().size() - game.getRound();
+                System.out.println(player.getNumberTurns());
+                if (turnCount < 10 || turnCount > 200) {
+                    continue;
+                }
+                factionCount.put(faction,
+                    1 + factionCount.getOrDefault(faction, 0.0));
+                factionTurnCount.put(faction,
+                    turnCount + factionTurnCount.getOrDefault(faction, 0.0));
+                factionCount.put("allFactions",
+                    1 + factionCount.getOrDefault("allFactions", 0.0));
+                factionTurnCount.put("allFactions",
+                    turnCount + factionTurnCount.getOrDefault("allFactions", 0.0));
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Average Turns per Faction:").append("\n");
+        sb.append("All Factions Combined:").append(String.format("%.2f", factionTurnCount.get("allFactions") / factionCount.get("allFactions"))).append("\n");
+        factionCount.entrySet().stream()
+            .filter(entry -> Mapper.isValidFaction(entry.getKey()))
+            .sorted(Map.Entry.comparingByValue())
+            .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
+            .forEach(entry -> sb.append("`")
+                .append(StringUtils.leftPad(String.format("%.2f", (factionTurnCount.get(entry.getKey().getAlias()) / entry.getValue())), 4))
+                .append(" turns from ").append(entry.getValue()).append(" games`")
+                .append(entry.getKey().getFactionEmoji()).append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append("\n"));
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Average Turns per Faction", sb.toString());
     }
 
     private static void showGameCount(SlashCommandInteractionEvent event) {
