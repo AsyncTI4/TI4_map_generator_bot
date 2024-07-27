@@ -40,7 +40,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
-        addOptions(new OptionData(OptionType.USER, Constants.FOWGM, "Game master (default: you)"));
+        addOptions(new OptionData(OptionType.USER, Constants.FOWGM, "GM/game master (default: you)"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next fow###)"));
     }
 

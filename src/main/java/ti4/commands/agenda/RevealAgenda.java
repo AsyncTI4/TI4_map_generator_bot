@@ -194,7 +194,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             msg = "Press this button if the last player forgot to react, but verbally said \"No Whens/Afters\".";
             proceedButtons.add(Button.danger("proceedToVoting", "Skip Waiting And Start The Voting For Everyone"));
             proceedButtons.add(Button.primary("transaction", "Transaction"));
-            proceedButtons.add(Button.danger("eraseMyVote", "Erase M Vote And Have Me Vote Again"));
+            proceedButtons.add(Button.danger("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
             proceedButtons.add(Button.danger("eraseMyRiders", "Erase My Riders"));
             proceedButtons.add(Button.secondary("refreshAgenda", "Refresh Agenda"));
         }
