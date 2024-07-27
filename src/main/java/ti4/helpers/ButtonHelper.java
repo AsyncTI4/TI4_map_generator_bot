@@ -8201,7 +8201,7 @@ public class ButtonHelper {
                 if (requesting) {
                     message = message + player.getRepresentation()
                         + " Click the promissory note you'd like to request."
-                        + " Since promissory notes are private info, all of the player's starting promissory notes which are not in play areas are available, though the player may not currently hold all of these."
+                        + " Since promissory notes are private info, all of the player's starting promissory notes which are not in play areas are available, though the player might not currently hold all of these."
                         + " Click TBD Note if you want someone else's promissory note, and it will give the player the option to send it.";
                     for (String pnShortHand : p1.getPromissoryNotesOwned()) {
                         if (anyoneHaveInPlayArea(game, pnShortHand)) {

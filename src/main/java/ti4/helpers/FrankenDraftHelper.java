@@ -194,7 +194,7 @@ public class FrankenDraftHelper {
 
         if (!undraftables.isEmpty()) {
             sb.append("# __Undraftable:__\n");
-            sb.append("> The following items are in your bag but may not be drafted, either because you:\n");
+            sb.append("> The following items are in your bag but cannot be drafted, either because you:\n");
             sb.append("> - are at your hand limit\n");
             sb.append("> - just drafted a similar item\n");
             sb.append("> - have not drafted one of each item type yet\n");

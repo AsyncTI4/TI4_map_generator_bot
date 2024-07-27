@@ -83,7 +83,7 @@ public class StartCombat extends CombatSubcommandData {
 
         if (playersForCombat.size() > 2) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                "There are more than 2 players in this system - something may not work correctly *yet*.");
+                "There are more than 2 players in this system - something might not work correctly *yet*.");
         } else if (playersForCombat.size() < 2) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "There are less than 2 players in this system - a combat thread could not be created.");

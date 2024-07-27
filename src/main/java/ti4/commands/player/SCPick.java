@@ -67,7 +67,7 @@ public class SCPick extends PlayerSubcommandData {
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
-            MessageHelper.sendMessageToEventChannel(event, "Player may not pick another strategy card. Max strategy cards per player for this game is " + maxSCsPerPlayer + ".");
+            MessageHelper.sendMessageToEventChannel(event, "Player cannot pick another strategy card. Max strategy cards per player for this game is " + maxSCsPerPlayer + ".");
             return;
         }
 

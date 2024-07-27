@@ -1091,7 +1091,7 @@ public class AgendaHelper {
                 + " if you intend to abstain from voting on this agenda, you have the option to preset an abstain here. Feel free not to pre-abstain, this is simply an optional way to resolve agendas faster";
             List<Button> buttons = new ArrayList<>();
             if (player.hasAbility("future_sight")) {
-                msg = msg + ". Reminder that you have Future Sight and may not wish to abstain.";
+                msg = msg + ". Reminder that you have Future Sight and might not wish to abstain.";
             }
 
             buttons.add(Button.success("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));

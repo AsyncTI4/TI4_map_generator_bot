@@ -593,7 +593,7 @@ public class FoWHelper {
 	/**
 	 * Return the list of players that are adjacent to a particular position
 	 * <p>
-	 * WARNING: This function returns information that certain players may not be
+	 * WARNING: This function returns information that certain players might not be
 	 * privy to
 	 */
 	public static List<Player> getAdjacentPlayers(Game game, String position, boolean includeSweep) {

@@ -74,7 +74,7 @@ public class FrankenApplicator {
                 for (DraftErrataModel i : draftItem.Errata.OptionalSwaps) {
                     DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
                     Button button = item.getAddButton().withEmoji(Emoji.fromFormatted(item.getItemEmoji()));
-                    String message = "WARNING! The following items were optional and may or may not have been removed by pressing the parent button:\n" + item.getLongDescription();
+                    String message = "WARNING! The following items were optional and might or might not have been removed by pressing the parent button:\n" + item.getLongDescription();
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, List.of(button));
                 }
             }

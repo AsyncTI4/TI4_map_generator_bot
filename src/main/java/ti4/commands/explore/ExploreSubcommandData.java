@@ -58,11 +58,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
     protected final OptionData idOption = new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ID; may include multiple comma-separated IDs.");
 
-    private static final String HAZ_NONE = "haz_none";
-    private static final String HAZ_INF = "haz_inf";
-    private static final String HAZ_MECH = "haz_mech";
-    private static final String HAZ_BOTH = "haz_both";
-
     public String getActionID() {
         return getName();
     }
@@ -502,23 +497,26 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button gainWInf = Button.success("resolveExpeditionI_" + planetID, "Ready " + planetName + " By Removing 1 Infantry There");
                 Button Decline3 = Button.danger("decline_explore", "Decline Expedition");
                 List<Button> buttons;
-                switch (findHazardousUnits(planetName, tile, player))
+                int mechCount = getMechCount(planetName, tile, player);
+                int infantryCount = getInfantryCount(planetName, tile, player);
+                if (mechCount > 0)
                 {
-                    case HAZ_BOTH:
-                        buttons = List.of(gainWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Expedition using the buttons. If you so wish, you could manually remove an infantry for this.", buttons);
-                        break;
-                    case HAZ_MECH:
-                        buttons = List.of(gainWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Expedition using the buttons.", buttons);
-                        break;
-                    case HAZ_INF:
-                        buttons = List.of(gainWInf, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Expedition using the buttons.", buttons);
-                        break;
-                    case HAZ_NONE:
-                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither a mech nor infantry on " + planetName + ", and thus cannot resolve Expedition.");
-                        break;
+                    buttons = List.of(gainWMech, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(),
+                        "You have " + mechCount + "mech" + (mechCount == 1 ? "" : "s") + " and " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Expedition using the buttons."
+                            + (infantryCount > 0 ? " If you so wish, you could manually remove an infantry for this." : ""), buttons);
+                }
+                else if (infantryCount > 0)
+                {
+                    buttons = List.of(gainWInf, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), 
+                        "You have no mechs but " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Expedition using the buttons.", buttons);
+                }
+                else
+                {
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither mechs nor infantry on " + planetName + ", and thus cannot resolve Expedition.");
                 }
             }
             case "frln1", "frln2", "frln3" -> {
@@ -533,23 +531,26 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button gainWInf = Button.success("resolveCoreMineI_" + planetID, "Gain 1 Trade Good By Removing 1 Infantry From " + planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Core Mine");
                 List<Button> buttons;
-                switch (findHazardousUnits(planetName, tile, player))
+                int mechCount = getMechCount(planetName, tile, player);
+                int infantryCount = getInfantryCount(planetName, tile, player);
+                if (mechCount > 0)
                 {
-                    case HAZ_BOTH:
-                        buttons = List.of(gainWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Core Mine using the buttons. If you so wish, you could manually remove an infantry for this.", buttons);
-                        break;
-                    case HAZ_MECH:
-                        buttons = List.of(gainWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Core Mine using the buttons.", buttons);
-                        break;
-                    case HAZ_INF:
-                        buttons = List.of(gainWInf, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Core Mine using the buttons.", buttons);
-                        break;
-                    case HAZ_NONE:
-                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither a mech nor infantry on " + planetName + ", and thus cannot resolve Core Mine.");
-                        break;
+                    buttons = List.of(gainWMech, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(),
+                        "You have " + mechCount + "mech" + (mechCount == 1 ? "" : "s") + " and " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Core Mine using the buttons."
+                            + (infantryCount > 0 ? " If you so wish, you could manually remove an infantry for this." : ""), buttons);
+                }
+                else if (infantryCount > 0)
+                {
+                    buttons = List.of(gainWInf, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), 
+                        "You have no mechs but " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Core Mine using the buttons.", buttons);
+                }
+                else
+                {
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither mechs nor infantry on " + planetName + ", and thus cannot resolve Core Mine.");
                 }
             }
             case "vfs1", "vfs2", "vfs3" -> {
@@ -557,23 +558,26 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button gainWInf = Button.success("resolveVolatileI_" + planetID, "Gain 1 Command Token By Removing 1 Infantry From " + planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Volatile Fuel Source");
                 List<Button> buttons;
-                switch (findHazardousUnits(planetName, tile, player))
+                int mechCount = getMechCount(planetName, tile, player);
+                int infantryCount = getInfantryCount(planetName, tile, player);
+                if (mechCount > 0)
                 {
-                    case HAZ_BOTH:
-                        buttons = List.of(gainWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Volatile Fuel Source using the buttons. If you so wish, you could manually remove an infantry for this.", buttons);
-                        break;
-                    case HAZ_MECH:
-                        buttons = List.of(gainWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Volatile Fuel Source using the buttons.", buttons);
-                        break;
-                    case HAZ_INF:
-                        buttons = List.of(gainWInf, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Volatile Fuel Source using the buttons.", buttons);
-                        break;
-                    case HAZ_NONE:
-                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither a mech nor infantry on " + planetName + ", and thus cannot resolve Volatile Fuel Source.");
-                        break;
+                    buttons = List.of(gainWMech, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(),
+                        "You have " + mechCount + "mech" + (mechCount == 1 ? "" : "s") + " and " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Volatile Fuel Source using the buttons."
+                            + (infantryCount > 0 ? " If you so wish, you could manually remove an infantry for this." : ""), buttons);
+                }
+                else if (infantryCount > 0)
+                {
+                    buttons = List.of(gainWInf, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), 
+                        "You have no mechs but " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Volatile Fuel Source using the buttons.", buttons);
+                }
+                else
+                {
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither mechs nor infantry on " + planetName + ", and thus cannot resolve Volatile Fuel Source.");
                 }
             }
             case "warforgeruins" -> {
@@ -583,29 +587,32 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button gainInfWInf = Button.success("ruinsI_" + planetID + "_2inf", "Place 2 Infantry On " + planetName + " By Removing 1 Infantry There");
                 Button Decline3 = Button.danger("decline_explore", "Decline War Forge Ruins");
                 List<Button> buttons;
-                switch (findHazardousUnits(planetName, tile, player))
+                int mechCount = getMechCount(planetName, tile, player);
+                int infantryCount = getInfantryCount(planetName, tile, player);
+                if (mechCount > 0)
                 {
-                    case HAZ_BOTH:
-                        buttons = List.of(gainMechWMech, gainInfWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve War Forge Ruins using the buttons. If you so wish, you could manually remove an infantry for this.", buttons);
-                        break;
-                    case HAZ_MECH:
-                        buttons = List.of(gainMechWMech, gainInfWMech, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve War Forge Ruins using the buttons.", buttons);
-                        break;
-                    case HAZ_INF:
-                        buttons = List.of(gainMechWInf, gainInfWInf, Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve War Forge Ruins using the buttons.", buttons);
-                        break;
-                    case HAZ_NONE:
-                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither a mech nor infantry on " + planetName + ", and thus cannot resolve War Forge Ruins.");
-                        break;
+                    buttons = List.of(gainMechWMech, gainInfWMech, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(),
+                        "You have " + mechCount + "mech" + (mechCount == 1 ? "" : "s") + " and " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve War Forge Ruins Source using the buttons."
+                            + (infantryCount > 0 ? " If you so wish, you could manually remove an infantry for this." : ""), buttons);
+                }
+                else if (infantryCount > 0)
+                {
+                    buttons = List.of(gainMechWInf, gainInfWInf, Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), 
+                        "You have no mechs but " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve War Forge Ruins using the buttons.", buttons);
+                }
+                else
+                {
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither mechs nor infantry on " + planetName + ", and thus cannot resolve War Forge Ruins.");
                 }
             }
             case "seedyspaceport" -> {
-                Button gainACWMech = Button.success("seedySpaceM_" + planetID, "Draw 1 Action Card Because Of Mech On " + planetName);
-                Button gainACWInf = Button.success("seedySpaceM_AC_" + planetID, "Draw 1 Action Card By Removing 1 Infantry From " + planetName);
-                Button Decline3 = Button.danger("seedySpaceI_AC_", "Decline Seedy Spaceport");
+                Button gainACWMech = Button.success("seedySpaceM_AC_" + planetID, "Draw 1 Action Card Because Of Mech On " + planetName);
+                Button gainACWInf = Button.success("seedySpaceI_AC_" + planetID, "Draw 1 Action Card By Removing 1 Infantry From " + planetName);
+                Button Decline3 = Button.danger("decline_explore", "Decline Seedy Spaceport");
                 List<String> agents = new ArrayList<>();
                 for (Leader leader : player.getLeaders()) {
                     if (leader.isExhausted() && leader.getId().contains("agent")) {
@@ -613,41 +620,38 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                 }
                 List<Button> buttons = new ArrayList<>();
-                switch (findHazardousUnits(planetName, tile, player))
+                int mechCount = getMechCount(planetName, tile, player);
+                int infantryCount = getInfantryCount(planetName, tile, player);
+                if (mechCount > 0)
                 {
-                    case HAZ_BOTH:
-                        for (String leader: agents)
-                        {
-                            buttons.add(Button.success("seedySpaceM_" + leader + "_" + planetID,
-                                "Ready " + Mapper.getLeader(leader).getName() + " Because Of Mech On " + planetName));
-                        }
-                        buttons.add(gainACWMech);
-                        buttons.add(Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Seedy Spaceport using the buttons. If you so wish, you could manually remove an infantry for this.", buttons);
-                        break;
-                    case HAZ_MECH:
-                        for (String leader: agents)
-                        {
-                            buttons.add(Button.success("seedySpaceM_" + leader + "_" + planetID,
-                                "Ready " + Mapper.getLeader(leader).getName() + " ecause Of Mech On " + planetName));
-                        }
-                        buttons.add(gainACWMech);
-                        buttons.add(Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Seedy Spaceport using the buttons.", buttons);
-                        break;
-                    case HAZ_INF:
-                        for (String leader: agents)
-                        {
-                            buttons.add(Button.success("seedySpaceI_" + leader + "_" + planetID,
-                                "Ready " + Mapper.getLeader(leader).getName() + " By Removing 1 Infantry From " + planetName));
-                        }
-                        buttons.add(gainACWInf);
-                        buttons.add(Decline3);
-                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), "Resolve Seedy Spaceport using the buttons.", buttons);
-                        break;
-                    case HAZ_NONE:
-                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither a mech nor infantry on " + planetName + ", and thus cannot resolve Seedy Spaceport.");
-                        break;
+                    for (String leader: agents)
+                    {
+                        buttons.add(Button.success("seedySpaceM_" + leader + "_" + planetID,
+                            "Ready " + Mapper.getLeader(leader).getName() + " Because Of Mech On " + planetName));
+                    }
+                    buttons.add(gainACWMech);
+                    buttons.add(Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(),
+                        "You have " + mechCount + "mech" + (mechCount == 1 ? "" : "s") + " and " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Seedy Spaceport using the buttons."
+                            + (infantryCount > 0 ? " If you so wish, you could manually remove an infantry for this." : ""), buttons);
+                }
+                else if (infantryCount > 0)
+                {
+                    for (String leader: agents)
+                    {
+                        buttons.add(Button.success("seedySpaceI_" + leader + "_" + planetID,
+                            "Ready " + Mapper.getLeader(leader).getName() + " By Removing 1 Infantry From " + planetName));
+                    }
+                    buttons.add(gainACWInf);
+                    buttons.add(Decline3);
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), 
+                        "You have no mechs but " + infantryCount + " infantry on " + planetName
+                            + ". Please resolve Seedy Spaceport using the buttons.", buttons);
+                }
+                else
+                {
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "You have neither mechs nor infantry on " + planetName + ", and thus cannot resolve Seedy Spaceport.");
                 }
             }
             case "hiddenlaboratory" -> {
@@ -718,23 +722,28 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
     }
 
-    private static String findHazardousUnits(String planetName, Tile tile, Player player) {
+    private static int getMechCount(String planetName, Tile tile, Player player) {
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         String colorID = Mapper.getColorID(player.getColor());
 
         UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
-        boolean hasMech = false;
-        if (unitHolder.getUnits() != null && unitHolder.getUnits().get(mechKey) != null && unitHolder.getUnits().get(mechKey) >= 1)
+        if (unitHolder.getUnits() != null && unitHolder.getUnits().get(mechKey) != null)
         {
-            hasMech = true;
+            return unitHolder.getUnits().get(mechKey);
         }
+        return 0;
+    }
+
+    private static int getInfantryCount(String planetName, Tile tile, Player player) {
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        String colorID = Mapper.getColorID(player.getColor());
 
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-        if (unitHolder.getUnits() != null && unitHolder.getUnits().get(infKey) != null && unitHolder.getUnits().get(infKey) >= 1)
+        if (unitHolder.getUnits() != null && unitHolder.getUnits().get(infKey) != null)
         {
-            return (hasMech ? HAZ_BOTH : HAZ_INF);
+            return unitHolder.getUnits().get(infKey);
         }
 
-        return (hasMech ? HAZ_MECH : HAZ_NONE);
+        return 0;
     }
 }

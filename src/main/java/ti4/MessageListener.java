@@ -585,7 +585,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 36) {
                                         ping = realIdentity
-                                            + " Life may not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience won't wait forever!";
+                                            + " Life might not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience won't wait forever!";
                                     }
                                     if (pingNumber == 37) {
                                         ping = realIdentity
