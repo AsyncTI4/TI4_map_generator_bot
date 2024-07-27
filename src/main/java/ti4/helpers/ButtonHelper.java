@@ -812,22 +812,22 @@ public class ButtonHelper {
         }
         PlanetAdd.doAction(p2, dmzPlanet, game, event, false);
         List<Button> goAgainButtons = new ArrayList<>();
-        Button button = Button.secondary("transactWith_" + p2.getColor(), "Send something else to player?");
+        Button button = Button.secondary("transactWith_" + p2.getColor(), "Send Something Else To Player?");
         Button done = Button.secondary("finishTransaction_" + p2.getColor(), "Done With This Transaction");
         String ident = getIdentOrColor(p1, game);
-        String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, game) + " to " + getIdentOrColor(p2, game);
+        String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, game) + " to " + getIdentOrColor(p2, game) + ".";
         goAgainButtons.add(button);
         goAgainButtons.add(done);
-        goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect something in return"));
+        goAgainButtons.add(Button.success("demandSomething_" + p2.getColor(), "Expect Something In Return"));
 
         if (game.isFowMode() || !game.isNewTransactionMethod()) {
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(p1.getPrivateChannel(), message2);
-                MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), ident + " Use buttons to complete transaction.", goAgainButtons);
                 MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message2);
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), ident + " Use Buttons To Complete Transaction", goAgainButtons);
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), ident + " Use buttons to complete transaction.", goAgainButtons);
             }
         }
         deleteMessage(event);
@@ -5980,7 +5980,7 @@ public class ButtonHelper {
             // if (!unitHolderName.equalsIgnoreCase(Constants.SPACE)) {
             //     fightingOnUnitHolderName = Helper.getPlanetRepresentation(unitHolderName, game);
             // }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were no units selected to reroll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were no units selected to reroll.");
             return;
         }
         game.setStoredValue("thalnosPlusOne", "true");
@@ -6791,8 +6791,8 @@ public class ButtonHelper {
                 newButtons.add(buttons.get(x));
             }
         }
-        newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!", "Get more colors"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired player color", newButtons);
+        newButtons.add(Button.secondary("setupStep3_" + userId + "_" + factionId + "_" + (maxBefore + 22) + "!", "Get More Colors"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please tell the bot the desired player color.", newButtons);
     }
 
     public static List<Button> getSpeakerSetupButtons(Game game, String buttonID) {

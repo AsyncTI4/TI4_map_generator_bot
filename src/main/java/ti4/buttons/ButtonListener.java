@@ -1370,8 +1370,9 @@ public class ButtonListener extends ListenerAdapter {
             if (p2 != null) {
                 List<Button> buttons = ButtonHelper.getStuffToTransButtonsOld(game, p2, player);
                 String message = p2.getRepresentation()
-                    + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to "
-                    + ButtonHelper.getIdentOrColor(player, game);
+                    + " you have been given something on the condition that you give something in return. Hopefully the player explained what."
+                    + " If you don't hand it over, please return what they sent. Use buttons to send something to "
+                    + ButtonHelper.getIdentOrColor(player, game) + ".";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
                 ButtonHelper.deleteMessage(event);
             }
@@ -1564,7 +1565,7 @@ public class ButtonListener extends ListenerAdapter {
                 Button automate = Button.success(opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_"
                     + p1.getFaction() + "_" + p2.getFaction() + "_" + planet + "_confirmed", "Automate Combat");
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-                    opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm confirm",
+                    opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm confirm.",
                     automate);
             }
         } else if (buttonID.startsWith("transitDiodes_")) {
@@ -2791,7 +2792,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons = ButtonHelper.getStuffToTransButtonsNew(game, player, player, p2);
                 }
                 String message = player.getRepresentation()
-                    + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
+                    + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false) + ".";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 ButtonHelper.checkTransactionLegality(game, player, p2);
                 ButtonHelper.deleteMessage(event);
@@ -2810,7 +2811,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the latest offer from "
                     + player.getRepresentation(false, false) + " has been rescinded.");
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "you rescinded the latest offer to "
-                    + p2.getRepresentation(false, false));
+                    + p2.getRepresentation(false, false) + ".");
                 player.clearTransactionItemsWith(p2);
                 ButtonHelper.deleteMessage(event);
             }

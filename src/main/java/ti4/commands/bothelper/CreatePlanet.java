@@ -47,7 +47,7 @@ public class CreatePlanet extends BothelperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToEventChannel(event, "Creating planet " + event.getOption(Constants.PLANET_NAME).getAsString());
+        MessageHelper.sendMessageToEventChannel(event, "Creating planet " + event.getOption(Constants.PLANET_NAME).getAsString() + ".");
         String planetID = event.getOption(Constants.PLANET_ID).getAsString().toLowerCase();
         PlanetModel planet = null;
         boolean fail = false;
@@ -70,23 +70,23 @@ public class CreatePlanet extends BothelperSubcommandData {
                 event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         } catch (Exception e) {
             fail = true;
-            BotLogger.log("Something went wrong creating the planet: " + planetID, e);
+            BotLogger.log("Something went wrong creating the planet: " + planetID + ".", e);
         }
         if (fail || planet == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the planet: " + planetID);
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the planet: " + planetID + ".");
             return;
         }
         try {
             exportPlanetModelToJson(planet);
         } catch (Exception e) {
-            MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the planet: " + planetID);
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the planet: " + planetID + ".");
             BotLogger.log("Something went wrong exporting the planet to json: " + planetID, e);
         }
         try {
             TileHelper.addNewPlanetToList(planet);
             AliasHandler.addNewPlanetAliases(planet);
         } catch (Exception e) {
-            MessageHelper.sendMessageToEventChannel(event, "Something went wrong adding the planet to the active planets list: " + planetID);
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong adding the planet to the active planets list: " + planetID + ".");
             BotLogger.log("Something went wrong adding the planet to the active planets list: " + planetID, e);
         }
 

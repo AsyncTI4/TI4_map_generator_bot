@@ -88,7 +88,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                     }
                     if (reveal && planet != null) {
 
-                        String sb = trapCard.getRepresentation() + "\n" + "__**" + "Has been revealed on planet: " + representation + "**__";
+                        String sb = trapCard.getRepresentation() + "\n" + "__**" + "Has been revealed on planet: " + representation + "**__.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                         if ("Minefields".equalsIgnoreCase(trapCard.getName())) {
                             for (Player p2 : game.getRealPlayers()) {
@@ -108,7 +108,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                     List<Button> buttons = new ArrayList<>();
                                     buttons.add(Button.success("steal2tg_" + p2.getFaction(), "Steal 2 Trade Goods From " + ButtonHelper.getIdentOrColor(p2, game)));
                                     buttons.add(Button.primary("steal3comm_" + p2.getFaction(), "Steal 3 Commodities From " + ButtonHelper.getIdentOrColor(p2, game)));
-                                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " use buttons to resolve",
+                                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " use buttons to resolve Account Siphon Trap.",
                                         buttons);
                                 }
                             }
