@@ -82,7 +82,7 @@ public class RemoveUnits extends AddRemoveUnits {
             tile.removeUnit(unitHolder.getName(), unitID, count);
             tile.removeUnitDamage(unitHolder.getName(), unitID, countToRemove);
         } else {
-            if (event instanceof ButtonInteractionEvent eventB) {
+            if (event instanceof ButtonInteractionEvent) {
                 BotLogger.log(event.getId() + " found a null unitholder with the following info: " + tile.getRepresentation() + " " + planetName);
             }
         }

@@ -32,7 +32,6 @@ public class RemoveAllianceMember extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player to remove from the alliance could not be found");
             return;
         }
-        String currentMembers = player_.getAllianceMembers();
         if (player_.getAllianceMembers().contains(player.getFaction())) {
             player_.removeAllianceMember(player.getFaction());
         }

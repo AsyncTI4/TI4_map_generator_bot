@@ -2,9 +2,7 @@
     "id": "aldra",
     "tileId": "d23",
     "name": "Aldra",
-    "aliases": [
-        "aldra"
-    ],
+    "aliases": ["aldra"],
     "positionInTile": {
         "x": 136.0,
         "y": 94.0

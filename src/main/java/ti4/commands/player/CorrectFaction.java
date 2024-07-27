@@ -3,7 +3,6 @@ package ti4.commands.player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +105,7 @@ public class CorrectFaction extends PlayerSubcommandData {
         ShowGame.simpleShowGame(game, event);
     }
 
+    @SuppressWarnings("unused")
     private void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {
         String oldColorSuffix = "_" + oldColorID + ".";
         String newColorSuffix = "_" + newColorID + ".";

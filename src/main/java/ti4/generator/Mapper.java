@@ -61,7 +61,6 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
-import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
@@ -524,49 +523,6 @@ public class Mapper {
         return actionCards.containsKey(id);
     }
 
-    /**
-     * @deprecated start with {@link #getPromissoryNote(String id)} instead
-     *
-     */
-    @Deprecated
-    public static String getPromissoryNoteText(String id, boolean longDisplay) {
-        if (longDisplay) {
-            return getPromissoryNoteLongText(id);
-        } else {
-            return getPromissoryNoteShortText(id);
-        }
-    }
-
-    /**
-     * @deprecated use {@link #getPromissoryNote(String id)}.getText() instead
-     *
-     */
-    @Deprecated
-    public static String getPromissoryNoteLongText(String id) {
-        return promissoryNotes.get(id).getText();
-    }
-
-    /**
-     * @deprecated use {@link #getPromissoryNote(String id)}.getShortText() instead
-     *
-     */
-    @Deprecated
-    public static String getPromissoryNoteShortText(String id) {
-        return promissoryNotes.get(id).getShortText();
-    }
-
-    /**
-     * @deprecated use {@link #getPromissoryNote(String id)}.getOwner() instead
-     *
-     */
-    @Deprecated
-    public static String getPromissoryNoteOwner(String id) {
-        if (promissoryNotes.get(id) == null) {
-            return "finNullDodger";
-        }
-        return promissoryNotes.get(id).getOwner();
-    }
-
     public static PublicObjectiveModel getPublicObjective(String id) {
         return publicObjectives.get(id);
     }
@@ -581,26 +537,6 @@ public class Mapper {
 
     public static EventModel getEvent(String id) {
         return events.get(id);
-    }
-
-    /**
-     * @deprecated Should use representations avaiable in {@link #ExploreModel} instead
-     */
-    @Deprecated
-    public static String getExploreRepresentation(String id) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
-        if (explore.get(id) != null) {
-            return explore.get(id).getRepresentation();
-        }
-        id = id.replace("_", "");
-
-        if (explore.get(id) != null) {
-            return explore.get(id).getRepresentation();
-        } else {
-            BotLogger.log("Cannot find explore with ID: " + id);
-            return null;
-        }
     }
 
     public static ExploreModel getExplore(String exploreId) {
@@ -797,10 +733,6 @@ public class Mapper {
             acNameList.put(entry.getKey(), entry.getValue().getName());
         }
         return acNameList;
-    }
-
-    public static TechnologyType getTechType(String id) {
-        return technologies.get(id).getType();
     }
 
     public static Map<String, TechnologyModel> getTechs() {

@@ -494,7 +494,7 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getTradeButtons(int sc) {
-        Button tradePrimary = Button.success("trade_primary", "Resolve Primary");
+        // Button tradePrimary = Button.success("trade_primary", "Resolve Primary");
         Button followButton = Button.success("sc_trade_follow", "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         Button refreshAndWash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));

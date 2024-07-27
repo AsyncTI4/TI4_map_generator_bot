@@ -229,7 +229,6 @@ public class TurnStart extends PlayerSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentation(true, true));
         sb.append(" Please resolve these before doing anything else:\n");
-        int count = 0;
         for (int sc : game.getPlayedSCsInOrder(player)) {
             if (game.getName().equalsIgnoreCase("pbd1000")) {
                 String num = sc + "";
@@ -249,7 +248,6 @@ public class TurnStart extends PlayerSubcommandData {
                 }
                 sb.append("\n");
                 sendReminder = true;
-                count++;
             }
         }
         sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");

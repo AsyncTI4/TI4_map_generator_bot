@@ -362,7 +362,7 @@ public class MiltyDraftHelper {
         MapTemplateHelper.buildMapFromMiltyData(game, mapTemplate);
     }
 
-    // TODO: add map template
+    // TODO (Jazz): add map template
     public static List<MiltyDraftSlice> parseSlicesFromString(String sliceString, List<ComponentSource> allowedSources) {
         try {
             MiltyDraftManager manager = new MiltyDraftManager();

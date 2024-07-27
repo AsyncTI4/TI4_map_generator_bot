@@ -3,7 +3,6 @@ package ti4.draft.items;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
@@ -36,8 +35,9 @@ public class TechDraftItem extends DraftItem {
     @Override
     public String getItemEmoji() {
         TechnologyModel model = getTech();
-        return Emojis.getEmojiFromDiscord(model.getType().toString().toLowerCase() + "tech");
+        return model.getCondensedReqsEmojis(true);
     }
+
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.TECH);

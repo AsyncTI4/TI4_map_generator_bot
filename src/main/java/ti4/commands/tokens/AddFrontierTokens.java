@@ -33,7 +33,6 @@ public class AddFrontierTokens implements Command {
 
     public static void parsingForTile(GenericInteractionCreateEvent event, Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
-        List<String> frontierTileList = Mapper.getFrontierTileIds();
         for (Tile tile : tileList) {
             if (((tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size() == 2) || Mapper.getFrontierTileIds().contains(tile.getTileID())) && !game.isBaseGameMode()) {
                 boolean hasMirage = false;

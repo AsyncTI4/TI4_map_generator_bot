@@ -799,7 +799,7 @@ public class AgendaHelper {
                     }
                 } else {
                     for (Player playerB : game.getRealPlayers()) {
-                        new RiseOfMessiah().doRise(playerB, event, game);
+                        RiseOfMessiah.doRise(playerB, event, game);
                     }
                 }
             }
@@ -822,10 +822,8 @@ public class AgendaHelper {
                 } else {
                     winOrLose = getWinningVoters(winner, game);
                     for (Player playerWL : winOrLose) {
-                        String message;
                         if (playerWL.hasAbility("autonetic_memory")) {
                             ButtonHelperAbilities.autoneticMemoryStep1(game, playerWL, 2);
-                            message = playerWL.getFactionEmoji() + " Triggered Autonetic Memory Option";
                         } else {
                             game.drawActionCard(playerWL.getUserID());
                             game.drawActionCard(playerWL.getUserID());
@@ -1328,7 +1326,7 @@ public class AgendaHelper {
         String votes = StringUtils.substringBetween(buttonLabel, "(", ")");
         if (!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive")
             && !buttonID.contains("everything")) {
-            new PlanetExhaust().doAction(player, planetName, game, false);
+            PlanetExhaust.doAction(player, planetName, game, false);
         }
         if (buttonID.contains("everything")) {
             for (String planet : player.getPlanets()) {
@@ -1450,10 +1448,7 @@ public class AgendaHelper {
                     existingData = existingData + ";" + identifier + "_" + votes;
                 }
                 game.setCurrentAgendaVote(outcome, existingData);
-                String msg = player.getFactionEmoji() + " Voted " + votes + " vote" + (votes.equals("1") ? "" : "s") + " for "
-                    + StringUtils.capitalize(outcome) + "!";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    Helper.buildSpentThingsMessageForVoting(player, game, false));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
                 event.getMessage().delete().queue();
             }
 
@@ -2262,7 +2257,6 @@ public class AgendaHelper {
                         if (specificVote.contains("Keleres Rider")) {
                             int currentTG = winningR.getTg();
                             winningR.setTg(currentTG + 2);
-                            String message = "";
                             boolean scheming = winningR.hasAbility("scheming");
                             if (winningR.hasAbility("autonetic_memory")) {
                                 ButtonHelperAbilities.autoneticMemoryStep1(game, winningR, 1);

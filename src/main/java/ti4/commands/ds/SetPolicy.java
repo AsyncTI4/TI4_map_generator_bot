@@ -31,6 +31,11 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not find player!");
+            return;
+        }
+
         // List<String> playerAbilities = player.getAbilities().stream().sorted().toList();
         OptionMapping policy1 = event.getOption(Constants.SET_PEOPLE);
         OptionMapping policy2 = event.getOption(Constants.SET_ENVIRONMENT);

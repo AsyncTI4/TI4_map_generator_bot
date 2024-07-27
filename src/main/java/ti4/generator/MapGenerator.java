@@ -280,7 +280,6 @@ public class MapGenerator {
             minY = 10000;
             maxX = -1;
             maxY = -1;
-            Set<String> filledPositions = new HashSet<>();
             for (String position : PositionMapper.getTilePositions()) {
                 String tileRing = "0";
                 if (position.length() == 3) {
@@ -1003,6 +1002,7 @@ public class MapGenerator {
         if (finRun) {
             // BotLogger.log("Show game made it past checkpoint #" + checkpoint);
             checkpoint++;
+            if (checkpoint > 1000) System.out.println(checkpoint);
         }
         if (debug)
             debugGameInfoTime = System.nanoTime() - debugStartTime;
@@ -1459,6 +1459,7 @@ public class MapGenerator {
         return x + deltaX + 10;
     }
 
+    @SuppressWarnings("unused") // TODO (Jazz): figure out why I added this function
     private static void getAndDrawControlToken(Graphics graphics, Player p, int x, int y, boolean hideFactionIcon, float scale) {
         String colorID = p == null ? "gray" : p.getColor();
         BufferedImage controlToken = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(colorID)), scale);
@@ -3720,7 +3721,7 @@ public class MapGenerator {
         int bufferBetweenTextAndTokens = 15;
         int playerCount = players.size();
         int minimumBoxWidth = 400;
-        if (game.isRedTapeMode()) { //TODO move and handle method displayUnrevealedObjectives into this method and calc boxWidth properly
+        if (game.isRedTapeMode()) { //TODO: move and handle method displayUnrevealedObjectives into this method and calc boxWidth properly
             minimumBoxWidth += 400;
         }
 

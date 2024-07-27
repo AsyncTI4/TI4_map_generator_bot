@@ -223,14 +223,12 @@ public class CombatRoll extends CombatSubcommandData {
         tempMods.addAll(tempOpponentMods);
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
-        message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers, tempMods, player,
-            opponent,
-            game, rollType, event, tile);
+        message += CombatHelper.RollForUnits(playerUnitsByQuantity, opponentUnitsByQuantity, extraRolls, modifiers, tempMods, player, opponent, game, rollType, event, tile);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
         int round = 0;
-        String combatName = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
+        String combatName = "combatRoundTracker" + (opponent == null ? "nullfaction" : opponent.getFaction()) + tile.getPosition() + combatOnHolder.getName();
         if (game.getStoredValue(combatName).isEmpty()) {
             round = 0;
         } else {

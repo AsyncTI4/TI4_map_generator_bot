@@ -1,7 +1,7 @@
 package ti4.helpers;
 
 public class Stickers {
-    
+
     public static final long HopesEnd = 1262605434905428087L;
     public static final long Mallice = 1262605513095516190L;
     public static final long Mecatol = 1262605300150833242L;

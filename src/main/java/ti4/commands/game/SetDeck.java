@@ -13,7 +13,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
-import ti4.model.StrategyCardSetModel;
 
 public class SetDeck extends GameSubcommandData {
 

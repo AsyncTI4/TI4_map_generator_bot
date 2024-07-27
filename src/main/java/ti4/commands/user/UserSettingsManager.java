@@ -4,14 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -75,7 +70,7 @@ public class UserSettingsManager {
     public void loadUserSetting(String settingFilePath) {
         ObjectMapper objectMapper = new ObjectMapper();
         String filePath = settingFilePath;
-        JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, UserSettings.class);
+        //JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, UserSettings.class);
 
         if (filePath != null) {
             try {
@@ -86,7 +81,7 @@ public class UserSettingsManager {
                 BotLogger.log("Could not import JSON Objects from File: " + settingFilePath, e);
             }
         }
-        
+
     }
 
     public void saveUserSetting(UserSettings userSetting) {
