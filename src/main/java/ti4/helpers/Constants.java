@@ -13,6 +13,7 @@ public class Constants {
     public static final String chassitId = "183213554445320192";
     public static final String tspId = "150809002974904321";
     public static final String jazzId = "228999251328368640";
+    public static final String prisonerOneID = "481860200169472030";
     public static final String bltId = "757405214398480486";
     public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 

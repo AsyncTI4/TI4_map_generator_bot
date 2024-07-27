@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
@@ -22,8 +23,7 @@ public class GlobalSettings {
         UPLOAD_DATA_TO_WEB_SERVER, //Whether to send map and data to the web server
         MAX_THREAD_COUNT, //How many threads can be open before force closing old ones
         THREAD_AUTOCLOSE_COUNT, //How many threads to close when above max thread count
-        FILE_IMAGE_CACHE_MAX_SIZE, FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, URL_IMAGE_CACHE_MAX_SIZE, URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, LOG_CACHE_STATS_INTERVAL_MINUTES,
-        GUILD_ID_FOR_NEW_GAME_CATEGORIES, //Which guild to create new game categories in
+        FILE_IMAGE_CACHE_MAX_SIZE, FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, URL_IMAGE_CACHE_MAX_SIZE, URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, LOG_CACHE_STATS_INTERVAL_MINUTES, GUILD_ID_FOR_NEW_GAME_CATEGORIES, //Which guild to create new game categories in
         MAX_GAMES_PER_CATEGORY, //Max # of games when creating a category
         READY_TO_RECEIVE_COMMANDS; //Whether the bot is ready to receive commands
 
@@ -64,7 +64,8 @@ public class GlobalSettings {
     public static void loadSettings() {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            settings = mapper.readValue(Files.readString(getFile().toPath()), HashMap.class);
+            JavaType settingsType = mapper.getTypeFactory().constructMapType(HashMap.class, String.class, Object.class);
+            settings = mapper.readValue(Files.readString(getFile().toPath()), settingsType);
         } catch (IOException e) {
             // THis _probably_ means there's no file, which isn't critical.
             // So this is intended to silently fail.

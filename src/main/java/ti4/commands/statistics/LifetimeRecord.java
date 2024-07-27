@@ -1,29 +1,14 @@
 package ti4.commands.statistics;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class LifetimeRecord extends StatisticsSubcommandData {

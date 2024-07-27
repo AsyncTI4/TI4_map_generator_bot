@@ -56,6 +56,7 @@ public class SearchGames extends SearchSubcommandData {
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAllianceGames && map.getValue().isAllianceMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFoWGames && map.getValue().isFowMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAbsolGames && map.getValue().isAbsolMode()).toList());
+        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeMiltyModGames && map.getValue().isMiltyModMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeDSGames && map.getValue().isDiscordantStarsMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFrankenGames && map.getValue().isFrankenGame()).toList());
 

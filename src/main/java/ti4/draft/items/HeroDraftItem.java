@@ -26,8 +26,7 @@ public class HeroDraftItem extends DraftItem {
     @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
-        if (leader == null)
-        {
+        if (leader == null) {
             return getAlias();
         }
         return "Hero - " + leader.getName().replace("\n", "");
@@ -53,7 +52,6 @@ public class HeroDraftItem extends DraftItem {
         }
         return "";
     }
-
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
