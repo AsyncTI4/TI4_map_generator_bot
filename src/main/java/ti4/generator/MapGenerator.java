@@ -2498,6 +2498,7 @@ public class MapGenerator {
      * @param outlineColor
      */
     private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign horizontalAlignment, VerticalAlign verticalAlignment, Stroke outlineSize, Color outlineColor) {
+        if (txt == null) return;
         if (horizontalAlignment != null) {
             double width = g.getFontMetrics().stringWidth(txt);
             switch (horizontalAlignment) {
@@ -2529,6 +2530,7 @@ public class MapGenerator {
     }
 
     private static void drawStringOutlined(Graphics2D g2, String text, int x, int y, Stroke outlineStroke, Color outlineColor, Color fillColor) {
+        if (text == null) return;
         Color origColor = g2.getColor();
         AffineTransform originalTileTransform = g2.getTransform();
         Stroke origStroke = g2.getStroke();
