@@ -389,7 +389,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             buttons.add(Button.success("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose which planet to Brutally Occupy.");
     }
 
     public static void resolveShrapnelTurrents(Player player, Game game, ButtonInteractionEvent event, String buttonID) {

@@ -3293,22 +3293,20 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void resolveWarForgeRuins(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
+    public static void resolveWarForgeRuins(Game game, String buttonID, Player player, ButtonInteractionEvent event, boolean mechUsed) {
         String planet = buttonID.split("_")[1];
+        String message = ButtonHelper.mechOrInfCheck(planet, game, player, mechUsed);
+        boolean failed = message.contains("does not have");
         String mech = buttonID.split("_")[2];
-        String message = "";
-        boolean failed;
-        message = message + mechOrInfCheck(planet, game, player);
-        failed = message.contains("Please try again.");
         if (!failed) {
             if ("mech".equalsIgnoreCase(mech)) {
                 new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
                     "mech " + planet, game);
-                message = message + "Placed mech on" + Mapper.getPlanet(planet).getName();
+                message = message + "Placed mech on" + Mapper.getPlanet(planet).getName() + ".";
             } else {
                 new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
                     "2 infantry " + planet, game);
-                message = message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
+                message = message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName() + ".";
             }
             addReaction(event, false, false, message, "");
             deleteMessage(event);
@@ -3317,13 +3315,11 @@ public class ButtonHelper {
         }
     }
 
-    public static void resolveSeedySpace(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
+    public static void resolveSeedySpace(Game game, String buttonID, Player player, ButtonInteractionEvent event, boolean mechUsed) {
         String planet = buttonID.split("_")[2];
         String acOrAgent = buttonID.split("_")[1];
-        String message = "";
-        boolean failed;
-        message = message + mechOrInfCheck(planet, game, player);
-        failed = message.contains("Please try again.");
+        String message = ButtonHelper.mechOrInfCheck(planet, game, player, mechUsed);
+        boolean failed = message.contains("does not have");
         if (!failed) {
             if ("ac".equalsIgnoreCase(acOrAgent)) {
                 if (player.hasAbility("scheming")) {
@@ -3332,7 +3328,7 @@ public class ButtonHelper {
                     message = getIdent(player)
                         + " Drew 2 action cards with Scheming. Please discard 1 action card with the blue buttons.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true) + " use buttons to discard",
+                        player.getRepresentation(true, true) + " use buttons to discard.",
                         ACInfo.getDiscardActionCardButtons(game, player, false));
                 } else {
                     game.drawActionCard(player.getUserID());
@@ -3349,7 +3345,7 @@ public class ButtonHelper {
                     return;
                 }
                 RefreshLeader.refreshLeader(player, playerLeader, game);
-                message = message + " readied " + Mapper.getLeader(acOrAgent).getName();
+                message = message + " readied " + Mapper.getLeader(acOrAgent).getName() + ".";
             }
             addReaction(event, false, false, message, "");
             deleteMessage(event);
@@ -9155,16 +9151,17 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void resolveExpedition(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
-        String message = "";
+    public static void resolveExpedition(String buttonID, Game game, Player player, ButtonInteractionEvent event, boolean mechUsed) {
         String planetName = buttonID.split("_")[1];
-        boolean failed = false;
-        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
-        failed = message.contains("Please try again.");
+        String message = ButtonHelper.mechOrInfCheck(planetName, game, player, mechUsed);
+        boolean failed = message.contains("does not have");
+
         if (!failed) {
             PlanetRefresh.doAction(player, planetName, game);
             planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
-            message = message + "Readied " + planetName;
+            message = message + "Readied " + planetName + ".";
+            String message2 = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation()
+                + ". Use buttons to gain command tokens.";
             ButtonHelper.addReaction(event, false, false, message, "");
             ButtonHelper.deleteMessage(event);
         } else {
@@ -9172,12 +9169,11 @@ public class ButtonHelper {
         }
     }
 
-    public static void resolveCoreMine(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
-        String message = "";
+    public static void resolveCoreMine(String buttonID, Game game, Player player, ButtonInteractionEvent event, boolean mechUsed) {
         String planetName = buttonID.split("_")[1];
-        boolean failed = false;
-        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
-        failed = message.contains("Please try again.");
+        String message = ButtonHelper.mechOrInfCheck(planetName, game, player, mechUsed);
+        boolean failed = message.contains("does not have");
+
         if (!failed) {
             message = message + "Gained 1 trade good (" + player.getTg() + "->" + (player.getTg() + 1) + ").";
             player.setTg(player.getTg() + 1);
@@ -9192,7 +9188,6 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " " + message);
             }
         }
-
     }
 
     public static void resolveLocalFab(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
@@ -9223,12 +9218,10 @@ public class ButtonHelper {
         }
     }
 
-    public static void resolveVolatile(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
-        String message = "";
+    public static void resolveVolatile(String buttonID, Game game, Player player, ButtonInteractionEvent event, boolean mechUsed) {
         String planetName = buttonID.split("_")[1];
-        boolean failed = false;
-        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
-        failed = message.contains("Please try again.");
+        String message = ButtonHelper.mechOrInfCheck(planetName, game, player, mechUsed);
+        boolean failed = message.contains("does not have");
 
         if (!failed) {
             String message2 = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation()
@@ -9247,36 +9240,38 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " " + message);
             }
         }
-
     }
 
-    public static String mechOrInfCheck(String planetName, Game game, Player player) {
+    public static String mechOrInfCheck(String planetName, Game game, Player player, boolean mechUsed) {
         String message;
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        int numMechs = 0;
-        int numInf = 0;
         String colorID = Mapper.getColorID(player.getColor());
-        UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
-        UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-        if (unitHolder.getUnits() != null) {
-
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                numMechs = unitHolder.getUnits().get(mechKey);
+        if (mechUsed)
+        {
+            UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
+            if (unitHolder.getUnits() != null && unitHolder.getUnits().get(mechKey) != null && unitHolder.getUnits().get(mechKey) >= 1)
+            {
+                message = unitHolder.getName() + " has a mech.";
             }
-            if (unitHolder.getUnits().get(infKey) != null) {
-                numInf = unitHolder.getUnits().get(infKey);
+            else
+            {
+                message = unitHolder.getName() + " does not have a mech.";
             }
         }
-        if (numMechs > 0 || numInf > 0) {
-            if (numMechs > 0) {
-                message = "Planet had a mech. ";
-            } else {
-                message = "Planet did not have a mech. Removed 1 infantry (" + numInf + "->" + (numInf - 1) + "). ";
+        else
+        {
+            UnitKey infKey = Mapper.getUnitKey("gf", colorID);
+            int numInf = 0;
+            if (unitHolder.getUnits() != null && unitHolder.getUnits().get(infKey) != null && (numInf = unitHolder.getUnits().get(infKey)) >= 1)
+            {
+                message = "Removed 1 infantry from " + unitHolder.getName() + " (" + numInf + "->" + (numInf-1) + ").";
                 tile.removeUnit(planetName, infKey, 1);
             }
-        } else {
-            message = "Planet did not have a mech or an infantry. Please try again.";
+            else
+            {
+                message = unitHolder.getName() + " does not have any infantry to remove.";
+            }
         }
         return message;
     }

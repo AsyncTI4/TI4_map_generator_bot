@@ -1183,8 +1183,10 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("assignHits_")) {
             ButtonHelperModifyUnits.assignHits(buttonID, event, game, player, ident, buttonLabel);
-        } else if (buttonID.startsWith("seedySpace_")) {
-            ButtonHelper.resolveSeedySpace(game, buttonID, player, event);
+        } else if (buttonID.startsWith("seedySpaceM_")) {
+            ButtonHelper.resolveSeedySpace(game, buttonID, player, event, true);
+        } else if (buttonID.startsWith("seedySpaceI_")) {
+            ButtonHelper.resolveSeedySpace(game, buttonID, player, event, false);
         } else if (buttonID.startsWith("startDevotion_")) {
             ButtonHelperModifyUnits.startDevotion(player, game, event, buttonID);
         } else if (buttonID.startsWith("purgeTech_")) {
@@ -1317,7 +1319,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
                     Tile tile = game.getTileFromPlanet(planetName);
                     String msg = player.getRepresentation() + " added 1 infantry to " + planetName
-                        + " due to the arcane citadel";
+                        + " due to the Arcane Citadel.";
                     new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planetName, game);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 }
@@ -2060,8 +2062,10 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("colonialRedTarget_")) {
             AgendaHelper.resolveColonialRedTarget(game, buttonID, event);
-        } else if (buttonID.startsWith("ruins_")) {
-            ButtonHelper.resolveWarForgeRuins(game, buttonID, player, event);
+        } else if (buttonID.startsWith("ruinsM_")) {
+            ButtonHelper.resolveWarForgeRuins(game, buttonID, player, event, true);
+        } else if (buttonID.startsWith("ruinsI_")) {
+            ButtonHelper.resolveWarForgeRuins(game, buttonID, player, event, false);
         } else if (buttonID.startsWith("createGameChannels")) {
             CreateGameButton.decodeButtonMsg(event);
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
@@ -2961,14 +2965,20 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, game);
         } else if (buttonID.startsWith("veldyrAttach_")) {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, game, player);
-        } else if (buttonID.startsWith("resolveExpedition_")) {
-            ButtonHelper.resolveExpedition(buttonID, game, player, event);
+        } else if (buttonID.startsWith("resolveExpeditionM_")) {
+            ButtonHelper.resolveExpedition(buttonID, game, player, event, true);
+        } else if (buttonID.startsWith("resolveExpeditionI_")) {
+            ButtonHelper.resolveExpedition(buttonID, game, player, event, false);
         } else if (buttonID.startsWith("resolveLocalFab_")) {
             ButtonHelper.resolveLocalFab(buttonID, game, player, event);
-        } else if (buttonID.startsWith("resolveVolatile_")) {
-            ButtonHelper.resolveVolatile(buttonID, game, player, event);
-        } else if (buttonID.startsWith("resolveCoreMine_")) {
-            ButtonHelper.resolveCoreMine(buttonID, game, player, event);
+        } else if (buttonID.startsWith("resolveVolatileM_")) {
+            ButtonHelper.resolveVolatile(buttonID, game, player, event, true);
+        } else if (buttonID.startsWith("resolveVolatileI_")) {
+            ButtonHelper.resolveVolatile(buttonID, game, player, event, false);
+        } else if (buttonID.startsWith("resolveCoreMineM_")) {
+            ButtonHelper.resolveCoreMine(buttonID, game, player, event, true);
+        } else if (buttonID.startsWith("resolveCoreMineI_")) {
+            ButtonHelper.resolveCoreMine(buttonID, game, player, event, false);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
             String planet = buttonID.replace("nanoforgePlanet_", "");
             Planet planetReal = game.getPlanetsInfo().get(planet);
@@ -4297,30 +4307,6 @@ public class ButtonListener extends ListenerAdapter {
                     String editedMessage = player.getRepresentation() + " Command tokens have gone from " + originalCCs + " -> "
                         + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
                     event.getMessage().editMessage(editedMessage).queue();
-                }
-                case "gain_1_tg" -> {
-                    String message = "";
-                    String labelP = event.getButton().getLabel();
-                    String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1);
-                    boolean failed = false;
-                    if (labelP.contains("inf") && labelP.contains("mech")) {
-                        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
-                        failed = message.contains("Please try again.");
-                    }
-                    if (!failed) {
-                        message = message + "Gained 1 trade good (" + player.getTg() + "->" + (player.getTg() + 1) + ").";
-                        player.setTg(player.getTg() + 1);
-                        ButtonHelperAbilities.pillageCheck(player, game);
-                        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-                    }
-                    ButtonHelper.addReaction(event, false, false, message, "");
-                    if (!failed) {
-                        ButtonHelper.deleteMessage(event);
-                        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-                            String pF = player.getFactionEmoji();
-                            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " " + message);
-                        }
-                    }
                 }
                 case "gain1tgFromLetnevCommander" -> {
                     String message = player.getRepresentation() + " Gained 1 trade good (" + player.getTg() + "->"

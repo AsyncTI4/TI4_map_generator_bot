@@ -2216,7 +2216,7 @@ public class AgendaHelper {
                             ButtonHelperAbilities.pillageCheck(p2, game);
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
-                                    + " you gained 2 trade goods due to voting the same way as corporate lobbying");
+                                    + ", the Corporate Lobbyists have \"gifted\" you gained 2 trade goods, completely coincidental to you voting for the outcome they desired.");
                             ButtonHelper.checkFleetInEveryTile(p2, game, event);
                         }
                     }
@@ -2763,7 +2763,7 @@ public class AgendaHelper {
                     if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
                         Tile tile = game.getTileFromPlanet(planetName);
                         String msg = player.getRepresentation() + " added 1 infantry to " + planetName
-                            + " due to the arcane citadel";
+                            + " due to the Arcane Citadel.";
                         new AddUnits().unitParsing(event, player.getColor(), tile, "1 infantry " + planetName, game);
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     }
