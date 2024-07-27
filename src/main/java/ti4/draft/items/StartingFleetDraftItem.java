@@ -16,7 +16,6 @@ public class StartingFleetDraftItem extends DraftItem {
         super(Category.STARTINGFLEET, itemId);
     }
 
-
     @JsonIgnore
     private FactionModel getFaction() {
         return Mapper.getFaction(ItemId);
@@ -45,7 +44,6 @@ public class StartingFleetDraftItem extends DraftItem {
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGFLEET);
         return allItems;
     }
-
 
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();

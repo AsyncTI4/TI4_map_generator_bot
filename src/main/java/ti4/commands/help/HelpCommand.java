@@ -1,21 +1,15 @@
 package ti4.commands.help;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.message.MessageHelper;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class HelpCommand implements Command {
 
@@ -53,7 +47,6 @@ public class HelpCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
     }
 
-
     protected String getActionDescription() {
         return "Help";
     }
@@ -70,7 +63,7 @@ public class HelpCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+            Commands.slash(getActionID(), getActionDescription())
+                .addSubcommands(getSubcommands()));
     }
 }

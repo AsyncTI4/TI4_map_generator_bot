@@ -142,8 +142,7 @@ public class MoveUnits extends AddRemoveUnits {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
-        }
-        else if ("82ah".equals(tile.getTileID())) {
+        } else if ("82ah".equals(tile.getTileID())) {
             String position = tile.getPosition();
             game.removeTile(position);
 
@@ -183,8 +182,7 @@ public class MoveUnits extends AddRemoveUnits {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
-        }
-        else if ("82ah".equals(tile.getTileID())) {
+        } else if ("82ah".equals(tile.getTileID())) {
             String position = tile.getPosition();
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82bh");

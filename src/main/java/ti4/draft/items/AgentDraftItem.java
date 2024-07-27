@@ -26,8 +26,7 @@ public class AgentDraftItem extends DraftItem {
     @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
-        if (leader == null)
-        {
+        if (leader == null) {
             return getAlias();
         }
         return "Agent - " + leader.getName();
@@ -65,7 +64,7 @@ public class AgentDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             List<String> agents = faction.getLeaders();
             agents.removeIf((String leader) -> {
-               return !"agent".equals(allLeaders.get(leader).getType());
+                return !"agent".equals(allLeaders.get(leader).getType());
             });
             for (String agent : agents) {
                 allItems.add(DraftItem.Generate(Category.AGENT, agent));

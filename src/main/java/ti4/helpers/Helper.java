@@ -207,7 +207,7 @@ public class Helper {
         return player;
     }
 
-    // TODO: Jazz: This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
+    // TODO: (Jazz): This method *should* include base game + pok tiles (+ DS tiles if and only if DS mode is set)
     //     - Once the bot is using milty draft settings, we can make this accurately pull in tiles
     //     - from every source available to the active game
     public static List<MiltyDraftTile> getUnusedTiles(Game game) {
@@ -777,7 +777,7 @@ public class Helper {
 
     public static String getSCName(int sc, Game game) {
         if (Optional.ofNullable(game.getScSetID()).isPresent() && !"null".equals(game.getScSetID())) {
-            return Mapper.getStrategyCardSets().get(game.getScSetID()).getCardValues().get(sc);
+            return game.getStrategyCardSet().getSCName(sc);
         }
         return "**SC" + sc + "**";
     }
@@ -3140,6 +3140,7 @@ public class Helper {
         return new HashSet<>(getListFromCSV(commaSeparatedString));
     }
 
+    // TODO (Jazz): Make one TokenModel to rule them all
     @Deprecated
     public static boolean isFakeAttachment(String attachmentName) {
         attachmentName = AliasHandler.resolveAttachment(attachmentName);

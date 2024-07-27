@@ -241,7 +241,7 @@ public class MiltyDraftManager {
         MiltyDraftHelper.initDraftTiles(this, game);
     }
 
-    //TODO: Integrate this directly in the manager. For now, it's just dumb and hacky
+    //TODO (Jazz): Integrate this directly in the manager. For now, it's just dumb and hacky
     public void init(List<ComponentSource> sources) {
         clear();
         MiltyDraftHelper.initDraftTiles(this, sources);

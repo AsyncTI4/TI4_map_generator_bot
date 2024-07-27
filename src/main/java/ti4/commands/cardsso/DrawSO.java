@@ -40,16 +40,18 @@ public class DrawSO extends SOCardsSubcommandData {
     }
 
     public static void drawSO(GenericInteractionCreateEvent event, Game game, Player player, int count, boolean useTnelis) {
-        String output = Integer.toString(count) + "secret objective" + (count > 1 ? "s" : "");
+        String output = " drew " + count + " secret objective" + (count > 1 ? "s" : "") + ".";
         if (useTnelis && player.hasAbility("plausible_deniability")) {
-            output = "[" + count + " + 1 = " + (count + 1) + "] secret objectives (Plausible Deniability).";
+            output = " used Plausible Deniablity to draw " + (count + 1) + " secret objectives.";
             count++;
         }
-
         for (int i = 0; i < count; i++) {
             game.drawSecretObjective(player.getUserID());
         }
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " Drew " + output);
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
         SOInfo.sendSecretObjectiveInfo(game, player, event);
+        if (useTnelis && player.hasAbility("plausible_deniability")) {
+            SOInfo.sendSODiscardButtons(game, player);
+        }
     }
 }

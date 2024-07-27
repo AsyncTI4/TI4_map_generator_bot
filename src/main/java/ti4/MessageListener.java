@@ -646,7 +646,8 @@ public class MessageListener extends ListenerAdapter {
                                             }
                                         }
                                     }
-                                    ButtonHelper.increasePingCounter(mapreference, player.getUserID());
+                                    if (player != null)
+                                        ButtonHelper.increasePingCounter(mapreference, player.getUserID());
                                 }
                                 if (player != null) {
                                     player.setWhetherPlayerShouldBeTenMinReminded(false);
@@ -663,7 +664,6 @@ public class MessageListener extends ListenerAdapter {
                                 game.setLastActivePlayerPing(new Date());
                                 GameSaveLoadManager.saveMap(game, "Auto Ping");
                             }
-
                         }
                     }
                 }
@@ -810,8 +810,8 @@ public class MessageListener extends ListenerAdapter {
                         String newMessage = player.getRepresentation(true, true) + " Someone said: " + messageText;
                         if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
                             String hits = StringUtils.substringAfter(messageText, "Total hits ");
-                            String location = StringUtils.substringAfter(messageText, "rolls for");
-                            location = StringUtils.substringBefore(messageText, "Combat");
+                            String location = StringUtils.substringAfter(messageText, "rolls for ");
+                            location = StringUtils.substringBefore(location, " Combat");
                             newMessage = player.getRepresentation(true, true) + " Someone rolled dice for " + location
                                 + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "" : "s");
                         }

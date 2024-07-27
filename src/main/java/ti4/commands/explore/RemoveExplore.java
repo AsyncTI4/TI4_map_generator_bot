@@ -5,6 +5,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 
 public class RemoveExplore extends ExploreSubcommandData {
 
@@ -20,9 +21,10 @@ public class RemoveExplore extends ExploreSubcommandData {
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
-            if (Mapper.getExplore(id) != null) {
+            ExploreModel explore = Mapper.getExplore(id);
+            if (explore != null) {
                 game.purgeExplore(id);
-                sb.append("Exploration card removed: ").append(displayExplore(id)).append(System.lineSeparator());
+                sb.append("Exploration card removed: ").append(explore.textRepresentation()).append(System.lineSeparator());
             } else {
                 game.purgeExplore(id);
                 sb.append("Removed id without matching card: ").append(id).append(System.lineSeparator());

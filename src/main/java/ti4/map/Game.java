@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -86,7 +86,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
 public class Game extends GameProperties {
-    // TODO: Sort through these
+    // TODO (Jazz): Sort through these and add to GameProperties
     private Map<String, Tile> tileMap = new HashMap<>(); // Position, Tile
     private Map<String, Player> players = new LinkedHashMap<>();
 
@@ -96,7 +96,8 @@ public class Game extends GameProperties {
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private final Map<String, String> checkingForAllReacts = new HashMap<>();
     private final String[] listOfTilePinged = new String[10];
-    // TODO: Maybe doable
+
+    // TODO (Jazz): These should be easily added to GameProperties
     private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
     private Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
     private Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
@@ -621,6 +622,12 @@ public class Game extends GameProperties {
     @JsonIgnore
     public Guild getGuild() {
         return getActionsChannel() == null ? null : getActionsChannel().getGuild();
+    }
+
+    @Nullable
+    @JsonIgnore
+    public String getGuildId() {
+        return getActionsChannel() == null ? null : getActionsChannel().getGuild().getId();
     }
 
     public Map<Integer, Boolean> getScPlayed() {
@@ -3714,15 +3721,6 @@ public class Game extends GameProperties {
         return player;
     }
 
-    @Deprecated
-    public UnitModel getUnitFromImageName(String imageName) {
-        String colorID = StringUtils.substringBefore(imageName, "_");
-        Player player = getPlayerFromColorOrFaction(colorID);
-        if (player == null)
-            return null;
-        return player.getUnitFromImageName(imageName);
-    }
-
     public UnitModel getUnitFromUnitKey(UnitKey unitKey) {
         Player player = getPlayerFromColorOrFaction(unitKey.getColorID());
         if (player == null)
@@ -3832,7 +3830,7 @@ public class Game extends GameProperties {
     }
 
     // Currently unused
-    // TODO: Jazz parse this better
+    // TODO (Jazz): parse this better
     public List<ComponentSource> getComponentSources() {
         List<ComponentSource> sources = new ArrayList<>();
         sources.add(ComponentSource.base);

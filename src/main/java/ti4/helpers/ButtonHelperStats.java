@@ -22,7 +22,7 @@ public class ButtonHelperStats {
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         } else {
-            message = "Converted their " +  player.getCommodities() + " remaining commodities (less than " + amt + ") to trade goods.";
+            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt + ") to trade goods.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }

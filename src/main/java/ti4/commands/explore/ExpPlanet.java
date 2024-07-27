@@ -134,7 +134,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             if (Helper.mechCheck(planetName, game, player)) {
                 if (!NRACheck) {
                     if (player.hasTech("pfa")) { //Pre-Fab Arcologies
-                        new PlanetRefresh().doAction(player, planetName, game);
+                        PlanetRefresh.doAction(player, planetName, game);
                         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically readied because you have Pre-Fab Arcologies.");
                     }
                     String message = "Please decide whether or not to use your " + Emojis.Naaz + "**Distant Suns** ability to choose from the top two exploration cards.";
@@ -233,7 +233,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
-            new PlanetRefresh().doAction(player, planetName, game);
+            PlanetRefresh.doAction(player, planetName, game);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically readied because you have Pre-Fab Arcologies.");
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
@@ -241,7 +241,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord (a Ghemina flagship) . Technically happens \"after\" exploring.");
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
-            new PlanetRefresh().doAction(player, planetName, game);
+            PlanetRefresh.doAction(player, planetName, game);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
             ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
         }
@@ -266,8 +266,9 @@ public class ExpPlanet extends ExploreSubcommandData {
                     buttons.add(Button.success("exhaustAgent_augersagent_" + player.getFaction(),
                         "Use Augers Agent on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    String msg2 = p2.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") 
-                        + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2 trade goods.";
+                    String msg2 = p2.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                        + ButtonHelper.getIdentOrColor(player, game) + " to give them 2 trade goods.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }
             }
