@@ -19,7 +19,6 @@ import ti4.commands.combat.StartCombat;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExpPlanet;
-import ti4.commands.explore.ExploreAndDiscard;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.TurnStart;
@@ -157,7 +156,6 @@ public class ButtonHelperAbilities {
 
     public static void mercenariesStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos2 = buttonID.split("_")[1];
-        Tile tile = game.getTileByPosition(pos2);
         String pos = buttonID.split("_")[2];
         Tile tile2 = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
@@ -174,19 +172,15 @@ public class ButtonHelperAbilities {
         String pos2 = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos2);
         String pos = buttonID.split("_")[2];
-        Tile tile2 = game.getTileByPosition(pos);
         String fighters = buttonID.split("_")[3];
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (FoWHelper.playerHasShipsInSystem(p2, tile)) {
+                String id = "mercenariesStep4_" + pos2 + "_" + pos + "_" + fighters + "_" + p2.getFaction();
                 if (game.isFowMode()) {
-                    buttons.add(Button.success(
-                        "mercenariesStep4_" + pos2 + "_" + pos + "_" + fighters + "_" + p2.getFaction(),
-                        StringUtils.capitalize(p2.getColor())));
+                    buttons.add(Button.success(id, StringUtils.capitalize(p2.getColor())));
                 } else {
-                    buttons.add(Button.success(
-                        "mercenariesStep4_" + pos2 + "_" + pos + "_" + fighters + "_" + p2.getFaction(),
-                        p2.getFactionModel().getFactionName()));
+                    buttons.add(Button.success(id, p2.getFactionModel().getFactionName()));
                 }
             }
         }
@@ -650,8 +644,9 @@ public class ButtonHelperAbilities {
                     buttons.add(winnuButton);
                     buttons.add(Button.danger("deleteButtons", "Done"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
-                        p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") 
-                        + "Suffi An, the Mentak" + (p2.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent?", buttons);
+                        p2.getRepresentation() + "Wanna use " + (p2.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                            + "Suffi An, the Mentak" + (p2.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent?",
+                        buttons);
                 }
             }
         }
@@ -845,28 +840,23 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         String message = "";
         String techName = "";
-        boolean hasTech = false;
         if (Mapper.getRelic(order).getName().contains("Dreadnought")) {
-            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought",
-                "placeOneNDone_skipbuild", event));
+            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 1 dreadnought in a system with your ships and CC";
             techName = "dn2";
         }
         if (Mapper.getRelic(order).getName().contains("Carrier")) {
-            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "carrier",
-                "placeOneNDone_skipbuild", event));
+            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "carrier", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 1 carrier in a system with your ships and CC";
             techName = "cv2";
         }
         if (Mapper.getRelic(order).getName().contains("Cruiser")) {
-            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "cruiser",
-                "placeOneNDone_skipbuild", event));
+            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 1 cruiser in a system with your ships and CC";
             techName = "cr2";
         }
         if (Mapper.getRelic(order).getName().contains("Destroyer")) {
-            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "2destroyer",
-                "placeOneNDone_skipbuild", event));
+            buttons.addAll(Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "2destroyer", "placeOneNDone_skipbuild", event));
             message = "Use buttons to put 2 destroyers in a system with your ships and CC";
             techName = "dd2";
         }
@@ -1035,8 +1025,8 @@ public class ButtonHelperAbilities {
         player.setHasUsedEnvironmentPreserveAbility(true);
         StringBuilder sb = new StringBuilder();
         String cardID = game.drawExplore(type);
-        sb.append(new ExploreAndDiscard().displayExplore(cardID)).append(System.lineSeparator());
         ExploreModel card = Mapper.getExplore(cardID);
+        sb.append(card.textRepresentation()).append(System.lineSeparator());
         String cardType = card.getResolution();
         if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
             sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
@@ -1424,8 +1414,7 @@ public class ButtonHelperAbilities {
             planet = "mallice";
             Tile tile = game.getTileFromPlanet("lockedmallice");
             tile = MoveUnits.flipMallice(event, tile, game);
-        }
-        else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
+        } else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
             planet = "hexmallice";
             Tile tile = game.getTileFromPlanet("hexlockedmallice");
             tile = MoveUnits.flipMallice(event, tile, game);

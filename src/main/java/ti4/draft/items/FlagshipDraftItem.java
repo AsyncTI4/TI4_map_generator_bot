@@ -71,7 +71,6 @@ public class FlagshipDraftItem extends DraftItem {
         return Emojis.flagship;
     }
 
-
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.FLAGSHIP);

@@ -124,7 +124,7 @@ public class ButtonHelperModifyUnits {
                     continue;
                 }
                 UnitKey unitKey = unitEntry.getKey();
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                //String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int damagedUnits = 0;
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
                     damagedUnits = unitHolder.getUnitDamage().get(unitKey);
@@ -873,7 +873,7 @@ public class ButtonHelperModifyUnits {
         if (skilled) {
             skilledS = "_skilled";
         }
-        HashSet<String> adjTiles = new HashSet();
+        HashSet<String> adjTiles = new HashSet<>();
         adjTiles.addAll(FoWHelper.getAdjacentTilesAndNotThisTile(game, pos1, player, false));
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
             Tile hs = player.getHomeSystemTile();

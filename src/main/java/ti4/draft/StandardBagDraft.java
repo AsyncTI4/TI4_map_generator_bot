@@ -20,13 +20,12 @@ public class StandardBagDraft extends BagDraft {
 
     @Override
     public int getItemLimitForCategory(DraftItem.Category category) {
-        int limit = 0;
-        switch (category) {
-            case BLUETILE -> limit = 3;
-            case REDTILE -> limit = 2;
-            case DRAFTORDER, HOMESYSTEM -> limit = 1;
-        }
-        return limit;
+        return switch (category) {
+            case BLUETILE -> 3;
+            case REDTILE -> 2;
+            case DRAFTORDER, HOMESYSTEM -> 1;
+            default -> 0;
+        };
     }
 
     @Override

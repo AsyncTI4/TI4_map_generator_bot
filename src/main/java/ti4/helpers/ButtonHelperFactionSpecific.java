@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.combat.StartCombat;
-import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
@@ -671,7 +670,7 @@ public class ButtonHelperFactionSpecific {
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
             "1 mech " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdent(player) + " landed 1 mech on "
+            player.getFactionEmoji() + " landed 1 mech on "
                 + Helper.getPlanetRepresentation(planet, game) + " using Tnelis mech deploy ability");
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, game.getTileFromPlanet(planet), planet);
         if (players.size() > 1) {
@@ -1371,23 +1370,21 @@ public class ButtonHelperFactionSpecific {
         sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
         String topCard = deck.get(0);
         game.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
-        sb.append(ExploreSubcommandData.displayExplore(topCard));
+        ExploreModel explore = Mapper.getExplore(topCard);
+        sb.append(explore.textRepresentation());
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
-                + " Cards info thread.");
+            "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji + " Cards info thread.");
     }
 
     public static void resolveExpDiscard(Player player, Game game, ButtonInteractionEvent event,
         String deckType) {
         List<String> deck = game.getExploreDeck(deckType);
-        List<String> discardPile = game.getExploreDiscard(deckType);
         String topCard = deck.get(0);
         ExploreModel top = Mapper.getExplore(topCard);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " Discarded the top of the " + deckType + " deck. The discarded card was "
-                + top.getName());
+            player.getRepresentation() + " Discarded the top of the " + deckType + " deck. The discarded card was " + top.getName());
         game.discardExplore(topCard);
         ButtonHelper.deleteTheOneButton(event);
     }

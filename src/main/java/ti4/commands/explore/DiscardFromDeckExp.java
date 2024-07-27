@@ -5,6 +5,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 
 public class DiscardFromDeckExp extends ExploreSubcommandData {
 
@@ -20,9 +21,10 @@ public class DiscardFromDeckExp extends ExploreSubcommandData {
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
-            if (Mapper.getExplore(id) != null) {
+            ExploreModel explore = Mapper.getExplore(id);
+            if (explore != null) {
                 game.discardExplore(id);
-                sb.append("Card discarded: ").append(displayExplore(id)).append(System.lineSeparator());
+                sb.append("Card discarded: ").append(explore.textRepresentation()).append(System.lineSeparator());
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }

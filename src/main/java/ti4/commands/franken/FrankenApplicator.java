@@ -91,6 +91,8 @@ public class FrankenApplicator {
             case COMMODITIES -> Stats.setTotalCommodities(event, player, (player.getCommoditiesTotal() + ((CommoditiesDraftItem) draftItem).getCommodities()));
             case PN -> PNAdd.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
             case STARTINGTECH -> addStartingTech(event, player, itemID);
+            default -> {
+            }
         }
     }
 
@@ -104,6 +106,8 @@ public class FrankenApplicator {
             case COMMODITIES -> Stats.setTotalCommodities(event, player, (player.getCommoditiesTotal() - ((CommoditiesDraftItem) draftItem).getCommodities()));
             case PN -> PNRemove.removePromissoryNotes(event, player, List.of(itemID));
             case STARTINGTECH -> removeStartingTech(event, player, itemID);
+            default -> {
+            }
         }
     }
 

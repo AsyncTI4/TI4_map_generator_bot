@@ -50,27 +50,31 @@ public class CreatePlanet extends BothelperSubcommandData {
         MessageHelper.sendMessageToEventChannel(event, "Creating planet " + event.getOption(Constants.PLANET_NAME).getAsString());
         String planetID = event.getOption(Constants.PLANET_ID).getAsString().toLowerCase();
         PlanetModel planet = null;
+        boolean fail = false;
         try {
             planet = createPlanetModel(planetID,
-                    event.getOption(Constants.PLANET_TILE_ID).getAsString().toLowerCase(),
-                    event.getOption(Constants.PLANET_NAME).getAsString(),
-                    event.getOption(Constants.PLANET_ALIASES).getAsString(),
-                    event.getOption(Constants.PLANET_POSITION_X).getAsInt(),
-                    event.getOption(Constants.PLANET_POSITION_Y).getAsInt(),
-                    event.getOption(Constants.PLANET_RESOURCES).getAsInt(),
-                    event.getOption(Constants.PLANET_INFLUENCE).getAsInt(),
-                    event.getOption(Constants.PLANET_TYPE).getAsString(),
-                    event.getOption(Constants.PLANET_TECH_SKIPS, null, OptionMapping::getAsString),
-                    event.getOption(Constants.PLANET_LEGENDARY_NAME, null, OptionMapping::getAsString),
-                    event.getOption(Constants.PLANET_LEGENDARY_TEXT, null, OptionMapping::getAsString),
-                    event.getOption(Constants.PLANET_FACTION_HOMEWORLD, null, OptionMapping::getAsString),
-                    event.getOption(Constants.PLANET_SHORT_NAME, null, OptionMapping::getAsString),
-                    event.getOption(Constants.PLANET_FLAVOUR_TEXT, null, OptionMapping::getAsString),
-                    event.getOption(Constants.SOURCE, null, OptionMapping::getAsString)
-            );
+                event.getOption(Constants.PLANET_TILE_ID).getAsString().toLowerCase(),
+                event.getOption(Constants.PLANET_NAME).getAsString(),
+                event.getOption(Constants.PLANET_ALIASES).getAsString(),
+                event.getOption(Constants.PLANET_POSITION_X).getAsInt(),
+                event.getOption(Constants.PLANET_POSITION_Y).getAsInt(),
+                event.getOption(Constants.PLANET_RESOURCES).getAsInt(),
+                event.getOption(Constants.PLANET_INFLUENCE).getAsInt(),
+                event.getOption(Constants.PLANET_TYPE).getAsString(),
+                event.getOption(Constants.PLANET_TECH_SKIPS, null, OptionMapping::getAsString),
+                event.getOption(Constants.PLANET_LEGENDARY_NAME, null, OptionMapping::getAsString),
+                event.getOption(Constants.PLANET_LEGENDARY_TEXT, null, OptionMapping::getAsString),
+                event.getOption(Constants.PLANET_FACTION_HOMEWORLD, null, OptionMapping::getAsString),
+                event.getOption(Constants.PLANET_SHORT_NAME, null, OptionMapping::getAsString),
+                event.getOption(Constants.PLANET_FLAVOUR_TEXT, null, OptionMapping::getAsString),
+                event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         } catch (Exception e) {
-            MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the planet: " + planetID);
+            fail = true;
             BotLogger.log("Something went wrong creating the planet: " + planetID, e);
+        }
+        if (fail || planet == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong creating the planet: " + planetID);
+            return;
         }
         try {
             exportPlanetModelToJson(planet);
@@ -85,30 +89,17 @@ public class CreatePlanet extends BothelperSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Something went wrong adding the planet to the active planets list: " + planetID);
             BotLogger.log("Something went wrong adding the planet to the active planets list: " + planetID, e);
         }
-        
+
         String message = "Created new planet! Please check and make sure everything generated properly. This is the model:\n" +
-                "```json\n" + TileHelper.getAllPlanets().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```";
+            "```json\n" + TileHelper.getAllPlanets().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```";
         MessageHelper.sendMessageToChannelWithEmbed(event.getChannel(), message, planet.getRepresentationEmbed(true));
     }
 
-    private static PlanetModel createPlanetModel(String planetId,
-                                                String planetTileId,
-                                                String planetName,
-                                                String planetAliases,
-                                                int planetPosX,
-                                                int planetPosY,
-                                                int resources,
-                                                int influence,
-                                                String planetType,
-                                                String skips,
-                                                String legendaryName,
-                                                String legendaryText,
-                                                String factionHomeworld,
-                                                String shortName,
-                                                String flavourText,
-                                                String source) {
-        PlanetTypeModel typeModel = new PlanetTypeModel();
+    private static PlanetModel createPlanetModel(String planetId, String planetTileId, String planetName, String planetAliases, int planetPosX, int planetPosY,
+        int resources, int influence, String planetType, String skips, String legendaryName, String legendaryText, String factionHomeworld, String shortName,
+        String flavourText, String source) {
 
+        PlanetTypeModel typeModel = new PlanetTypeModel();
         PlanetModel planet = new PlanetModel();
         planet.setId(planetId.toLowerCase());
         planet.setTileId(planetTileId);
@@ -118,13 +109,13 @@ public class CreatePlanet extends BothelperSubcommandData {
         planet.setResources(resources);
         planet.setInfluence(influence);
         planet.setPlanetType(typeModel.getPlanetTypeFromString(planetType));
-        if(Optional.ofNullable(skips).isPresent())
+        if (Optional.ofNullable(skips).isPresent())
             planet.setTechSpecialties(getTechSpecialtiesFromString(skips));
-        if(Optional.ofNullable(factionHomeworld).isPresent())
+        if (Optional.ofNullable(factionHomeworld).isPresent())
             planet.setFactionHomeworld(factionHomeworld);
-        if(Optional.ofNullable(shortName).isPresent())
+        if (Optional.ofNullable(shortName).isPresent())
             planet.setShortName(shortName);
-        if(Optional.ofNullable(legendaryName).isPresent()) {
+        if (Optional.ofNullable(legendaryName).isPresent()) {
             planet.setLegendaryAbilityName(legendaryName);
             planet.setLegendaryAbilityText(legendaryText);
         }
@@ -176,8 +167,8 @@ public class CreatePlanet extends BothelperSubcommandData {
     private static void exportPlanetModelToJson(PlanetModel planetModel) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writeValue(new File(Storage.getResourcePath() + File.separator + "planets" + File.separator + planetModel.getId()+".json"),planetModel);
-            mapper.writeValue(new File(Storage.getStoragePath() + File.separator + "planets" + File.separator + planetModel.getId()+".json"),planetModel);
+            mapper.writeValue(new File(Storage.getResourcePath() + File.separator + "planets" + File.separator + planetModel.getId() + ".json"), planetModel);
+            mapper.writeValue(new File(Storage.getStoragePath() + File.separator + "planets" + File.separator + planetModel.getId() + ".json"), planetModel);
         } catch (IOException e) {
             BotLogger.log("Something went wrong creating new planet JSON!", e);
         }

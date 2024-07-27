@@ -58,7 +58,7 @@ public class SetOrder extends GameSubcommandData {
                 newPlayerOrder.putAll(players);
             }
             game.setPlayers(newPlayerOrder);
-        } catch (Exception e){
+        } catch (Exception e) {
             game.setPlayers(playersBackup);
         }
         GameSaveLoadManager.saveMap(game, event);
