@@ -58,19 +58,22 @@ public class AddAllianceMember extends PlayerSubcommandData {
         }
         if (player.hasAbility("edict")) {
             player.addMahactCC(player_.getColor());
-            MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), player_.getRepresentation() + " heads up, in an alliance game with Mahact as an alliance partner, you do not get mahacts alliance, they in fact grab a CC from your pool. This is because Dane thought Mahact's commander was too powerful to share.");
+            MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), player_.getRepresentation() + " heads up, in an alliance game with Mahact as an alliance partner, you do not get to share their commander ability."
+                + " Instead, they start with 1 of your command tokens in their fleet pool."
+                + " This is because Dane thought that Il Na Viroset, the Mahact commander, was too powerful to share (or did so for thematic reasons).");
         }
         if (player_.hasAbility("edict")) {
             player_.addMahactCC(player.getColor());
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " heads up, in an alliance game with Mahact as an alliance partner, you do not get mahacts alliance, they in fact grab a CC from your pool. This is because Dane thought Mahact's commander was too powerful to share.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " heads up, in an alliance game with Mahact as an alliance partner, you do not get to share their commander ability."
+                + " Instead, they start with 1 of your command tokens in their fleet pool."
+                + " This is because Dane thought that Il Na Viroset, the Mahact commander, was too powerful to share (or did so for thematic reasons).");
 
         }
         String msg = player.getRepresentation(true, true) + player_.getRepresentation(true, true)
-            + " pinging you into this";
+            + " pinging you into this.";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), msg);
 
-        MessageHelper.sendMessageToEventChannel(event, "Added " + player_.getFaction() + " as part of " + player.getFaction()
-            + "'s alliance. This works 2 ways");
+        MessageHelper.sendMessageToEventChannel(event, player.getFaction() + " has entered into an alliance with " + player_.getFaction() + ".");
     }
 }
