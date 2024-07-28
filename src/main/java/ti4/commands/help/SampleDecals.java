@@ -30,8 +30,10 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
-import ti4.message.MessageHelper;
 import ti4.helpers.Storage;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.commands.player.ChangeUnitDecal;
 
@@ -39,6 +41,7 @@ public class SampleDecals extends HelpSubcommandData {
     public SampleDecals() {
         super(Constants.SAMPLE_DECALS, "Show a sample image of dreadnoughts with various decals.");
         addOptions(new OptionData(OptionType.STRING, Constants.DECAL_HUE, "Category of decals to show (default: all)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of the dreadnoughts under the decals (default: your color, if in a game channel, else blue)").setAutoComplete(true));
     }
 
     @Override
@@ -55,7 +58,7 @@ public class SampleDecals extends HelpSubcommandData {
             List<String> others = Arrays.asList(new String[]{"cb_10", "cb_10", "cb_52", "cb_81"});
             decals = decals.stream()
                 .filter(decalID -> others.contains(decalID))
-                .collect(Collectors.toList());;
+                .collect(Collectors.toList());
         }
         else
         {
@@ -95,10 +98,28 @@ public class SampleDecals extends HelpSubcommandData {
         graphic.drawImage(backgroundImage, 0, 0, null);
         BasicStroke stroke = new BasicStroke(3.0f);
         
+        String color = "blu";
+        OptionMapping colInput = event.getOption(Constants.COLOR);
+        if (colInput == null || colInput.getAsString().equals(""))
+        {
+            Game game = getActiveGame();
+            Player player = game.getPlayer(getUser().getId());
+            player = Helper.getGamePlayer(game, player, event, null);
+            color = Mapper.getColorID(player.getColor());
+        }
+        else
+        {
+            color = Mapper.getColorID(colInput.getAsString());
+        }
+        color = (color == null ? "blu" : color);
+        String suffix =  MapGenerator.getBlackWhiteFileSuffix(color);
+        
         for (String d: decals)
         {
-            BufferedImage dread = ImageHelper.read(ResourceHelper.getInstance().getDecalFile("sample/" + d + "_dn_wht.png"));
+            BufferedImage dread = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(color + "_dn.png"));
             graphic.drawImage(dread, x + SPACING, y + SPACING, null);
+            BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(d + "_dn" + suffix));
+            graphic.drawImage(decal, x + SPACING, y + SPACING, null);
             
             String label = Mapper.getDecalName(d);
             int mid = -1;
@@ -126,7 +147,6 @@ public class SampleDecals extends HelpSubcommandData {
             n += 1;
             if (n >= PERROW)
             {
-                //MessageHelper.sendMessageToEventChannel(event, d + ": " + x + ", " + y + "\n" + "sample/" + d + "_dn_wht.png");
                 n = 0;
                 x = left;
                 y += DREADTEXHIGHT;
