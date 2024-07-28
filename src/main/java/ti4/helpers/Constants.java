@@ -251,6 +251,8 @@ public class Constants {
     public static final String TILE_NAME_FROM_3 = "tile_name_from_3";
     public static final String TILE_NAME_FROM_4 = "tile_name_from_4";
     public static final String COLOR = "color";
+    public static final String HUE = "hue";
+    public static final String DECAL_HUE = "decal_category";
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
     public static final String ADD_FOG_TILE = "add_fog_tile";
@@ -532,6 +534,8 @@ public class Constants {
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
     public static final String CUSTOMIZATION = "customization";
     public static final String CHANGE_COLOR = "change_color";
+    public static final String SAMPLE_COLORS = "sample_colors";
+    public static final String SAMPLE_DECALS = "sample_decals";
     public static final String CORRECT_FACTION = "correct_faction";
     public static final String GAME_CHANNEL_SETUP = "game_channel_setup";
     public static final String PLANETS = "planets";
