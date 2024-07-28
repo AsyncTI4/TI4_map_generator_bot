@@ -102,7 +102,6 @@ public class AsyncTI4DiscordBot {
     public static Guild guildQuaternary;
     public static Guild guildQuinary;
     public static Guild guildSenary;
-    public static Guild guildSeptenary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
@@ -294,19 +293,6 @@ public class AsyncTI4DiscordBot {
                 BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildSenary.getName());
                 guilds.add(guildSenary);
                 serversToCreateNewGamesOn.add(guildSenary);
-            }
-        }
-
-        // Sigma
-        if (true) {
-            guildSeptenary = jda.getGuildById("1215451631622164610");
-            if (guildSeptenary != null) {
-                CommandListUpdateAction commandsD = guildSeptenary.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-                commandsD.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildSeptenary.getName());
-                guilds.add(guildSeptenary);
-                serversToCreateNewGamesOn.add(guildSeptenary);
             }
         }
 
