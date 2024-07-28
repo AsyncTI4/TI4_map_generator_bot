@@ -34,7 +34,7 @@ public class UnscoreSO extends SOCardsSubcommandData {
             return;
         }
 
-        boolean scored = game.unscoreSecretObjective(getUser().getId(), option.getAsInt());
+        boolean scored = game.unscoreSecretObjective(player.getUserID(), option.getAsInt());
         if (!scored) {
             List<String> scoredSOs = player.getSecretsScored().entrySet().stream()
                 .map(e -> "> (" + e.getValue() + ") " + SOInfo.getSecretObjectiveRepresentationShort(e.getKey()))

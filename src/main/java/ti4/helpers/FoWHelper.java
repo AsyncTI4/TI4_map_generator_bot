@@ -653,7 +653,7 @@ public class FoWHelper {
 
 	public static boolean playerHasPlanetsInSystem(Player player, Tile tile) {
 		for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-			if (player.getPlanets().contains(uH.getName())) {
+			if (player.getPlanetsAllianceMode().contains(uH.getName())) {
 				return true;
 			}
 		}
