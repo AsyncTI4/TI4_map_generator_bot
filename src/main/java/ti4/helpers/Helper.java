@@ -3046,15 +3046,16 @@ public class Helper {
         }
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
-        }
-        List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(game.getTileMap().values());
-        for (Tile tile : tiles) {
-            if (tile == null) {
-                continue;
-            }
-            if (tile.getTileID().equals("0g") || tile.getTileID().equals("-1") || tile.getTileID().equals("0gray")) {
-                game.removeTile(tile.getPosition());
+
+            List<Tile> tiles = new ArrayList<>();
+            tiles.addAll(game.getTileMap().values());
+            for (Tile tile : tiles) {
+                if (tile == null) {
+                    continue;
+                }
+                if (tile.getTileID().equals("0g") || tile.getTileID().equals("-1") || tile.getTileID().equals("0gray")) {
+                    game.removeTile(tile.getPosition());
+                }
             }
         }
     }

@@ -58,9 +58,12 @@ public class AddAllianceMember extends PlayerSubcommandData {
         }
         if (player.hasAbility("edict")) {
             player.addMahactCC(player_.getColor());
+            MessageHelper.sendMessageToChannel(player_.getCorrectChannel(), player_.getRepresentation() + " heads up, in an alliance game with Mahact as an alliance partner, you do not get mahacts alliance, they in fact grab a CC from your pool. This is because Dane thought Mahact's commander was too powerful to share.");
         }
         if (player_.hasAbility("edict")) {
             player_.addMahactCC(player.getColor());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " heads up, in an alliance game with Mahact as an alliance partner, you do not get mahacts alliance, they in fact grab a CC from your pool. This is because Dane thought Mahact's commander was too powerful to share.");
+
         }
         String msg = player.getRepresentation(true, true) + player_.getRepresentation(true, true)
             + " pinging you into this";
