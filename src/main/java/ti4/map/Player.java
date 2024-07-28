@@ -2980,6 +2980,9 @@ public class Player {
     @JsonIgnore
     public Tile getHomeSystemTile() {
         Game game = getGame();
+        if (faction == null) {
+            return null;
+        }
         if (getHomeSystemPosition() != null) {
             Tile frankenHs = game.getTileByPosition(getHomeSystemPosition());
             if (frankenHs != null) {
