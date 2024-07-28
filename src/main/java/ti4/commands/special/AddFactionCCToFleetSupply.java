@@ -1,13 +1,14 @@
 package ti4.commands.special;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-
-import java.util.List;
 
 public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
     public AddFactionCCToFleetSupply() {
@@ -18,6 +19,7 @@ public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
     void action(SlashCommandInteractionEvent event, List<String> colors, Game game, Player player) {
         for (String color : colors) {
             player.addMahactCC(color);
+            Helper.isCCCountCorrect(event, game, color);
         }
         if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "mahact", event);
