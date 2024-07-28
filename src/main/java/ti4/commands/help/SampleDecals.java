@@ -53,17 +53,22 @@ public class SampleDecals extends HelpSubcommandData {
         else if (input.getAsString().equals("Other"))
         {
             List<String> others = Arrays.asList(new String[]{"cb_10", "cb_10", "cb_52", "cb_81"});
-            decals = Mapper.getDecals().stream()
-                .filter(decalID -> others.contains(input.getAsString()))
+            decals = decals.stream()
+                .filter(decalID -> others.contains(decalID))
                 .collect(Collectors.toList());;
         }
         else
         {
-            decals = Mapper.getDecals().stream()
+            decals = decals.stream()
                 .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
                 .collect(Collectors.toList());;
         }
         Collections.sort(decals);
+        if (decals.size() == 0)
+        {
+            MessageHelper.sendMessageToEventChannel(event, "No decals found. Something has probably gone wrong.");
+            return;
+        }
 
         int SPACING = 24;
         int DREADWIDTH = 77 + 2*SPACING;
