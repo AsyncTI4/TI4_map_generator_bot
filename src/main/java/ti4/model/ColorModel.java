@@ -17,6 +17,7 @@ public class ColorModel implements ModelInterface {
     private String name;
     private List<String> aliases;
     private String textColor;
+    private String hue;
 
     private Color primaryColor;
     private Color secondaryColor;
@@ -36,6 +37,10 @@ public class ColorModel implements ModelInterface {
 
     public Color getSecondaryColor() {
         return secondaryColor();
+    }
+
+    public String getHue() {
+        return (hue == null ? "null" : hue);
     }
 
     public Color primaryColor() {
