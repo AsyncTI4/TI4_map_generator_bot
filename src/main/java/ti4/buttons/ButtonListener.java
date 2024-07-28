@@ -987,7 +987,7 @@ public class ButtonListener extends ListenerAdapter {
             buttons.add(
                 Button.danger("getDamageButtons_" + tile.getPosition() + "_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
             buttons.add(Button.secondary("cancelGroundHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-            String msg2 = player.getRepresentation() + " you may autoassign " + h + " hit" + (h==1 ? "" : "s") + ".";
+            String msg2 = player.getRepresentation() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
             event.getMessage().editMessage(msg2).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
                 .queue();
         } else if (buttonID.startsWith("cancelPdsOffenseHits_")) {
@@ -2186,6 +2186,7 @@ public class ButtonListener extends ListenerAdapter {
             String color = buttonID.replace("mahactStealCC_", "");
             if (!player.getMahactCC().contains(color)) {
                 player.addMahactCC(color);
+                Helper.isCCCountCorrect(event, game, color);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     ident + " added a " + color + " CC to their fleet pool");
             } else {
@@ -5792,7 +5793,6 @@ public class ButtonListener extends ListenerAdapter {
                 if (game.getLatestAfterMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Afters'").queueAfter(1000, TimeUnit.MILLISECONDS);
                     AgendaHelper.startTheVoting(game);
-                    msg.delete().queue();
                 } else if (game.getLatestWhenMsg().equalsIgnoreCase(messageId)) {
                     msg.reply("All players have indicated 'No Whens'").queueAfter(10, TimeUnit.MILLISECONDS);
 
@@ -5876,7 +5876,6 @@ public class ButtonListener extends ListenerAdapter {
             case "no_after", "no_after_persistent" -> {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Afters'").queue();
                 AgendaHelper.startTheVoting(game);
-                ButtonHelper.deleteMessage(event);
 
             }
             case "no_sabotage" -> {

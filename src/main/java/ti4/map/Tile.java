@@ -590,10 +590,11 @@ public class Tile {
         // }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planetHolder) {
-                boolean oneOfThree = planetHolder.getOriginalPlanetType() != null
+                boolean oneOfThree = (unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_threetraits.png")) || (planetHolder.getOriginalPlanetType() != null
                     && ("industrial".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
                         || "cultural".equalsIgnoreCase(planetHolder.getOriginalPlanetType())
-                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType()));
+                        || "hazardous".equalsIgnoreCase(planetHolder.getOriginalPlanetType())));
+
                 if (!Constants.MECATOLS.contains(planetHolder.getName()) && !oneOfThree) {
                     return true;
                 }
