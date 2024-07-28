@@ -124,6 +124,11 @@ public class SampleColors extends HelpSubcommandData {
             right = Math.max(right, x);
             y += 2*DREADTEXHIGHT;
         }
+        if (left == right)
+        {
+            MessageHelper.sendMessageToEventChannel(event, "No colours found. Something has probably gone wrong.");
+            return;
+        }
         coloursImage = coloursImage.getSubimage(left, top, right-left, bottom-top);
         FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, 1.0f, "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.get(0) : "ALL"))
             .setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.get(0) : "ALL the") + " units.");
