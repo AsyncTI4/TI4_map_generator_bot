@@ -54,7 +54,7 @@ public class SampleDecals extends HelpSubcommandData {
         {
             List<String> others = Arrays.asList(new String[]{"cb_10", "cb_10", "cb_52", "cb_81"});
             decals = Mapper.getDecals().stream()
-                .filter(decalID -> others.contains(input.getAsString()))
+                .filter(decalID -> others.contains(decalID))
                 .collect(Collectors.toList());;
         }
         else
