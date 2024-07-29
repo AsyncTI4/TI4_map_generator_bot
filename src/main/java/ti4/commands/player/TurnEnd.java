@@ -108,6 +108,7 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setTemporaryPingDisable(false);
         game.setStoredValue("lawsDisabled", "no");
         game.setStoredValue("endTurnWhenSCFinished", "");
+        game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
         ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "sol", event);
         ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "hacan", event);
