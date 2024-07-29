@@ -79,6 +79,7 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(token -> {
             AttachmentModel attach = Mapper.getAttachmentInfo(token);
@@ -86,6 +87,7 @@ public class Planet extends UnitHolder {
 
             if (token.contains("sleeper")) return false;
             if (token.contains("dmz_large")) return false;
+            if (token.contains("custodiavigilia")) return false;
             return !Helper.isFakeAttachment(token);
         });
     }

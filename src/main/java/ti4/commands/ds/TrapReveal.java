@@ -88,8 +88,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                     }
                     if (reveal && planet != null) {
 
-                        String sb = trapCard.getRepresentation() + "\n" +
-                            "__**" + "Has been revealed on planet: " + representation + "**__";
+                        String sb = trapCard.getRepresentation() + "\n" + "__**" + "Has been revealed on planet: " + representation + "**__";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
                         if ("Minefields".equalsIgnoreCase(trapCard.getName())) {
                             for (Player p2 : game.getRealPlayers()) {

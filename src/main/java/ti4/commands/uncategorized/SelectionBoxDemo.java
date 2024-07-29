@@ -4,9 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.helpers.Constants;
-import ti4.map.GameManager;
-import ti4.message.MessageHelper;
 import ti4.selections.selectmenus.BigSelectDemo;
 
 public class SelectionBoxDemo implements Command {
@@ -25,10 +22,11 @@ public class SelectionBoxDemo implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         BigSelectDemo.serveDemoSelectMenu(event);
     }
+
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
 
         commands.addCommands(
-                Commands.slash(getActionID(), "Show selection box demo"));
+            Commands.slash(getActionID(), "Show selection box demo"));
     }
 }

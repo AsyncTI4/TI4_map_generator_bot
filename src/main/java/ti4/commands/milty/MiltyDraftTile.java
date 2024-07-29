@@ -18,7 +18,7 @@ public class MiltyDraftTile {
     private int milty_res;
     private int milty_inf;
     private int milty_flex;
-    
+
     public void addPlanet(Planet planet) {
         int r = planet.getResources();
         int i = planet.getInfluence();
@@ -26,9 +26,12 @@ public class MiltyDraftTile {
         resources += r;
         influence += i;
 
-        if (r > i) milty_res += r;
-        else if (i > r) milty_inf += i;
-        else milty_flex += r;
+        if (r > i)
+            milty_res += r;
+        else if (i > r)
+            milty_inf += i;
+        else
+            milty_flex += r;
 
         if (planet.isLegendary()) isLegendary = true;
     }

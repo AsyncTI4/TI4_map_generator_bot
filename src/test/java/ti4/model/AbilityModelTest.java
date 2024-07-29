@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import ti4.generator.Mapper;
-import ti4.message.BotLogger;
 import ti4.model.Source.ComponentSource;
 import ti4.testUtils.BaseTi4Test;
 

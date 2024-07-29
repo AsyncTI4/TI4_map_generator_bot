@@ -1,6 +1,5 @@
 package ti4.commands.uncategorized;
 
-import java.util.HashMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
