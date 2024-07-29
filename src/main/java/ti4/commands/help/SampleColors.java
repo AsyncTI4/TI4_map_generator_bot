@@ -55,7 +55,7 @@ public class SampleColors extends HelpSubcommandData {
         List<String> hues = new ArrayList<String>();
         if (input == null || input.getAsString().equals("ALL") || input.getAsString().equals(""))
         {
-            hues = Arrays.asList(new String[]{"RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK"});
+            hues = Arrays.asList(new String[]{"GRAY", "RED", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK"});
         }
         else
         {

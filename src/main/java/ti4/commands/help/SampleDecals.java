@@ -103,9 +103,12 @@ public class SampleDecals extends HelpSubcommandData {
         if (colInput == null || colInput.getAsString().equals(""))
         {
             Game game = getActiveGame();
-            Player player = game.getPlayer(getUser().getId());
-            player = Helper.getGamePlayer(game, player, event, null);
-            color = Mapper.getColorID(player.getColor());
+            if (game != null)
+            {
+                Player player = game.getPlayer(getUser().getId());
+                player = Helper.getGamePlayer(game, player, event, null);
+                color = Mapper.getColorID(player.getColor());
+            }
         }
         else
         {
