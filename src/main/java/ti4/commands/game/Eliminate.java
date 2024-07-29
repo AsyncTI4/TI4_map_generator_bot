@@ -115,16 +115,14 @@ public class Eliminate extends AddRemovePlayer {
                 //discard all of a players ACs
                 Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
                 for (Map.Entry<String, Integer> ac : acs.entrySet()) {
-                    boolean removed = game.discardActionCard(player.getUserID(), ac.getValue());
-                    String sb = "Player: " + player.getUserName() + " - " +
-                        "Discarded Action Card:" + "\n" +
-                        Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
+                    game.discardActionCard(player.getUserID(), ac.getValue());
+                    String sb = "Player: " + player.getUserName() + " - " + "Discarded Action Card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb);
                 }
                 //unscore all of a players SOs
                 acs = new LinkedHashMap<>(player.getSecretsScored());
                 for (int so : acs.values()) {
-                    boolean scored = game.unscoreSecretObjective(player.getUserID(), so);
+                    game.unscoreSecretObjective(player.getUserID(), so);
                 }
                 //discard all of a players SOs
 

@@ -258,6 +258,11 @@ public class Storage {
     }
 
     @NotNull
+    public static File getAppEmojiDirectory() {
+        return new File(getResourcePath() + "/emojis/");
+    }
+
+    @NotNull
     public static File getMapUndoStorage(String mapName) {
         return new File(getStoragePath() + MAPS_UNDO + mapName);
     }

@@ -74,8 +74,7 @@ public class SCPick extends PlayerSubcommandData {
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scPicked = option.getAsInt();
 
-        Stats stats = new Stats();
-        boolean pickSuccessful = stats.pickSC(event, game, player, option);
+        boolean pickSuccessful = Stats.pickSC(event, game, player, option);
         Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
             if (game.isFowMode()) {
@@ -83,7 +82,7 @@ public class SCPick extends PlayerSubcommandData {
                 int c = 0;
                 while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
                     if (event.getOption(scs[c]) != null) {
-                        pickSuccessful = stats.pickSC(event, game, player, event.getOption(scs[c]));
+                        pickSuccessful = Stats.pickSC(event, game, player, event.getOption(scs[c]));
                     }
                     playerSCs = player.getSCs();
                     c++;

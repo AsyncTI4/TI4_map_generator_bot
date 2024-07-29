@@ -1367,7 +1367,7 @@ public class Player {
     }
 
     @JsonIgnore
-    public User getUser() { // TODO: Jazz
+    public User getUser() {
         return AsyncTI4DiscordBot.jda.getUserById(userID);
     }
 
@@ -2778,12 +2778,6 @@ public class Player {
         return getNeighbouringPlayers().size();
     }
 
-    @Deprecated
-    public UnitModel getUnitFromImageName(String imageName) {
-        String asyncID = StringUtils.substringBetween(imageName, "_", ".png");
-        return getUnitFromAsyncID(asyncID);
-    }
-
     public UnitModel getUnitFromUnitKey(UnitKey unit) {
         return getUnitFromAsyncID(unit.asyncID());
     }
@@ -2795,11 +2789,6 @@ public class Player {
 
     public boolean unitBelongsToPlayer(UnitKey unit) {
         return getColor().equals(AliasHandler.resolveColor(unit.getColorID()));
-    }
-
-    @Deprecated
-    public boolean colorMatchesUnitImageName(String imageName) {
-        return getColor().equals(AliasHandler.resolveColor(StringUtils.substringBefore(imageName, "_")));
     }
 
     public List<TemporaryCombatModifierModel> getNewTempCombatModifiers() {

@@ -26,10 +26,10 @@ public class CommanderDraftItem extends DraftItem {
     @Override
     public String getShortDescription() {
         LeaderModel leader = getLeader();
-        if (leader == null)
-        {
+        if (leader == null) {
             return getAlias();
-        }return "Commander - " + getLeader().getName();
+        }
+        return "Commander - " + getLeader().getName();
     }
 
     @JsonIgnore

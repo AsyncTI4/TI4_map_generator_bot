@@ -470,12 +470,12 @@ public class CombatHelper {
             totalMisses = totalMisses + misses;
 
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + (misses == 1 ? "" : "s") + " due to " + (misses  == 1 ? "a Thalnos miss" : "Thalnos misses");
+                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + (misses == 1 ? "" : "s") + " due to " + (misses == 1 ? "a Thalnos miss" : "Thalnos misses");
                 for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
                     Tile tile = game.getTileByPosition(pos);
-                    int amount = game.getSpecificThalnosUnit(thalnosUnit);
+                    //int amount = game.getSpecificThalnosUnit(thalnosUnit);
                     String unitName = ButtonHelper.getUnitName(unit.getAsyncId());
                     thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                     if (thalnosUnit.equals(unitName)) {
@@ -507,7 +507,7 @@ public class CombatHelper {
                 if (misses > 0 && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         player.getFactionEmoji() + " had " + misses + " " + unit.getName() + (misses == 1 ? "" : "s") + " miss" + (misses == 1 ? "" : "es")
-                        + " on a Thalnos roll, but no units were removed due to extra rolls being unaccounted for.");
+                            + " on a Thalnos roll, but no units were removed due to extra rolls being unaccounted for.");
                 }
             }
 
@@ -563,7 +563,7 @@ public class CombatHelper {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have the Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses") 
+            result = result + "\n" + player.getFactionEmoji() + " You have the Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
                 + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
         }
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {

@@ -81,21 +81,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         game = GameManager.getInstance().getUserActiveGame(user.getId());
     }
 
-    /**
-     * @deprecated should use {@link ExploreModel#getRepresentationEmbed()} instead
-     */
-    @Deprecated
-    public static String displayExplore(String cardID) {
-        ExploreModel model = Mapper.getExplore(cardID);
-        StringBuilder sb = new StringBuilder();
-        if (model != null) {
-            sb.append("(").append(cardID).append(") ").append(model.getName()).append(" - ").append(model.getText());
-        } else {
-            sb.append("Invalid ID ").append(cardID);
-        }
-        return sb.toString();
-    }
-
     protected Tile getTile(SlashCommandInteractionEvent event, String tileID, Game game) {
         if (game.isTileDuplicated(tileID)) {
             MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
@@ -112,8 +97,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID,
-        String messageText, Player player, Game game) {
+    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID, String messageText, Player player, Game game) {
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Player could not be found");
             return;
@@ -345,8 +329,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     return;
                 }
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
-                    || game.getPhaseOfGame().contains("agenda")) && player.hasAbility("scavenge")
-                    && event != null) {
+                    || game.getPhaseOfGame().contains("agenda")) && player.hasAbility("scavenge")) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1TG from Scavenge ("
                         + player.getTg() + "->" + (player.getTg() + 1)
@@ -358,7 +341,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
                     || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")
-                    && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
                     saarButton.add(Button.success("saarMechRes_" + "mirage",
                         "Pay 1TG for mech on " + Helper.getPlanetRepresentation("mirage", game)));
@@ -369,7 +352,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         saarButton);
                 }
 
-                if (ButtonHelper.isPlayerElected(game, player, "minister_exploration") && event != null) {
+                if (ButtonHelper.isPlayerElected(game, player, "minister_exploration")) {
                     String fac = player.getFactionEmoji();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         fac + " gained one " + Emojis.tg + " from Minister of Exploration (" + player.getTg()
@@ -377,13 +360,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     player.setTg(player.getTg() + 1);
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-
                 }
 
                 String exploredMessage = player.getRepresentation() + " explored " + Emojis.Cultural +
-                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(mirageID) + " *(tile " + tile.getPosition()
-                    + ")*:";
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
+                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(mirageID) +
+                    (tile == null ? "" : " *(tile " + tile.getPosition() + ")*:");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 resolveExplore(event, exploreID, tile, mirageID, exploredMessage, player, game);
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
@@ -570,24 +552,20 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 new ExpFrontier().expFront(event, tile, game, player);
             }
             case "ancientshipyard" -> {
-                List<String> colors = tile.getUnitHolders().get("space").getUnitColorsOnHolder();
+                List<String> colors = tile == null ? List.of() : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
                 if (colors.isEmpty() || colors.contains(player.getColorID())) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
-                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                        "Cruiser added to the system automatically.");
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Cruiser added to the system automatically.");
                 } else {
-                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                        "Someone else's ships were in the system, no cruiser added");
+                    MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Someone else's ships were in the system, no cruiser added");
                 }
-
             }
             case "forgottentradestation" -> {
-                int tgGain = tile.getUnitHolders().size() - 1;
+                int tgGain = tile == null ? 0 : tile.getUnitHolders().size() - 1;
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG"
-                        + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG"
+                    + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
             }

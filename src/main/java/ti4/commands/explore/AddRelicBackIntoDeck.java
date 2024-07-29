@@ -27,7 +27,7 @@ public class AddRelicBackIntoDeck extends GenericRelicAction {
         }
         String relicId = option.getAsString();
         List<String> allRelics = getActiveGame().getAllRelics();
-        if (!allRelics.contains(relicId)){
+        if (!allRelics.contains(relicId)) {
             getActiveGame().shuffleRelicBack(relicId);
             MessageHelper.sendMessageToEventChannel(event, "Relic " + relicId + " added back into deck");
         } else {

@@ -56,7 +56,7 @@ public class SearchMyGames extends SearchSubcommandData {
         Predicate<Game> endedGamesFilter = includeEndedGames ? game -> true : game -> !game.isHasEnded() && !game.isFowMode();
         Predicate<Game> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
         Predicate<Game> ignoreAbortedFilter = ignoreAborted ? game -> !game.isHasEnded() || game.getWinner().isPresent() : game -> true;
-        Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames);
+        Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames).and(ignoreAbortedFilter);
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 

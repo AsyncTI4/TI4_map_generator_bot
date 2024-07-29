@@ -723,6 +723,7 @@ public class DataMigrationManager {
         return found;
     }
 
+    @SuppressWarnings("unused")
     private static boolean replaceStage1s(Game game, List<String> decksToCheck, Map<String, String> replacements) {
         if (!decksToCheck.contains(game.getStage1PublicDeckID())) {
             return false;
@@ -739,6 +740,7 @@ public class DataMigrationManager {
         return mapNeededMigrating;
     }
 
+    @SuppressWarnings("unused")
     private static boolean replaceActionCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
         if (!decksToCheck.contains(game.getAcDeckID())) {
             return false;
@@ -758,6 +760,7 @@ public class DataMigrationManager {
         return mapNeededMigrating;
     }
 
+    @SuppressWarnings("unused")
     private static boolean replaceAgendaCards(Game game, List<String> decksToCheck, Map<String, String> replacements) {
         if (!decksToCheck.contains(game.getAgendaDeckID())) {
             return false;

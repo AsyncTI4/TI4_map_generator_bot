@@ -1,7 +1,5 @@
 package ti4.commands.explore;
 
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

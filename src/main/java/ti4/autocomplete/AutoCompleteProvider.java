@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -154,6 +155,47 @@ public class AutoCompleteProvider {
                         .toList();
                     event.replyChoices(options).queue();
                 }
+            }
+            case Constants.HUE -> {
+                String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
+                Map<String, String> values = new HashMap<String, String>() {{
+                    put("RED", "Reds");
+                    put("GRAY", "Grays");
+                    put("GRAY", "Greys");
+                    put("GRAY", "Blacks");
+                    put("ORANGE", "Oranges");
+                    put("ORANGE", "Browns");
+                    put("YELLOW", "Yellows");
+                    put("GREEN", "Greens");
+                    put("BLUE", "Blues");
+                    put("PURPLE", "Purples");
+                    put("PINK", "Pinks");
+                    put("ALL", "ALL COLOURS");
+                }};
+                List<Command.Choice> options = values.entrySet().stream()
+                    .filter(entry -> entry.getValue().toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(entry -> new Command.Choice(entry.getValue(), entry.getKey()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.DECAL_HUE -> {
+                String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
+                Map<String, String> values = new HashMap<String, String>() {{
+                    put("Pattern", "Pattern");
+                    put("Icon", "Icon");
+                    put("Symbol", "Symbol");
+                    put("Texture", "Texture");
+                    put("Line", "Line");
+                    put("Other", "Other");
+                    put("ALL", "ALL DECALS");
+                }};
+                List<Command.Choice> options = values.entrySet().stream()
+                    .filter(entry -> entry.getValue().toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(entry -> new Command.Choice(entry.getValue(), entry.getKey()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
             }
             case Constants.CC_USE -> {
                 String enteredValue = event.getFocusedOption().getValue();

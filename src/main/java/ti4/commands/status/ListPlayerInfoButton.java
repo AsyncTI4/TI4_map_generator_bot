@@ -2,8 +2,6 @@ package ti4.commands.status;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.collections4.CollectionUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -179,6 +177,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
         } else {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
+            if (p2 == null) return;
             switch (category) {
                 case "allFaction" -> {
                     sb.append(new Stats().getPlayersCurrentStatsText(p2, game));

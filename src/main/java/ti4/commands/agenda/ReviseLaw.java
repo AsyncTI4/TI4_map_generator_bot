@@ -36,7 +36,7 @@ public class ReviseLaw extends AgendaSubcommandData {
         String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         String message = "Law revised";
-        if (playerWasElected) {
+        if (playerWasElected && player != null) {
             optionText = player.getFaction();
             message = message + " with " + player.getColor() + " as the elected color";
         } else {

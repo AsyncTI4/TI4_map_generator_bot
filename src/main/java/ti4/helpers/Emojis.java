@@ -1,19 +1,111 @@
 package ti4.helpers;
 
+import java.io.File;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.map.Game;
 import ti4.map.Leader;
 
 public class Emojis {
+    // APPLICATION EMOJIS
+    public static final Map<String, EmojiUnion> emojis = new HashMap<>();
+
+    public static void initApplicationEmojis() {
+        List<EmojiUnion> all = getAllApplicationEmojis();
+        all.forEach(e -> emojis.put(e.getName(), e));
+        reloadAllApplicationEmojis();
+    }
+
+    private static void reloadAllApplicationEmojis() {
+        Map<String, Boolean> emojiExists = new HashMap<>();
+        emojis.keySet().forEach(k -> emojiExists.put(k, false));
+
+        List<File> emojiFiles = enumerateEmojiFilesRecursive(Storage.getAppEmojiDirectory());
+        List<File> toUpload = new ArrayList<>();
+        List<String> toDelete = new ArrayList<>();
+        for (File emoji : emojiFiles) {
+            EmojiUnion existingEmoji = getApplicationEmoji(emoji.getName());
+            if (existingEmoji == null) {
+                toUpload.add(emoji);
+            } else {
+                LocalDateTime lastModified = LocalDateTime.ofInstant(Instant.ofEpochMilli(emoji.lastModified()), ZoneId.systemDefault());
+                OffsetDateTime emojiUploadTime = existingEmoji.asCustom().getTimeCreated();
+                OffsetDateTime fileModTime = lastModified.atOffset(emojiUploadTime.getOffset());
+                if (emojiUploadTime.isBefore(fileModTime)) {
+                    toUpload.add(emoji);
+                    toDelete.add(emoji.getName());
+                }
+            }
+            emojiExists.put(emoji.getName(), true);
+        }
+
+        // Remove unused emojis from the application
+        for (String key : emojis.keySet()) {
+            if (!emojiExists.get(key)) {
+                toDelete.add(key);
+            }
+        }
+
+        // Delete emojis that have been removed and also out-of-date emojis
+        toDelete.parallelStream().forEach(key -> deleteApplicationEmoji(key));
+        toDelete.forEach(key -> emojis.remove(key));
+
+        // (Re-)Upload emojis
+        Map<String, EmojiUnion> uploaded = toUpload.parallelStream()
+            .map(file -> createApplicationEmoji(file))
+            .collect(Collectors.toConcurrentMap(e -> e.getName(), e -> e));
+        emojis.putAll(uploaded);
+    }
+
+    private static List<File> enumerateEmojiFilesRecursive(File folder) {
+        List<File> filesAndDirectories = Arrays.asList(folder.listFiles());
+        return filesAndDirectories.stream().flatMap(fileOrDir -> {
+            if (fileOrDir == null) return null;
+            if (isValidEmojiFile(fileOrDir)) return Stream.of(fileOrDir);
+            if (fileOrDir.isDirectory()) return enumerateEmojiFilesRecursive(fileOrDir).stream();
+            return null;
+        }).toList();
+    }
+
+    private static boolean isValidEmojiFile(File file) {
+        return file.isFile() && (file.getName().endsWith(".png") || file.getName().endsWith(".jpg"));
+    }
+
+    private static EmojiUnion getApplicationEmoji(String name) {
+        if (emojis.containsKey(name))
+            return emojis.get(name);
+        return null;
+    }
+
+    private static List<EmojiUnion> getAllApplicationEmojis() {
+        return new ArrayList<>(); // TODO (Jazz): fill this in when we get the JDA update
+    }
+
+    private static void deleteApplicationEmoji(String name) {
+        // TODO (Jazz): fill this in when we get the JDA update
+    }
+
+    private static EmojiUnion createApplicationEmoji(File emoji) {
+        return null; // TODO (Jazz): fill this in when we get the JDA update
+    }
+
     // FACTIONS
     public static final String Arborec = "<:Arborec:1156670455856513175>";
     public static final String Argent = "<:Argent:1156670457123192873>";

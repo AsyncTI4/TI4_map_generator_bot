@@ -644,8 +644,7 @@ public class StartCombat extends CombatSubcommandData {
     }
 
     // TODO: Break apart into: [all combats, space combat, ground combat] methods
-    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2,
-        String groundOrSpace, GenericInteractionCreateEvent event) {
+    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2, String groundOrSpace, GenericInteractionCreateEvent event) {
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getUnitHolders().get("space");
