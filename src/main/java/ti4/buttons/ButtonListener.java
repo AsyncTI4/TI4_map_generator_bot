@@ -2954,7 +2954,7 @@ public class ButtonListener extends ListenerAdapter {
 
             GameSaveLoadManager.undo(game, event);
 
-            String msg = "You undid something, the details of which can be found in the undo-log thread";
+            String msg = "You undid something, the details of which can be found in the undo-log thread.";
             List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
             for (ThreadChannel threadChannel_ : threadChannels) {
                 if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {

@@ -5511,7 +5511,7 @@ public class ButtonHelper {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
                     EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
-                    for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
+                    for (int x = 1; x <= damagedUnits && x <= 2; x++) {
                         Button validTile2 = Button.danger(
                             finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID + "damaged",
                             "Rift " + x + " damaged " + unitModel.getBaseType());
@@ -5519,7 +5519,7 @@ public class ButtonHelper {
                         buttons.add(validTile2);
                     }
                     totalUnits = totalUnits - damagedUnits;
-                    for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
+                    for (int x = 1; x <= totalUnits && x <= 2; x++) {
                         Button validTile2 = Button.danger(
                             finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID,
                             "Rift " + x + " " + unitModel.getBaseType());
@@ -5533,10 +5533,10 @@ public class ButtonHelper {
         Button doAll;
         Button concludeMove1;
 
-        doAll = Button.secondary(finChecker + "riftAllUnits_" + tile.getPosition(), "Rift all units");
+        doAll = Button.secondary(finChecker + "riftAllUnits_" + tile.getPosition(), "Rift All Units");
         concludeMove1 = Button.primary("getDamageButtons_" + tile.getPosition() + "_remove",
-            "Remove excess infantry/fighters");
-        concludeMove = Button.danger("doneRifting", "Done rifting units and removing excess capacity");
+            "Remove Lost Transported Units");
+        concludeMove = Button.danger("doneRifting", "Done Rifting Units (And Removing Lost Transported Units)");
 
         buttons.add(doAll);
         buttons.add(concludeMove1);
@@ -5558,10 +5558,10 @@ public class ButtonHelper {
                     return;
                 }
             }
-            String msg = player.getRepresentation() + " if mallice was improperly unlocked during this action, you can use the button below to unflip it";
+            String msg = player.getRepresentation() + " if Mallice was improperly unlocked during this action, you can use the button below to unflip it.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("unflipMallice", "Unflip Mallice"));
-            buttons.add(Button.danger("deleteButtons", "Leave it alone"));
+            buttons.add(Button.danger("deleteButtons", "Leave It Alone"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
         }
     }
@@ -5580,19 +5580,19 @@ public class ButtonHelper {
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82a");
             if (!PositionMapper.isTilePositionValid(position)) {
-                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                MessageHelper.replyToMessage(event, "Position tile not allowed.");
                 return;
             }
 
             String tileName = Mapper.getTileID(planetTileName);
             String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
             if (tilePath == null) {
-                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName + ".");
                 return;
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Unflipped mallice");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Unflipped Mallice");
         }
     }
 
@@ -5689,13 +5689,13 @@ public class ButtonHelper {
             buttons.add(doAllShips);
             doAll = Button.secondary(
                 finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_removeAll",
-                "Remove all units");
-            concludeMove = Button.primary(finChecker + "doneRemoving", "Done removing units");
+                "Remove All Units");
+            concludeMove = Button.primary(finChecker + "doneRemoving", "Done Removing Units");
         } else {
             doAll = Button.secondary(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_moveAll",
                 "Move all units");
             concludeMove = Button.primary(finChecker + "doneWithOneSystem_" + tile.getPosition(),
-                "Done moving units from this system");
+                "Done Moving Units From This System");
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tneliscommander")
                 && game.getStoredValue("tnelisCommanderTracker").isEmpty()) {
                 buttons.add(Button.primary("declareUse_Tnelis Commander_" + tile.getPosition(), "Use Tnelis Commander")
@@ -5726,7 +5726,7 @@ public class ButtonHelper {
                 }
                 String blabel = "Undo move of " + x + " " + damagedMsg + unitkey;
                 if (!"".equalsIgnoreCase(planet)) {
-                    blabel = blabel + " from " + Helper.getPlanetRepresentation(planet.toLowerCase(), game);
+                    blabel = blabel + " from " + Helper.getPlanetRepresentation(planet.toLowerCase(), game) + ".";
                 }
                 Button validTile2 = Button.success(
                     finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_" + x
@@ -5740,7 +5740,7 @@ public class ButtonHelper {
         }
         if (displacedUnits.keySet().size() > 0) {
             Button validTile2 = Button.success(
-                finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_reverseAll", "Undo all");
+                finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_reverseAll", "Undo All");
             buttons.add(validTile2);
         }
         return buttons;
@@ -5753,13 +5753,13 @@ public class ButtonHelper {
             String tokenFilename = Mapper.getTokenID("ionalpha");
             tile.addToken(tokenFilename, Constants.SPACE);
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Added ionstorm alpha to " + tile.getRepresentation());
+                "Added the Ion Storm to " + tile.getRepresentation() + " on its alpha side.");
 
         } else {
             String tokenFilename = Mapper.getTokenID("ionbeta");
             tile.addToken(tokenFilename, Constants.SPACE);
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Added ionstorm beta to " + tile.getRepresentation());
+                "Added the Ion Storm to " + tile.getRepresentation() + " on its beta side.");
         }
         deleteMessage(event);
     }
@@ -5773,7 +5773,7 @@ public class ButtonHelper {
             buttons.add(Button.success("flipIonStorm_" + tile.getPosition(), "Flip Ion Storm"));
             buttons.add(Button.danger("deleteButtons", "Not Used"));
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game),
-                player.getRepresentation() + " if you used the Ion Storm please press button to flip it", buttons);
+                player.getRepresentation() + " if you used the Ion Storm, please press button to flip it.", buttons);
         }
     }
 
@@ -5781,17 +5781,19 @@ public class ButtonHelper {
         String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         Tile tile = game.getTileByPosition(pos);
         String tokenFilenameAlpha = Mapper.getTokenID("ionalpha");
+        String tokenFilenameBeta = Mapper.getTokenID("ionbeta");
         UnitHolder space = tile.getUnitHolders().get("space");
-        String tokenFilename = Mapper.getTokenID("ionbeta");
         if (space.getTokenList().contains(tokenFilenameAlpha)) {
-            tile.addToken(tokenFilename, Constants.SPACE);
             tile.removeToken(tokenFilenameAlpha, "space");
+            tile.addToken(tokenFilenameBeta, Constants.SPACE);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                    "Flipped the Ion Storm in " + tile.getRepresentation() + " to its beta side.");
         } else {
-            tile.removeToken(tokenFilename, Constants.SPACE);
+            tile.removeToken(tokenFilenameBeta, Constants.SPACE);
             tile.addToken(tokenFilenameAlpha, "space");
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                    "Flipped the Ion Storm in " + tile.getRepresentation() + " on its alpha side.");
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Flipped ionstorm in " + tile.getRepresentation());
         deleteTheOneButton(event);
     }
 
@@ -8717,7 +8719,8 @@ public class ButtonHelper {
                 try{
                     pnIndex = Integer.parseInt(amountToTrans);
                 }catch(NumberFormatException e){
-                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation()+" heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
+                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation()+" heads up, a promissory note failed to send."
+                        + " This is likely due to you not having the promissory note to send. Maybe you already gave it to someone else and forgot?");
                     return;
                 }
                 for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
@@ -8726,7 +8729,7 @@ public class ButtonHelper {
                     }
                 }
                 if (id == null) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that promissory note; no promissory note sent");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that promissory note; no promissory note sent.");
                     return;
                 }
                 p1.removePromissoryNote(id);

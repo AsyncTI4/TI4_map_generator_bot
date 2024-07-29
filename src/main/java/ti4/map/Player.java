@@ -1326,7 +1326,7 @@ public class Player {
                 List<Button> buttons = new ArrayList<>(
                     Helper.getPlanetPlaceUnitButtons(this, getGame(), "mech", "placeOneNDone_skipbuild"));
                 String message = getRepresentation()
-                    + " due to your mech deploy ability, you may now place a mech on a planet you control.";
+                    + " due to the Deploy ability of your Auctioneer mech, you may now place 1 on a planet you control.";
                 for (int i = 0; i < firstTime && i < mechsRemain; i++) {
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
                 }
@@ -1941,7 +1941,7 @@ public class Player {
                 TurnEnd.pingNextPlayer(event, game, p2);
                 if (!game.isFowMode()) {
                     ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
-                        + game.getRound() + " for " + p2.getFactionEmoji());
+                        + game.getRound() + " for " + p2.getFactionEmoji() + ".");
                 }
             }
             if (game.getStoredValue("fleetLogWhenSCFinished")
