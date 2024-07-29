@@ -601,7 +601,7 @@ public class FoWHelper {
 		Set<String> tilesToCheck = getAdjacentTiles(game, position, null, false);
 		Tile startingTile = game.getTileByPosition(position);
 
-		for (Player player_ : game.getPlayers().values()) {
+		for (Player player_ : game.getRealPlayers()) {
 			Set<String> tiles = new HashSet<>(tilesToCheck);
 			if (player_.hasAbility("quantum_entanglement")) {
 				tiles.addAll(getWormholeAdjacencies(game, position, player_));

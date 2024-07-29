@@ -41,6 +41,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.player.TurnEnd;
+import ti4.commands.player.TurnStart;
 import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
@@ -239,7 +240,8 @@ public class Player {
 
     @JsonIgnore
     public String getDecalFile(String unitType) {
-        if (getDecalSet() == null) return null;
+        if (getDecalSet() == null)
+            return null;
         return String.format("%s_%s%s", getDecalSet(), unitType, MapGenerator.getBlackWhiteFileSuffix(getColorID()));
     }
 
@@ -379,7 +381,8 @@ public class Player {
             Map<UnitKey, Integer> units = uH.getUnits();
             for (UnitKey unit : units.keySet()) {
                 if (unitBelongsToPlayer(unit) && getUnitFromUnitKey(unit).getBombardDieCount() > 0) {
-                    if (ButtonHelper.isLawInPlay(getGame(), "articles_war") && getUnitFromUnitKey(unit).getBaseType().equalsIgnoreCase("mech")) {
+                    if (ButtonHelper.isLawInPlay(getGame(), "articles_war")
+                        && getUnitFromUnitKey(unit).getBaseType().equalsIgnoreCase("mech")) {
                         continue;
                     }
                     for (int x = 0; x < units.get(unit); x++) {
@@ -571,7 +574,8 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
+                    .complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getId().equals(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -602,7 +606,8 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
+                    .complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -1318,8 +1323,10 @@ public class Player {
             }
             if (hasUnit("bentor_mech") && firstTime > 0) {
                 int mechsRemain = 4 - ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), this, "mech", true);
-                List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(this, getGame(), "mech", "placeOneNDone_skipbuild"));
-                String message = getRepresentation() + " due to your mech deploy ability, you may now place a mech on a planet you control.";
+                List<Button> buttons = new ArrayList<>(
+                    Helper.getPlanetPlaceUnitButtons(this, getGame(), "mech", "placeOneNDone_skipbuild"));
+                String message = getRepresentation()
+                    + " due to your mech deploy ability, you may now place a mech on a planet you control.";
                 for (int i = 0; i < firstTime && i < mechsRemain; i++) {
                     MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), message, buttons);
                 }
@@ -1360,7 +1367,7 @@ public class Player {
     }
 
     @JsonIgnore
-    public User getUser() { //TODO: Jazz
+    public User getUser() { // TODO: Jazz
         return AsyncTI4DiscordBot.jda.getUserById(userID);
     }
 
@@ -1922,7 +1929,8 @@ public class Player {
 
         followedSCs.add(sc);
         if (game != null && game.getActivePlayer() != null) {
-            if (game.getStoredValue("endTurnWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
+            if (game.getStoredValue("endTurnWhenSCFinished")
+                .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (!p2.hasFollowedSC(sc)) {
                         return;
@@ -1932,8 +1940,22 @@ public class Player {
                 Player p2 = game.getActivePlayer();
                 TurnEnd.pingNextPlayer(event, game, p2);
                 if (!game.isFowMode()) {
-                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round " + game.getRound() + " for " + p2.getFactionEmoji());
+                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getTurnCount() + ", Round "
+                        + game.getRound() + " for " + p2.getFactionEmoji());
                 }
+            }
+            if (game.getStoredValue("fleetLogWhenSCFinished")
+                .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!p2.hasFollowedSC(sc)) {
+                        return;
+                    }
+                }
+                game.setStoredValue("fleetLogWhenSCFinished", "");
+                Player p2 = game.getActivePlayer();
+                String message = p2.getRepresentation() + " Use buttons to end turn or do another action.";
+                List<Button> systemButtons = TurnStart.getStartOfTurnButtons(p2, game, true, event);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, systemButtons);
             }
         }
     }
@@ -2283,7 +2305,8 @@ public class Player {
         }
     }
 
-    // Provided because people make mistakes, also nekro exists, also weird homebrew exists
+    // Provided because people make mistakes, also nekro exists, also weird homebrew
+    // exists
     private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
         if ("iihq".equalsIgnoreCase(techID)) {
@@ -2368,12 +2391,14 @@ public class Player {
         }
         Game game = getGame();
         if (ButtonHelper.getUnitHolderFromPlanetName(planet, game) != null && game.isAbsolMode()
-            && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList().contains("attachment_nanoforge.png")
+            && ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList()
+                .contains("attachment_nanoforge.png")
             && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
             buttons.add(Button.danger("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(), getRepresentation() + " You may choose to Exhaust Nanoforge Ability to ready the planet.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(),
+                getRepresentation() + " You may choose to Exhaust Nanoforge Ability to ready the planet.", buttons);
         }
     }
 
@@ -2850,7 +2875,8 @@ public class Player {
     }
 
     /**
-     * @return a list of colours the user would prefer to play as, in order of preference - the colours should all be "valid"- colourIDs
+     * @return a list of colours the user would prefer to play as, in order of
+     *         preference - the colours should all be "valid"- colourIDs
      */
     @JsonIgnore
     public List<String> getPreferredColours() {
@@ -2885,7 +2911,8 @@ public class Player {
     }
 
     /**
-     * @return Player's private channel if Fog of War game, otherwise the main (action) game channel
+     * @return Player's private channel if Fog of War game, otherwise the main
+     *         (action) game channel
      */
     @JsonIgnore
     public MessageChannel getCorrectChannel() {
@@ -2909,26 +2936,27 @@ public class Player {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel faction = getFactionModel();
 
-        //TITLE
+        // TITLE
         StringBuilder title = new StringBuilder();
         title.append(getFactionEmoji()).append(" ");
-        if (!"null".equals(getDisplayName())) title.append(getDisplayName()).append(" ");
+        if (!"null".equals(getDisplayName()))
+            title.append(getDisplayName()).append(" ");
         title.append(faction.getFactionNameWithSourceEmoji());
         eb.setTitle(title.toString());
 
         // // ICON
         // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
         // if (emoji instanceof CustomEmoji customEmoji) {
-        //     eb.setThumbnail(customEmoji.getImageUrl());
+        // eb.setThumbnail(customEmoji.getImageUrl());
         // }
 
-        //DESCRIPTION
+        // DESCRIPTION
         StringBuilder desc = new StringBuilder();
         desc.append(Emojis.getColorEmojiWithName(getColor()));
         desc.append("\n").append(StringUtils.repeat(Emojis.comm, getCommoditiesTotal()));
         eb.setDescription(desc.toString());
 
-        //FIELDS
+        // FIELDS
         // Abilities
         StringBuilder sb = new StringBuilder();
         for (String id : getAbilities()) {
@@ -2980,7 +3008,7 @@ public class Player {
         // Author (Player Avatar)
         eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
 
-        //FOOTER
+        // FOOTER
         StringBuilder foot = new StringBuilder();
         eb.setFooter(foot.toString());
 
