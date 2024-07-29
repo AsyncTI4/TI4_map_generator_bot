@@ -281,11 +281,15 @@ public class TurnStart extends PlayerSubcommandData {
         for (Integer SC : player.getSCs()) {
             if (!game.getPlayedSCs().contains(SC)) {
                 hadAnyUnplayedSCs = true;
+                String name = Helper.getSCName(SC, game);
+                if (game.getName().equalsIgnoreCase("pbd1000")) {
+                    name = name + "(" + SC + ")";
+                }
                 if (game.isHomebrewSCMode()) {
-                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + Helper.getSCName(SC, game));
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + name);
                     startButtons.add(strategicAction);
                 } else {
-                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + Helper.getSCName(SC, game))
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + name)
                         .withEmoji(Emoji.fromFormatted(Emojis.getSCEmojiFromInteger(SC)));
                     startButtons.add(strategicAction);
                 }

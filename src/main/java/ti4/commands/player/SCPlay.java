@@ -351,7 +351,10 @@ public class SCPlay extends PlayerSubcommandData {
             conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability (" + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
         }
         conclusionButtons.add(deleteButton);
-        conclusionButtons.add(Button.danger("endTurnWhenAllReactedTo_" + scToPlay, "End turn When All Have Reacted"));
+        conclusionButtons.add(Button.danger("endTurnWhenAllReactedTo_" + scToPlay, "End Turn When All Have Reacted"));
+        if (player.hasTech("fl")) {
+            conclusionButtons.add(Button.danger("fleetLogWhenAllReactedTo_" + scToPlay, "Use Fleet Logistics When All Have Reacted"));
+        }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!game.isHomebrewSCMode() && player.hasAbility("grace")
             && !player.getExhaustedAbilities().contains("grace")
