@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.async.CustomizationsHelper;
 import ti4.helpers.async.NotepadHelper;
@@ -37,7 +38,7 @@ public class AnnotationHandler {
     private static <H extends Annotation> List<Class<?>> classesToCheck(Class<H> handlerClass) {
         List<Class<?>> classesWithHandlers = new ArrayList<>();
         // Async
-        classesWithHandlers.addAll(List.of(RoundSummaryHelper.class, WhisperHelper.class, NotepadHelper.class, CustomizationsHelper.class));
+        classesWithHandlers.addAll(List.of(RoundSummaryHelper.class, WhisperHelper.class, NotepadHelper.class, CustomizationsHelper.class, ButtonHelper.class));
 
         // Homebrew
         classesWithHandlers.addAll(List.of(IgnisAuroraHelperTechs.class));

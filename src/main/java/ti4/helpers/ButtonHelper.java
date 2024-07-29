@@ -51,6 +51,7 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -100,6 +101,7 @@ import ti4.generator.TileHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -3115,10 +3117,10 @@ public class ButtonHelper {
 
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
         if (event != null && event instanceof ButtonInteractionEvent bevent)
-            deleteTheOneButton(bevent, true);
+            deleteTheOneButton(bevent, bevent.getButton().getId(), true);
     }
 
-    public static void deleteTheOneButton(ButtonInteractionEvent event, boolean deleteMsg) {
+    public static void deleteTheOneButton(ButtonInteractionEvent event, String buttonID, boolean deleteMsg) {
         if (event == null)
             return;
         String exhaustedMessage = event.getMessage().getContentRaw();
@@ -3131,7 +3133,19 @@ public class ButtonHelper {
         String id2 = "br";
         for (ActionRow row : event.getMessage().getActionRows()) {
             List<ItemComponent> buttonRow = row.getComponents();
+            List<ItemComponent> buttonRow2 = new ArrayList<>();
+            buttonRow2.addAll(buttonRow);
             int buttonIndex = buttonRow.indexOf(event.getButton());
+            int counter = 0;
+            for (ItemComponent item : buttonRow2) {
+                if (item instanceof Button b) {
+                    if (b.getId().equalsIgnoreCase(buttonID)) {
+                        buttonIndex = counter;
+                    }
+                    counter++;
+                }
+            }
+
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
             }
@@ -5524,13 +5538,64 @@ public class ButtonHelper {
         doAll = Button.secondary(finChecker + "riftAllUnits_" + tile.getPosition(), "Rift all units");
         concludeMove1 = Button.primary("getDamageButtons_" + tile.getPosition() + "_remove",
             "Remove excess infantry/fighters");
-        concludeMove = Button.danger("deleteButtons", "Done rifting units and removing excess capacity");
+        concludeMove = Button.danger("doneRifting", "Done rifting units and removing excess capacity");
 
         buttons.add(doAll);
         buttons.add(concludeMove1);
         buttons.add(concludeMove);
 
         return buttons;
+    }
+
+    @ButtonHandler("doneRifting")
+    public static void doneRifting(Game game, Player player, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        Tile tile = null;
+        if (game.getActiveSystem() != null) {
+            tile = game.getTileByPosition(game.getActiveSystem());
+        }
+        if (tile != null && tile.getTileID().equalsIgnoreCase("82b")) {
+            for (Player p : game.getRealPlayers()) {
+                if (FoWHelper.playerHasUnitsInSystem(p, tile)) {
+                    return;
+                }
+            }
+            String msg = player.getRepresentation() + " if mallice was improperly unlocked during this action, you can use the button below to unflip it";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("unflipMallice", "Unflip Mallice"));
+            buttons.add(Button.danger("deleteButtons", "Leave it alone"));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
+        }
+    }
+
+    @ButtonHandler("unflipMallice")
+    public static void unflipMallice(Game game, Player player, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+
+        if (player.getPlanets().contains("mallice")) {
+            player.removePlanet("mallice");
+        }
+        Tile tile = game.getTileFromPlanet("mallice");
+
+        if (tile != null && "82b".equals(tile.getTileID())) {
+            String position = tile.getPosition();
+            game.removeTile(position);
+            String planetTileName = AliasHandler.resolveTile("82a");
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                return;
+            }
+
+            String tileName = Mapper.getTileID(planetTileName);
+            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            if (tilePath == null) {
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                return;
+            }
+            tile = new Tile(planetTileName, position);
+            game.setTile(tile);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Unflipped mallice");
+        }
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {
@@ -7778,11 +7843,24 @@ public class ButtonHelper {
     public static void endTurnWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String sc = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            game.getPing() + " the active player has elected to end turn once everyone has resolved "
+            game.getPing() + " the active player has elected to move the game along after everyone has resolved "
                 + Helper.getSCName(Integer.parseInt(sc), game) + ". Please resolve it as soon as possible so the game may progress.");
         game.setTemporaryPingDisable(true);
         game.setStoredValue("endTurnWhenSCFinished", sc + player.getFaction());
         ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteTheOneButton(event, "fleetLogWhenAllReactedTo_" + sc, true);
+    }
+
+    @ButtonHandler("fleetLogWhenAllReactedTo_")
+    public static void fleetLogWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String sc = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+            game.getPing() + " the active player has elected to move the game along after everyone has resolved "
+                + Helper.getSCName(Integer.parseInt(sc), game) + ". Please resolve it as soon as possible so the game may progress.");
+        game.setTemporaryPingDisable(true);
+        game.setStoredValue("fleetLogWhenSCFinished", sc + player.getFaction());
+        ButtonHelper.deleteTheOneButton(event);
+        ButtonHelper.deleteTheOneButton(event, "endTurnWhenAllReactedTo_" + sc, true);
     }
 
     public static void resolveTwilightMirror(Game game, Player player, ButtonInteractionEvent event) {
@@ -8636,7 +8714,12 @@ public class ButtonHelper {
             case "PNs" -> {
                 String id = null;
                 int pnIndex;
-                pnIndex = Integer.parseInt(amountToTrans);
+                try{
+                    pnIndex = Integer.parseInt(amountToTrans);
+                }catch(NumberFormatException e){
+                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation()+" heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
+                    return;
+                }
                 for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
                     if (pn.getValue().equals(pnIndex)) {
                         id = pn.getKey();
