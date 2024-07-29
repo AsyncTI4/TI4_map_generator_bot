@@ -1616,13 +1616,13 @@ public class ButtonListener extends ListenerAdapter {
                 case "st" -> { // Sarween Tools
                     player.addSpentThing("sarween");
                     String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-                    ButtonHelper.deleteTheOneButton(event, false);
+                    ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "absol_st" -> { // Absol's Sarween Tools
                     player.addSpentThing("absol_sarween");
                     String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-                    ButtonHelper.deleteTheOneButton(event, false);
+                    ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
                     event.getMessage().editMessage(exhaustedMessage).queue();
                 }
                 case "absol_pa" -> { // Absol's Psychoarcheology
@@ -2953,6 +2953,15 @@ public class ButtonListener extends ListenerAdapter {
             }
 
             GameSaveLoadManager.undo(game, event);
+
+            String msg = "You undid something, the details of which can be found in the undo-log thread";
+            List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {
+                    msg = msg + ": " + threadChannel_.getJumpUrl();
+                }
+            }
+            event.getHook().sendMessage(msg).setEphemeral(true).queue();
 
         } else if (buttonID.startsWith("addIonStorm_")) {
             ButtonHelper.addIonStorm(game, buttonID, event);
@@ -4972,6 +4981,7 @@ public class ButtonListener extends ListenerAdapter {
                             }
                         }
                     }
+
                     GameSaveLoadManager.undo(game, event);
                     if ("action".equalsIgnoreCase(game.getPhaseOfGame())
                         || "agendaVoting".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -4996,6 +5006,7 @@ public class ButtonListener extends ListenerAdapter {
                             }
                         }
                     }
+
                 }
                 // kick
                 case "getDiscardButtonsACs" -> {
