@@ -652,6 +652,9 @@ public class FoWHelper {
 	}
 
 	public static boolean playerHasPlanetsInSystem(Player player, Tile tile) {
+		if (tile == null || player == null) {
+			return false;
+		}
 		for (UnitHolder uH : tile.getPlanetUnitHolders()) {
 			if (player.getPlanetsAllianceMode().contains(uH.getName())) {
 				return true;

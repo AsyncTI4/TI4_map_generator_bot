@@ -3,9 +3,9 @@ package ti4.commands.custom;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -128,9 +128,13 @@ public class CustomizationOptions extends CustomSubcommandData {
         if (showBa != null)
             game.setShowBanners(showBa);
 
-        String hexStyle = event.getOption(Constants.SHOW_HEX_BORDERS, null, OptionMapping::getAsString).toLowerCase();
-        if (hexStyle.equals("dash") || hexStyle.equals("off") || hexStyle.equals("solid")) {
-            game.setHexBorderStyle(hexStyle);
+        String hexStyle = event.getOption(Constants.SHOW_HEX_BORDERS, null, OptionMapping::getAsString);
+        if (hexStyle != null) {
+            hexStyle = hexStyle.toLowerCase();
+            if (hexStyle.equals("dash") || hexStyle.equals("off") || hexStyle.equals("solid")) {
+                game.setHexBorderStyle(hexStyle);
+
+            }
         }
 
         Boolean homebrew = event.getOption(Constants.HOMEBREW_MODE, null, OptionMapping::getAsBoolean);
