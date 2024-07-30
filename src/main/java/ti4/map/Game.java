@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -1251,6 +1251,12 @@ public class Game extends GameProperties {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
             objectiveList.remove(id);
+            int counter = 20;
+            while (revealedPublicObjectives.keySet().contains(id) && objectiveList.size() > 1 && counter > 0) {
+                id = objectiveList.get(0);
+                objectiveList.remove(id);
+                counter = counter - 1;
+            }
             addRevealedPublicObjective(id);
             for (Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
                 if (entry.getKey().equals(id)) {
@@ -3876,8 +3882,8 @@ public class Game extends GameProperties {
             || Mapper.getLeaders().values().stream()
                 .filter(leader -> !leader.getSource().isPok())
                 .anyMatch(leader -> isLeaderInGame(leader.getID()))
-            || (publicObjectives1!= null && publicObjectives1.size() < 5 && getRound() >= 4)
-            || (publicObjectives2!= null && publicObjectives2.size() < (getRound() - 4))
+            || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
+            || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()
                 .anyMatch(player -> player.getSecretVictoryPoints() > 3
                     && !player.getRelics().contains("obsidian"))

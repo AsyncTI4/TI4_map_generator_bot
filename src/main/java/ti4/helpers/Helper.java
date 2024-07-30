@@ -2814,7 +2814,7 @@ public class Helper {
 
     private static void addGameRoleToMapPlayers(Guild guild, Game game, Role role) {
         for (String playerID : game.getPlayerIDs()) {
-            if (game.getRound() > 1 && game.getPlayer(playerID).getFaction() == null) {
+            if (game.getRound() > 1 && !game.getPlayer(playerID).isRealPlayer()) {
                 continue;
             }
             Member member = guild.getMemberById(playerID);
