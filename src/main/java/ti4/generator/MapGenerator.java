@@ -4222,31 +4222,31 @@ public class MapGenerator {
                     switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase())
                     {
                         case "TYPE05": // wormhole + planet
-                            tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+162, TILE_PADDING+166, null);
+                            tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+202, TILE_PADDING+206, null);
                             break;
                         case "TYPE08": // empties
-                            tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+132, TILE_PADDING+110, null);
+                            tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+172, TILE_PADDING+150, null);
                             break;
                         case "TYPE09": // spirals
                             switch (tile.getTileID())
                             {
                                 case "82b":
-                                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+95, TILE_PADDING+249, null);
-                                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+169, TILE_PADDING+273, null);
+                                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+135, TILE_PADDING+289, null);
+                                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+209, TILE_PADDING+313, null);
                                     break;
                                 default:
-                                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+86, TILE_PADDING+260, null);
+                                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+126, TILE_PADDING+300, null);
                             }
                             break;
                         default:
-                            tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+86, TILE_PADDING+260, null);
+                            tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+126, TILE_PADDING+300, null);
                             
                     }
                 }
                 if (reconstruction
                     && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA)))
                 {
-                    BufferedImage doubleWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_beta.png"));
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f/65);
                     switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase())
                     {
                         case "TYPE05": // wormhole + planet
@@ -4273,7 +4273,7 @@ public class MapGenerator {
                 if (reconstruction
                     && (Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA)))
                 {
-                    BufferedImage doubleWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_alpha.png"));
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f/65);
                     switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase())
                     {
                         case "TYPE05": // wormhole + planet
@@ -4302,8 +4302,8 @@ public class MapGenerator {
                     && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))) // avoid doubling up, which is important when using the transparent symbol
                 {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+95, TILE_PADDING+249, null);
-                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+169, TILE_PADDING+273, null);
+                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+135, TILE_PADDING+289, null);
+                    tileGraphics.drawImage(blockedWormholeImage, TILE_PADDING+209, TILE_PADDING+313, null);
                 }
             }
             case Extras -> {
@@ -4878,16 +4878,16 @@ public class MapGenerator {
                     && (tokenPath.toLowerCase().contains("alpha") || tokenPath.toLowerCase().contains("beta")))
                 {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX, drawY + offsetY, null);
+                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
                 }
                 if (reconstruction && tokenPath.toLowerCase().contains("alpha"))
                 {
-                    BufferedImage doubleWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_beta.png"));
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f/65);
                     tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
                 }
                 if (reconstruction && tokenPath.toLowerCase().contains("beta"))
                 {
-                    BufferedImage doubleWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_alpha.png"));
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f/65);
                     tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
@@ -4896,7 +4896,7 @@ public class MapGenerator {
                     && (tokenPath.toLowerCase().contains("alpha") || tokenPath.toLowerCase().contains("beta")))
                 {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX, drawY + offsetY, null);
+                    tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
                 }
             }
         }
