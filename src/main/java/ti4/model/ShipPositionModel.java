@@ -48,6 +48,18 @@ public class ShipPositionModel {
             };
         }
 
+        public Point getWormholeLocation() {
+            return switch (this) {
+                case TYPE05 -> new Point(162, 166); // planet and wormhole
+                case TYPE07 -> new Point(172, 32); // 1 planet bottom left
+                case TYPE08 -> new Point(132, 110); // empty and wormhole
+                case TYPE13 -> new Point(139, 186); // Eko
+                case TYPE14 -> new Point(152, 124); // Horace
+                
+                default -> null;
+            };
+        }
+
         public String getName() {
             return switch (this) {
                 // HS system layouts
