@@ -5095,6 +5095,10 @@ public class MapGenerator {
                 }
 
                 tileGraphics.drawImage(unitImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                if (unitKey.getUnitType() == UnitType.Mech && (ButtonHelper.isLawInPlay(game, "articles_war") || ButtonHelper.isLawInPlay(game, "absol_articleswar"))) {
+                    BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_articles_of_war"+getBlackWhiteFileSuffix(unitKey.getColorID())));
+                    tileGraphics.drawImage(mechTearImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                }
                 if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
                     tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 }
