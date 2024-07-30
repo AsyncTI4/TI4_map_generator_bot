@@ -2,6 +2,7 @@ package ti4.commands.status;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -622,7 +623,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
                         false)) {
                         Tile tile2 = game.getTileByPosition(pos);
-                        if (FoWHelper.playerHasPlanetsInSystem(player, tile2)) {
+                        if (tile2 != null && FoWHelper.playerHasPlanetsInSystem(player, tile2)) {
                             count++;
                             break;
                         }

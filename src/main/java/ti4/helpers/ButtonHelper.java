@@ -6304,7 +6304,12 @@ public class ButtonHelper {
     public static boolean isNumeric(String strNum) {
         if (strNum == null)
             return false;
-        return Pattern.compile(RegexHelper.intRegex(strNum)).matcher(strNum).matches();
+        try {
+            int d = Integer.parseInt(strNum);
+            return true;
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
     }
 
     public static void rematch(Game game, GenericInteractionCreateEvent event) {
@@ -8375,7 +8380,11 @@ public class ButtonHelper {
             opposing = p1;
         }
         String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
-            + "\n Click something else for " + p1.getRepresentation(false, false) + " to offer";
+            + "\n## Click something else that you want to request from " + p1.getRepresentation(false, false);
+        if (p1 == player) {
+            message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
+                + "\n## Click something else that YOU want to offer";
+        }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message,
             ButtonHelper.getStuffToTransButtonsNew(game, player, p1, p2));
@@ -8391,7 +8400,11 @@ public class ButtonHelper {
             opposing = p1;
         }
         String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
-            + "\n Click something for " + p1.getRepresentation(false, false) + " to offer";
+            + "\n## Click something that you want to request from " + p1.getRepresentation(false, false);
+        if (p1 == player) {
+            message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
+                + "\n## Click something that YOU want to offer";
+        }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message,
             ButtonHelper.getStuffToTransButtonsNew(game, player, p1, p2));
@@ -8714,10 +8727,10 @@ public class ButtonHelper {
             case "PNs" -> {
                 String id = null;
                 int pnIndex;
-                try{
+                try {
                     pnIndex = Integer.parseInt(amountToTrans);
-                }catch(NumberFormatException e){
-                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation()+" heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
+                } catch (NumberFormatException e) {
+                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
                     return;
                 }
                 for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
