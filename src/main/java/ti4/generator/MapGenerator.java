@@ -3492,6 +3492,8 @@ public class MapGenerator {
         Map<String, Integer> customPublicVP = game.getCustomPublicVP();
         Map<String, String> customPublics = customPublicVP.keySet().stream()
             .collect(Collectors.toMap(key -> key, name -> {
+                name = name.replace("extra1", "");
+                name = name.replace("extra2", "");
                 String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
                 return nameOfPO != null ? nameOfPO : name;
             }, (key1, key2) -> key1, LinkedHashMap::new));
@@ -3682,6 +3684,8 @@ public class MapGenerator {
         Map<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
 
         for (String id : secrets.keySet()) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         if (player.isSearchWarrant()) {
@@ -3691,10 +3695,14 @@ public class MapGenerator {
         }
         Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
             secretsScored.remove(id);
         }
         Map<String, Integer> revealedSecretObjectives = new LinkedHashMap<>(secretsScored);
         for (String id : secretsScored.keySet()) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);

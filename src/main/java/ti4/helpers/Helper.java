@@ -1414,7 +1414,7 @@ public class Helper {
             } else {
                 count = Integer.parseInt(thing.split("_")[1]);
             }
-            if (flavor.contains("tg")) {
+            if (flavor.contains("tg") && !flavor.contains("dsgh")) {
                 votes = votes + count * 2;
             } else {
                 votes = votes + count;

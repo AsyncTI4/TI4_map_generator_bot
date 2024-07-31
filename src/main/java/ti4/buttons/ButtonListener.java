@@ -2789,7 +2789,7 @@ public class ButtonListener extends ListenerAdapter {
                     + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 ButtonHelper.checkTransactionLegality(game, player, p2);
-                ButtonHelper.deleteMessage(event); 
+                ButtonHelper.deleteMessage(event);
             }
         } else if (buttonID.startsWith("getNewTransaction_")) {
             ButtonHelper.getNewTransaction(game, player, buttonID, event);
@@ -2808,7 +2808,7 @@ public class ButtonListener extends ListenerAdapter {
                     + p2.getRepresentation(false, false));
                 player.clearTransactionItemsWith(p2);
                 ButtonHelper.deleteMessage(event);
-            } 
+            }
         } else if (buttonID.startsWith("acceptOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             Helper.acceptTransactionOffer(p1, player, game, event);
@@ -4659,7 +4659,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "mitosisMech" -> ButtonHelperAbilities.resolveMitosisMech(buttonID, event, game, player,
                     ident, finsFactionCheckerPrefix);
-                case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, false, false, true, false);
+                case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, false, true, false);
                 case "cardsInfo" -> CardsInfo.sendCardsInfo(game, player, event);
                 case "showGameAgain" -> ShowGame.simpleShowGame(game, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, game, player, ident);
