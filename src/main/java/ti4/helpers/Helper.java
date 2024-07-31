@@ -1238,7 +1238,7 @@ public class Helper {
             Button button;
             String label = getSCName(sc, game);
             if (game.getScTradeGoods().get(sc) > 0 && !game.isFowMode()) {
-                label += " [has " + game.getScTradeGoods().get(sc) + " Trade Good" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
+                label += " [Has " + game.getScTradeGoods().get(sc) + " Trade Good" + (game.getScTradeGoods().get(sc) == 1 ? "" : "s") + "]";
             }
             if (sc == ButtonHelper.getKyroHeroSC(game)) {
                 label += " - Kyro Hero Cursed";
