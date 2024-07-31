@@ -8762,7 +8762,7 @@ public class ButtonHelper {
                     } else {
                         sendAlliance = true;
                         if (game.getPNOwner(id).hasLeaderUnlocked("bentorcommander")) {
-                            p2.setCommoditiesTotal(p2.getCommodities() + 1);
+                            p2.setCommoditiesTotal(p2.getCommoditiesTotal() + 1);
                         }
                     }
                 }

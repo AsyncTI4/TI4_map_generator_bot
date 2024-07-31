@@ -3492,6 +3492,8 @@ public class MapGenerator {
         Map<String, Integer> customPublicVP = game.getCustomPublicVP();
         Map<String, String> customPublics = customPublicVP.keySet().stream()
             .collect(Collectors.toMap(key -> key, name -> {
+                name = name.replace("extra1", "");
+                name = name.replace("extra2", "");
                 String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
                 return nameOfPO != null ? nameOfPO : name;
             }, (key1, key2) -> key1, LinkedHashMap::new));
@@ -3682,6 +3684,8 @@ public class MapGenerator {
         Map<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
 
         for (String id : secrets.keySet()) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         if (player.isSearchWarrant()) {
@@ -3691,10 +3695,14 @@ public class MapGenerator {
         }
         Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
             secretsScored.remove(id);
         }
         Map<String, Integer> revealedSecretObjectives = new LinkedHashMap<>(secretsScored);
         for (String id : secretsScored.keySet()) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);
@@ -4180,7 +4188,17 @@ public class MapGenerator {
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 if (tile.isAnomaly(game)) {
                     BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
-                    tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
+                    int offset = 0;
+                    switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase())
+                    {
+                        case "TYPE09":
+                        case "TYPE12":
+                        case "TYPE15":
+                            tileGraphics.drawImage(anomalyImage, TILE_PADDING+36, TILE_PADDING+43, null);
+                            break;
+                        default:
+                            tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
+                    }
                 }
 
                 // ADD HEX BORDERS FOR CONTROL
@@ -4303,6 +4321,35 @@ public class MapGenerator {
                 {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
+                }
+                if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula())
+                {
+                    BufferedImage nebulaBypass = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
+                    if (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().isSpiral())
+                    {
+                        switch (tile.getTileID())
+                        {
+                            case "51":
+                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 235, null);
+                                break;
+                            case "82b":
+                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 30, TILE_PADDING + 221, null);
+                                break;
+                            case "82a":
+                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 63, TILE_PADDING + 273, null);
+                                break;
+                            default:
+                                tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 99, TILE_PADDING + 294, null);
+                        }
+                    }
+                    else if (tile.isHomeSystem())
+                    {
+                        tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 193, null);
+                    }
+                    else
+                    {
+                        tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 80, TILE_PADDING + 236, null);
+                    }
                 }
             }
             case Extras -> {
