@@ -29,12 +29,12 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
     private static final String FACTION_WON_FILTER = "faction_won";
 
     public FactionRecordOfSCPick() {
-        super(Constants.FACTION_RECORD_OF_SCPICK, "# of times a tech has been acquired by a faction");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want History Of").setRequired(true).setAutoComplete(true));
+        super(Constants.FACTION_RECORD_OF_SCPICK, "Number of times a technology has been acquired by a faction.");
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want the technology history of").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
-        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
-        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
+        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, PoK, absol, DS, action_deck_2, little_omega"));
+        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog of war game"));
         addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, FACTION_WON_FILTER, "Only include games where the faction won"));
 
@@ -55,7 +55,7 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
         String faction = event.getOption(Constants.FACTION, "eh", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No faction known as " + faction + ".");
             return "bleh";
         }
         boolean onlyIncludeWins = event.getOption(FACTION_WON_FILTER, false, OptionMapping::getAsBoolean);
