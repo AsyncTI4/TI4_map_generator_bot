@@ -4316,7 +4316,7 @@ public class MapGenerator {
                     drawOnWormhole(tile, tileGraphics, doubleWormholeImage, 0, "b");
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                    && (tile.getTileID().equals("82a"))
+                    && (tile.getTileID().equals("82b"))
                     && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))) // avoid doubling up, which is important when using the transparent symbol
                 {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
@@ -4937,7 +4937,7 @@ public class MapGenerator {
                     tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
-                    && (tile.getTileID().equals("82a"))
+                    && (tile.getTileID().equals("82b"))
                     && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban")) // avoid doubling up, which is important when using the transparent symbol
                     && (tokenPath.toLowerCase().contains("alpha") || tokenPath.toLowerCase().contains("beta")))
                 {
