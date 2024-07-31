@@ -872,8 +872,10 @@ public class AgendaHelper {
                     TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
                     for (Player playerB : comrades) {
                         MessageHelper.sendMessageToChannel(watchPary,
-                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + "TGs to the less economically fortunate citizens of the galaxy.");
+                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
                     }
+                    MessageHelper.sendMessageToChannel(watchPary,
+                        Emojis.tg.repeat(maxLoss));
                 }
             }
             if ("crisis".equalsIgnoreCase(agID)) {
