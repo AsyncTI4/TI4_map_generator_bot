@@ -510,6 +510,8 @@ public class Mapper {
     }
 
     public static boolean isValidSecretObjective(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return secretObjectives.containsKey(id);
     }
 
