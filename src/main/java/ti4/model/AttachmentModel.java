@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.model.Source.ComponentSource;
 
 @Data
-public class AttachmentModel implements ModelInterface {
+public class AttachmentModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String name;
     private String imagePath;
@@ -41,18 +43,6 @@ public class AttachmentModel implements ModelInterface {
         return Optional.ofNullable(name).orElse(id);
     }
 
-    public String getRepresentation() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getId());
-        if (name != null) sb.append (" ").append(getName());
-        if (resourcesModifier != 0) sb.append(" R" + resourcesModifier);
-        if (influenceModifier != 0) sb.append(" I" + influenceModifier);
-
-        if (isLegendary) sb.append(" Legendary ");
-        if (isFakeAttachment) sb.append(" [FAKE]");
-        return getName() + " ";
-    }
-
     public boolean isFakeAttachment() {
         return Optional.ofNullable(isFakeAttachment).orElse(false);
     }
@@ -67,5 +57,48 @@ public class AttachmentModel implements ModelInterface {
 
     public Optional<String> getToken() {
         return Optional.ofNullable(token);
+    }
+
+    @Override
+    public String getAutoCompleteName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getId());
+        if (name != null) sb.append (" ").append(getName());
+        if (resourcesModifier != 0) sb.append(" R" + resourcesModifier);
+        if (influenceModifier != 0) sb.append(" I" + influenceModifier);
+
+        if (isLegendary()) sb.append(" Legendary ");
+        if (isFakeAttachment()) sb.append(" [FAKE]");
+        return getName() + " ";
+    }
+
+    @Override
+    public MessageEmbed getRepresentationEmbed() {
+        EmbedBuilder eb = new EmbedBuilder();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("__").append(getName()).append("__");
+        eb.setTitle(sb.toString());
+
+
+        sb = new StringBuilder();
+        eb.setDescription(sb.toString());
+
+        sb = new StringBuilder();
+        sb.append("ID: ").append(getId());
+        sb.append(" Source: ").append(getSource());
+        eb.setFooter(sb.toString());
+
+        return eb.build();
+    }
+
+    @Override
+    public boolean search(String searchString) {
+        return getName().contains(searchString)
+            || getId().contains(searchString)
+            || (isLegendary() && "legendary".contains(searchString))
+            || getSource().toString().contains(searchString)
+            || getAutoCompleteName().contains(searchString);
+
     }
 }
