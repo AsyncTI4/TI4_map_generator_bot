@@ -867,13 +867,15 @@ public class AgendaHelper {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    game.getPing() + " Set everyone's TGs to " + finalTG);
-                if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
+                    game.getPing() + " Set all players' trade goods to " + finalTG + ".");
+                if (comrades.size() > 0 && AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
                     TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
                     for (Player playerB : comrades) {
                         MessageHelper.sendMessageToChannel(watchPary,
-                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + "TGs to the less economically fortunate citizens of the galaxy.");
+                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
                     }
+                    MessageHelper.sendMessageToChannel(watchPary,
+                        Emojis.tg.repeat(maxLoss));
                 }
             }
             if ("crisis".equalsIgnoreCase(agID)) {
