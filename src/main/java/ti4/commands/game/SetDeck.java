@@ -31,6 +31,7 @@ public class SetDeck extends GameSubcommandData {
         addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
         addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
         addDefaultOption(Constants.TECHNOLOGY_DECK, "Technology");
+        addOptions(new OptionData(OptionType.STRING, "reset_deck", "True to completely reset deck"));
     }
 
     @Override
