@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -232,38 +234,6 @@ public class Game extends GameProperties {
         neutral.setUnitsOwned(playerOwnedUnits);
 
         return neutral;
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer(String fallbackColor) {
-        if (players.get("572698679618568193") != null)
-            return players.get("572698679618568193");
-        return setupNeutralPlayer(fallbackColor);
-    }
-
-    @JsonIgnore
-    public Player getNeutralPlayer() {
-        if (players.get("572698679618568193") != null)
-            return players.get("572698679618568193");
-        return null;
-    }
-
-    public String pickNeutralColorID(List<String> exclusions) {
-        // Start with the preferred colors, but then add all the colors to the list anyway
-        List<String> colorPriority = new ArrayList<>(List.of("gray", "red", "blue", "green", "orange", "yellow", "black", "pink", "purple", "rose", "lime", "brown", "teal", "spring", "petrol", "lightgray"));
-        colorPriority.addAll(Mapper.getColorNames());
-        List<String> preferredNeutralColors = new ArrayList<>(colorPriority.stream().map(Mapper::getColorID).toList());
-
-        // Build the full set of exclusions based on the argument plus the list of players
-        Set<String> excludedColorIDs = new HashSet<>(exclusions);
-        excludedColorIDs.addAll(getPlayers().values().stream().map(Player::getColorID).toList());
-
-        // Finally, pick a color
-        String neutralColorID = preferredNeutralColors.stream().filter(colorID -> !excludedColorIDs.contains(colorID)).findFirst().orElse(null);
-        if (neutralColorID == null) {
-            MessageHelper.sendMessageToChannel(getActionsChannel(), "Could not determine a good neutral unit color " + Constants.jazzPing());
-        }
-        return neutralColorID;
     }
 
     public int getNumberOfSOsInTheDeck() {
@@ -2828,23 +2798,29 @@ public class Game extends GameProperties {
         return true;
     }
 
+    public void resetActionCardDeck(DeckModel deck) {
+        setActionCards(deck.getNewShuffledDeck());
+        getDiscardActionCards().clear();
+        for (Player player : getPlayers().values()) {
+            player.getActionCards().clear();
+        }
+    }
+
     public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         boolean shuffledExtrasIn = false;
-        List<String> oldDeck = new ArrayList<>();
-        oldDeck.addAll(Mapper.getDeck(getAcDeckID()).getNewShuffledDeck());
-        List<String> newDeck = new ArrayList<>();
+        List<String> oldDeck = new ArrayList<>(Mapper.getDeck(getAcDeckID()).getNewShuffledDeck());
         setAcDeckID(deck.getAlias());
-        newDeck.addAll(deck.getNewShuffledDeck());
+        List<String> newDeck = new ArrayList<>(deck.getNewShuffledDeck());
         for (String ac : oldDeck) {
             newDeck.remove(ac);
         }
-        if (getDiscardActionCards().size() > 0) {
+        if (!getDiscardActionCards().isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
             shuffledExtrasIn = true;
         } else {
             for (Player player : getPlayers().values()) {
-                if (player.getActionCards().size() > 0) {
+                if (!player.getActionCards().isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
                     shuffledExtrasIn = true;
@@ -2865,7 +2841,7 @@ public class Game extends GameProperties {
 
     public boolean validateAndSetRelicDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         for (Player player : getPlayers().values()) {
-            if (player.getRelics().size() > 0) {
+            if (!player.getRelics().isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change relic deck to **"
                     + deck.getName() + "** while there are relics in player hands.");
                 return false;
