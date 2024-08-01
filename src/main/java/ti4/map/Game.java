@@ -2798,16 +2798,15 @@ public class Game extends GameProperties {
         return true;
     }
 
-    public boolean validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
-        boolean resetDeck = event.getOption("reset_deck", false, OptionMapping::getAsBoolean);
-        if (resetDeck) {
-            setActionCards(deck.getNewShuffledDeck());
-            getDiscardActionCards().clear();
-            for (Player player : getPlayers().values()) {
-                player.getActionCards().clear();
-            }
-            return true;
+    public void resetActionCardDeck(DeckModel deck) {
+        setActionCards(deck.getNewShuffledDeck());
+        getDiscardActionCards().clear();
+        for (Player player : getPlayers().values()) {
+            player.getActionCards().clear();
         }
+    }
+
+    public boolean validateAndSetActionCardDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         boolean shuffledExtrasIn = false;
         List<String> oldDeck = new ArrayList<>(Mapper.getDeck(getAcDeckID()).getNewShuffledDeck());
         setAcDeckID(deck.getAlias());

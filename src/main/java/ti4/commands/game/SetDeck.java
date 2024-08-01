@@ -75,8 +75,13 @@ public class SetDeck extends GameSubcommandData {
 
     public static boolean setDeck(SlashCommandInteractionEvent event, Game game, String deckType, DeckModel deckModel) {
         if (Optional.ofNullable(deckModel).isPresent()) {
+            boolean resetDeck = event.getOption("reset_deck", false, OptionMapping::getAsBoolean);
             switch (deckType) {
                 case Constants.AC_DECK -> {
+                    if (resetDeck) {
+                        game.resetActionCardDeck(deckModel);
+                        return true;
+                    }
                     return game.validateAndSetActionCardDeck(event, deckModel);
                 }
                 case Constants.SO_DECK -> {
