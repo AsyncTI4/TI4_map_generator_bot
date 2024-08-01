@@ -50,8 +50,9 @@ public class Planet extends UnitHolder {
             } else if (planetInfo.getPlanetType() != null) {
                 originalPlanetType = planetInfo.getPlanetType().toString();
             }
-
-            contrastColor = planetInfo.getContrastColor().orElse("");
+            if (planetInfo.getContrastColor() != null) {
+                contrastColor = planetInfo.getContrastColor();
+            }
             if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0) {
                 originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString();
                 techSpeciality.addAll(planetInfo.getTechSpecialties().stream().map(x -> x.toString()).toList());
