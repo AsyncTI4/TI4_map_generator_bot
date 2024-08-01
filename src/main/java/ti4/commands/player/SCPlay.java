@@ -450,7 +450,7 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getDiplomacyButtons(int sc) {
-        Button followButton = Button.success("sc_follow_2", "Spend A Strategy CC");
+        Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
         Button diploSystemButton = Button.primary("diploSystem", "Diplo a System");
         Button refreshButton = Button.success("diploRefresh2", "Ready 2 Planets");
 
@@ -459,7 +459,7 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private static List<Button> getPoliticsButtons(int sc) {
-        Button followButton = Button.success("sc_follow_3", "Spend A Strategy CC");
+        Button followButton = Button.success("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         Button draw2AC = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
         return List.of(followButton, noFollowButton, draw2AC);

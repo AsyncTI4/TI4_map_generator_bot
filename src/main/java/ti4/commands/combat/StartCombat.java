@@ -784,16 +784,33 @@ public class StartCombat extends CombatSubcommandData {
         // buttons.add(Button.secondary(finChecker + "mahactStealCC_" + p2.getColor(),
         // "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
         // }
-        if ((p2.hasAbility("for_glory")) && !game.isFowMode()
-            && ButtonHelperAgents.getGloryTokenTiles(game).size() < 3) {
+        if ((p2.hasAbility("glory")) && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
-                .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+                buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            } else {
+                buttons.add(Button.secondary(finChecker + "moveGloryStart_" + pos, "Move Glory Token (Upon Win)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            }
+            if (p2.getStrategicCC() > 0) {
+                buttons.add(Button.secondary(finChecker + "gloryTech", "Research Unit Upgrade (Upon Win)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            }
         }
-        if (p1.hasAbility("for_glory") && ButtonHelperAgents.getGloryTokenTiles(game).size() < 3) {
+        if (p1.hasAbility("glory") && ButtonHelperAgents.getGloryTokenTiles(game).size() < 3) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
-                .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+                buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            } else {
+                buttons.add(Button.secondary(finChecker + "moveGloryStart_" + pos, "Move Glory Token (Upon Win)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            }
+            if (p1.getStrategicCC() > 0) {
+                buttons.add(Button.secondary(finChecker + "gloryTech", "Research Unit Upgrade (Upon Win)")
+                    .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
+            }
         }
 
         if ((p2.hasAbility("collateralized_loans")) && !game.isFowMode()
