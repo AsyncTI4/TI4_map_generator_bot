@@ -1128,7 +1128,8 @@ public class Player {
     }
 
     public void setSecret(String id) {
-
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         Collection<Integer> values = secrets.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
         while (values.contains(identifier)) {
@@ -1138,6 +1139,8 @@ public class Player {
     }
 
     public void setSecret(String id, Integer identifier) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         secrets.put(id, identifier);
     }
 
@@ -1160,6 +1163,8 @@ public class Player {
                 break;
             }
         }
+        idToRemove = idToRemove.replace("extra1", "");
+        idToRemove = idToRemove.replace("extra2", "");
         return Mapper.getSecretObjective(idToRemove);
     }
 
@@ -1171,8 +1176,11 @@ public class Player {
     public Map<String, Integer> getSecretsUnscored() {
         Map<String, Integer> secretsUnscored = new HashMap<>();
         for (Map.Entry<String, Integer> secret : secrets.entrySet()) {
-            if (!secretsScored.containsKey(secret.getKey())) {
-                secretsUnscored.put(secret.getKey(), secret.getValue());
+            String id = secret.getKey();
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
+            if (!secretsScored.containsKey(id)) {
+                secretsUnscored.put(id, secret.getValue());
             }
         }
         return secretsUnscored;
@@ -1186,10 +1194,14 @@ public class Player {
         while (values.contains(identifier) || allIDs.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         secretsScored.put(id, identifier);
     }
 
     public void setSecretScored(String id, Integer identifier) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         secretsScored.put(id, identifier);
     }
 
