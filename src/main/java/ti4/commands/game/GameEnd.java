@@ -207,47 +207,42 @@ public class GameEnd extends GameSubcommandData {
                 message.append(
                     "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
 
-                Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
                 // CREATE POST IN #THE-PBD-CHRONICLES
-                if (publish && !AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).isEmpty()) {
-                    TextChannel pbdChroniclesChannel = AsyncTI4DiscordBot.guildPrimary
-                        .getTextChannelsByName("the-pbd-chronicles", true).get(0);
-                    String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles"
-                        : pbdChroniclesChannel.getAsMention();
-                    if (pbdChroniclesChannel == null) {
-                        BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
+                if (publish) {
+                    TextChannel summaryChannel = getGameSummaryChannel(game);
+                    if (summaryChannel == null) {
+                        BotLogger.log(event, game.isFowMode() ? "`#fow-war-stories`" : "`#the-pbd-chronicles`"
+                            + " channel not found - `/game end` cannot post summary");
                         return;
                     }
-                    if (!game.isFowMode()) {
-                        // INFORM PLAYERS
-                        pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
-                            m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
-                            m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
-                                t -> {
-                                    t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + game.getName() + "** in PBD Chronicles:\n> " + error.getMessage()));
-                                    String endOfGameSummary = "";
+                    // INFORM PLAYERS
+                    summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
+                        m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
+                        m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
+                            t -> {
+                                t.sendMessage(message.toString()).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + game.getName() + "**:\n> " + error.getMessage()));
+                                String endOfGameSummary = "";
 
-                                    for (int x = 1; x < game.getRound() + 1; x++) {
-                                        String summary = "";
-                                        for (Player player : game.getRealPlayers()) {
-                                            String summaryKey = "endofround" + x + player.getFaction();
-                                            if (!game.getStoredValue(summaryKey).isEmpty()) {
-                                                summary += player.getFactionEmoji() + ": " + game.getStoredValue(summaryKey) + "\n";
-                                            }
-                                        }
-                                        if (!summary.isEmpty()) {
-                                            summary = "**__Round " + x + " Secret Summary__**\n" + summary;
-                                            endOfGameSummary = endOfGameSummary + summary;
+                                for (int x = 1; x < game.getRound() + 1; x++) {
+                                    String summary = "";
+                                    for (Player player : game.getRealPlayers()) {
+                                        String summaryKey = "endofround" + x + player.getFaction();
+                                        if (!game.getStoredValue(summaryKey).isEmpty()) {
+                                            summary += player.getFactionEmoji() + ": " + game.getStoredValue(summaryKey) + "\n";
                                         }
                                     }
-                                    if (!endOfGameSummary.isEmpty()) {
-                                        MessageHelper.sendMessageToChannel(t, endOfGameSummary);
+                                    if (!summary.isEmpty()) {
+                                        summary = "**__Round " + x + " Secret Summary__**\n" + summary;
+                                        endOfGameSummary = endOfGameSummary + summary;
                                     }
-                                }); // CREATE THREAD AND POST FOLLOW UP
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                                "Game summary has been posted in the " + channelMention + " channel: " + m.getJumpUrl());
-                        });
-                    }
+                                }
+                                if (!endOfGameSummary.isEmpty()) {
+                                    MessageHelper.sendMessageToChannel(t, endOfGameSummary);
+                                }
+                            }); // CREATE THREAD AND POST FOLLOW UP
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
+                    });
                 }
 
                 // TIGL Extras
@@ -259,6 +254,16 @@ public class GameEnd extends GameSubcommandData {
                 }
             });
 
+    }
+
+    private static TextChannel getGameSummaryChannel(Game game) {
+        if (game.isFowMode()) {
+            Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
+            return AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true).get(0);
+        } else {
+            Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+            return AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
+        }
     }
 
     public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
