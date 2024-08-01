@@ -507,15 +507,32 @@ public class GameStats extends StatisticsSubcommandData {
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         Map<String, Integer> factionWinCount = new HashMap<>();
         Map<String, Integer> factionGameCount = new HashMap<>();
+        Map<String, Integer> factionWinsWithRelics = new HashMap<>();
         for (Game game : filteredGames) {
             Optional<Player> winner = game.getWinner();
             if (winner.isEmpty()) {
                 continue;
             }
+            boolean emphidia = false;
             String winningFaction = winner.get().getFaction();
             factionWinCount.put(winningFaction,
                 1 + factionWinCount.getOrDefault(winningFaction, 0));
-
+            for (Map.Entry<String, List<String>> scoredPOEntry : game.getScoredPublicObjectives().entrySet()) {
+                if (scoredPOEntry.getValue().contains(winner.get().getUserID())) {
+                    String poID = scoredPOEntry.getKey();
+                    if (poID.toLowerCase().contains("emphidia")) {
+                        emphidia = true;
+                    }
+                }
+            }
+            if (winner.get().getRelics().contains("shard") || winner.get().getRelics().contains("obsidian") || emphidia) {
+                factionWinsWithRelics.put(winningFaction,
+                    1 + factionWinsWithRelics.getOrDefault(winningFaction, 0));
+                factionWinsWithRelics.put("allWinners",
+                    1 + factionWinsWithRelics.getOrDefault("allWinners", 0));
+            }
+            factionWinCount.put("allWinners",
+                1 + factionWinCount.getOrDefault("allWinners", 0));
             game.getRealAndEliminatedAndDummyPlayers().forEach(player -> {
                 String faction = player.getFaction();
                 factionGameCount.put(faction,
@@ -542,6 +559,29 @@ public class GameStats extends StatisticsSubcommandData {
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Faction Win Percent", sb.toString());
+
+        StringBuilder sb2 = new StringBuilder();
+        sb2.append("Winning Faction Relic Holding Percent:").append("\n");
+
+        Mapper.getFactions().stream()
+            .map(faction -> {
+                double winCount = factionWinsWithRelics.getOrDefault(faction.getAlias(), 0);
+                double gameCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
+                return Map.entry(faction, gameCount == 0 ? 0 : Math.round(100 * winCount / gameCount));
+            })
+            .filter(entry -> factionGameCount.containsKey(entry.getKey().getAlias()))
+            .sorted(Map.Entry.<FactionModel, Long>comparingByValue().reversed())
+            .forEach(entry -> sb2.append("`")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("%` (")
+                .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
+                .append(" games) ")
+                .append(entry.getKey().getFactionEmoji()).append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append("\n"));
+
+        sb2.append("All winners: " + factionWinsWithRelics.getOrDefault("allWinners", 0) + " wins with relics out of " + factionWinCount.getOrDefault("allWinners", 0) + " total wins");
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Winning Faction Relic Holding Percent", sb2.toString());
     }
 
     private static void showMostPlayedColour(SlashCommandInteractionEvent event) {
