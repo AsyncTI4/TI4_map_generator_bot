@@ -1925,10 +1925,16 @@ public class ButtonHelperAgents {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         UnitHolder spaceAS = tileAS.getUnitHolders().get(Constants.SPACE);
-        if (space.getTokenList().contains("token_ds_glory.png")) {
-            space.removeToken("token_ds_glory.png");
+        String tokenToMove = "";
+        for (String token : space.getTokenList()) {
+            if (token.contains("glory")) {
+                tokenToMove = token;
+            }
         }
-        spaceAS.addToken("token_ds_glory.png");
+        if (space.getTokenList().contains(tokenToMove)) {
+            space.removeToken(tokenToMove);
+        }
+        spaceAS.addToken(tokenToMove);
         String msg = player.getFactionEmoji() + " moved a Glory token from " + tile.getRepresentation() + " to "
             + tileAS.getRepresentation() + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
@@ -1939,26 +1945,46 @@ public class ButtonHelperAgents {
 
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        space.addToken("token_ds_glory.png");
-        String msg = player.getFactionEmoji() + " added a Glory token to " + tile.getRepresentation();
+        List<String> gloryTokens = getGloryTokensLeft(game);
+        if (gloryTokens.size() == 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " cannot place more glory, you've hit the limit");
+            return;
+        }
+        space.addToken(gloryTokens.get(0));
+
+        String msg = player.getFactionEmoji() + " added a Glory token to " + tile.getRepresentation() + ".";
         if (player.getLeaderIDs().contains("kjalengardcommander") && !player.hasLeaderUnlocked("kjalengardcommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "kjalengard", event);
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-        if (player == game.getActivePlayer()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getFactionEmoji()
-                    + " may spend 4 trade goods to RESEARCH a unit upgrade of one of their units in the system.",
-                List.of(Buttons.GET_A_TECH));
-        }
+
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static List<String> getGloryTokensLeft(Game game) {
+        List<String> gloryTokens = new ArrayList<>();
+        gloryTokens.add("token_ds_glory.png");
+        gloryTokens.add("token_ds_glory2.png");
+        gloryTokens.add("token_ds_glory3.png");
+        for (Tile tile : game.getTileMap().values()) {
+            List<String> gloryTokens2 = new ArrayList<>();
+            gloryTokens2.addAll(gloryTokens);
+            for (String glory : gloryTokens2) {
+                if (tile.getUnitHolders().get("space").getTokenList().contains(glory)) {
+                    gloryTokens.remove(glory);
+                }
+            }
+        }
+        return gloryTokens;
     }
 
     public static List<Tile> getGloryTokenTiles(Game game) {
         List<Tile> gloryTiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory.png")) {
+            if (tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory.png")
+                || tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory2.png")
+                || tile.getUnitHolders().get("space").getTokenList().contains("token_ds_glory3.png")) {
                 gloryTiles.add(tile);
             }
         }

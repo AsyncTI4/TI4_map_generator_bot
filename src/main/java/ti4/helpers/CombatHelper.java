@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -451,6 +452,14 @@ public class CombatHelper {
                 for (Die die : resultRolls) {
                     if (die.getResult() > 8) {
                         hitRolls = hitRolls + 2;
+                    }
+                }
+            }
+            if (rollType == CombatRollType.combatround && player.hasAbility("valor") && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                for (Die die : resultRolls) {
+                    if (die.getResult() > 9) {
+                        hitRolls = hitRolls + 1;
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " got an extra hit due to the valor ability (it has been accounted for in the hit count).");
                     }
                 }
             }

@@ -120,7 +120,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                             messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                         }
                         for (String pn : p2.getPromissoryNotesOwned()) {
-                            if (!pn.contains("_")) {
+                            if (!pn.contains(p2.getColor() + "_")) {
                                 messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
                             }
                         }
@@ -156,7 +156,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     }
                     case "pn" -> {
                         for (String pn : p2.getPromissoryNotesOwned()) {
-                            if (!pn.contains("_")) {
+                            if (!pn.contains(p2.getColor() + "_")) {
                                 messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
                             }
                         }
@@ -208,7 +208,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
                     }
                     for (String pn : p2.getPromissoryNotesOwned()) {
-                        if (!pn.contains("_")) {
+                        if (!pn.contains(p2.getColor() + "_")) {
                             messageEmbeds.add(Mapper.getPromissoryNote(pn).getRepresentationEmbed());
                         }
                     }

@@ -104,6 +104,9 @@ public class ButtonHelperModifyUnits {
                         && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                         ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, min, unitName, event);
                     }
+                    if (player.hasAbility("heroism")) {
+                        ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, min, unitName, event);
+                    }
                     if (mentakHero != null) {
                         ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, game, mentakHero, min,
                             unitName, event, tile);
@@ -325,6 +328,9 @@ public class ButtonHelperModifyUnits {
                             || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) || cabalMech)
                         && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planet)) {
                         ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, min, unitName, event);
+                    }
+                    if (player.hasAbility("heroism")) {
+                        ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, min, unitName, event);
                     }
                 }
             }
@@ -708,6 +714,9 @@ public class ButtonHelperModifyUnits {
                                         || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))
                                     && FoWHelper.playerHasShipsInSystem(cabal, tile)) {
                                     ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, min, unitName, event);
+                                }
+                                if (player.hasAbility("heroism") && unitModel.getBaseType().equalsIgnoreCase("fighter")) {
+                                    ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, min, unitName, event);
                                 }
                                 msg = msg + "> Destroyed " + min + " " + unitModel.getUnitEmoji() + "\n";
                                 if (mentakHero != null) {
@@ -2126,7 +2135,9 @@ public class ButtonHelperModifyUnits {
         if (!game.getStoredValue(player.getFaction() + "latestAssignHits").isEmpty()) {
             assignType = game.getStoredValue(player.getFaction() + "latestAssignHits");
         }
+        boolean heroism = player.hasAbility("heroism");
         if (!assignType.toLowerCase().contains("combat")) {
+            heroism = false;
             if (cabal != null && !ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)) {
                 cabal = null;
             }
@@ -2163,6 +2174,9 @@ public class ButtonHelperModifyUnits {
                                     || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))) {
                                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal,
                                     unitEntry.getValue(), unitName, event);
+                            }
+                            if (player.hasAbility("heroism") && unitName.toLowerCase().contains("infantry")) {
+                                ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, unitEntry.getValue(), unitName, event);
                             }
                             if (mentakHero != null) {
                                 ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, game, mentakHero,
@@ -2273,6 +2287,9 @@ public class ButtonHelperModifyUnits {
                 ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, game, mentakHero, amount, unitName,
                     event, tile);
             }
+            if (heroism && unitKey.getUnitType() == UnitType.Fighter) {
+                ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, amount, unitName, event);
+            }
         } else {
             boolean cabalMech = cabal != null
                 && game.getTileByPosition(pos).getUnitHolders().get(planetName).getUnitCount(UnitType.Mech,
@@ -2300,6 +2317,9 @@ public class ButtonHelperModifyUnits {
                 for (int x = 0; x < amount; x++) {
                     ButtonHelper.rollMykoMechRevival(game, player);
                 }
+            }
+            if (heroism && unitKey.getUnitType() == UnitType.Infantry) {
+                ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, amount, unitName, event);
             }
             if (unitKey.getUnitType() == UnitType.Mech && player.hasUnit("cheiran_mech") && !planetName.equalsIgnoreCase("space")) {
                 new AddUnits().unitParsing(event, player.getColor(), tile, amount + " infantry " + planetName, game);
