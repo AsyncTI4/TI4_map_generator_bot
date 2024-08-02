@@ -325,7 +325,7 @@ public class StartCombat extends CombatSubcommandData {
                     autoButtons.add(automate);
                 }
             }
-            if (autoButtons.size() > 0) {
+            if (!autoButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm.", autoButtons);
             }
         }
@@ -343,10 +343,10 @@ public class StartCombat extends CombatSubcommandData {
             pdsMessage.append("In fog of war, it is the players' responsibility to check for PDS2\n");
         }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
-        if (playersWithPds2.size() < 1) {
+        if (playersWithPds2.isEmpty()) {
             return;
         }
-        if (!game.isFowMode() && playersWithPds2.size() > 0) {
+        if (!game.isFowMode() && !playersWithPds2.isEmpty()) {
             pdsMessage.append("These players have units with space cannon offense that can fire at this system:\n");
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append("> ").append(playerWithPds.getRepresentation()).append("\n");
@@ -762,12 +762,12 @@ public class StartCombat extends CombatSubcommandData {
         // }
 
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !game.isFowMode() && isGroundCombat
-            && p1.getFragments().size() > 0) {
+            && !p1.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
                 "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
-        if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && p2.getFragments().size() > 0) {
+        if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && !p2.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
                 "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
@@ -786,7 +786,7 @@ public class StartCombat extends CombatSubcommandData {
         // }
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+            if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
                     .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
             } else {
@@ -800,7 +800,7 @@ public class StartCombat extends CombatSubcommandData {
         }
         if (p1.hasAbility("glory") && ButtonHelperAgents.getGloryTokenTiles(game).size() < 3) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+            if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
                     .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
             } else {

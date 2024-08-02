@@ -7548,7 +7548,7 @@ public class ButtonHelper {
                 if (!preferences.isEmpty()) {
                     preferences = preferences.substring(0, preferences.length() - 2);
                     preferences = player.getRepresentation() + " this is a reminder that at the start of the game, your fellow players stated a preference for the following environments:\n" +
-                        preferences + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play";
+                        preferences + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play.";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), preferences);
                 }
             }

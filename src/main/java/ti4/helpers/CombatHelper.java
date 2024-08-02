@@ -456,11 +456,14 @@ public class CombatHelper {
                 }
             }
             if (rollType == CombatRollType.combatround && player.hasAbility("valor") && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                int crits = 0;
                 for (Die die : resultRolls) {
-                    if (die.getResult() > 9) {
-                        hitRolls = hitRolls + 1;
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " got an extra hit due to the valor ability (it has been accounted for in the hit count).");
-                    }
+                    crits += die.getResult() == 10 ? 1 : 0;
+                }
+                if (crits > 0) {
+                    hitRolls = hitRolls + crits;
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                        + " produced " + crits + " additional hit" + (crits == 1 ? "" : "s") + " due to rolling that many 10s with their Valor faction ability; these have been accounted for in the hit count.");
                 }
             }
             if (unit.getId().equalsIgnoreCase("vaden_flagship") && CombatRollType.bombardment == rollType) {

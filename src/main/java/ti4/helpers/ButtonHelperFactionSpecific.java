@@ -52,15 +52,15 @@ public class ButtonHelperFactionSpecific {
     public static void getTechFromGlory(Player player, Game game, ButtonInteractionEvent event) {
         Player p2 = player;
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.secondary("getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech"));
+        buttons.add(Button.secondary("getAllTechOfType_unitupgrade_noPay", "Research A Unit Upgrade Technoloy"));
         buttons.add(Button.danger("deleteButtons", "Delete This"));
         p2.setStrategicCC(p2.getStrategicCC() - 1);
         MessageChannel channel = p2.getCorrectChannel();
         ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, game, event, "Glory");
         String message0 = p2.getRepresentation(true, true)
-            + "1 CC has been subtracted from your strat pool due to use of glory to acquire the tech of one of the participating units.";
+            + " 1 command token has been spent from your strategy pool due to use of your Glory faction ability. You may now research the unit upgrade technology of one of the participating units.";
         String message = p2.getRepresentation(true, true)
-            + " Use buttons to get a unit upgrade";
+            + " Use buttons to research a unit upgrade.";
         MessageHelper.sendMessageToChannel(channel, message0);
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         ButtonHelper.deleteTheOneButton(event);

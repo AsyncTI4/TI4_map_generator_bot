@@ -1947,7 +1947,7 @@ public class ButtonHelperAgents {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         List<String> gloryTokens = getGloryTokensLeft(game);
         if (gloryTokens.size() == 0) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " cannot place more glory, you've hit the limit");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + ", you cannot place another Glory token, you allready have all 3 on the board.");
             return;
         }
         space.addToken(gloryTokens.get(0));
@@ -2006,7 +2006,7 @@ public class ButtonHelperAgents {
 
     public static List<Button> getMercerAgentInitialButtons(Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        String msgStart = "Use Field Marshal Mercer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on ";
+        String msgStart = "Use Field Marshal Merce On ";
         List<Button> buttons = new ArrayList<>();
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String planetID = planet.getName();
