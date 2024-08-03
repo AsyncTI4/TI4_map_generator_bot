@@ -1544,7 +1544,7 @@ public class ButtonHelperFactionSpecific {
         GenericInteractionCreateEvent event, boolean cabalAgent) {
         String msg = cabal.getRepresentation(true, true) + " has failed to eat " + amount + " of the " + unit
             + "s owned by "
-            + player.getRepresentation() + " because they were blockaded. Wah-wah.";
+            + player.getRepresentation() + " because they were blockaded. Womp Womp.";
         String unitP = AliasHandler.resolveUnit(unit);
         if (unitP.contains("sd") || unitP.contains("pd")
             || (cabal.getAllianceMembers().contains(player.getFaction()) && !cabalAgent)) {
