@@ -1127,7 +1127,7 @@ public class ButtonHelperHeroes {
 
         for (Tile tile : adjTiles) {
             empties.add(Button.primary(finChecker + "cabalHeroTile_" + tile.getPosition(),
-                "Roll for units in " + tile.getRepresentationForButtons(game, player)));
+                "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
         return empties;
     }
@@ -1147,7 +1147,7 @@ public class ButtonHelperHeroes {
                 && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
                 String msg = player.getRepresentation(true, true) + " has failed to eat units owned by "
                     + p2.getRepresentation()
-                    + " because they were blockaded. Womp womp.";
+                    + " because they were blockaded. Womp Womp.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
