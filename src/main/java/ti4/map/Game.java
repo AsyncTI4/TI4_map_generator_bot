@@ -26,8 +26,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +40,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -3084,6 +3083,16 @@ public class Game extends GameProperties {
     @JsonIgnore
     public List<Player> getNotRealPlayers() {
         return getPlayers().values().stream().filter(Player::isNotRealPlayer).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getPlayersWithGMRole() {
+        List<Role> roles = getGuild().getRolesByName(getName() + " GM", true);
+        Role gmRole = roles.isEmpty() ? null : roles.get(0);
+        return getPlayers().values().stream().filter(player -> {
+            Member user = getGuild().getMemberById(player.getUserID());
+            return user != null && user.getRoles().contains(gmRole);
+        }).collect(Collectors.toList());
     }
 
     @JsonIgnore
