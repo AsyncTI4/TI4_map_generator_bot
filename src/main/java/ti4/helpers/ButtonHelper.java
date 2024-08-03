@@ -457,7 +457,7 @@ public class ButtonHelper {
             damaged = true;
         }
         Die d1 = new Die(4);
-        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " tile.getPosition()  + " rolled a " + d1.getResult();
+        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getPosition()  + " rolled a " + d1.getResult();
         if (damaged) {
             msg = "A damaged " + msg;
         }
