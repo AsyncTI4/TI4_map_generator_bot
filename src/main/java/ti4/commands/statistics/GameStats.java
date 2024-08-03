@@ -574,7 +574,7 @@ public class GameStats extends StatisticsSubcommandData {
             .forEach(entry -> sb2.append("`")
                 .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                 .append("%` (")
-                .append(factionGameCount.getOrDefault(entry.getKey().getAlias(), 0))
+                .append(factionWinCount.getOrDefault(entry.getKey().getAlias(), 0))
                 .append(" games) ")
                 .append(entry.getKey().getFactionEmoji()).append(" ")
                 .append(entry.getKey().getFactionNameWithSourceEmoji())

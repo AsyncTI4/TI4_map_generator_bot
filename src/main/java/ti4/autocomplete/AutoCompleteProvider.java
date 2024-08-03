@@ -111,7 +111,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION -> {
+            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6 -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FactionModel> factions = Mapper.getFactions();
                 List<Command.Choice> options;
@@ -158,20 +158,22 @@ public class AutoCompleteProvider {
             }
             case Constants.HUE -> {
                 String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
-                Map<String, String> values = new HashMap<String, String>() {{
-                    put("RED", "Reds");
-                    put("GRAY", "Grays");
-                    put("GRAY", "Greys");
-                    put("GRAY", "Blacks");
-                    put("ORANGE", "Oranges");
-                    put("ORANGE", "Browns");
-                    put("YELLOW", "Yellows");
-                    put("GREEN", "Greens");
-                    put("BLUE", "Blues");
-                    put("PURPLE", "Purples");
-                    put("PINK", "Pinks");
-                    put("ALL", "ALL COLOURS");
-                }};
+                Map<String, String> values = new HashMap<String, String>() {
+                    {
+                        put("RED", "Reds");
+                        put("GRAY", "Grays");
+                        put("GRAY", "Greys");
+                        put("GRAY", "Blacks");
+                        put("ORANGE", "Oranges");
+                        put("ORANGE", "Browns");
+                        put("YELLOW", "Yellows");
+                        put("GREEN", "Greens");
+                        put("BLUE", "Blues");
+                        put("PURPLE", "Purples");
+                        put("PINK", "Pinks");
+                        put("ALL", "ALL COLOURS");
+                    }
+                };
                 List<Command.Choice> options = values.entrySet().stream()
                     .filter(entry -> entry.getValue().toLowerCase().contains(enteredValue))
                     .limit(25)
@@ -181,15 +183,17 @@ public class AutoCompleteProvider {
             }
             case Constants.DECAL_HUE -> {
                 String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
-                Map<String, String> values = new HashMap<String, String>() {{
-                    put("Pattern", "Pattern");
-                    put("Icon", "Icon");
-                    put("Symbol", "Symbol");
-                    put("Texture", "Texture");
-                    put("Line", "Line");
-                    put("Other", "Other");
-                    put("ALL", "ALL DECALS");
-                }};
+                Map<String, String> values = new HashMap<String, String>() {
+                    {
+                        put("Pattern", "Pattern");
+                        put("Icon", "Icon");
+                        put("Symbol", "Symbol");
+                        put("Texture", "Texture");
+                        put("Line", "Line");
+                        put("Other", "Other");
+                        put("ALL", "ALL DECALS");
+                    }
+                };
                 List<Command.Choice> options = values.entrySet().stream()
                     .filter(entry -> entry.getValue().toLowerCase().contains(enteredValue))
                     .limit(25)
