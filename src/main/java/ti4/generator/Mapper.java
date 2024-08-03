@@ -504,24 +504,34 @@ public class Mapper {
     }
 
     public static SecretObjectiveModel getSecretObjective(String id) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
+        if (id != null) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
+        }
         return secretObjectives.get(id);
     }
 
     public static boolean isValidSecretObjective(String id) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
+        if (id != null) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
+        }
         return secretObjectives.containsKey(id);
     }
 
     public static ActionCardModel getActionCard(String id) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
+        if (id != null) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
+        }
         return actionCards.get(id);
     }
 
     public static boolean isValidActionCard(String id) {
+        if (id != null) {
+            id = id.replace("extra1", "");
+            id = id.replace("extra2", "");
+        }
         return actionCards.containsKey(id);
     }
 
