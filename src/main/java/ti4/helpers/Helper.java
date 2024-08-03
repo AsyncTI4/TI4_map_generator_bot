@@ -1313,7 +1313,11 @@ public class Helper {
             }
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
                 getPlanetRepresentation(planet, game));
-            button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit)));
+            String emoji = unit;
+            if (emoji.equalsIgnoreCase("2gf")) {
+                emoji = "infantry";
+            }
+            button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(emoji)));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -2293,16 +2297,12 @@ public class Helper {
         if (includeAbility && Constants.HERO.equals(leader.getType()))
             representation.append("\n").append("**").append(heroAbilityName).append("**"); // add hero ability name
         if (includeAbility)
-            if (leaderAbilityWindow.equalsIgnoreCase("action:"))
-            {
+            if (leaderAbilityWindow.equalsIgnoreCase("action:")) {
                 representation.append("\n*ACTION:*").append(leaderAbilityText); // add ability
-            }
-            else
-            {
+            } else {
                 representation.append("\n*").append(leaderAbilityWindow).append("*\n").append(leaderAbilityText); // add ability
             }
-        if (includeUnlockCondition)
-        {
+        if (includeUnlockCondition) {
             representation.append("\n*UNLOCK:* ").append(leaderUnlockCondition);
         }
 

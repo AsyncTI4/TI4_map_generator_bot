@@ -49,6 +49,7 @@ public class SearchCommand implements Command {
         subcommands.add(new SearchUnits());
         subcommands.add(new SearchCommands());
         subcommands.add(new SearchMyGames());
+        subcommands.add(new SearchForGame());
         subcommands.add(new SearchMyTitles());
         subcommands.add(new SearchAgendas());
         subcommands.add(new SearchEvents());
