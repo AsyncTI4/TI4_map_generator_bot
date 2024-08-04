@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -26,8 +26,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,11 +117,7 @@ public class Game extends GameProperties {
 
     @Getter
     private Map<String, Integer> discardedEvents = new LinkedHashMap<>();
-    //decks
-    // End to do's
-    //
-    //
-    //
+
     private List<String> messageIDsForSaboReacts = new ArrayList<>();
 
     @Getter
