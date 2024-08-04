@@ -67,6 +67,7 @@
     },
     {
         "id": "paradiseworld",
+        "name": "Paradise World",
         "imagePath": "attachment_paradiseworld.png",
         "resourcesModifier": 0,
         "influenceModifier": 2,
@@ -89,6 +90,7 @@
     },
     {
         "id": "richworld",
+        "name": "Rich World",
         "imagePath": "attachment_richworld.png",
         "resourcesModifier": 1,
         "source": "pok"

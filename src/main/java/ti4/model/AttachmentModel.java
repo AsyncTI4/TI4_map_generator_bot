@@ -67,9 +67,9 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         if (resourcesModifier != 0) sb.append(" R" + resourcesModifier);
         if (influenceModifier != 0) sb.append(" I" + influenceModifier);
 
-        if (isLegendary()) sb.append(" Legendary ");
+        if (isLegendary()) sb.append(" Legendary");
         if (isFakeAttachment()) sb.append(" [FAKE]");
-        return getName() + " ";
+        return sb.toString();
     }
 
     @Override
