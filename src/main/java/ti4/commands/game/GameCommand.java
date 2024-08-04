@@ -101,6 +101,7 @@ public class GameCommand implements Command {
         subcommands.add(new WeirdGameSetup());
         subcommands.add(new Swap());
         subcommands.add(new Observer());
+        subcommands.add(new Tags());
         // subcommands.add(new ReverseSpeakerOrder());
         return subcommands;
     }
