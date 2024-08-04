@@ -208,15 +208,6 @@ public class GameEnd extends GameSubcommandData {
             ButtonHelper.offerEveryoneTitlePossibilities(game);
         }
 
-        StringBuilder message = new StringBuilder();
-        for (String playerID : game.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
-            Member member = event.getGuild().getMemberById(playerID);
-            if (member != null)
-                message.append(member.getAsMention()).append(" ");
-        }
-        message.append(
-            "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
-
         TextChannel summaryChannel = getGameSummaryChannel(game);
         if (!game.isFowMode()) {
             // SEND THE MAP IMAGE
@@ -233,7 +224,10 @@ public class GameEnd extends GameSubcommandData {
                     summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
                         m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
                         m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
-                          t -> sendRoundSummariesToThread(t, message.toString(), game));
+                          t -> {
+                            sendFeedbackMessage(t, game);
+                            sendRoundSummariesToThread(t, game);
+                          });
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
                     });
@@ -256,13 +250,13 @@ public class GameEnd extends GameSubcommandData {
             summaryChannel.createThreadChannel(gameName, true).queue( 
                 t -> { 
                     MessageHelper.sendMessageToChannel(t, gameEndText);
-                    sendRoundSummariesToThread(t, message.toString(), game);
+                    sendFeedbackMessage(t, game);
+                    sendRoundSummariesToThread(t, game);
             });
         }
     }
 
-    private static void sendRoundSummariesToThread(ThreadChannel t, String message, Game game) {
-        t.sendMessage(message).queue(null, (error) -> BotLogger.log("Failure to create Game End thread for **" + game.getName() + "**:\n> " + error.getMessage()));
+    private static void sendRoundSummariesToThread(ThreadChannel t, Game game) {
         String endOfGameSummary = "";
 
         for (int x = 1; x < game.getRound() + 1; x++) {
@@ -281,6 +275,19 @@ public class GameEnd extends GameSubcommandData {
         if (!endOfGameSummary.isEmpty()) {
             MessageHelper.sendMessageToChannel(t, endOfGameSummary);
         }
+    }
+
+    private static void sendFeedbackMessage(ThreadChannel t, Game game) {
+        StringBuilder message = new StringBuilder();
+        for (String playerID : game.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
+            Member member = game.getGuild().getMemberById(playerID);
+            if (member != null)
+                message.append(member.getAsMention()).append(" ");
+        }
+        message.append(
+            "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
+        
+        MessageHelper.sendMessageToChannel(t, message.toString());
     }
 
     private static TextChannel getGameSummaryChannel(Game game) {
