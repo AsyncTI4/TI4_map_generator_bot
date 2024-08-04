@@ -242,14 +242,14 @@ public class TechExhaust extends TechAddRemove {
             case "wg" -> { // Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
+                String message = player.getRepresentation(true, true) + " select the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "absol_wg" -> { // Absol's Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
+                String message = player.getRepresentation(true, true) + " select the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
