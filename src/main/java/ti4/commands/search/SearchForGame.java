@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 public class SearchForGame extends SearchSubcommandData {
 
     public SearchForGame() {
-        super(Constants.SEARCH_FOR_GAME, "Get a specific games channels");
+        super(Constants.SEARCH_FOR_GAME, "Get a specific game's channels.");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game to find channels of").setRequired(true).setAutoComplete(true));
     }
 
@@ -23,14 +23,14 @@ public class SearchForGame extends SearchSubcommandData {
         if (option != null) {
             String mapName = option.getAsString();
             if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
+                MessageHelper.replyToMessage(event, "Game with that name does not exists. Use `/search games` to find a game.");
                 return;
             }
             game = GameManager.getInstance().getGame(mapName);
         } else {
             game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
             if (game == null) {
-                MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
+                MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show.");
                 return;
             }
         }
