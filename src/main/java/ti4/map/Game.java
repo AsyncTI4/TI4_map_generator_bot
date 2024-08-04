@@ -483,6 +483,9 @@ public class Game extends GameProperties {
                 put("Homebrew", hasHomebrew());
             }
         };
+        for (String tag : getTags()) {
+            gameModes.put(tag, true);
+        }
         return gameModes.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey)
             .collect(Collectors.joining(", "));
     }
@@ -3926,5 +3929,13 @@ public class Game extends GameProperties {
         return Mapper.getColors().stream()
             .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
             .toList();
+    }
+
+    public boolean addTag(String tag) {
+        return getTags().add(tag);
+    }
+
+    public boolean removeTag(String tag) {
+        return getTags().remove(tag);
     }
 }
