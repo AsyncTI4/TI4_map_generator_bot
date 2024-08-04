@@ -1,0 +1,71 @@
+[
+    {
+        "id": "lloyd_populationgrowth",
+        "imagePath": "attachment_populationgrowth.png",
+        "resourcesModifier": 1,
+        "influenceModifier": 1,
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_planetaryarcologies",
+        "imagePath": "attachment_planetaryarcologies.png",
+        "influenceModifier": 1,
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_industrialboom",
+        "imagePath": "attachment_industrialboom.png",
+        "resourcesModifier": 2,
+        "planetTypes": [
+            "industrial"
+        ],
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_orbitalslingshot",
+        "imagePath": "attachment_orbitalslingshot.png",
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_traderoute",
+        "imagePath": "attachment_traderoute.png",
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_terraformingmilestone",
+        "imagePath": "attachment_terraformingmilestone.png",
+        "resourcesModifier": 2,
+        "influenceModifier": 2,
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_galacticfinancialcenter",
+        "imagePath": "attachment_galacticfinancialcenter.png",
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_culturalboom",
+        "imagePath": "attachment_culturalboom.png",
+        "influenceModifier": 2,
+        "planetTypes": [
+            "cultural"
+        ],
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_interplanetaryhub",
+        "imagePath": "attachment_interplanetaryhub.png",
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_geothermal",
+        "imagePath": "attachment_geothermal.png",
+        "resourcesModifier": 1,
+        "source": "lost_star_charts_of_ixth"
+    },
+    {
+        "id": "lloyd_selfdefense",
+        "imagePath": "attachment_selfdefense.png",
+        "source": "lost_star_charts_of_ixth"
+    }
+]

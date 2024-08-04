@@ -4676,7 +4676,7 @@ public class MapGenerator {
                     tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
                     break;
             }
-            float scale = .95f;
+            float scale = 0.95f;
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                 && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko")
                 && !unitHolder.getName().equalsIgnoreCase("mallice")
@@ -4705,7 +4705,19 @@ public class MapGenerator {
                 }
                 float scale = 0.85f;
                 if (tokenPath.contains(Constants.DMZ_LARGE)) {
-                    scale = 0.6f;
+                    scale = 0.3f;
+                    if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
+                        && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko")
+                        && !unitHolder.getName().toLowerCase().contains("mallice") // includes locked
+                        && !unitHolder.getName().equalsIgnoreCase("domna")) {
+                        scale = 0.53f;
+                    }
+                    if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+                        scale = 0.50f;
+                    }
+                    if (Constants.MECATOLS.contains(unitHolder.getName())) {
+                        scale = 0.61f;
+                    }
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     scale = 1.32f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
@@ -4722,6 +4734,8 @@ public class MapGenerator {
                     position = new Point(position.x + 10, position.y + 10);
                 } else if (tokenID.contains(Constants.WORLD_DESTROYED)) {
                     position = new Point(position.x + 4, position.y + 13);
+                } else if (tokenID.contains(Constants.DMZ_LARGE)) {
+                    position = new Point(position.x, position.y + 10);
                 }
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
             }
@@ -4801,8 +4815,7 @@ public class MapGenerator {
                 if (tokenImage == null)
                     continue;
 
-                if (tokenPath.contains(Constants.DMZ_LARGE) ||
-                    tokenPath.contains(Constants.WORLD_DESTROYED) ||
+                if (tokenPath.contains(Constants.WORLD_DESTROYED) ||
                     tokenPath.contains(Constants.CONSULATE_TOKEN) ||
                     tokenPath.contains(Constants.GLEDGE_CORE) || tokenPath.contains("freepeople")) {
                     if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
@@ -4814,6 +4827,24 @@ public class MapGenerator {
                             TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
                             TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
                     }
+                } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
+                    float scale = 0.3f;
+                    if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
+                        && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko")
+                        && !unitHolder.getName().toLowerCase().contains("mallice") // includes locked
+                        && !unitHolder.getName().equalsIgnoreCase("domna")) {
+                        scale = 0.53f;
+                    }
+                    if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+                        scale = 0.50f;
+                    }
+                    if (Constants.MECATOLS.contains(unitHolder.getName())) {
+                        scale = 0.61f;
+                    }
+                    tokenImage = ImageHelper.readScaled(tokenPath, scale);
+                    tileGraphics.drawImage(tokenImage,
+                        TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
+                        TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2) + 10, null);
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 70, TILE_PADDING + 45, null);
                 } else if (tokenPath.contains("custodiavigilia")) {
