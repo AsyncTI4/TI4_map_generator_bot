@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -84,6 +85,7 @@ public class GameProperties {
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private long autoPingSpacer;
+    private List<String> tags = new ArrayList<String>();
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
