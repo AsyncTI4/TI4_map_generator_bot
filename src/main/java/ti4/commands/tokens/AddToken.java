@@ -1,5 +1,14 @@
 package ti4.commands.tokens;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -9,7 +18,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -17,24 +25,29 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.*;
 
 public class AddToken extends AddRemoveToken {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
 
-        OptionMapping option = event.getOption(Constants.TOKEN);
-        if (option != null) {
-            String tokenName = option.getAsString().toLowerCase();
-            tokenName = AliasHandler.resolveAttachment(tokenName);
-            addToken(event, tile, tokenName, game);
-            game.clearPlanetsCache();
-        } else {
+        String tokenName = event.getOption(Constants.TOKEN, "", OptionMapping::getAsString).toLowerCase();
+        if (tokenName.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
+            return;
         }
+        tokenName = StringUtils.substringBefore(tokenName, " ");
+        tokenName = AliasHandler.resolveAttachment(tokenName);
+        if (!Mapper.isValidToken(tokenName)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Token not found: " + tokenName);
+            return;
+        }
+        addToken(event, tile, tokenName, game);
+        game.clearPlanetsCache();
     }
 
     public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Game game) {

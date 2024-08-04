@@ -212,9 +212,17 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.TOKEN -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Mapper.getTokens().stream()
-                    .filter(token -> token.contains(enteredValue))
+                List<String> tokenNames = Mapper.getTokens().stream()
+                    .map(str -> {
+                        if (Mapper.getAttachmentInfo(str) != null) {
+                            return Mapper.getAttachmentInfo(str).getAutoCompleteName();
+                        }
+                        return str;
+                    })
+                    .toList();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options = tokenNames.stream()
+                    .filter(token -> token.toLowerCase().contains(enteredValue))
                     .limit(25)
                     .map(token -> new Command.Choice(token, token))
                     .collect(Collectors.toList());
