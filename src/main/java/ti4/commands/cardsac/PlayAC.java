@@ -382,9 +382,9 @@ public class PlayAC extends ACCardsSubcommandData {
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
-            codedName = "Shrapnel Turrents";
+            codedName = "Shrapnel Turrets";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveShrapnelTurrents_" + game.getActiveSystem(),
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveShrapnelTurrets_" + game.getActiveSystem(),
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }

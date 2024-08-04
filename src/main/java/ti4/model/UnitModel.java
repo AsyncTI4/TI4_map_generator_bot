@@ -153,45 +153,50 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player, Game game) {
-        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
-            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
-                return 2;
-            }
-            return getAfbDieCount();
-        } else {
-            if (getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
-                return 1;
-            } else {
-                return getAfbDieCount();
-            }
+        if (getCapacityValue() > 0 &&
+                player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction")) &&
+                getExpectedAfbHits() < .6) {
+            return 2;
         }
+        if (getAfbDieCount() == 0 &&
+                isWarsunOrDreadnought() &&
+                game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            return 1;
+        }
+        return getAfbDieCount();
+    }
+
+    private double getExpectedAfbHits() {
+        return getAfbDieCount() * ((10 - getAfbHitsOn()) / 10d);
+    }
+
+    private boolean isWarsunOrDreadnought() {
+        return getBaseType().equalsIgnoreCase("warsun") ||
+                getBaseType().equalsIgnoreCase("dreadnought");
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
         if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
             return getSpaceCannonDieCount();
-        } else {
-            if (getBaseType().equalsIgnoreCase("spacedock")) {
-                return 3;
-            } else {
-                return getSpaceCannonDieCount();
-            }
         }
+        if (getBaseType().equalsIgnoreCase("spacedock")) {
+            return 3;
+        }
+        return getSpaceCannonDieCount();
     }
 
     public int getAfbHitsOn(Player player, Game game) {
-        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
-            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
-                return 9;
-            }
-            return getAfbHitsOn();
-        } else {
-            if (getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
-                return 5;
-            } else {
-                return getAfbHitsOn();
-            }
+        if (getCapacityValue() > 0 &&
+                game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction()) &&
+                getExpectedAfbHits() < .6) {
+            return 8;
         }
+        if (getAfbDieCount() == 0 &&
+                isWarsunOrDreadnought() &&
+                game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            return 5;
+        }
+        return getAfbHitsOn();
     }
 
     public int getSpaceCannonHitsOn(Player player, Game game) {

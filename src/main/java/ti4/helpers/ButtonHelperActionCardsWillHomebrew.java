@@ -392,15 +392,15 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation");
     }
 
-    public static void resolveShrapnelTurrents(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        game.setStoredValue("ShrapnelTurrentsFaction", player.getFaction());
+    public static void resolveShrapnelTurrets(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        game.setStoredValue("ShrapnelTurretsFaction", player.getFaction());
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
         }
-        game.setStoredValue("ShrapnelTurrentsFaction", "");
+        game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();
     }
 
