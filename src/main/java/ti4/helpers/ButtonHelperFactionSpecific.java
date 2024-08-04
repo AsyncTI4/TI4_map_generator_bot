@@ -34,6 +34,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -45,6 +46,24 @@ import ti4.model.ExploreModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
+
+    @ButtonHandler("gloryTech_")
+    public static void getTechFromGlory(Player player, Game game, ButtonInteractionEvent event) {
+        Player p2 = player;
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.secondary("getAllTechOfType_unitupgrade_noPay", "Get A Unit Upgrade Tech"));
+        buttons.add(Button.danger("deleteButtons", "Delete This"));
+        p2.setStrategicCC(p2.getStrategicCC() - 1);
+        MessageChannel channel = p2.getCorrectChannel();
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, game, event, "Glory");
+        String message0 = p2.getRepresentation(true, true)
+            + "1 CC has been subtracted from your strat pool due to use of glory to acquire the tech of one of the participating units.";
+        String message = p2.getRepresentation(true, true)
+            + " Use buttons to get a unit upgrade";
+        MessageHelper.sendMessageToChannel(channel, message0);
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
 
     public static void resolveVadenTgForSpeed(Player player, Game game, GenericInteractionCreateEvent event) {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1525,7 +1544,7 @@ public class ButtonHelperFactionSpecific {
         GenericInteractionCreateEvent event, boolean cabalAgent) {
         String msg = cabal.getRepresentation(true, true) + " has failed to eat " + amount + " of the " + unit
             + "s owned by "
-            + player.getRepresentation() + " because they were blockaded. Wah-wah.";
+            + player.getRepresentation() + " because they were blockaded. Womp Womp.";
         String unitP = AliasHandler.resolveUnit(unit);
         if (unitP.contains("sd") || unitP.contains("pd")
             || (cabal.getAllianceMembers().contains(player.getFaction()) && !cabalAgent)) {

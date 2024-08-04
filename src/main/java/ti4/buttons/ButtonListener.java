@@ -1881,6 +1881,8 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.reverseRider(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("moveGlory_")) {
             ButtonHelperAgents.moveGlory(game, player, event, buttonID);
+        } else if (buttonID.startsWith("moveGloryStart_")) {
+            ButtonHelperAgents.offerMoveGloryOptions(game, player, event);
         } else if (buttonID.startsWith("placeGlory_")) {
             ButtonHelperAgents.placeGlory(game, player, event, buttonID);
         } else if (buttonID.startsWith("rider_")) {
@@ -3581,6 +3583,13 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, leadershipInitiative, game, event);
                     }
                     player.addFollowedSC(leadershipInitiative, event);
+                    if (game.getName().equalsIgnoreCase("pbd1000")) {
+                        for (int sc : player.getUnfollowedSCs()) {
+                            if (sc % 10 == 1) {
+                                player.addFollowedSC(sc, event);
+                            }
+                        }
+                    }
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                     Button doneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
@@ -3817,6 +3826,13 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
                     }
                     player.addFollowedSC(tradeInitiative, event);
+                    if (game.getName().equalsIgnoreCase("pbd1000")) {
+                        for (int sc : player.getUnfollowedSCs()) {
+                            if (sc % 10 == 5) {
+                                player.addFollowedSC(sc, event);
+                            }
+                        }
+                    }
                     ButtonHelperStats.replenishComms(event, game, player, true);
 
                     ButtonHelper.addReaction(event, false, false, message, "");
@@ -3886,6 +3902,13 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, game, event);
                     }
                     player.addFollowedSC(5, event);
+                    if (game.getName().equalsIgnoreCase("pbd1000")) {
+                        for (int sc : player.getUnfollowedSCs()) {
+                            if (sc % 10 == 5) {
+                                player.addFollowedSC(sc, event);
+                            }
+                        }
+                    }
                     ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
                     ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
                     ButtonHelperAgents.cabalAgentInitiation(game, player);
@@ -3953,6 +3976,13 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, game, event);
                     }
                     player.addFollowedSC(5, event);
+                    if (game.getName().equalsIgnoreCase("pbd1000")) {
+                        for (int sc : player.getUnfollowedSCs()) {
+                            if (sc % 10 == 5) {
+                                player.addFollowedSC(sc, event);
+                            }
+                        }
+                    }
                     ButtonHelper.addReaction(event, false, false, "Replenishing and washing", "");
                     ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
                     ButtonHelperAgents.cabalAgentInitiation(game, player);

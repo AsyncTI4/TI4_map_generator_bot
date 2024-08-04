@@ -201,6 +201,7 @@ public class Constants {
     public static final String SEARCH_EXPLORES = "explores";
     public static final String SEARCH_COMMANDS = "commands";
     public static final String SEARCH_MY_GAMES = "my_games";
+    public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
@@ -311,8 +312,8 @@ public class Constants {
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172, 150);
-    public static final Point MIRAGE_POSITION = new Point(175, 55); // 55, 5
-    public static final Point MIRAGE_CENTER_POSITION = new Point(70, 60);
+    public static final Point MIRAGE_POSITION = new Point(172, 43); // 55, 5
+    public static final Point MIRAGE_CENTER_POSITION = new Point(71, 69);
     public static final String MIRAGE = "mirage";
     public static final String SLEEPER = "sleeper";
     public static final String DMZ = "dmz";
@@ -572,6 +573,11 @@ public class Constants {
     public static final String STASIS_INFANTRY = "stasis_infantry";
     public static final String AUTO_SABO_PASS_MEDIAN = "auto_sabo_pass_median";
     public static final String FACTION = "faction";
+    public static final String FACTION2 = "faction2";
+    public static final String FACTION3 = "faction3";
+    public static final String FACTION4 = "faction4";
+    public static final String FACTION5 = "faction5";
+    public static final String FACTION6 = "faction6";
     public static final String AC = "action_cards";
     public static final String ACTION_CARD = "action_card";
     public static final String AC_DECK = "ac_deck";
@@ -1116,6 +1122,7 @@ public class Constants {
     public static final String RESTORE_GAME = "restore_game";
     public static final String SAVE_FILE = "save_file";
     public static final String GAMES = "games";
+    public static final String GAMES_WITH_FACTIONS = "games_with_factions";
     public static final String GAME_STATISTIC = "game_statistic";
     public static final String PLAYER_STATISTIC = "player_statistic";
     public static final String UNDO_TO_BEFORE_COMMAND = "undo_to_before_command";

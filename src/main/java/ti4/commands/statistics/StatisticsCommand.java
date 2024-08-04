@@ -67,6 +67,7 @@ public class StatisticsCommand implements Command {
         subcommands.add(new LifetimeRecord());
         subcommands.add(new FactionRecordOfTech());
         subcommands.add(new FactionRecordOfSCPick());
+        subcommands.add(new GameWinsWithOtherFactions());
         subcommands.add(new StellarConverter());
 
         return subcommands;

@@ -76,7 +76,7 @@
         "name": "Projection of Power",
         "faction": "celdauri",
         "window": "At the start of a space combat in a system that is adjacent to or contains 1 or more of your space docks",
-        "windowEffect": "Choose up to 1 ship in that system to gain ANTI-FIGHTER BARRAGE 6(x2) until the end of that combat.",
+        "windowEffect": "Choose up to 1 ship in that system to gain ANTI-FIGHTER BARRAGE 6 until the end of that combat.",
         "source": "ds"
     },
     {

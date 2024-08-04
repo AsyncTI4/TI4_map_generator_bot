@@ -457,7 +457,7 @@ public class ButtonHelper {
             damaged = true;
         }
         Die d1 = new Die(4);
-        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " rolled a " + d1.getResult();
+        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getPosition()  + " rolled a " + d1.getResult();
         if (damaged) {
             msg = "A damaged " + msg;
         }
@@ -2119,6 +2119,9 @@ public class ButtonHelper {
             }
             UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
             if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff")) {
+                count = count + space.getUnits().get(unit);
+            }
+            if (removedUnit.getBaseType().equalsIgnoreCase("mech") && player.hasUnit("naaz_mech_space")) {
                 count = count + space.getUnits().get(unit);
             }
         }
@@ -7530,6 +7533,25 @@ public class ButtonHelper {
 
         for (Player player : game.getRealPlayers()) {
             Leader playerLeader = player.getLeader("naaluhero").orElse(null);
+
+            if (game.getRound() < 4) {
+                String preferences = "";
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    String old = game.getStoredValue(p2.getUserID() + "anonDeclare");
+                    if (!old.isEmpty() && !old.toLowerCase().contains("strong")) {
+                        preferences = preferences + old + "; ";
+                    }
+                }
+                if (!preferences.isEmpty()) {
+                    preferences = preferences.substring(0, preferences.length() - 2);
+                    preferences = player.getRepresentation() + " this is a reminder that at the start of the game, your fellow players stated a preference for the following environments:\n" +
+                        preferences + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play";
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), preferences);
+                }
+            }
 
             if (player.hasLeader("naaluhero") && player.getLeaderByID("naaluhero").isPresent()
                 && playerLeader != null && !playerLeader.isLocked()) {

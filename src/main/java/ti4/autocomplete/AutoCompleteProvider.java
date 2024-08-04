@@ -111,7 +111,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION -> {
+            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6 -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<FactionModel> factions = Mapper.getFactions();
                 List<Command.Choice> options;
