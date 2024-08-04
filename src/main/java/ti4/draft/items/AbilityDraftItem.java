@@ -1,14 +1,15 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.model.AbilityModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AbilityDraftItem extends DraftItem {
     public AbilityDraftItem(String itemId) {
@@ -25,12 +26,14 @@ public class AbilityDraftItem extends DraftItem {
     @Override
     public String getLongDescriptionImpl() {
         AbilityModel abilityModel = getAbilityModel();
+        StringBuilder sb = new StringBuilder();
         if (abilityModel.getPermanentEffect().isPresent()) {
-            return abilityModel.getPermanentEffect().get();
-        } else if (abilityModel.getWindow().isPresent() && abilityModel.getWindowEffect().isPresent()) {
-            return "*" + abilityModel.getWindow().get() + ":* " + abilityModel.getWindowEffect().get();
+            sb.append(abilityModel.getPermanentEffect().get()).append("\n");
         }
-        return "";
+        if (abilityModel.getWindow().isPresent() && abilityModel.getWindowEffect().isPresent()) {
+            sb.append("*").append(abilityModel.getWindow().get()).append(":* ").append(abilityModel.getWindowEffect().get());
+        }
+        return sb.toString();
     }
 
     @JsonIgnore
