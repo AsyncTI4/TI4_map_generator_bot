@@ -639,7 +639,7 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "unexpected_strategy",
+        "alias": "unexpected_strategy_old",
         "name": "Unexpected Strategy",
         "phase": "Strategy",
         "window": "When you choose a strategy card",
