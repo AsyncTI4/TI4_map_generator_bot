@@ -1,5 +1,13 @@
 package ti4.commands.tokens;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -15,8 +23,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-import java.util.*;
-
 public class RemoveToken extends AddRemoveToken {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
@@ -24,6 +30,7 @@ public class RemoveToken extends AddRemoveToken {
         OptionMapping option = event.getOption(Constants.TOKEN);
         if (option != null) {
             String tokenName = option.getAsString().toLowerCase();
+            tokenName = StringUtils.substringBefore(tokenName, " ");
             tokenName = AliasHandler.resolveAttachment(tokenName);
 
             String tokenID = Mapper.getAttachmentImagePath(tokenName);
