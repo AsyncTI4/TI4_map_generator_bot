@@ -18,20 +18,20 @@ public class CustomizationOptions extends CustomSubcommandData {
 
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options");
-        addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tiny/small/medium/large (default: medium)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Turn ON or OFF strategy card follow reminders at the start of turn").addChoices(onOff));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT, "Show full text of components when using/exhausting"));
-        addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").addChoices(verbChoices));
+        addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal (default: Verbose)").addChoices(verbChoices));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Turn ON or OFF pings for exceeding component limits").addChoices(onOff));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Turn ON or OFF the bot leaving your faction react on msgs").addChoices(onOff));
         addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON or OFF").addChoices(onOff));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE,
-            "Reveal all objectives and diplo gets the power to pre-reveal"));
+            "Reveal all objectives and Diplomacy gets the power to pre-reveal"));
         addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
+            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace trade good emoji with Nomad Coin emoji"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue secret objective discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
@@ -41,7 +41,7 @@ public class CustomizationOptions extends CustomSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW,
-            "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
+            "Consider players passing on strategy cards if they don't respond with X hours; set X to 0 to disable"));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE,
             "Swap player's owned units to units from another source").setAutoComplete(true));
     }

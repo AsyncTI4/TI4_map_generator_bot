@@ -23,7 +23,7 @@ import ti4.model.UnitModel;
 public class UnitInfo extends PlayerSubcommandData {
     public UnitInfo() {
         super(Constants.UNIT_INFO, "Send special unit information to your Cards Info channel");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_ALL_UNITS, "'True' also show basic (non-faction) units (Default: False)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_ALL_UNITS, "\"True\" also show basic (non-faction) units (default: False)"));
     }
 
     @Override

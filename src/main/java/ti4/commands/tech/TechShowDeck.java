@@ -18,8 +18,8 @@ import ti4.model.TechnologyModel;
 
 public class TechShowDeck extends TechSubcommandData {
     public TechShowDeck() {
-        super("show_deck", "Look at available non-faction techs");
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The deck type you want to see").setRequired(true).setAutoComplete(true));
+        super("show_deck", "Look at available non-faction technologies");
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH_TYPE, "The deck type you wish to see").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TechShowDeck extends TechSubcommandData {
             .filter(t -> !t.isFactionTech())
             .map(t -> t.getRepresentationEmbed(false, true))
             .toList();
-        String message = StringUtils.capitalize(deck) + " Tech Deck:";
+        String message = StringUtils.capitalize(deck) + " Technology Deck:";
         MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), message, embeds);
     }
 }

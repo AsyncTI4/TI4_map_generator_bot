@@ -16,8 +16,8 @@ import ti4.message.MessageHelper;
 
 public class StartFrankenDraft extends FrankenSubcommandData {
     public StartFrankenDraft() {
-        super(Constants.START_FRANKEN_DRAFT, "Start a franken draft");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FORCE, "'True' to forcefully overwrite existing faction setups (Default: False)"));
+        super(Constants.START_FRANKEN_DRAFT, "Start a franken draft.");
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FORCE, "\"True\" to forcefully overwrite existing faction setups (default: False)"));
         addOptions(new OptionData(OptionType.STRING, Constants.DRAFT_MODE, "Special draft mode").setAutoComplete(true));
     }
 
@@ -56,7 +56,7 @@ public class StartFrankenDraft extends FrankenSubcommandData {
     }
 
     public enum FrankenDraftMode {
-      POWERED("powered", "Adds 1 extra faction tech/ability to pick from."), 
+      POWERED("powered", "Adds 1 extra faction technology/ability to pick from."), 
       ONEPICK("onepick", "Draft 1 item a time.");
 
       private final String name;

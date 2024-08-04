@@ -12,7 +12,7 @@ import ti4.map.Player;
 
 public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
     public AddFactionCCToFleetSupply() {
-        super(Constants.ADD_CC_TO_FS, "Add Faction CC to Fleet Supply");
+        super(Constants.ADD_CC_TO_FS, "Add a faction command token to your fleet pool.");
     }
 
     @Override

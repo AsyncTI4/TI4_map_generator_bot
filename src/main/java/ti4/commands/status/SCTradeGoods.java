@@ -14,9 +14,9 @@ import java.util.Set;
 
 public class SCTradeGoods extends StatusSubcommandData {
     public SCTradeGoods() {
-        super(Constants.SC_TRADE_GOODS, "Add Trade goods to Strategy Cards");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards number").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card").setRequired(false));
+        super(Constants.SC_TRADE_GOODS, "Add trade goods to strategy cards.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Number of trade goods to have on strategy card").setRequired(false));
     }
 
     @Override
@@ -27,12 +27,12 @@ public class SCTradeGoods extends StatusSubcommandData {
         OptionMapping tgOption = event.getOption(Constants.TG);
         if (scOption != null || tgOption != null) {
             if (scOption == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Strategy Card");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify strategy card.");
                 return;
 
             }
             if (tgOption == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Trade Good Count");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify trade good count.");
                 return;
 
             }
@@ -40,7 +40,7 @@ public class SCTradeGoods extends StatusSubcommandData {
             int tg = tgOption.getAsInt();
             Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
             if (!scTradeGoods.containsKey(sc)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card must be a strategy card that's in the game.");
                 return;
             }
             Set<Integer> scPicked = new HashSet<>();
@@ -48,7 +48,7 @@ public class SCTradeGoods extends StatusSubcommandData {
                 scPicked.addAll(player_.getSCs());
             }
             if (scPicked.contains(sc)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card is already picked, can't add Trade Goods");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card is already picked, can't add trade goods to it.");
                 return;
             }
             game.setScTradeGood(sc, tg);

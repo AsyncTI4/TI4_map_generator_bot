@@ -16,7 +16,7 @@ import java.util.List;
 public class ExploreLookAtTop extends ExploreSubcommandData {
 
     public ExploreLookAtTop() {
-        super(Constants.LOOK_AT_TOP, "Look at the top card of an explore deck. Sends to Cards Info thread.");
+        super(Constants.LOOK_AT_TOP, "Look at the top card of an exploration deck. Sends to Cards Info thread.");
         addOptions(typeOption.setRequired(true));
     }
 
@@ -42,7 +42,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
         String playerFactionNameWithEmoji = player.getFactionEmoji();
         if (deck.isEmpty() && discardPile.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+            MessageHelper.sendMessageToEventChannel(event, traitNameWithEmoji + " exploration deck and discard is empty; nothing to look at.");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -52,8 +52,8 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         sb.append(explore.textRepresentation());
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
-            + " Cards info thread.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "top of " + traitNameWithEmoji + " exploration deck has been set to " + playerFactionNameWithEmoji
+            + " `#Cards Info` thread.");
 
     }
 }

@@ -189,8 +189,8 @@ public class Game extends GameProperties {
 
     public void fixScrewedSOs() {
         MessageHelper.sendMessageToChannel(getActionsChannel(),
-            "The number of SOs in the deck before this operation is " + getNumberOfSOsInTheDeck()
-                + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
+            "The number of secret objectives in the deck before this operation is " + getNumberOfSOsInTheDeck()
+                + ". The number in players hands is " + getNumberOfSOsInPlayersHands() + ".");
 
         List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(getSecretObjectives());
@@ -213,8 +213,8 @@ public class Game extends GameProperties {
             }
         }
         MessageHelper.sendMessageToChannel(getActionsChannel(),
-            "Fixed the SOs, the total amount of SOs in deck is " + getNumberOfSOsInTheDeck()
-                + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
+            "Fixed the secret objectives; the total amount of secret objectives in deck is " + getNumberOfSOsInTheDeck()
+                + ". The number in players hands is " + getNumberOfSOsInPlayersHands() + ".");
     }
 
     @JsonIgnore
@@ -392,7 +392,7 @@ public class Game extends GameProperties {
                 return true;
             } else {
                 if (Mapper.getActionCard(ac.getKey()) == null) {
-                    BotLogger.log(ac.getKey() + " is returning a null AC when sent to Mapper in game " + getName());
+                    BotLogger.log(ac.getKey() + " is returning a null action card when sent to Mapper in game " + getName());
                 }
             }
         }
@@ -964,8 +964,8 @@ public class Game extends GameProperties {
                 ButtonHelperAbilities.pillageCheck(player, this);
                 ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
                 tradeGoodCount = 0;
-                MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + (tradeGoodCount == 1 ? "TG" : tradeGoodCount + "TGs")
-                    + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
+                MessageHelper.sendMessageToChannel(getActionsChannel(), "The trade good" + (tradeGoodCount == 1 ? "" : tradeGoodCount + "s")
+                    + " that would be placed on the  " + Helper.getSCName(sc, this) + " strategy card " + (tradeGoodCount == 1 ? "has" : tradeGoodCount + "have") + " instead been given to the Kyro Hero player, as per Kyro Hero text.");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);
@@ -2101,7 +2101,7 @@ public class Game extends GameProperties {
                 getActionCards().addAll(discardActionCards.keySet());
                 discardActionCards.clear();
                 Collections.shuffle(getActionCards());
-                String msg = "# " + getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
+                String msg = "# " + getPing() + " shuffling the action card discard  pile into a new action card deck because the action card deck ran out of cards.";
                 MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
                 return drawActionCard(userID);
             }
@@ -2374,11 +2374,11 @@ public class Game extends GameProperties {
 
     public void checkSOLimit(Player player) {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
-            String msg = player.getRepresentation(true, true) + " you have more SOs than the limit ("
+            String msg = player.getRepresentation(true, true) + " you have more secret objectives than the limit ("
                 + player.getMaxSOCount()
-                + ") and should discard one. If your game is playing with a higher SO limit, you may change that in /game setup.";
+                + ") and should discard 1. If your game is playing with a higher secret objectives limit, you should change that with `/game setup`.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            String secretScoreMsg = "Click a button below to discard your Secret Objective";
+            String secretScoreMsg = "Click a button below to discard a secret objective.";
             List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(this, player);
             if (soButtons != null && !soButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), secretScoreMsg,
@@ -2745,7 +2745,7 @@ public class Game extends GameProperties {
         DeckSettings deckSettings = miltySettings.getGameSettings().getDecks();
 
         boolean success = true;
-        // &= is the "and operator". It will assign true to success iff success is true and the result is true. Otherwise it will propagate a false value to the end
+        // &= is the "and operator". It will assign true to success if and only if success is true and the result is true. Otherwise it will propagate a false value to the end
         success &= validateAndSetPublicObjectivesStage1Deck(event, deckSettings.getStage1().getValue());
         success &= validateAndSetPublicObjectivesStage2Deck(event, deckSettings.getStage2().getValue());
         success &= validateAndSetSecretObjectiveDeck(event, deckSettings.getSecrets().getValue());
@@ -2756,14 +2756,14 @@ public class Game extends GameProperties {
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the agenda deck you chose will be overridden.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using Absol mode, so the agenda deck you chose will be overridden.");
             success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
         } else {
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
 
         if (isAbsolMode() && !deckSettings.getRelics().getChosenKey().contains("absol")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using Absol mode, so the relic deck you chose will be overridden.");
             success &= validateAndSetRelicDeck(event, Mapper.getDeck("relics_absol"));
         } else {
             success &= validateAndSetRelicDeck(event, deckSettings.getRelics().getValue());
@@ -2814,13 +2814,13 @@ public class Game extends GameProperties {
         }
         if (!getDiscardActionCards().isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Since there were ACs in the discard pile, will just shuffle any new ACs into the existing deck");
+                "Since there were action cards in the discard pile, will just shuffle any new action cards into the existing deck.");
             shuffledExtrasIn = true;
         } else {
             for (Player player : getPlayers().values()) {
                 if (!player.getActionCards().isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Since there were ACs in players hands, will just shuffle any new ACs into the existing deck");
+                        "Since there were action cards in players hands, will just shuffle any new action cards into the existing deck.");
                     shuffledExtrasIn = true;
                     break;
                 }
@@ -2873,8 +2873,8 @@ public class Game extends GameProperties {
 
     public boolean validateAndSetExploreDeck(GenericInteractionCreateEvent event, DeckModel deck) {
         if (getAllExploreDiscard().size() > 0) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change explore deck to **"
-                + deck.getName() + "** while there are explores in the discard pile.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change exploration deck to **"
+                + deck.getName() + "** while there are exploration cards in the discard pile.");
             return false;
         }
         setExplorationDeckID(deck.getAlias());

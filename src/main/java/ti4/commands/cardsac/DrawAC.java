@@ -13,8 +13,8 @@ import ti4.message.MessageHelper;
 
 public class DrawAC extends ACCardsSubcommandData {
     public DrawAC() {
-        super(Constants.DRAW_AC, "Draw Action Card");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1, max 10"));
+        super(Constants.DRAW_AC, "Draw an action card.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw (default: 1; max: 10)"));
     }
 
     @Override
@@ -23,7 +23,7 @@ public class DrawAC extends ACCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
         OptionMapping option = event.getOption(Constants.COUNT);
@@ -44,9 +44,9 @@ public class DrawAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
-        String message = player.getRepresentation() + " Drew " + count + " AC";
+        String message = player.getRepresentation() + " Drew " + count + " action card" + (count == 1 ? "" : "s") + ".";
         if (addScheming && player.hasAbility("scheming")) {
-            message = "Drew [" + count + "+1=" + ++count + "] AC (Scheming)";
+            message = "Drew [" + count + "+1=" + ++count + "] action cards (Scheming).";
         }
 
         for (int i = 0; i < count; i++) {

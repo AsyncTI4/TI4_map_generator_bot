@@ -13,8 +13,8 @@ import ti4.message.MessageHelper;
 
 public class ShowSOToAll extends SOCardsSubcommandData {
     public ShowSOToAll() {
-        super(Constants.SHOW_SO_TO_ALL, "Show a Secret Objective to all players");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+        super(Constants.SHOW_SO_TO_ALL, "Show a secret objectives to all players");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID to show").setRequired(true));
     }
 
     @Override
@@ -23,12 +23,12 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Secret Objective to show to All");
+            MessageHelper.sendMessageToEventChannel(event, "Please select which secret objective to show to everyone.");
             return;
         }
 
@@ -52,7 +52,7 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         }
 
         if (soID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such secret objective ID found, please retry.");
             return;
         }
 

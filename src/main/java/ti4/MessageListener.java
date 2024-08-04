@@ -234,7 +234,8 @@ public class MessageListener extends ListenerAdapter {
                     Game mapreference = GameManager.getInstance().getGame("finreference");
                     if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
                         mapreference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command /game create_game_button, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name."
+                        + " This will create a button that you may press to launch the game after confirming the members are correct.");
                     }
                 }
             }
@@ -325,7 +326,7 @@ public class MessageListener extends ListenerAdapter {
                                                 sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                                             }
                                             sb.append("You currently have ").append(p2.getStrategicCC())
-                                                .append(" CC in your strategy pool.");
+                                                .append(" command token" + (p2.getStrategicCC() == 1 ? "" : "s") + " in your strategy pool.");
                                             if (!p2.hasFollowedSC(sc)) {
                                                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                                                     sb.toString());
@@ -584,7 +585,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (pingNumber == 36) {
                                         ping = realIdentity
-                                            + " Life may not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience won't wait forever!";
+                                            + " Life might not signify anything, but these pings signify that you should take your turn! This is your hour upon the stage, and the audience won't wait forever!";
                                     }
                                     if (pingNumber == 37) {
                                         ping = realIdentity

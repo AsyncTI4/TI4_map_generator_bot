@@ -16,8 +16,8 @@ import ti4.message.MessageHelper;
 
 public class PickACFromDiscard extends ACCardsSubcommandData {
     public PickACFromDiscard() {
-        super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true).setAutoComplete(true));
+        super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "ID of the action card to pick").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to draw from discard pile");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what action card to draw from discard pile.");
             return;
         }
 
@@ -48,12 +48,12 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         }
 
         if (acId == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such action card ID found, please retry.");
             return;
         }
         boolean picked = game.pickActionCard(player.getUserID(), acIndex);
         if (!picked) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such action card ID found, please retry.");
             return;
         }
         String sb = "Game: " + game.getName() + " " +

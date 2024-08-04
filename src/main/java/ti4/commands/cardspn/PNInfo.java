@@ -39,13 +39,13 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
             return;
         }
         sendPromissoryNoteInfo(game, player, true, event);
-        MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "Promissory note info sent.");
     }
 
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentation(true, true) + " Heads up, someone used some command";
+        String headerText = player.getRepresentation(true, true) + " Heads up, someone used some command.";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }
@@ -133,7 +133,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
     private static String getPromissoryNoteRepresentation(Game game, String pnID, Integer pnUniqueID, boolean longFormat) {
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
         if (pnModel == null) {
-            String error = "Could not find representation for PN ID: " + pnID;
+            String error = "Could not find representation for promissory note ID: " + pnID;
             BotLogger.log(error);
             return error;
         }

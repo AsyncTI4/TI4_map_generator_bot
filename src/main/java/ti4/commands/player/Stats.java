@@ -30,17 +30,17 @@ import ti4.model.StrategyCardModel;
 
 public class Stats extends PlayerSubcommandData {
     public Stats() {
-        super(Constants.STATS, "Player Stats: CC,TG,Commodities");
-        addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count - can use +1/-1 etc. to add/subtract"))
+        super(Constants.STATS, "Player Stats: Command Tokens, Trade Goods, Commodities");
+        addOptions(new OptionData(OptionType.STRING, Constants.CC, "Command Tokens Example: 3/3/2 or +1/-1/+0"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactic pool command token count - can use +1/-1 etc. to add/subtract"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet pool command token count - can use +1/-1 etc. to add/subtract"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy pool command token count - can use +1/-1 etc. to add/subtract"))
+            .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade good count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "# turns this round"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card's played status. Enter the SC #."))
+            .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card number"))
+            .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "Number of turns this round"))
+            .addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Toggle a strategy card readied/exhausted status; enter the strategy card #"))
             .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Set whether player has passed y/n"))
             .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Set whether player is speaker y/n"))
             .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
@@ -82,7 +82,7 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionF = event.getOption(Constants.FLEET);
         OptionMapping optionS = event.getOption(Constants.STRATEGY);
         if (optionCC != null && (optionT != null || optionF != null || optionS != null)) {
-            MessageHelper.sendMessageToEventChannel(event, "Use format 3/3/3 for command counters or individual values, not both");
+            MessageHelper.sendMessageToEventChannel(event, "Use format 3/3/3 for command tokens or individual values, not both.");
         } else {
             String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/"
                 + player.getStrategicCC();
@@ -93,14 +93,14 @@ public class Stats extends PlayerSubcommandData {
                     MessageHelper.sendMessageToEventChannel(event, "Wrong format for tokens count. Must be 3/3/3");
                 } else {
                     try {
-                        setValue(event, game, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC,
+                        setValue(event, game, player, "Tactic Tokens", player::setTacticalCC, player::getTacticalCC,
                             tokenizer.nextToken(), true);
-                        setValue(event, game, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
+                        setValue(event, game, player, "Fleet Tokens", player::setFleetCC, player::getFleetCC,
                             tokenizer.nextToken(), true);
-                        setValue(event, game, player, "Strategy CC", player::setStrategicCC,
+                        setValue(event, game, player, "Strategy Tokens", player::setStrategicCC,
                             player::getStrategicCC, tokenizer.nextToken(), true);
                     } catch (Exception e) {
-                        MessageHelper.sendMessageToEventChannel(event, "Not number entered, check CC count again");
+                        MessageHelper.sendMessageToEventChannel(event, "Not number entered, check command token count and try again.");
                     }
                 }
                 Helper.isCCCountCorrect(event, game, player.getColor());
@@ -116,7 +116,7 @@ public class Stats extends PlayerSubcommandData {
             }
             if (optionT != null || optionF != null || optionS != null || optionCC != null) {
                 String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-                MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " updated CCs: " + originalCCString + " -> " + newCCString);
+                MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " updated command tokens: " + originalCCString + " -> " + newCCString);
             }
             if (optionT != null || optionF != null || optionS != null) {
                 Helper.isCCCountCorrect(event, game, player.getColor());
@@ -303,7 +303,7 @@ public class Stats extends PlayerSubcommandData {
 
         sb.append("\n");
 
-        sb.append("> CC: `").append(player.getCCRepresentation()).append("`\n");
+        sb.append("> Command Tokens: `").append(player.getCCRepresentation()).append("`\n");
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
         sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
         sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
@@ -322,14 +322,14 @@ public class Stats extends PlayerSubcommandData {
         sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
         sb.append("> Planets: `").append(player.getPlanets()).append("`\n");
         sb.append("> Techs: `").append(player.getTechs()).append("`\n");
-        sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
+        sb.append("> Relic Fragments: `").append(player.getFragments()).append("`\n");
         sb.append("> Relics: `").append(player.getRelics()).append("`\n");
-        sb.append("> Mahact CC: `").append(player.getMahactCC()).append("`\n");
+        sb.append("> Mahact Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
-        sb.append("> Owned PNs: `").append(player.getPromissoryNotesOwned()).append("`\n");
+        sb.append("> Owned Promissory Notes: `").append(player.getPromissoryNotesOwned()).append("`\n");
         sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
         sb.append("> Alliance Members: ").append(player.getAllianceMembers().replace(player.getFaction(), "")).append("\n");
-        sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
+        sb.append("> Followed Strategy Cards: `").append(player.getFollowedSCs().toString()).append("`\n");
         sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
         sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
         sb.append("> Total Unit Resource Value: ").append(Emojis.resources).append("`").append(player.getTotalResourceValueOfUnits()).append("`\n");
@@ -400,10 +400,10 @@ public class Stats extends PlayerSubcommandData {
             int tg = player.getTg();
             tg += tgCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game));
+                player.getRepresentation() + " gained " + tgCount + " trade goods" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game));
             if (game.isFowMode()) {
                 String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                    + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game);
+                    + " trade goods" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game);
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);

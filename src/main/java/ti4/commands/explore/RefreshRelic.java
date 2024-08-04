@@ -12,8 +12,8 @@ import ti4.message.MessageHelper;
 public class RefreshRelic extends ExhaustRelic {
 
     public RefreshRelic() {
-        super(Constants.RELIC_REFRESH, "Ready a relic");
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
+        super(Constants.RELIC_REFRESH, "Ready a relic.");
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to ready").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit\"").setRequired(false));
     }
 
@@ -21,6 +21,6 @@ public class RefreshRelic extends ExhaustRelic {
     protected void subAction(Player player, SlashCommandInteractionEvent event, String relicId) {
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
-        MessageHelper.sendMessageToEventChannel(event, "Refreshed " + Emojis.Relic + "Relic: " + relicName);
+        MessageHelper.sendMessageToEventChannel(event, "Readied " + Emojis.Relic + "relic: " + relicName);
     }
 }

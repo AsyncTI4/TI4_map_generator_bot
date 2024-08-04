@@ -25,7 +25,7 @@ import ti4.model.SecretObjectiveModel;
 
 public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     public SOInfo() {
-        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread");
+        super(Constants.INFO, "Sent scored and unscored secret objective information to your `#Cards Info` thread.");
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
@@ -42,7 +42,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
             return;
         }
         sendSecretObjectiveInfo(game, player, event);
-        MessageHelper.sendMessageToEventChannel(event, "SO Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "Secret objectives information sent.");
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
@@ -70,10 +70,10 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         if (player.getSecretsUnscored().isEmpty()) return;
 
         // SCORE/DISCARD BUTTONS
-        String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
+        String secretMsg = "_ _\nClick a button to either score or discard a secret objective.";
         List<Button> buttons = new ArrayList<>();
-        Button scoreB = Button.primary("get_so_score_buttons", "Score an SO");
-        Button discardB = Button.danger("get_so_discard_buttons", "Discard an SO");
+        Button scoreB = Button.primary("get_so_score_buttons", "Score A Secret Objective");
+        Button discardB = Button.danger("get_so_discard_buttons", "Discard A Secret Objective");
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
         buttons.add(scoreB);
         buttons.add(discardB);
@@ -181,9 +181,9 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
 
     public static void sendSODiscardButtons(Game game, Player player, String suffix) {
         List<Button> buttons = getSODiscardButtonsWithSuffix(game, player, suffix);
-        String message = "Use buttons to discard a Secret Objective:";
+        String message = "Use buttons to discard a secret objective:";
         if ("redraw".equals(suffix)) {
-            message += "\n> - A new secret will be automatically drawn for you";
+            message += "\n> - A new secret objective will be automatically drawn for you.";
         } else if (!"".equals(suffix)) {
             suffix = "";
         }

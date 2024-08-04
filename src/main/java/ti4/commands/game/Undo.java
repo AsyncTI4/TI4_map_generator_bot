@@ -21,7 +21,7 @@ import ti4.message.MessageHelper;
 
 public class Undo extends GameSubcommandData {
     public Undo() {
-        super(Constants.UNDO, "Undo the last action");
+        super(Constants.UNDO, "Undo the last several actions.");
         addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_BEFORE_COMMAND, "Command to undo back to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
@@ -31,7 +31,7 @@ public class Undo extends GameSubcommandData {
         GameManager gameManager = GameManager.getInstance();
         Game game = gameManager.getUserActiveGame(event.getUser().getId());
         if (game == null) {
-            MessageHelper.replyToMessage(event, "Must set active Game");
+            MessageHelper.replyToMessage(event, "Must set active game.");
             return;
         }
         if (!event.getChannel().getName().startsWith(game.getName() + "-")) {
@@ -41,13 +41,13 @@ public class Undo extends GameSubcommandData {
 
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Undo failed - Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Undo failed; must confirm with `YES`.");
             return;
         }
 
         String gameToUndoBackTo = event.getOption(Constants.UNDO_TO_BEFORE_COMMAND, null, OptionMapping::getAsString);
         if (gameToUndoBackTo == null || gameToUndoBackTo.isEmpty()) {
-            MessageHelper.replyToMessage(event, "Must specify command to undo back to");
+            MessageHelper.replyToMessage(event, "Must specify command to undo back to.");
             return;
         }
         if (gameToUndoBackTo.toLowerCase().contains("fog of war")) {
@@ -56,7 +56,7 @@ public class Undo extends GameSubcommandData {
             return;
         }
         if (!gameToUndoBackTo.contains(game.getName())) {
-            MessageHelper.replyToMessage(event, "Undo failed - Parameter doesn't look right: " + gameToUndoBackTo);
+            MessageHelper.replyToMessage(event, "Undo failed; parameter doesn't look right: " + gameToUndoBackTo + ".");
             return;
         }
         String intToUndoBackTo = gameToUndoBackTo.replace(game.getName() + "_", "").replace(".txt", "");
@@ -70,13 +70,13 @@ public class Undo extends GameSubcommandData {
         String undoFileToRestorePath = game.getName() + "_" + gameToUndoBackToNumber + ".txt";
         File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
         if (!undoFileToRestore.exists()) {
-            MessageHelper.replyToMessage(event, "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
+            MessageHelper.replyToMessage(event, "Undo failed; couldn't find game to undo back to: " + undoFileToRestorePath + ".");
             return;
         }
         Game gameToRestore = GameSaveLoadManager.loadMap(undoFileToRestore);
         if (gameToRestore == null) {
             MessageHelper.replyToMessage(event,
-                "Undo failed - Couldn't load game to undo back to: " + undoFileToRestorePath);
+                "Undo failed; couldn't load game to undo back to: " + undoFileToRestorePath);
             return;
         }
 

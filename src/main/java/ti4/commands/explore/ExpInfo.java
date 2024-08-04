@@ -27,7 +27,7 @@ public class ExpInfo extends ExploreSubcommandData {
     public ExpInfo() {
         super(Constants.INFO, "Display cards in exploration decks and discards.");
         addOptions(typeOption);
-        addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE if override fog"));
+        addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE to override fog of war"));
     }
 
     @Override

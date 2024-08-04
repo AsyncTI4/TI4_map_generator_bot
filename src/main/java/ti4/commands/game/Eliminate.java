@@ -74,7 +74,7 @@ public class Eliminate extends AddRemovePlayer {
             if (player != null && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
                 if (player.getPlanets().size() > 0) {
                     Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
-                    String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
+                    String msg = "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`.";
                     if (bothelperRole != null) {
                         msg = msg + " Pinging bothelper for assistance: " + bothelperRole.getAsMention();
                     }

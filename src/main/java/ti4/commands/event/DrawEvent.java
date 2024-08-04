@@ -12,8 +12,8 @@ import ti4.message.MessageHelper;
 
 public class DrawEvent extends EventSubcommandData {
     public DrawEvent() {
-        super(Constants.DRAW, "Draw Event");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        super(Constants.DRAW, "Draw an event card");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw (default: 1)"));
     }
 
     @Override

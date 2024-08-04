@@ -16,8 +16,8 @@ import java.util.LinkedHashMap;
 
 public class MakeSecretIntoPO extends SpecialSubcommandData {
     public MakeSecretIntoPO() {
-        super(Constants.MAKE_SO_INTO_PO, "Make Secret Objective a Public Objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+        super(Constants.MAKE_SO_INTO_PO, "Make a secret objective into a public objective");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "ID of the secret objective").setRequired(true));
     }
 
     @Override
@@ -25,7 +25,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
         Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to make Public");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select which secret objective to make into a public objective.");
             return;
         }
 
@@ -46,18 +46,18 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
         }
 
         if (playerWithSO == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
             return;
         }
         if (soName.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Can make just Scored SO to Public");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Can only make a scored secret objective into a public objective.");
             return;
         }
         game.addToSoToPoList(soName);
         Integer poIndex = game.addCustomPO(soName, 1);
         game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
-        String sb = "**Public Objective added from Secret:**" + "\n" +
+        String sb = "**Secret objectives made into a public objective:**" + "\n" +
             "(" + poIndex + ") " + "\n" +
             Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);

@@ -15,8 +15,8 @@ import ti4.model.PublicObjectiveModel;
 
 public class PeakAtStage2 extends CustomSubcommandData {
     public PeakAtStage2() {
-        super(Constants.PEAK_AT_STAGE2, "Peak at a stage 2 objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location Of Objective (typical 1-5)").setRequired(true));
+        super(Constants.PEAK_AT_STAGE2, "Peek at a stage 2 objective.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location of objective, typically 1-5").setRequired(true));
     }
 
     @Override

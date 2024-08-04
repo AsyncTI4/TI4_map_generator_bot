@@ -77,9 +77,9 @@ public class PlanetAdd extends PlanetAddRemove {
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
+                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored with the Custodians token!");
                 String message2 = player.getRepresentation(true, true)
-                    + " Click the names of the planets you wish to exhaust to spend 6i.";
+                    + " Click the names of the planets you wish to exhaust to spend 6 influence.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                 buttons.add(DoneExhausting);
@@ -106,9 +106,9 @@ public class PlanetAdd extends PlanetAddRemove {
                         if (relic.contains("shard")
                             && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
                             && !doubleCheck) {
-                            String msg2 = player_.getRepresentation() + " lost shard and lost a victory point. "
+                            String msg2 = player_.getRepresentation() + " lost Shard of the Throne, and thus lost a victory point. "
                                 + player.getRepresentation()
-                                + " gained shard and a victory point.";
+                                + " gained Shard of the Throne, and thus gained a victory point.";
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                 msg2);
                             player_.removeRelic(relic);
@@ -208,8 +208,8 @@ public class PlanetAdd extends PlanetAddRemove {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), fac
-                + " gained 1TG from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
-                + "). Reminder that you do not legally have this TG prior to exploring, and that this was mandatory.");
+                + " gained 1 trade good from Scavenge (" + player.getTg() + "->" + (player.getTg() + 1)
+                + "). Reminder that you do not legally have this trade good prior to exploring, and that this was mandatory.");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -223,7 +223,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC";
+                + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
@@ -235,8 +235,8 @@ public class PlanetAdd extends PlanetAddRemove {
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
-                + " if you have not already used Scour this tactical action, you may discard 1AC to ready the planet "
-                + Helper.getPlanetRepresentation(planet, game);
+                + " if you have not already used Scour this tactical action, you may discard 1 action card to ready the planet "
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
         }
@@ -258,13 +258,13 @@ public class PlanetAdd extends PlanetAddRemove {
             && game.playerHasLeaderUnlockedOrAlliance(player, "cymiaecommander")) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("cymiaeCommanderRes_" + planet,
-                "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, game)));
+                "Discard Action Card For Mech On " + Helper.getPlanetRepresentation(planet, game)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " due to Koryl Ferax, the Cymiae Commander, you may discard 1AC here to place or move 1 mech on "
+                    + " due to Koryl Ferax, the Cymiae Commander, you may discard 1 action card here to place or move 1 mech on "
                     + Helper.getPlanetRepresentation(planet, game)
-                    + ". Do not do this prior to exploring. It is an after, while exploring is a when.",
+                    + ". Do not do this prior to exploring. It is an \"after\", while exploring is a \"when\".",
                 saarButton);
         }
 
@@ -286,7 +286,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if (ButtonHelper.isPlayerElected(game, player, "minister_exploration") && event != null) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                fac + " gained 1TG from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1)
+                fac + " gained 1 trade good from Minister of Exploration (" + player.getTg() + "->" + (player.getTg() + 1)
                     + ").");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
@@ -309,17 +309,17 @@ public class PlanetAdd extends PlanetAddRemove {
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
             saarButton.add(Button.success("saarMechRes_" + planet,
-                "Pay 1TG for mech on " + Helper.getPlanetRepresentation(planet, game)));
+                "Pay 1 Trade Good For Mech On " + Helper.getPlanetRepresentation(planet, game)));
             saarButton.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
-                    + " you may pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
+                    + " you may pay 1 trade good to place 1 mech here. Do not do this prior to exploring. It is an \"after\", while exploring is a \"when\".",
                 saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {
-            String message = player.getRepresentation() + " Click the button to resolve an integrated build on " + Helper.getPlanetRepresentation(planet, game);
+            String message = player.getRepresentation() + " Click the button to resolve an Integrated Economy build on " + Helper.getPlanetRepresentation(planet, game);
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.primary("integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Button.primary("integratedBuild_" + planet, "Integrated Economy On " + Helper.getPlanetRepresentation(planet, game)));
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }

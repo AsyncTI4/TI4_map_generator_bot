@@ -7,7 +7,7 @@ import ti4.map.GameSaveLoadManager;
 
 public class FixSODeck extends CustomSubcommandData {
     public FixSODeck() {
-        super(Constants.FIX_SO_DECK, "Put back into the deck any removed SOs");
+        super(Constants.FIX_SO_DECK, "Put any removed secret objectives back into the deck.");
     }
 
     @Override

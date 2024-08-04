@@ -13,8 +13,8 @@ import ti4.message.MessageHelper;
 
 public class DrawSO extends SOCardsSubcommandData {
     public DrawSO() {
-        super(Constants.DRAW_SO, "Draw Secret Objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        super(Constants.DRAW_SO, "Draw secret objective(s).");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw (default: 1)"));
     }
 
     @Override
@@ -23,7 +23,7 @@ public class DrawSO extends SOCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         OptionMapping option = event.getOption(Constants.COUNT);
@@ -40,15 +40,15 @@ public class DrawSO extends SOCardsSubcommandData {
     }
 
     public static void drawSO(GenericInteractionCreateEvent event, Game game, Player player, int count, boolean useTnelis) {
-        String output = "Drew " + Integer.toString(count) + "Secret Objective" + (count > 1 ? "s" : "");
+        String output = " drew " + count + " secret objective" + (count > 1 ? "s" : "") + ".";
         if (useTnelis && player.hasAbility("plausible_deniability")) {
-            output = "Used Plausible Deniablity to draw [" + count + " + 1 = " + (count + 1) + "] Secret Objectives";
+            output = " used Plausible Deniablity to draw " + (count + 1) + " secret objectives.";
             count++;
         }
         for (int i = 0; i < count; i++) {
             game.drawSecretObjective(player.getUserID());
         }
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " " + output);
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + output);
         SOInfo.sendSecretObjectiveInfo(game, player, event);
         if (useTnelis && player.hasAbility("plausible_deniability")) {
             SOInfo.sendSODiscardButtons(game, player);

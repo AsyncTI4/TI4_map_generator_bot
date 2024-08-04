@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class PurgePN extends PNCardsSubcommandData {
     public PurgePN() {
         super(Constants.PURGE_PN, "Purge Promissory Note");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory note ID to be purged").setRequired(true));
     }
 
     @Override
@@ -23,12 +23,12 @@ public class PurgePN extends PNCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to send");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what promissory note to purge.");
             return;
         }
 
@@ -41,12 +41,12 @@ public class PurgePN extends PNCardsSubcommandData {
         }
 
         if (id == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
             return;
         }
         game.setPurgedPN(id);
         player.removePromissoryNote(id);
-        MessageHelper.sendMessageToEventChannel(event, "PN Purged");
+        MessageHelper.sendMessageToEventChannel(event, "Promissory note purged.");
         PNInfo.sendPromissoryNoteInfo(game, player, false);
     }
 }

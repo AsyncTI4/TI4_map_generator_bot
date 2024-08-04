@@ -37,11 +37,11 @@ public class StartMilty extends MiltySubcommandData {
     public static final int SLICE_GENERATION_CYCLES = 1000;
 
     public StartMilty() {
-        super(Constants.QUICKSTART, "Start Milty Draft with default settings");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default = players + 1)").setRequired(false).setRequiredRange(1, 25));
+        super(Constants.QUICKSTART, "Start Milty Draft with default settings.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default: players + 1)").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default: players + 1)").setRequired(false).setRequiredRange(1, 25));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions").setRequired(false));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (Discordant Stars)").setRequired(false));
     }
 
     @Data

@@ -23,7 +23,7 @@ import ti4.model.GenericCardModel;
 
 public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public ACInfo() {
-        super(Constants.INFO, "Send Action Cards to your Cards Info thread");
+        super(Constants.INFO, "Send action card information to your #Cards Info thread.");
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
@@ -36,11 +36,11 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         sendActionCardInfo(game, player, event);
-        MessageHelper.sendMessageToEventChannel(event, "AC Info Sent");
+        MessageHelper.sendMessageToEventChannel(event, "Action cards information sent.");
     }
 
     private static void sendTrapCardInfo(Game game, Player player) {
@@ -98,7 +98,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public static void sendActionCardInfo(Game game, Player player) {
         // AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getActionCardInfo(game, player));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an Action Card", getPlayActionCardButtons(game, player));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an action card", getPlayActionCardButtons(game, player));
 
         sendTrapCardInfo(game, player);
     }
@@ -153,15 +153,15 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
             }
         }
         if (ButtonHelper.isPlayerElected(game, player, "censure") || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
-            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC (You are politically censured)"));
+            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard An Action Card (You Are Politically Censured)"));
         } else {
-            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard An Acton Card"));
         }
         if (actionCards != null && !actionCards.isEmpty()
             && !ButtonHelper.isPlayerElected(game, player, "censure")
             && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")
                 || actionCards.containsKey("investments") || actionCards.containsKey("summit"))) {
-            acButtons.add(Button.secondary("checkForAllACAssignments", "Pre assign ACs"));
+            acButtons.add(Button.secondary("checkForAllACAssignments", "Pre-Assign Action Cards"));
         }
 
         return acButtons;
@@ -188,7 +188,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     public static void sendDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
         List<Button> buttons = getDiscardActionCardButtons(game, player, doingAction);
-        String msg = player.getRepresentation(true, true) + " use buttons to discard";
+        String msg = player.getRepresentation(true, true) + " use buttons to discard.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 

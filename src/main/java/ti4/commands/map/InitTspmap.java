@@ -11,8 +11,8 @@ import ti4.message.MessageHelper;
 
 public class InitTspmap extends MapSubcommandData {
     public InitTspmap() {
-        super(Constants.INIT_TSPMAP, "Initialize the map to have the hyperlanes and edge adjacencies of Tispoon's endless map layout");
-        addOption(OptionType.STRING, Constants.CONFIRM, "Type 'YES' to confirm. This command can erase tiles", true, false);
+        super(Constants.INIT_TSPMAP, "Initialize the map to have the hyperlanes and edge adjacencies of Tispoon's endless map layout.");
+        addOption(OptionType.STRING, Constants.CONFIRM, "Type 'YES' to confirm; this command can erase tiles", true, false);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class InitTspmap extends MapSubcommandData {
         Game game = getActiveGame();
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
 

@@ -25,9 +25,9 @@ public class MedianTurnTime extends StatisticsSubcommandData {
 
     public MedianTurnTime() {
         super(Constants.MEDIAN_TURN_TIME, "Median turn time accross all games for all players");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns to show (Default = 1)").setRequired(false));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default = false)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (default: 50)").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns to show (default: 1)").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.IGNORE_ENDED_GAMES, "True to exclude ended games from the calculation (default: False)"));
     }
 
     @Override

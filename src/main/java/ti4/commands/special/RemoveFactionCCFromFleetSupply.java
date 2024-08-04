@@ -10,7 +10,7 @@ import java.util.List;
 
 public class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFleet {
     public RemoveFactionCCFromFleetSupply() {
-        super(Constants.REMOVE_CC_FROM_FS, "Remove Faction CC from Fleet Supply");
+        super(Constants.REMOVE_CC_FROM_FS, "Remove Faction Command Token From Fleet Pool");
     }
 
     @Override
