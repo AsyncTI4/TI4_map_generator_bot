@@ -1,15 +1,19 @@
 package ti4.commands.game;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.bothelper.CreateGameChannels;
 import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class Observer extends GameSubcommandData {
@@ -22,27 +26,68 @@ public class Observer extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Guild guild = event.getGuild();
-        Member user = guild.getMemberById(event.getOption("player").getAsString());
+        Member user = event.getOption("player").getAsMember();
+        String gameName = event.getOption("game_name", null, OptionMapping::getAsString);
+        String addOrRemove = event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
 
-        List<GuildChannel> channels = guild.getChannels();
+        if (!GameManager.getInstance().isValidGame(gameName)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found: " + gameName);
+            return;
+        }
 
+        if (!"add".equals(addOrRemove) && !"remove".equals(addOrRemove)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify whether to 'add' or 'remove'");
+            return;
+        }
+
+        Game game = GameManager.getInstance().getGame(gameName);
+
+        // INVITE TO GAME SERVER IF MISSING
+        if (!CreateGameChannels.inviteUsersToServer(game.getGuild(), List.of(user), event.getChannel()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "User was not a member of the Game's server (" + game.getGuild().getName() + ")\nPlease run this command again once the user joins the server.");
+            return;
+        }
+
+        List<GuildChannel> channels = new ArrayList<>(game.getGuild().getChannels());
+
+        // ADD TO GAME's SET CHANNELS
+        GuildChannel tableTalk = game.getTableTalkChannel();
+        GuildChannel actionsChannel = game.getActionsChannel();
+        if ("add".equals(addOrRemove)) {
+            addObserver(event, user, tableTalk);
+            addObserver(event, user, actionsChannel);
+        } else if ("remove".equals(addOrRemove)) {
+            removeObserver(event, user, tableTalk);
+            removeObserver(event, user, actionsChannel);
+        }
+
+        channels.remove(tableTalk);
+        channels.remove(actionsChannel);
+
+        // ADD TO ALL OTHER CHANNELS
         for (GuildChannel channel : channels) {
-            if (channel.getName().contains(event.getOption("game_name").getAsString())) {
-
-                if ("add".equals(event.getOption("add_remove").getAsString())) {
-                    channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
-                    MessageHelper.sendMessageToEventChannel(event, "Permissions granted on " + user.getAsMention() + " to channel " + channel.getName());
-                }
-
-                if ("remove".equals(event.getOption("add_remove").getAsString())) {
-                    // clear permissions instead of revoking permissions.
-                    // This resets the user's perms to the default value, 
-                    //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
-                    channel.getPermissionContainer().upsertPermissionOverride(user).clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
-                    MessageHelper.sendMessageToEventChannel(event, "Permissions revoked on " + user.getAsMention() + " to channel " + channel.getName());
+            if (channel.getName().contains(gameName)) {
+                if ("add".equals(addOrRemove)) {
+                    addObserver(event, user, channel);
+                } else if ("remove".equals(addOrRemove)) {
+                    removeObserver(event, user, channel);
                 }
             }
         }
+    }
+
+    private void addObserver(SlashCommandInteractionEvent event, Member user, GuildChannel channel) {
+        if (channel == null) return;
+        channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
+        MessageHelper.sendMessageToEventChannel(event, "Observer permissions granted on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
+    }
+
+    private void removeObserver(SlashCommandInteractionEvent event, Member user, GuildChannel channel) {
+        if (channel == null) return;
+        // clear permissions instead of revoking permissions.
+        // This resets the user's perms to the default value, 
+        //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
+        channel.getPermissionContainer().upsertPermissionOverride(user).clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
+        MessageHelper.sendMessageToEventChannel(event, "Observer permissions revoked on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
     }
 }
