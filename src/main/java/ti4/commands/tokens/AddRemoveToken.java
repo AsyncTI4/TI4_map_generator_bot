@@ -30,7 +30,7 @@ abstract public class AddRemoveToken implements Command {
         String userID = event.getUser().getId();
         GameManager gameManager = GameManager.getInstance();
         if (!gameManager.isUserWithActiveGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+            MessageHelper.replyToMessage(event, "Set your active game using: `/set_game`.");
             return;
         }
 
@@ -52,7 +52,7 @@ abstract public class AddRemoveToken implements Command {
                 if (!colors.contains(color)) {
                     colors.add(color);
                     if (!Mapper.isValidColor(color)) {
-                        MessageHelper.replyToMessage(event, "Color/faction not valid: " + color);
+                        MessageHelper.replyToMessage(event, "Color/faction not valid: " + color + ".");
                         return;
                     }
                 }
@@ -61,7 +61,7 @@ abstract public class AddRemoveToken implements Command {
             Player player = game.getPlayer(userID);
             player = Helper.getGamePlayer(game, player, event, null);
             if (player == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
                 return;
             }
             colors.add(player.getColor());
@@ -75,7 +75,7 @@ abstract public class AddRemoveToken implements Command {
             String tileID = AliasHandler.resolveTile(tileTokenizer.nextToken());
 
             if (game.isTileDuplicated(tileID)) {
-                MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
+                MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates.");
                 return;
             }
             Tile tile = game.getTile(tileID);
@@ -83,7 +83,7 @@ abstract public class AddRemoveToken implements Command {
                 tile = game.getTileByPosition(tileID);
             }
             if (tile == null) {
-                MessageHelper.replyToMessage(event, "Tile in map not found");
+                MessageHelper.replyToMessage(event, "Tile in map not found.");
                 return;
             }
             tiles.add(tile);

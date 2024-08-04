@@ -43,7 +43,7 @@ public class AddToken extends AddRemoveToken {
         tokenName = StringUtils.substringBefore(tokenName, " ");
         tokenName = AliasHandler.resolveAttachment(tokenName);
         if (!Mapper.isValidToken(tokenName)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Token not found: " + tokenName);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Token not found: " + tokenName + ".");
             return;
         }
         addToken(event, tile, tokenName, game);
@@ -62,7 +62,7 @@ public class AddToken extends AddRemoveToken {
             tokenPath = tile.getTokenPath(tokenFileName);
 
             if (tokenPath == null) {
-                MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");
+                MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid.");
                 return;
             }
             addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName), game);

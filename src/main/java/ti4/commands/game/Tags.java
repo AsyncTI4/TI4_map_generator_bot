@@ -23,13 +23,13 @@ import ti4.message.MessageHelper;
 public class Tags extends GameSubcommandData {
 
     public Tags() {
-        super("tags", "Add or remove a 'tag' to a game for sorting/reference");
+        super("tags", "Add or remove a `tag` to a game for sorting/reference.");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Button button = Buttons.green("editTags~MDL", "Edit Tags");
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(), "Press the below button to edit the game's tags:", button);
+        MessageHelper.sendMessageToChannelWithButton(event.getChannel(), "Press the below button to edit the game's tags.", button);
     }
 
     @ButtonHandler("editTags~MDL")
@@ -44,7 +44,7 @@ public class Tags extends GameSubcommandData {
             .setValue(currentTags)
             .setRequired(false)
             .build();
-        Modal modal = Modal.create(modalId, "Tags for Game " + game.getName()).addActionRow(tags).build();
+        Modal modal = Modal.create(modalId, "Tags for game " + game.getName() + ".").addActionRow(tags).build();
         event.replyModal(modal).queue();
     }
 
@@ -59,7 +59,7 @@ public class Tags extends GameSubcommandData {
             List<String> tags = new ArrayList<>(Arrays.asList((tagsRaw.split(";"))));
             game.setTags(tags);
         }
-        MessageHelper.sendMessageToEventChannel(event, "Changed tags from `" + currentTags + "` to `" + game.getTags() + "`");
+        MessageHelper.sendMessageToEventChannel(event, "Changed tags from `" + currentTags + "` to `" + game.getTags() + "`.");
     }
     
 }
