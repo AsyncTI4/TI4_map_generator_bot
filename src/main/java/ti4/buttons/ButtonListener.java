@@ -3216,7 +3216,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null,
                     List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
                 case "gameInfoButtons" -> ListPlayerInfoButton.offerInfoButtons(event);
-                case "refreshACInfo" -> ACInfo.sendActionCardInfo(game, player, event);
                 case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
                 case "refreshSOInfo" -> SOInfo.sendSecretObjectiveInfo(game, player, event);
                 case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(game, player, event);

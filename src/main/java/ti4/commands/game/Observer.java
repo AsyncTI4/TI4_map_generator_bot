@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -26,7 +28,7 @@ public class Observer extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Member user = event.getOption("player").getAsMember();
+        User user = event.getOption(Constants.PLAYER).getAsUser();
         String gameName = event.getOption("game_name", null, OptionMapping::getAsString);
         String addOrRemove = event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
 
@@ -41,24 +43,26 @@ public class Observer extends GameSubcommandData {
         }
 
         Game game = GameManager.getInstance().getGame(gameName);
+        Guild guild = game.getGuild();
+        Member member = guild.getMemberById(user.getId());
 
         // INVITE TO GAME SERVER IF MISSING
-        if (!CreateGameChannels.inviteUsersToServer(game.getGuild(), List.of(user), event.getChannel()).isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User was not a member of the Game's server (" + game.getGuild().getName() + ")\nPlease run this command again once the user joins the server.");
+        if (!CreateGameChannels.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "User was not a member of the Game's server (" + guild.getName() + ")\nPlease run this command again once the user joins the server.");
             return;
         }
 
-        List<GuildChannel> channels = new ArrayList<>(game.getGuild().getChannels());
+        List<GuildChannel> channels = new ArrayList<>(guild.getChannels());
 
         // ADD TO GAME's SET CHANNELS
         GuildChannel tableTalk = game.getTableTalkChannel();
         GuildChannel actionsChannel = game.getActionsChannel();
         if ("add".equals(addOrRemove)) {
-            addObserver(event, user, tableTalk);
-            addObserver(event, user, actionsChannel);
+            addObserver(event, member, tableTalk);
+            addObserver(event, member, actionsChannel);
         } else if ("remove".equals(addOrRemove)) {
-            removeObserver(event, user, tableTalk);
-            removeObserver(event, user, actionsChannel);
+            removeObserver(event, member, tableTalk);
+            removeObserver(event, member, actionsChannel);
         }
 
         channels.remove(tableTalk);
@@ -68,9 +72,9 @@ public class Observer extends GameSubcommandData {
         for (GuildChannel channel : channels) {
             if (channel.getName().contains(gameName)) {
                 if ("add".equals(addOrRemove)) {
-                    addObserver(event, user, channel);
+                    addObserver(event, member, channel);
                 } else if ("remove".equals(addOrRemove)) {
-                    removeObserver(event, user, channel);
+                    removeObserver(event, member, channel);
                 }
             }
         }
@@ -85,7 +89,7 @@ public class Observer extends GameSubcommandData {
     private void removeObserver(SlashCommandInteractionEvent event, Member user, GuildChannel channel) {
         if (channel == null) return;
         // clear permissions instead of revoking permissions.
-        // This resets the user's perms to the default value, 
+        // This resets the member's perms to the default value, 
         //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
         channel.getPermissionContainer().upsertPermissionOverride(user).clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
         MessageHelper.sendMessageToEventChannel(event, "Observer permissions revoked on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
