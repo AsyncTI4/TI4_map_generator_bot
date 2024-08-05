@@ -43,6 +43,10 @@ public class GameManager {
         return gameNameToGame.remove(gameName);
     }
 
+    public boolean isValidGame(String game) {
+        return gameNameToGame.containsKey(game);
+    }
+
     public boolean setGameForUser(String userID, String gameName) {
         if (gameNameToGame.get(gameName) != null) {
             userNameToGameName.put(userID, gameName);

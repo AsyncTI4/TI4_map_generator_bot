@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -26,8 +26,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +40,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -119,11 +118,7 @@ public class Game extends GameProperties {
 
     @Getter
     private Map<String, Integer> discardedEvents = new LinkedHashMap<>();
-    //decks
-    // End to do's
-    //
-    //
-    //
+
     private List<String> messageIDsForSaboReacts = new ArrayList<>();
 
     @Getter
@@ -483,6 +478,9 @@ public class Game extends GameProperties {
                 put("Homebrew", hasHomebrew());
             }
         };
+        for (String tag : getTags()) {
+            gameModes.put(tag, true);
+        }
         return gameModes.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey)
             .collect(Collectors.joining(", "));
     }
@@ -3087,6 +3085,16 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public List<Player> getPlayersWithGMRole() {
+        List<Role> roles = getGuild().getRolesByName(getName() + " GM", true);
+        Role gmRole = roles.isEmpty() ? null : roles.get(0);
+        return getPlayers().values().stream().filter(player -> {
+            Member user = getGuild().getMemberById(player.getUserID());
+            return user != null && user.getRoles().contains(gmRole);
+        }).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
     public Set<String> getFactions() {
         return getRealAndEliminatedAndDummyPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
@@ -3926,5 +3934,13 @@ public class Game extends GameProperties {
         return Mapper.getColors().stream()
             .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
             .toList();
+    }
+
+    public boolean addTag(String tag) {
+        return getTags().add(tag);
+    }
+
+    public boolean removeTag(String tag) {
+        return getTags().remove(tag);
     }
 }

@@ -107,23 +107,25 @@ public class MiltyDraftManager {
     }
 
     public String getCurrentDraftPlayer() {
-        if (draftOrder.size() < draftIndex) return null;
+        if (draftOrder.size() <= draftIndex) return null;
         return draftOrder.get(draftIndex);
     }
 
     public String getNextDraftPlayer() {
-        if (draftOrder.size() < draftIndex + 1) return null;
+        if (draftOrder.size() <= draftIndex + 1) return null;
         return draftOrder.get(draftIndex + 1);
     }
 
     public Player getCurrentDraftPlayer(Game game) {
-        if (draftOrder.size() < draftIndex) return null;
-        return game.getPlayer(draftOrder.get(draftIndex));
+        String user = getCurrentDraftPlayer();
+        if (user == null) return null;
+        return game.getPlayer(user);
     }
 
     public Player getNextDraftPlayer(Game game) {
-        if (draftOrder.size() < draftIndex + 1) return null;
-        return game.getPlayer(draftOrder.get(draftIndex + 1));
+        String user = getNextDraftPlayer();
+        if (user == null) return null;
+        return game.getPlayer(user);
     }
 
     public void setNextPlayerInDraft() {
@@ -186,8 +188,9 @@ public class MiltyDraftManager {
     }
 
     public List<String> allRemainingOptionsForActive() {
-        PlayerDraft active = getPlayerDraft(getCurrentDraftPlayer());
         List<String> remaining = new ArrayList<>();
+        if (getCurrentDraftPlayer() == null) return remaining;
+        PlayerDraft active = getPlayerDraft(getCurrentDraftPlayer());
         if (active.getSlice() == null) {
             for (MiltyDraftSlice slice : slices)
                 if (!isSliceTaken(slice.getName()))
@@ -317,7 +320,7 @@ public class MiltyDraftManager {
             finishDraft(game, event);
             return;
         }
-        if (!userId.equals(getCurrentDraftPlayer())) {
+        if (getCurrentDraftPlayer() == null || !userId.equals(getCurrentDraftPlayer())) {
             if (event instanceof ButtonInteractionEvent bevent) {
                 bevent.getHook().sendMessage("You are not up to draft").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
             } else {
@@ -593,13 +596,15 @@ public class MiltyDraftManager {
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
             sb.append(picks.summary(goodDogOfTheDay)).append(" ");
 
-            if (p.equals(getNextDraftPlayer())) sb.append("*");
-            if (p.equals(getCurrentDraftPlayer())) sb.append("**__");
+            String next = getNextDraftPlayer();
+            String current = getCurrentDraftPlayer();
+            if (next != null && p.equals(getNextDraftPlayer())) sb.append("*");
+            if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("**__");
             sb.append(player.getUserName());
-            if (p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
-            if (p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
-            if (p.equals(getCurrentDraftPlayer())) sb.append("__**");
-            if (p.equals(getNextDraftPlayer())) sb.append("*");
+            if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
+            if (next != null && p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
+            if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("__**");
+            if (next != null && p.equals(getNextDraftPlayer())) sb.append("*");
 
             pickNum++;
         }
@@ -623,8 +628,11 @@ public class MiltyDraftManager {
 
     public void ping(Game game) {
         clearOldPing(game);
-        Player p = game.getPlayer(getCurrentDraftPlayer());
-        String ping = p.getPing() + " is up to draft!";
+        String ping = "Nobody is up to draft!";
+        if (getCurrentDraftPlayer() != null) {
+            Player p = getCurrentDraftPlayer(game);
+            ping = p.getPing() + " is up to draft!";
+        }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("showMiltyDraft", "Show draft again"));
         buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));

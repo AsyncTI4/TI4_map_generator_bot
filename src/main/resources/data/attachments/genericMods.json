@@ -1,0 +1,94 @@
+[
+    {
+        "id": "threetraits",
+        "imagePath": "attachment_threetraits.png",
+        "planetTypes": [
+            "cultural",
+            "industrial",
+            "hazardous"
+        ],
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "negativeinf",
+        "imagePath": "attachment_negativeinf.png",
+        "influenceModifier": -1,
+        "source": "other"
+    },
+    {
+        "id": "negativeinf2",
+        "imagePath": "attachment_negativeinf2.png",
+        "influenceModifier": -2,
+        "source": "other"
+    },
+    {
+        "id": "negativeinf3",
+        "imagePath": "attachment_negativeinf3.png",
+        "influenceModifier": -3,
+        "source": "other"
+    },
+    {
+        "id": "positiveinf3",
+        "imagePath": "attachment_positiveinf3.png",
+        "influenceModifier": 3,
+        "source": "other"
+    },
+    {
+        "id": "negativeres",
+        "imagePath": "attachment_negativeres.png",
+        "resourcesModifier": -1,
+        "source": "other"
+    },
+    {
+        "id": "negativeres2",
+        "imagePath": "attachment_negativeres2.png",
+        "resourcesModifier": -2,
+        "source": "other"
+    },
+    {
+        "id": "negativeres3",
+        "imagePath": "attachment_negativeres3.png",
+        "resourcesModifier": -3,
+        "source": "other"
+    },
+    {
+        "id": "positiveres3",
+        "imagePath": "attachment_positiveres3.png",
+        "resourcesModifier": 3,
+        "source": "other"
+    },
+    {
+        "id": "legendary",
+        "imagePath": "attachment_legendary.png",
+        "isLegendary": true,
+        "source": "other"
+    },
+    {
+        "id": "cultural",
+        "imagePath": "attachment_cultural.png",
+        "planetTypes": [
+            "cultural"
+        ],
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "industrial",
+        "imagePath": "attachment_industrial.png",
+        "planetTypes": [
+            "industrial"
+        ],
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "hazardous",
+        "imagePath": "attachment_hazardous.png",
+        "planetTypes": [
+            "hazardous"
+        ],
+        "isFakeAttachment": true,
+        "source": "other"
+    }
+]

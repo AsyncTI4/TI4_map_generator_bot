@@ -1,17 +1,26 @@
 package ti4.helpers;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
 import ti4.ResourceHelper;
 import ti4.generator.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class AliasHandler {
 
@@ -162,6 +171,8 @@ public class AliasHandler {
     public static void addNewTileAliases(TileModel tileModel) {
         Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
             .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
+        Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>())
+            .forEach(planet -> allTileAliases.put(planet.toLowerCase(), tileModel.getId()));
     }
 
     public static String resolveTile(String name) {

@@ -1544,7 +1544,7 @@ public class ButtonHelperFactionSpecific {
         GenericInteractionCreateEvent event, boolean cabalAgent) {
         String msg = cabal.getRepresentation(true, true) + " has failed to eat " + amount + " of the " + unit
             + "s owned by "
-            + player.getRepresentation() + " because they were blockaded. Wah-wah.";
+            + player.getRepresentation() + " because they were blockaded. Womp Womp.";
         String unitP = AliasHandler.resolveUnit(unit);
         if (unitP.contains("sd") || unitP.contains("pd")
             || (cabal.getAllianceMembers().contains(player.getFaction()) && !cabalAgent)) {
@@ -1558,7 +1558,7 @@ public class ButtonHelperFactionSpecific {
             if (unitP.contains("ff") || unitP.contains("gf")) {
                 color = cabal.getColor();
             }
-            msg = msg.replace("Infantrys", "infantry");
+            msg = msg.replace("infantrys", "infantry");
 
             new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount + " " + unit, game);
         }
@@ -1955,10 +1955,10 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getCreussIFFTypeOptions() {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("creussIFFStart_beta", "Beta").withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
-        buttons.add(Button.danger("creussIFFStart_gamma", "Gamma").withEmoji(Emoji.fromFormatted(Emojis.CreussGamma)));
         buttons.add(
-            Button.secondary("creussIFFStart_alpha", "Alpha").withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
+            Button.danger("creussIFFStart_alpha", "Alpha").withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
+        buttons.add(Button.success("creussIFFStart_beta", "Beta").withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
+        buttons.add(Button.primary("creussIFFStart_gamma", "Gamma").withEmoji(Emoji.fromFormatted(Emojis.CreussGamma)));
         return buttons;
     }
 
@@ -1967,30 +1967,28 @@ public class ButtonHelperFactionSpecific {
         String type = buttonID.split("_")[2];
         String tokenName = "creuss" + type;
         Tile tile = game.getTileByPosition(tilePos);
-        StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        sb.append(" moved ").append(Emojis.getEmojiFromDiscord(tokenName)).append(" to ")
-            .append(tile.getRepresentationForButtons(game, player));
+        String msg =  player.getRepresentation() + " moved " + Emojis.getEmojiFromDiscord(tokenName)
+             + " " + type + " wormhole to " + tile.getRepresentationForButtons(game, player);
         for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
-                sb.append(" (from ").append(tile_.getRepresentationForButtons(game, player)).append(")");
+                msg += " (from " + tile_.getRepresentationForButtons(game, player) + ")";
                 break;
             }
         }
-        boolean removed = false;
+        msg += ".";
         for (UnitHolder uH : tile.getUnitHolders().values()) {
-            if (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0 && !removed) {
-                removed = true;
+            if (uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
                 String name = uH.getName();
                 if ("space".equals(name)) {
                     name = "";
                 }
                 new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 mech " + name, game);
-                sb.append("\n ").append(player.getFactionEmoji()).append(" removed 1 mech from ")
-                    .append(tile.getRepresentation()).append("(").append(uH.getName()).append(")");
+                msg += "\n" + player.getFactionEmoji() + " removed 1 mech from " + tile.getRepresentation()
+                    + " (" + uH.getName() + ").";
+                break;
             }
         }
-        String msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
     }
@@ -2034,14 +2032,14 @@ public class ButtonHelperFactionSpecific {
     public static void creussMechStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         String tilePos = buttonID.split("_")[1];
+        buttons.add(Button.danger("creussMechStep3_" + tilePos + "_alpha", "Alpha")
+            .withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
         buttons.add(Button.success("creussMechStep3_" + tilePos + "_beta", "Beta")
             .withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
-        buttons.add(Button.danger("creussMechStep3_" + tilePos + "_gamma", "Gamma")
+        buttons.add(Button.primary("creussMechStep3_" + tilePos + "_gamma", "Gamma")
             .withEmoji(Emoji.fromFormatted(Emojis.CreussGamma)));
-        buttons.add(Button.secondary("creussMechStep3_" + tilePos + "_alpha", "Alpha")
-            .withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " choose the type of wormhole you wish to place in " + tilePos,
+            player.getRepresentation(true, true) + " choose the type of wormhole you wish to place in " + tilePos + ".",
             buttons);
         event.getMessage().delete().queue();
     }
@@ -2054,7 +2052,7 @@ public class ButtonHelperFactionSpecific {
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " choose the tile where you wish to remove 1 mech to place a Creuss wormhole",
+                + " choose the tile with the mech you wish to remove in order to place a Creuss wormhole.",
             buttons);
     }
 
@@ -2114,7 +2112,7 @@ public class ButtonHelperFactionSpecific {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(game, player, type);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            ident + " please select the tile you would like to put a wormhole in", buttons);
+            ident + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -2125,18 +2123,18 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(pos);
         String msg;
         if (game.isFowMode() && !isTileCreussIFFSuitable(game, player, tile)) {
-            msg = "Tile was not suitable for the iff.";
+            msg = "Tile was not suitable for the Creuss IFF.";
             if (player.getTg() > 0) {
                 player.setTg(player.getTg() - 1);
-                msg = msg + " You lost 1TG";
+                msg = msg + " You lost 1 trade good.";
             } else {
                 if (player.getTacticalCC() > 0) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
-                    msg = msg + " You lost a tactic CC";
+                    msg = msg + " You lost 1 command token from your tactic pool.";
                 } else {
                     if (player.getFleetCC() > 0) {
                         player.setFleetCC(player.getFleetCC() - 1);
-                        msg = msg + " You lost a fleet CC";
+                        msg = msg + " You lost 1 command token from your fleet pool.";
                     }
                 }
             }
@@ -2147,7 +2145,7 @@ public class ButtonHelperFactionSpecific {
                 .append(tile.getRepresentationForButtons(game, player));
             for (Tile tile_ : game.getTileMap().values()) {
                 if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
-                    sb.append(" (from ").append(tile_.getRepresentationForButtons(game, player)).append(")");
+                    sb.append(" (from ").append(tile_.getRepresentationForButtons(game, player)).append(").");
                     break;
                 }
             }

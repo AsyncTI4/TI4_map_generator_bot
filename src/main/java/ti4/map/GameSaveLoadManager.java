@@ -183,7 +183,7 @@ public class GameSaveLoadManager {
         boolean lastSaveTrivial = trivialSaveReasons.contains(game.getLatestCommand());
         boolean thisSaveTrivial = saveReason == null || trivialSaveReasons.contains(saveReason);
         if (keepModifiedDate && game.isHasEnded() && lastSaveTrivial && thisSaveTrivial) {
-            //return;
+            // return;
         }
 
         if (saveReason != null) {
@@ -433,12 +433,10 @@ public class GameSaveLoadManager {
         writer.write(Constants.AUTO_PING + " " + game.getAutoPingSpacer());
         writer.write(System.lineSeparator());
 
-        writer.write(
-            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + game.getPlayersWhoHitPersistentNoAfter());
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + game.getPlayersWhoHitPersistentNoAfter());
         writer.write(System.lineSeparator());
 
-        writer.write(
-            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + game.getPlayersWhoHitPersistentNoWhen());
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + game.getPlayersWhoHitPersistentNoWhen());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.CURRENT_AGENDA_INFO + " " + game.getCurrentAgendaInfo());
@@ -760,6 +758,9 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.BAG_DRAFT + " " + (game.getActiveBagDraft() == null ? "" : game.getActiveBagDraft().getSaveString()));
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.GAME_TAGS + " " + String.join(",", game.getTags()));
         writer.write(System.lineSeparator());
 
         MiltyDraftManager manager = game.getMiltyDraftManager();
@@ -1876,7 +1877,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case "fow_hide_names" -> { //TODO REMOVE THIS AFTER ONE SAVE/LOAD GAMES
+                case "fow_hide_names" -> { // TODO REMOVE THIS AFTER ONE SAVE/LOAD GAMES
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         if (value)
@@ -2098,7 +2099,7 @@ public class GameSaveLoadManager {
                         boolean value = Boolean.parseBoolean(info);
                         game.setPromisesPromisesMode(value);
                     } catch (Exception e) {
-                        //Do nothing
+                        // Do nothing
                     }
                 }
                 case Constants.FLAGSHIPPING -> {
@@ -2106,7 +2107,7 @@ public class GameSaveLoadManager {
                         boolean value = Boolean.parseBoolean(info);
                         game.setFlagshippingMode(value);
                     } catch (Exception e) {
-                        //Do nothing
+                        // Do nothing
                     }
                 }
                 case Constants.MILTYMOD_MODE -> {
@@ -2242,6 +2243,7 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
+                case Constants.GAME_TAGS -> game.setTags(getCardList(info));
             }
         }
     }
