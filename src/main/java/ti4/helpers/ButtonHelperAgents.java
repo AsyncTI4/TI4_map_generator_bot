@@ -1217,7 +1217,9 @@ public class ButtonHelperAgents {
             DrawAgenda.drawAgenda(1, false, game, edyn2, true);
             Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
             game.setStoredValue("edynAgentInAction", "");
-            ButtonHelper.startMyTurn(event, game, newActivePlayer);
+            if (newActivePlayer != null) {
+                ButtonHelper.startMyTurn(event, game, newActivePlayer);
+            }
             return true;
         }
         return false;
