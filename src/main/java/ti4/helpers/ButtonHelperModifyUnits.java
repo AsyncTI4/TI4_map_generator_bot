@@ -497,11 +497,11 @@ public class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                if (unitModel == null || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
+                if (unitModel == null || !unitModel.getSustainDamage() || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
                 if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) continue;
 
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
-                if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) continue;
+                if (!unitName.equalsIgnoreCase("dreadnought") || !player.hasUpgradedUnit("dn2")) continue;
 
                 // Get damaged units count  
                 int damagedUnits = (unitHolder.getUnitDamage() != null) ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
@@ -529,7 +529,7 @@ public class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                if (unitModel == null || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
+                if (unitModel == null || !unitModel.getSustainDamage() || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
                 if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) continue;
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) continue;
