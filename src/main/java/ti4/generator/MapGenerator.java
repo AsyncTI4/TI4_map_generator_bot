@@ -533,7 +533,7 @@ public class MapGenerator {
         if (name.contains("KELERES")) {
             name = "THE COUNCIL KELERES";
         }
-        if (name.contains("FRANKEN") && player.getDisplayName() != null && !player.getDisplayName().isEmpty()) {
+        if (name.contains("FRANKEN") && player.getDisplayName() != null && !player.getDisplayName().isEmpty() && !player.getDisplayName().equalsIgnoreCase("null")) {
             name = player.getDisplayName().toUpperCase();
         }
         superDrawString(bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
@@ -4179,16 +4179,13 @@ public class MapGenerator {
     public static BufferedImage partialTileImage(Tile tile, Game game, TileStep step, Player frogPlayer, Boolean isFrogPrivate) {
         return new MapGenerator(game).partialTileImage(tile, step, frogPlayer, isFrogPrivate);
     }
-    
-    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset)
-    {
+
+    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset) {
         drawOnWormhole(tile, graphics, icon, offset, "ab");
     }
 
-    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, String types)
-    {
-        switch (tile.getTileID())
-        {
+    private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset, String types) {
+        switch (tile.getTileID()) {
             case "82b": // wormhole nexus
                 if (types.contains("a")) graphics.drawImage(icon, TILE_PADDING + offset + 95, TILE_PADDING + offset + 249, null);
                 if (types.contains("b")) graphics.drawImage(icon, TILE_PADDING + offset + 169, TILE_PADDING + offset + 273, null);
@@ -4232,15 +4229,12 @@ public class MapGenerator {
                 break;
             default:
                 Point wormholeLocation = TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().getWormholeLocation();
-                if (wormholeLocation == null)
-                {
+                if (wormholeLocation == null) {
                     graphics.drawImage(icon, TILE_PADDING + offset + 86, TILE_PADDING + 260, null);
-                }
-                else
-                {
+                } else {
                     graphics.drawImage(icon, TILE_PADDING + offset + wormholeLocation.x, TILE_PADDING + offset + wormholeLocation.y, null);
                 }
-                
+
         }
     }
 
@@ -4259,12 +4253,11 @@ public class MapGenerator {
                 if (tile.isAnomaly(game)) {
                     BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     int offset = 0;
-                    switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase())
-                    {
+                    switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase()) {
                         case "TYPE09":
                         case "TYPE12":
                         case "TYPE15":
-                            tileGraphics.drawImage(anomalyImage, TILE_PADDING+36, TILE_PADDING+43, null);
+                            tileGraphics.drawImage(anomalyImage, TILE_PADDING + 36, TILE_PADDING + 43, null);
                             break;
                         default:
                             tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
@@ -4368,21 +4361,18 @@ public class MapGenerator {
                 // add icons to wormholes for agendas
                 boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
                 if ((ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))
-                    && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA) || Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA)))
-                {
+                    && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA) || Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA))) {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
                 }
                 if (reconstruction
-                    && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA)))
-                {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f/65);
+                    && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA))) {
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
                     drawOnWormhole(tile, tileGraphics, doubleWormholeImage, 0, "a");
                 }
                 if (reconstruction
-                    && (Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA)))
-                {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f/65);
+                    && (Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA))) {
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
                     drawOnWormhole(tile, tileGraphics, doubleWormholeImage, 0, "b");
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
@@ -4392,13 +4382,10 @@ public class MapGenerator {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     drawOnWormhole(tile, tileGraphics, blockedWormholeImage, 40);
                 }
-                if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula())
-                {
+                if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula()) {
                     BufferedImage nebulaBypass = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
-                    if (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().isSpiral())
-                    {
-                        switch (tile.getTileID())
-                        {
+                    if (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().isSpiral()) {
+                        switch (tile.getTileID()) {
                             case "51":
                                 tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 235, null);
                                 break;
@@ -4411,13 +4398,9 @@ public class MapGenerator {
                             default:
                                 tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 99, TILE_PADDING + 294, null);
                         }
-                    }
-                    else if (tile.isHomeSystem())
-                    {
+                    } else if (tile.isHomeSystem()) {
                         tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 193, null);
-                    }
-                    else
-                    {
+                    } else {
                         tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 80, TILE_PADDING + 236, null);
                     }
                 }
@@ -5016,32 +4999,28 @@ public class MapGenerator {
                     deltaY += 30;
                 }
                 tileGraphics.drawImage(tokenImage, drawX, drawY, null);
-                
+
                 // add icons to wormholes for agendas
                 boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
-                int offsetX = (tokenImage.getWidth()-80)/2;
-                int offsetY = (tokenImage.getWidth()-80)/2;
+                int offsetX = (tokenImage.getWidth() - 80) / 2;
+                int offsetY = (tokenImage.getWidth() - 80) / 2;
                 if ((ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))
-                    && (tokenPath.toLowerCase().contains("alpha") || tokenPath.toLowerCase().contains("beta")))
-                {
+                    && (tokenPath.toLowerCase().contains("alpha") || tokenPath.toLowerCase().contains("beta"))) {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
                 }
-                if (reconstruction && tokenPath.toLowerCase().contains("alpha"))
-                {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f/65);
+                if (reconstruction && tokenPath.toLowerCase().contains("alpha")) {
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
                     tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
                 }
-                if (reconstruction && tokenPath.toLowerCase().contains("beta"))
-                {
-                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f/65);
+                if (reconstruction && tokenPath.toLowerCase().contains("beta")) {
+                    BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
                     tileGraphics.drawImage(doubleWormholeImage, drawX + offsetX, drawY + offsetY, null);
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
                     && (tile.getTileID().equals("82b"))
                     && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban")) // avoid doubling up, which is important when using the transparent symbol
-                    && (tokenPath.toLowerCase().contains("alpha") || tokenPath.toLowerCase().contains("beta")))
-                {
+                    && (tokenPath.toLowerCase().contains("alpha") || tokenPath.toLowerCase().contains("beta"))) {
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                     tileGraphics.drawImage(blockedWormholeImage, drawX + offsetX + 40, drawY + offsetY + 40, null);
                 }
@@ -5244,7 +5223,7 @@ public class MapGenerator {
 
                 tileGraphics.drawImage(unitImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 if (unitKey.getUnitType() == UnitType.Mech && (ButtonHelper.isLawInPlay(game, "articles_war") || ButtonHelper.isLawInPlay(game, "absol_articleswar"))) {
-                    BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_articles_of_war"+getBlackWhiteFileSuffix(unitKey.getColorID())));
+                    BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_articles_of_war" + getBlackWhiteFileSuffix(unitKey.getColorID())));
                     tileGraphics.drawImage(mechTearImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 }
                 if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {

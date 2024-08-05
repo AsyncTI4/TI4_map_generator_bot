@@ -132,7 +132,7 @@ public class Emojis {
     public static final String Xxcha = "<:Xxcha:1156670723541180547>";
     public static final String Yin = "<:Yin:1156670724438769754>";
     public static final String Lazax = "<:Lazax:946891797639073884>";
-    public static final String Neutral = "<:neutral:1245950121485664276>";
+    public static final String Neutral = "<:neutral:1269693830639390720>";
     public static final String Keleres = "<:Keleres:1156670565793398875>";
     public static final String RandomFaction = "<a:factions:1193971011633291284>";
 
