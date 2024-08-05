@@ -715,7 +715,7 @@
     "name": "Shrapnel Turrets",
     "phase": "Action",
     "window": "At the start of a space combat",
-    "text": "Each of your non-fighter ships in the active system that have a capacity value and do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9 (x3) until the end of the combat.",
+    "text": "Choose any number of your ships in the active system that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8 (x2) during this combat.",
     "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. It'll shred 'em fine!\"",
     "source": "action_deck_2"
   },
@@ -769,7 +769,7 @@
     "name": "Stasis Haul",
     "phase": "Action",
     "window": "After you activate a system",
-    "text": "During this tactical action, apply +1 to the capacity value of each of your non-fighter ships that have a capacity value.",
+    "text": "During this tactical action, apply +1 to the capacity value of each of your ships that have a capacity value.",
     "flavorText": "The cargo ships blasted out of the planet's gravity field. Their destination was weeks away, if not months. For all, it meant the promise of new life. For some, it would mean death.",
     "source": "action_deck_2"
   },

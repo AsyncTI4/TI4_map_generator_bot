@@ -386,7 +386,7 @@ public class MapGenerator {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, 1.0f, game.getName());
+        FileUpload fileUpload = uploadToDiscord(mainImage, 0.15f, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
@@ -955,6 +955,7 @@ public class MapGenerator {
                 // SECOND ROW RIGHT SIDE
                 xDeltaSecondRowFromRightSide = reinforcements(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
                 xDeltaSecondRowFromRightSide = sleeperTokens(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
+                xDeltaSecondRowFromRightSide = creussWormholeTokens(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
                 xDeltaSecondRowFromRightSide = speakerToken(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
 
                 if (player.hasAbility("ancient_blueprints")) {
@@ -1037,20 +1038,89 @@ public class MapGenerator {
     }
 
     private int sleeperTokens(Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
-        if (player.hasAbility("awaken")) {
-            String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
-            BufferedImage bufferedImage = ImageHelper.read(sleeperFile);
-
-            List<Point> points = new ArrayList<>();
-            points.add(new Point(0, 15));
-            points.add(new Point(50, 0));
-            points.add(new Point(50, 50));
-            points.add(new Point(100, 25));
-            points.add(new Point(10, 40));
-
-            int numToDisplay = 5 - game.getSleeperTokensPlacedCount();
-            return displayRemainingFactionTokens(points, bufferedImage, numToDisplay, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
+        if (!player.hasAbility("awaken")) {
+            return xDeltaSecondRowFromRightSide;
         }
+        String sleeperFile = ResourceHelper.getInstance().getTokenFile(Constants.TOKEN_SLEEPER_PNG);
+        BufferedImage bufferedImage = ImageHelper.read(sleeperFile);
+
+        List<Point> points = new ArrayList<>();
+        points.add(new Point(0, 15));
+        points.add(new Point(50, 0));
+        points.add(new Point(50, 50));
+        points.add(new Point(100, 25));
+        points.add(new Point(10, 40));
+
+        int numToDisplay = 5 - game.getSleeperTokensPlacedCount();
+        return displayRemainingFactionTokens(points, bufferedImage, numToDisplay, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
+    }
+
+    private int creussWormholeTokens(Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
+        if (!player.getFaction().equalsIgnoreCase("ghost")) {
+            return xDeltaSecondRowFromRightSide;
+        }
+        boolean alphaOnMap = false;
+        boolean betaOnMap = false;
+        boolean gammaOnMap = false;
+        String alphaID = Mapper.getTokenID("creussalpha");
+        String betaID = Mapper.getTokenID("creussbeta");
+        String gammaID = Mapper.getTokenID("creussgamma");
+        for (Tile tile : game.getTileMap().values()) {
+            Set<String> tileTokens = tile.getUnitHolders().get("space").getTokenList();
+            alphaOnMap |= tileTokens.contains(alphaID);
+            betaOnMap |= tileTokens.contains(betaID);
+            gammaOnMap |= tileTokens.contains(gammaID);
+        }
+        
+        xDeltaSecondRowFromRightSide += (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 90);
+        boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
+        boolean travelBan = ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban");
+        
+        if (!gammaOnMap)
+        {
+            String tokenFile = Mapper.getTokenPath(gammaID);
+            BufferedImage bufferedImage = ImageHelper.read(tokenFile);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            xDeltaSecondRowFromRightSide += 40;
+        }
+        
+        if (!betaOnMap)
+        {
+            String tokenFile = Mapper.getTokenPath(betaID);
+            BufferedImage bufferedImage = ImageHelper.read(tokenFile);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            if (travelBan)
+            {
+                BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
+                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
+            }
+            if (reconstruction)
+            {
+                BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f/65);
+                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            }
+            xDeltaSecondRowFromRightSide += 40;
+        }
+        
+        if (!alphaOnMap)
+        {
+            String tokenFile = Mapper.getTokenPath(alphaID);
+            BufferedImage bufferedImage = ImageHelper.read(tokenFile);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow+40, null);
+            if (travelBan)
+            {
+                BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
+                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
+            }
+            if (reconstruction)
+            {
+                BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f/65);
+                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            }
+            xDeltaSecondRowFromRightSide += 40;
+        }
+
+        xDeltaSecondRowFromRightSide -= (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 40);
         return xDeltaSecondRowFromRightSide;
     }
 

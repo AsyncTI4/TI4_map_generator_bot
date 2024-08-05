@@ -2450,10 +2450,10 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("resolveEBSStep1_")) {
             ButtonHelperActionCards.resolveEBSStep1(player, game, event, buttonID);
-        } else if (buttonID.startsWith("resolveBlitz_")) {// resolveShrapnelTurrents_
+        } else if (buttonID.startsWith("resolveBlitz_")) {
             ButtonHelperActionCards.resolveBlitz(player, game, event, buttonID);
-        } else if (buttonID.startsWith("resolveShrapnelTurrents_")) {// resolveShrapnelTurrents_
-            ButtonHelperActionCardsWillHomebrew.resolveShrapnelTurrents(player, game, event, buttonID);
+        } else if (buttonID.startsWith("resolveShrapnelTurrets_")) {// resolveShrapnelTurrets_
+            ButtonHelperActionCardsWillHomebrew.resolveShrapnelTurrets(player, game, event, buttonID);
         } else if (buttonID.startsWith("unitTactical")) {
             ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, game, player, buttonLabel);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {
@@ -3216,7 +3216,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null,
                     List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
                 case "gameInfoButtons" -> ListPlayerInfoButton.offerInfoButtons(event);
-                case "refreshACInfo" -> ACInfo.sendActionCardInfo(game, player, event);
                 case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
                 case "refreshSOInfo" -> SOInfo.sendSecretObjectiveInfo(game, player, event);
                 case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(game, player, event);
