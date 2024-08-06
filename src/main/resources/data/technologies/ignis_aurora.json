@@ -212,7 +212,7 @@
         "baseUpgrade": "cv2",
         "source": "ignis_aurora",
         "text": "Cost 3, Combat 9, Move 2, Capacity 8, SUSTAIN DAMAGE",
-        "homebrewReplacesID": "ac"
+        "homebrewReplacesID": "ac2"
     },
     {
         "alias": "baldrick_sdn2",
