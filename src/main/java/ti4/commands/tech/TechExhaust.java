@@ -135,7 +135,7 @@ public class TechExhaust extends TechAddRemove {
                     RemoveCC.removeCC(event, player.getColor(), tile, game);
                 }
             }
-            case "td" -> { // Transit Diodes
+            case "td", "absol_td" -> { // Transit Diodes
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
             }
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
