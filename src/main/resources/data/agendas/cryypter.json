@@ -162,7 +162,7 @@
         "source": "cryypter"
     },
     {
-        "alias": "cryypter_minister_commrece",
+        "alias": "cryypter_minister_commerce",
         "name": "Minister of Commerce",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
