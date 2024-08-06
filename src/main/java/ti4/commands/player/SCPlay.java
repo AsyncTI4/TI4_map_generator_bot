@@ -549,7 +549,7 @@ public class SCPlay extends PlayerSubcommandData {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button secondary = Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", Emojis.UFrag);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        return List.of(primary, followButton, secondary);
+        return List.of(primary, followButton, secondary, noFollowButton);
     }
 
     @ButtonHandler("ignisAuroraSC8Primary")
