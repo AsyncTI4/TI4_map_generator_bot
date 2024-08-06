@@ -235,7 +235,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileFromPlanet(planet);
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
         String duraniumMsg = getDamagedUnits(player, unitHolder, game);
-        boolean usedDuraniumAlready = player.hasTech("da");
+        boolean usedDuraniumAlready = !player.hasTech("da");
         int sardakkMechHits = 0;
         if (hits < 1 && (usedDuraniumAlready || duraniumMsg.isEmpty())) return 0;
 
