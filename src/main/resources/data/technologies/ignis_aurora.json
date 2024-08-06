@@ -16,8 +16,7 @@
         "faction": "qulane",
         "baseUpgrade": "inf2",
         "source": "ignis_aurora",
-        "text": "Cost 1 (x2) Combat: 7 This unit does not count against capacity. Up to 4 of this unit can be transported on each non-fighter ship. At the start of a space combat, you may remove up to 3 infantry from the space area of the active system. For each 1 that you remove, your opponent must assign 1 hit to their ships.",
-        "homebrewReplacesID": "inf"
+        "text": "Cost 1 (x2) Combat: 7 This unit does not count against capacity. Up to 4 of this unit can be transported on each non-fighter ship. At the start of a space combat, you may remove up to 3 infantry from the space area of the active system. For each 1 that you remove, your opponent must assign 1 hit to their ships."
     },
     {
         "alias": "stellarcorridors",
