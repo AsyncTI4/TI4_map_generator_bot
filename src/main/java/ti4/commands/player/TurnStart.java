@@ -364,7 +364,8 @@ public class TurnStart extends PlayerSubcommandData {
                     .withEmoji(Emoji.fromFormatted(Emojis.Keleres));
                 startButtons.add(chaos);
             }
-            if (player.hasTech("td") && !player.getExhaustedTechs().contains("td")) {
+            if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td")) ||
+                (player.hasTech("absol_td") && !player.getExhaustedTechs().contains("absol_td"))) {
                 Button transit = Button.secondary(finChecker + "exhaustTech_td", "Exhaust Transit Diodes");
                 transit = transit.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
                 startButtons.add(transit);
