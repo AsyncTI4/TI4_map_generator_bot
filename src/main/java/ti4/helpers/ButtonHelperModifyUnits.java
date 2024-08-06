@@ -613,7 +613,7 @@ public class ButtonHelperModifyUnits {
                         continue; // Skip to the next unit if not sustaining  
                     }
                     hits -= min;
-                    if (player.hasTech("nes")) hits -= min; // Adjust hits for tech "nes"  
+                    if (player.hasTech("nes")) hits -= min;
                     if (!justSummarizing) {
                         tile.addUnitDamage("space", unitKey, min);
                         handleLetnevCommanderCheck(player, game, event, min);
@@ -645,7 +645,7 @@ public class ButtonHelperModifyUnits {
         }
 
         // Remove floating infantry and mechs if everything else is dead  
-        if (hits <= 0 && FoWHelper.playerHasActualShipsInSystem(player, tile)) {
+        if (hits >= 0 && !FoWHelper.playerHasActualShipsInSystem(player, tile)) {
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey) || unitEntry.getValue() <= 0)
