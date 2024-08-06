@@ -4,9 +4,9 @@
         "faction": "arborec",
         "type": "envoy",
         "name": "Dirzuga Ohao",
-        "title": "Treasures Of Nestphar",
+        "title": "Flaah Cultivator",
         "abilityWindow": "When an outcome you predicted or cast 5 or more votes for would be resolved:",
-        "abilityText": "You may exhaust a planet you control, then use the PRODUCTION ability of one of your ground forces; you may only spend the resources from the exhausted planet to produce these units.",
+        "abilityText": "You may place 1 infantry from your reinforcements on a planet that does not contain other players’ units and is adjacent to a planet you control.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -61,7 +61,7 @@
         "name": "Huldran",
         "title": "Return On Investment",
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
-        "abilityText": "You and each other player that voted for that agenda may gain 1 trade good.",
+        "abilityText": "Each other player that voted for that agenda may gain 1 trade good.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -70,9 +70,9 @@
         "faction": "jolnar",
         "type": "envoy",
         "name": "Yaluga Huin",
-        "title": "University Headmaster",
-        "abilityWindow": "",
-        "abilityText": "Each player that votes for the outcome you predict or vote for gains additional votes equal to the number of planets with technology specialties they exhausted.",
+        "title": "Dean of Patents",
+        "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
+        "abilityText": "Place a control token on a technology you own. Players must place 1 trade good on this card to research technologies with your control tokens. At the end of the status phase, gain the trade goods on this card.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -93,8 +93,8 @@
         "type": "envoy",
         "name": "A6AH3",
         "title": "Calculated Presence",
-        "abilityWindow": "When you exhaust 1 or more planets to cast votes:",
-        "abilityText": "You may exhaust this card. If you do, the number of votes you cast is equal to the resource or influence value of each planet, whichever is greater.",
+        "abilityWindow": "After an outcome is resolved:",
+        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may exhaust this card and remove 1 of your dreadnoughts adjacent to Mecatol Rex from the board to discard the agenda instead; it is resolved with no effect and is not replaced.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -105,7 +105,7 @@
         "name": "Legate Erran",
         "title": "Wheels Of Industry",
         "abilityWindow": "After an outcome is resolved:",
-        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may place 1 cruiser or destroyer in a system that contains 1 or more of your ships.",
+        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may choose a system that contains 1 of your space docks. Replace 1 of your non-fighter ships in that system with a dreadnought from your reinforcements, or place 1 cruiser or destroyer in that system.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -116,7 +116,7 @@
         "name": "Keer En Hanaan",
         "title": "Archon Of Unity",
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
-        "abilityText": "You may exhaust this card to choose a player who did not vote for that outcome. Replace 1 command token in your fleet pool with 1 from that player’s reinforcements if it does not already contain 1 of that player's tokens.",
+        "abilityText": "You may exhaust this card to choose a player who can vote who did not vote for that outcome. Replace 1 command token in your fleet pool with 1 from that player’s reinforcements if it does not already contain 1 of that player's tokens.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -126,8 +126,8 @@
         "type": "envoy",
         "name": "Cador Gim",
         "title": "An Offer You Can’t Refuse",
-        "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Choose a player. That player must cast at least 1 vote for an outcome of your choice, if able, or give you 2 trade goods or 1 promissory note.",
+        "abilityWindow": "You may exhaust this card before a player casts votes:",
+        "abilityText": "That player must cast at least 1 vote for an outcome of your choice, if able, or give you 2 trade goods or 1 promissory note.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -192,8 +192,8 @@
         "type": "envoy",
         "name": "Qui'rek",
         "title": "Broodmaster",
-        "abilityWindow": "After an outcome is resolved:",
-        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may move up to 2 ground forces to adjacent planets you control.",
+        "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
+        "abilityText": "You may place 2 fighters from your reinforcements in a system that contains 1 or more of your ships.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -215,7 +215,7 @@
         "name": "Ronald Wiley",
         "title": "Political Rally",
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
-        "abilityText": "You may ready 1 planet.",
+        "abilityText": "You may ready each planet you control in 1 system.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -236,8 +236,8 @@
         "type": "envoy",
         "name": "Perdin Perdona",
         "title": "Echoes Of The Lazax",
-        "abilityWindow": "When you vote using the influence value of either your home planet or Mecatol Rex:",
-        "abilityText": "Do not exhaust that planet.",
+        "abilityWindow": "When you cast votes:",
+        "abilityText": "Choose either your home planet or Mecatol Rex. If you control that planet, you can vote using its influence value without exhausting it, even if it is exhausted.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -247,8 +247,8 @@
         "type": "envoy",
         "name": "The Brothers Qquiar",
         "title": "Coalition Builders",
-        "abilityWindow": "",
-        "abilityText": "Each other player that votes for the outcome you predict or vote for gains 2 additional votes.",
+        "abilityWindow": "At the end of the agenda phase:",
+        "abilityText": "You may exhaust this card to look at the top 3 cards of the agenda deck, then choose 1 to reveal. Players vote on this agenda.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -258,8 +258,8 @@
         "type": "envoy",
         "name": "Brother Rhal",
         "title": "Evangelist",
-        "abilityWindow": "After a player abstains or votes on an agenda:",
-        "abilityText": "You may exhaust this card to exhaust 1 planet controlled by that player and cast additional votes equal to that planet’s influence value.",
+        "abilityWindow": "When you cast votes:",
+        "abilityText": "You may remove 1 infantry from a planet you control to exhaust 1 adjacent planet controlled by another player and cast additional votes equal to that planet’s influence value.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     },
@@ -269,8 +269,8 @@
         "type": "envoy",
         "name": "Ne Ruk",
         "title": "Secret Keeper",
-        "abilityWindow": "Before a player votes on an agenda:",
-        "abilityText": "Exhaust this card. If you do and that player does not abstain, they must give you an action card from their hand.",
+        "abilityWindow": "When another player discards an action card during the agenda phase:",
+        "abilityText": "You may exhaust this card and discard an action card to take that action card from the discard pile.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "cryypter"
     }
