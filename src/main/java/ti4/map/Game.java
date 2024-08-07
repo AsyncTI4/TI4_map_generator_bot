@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -679,7 +679,18 @@ public class Game extends GameProperties {
             if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
                 judger = 0;
             }
-            if (judger < playerSC) {
+            if (judger == 0) {
+                orderedSCs.add(sc);
+            }
+        }
+        for (int sc : orderedSCsBasic) {
+            Player holder = getPlayerFromSC(sc);
+            String scT = sc + "";
+            int judger = sc;
+            if (holder != null && !scT.equalsIgnoreCase(getSCNumberIfNaaluInPlay(holder, scT))) {
+                judger = 0;
+            }
+            if (judger < playerSC && judger != 0) {
                 orderedSCs.add(sc);
             }
         }
@@ -2838,13 +2849,13 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetRelicDeck(GenericInteractionCreateEvent event, DeckModel deck) {
-        for (Player player : getPlayers().values()) {
-            if (!player.getRelics().isEmpty()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change relic deck to **"
-                    + deck.getName() + "** while there are relics in player hands.");
-                return false;
-            }
-        }
+        // for (Player player : getPlayers().values()) {
+        //     if (!player.getRelics().isEmpty()) {
+        //         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change relic deck to **"
+        //             + deck.getName() + "** while there are relics in player hands.");
+        //         return false;
+        //     }
+        // }
         setRelicDeckID(deck.getAlias());
         setRelics(deck.getNewShuffledDeck());
         return true;
