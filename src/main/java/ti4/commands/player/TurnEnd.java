@@ -145,6 +145,7 @@ public class TurnEnd extends PlayerSubcommandData {
             showPublicObjectivesWhenAllPassed(event, game, gameChannel);
             game.updateActivePlayer(null);
             ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event);
+            ButtonHelperAgents.checkForEdynAgentActive(game, event);
             return;
         }
 

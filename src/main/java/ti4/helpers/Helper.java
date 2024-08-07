@@ -2232,6 +2232,9 @@ public class Helper {
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         if (mahact == null) {
             for (String planet : planets) {
+                if (planet.equalsIgnoreCase("ghoti") || planet.contains("custodia")) {
+                    continue;
+                }
                 if (!getPlanetRepresentation(planet, game).toLowerCase().contains("mecatol") || ac) {
                     Button button = Button.secondary(finsFactionCheckerPrefix + "diplo_" + planet + "_" + "diploP",
                         getPlanetRepresentation(planet, game) + " System");
