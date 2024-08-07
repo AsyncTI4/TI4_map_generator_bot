@@ -1,6 +1,6 @@
 package ti4.commands.game;
 
-import static ti4.helpers.StringHelper.*;
+import static ti4.helpers.StringHelper.ordinal;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -313,7 +313,12 @@ public class GameEnd extends GameSubcommandData {
 
     public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("__**").append(game.getName()).append("**__ - ").append(game.getCustomName()).append("\n");
+        sb.append("**Game: __").append(game.getName()).append("__**");
+        if (!game.getCustomName().isEmpty()) {
+            sb.append(" - ").append(game.getCustomName());
+        }
+        sb.append("\n");
+        sb.append("**Duration:** ");
         sb.append(game.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(game.getLastModifiedDate()));
         sb.append("\n");
         sb.append("\n");
