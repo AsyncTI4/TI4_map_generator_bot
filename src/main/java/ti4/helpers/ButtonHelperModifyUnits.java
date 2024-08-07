@@ -560,9 +560,9 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
-        List<String> assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "nraShenanigans", "dreadnought", "carrier", "flagship", "warsun"));
+        List<String> assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "nraShenanigans", "carrier", "dreadnought", "flagship", "warsun"));
         if (spaceCannonOffence) {
-            assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "dreadnought", "carrier", "flagship", "warsun"));
+            assignHitOrder = new ArrayList<String>(List.of("fighter", "destroyer", "cruiser", "remainingSustains", "carrier", "dreadnought", "flagship", "warsun"));
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;

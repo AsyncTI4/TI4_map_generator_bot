@@ -1071,50 +1071,43 @@ public class MapGenerator {
             betaOnMap |= tileTokens.contains(betaID);
             gammaOnMap |= tileTokens.contains(gammaID);
         }
-        
+
         xDeltaSecondRowFromRightSide += (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 90);
         boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
         boolean travelBan = ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban");
-        
-        if (!gammaOnMap)
-        {
+
+        if (!gammaOnMap) {
             String tokenFile = Mapper.getTokenPath(gammaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
             xDeltaSecondRowFromRightSide += 40;
         }
-        
-        if (!betaOnMap)
-        {
+
+        if (!betaOnMap) {
             String tokenFile = Mapper.getTokenPath(betaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
-            if (travelBan)
-            {
+            if (travelBan) {
                 BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                 graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
             }
-            if (reconstruction)
-            {
-                BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f/65);
+            if (reconstruction) {
+                BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
                 graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
             }
             xDeltaSecondRowFromRightSide += 40;
         }
-        
-        if (!alphaOnMap)
-        {
+
+        if (!alphaOnMap) {
             String tokenFile = Mapper.getTokenPath(alphaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow+40, null);
-            if (travelBan)
-            {
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            if (travelBan) {
                 BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
                 graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
             }
-            if (reconstruction)
-            {
-                BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f/65);
+            if (reconstruction) {
+                BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
                 graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
             }
             xDeltaSecondRowFromRightSide += 40;
@@ -4732,7 +4725,7 @@ public class MapGenerator {
             float scale = 0.95f;
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                 && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko")
-                && !unitHolder.getName().toLowerCase().contains("mallice") // includes locked
+                && !unitHolder.getName().toLowerCase().contains("mallice")
                 && !unitHolder.getName().equalsIgnoreCase("domna")) {
                 scale = 1.65f;
             }
