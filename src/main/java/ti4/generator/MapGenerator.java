@@ -4732,7 +4732,7 @@ public class MapGenerator {
             float scale = 0.95f;
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
                 && !unitHolder.getName().equalsIgnoreCase("mirage") && !unitHolder.getName().equalsIgnoreCase("eko")
-                && !unitHolder.getName().equalsIgnoreCase("mallice")
+                && !unitHolder.getName().toLowerCase().contains("mallice") // includes locked
                 && !unitHolder.getName().equalsIgnoreCase("domna")) {
                 scale = 1.65f;
             }
