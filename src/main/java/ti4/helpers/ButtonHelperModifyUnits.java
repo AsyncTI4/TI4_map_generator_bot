@@ -590,7 +590,7 @@ public class ButtonHelperModifyUnits {
                 int damagedUnits = unitHolder.getUnitDamage() != null ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
                 int effectiveUnits = totalUnits - damagedUnits;
                 int min = Math.min(effectiveUnits, hits);
-                if (isNraShenanigans && unitName.equalsIgnoreCase("mech") && min > 0) {
+                if (isNraShenanigans && player.getUnitsOwned().contains("naaz_mech_space") && unitName.equalsIgnoreCase("mech") && min > 0) {
                     hits -= min;
                     if (!justSummarizing) {
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey,
