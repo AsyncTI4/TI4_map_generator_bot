@@ -492,6 +492,7 @@ public class ButtonHelperModifyUnits {
 
         // Process sustains if necessary  
         if (numSustains > 0) {
+            //just for dread 2s
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
@@ -523,7 +524,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
-            // Second loop for sustaining damage  
+            // Second loop for non dread 2s  
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
@@ -532,6 +533,7 @@ public class ButtonHelperModifyUnits {
                 if (unitModel == null || !unitModel.getSustainDamage() || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
                 if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) continue;
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+
                 if (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2")) continue;
 
                 // Get damaged units count  
@@ -588,7 +590,10 @@ public class ButtonHelperModifyUnits {
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                 int totalUnits = unitEntry.getValue();
                 int damagedUnits = unitHolder.getUnitDamage() != null ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
-                int effectiveUnits = totalUnits - damagedUnits;
+                int effectiveUnits = totalUnits;
+                if (isRemainingSustains) {
+                    effectiveUnits = effectiveUnits - damagedUnits;
+                }
                 int min = Math.min(effectiveUnits, hits);
                 if (isNraShenanigans && player.getUnitsOwned().contains("naaz_mech_space") && unitName.equalsIgnoreCase("mech") && min > 0) {
                     hits -= min;
@@ -610,15 +615,18 @@ public class ButtonHelperModifyUnits {
                     }
                     if (!stuffNotToSustain.contains(unitName.toLowerCase()) ||
                         (unitName.equalsIgnoreCase("dreadnought") && player.hasUpgradedUnit("dn2"))) {
-                        continue; // Skip to the next unit if not sustaining  
+                        continue; // Skip to the next unit since these sustains are already handled  
                     }
                     hits -= min;
                     if (player.hasTech("nes")) hits -= min;
                     if (!justSummarizing) {
                         tile.addUnitDamage("space", unitKey, min);
                         handleLetnevCommanderCheck(player, game, event, min);
+                        msg += "> Sustained " + min + " " + unitModel.getUnitEmoji() + "\n";
+                    } else {
+                        msg += "> Would sustain " + min + " " + unitModel.getUnitEmoji() + "\n";
                     }
-                    msg += "> Sustained " + min + " " + unitModel.getUnitEmoji() + "\n";
+
                     continue; // Skip to the next unit  
                 }
 
