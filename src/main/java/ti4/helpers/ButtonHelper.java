@@ -8930,7 +8930,8 @@ public class ButtonHelper {
             String techEmoji = techRep.getCondensedReqsEmojis(true);
             String techText = techRep.getText();
 
-            if (techText.contains("ACTION") || (tech.equalsIgnoreCase("det") && game.isAgeOfExplorationMode())) {
+            if (techText.contains("ACTION") || 
+              ((tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det")) && game.isAgeOfExplorationMode())) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
