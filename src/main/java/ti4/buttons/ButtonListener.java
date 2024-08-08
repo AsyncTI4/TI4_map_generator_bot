@@ -1866,7 +1866,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (result.contains("committee")) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdentOrColor(player,
                         game)
-                        + " has chosen to discard Committee Formation to choose the winner. Note that afters may be played before this occurs, and that confounding may still be played.");
+                        + " has chosen to discard Committee Formation to choose the winner. Note that afters may be played before this occurs, and that confounding may still be played. You should probably wait and confirm no confounding before resolving");
                     boolean success = game.removeLaw(game.getLaws().get("committee"));
                 }
                 String resMessage3 = "Please select the winner.";
@@ -4690,7 +4690,9 @@ public class ButtonListener extends ListenerAdapter {
                     ident, finsFactionCheckerPrefix);
                 case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, false, true, false);
                 case "cardsInfo" -> CardsInfo.sendCardsInfo(game, player, event);
+                case "showMap" -> ShowGame.showMap(game, event);
                 case "showGameAgain" -> ShowGame.simpleShowGame(game, event);
+                case "showPlayerAreas" -> ShowGame.showPlayArea(game, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, game, player, ident);
                 case "doneLanding" -> ButtonHelperModifyUnits.finishLanding(buttonID, event, game, player);
                 case "vote" -> {

@@ -4810,6 +4810,9 @@ public class MapGenerator {
                     continue;
                 }
                 if (unitModel.getPlanetaryShield()) {
+                    if (unitModel.getBaseType().equalsIgnoreCase("mech") && ButtonHelper.isLawInPlay(game, "articles_war")) {
+                        return false;
+                    }
                     return true;
                 }
             }
@@ -4978,7 +4981,11 @@ public class MapGenerator {
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
                     TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
             } else {
+
                 int drawX = TILE_PADDING + x;
+                if (tokenPath.contains("mustache")) {
+                    drawX = drawX - 120;
+                }
                 int drawY = TILE_PADDING + y;
                 if (spaceTokenPositions.size() > index) {
                     Point point = spaceTokenPositions.get(index);
