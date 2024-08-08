@@ -590,7 +590,7 @@ public class ButtonHelperModifyUnits {
                 int damagedUnits = unitHolder.getUnitDamage() != null ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
                 int effectiveUnits = totalUnits - damagedUnits;
                 int min = Math.min(effectiveUnits, hits);
-                if (isNraShenanigans && unitName.equalsIgnoreCase("mech") && min > 0) {
+                if (isNraShenanigans && player.getUnitsOwned().contains("naaz_mech_space") && unitName.equalsIgnoreCase("mech") && min > 0) {
                     hits -= min;
                     if (!justSummarizing) {
                         new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey,
@@ -817,7 +817,7 @@ public class ButtonHelperModifyUnits {
             Tile tile2 = game.getTileByPosition(pos2);
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game)) {
                 if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, game) || skilled
-                    || FoWHelper.playerHasShipsInSystem(player, tile2)) {
+                    || FoWHelper.playerIsInSystem(game, tile2, player)) {
                     if (FoWHelper.playerIsInSystem(game, tile2, player) || player.hasTech("det")
                         || player.hasTech("absol_det") || skilled) {
                         buttons.add(Button.secondary(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS,

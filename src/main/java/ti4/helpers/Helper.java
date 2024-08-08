@@ -1314,7 +1314,7 @@ public class Helper {
             Button button = Button.danger("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
                 getPlanetRepresentation(planet, game));
             String emoji = unit;
-            if (emoji.equalsIgnoreCase("2gf")) {
+            if (emoji.equalsIgnoreCase("2gf") || emoji.equalsIgnoreCase("3gf")) {
                 emoji = "infantry";
             }
             button = button.withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(emoji)));
@@ -1771,6 +1771,9 @@ public class Helper {
                 if ("fs".equals(unitModel.getAsyncId()) && player.ownsUnit("ghoti_flagship")) {
                     productionValueTotal = productionValueTotal + player.getFleetCC();
                 }
+                if (unitModel.getBaseType().equalsIgnoreCase("mech") && ButtonHelper.isLawInPlay(game, "articles_war")) {
+                    productionValue = 0;
+                }
                 if ("sd".equals(unitModel.getAsyncId()) && (productionValue == 2 || productionValue == 4 || player.ownsUnit("mykomentori_spacedock2") || player.ownsUnit("miltymod_spacedock2"))) {
                     if (uH instanceof Planet planet) {
                         if (player.hasUnit("celdauri_spacedock") || player.hasUnit("celdauri_spacedock2")) {
@@ -1882,6 +1885,9 @@ public class Helper {
                             continue;
                         }
                         int productionValue = unitModel.getProductionValue();
+                        if (unitModel.getBaseType().equalsIgnoreCase("mech") && ButtonHelper.isLawInPlay(game, "articles_war")) {
+                            productionValue = 0;
+                        }
                         if ("sd".equals(unitModel.getAsyncId()) && (productionValue == 2 || productionValue == 4
                             || player.ownsUnit("mykomentori_spacedock2")
                             || player.ownsUnit("miltymod_spacedock2"))) {
