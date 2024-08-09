@@ -2433,7 +2433,7 @@ public class ButtonListener extends ListenerAdapter {
                 .findFirst().orElse(null);
 
             if (lanefirPlayer != null) {
-                ButtonHelper.commanderUnlockCheck(player, game, "lanefir", event);
+                ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
             }
 
             String message = player.getRepresentation() + " purged fragments: "
