@@ -1612,7 +1612,7 @@ public class ButtonHelperModifyUnits {
                 successMessage = "Placed 1 " + Emojis.spacedock + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
-        } else if ("pds".equalsIgnoreCase(unit)) {
+        } else if ("pd".equalsIgnoreCase(unit)) {
             if (player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2")) {
                 new AddUnits().unitParsing(event, player.getColor(),
                     game.getTile(AliasHandler.resolveTile(planetName)), unit, game);
