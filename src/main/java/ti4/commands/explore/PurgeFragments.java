@@ -75,7 +75,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 			p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
 
 		if (lanefirPlayer != null) {
-			ButtonHelper.commanderUnlockCheck(activePlayer, game, "lanefir", event);
+			ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
 		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		MessageHelper.sendMessageToEventChannel(event, message);
