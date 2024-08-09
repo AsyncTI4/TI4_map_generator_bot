@@ -4149,6 +4149,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "convert_2_comms" -> ButtonHelperStats.convertComms(event, game, player, 2);
                 case "convert_3_comms" -> ButtonHelperStats.convertComms(event, game, player, 3);
                 case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
+                case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
                 // etc
                 case "startPlayerSetup" -> ButtonHelper.resolveSetupStep0(player, game, event);
                 case "comm_for_AC" -> {
