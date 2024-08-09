@@ -274,7 +274,7 @@ public class TechExhaust extends TechAddRemove {
                     player.refreshTech("lgf");
                 }
             }
-            case "det" -> {
+            case "det", "absol_det" -> {
                 deleteIfButtonEvent(event);
                 Die d1 = new Die(5);
 

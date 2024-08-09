@@ -1874,6 +1874,11 @@ public class Game extends GameProperties {
                     }
                 }
             }
+            if ("censure".equalsIgnoreCase(id)) {
+                if (getCustomPublicVP().get("Political Censure") != null) {
+                    removeCustomPO(getCustomPublicVP().get("Political Censure"));
+                }
+            }
             laws.remove(id);
             lawsInfo.remove(id);
             addDiscardAgenda(id);
@@ -1889,6 +1894,11 @@ public class Game extends GameProperties {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
                         p2.setSearchWarrant(false);
                     }
+                }
+            }
+            if ("censure".equalsIgnoreCase(id)) {
+                if (getCustomPublicVP().get("Political Censure") != null) {
+                    removeCustomPO(getCustomPublicVP().get("Political Censure"));
                 }
             }
             laws.remove(id);

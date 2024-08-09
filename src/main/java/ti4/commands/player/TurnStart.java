@@ -458,6 +458,9 @@ public class TurnStart extends PlayerSubcommandData {
             startButtons.add(Button.secondary("showGameAgain", "Show Game"));
         }
 
+        startButtons.add(Button.secondary("showMap", "Show Map"));
+        startButtons.add(Button.secondary("showPlayerAreas", "Show Player Areas"));
+
         return startButtons;
     }
 }

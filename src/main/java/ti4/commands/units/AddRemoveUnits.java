@@ -28,6 +28,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -325,7 +326,9 @@ abstract public class AddRemoveUnits implements Command {
                 Set<String> unitColors = new HashSet<>();
                 for (UnitKey unit_ : allUnitsOnPlanet) {
                     String unitColor = unit_.getColorID();
-                    unitColors.add(unitColor);
+                    if (unit_.getUnitType() != UnitType.Fighter) {
+                        unitColors.add(unitColor);
+                    }
                 }
 
                 if (unitColors.size() == 1) {

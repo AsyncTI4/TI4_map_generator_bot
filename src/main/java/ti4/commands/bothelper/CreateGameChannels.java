@@ -359,6 +359,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
         }
 
+        MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the async code of conduct, which is described here: https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006");
+
         String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
             "> " + chatChannel.getAsMention() + "\n" +
             "> " + actionsChannel.getAsMention() + "\n";
