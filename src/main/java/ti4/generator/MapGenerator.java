@@ -2380,6 +2380,15 @@ public class MapGenerator {
 
     private int techFieldUnit(int x, int y, List<String> techs, int deltaX, Player player, Game game) {
         drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
+        
+        boolean brokenWarSun = false;
+        if (ButtonHelper.isLawInPlay(game, "schematics"))
+        {
+            for (Player p2: game.getPlayers().values())
+            {
+                brokenWarSun |= p2.hasWarsunTech();
+            }
+        }
 
         // Add unit upgrade images
         if (techs != null) {
@@ -2399,6 +2408,15 @@ public class MapGenerator {
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
             }
+        }
+        if (brokenWarSun)
+        {
+            UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
+            Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+            UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+            BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile(
+                "agenda_publicize_weapon_schematics" + (player.hasWarsunTech() ? getBlackWhiteFileSuffix(unitKey.getColorID()) : "_blk.png")));
+            graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }
 
         // Add faction icons on top of upgraded or upgradable units
@@ -5236,8 +5254,8 @@ public class MapGenerator {
                     tileGraphics.drawImage(mechTearImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 }
                 else if (unitKey.getUnitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
-                    BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + getBlackWhiteFileSuffix(unitKey.getColorID())));
-                    tileGraphics.drawImage(mechTearImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + getBlackWhiteFileSuffix(unitKey.getColorID())));
+                    tileGraphics.drawImage(wsCrackImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 }
                 if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
                     tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
