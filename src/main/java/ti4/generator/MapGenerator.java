@@ -4940,11 +4940,11 @@ public class MapGenerator {
                 } else {
                     Point position = unitTokenPosition.getPosition(tokenID);
                     boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
-
                     if (isMirage) {
                         if (tile.getPlanetUnitHolders().size() == 3+1)
                         {
-                            position = Constants.MIRAGE_TRIPLE_POSITION;
+                            position.x += Constants.MIRAGE_TRIPLE_POSITION.x;
+                            position.y += Constants.MIRAGE_TRIPLE_POSITION.y;
                         }
                         else if (position == null)
                         {
