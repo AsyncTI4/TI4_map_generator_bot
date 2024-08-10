@@ -1071,6 +1071,7 @@ public class MapGenerator {
             betaOnMap |= tileTokens.contains(betaID);
             gammaOnMap |= tileTokens.contains(gammaID);
         }
+        yPlayAreaSecondRow += 25;
 
         xDeltaSecondRowFromRightSide += (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 90);
         boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
@@ -1079,38 +1080,41 @@ public class MapGenerator {
         if (!gammaOnMap) {
             String tokenFile = Mapper.getTokenPath(gammaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             xDeltaSecondRowFromRightSide += 40;
+            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
         }
 
         if (!betaOnMap) {
             String tokenFile = Mapper.getTokenPath(betaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
                 BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
+                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 40, null);
             }
             if (reconstruction) {
                 BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
-                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             }
             xDeltaSecondRowFromRightSide += 40;
+            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
         }
 
         if (!alphaOnMap) {
             String tokenFile = Mapper.getTokenPath(alphaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
                 BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
+                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 40, null);
             }
             if (reconstruction) {
                 BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
-                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             }
             xDeltaSecondRowFromRightSide += 40;
+            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
         }
 
         xDeltaSecondRowFromRightSide -= (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 40);
@@ -2376,6 +2380,15 @@ public class MapGenerator {
 
     private int techFieldUnit(int x, int y, List<String> techs, int deltaX, Player player, Game game) {
         drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
+        
+        boolean brokenWarSun = false;
+        if (ButtonHelper.isLawInPlay(game, "schematics"))
+        {
+            for (Player p2: game.getPlayers().values())
+            {
+                brokenWarSun |= p2.hasWarsunTech();
+            }
+        }
 
         // Add unit upgrade images
         if (techs != null) {
@@ -2395,6 +2408,15 @@ public class MapGenerator {
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
             }
+        }
+        if (brokenWarSun)
+        {
+            UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
+            Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+            UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+            BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile(
+                "agenda_publicize_weapon_schematics" + (player.hasWarsunTech() ? getBlackWhiteFileSuffix(unitKey.getColorID()) : "_blk.png")));
+            graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }
 
         // Add faction icons on top of upgraded or upgradable units
@@ -4791,6 +4813,11 @@ public class MapGenerator {
 
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
 
+        if (unitHolder.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
+        {
+            return false;
+        }
+
         Map<UnitKey, Integer> units = unitHolder.getUnits();
 
         if (ButtonHelper.isLawInPlay(game, "conventions")) {
@@ -5225,6 +5252,10 @@ public class MapGenerator {
                 if (unitKey.getUnitType() == UnitType.Mech && (ButtonHelper.isLawInPlay(game, "articles_war") || ButtonHelper.isLawInPlay(game, "absol_articleswar"))) {
                     BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_articles_of_war" + getBlackWhiteFileSuffix(unitKey.getColorID())));
                     tileGraphics.drawImage(mechTearImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                }
+                else if (unitKey.getUnitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
+                    BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + getBlackWhiteFileSuffix(unitKey.getColorID())));
+                    tileGraphics.drawImage(wsCrackImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 }
                 if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
                     tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
