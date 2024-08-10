@@ -226,6 +226,7 @@ public class MessageHelper {
 		sendFileUploadToChannel(channel, fileUpload);
 	}
 
+	//.setEphemeral(true).queue();
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
 		if (fileUpload == null) {
 			BotLogger.log("FileUpload null");
@@ -233,6 +234,14 @@ public class MessageHelper {
 		}
 		channel.sendFiles(fileUpload).queue(null,
 			error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error)));
+	}
+
+	public static void sendEphemeralFileInResponseToButtonPress(FileUpload fileUpload, ButtonInteractionEvent event) {
+		if (fileUpload == null) {
+			BotLogger.log("FileUpload null");
+			return;
+		}
+		event.getHook().sendMessage("Here is your requested image").addFiles(fileUpload).setEphemeral(true).queue();
 	}
 
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {

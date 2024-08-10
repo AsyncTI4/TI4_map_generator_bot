@@ -12,19 +12,25 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.Route;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
+import ti4.commands.event.RevealEvent;
+import ti4.commands.explore.DrawRelic;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -413,6 +419,9 @@ public class SCPlay extends PlayerSubcommandData {
             case "pok7technology" -> getTechnologyButtons(sc);
             case "pok8imperial" -> getImperialButtons(sc);
             // add your own special button resolutions here as additional cases
+            // ignis aurora
+            case "ignisaurora3" -> getGenericButtons(sc); //TODO: do it
+            case "ignisaurora8" -> getIgnisAuroraSC8Buttons(sc);
             default -> getGenericButtons(sc);
         };
     }
@@ -536,5 +545,30 @@ public class SCPlay extends PlayerSubcommandData {
         Button followButton = Button.success("sc_follow_" + sc, "Spend 1 Strategy Token");
         Button noFollowButton = Button.primary("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, noFollowButton);
+    }
+
+    private static List<Button> getIgnisAuroraSC8Buttons(int sc) {
+        Button primary = Buttons.blue("ignisAuroraSC8Primary", "[Primary] Gain Relic & Reveal Event");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button secondary = Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", Emojis.UFrag);
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        return List.of(primary, followButton, secondary, noFollowButton);
+    }
+
+    @ButtonHandler("ignisAuroraSC8Primary")
+    public static void resolveIgnisAuroraSC8Primary(ButtonInteractionEvent event, Game game, Player player) {
+        if (!player.getSCs().contains(8)) {
+            MessageHelper.sendMessageToEventChannel(event, "You don't have the Antiquities strategy card.");
+            return;
+        }
+        event.editButton(event.getButton().asDisabled()).queue();
+        DrawRelic.drawRelicAndNotify(player, event, game);
+        RevealEvent.revealEvent(event, game, game.getMainGameChannel());
+    }
+
+    @ButtonHandler("ignisAuroraSC8Secondary")
+    public static void resolveIgnisAuroraSC8Secondary(ButtonInteractionEvent event, Game game, Player player) {
+        player.addFragment("urf1");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained an " + Emojis.UFrag + " Unknown Relic Fragment");
     }
 }

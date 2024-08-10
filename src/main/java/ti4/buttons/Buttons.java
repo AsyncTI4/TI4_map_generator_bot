@@ -44,34 +44,58 @@ public class Buttons {
         REFRESH_PLANET_INFO,
         FACTION_EMBED);
 
+    /**
+     * A blue button (primary style)
+     */
     public static Button blue(String buttonID, String buttonLabel) {
         return Button.primary(buttonID, buttonLabel);
     }
 
+    /**
+     * A blue button (primary style) with an emoji
+     */
     public static Button blue(String buttonID, String buttonLabel, String emoji) {
         return Button.primary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
+    /**
+     * A gray button (secondary style)
+     */
     public static Button gray(String buttonID, String buttonLabel) {
         return Button.secondary(buttonID, buttonLabel);
     }
 
+    /**
+     * A gray button (secondary style) with an emoji
+     */
     public static Button gray(String buttonID, String buttonLabel, String emoji) {
         return Button.secondary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
+    /**
+     * A green button (success style)
+     */
     public static Button green(String buttonID, String buttonLabel) {
         return Button.success(buttonID, buttonLabel);
     }
 
+    /**
+     * A green button (success style) with an emoji
+     */
     public static Button green(String buttonID, String buttonLabel, String emoji) {
         return Button.success(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
+    /**
+     * A red button (danger style) with an emoji
+     */
     public static Button red(String buttonID, String buttonLabel) {
         return Button.danger(buttonID, buttonLabel);
     }
 
+    /**
+     * A red button (danger style) with an emoji
+     */
     public static Button red(String buttonID, String buttonLabel, String emoji) {
         return Button.danger(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }

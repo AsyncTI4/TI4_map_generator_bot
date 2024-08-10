@@ -12,6 +12,10 @@ import ti4.message.MessageHelper;
 public class ButtonHelperStats {
 
     public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt) {
+        convertComms(event, game, player, amt, event.getMessage().getContentRaw().contains("explore"));
+    }
+
+    public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg) {
         String message, ident = player.getRepresentation();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
@@ -35,7 +39,7 @@ public class ButtonHelperStats {
 
         ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
-        if (event.getMessage().getContentRaw().contains("explore")) {
+        if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
         }
     }

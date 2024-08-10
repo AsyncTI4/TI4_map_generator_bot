@@ -56,7 +56,7 @@ public class RoundSummaryHelper {
             .build();
         Modal modal = Modal.create(modalId, "End of Round " + roundNum + " Summary").addActionRow(summary).build();
         event.replyModal(modal).queue();
-        ButtonHelper.deleteMessage(event);
+        //ButtonHelper.deleteMessage(event); Breaks submiting the summary for some reason
     }
 
     @ModalHandler("finishEditRoundSummary_")

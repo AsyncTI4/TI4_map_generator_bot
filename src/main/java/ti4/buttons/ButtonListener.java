@@ -1871,7 +1871,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (result.contains("committee")) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), ButtonHelper.getIdentOrColor(player,
                         game)
-                        + " has chosen to discard Committee Formation to choose the winner. Note that \"after\"s may be played before this occurs, and that Confounding (or Confusing) Legal Text may still be played.");
+                        + " has chosen to discard Committee Formation to choose the winner. Note that \"after\"s may be played before this occurs, and that Confounding (or Confusing) Legal Text may still be played (you should probably wait and confirm no Legal Texts before resolving).");
                     boolean success = game.removeLaw(game.getLaws().get("committee"));
                 }
                 String resMessage3 = "Please select the winner.";
@@ -2440,7 +2440,7 @@ public class ButtonListener extends ListenerAdapter {
                 .findFirst().orElse(null);
 
             if (lanefirPlayer != null) {
-                ButtonHelper.commanderUnlockCheck(player, game, "lanefir", event);
+                ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
             }
 
             String message = player.getRepresentation() + " purged relic fragments: "
@@ -3229,7 +3229,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null,
                     List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
                 case "gameInfoButtons" -> ListPlayerInfoButton.offerInfoButtons(event);
-                case "refreshACInfo" -> ACInfo.sendActionCardInfo(game, player, event);
                 case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
                 case "refreshSOInfo" -> SOInfo.sendSecretObjectiveInfo(game, player, event);
                 case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(game, player, event);
@@ -4166,6 +4165,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "convert_2_comms" -> ButtonHelperStats.convertComms(event, game, player, 2);
                 case "convert_3_comms" -> ButtonHelperStats.convertComms(event, game, player, 3);
                 case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
+                case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
                 // etc
                 case "startPlayerSetup" -> ButtonHelper.resolveSetupStep0(player, game, event);
                 case "comm_for_AC" -> {
@@ -4682,7 +4682,9 @@ public class ButtonListener extends ListenerAdapter {
                     ident, finsFactionCheckerPrefix);
                 case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, false, true, false);
                 case "cardsInfo" -> CardsInfo.sendCardsInfo(game, player, event);
+                case "showMap" -> ShowGame.showMap(game, event);
                 case "showGameAgain" -> ShowGame.simpleShowGame(game, event);
+                case "showPlayerAreas" -> ShowGame.showPlayArea(game, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, game, player, ident);
                 case "doneLanding" -> ButtonHelperModifyUnits.finishLanding(buttonID, event, game, player);
                 case "vote" -> {

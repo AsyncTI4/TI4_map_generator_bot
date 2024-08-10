@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
-import ti4.generator.Mapper;
 import ti4.generator.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -165,7 +165,10 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + "\nAn agenda has been revealed";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
-
+        if (!action) {
+            MessageHelper.sendMessageToChannel(channel,
+                "The game believes this is agenda #" + aCount + " of this agenda phase");
+        }
         StringBuilder whensAftersMessage = new StringBuilder(
             "Please indicate whether you abstain from playing \"when\"s or \"after\"s below.\nIf you have an action card with those windows, you may simply play it.");
         if (action) {
@@ -204,8 +207,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                 "# " + game.getPing() + " the agenda target is " + agendaTarget
                     + ". Sent the agenda to the speaker's `#Cards Info` thread.");
         }
-        MessageHelper.sendMessageToChannel(channel,
-            "The game believes this is agenda #" + aCount + " of this agenda phase");
+
         if (!action && aCount == 1) {
             AgendaHelper.pingAboutDebt(game);
             String key = "round" + game.getRound() + "AgendaPlacement";

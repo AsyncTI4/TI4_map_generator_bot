@@ -6,6 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -85,6 +86,18 @@ public class ShowGame implements Command {
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
         simpleShowGame(game, event, DisplayType.all);
+    }
+
+    public static void showMap(Game game, ButtonInteractionEvent event) {
+        MapGenerator.saveImage(game, DisplayType.map, event).thenAccept(fileUpload -> {
+            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
+        });
+    }
+
+    public static void showPlayArea(Game game, ButtonInteractionEvent event) {
+        MapGenerator.saveImage(game, DisplayType.stats, event).thenAccept(fileUpload -> {
+            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
+        });
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {

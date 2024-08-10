@@ -457,7 +457,7 @@ public class ButtonHelper {
             damaged = true;
         }
         Die d1 = new Die(4);
-        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getPosition()  + " rolled a " + d1.getResult();
+        String msg = Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile " + tile.getPosition() + " rolled a " + d1.getResult();
         if (damaged) {
             msg = "A damaged " + msg;
         }
@@ -1428,20 +1428,20 @@ public class ButtonHelper {
     }
 
     public static int resolveOnActivationEnemyAbilities(Game game, Tile activeSystem, Player player,
-        boolean justChecking, GenericInteractionCreateEvent event) {
+        boolean justChecking, ButtonInteractionEvent event) {
         int numberOfAbilities = 0;
         if (game.isL1Hero()) {
             return 0;
         }
         String activePlayerident = player.getRepresentation();
         MessageChannel channel = game.getActionsChannel();
-
+        System.out.println("beep");
         Player ghostPlayer = Helper.getPlayerFromUnit(game, "ghost_mech");
         if (!game.isFowMode() && ghostPlayer != null && ghostPlayer != player
             && getNumberOfUnitsOnTheBoard(game, ghostPlayer, "mech", false) > 0
             && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                "This is a reminder that if you are moving via Creuss wormhole, you should first pause and check if the Creuss player wants to use their mech to move that wormhole.");
+            System.out.println("boop");
+            event.getHook().sendMessage(player.getRepresentation() + " This is a reminder that if you are moving via Creuss wormhole, you should first pause and check if the Creuss player wants to use their mech to move that wormhole.").setEphemeral(true).queue();
         }
         if (!game.isFowMode() && ButtonHelper.isLawInPlay(game, "minister_peace")) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, activeSystem, game)) {
@@ -1454,8 +1454,7 @@ public class ButtonHelper {
                             buttons2.add(hacanButton);
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                                 "Reminder you may use Minister of Peace.", buttons2);
-                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                "Reminder you should really check in with the Minister of Peace if this activation has the possibility of being relevant. If you proceed over their window, a rollback may be required.");
+                            event.getHook().sendMessage(player.getRepresentation() + " Reminder you should really check in with the Minister of Peace if this activation has the possibility of being relevant. If you proceed over their window, a rollback may be required.").queue();
                         }
                     }
                 }
@@ -8934,7 +8933,8 @@ public class ButtonHelper {
             String techEmoji = techRep.getCondensedReqsEmojis(true);
             String techText = techRep.getText();
 
-            if (techText.contains("ACTION") || (tech.equalsIgnoreCase("det") && game.isAgeOfExplorationMode())) {
+            if (techText.contains("ACTION") || 
+              ((tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det")) && game.isAgeOfExplorationMode())) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
@@ -9850,6 +9850,9 @@ public class ButtonHelper {
                     String message = "Select the technology you would like to ready.";
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message,
                         getAllTechsToReady(game, p1));
+                    List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
+                    String message2 = "Use buttons to end turn or do another action";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 }
             }
             case "getRelic" -> {
