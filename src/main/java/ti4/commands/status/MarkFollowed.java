@@ -12,9 +12,9 @@ import ti4.message.MessageHelper;
 
 public class MarkFollowed extends StatusSubcommandData {
     public MarkFollowed() {
-        super(Constants.MARK_FOLLOWED, "Mark player as having followed an SC");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "SC player followed").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true).setRequired(true));
+        super(Constants.MARK_FOLLOWED, "Mark player as having followed a Strategy Card");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Inititive value of Strategy Card that was followed").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color who followed").setAutoComplete(true).setRequired(true));
     }
 
     @Override
@@ -24,13 +24,14 @@ public class MarkFollowed extends StatusSubcommandData {
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found/");
             return;
         }
 
         OptionMapping option = event.getOption(Constants.SC);
         player.addFollowedSC(option.getAsInt());
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully marked " + player.getRepresentation() + " as having followed SC #" + (option.getAsInt()));
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Successfully marked " + player.getRepresentation() + " as having followed " + Helper.getSCName(option.getAsInt(), game) + ".");
 
     }
 

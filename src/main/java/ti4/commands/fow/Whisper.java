@@ -11,6 +11,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -109,8 +110,8 @@ public class Whisper extends FOWSubcommandData {
                     int num = Integer.parseInt(whisperHistory);
                     num = num + 1;
                     game.setStoredValue(key, "" + num);
-                    if ((num == 5 || num == 10)) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to " + player_.getFactionEmoji());
+                    if (num%5 == 0) {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending their " + StringHelper.ordinal(num) + " whisper of this turn to " + player_.getFactionEmoji());
                     }
                 }
             }

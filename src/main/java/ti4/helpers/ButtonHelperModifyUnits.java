@@ -393,7 +393,7 @@ public class ButtonHelperModifyUnits {
             for (int x = 0; x < min; x++) {
                 player.setTg(player.getTg() + 1);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation() + " gained 1TG from a mech dying while owning Self-Assembly Routines.");
+                    player.getRepresentation() + " gained 1 trade good from Self-Assembly Routines because of a dead mech.");
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -405,7 +405,7 @@ public class ButtonHelperModifyUnits {
         }
         if (player.hasUnit("cheiran_mech")) {
             new AddUnits().unitParsing(event, player.getColor(), tile, min + " infantry " + unitHolder.getName(), game);
-            msg.append("> Added ").append(min).append(" infantry to the planet due to Cheiran mech trigger\n");
+            msg.append("> Added ").append(min).append(" infantry to the planet due to Cheiran mech trigger.\n");
         }
         return msg.toString();
     }
@@ -433,8 +433,8 @@ public class ButtonHelperModifyUnits {
             for (int x = 0; x < min; x++) {
                 player.setTg(player.getTg() + 1);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1) + "->" + player.getTg()
-                        + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                    player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1) + "->" + player.getTg()
+                        + ") from Self-Assembly Routines because of a dead mech (this is a mandatory gain).");
                 ButtonHelperAbilities.pillageCheck(player, game);
             }
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -2125,7 +2125,7 @@ public class ButtonHelperModifyUnits {
                                         player.getCorrectChannel(),
                                         player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                            + ") Self-Assembly Routines because of a dead mech (this is a mandatory gain).");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -2237,7 +2237,7 @@ public class ButtonHelperModifyUnits {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                         .getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1) + "->"
                         + player.getTg()
-                        + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                        + ") Self-Assembly Routines because of a dead mech (this is a mandatory gain).");
                     ButtonHelperAbilities.pillageCheck(player, game);
                 }
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);

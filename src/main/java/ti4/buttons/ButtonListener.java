@@ -122,6 +122,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.StringHelper;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
@@ -1830,7 +1831,7 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 aCount = Integer.parseInt(agendaCount) + 1;
             }
-            Button flipNextAgenda = Button.primary("flip_agenda", "Flip Agenda #" + aCount);
+            Button flipNextAgenda = Button.primary("flip_agenda", "Flip " + StringHelper.ordinal(aCount) + " Agenda");
             Button proceedToStrategyPhase = Button.success("proceed_to_strategy",
                 "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
             List<Button> resActionRow = Arrays.asList(flipNextAgenda, proceedToStrategyPhase);

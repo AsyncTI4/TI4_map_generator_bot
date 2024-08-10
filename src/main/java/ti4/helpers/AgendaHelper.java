@@ -55,6 +55,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Planet;
@@ -476,7 +477,7 @@ public class AgendaHelper {
                                         player.getCorrectChannel(),
                                         player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                            + ") Self-Assembly Routines because of a dead mech (this is a mandatory gain).");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -548,7 +549,7 @@ public class AgendaHelper {
                                         player.getCorrectChannel(),
                                         player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
                                             + "->" + player.getTg()
-                                            + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                            + ") Self-Assembly Routines because of a dead mech (this is a mandatory gain).");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -974,7 +975,7 @@ public class AgendaHelper {
         } else {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
-        Button flipNextAgenda = Button.primary("flip_agenda", "Flip Agenda #" + aCount);
+        Button flipNextAgenda = Button.primary("flip_agenda", "Flip " + StringHelper.ordinal(aCount) +  " Agenda");
         Button proceedToStrategyPhase = Button.success("proceed_to_strategy",
             "Proceed to Strategy Phase (Will Run Agenda Cleanup And Ping Speaker)");
         List<Button> resActionRow = List.of(flipNextAgenda, proceedToStrategyPhase);

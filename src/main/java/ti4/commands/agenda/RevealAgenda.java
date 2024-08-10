@@ -19,6 +19,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
+import ti4.helpers.StringHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -167,7 +168,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
             MessageHelper.sendMessageToChannel(channel,
-                "The game believes this is agenda #" + aCount + " of this agenda phase");
+                "The game believes this is the **" + StringHelper.ordinal(aCount) + "** agenda of this agenda phase.");
         }
         StringBuilder whensAftersMessage = new StringBuilder(
             "Please indicate whether you abstain from playing \"when\"s or \"after\"s below.\nIf you have an action card with those windows, you may simply play it.");
@@ -232,7 +233,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         if (!game.isFowMode() && !action) {
             ButtonHelper.updateMap(game, event,
-                "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
+                "Start of the " + StringHelper.ordinal(aCount) + " agenda: " + agendaName + ".");
             game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, new Date().getTime() + "");
         }
     }

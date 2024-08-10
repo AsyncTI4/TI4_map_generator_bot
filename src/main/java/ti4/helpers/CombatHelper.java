@@ -505,7 +505,7 @@ public class CombatHelper {
                                 for (int x = 0; x < misses; x++) {
                                     player.setTg(player.getTg() + 1);
                                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
-                                        + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                        + "->" + player.getTg() + ") Self-Assembly Routines because of a dead mech (this is a mandatory gain).");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);

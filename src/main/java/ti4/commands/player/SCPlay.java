@@ -39,12 +39,12 @@ import ti4.model.StrategyCardModel;
 
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
-        super(Constants.SC_PLAY, "Play a Strategy Card");
+        super(Constants.SC_PLAY, "Play a Strategy Card.");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD,
-            "Which strategy card to play. If you have more than 1 strategy card, this is mandatory"));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
+            "Which strategy card to play; if you have more than 1 strategy card, this is mandatory"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player that is playing the strategy card (default: you)"));
         addOptions(
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color that is playing the strategy card (default: you)")
                 .setAutoComplete(true));
     }
 
@@ -62,7 +62,7 @@ public class SCPlay extends PlayerSubcommandData {
             : game.getMainGameChannel();
 
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game");
+            MessageHelper.sendMessageToEventChannel(event, "You are not a player of this game.");
             return;
         }
 
@@ -237,18 +237,17 @@ public class SCPlay extends PlayerSubcommandData {
                                 scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 Debt"));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
-                                "These buttons will work inside the thread", scButtons);
+                                "These buttons will work inside the thread.", scButtons);
                             if (scToPlay == 5) {
                                 String neighborsMsg = "NOT neighbors with the Trade holder:";
-                                for (Player p2 : game.getRealPlayers()) {
-                                    if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                        neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
-                                    }
-                                }
                                 String neighborsMsg2 = "Neighbors with the Trade holder:";
                                 for (Player p2 : game.getRealPlayers()) {
                                     if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                        neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
+                                        neighborsMsg2 += " " + p2.getFactionEmoji();
+                                    }
+                                    else
+                                    {
+                                        neighborsMsg += p2.getFactionEmoji();
                                     }
                                 }
                                 if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
@@ -270,7 +269,7 @@ public class SCPlay extends PlayerSubcommandData {
         if (scModel.usesAutomationForSCID("pok3politics")) {
             String assignSpeakerMessage = player.getRepresentation()
                 + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
-                + Emojis.SpeakerToken;
+                + Emojis.SpeakerToken + ".";
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -280,15 +279,15 @@ public class SCPlay extends PlayerSubcommandData {
             && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation()
-                    + " this is a reminder that this strategy card is Kyro Cursed and therefore you should only do 1 of its clauses. ");
+                    + " this is a reminder that this strategy card is Kyro Cursed and therefore you should only do 1 of its clauses.");
         }
 
         if (scModel.usesAutomationForSCID("pok3politics")) {
             String assignSpeakerMessage2 = player.getRepresentation()
-                + " after assigning speaker, Use this button to draw agendas into your `#Cards Info` thread.";
+                + " after assigning Speaker, use this button to draw agendas into your `#Cards Info` thread.";
 
             List<Button> drawAgendaButton = new ArrayList<>();
-            Button draw2Agenda = Button.success("FFCC_" + player.getFaction() + "_" + "drawAgenda_2", "Draw 2 agendas");
+            Button draw2Agenda = Button.success("FFCC_" + player.getFaction() + "_" + "drawAgenda_2", "Draw 2 Agendas");
             drawAgendaButton.add(draw2Agenda);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage2, drawAgendaButton);
@@ -307,7 +306,7 @@ public class SCPlay extends PlayerSubcommandData {
 
             for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                    String message2 = p2.getRepresentation(true, true) + " heads up, Trade has just been played and this is a reminder that you do not hold your Trade Agreement";
+                    String message2 = p2.getRepresentation(true, true) + " heads up, Trade has just been played and this is a reminder that you do not hold your Trade Agreement.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
                     for (Player p3 : game.getRealPlayers()) {
                         if (p2 == p3) {
@@ -383,7 +382,7 @@ public class SCPlay extends PlayerSubcommandData {
                             String acqMessage = player2.getRepresentation(true, true)
                                 + " you may use this button to play Acquiescence, the Winnu promissory note!";
                             List<Button> buttons = new ArrayList<>();
-                            buttons.add(Button.success("winnuPNPlay_" + scToPlay, "Use Acquisence"));
+                            buttons.add(Button.success("winnuPNPlay_" + scToPlay, "Use Acquiescence"));
                             buttons.add(Button.danger("deleteButtons", "Decline"));
                             MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), acqMessage,
                                 buttons);
@@ -549,7 +548,7 @@ public class SCPlay extends PlayerSubcommandData {
 
     private static List<Button> getIgnisAuroraSC8Buttons(int sc) {
         Button primary = Buttons.blue("ignisAuroraSC8Primary", "[Primary] Gain Relic & Reveal Event");
-        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend 1 Strategy Token");
         Button secondary = Buttons.green("ignisAuroraSC8Secondary", "Draw Unknown Relic Fragment", Emojis.UFrag);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(primary, followButton, secondary, noFollowButton);
@@ -569,6 +568,6 @@ public class SCPlay extends PlayerSubcommandData {
     @ButtonHandler("ignisAuroraSC8Secondary")
     public static void resolveIgnisAuroraSC8Secondary(ButtonInteractionEvent event, Game game, Player player) {
         player.addFragment("urf1");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained an " + Emojis.UFrag + " Unknown Relic Fragment");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained an " + Emojis.UFrag + " Unknown Relic Fragment.");
     }
 }

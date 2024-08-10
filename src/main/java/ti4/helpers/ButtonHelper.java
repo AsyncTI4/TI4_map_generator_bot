@@ -9851,7 +9851,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message,
                         getAllTechsToReady(game, p1));
                     List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
-                    String message2 = "Use buttons to end turn or do another action";
+                    String message2 = "Use buttons to end turn or do another action.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 }
             }
