@@ -313,7 +313,8 @@ public class Constants {
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172, 150);
     public static final Point MIRAGE_POSITION = new Point(172, 33); // 55, 5
-    public static final Point MIRAGE_CENTER_POSITION = new Point(71, 69);
+    public static final Point MIRAGE_TRIPLE_POSITION = new Point(38, 178);
+    public static final Point MIRAGE_CENTER_POSITION = new Point(71, 59);
     public static final String MIRAGE = "mirage";
     public static final String SLEEPER = "sleeper";
     public static final String DMZ = "dmz";

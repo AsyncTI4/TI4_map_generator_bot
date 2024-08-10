@@ -4672,9 +4672,16 @@ public class MapGenerator {
                 boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
                 Point position = unitTokenPosition.getPosition(controlID);
                 if (isMirage) {
-                    if (position == null) {
-                        position = new Point(Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y);
-                    } else {
+                    if (tile.getPlanetUnitHolders().size() == 3+1)
+                    {
+                        position = Constants.MIRAGE_TRIPLE_POSITION;
+                    }
+                    else if (position == null)
+                    {
+                        position = Constants.MIRAGE_POSITION;
+                    }
+                    else
+                    {
                         position.x += Constants.MIRAGE_POSITION.x;
                         position.y += Constants.MIRAGE_POSITION.y;
                     }
@@ -4722,6 +4729,11 @@ public class MapGenerator {
         Function<String, Boolean> isValid, Game game) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
+        if (unitHolder.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
+        {
+            centerPosition = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
+                Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
+        }
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.remove(null);
         tokenList.sort((o1, o2) -> {
@@ -4930,9 +4942,16 @@ public class MapGenerator {
                     boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
 
                     if (isMirage) {
-                        if (position == null) {
-                            position = new Point(Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y);
-                        } else {
+                        if (tile.getPlanetUnitHolders().size() == 3+1)
+                        {
+                            position = Constants.MIRAGE_TRIPLE_POSITION;
+                        }
+                        else if (position == null)
+                        {
+                            position = Constants.MIRAGE_POSITION;
+                        }
+                        else
+                        {
                             position.x += Constants.MIRAGE_POSITION.x;
                             position.y += Constants.MIRAGE_POSITION.y;
                         }
@@ -4987,7 +5006,7 @@ public class MapGenerator {
         float mirageDragRatio = 2.0f/3;
         int mirageDragX = Math.round((345/8 + TILE_PADDING) * (1-mirageDragRatio));
         int mirageDragY = Math.round((3*300/4 + TILE_PADDING) * (1-mirageDragRatio));
-        boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"));
+        boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage")) && (tile.getPlanetUnitHolders().size() != 3+1);
         List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = centerPosition.x;
@@ -5006,8 +5025,16 @@ public class MapGenerator {
                 return;
 
             if (tokenPath.contains(Constants.MIRAGE)) {
-                tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_POSITION.x,
-                    TILE_PADDING + Constants.MIRAGE_POSITION.y, null);
+                if (tile.getPlanetUnitHolders().size() == 3+1)
+                {
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.x,
+                        TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.y, null);
+                }
+                else
+                {
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_POSITION.x,
+                        TILE_PADDING + Constants.MIRAGE_POSITION.y, null);
+                }
             } else if (tokenPath.contains(Constants.SLEEPER)) {
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
                     TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
@@ -5031,8 +5058,12 @@ public class MapGenerator {
                 }
                 if (hasMirage)
                 {
+                    drawX += (tokenImage.getWidth() / 2);
+                    drawY += (tokenImage.getHeight() / 2);
                     drawX = Math.round(mirageDragRatio * drawX) + mirageDragX;
                     drawY = Math.round(mirageDragRatio * drawY) + mirageDragY;
+                    drawX -= (tokenImage.getWidth() / 2);
+                    drawY -= (tokenImage.getHeight() / 2);
                 }
                 tileGraphics.drawImage(tokenImage, drawX, drawY, null);
 
@@ -5079,7 +5110,8 @@ public class MapGenerator {
         if (isSpace)
         {
             Set<String> tokenList = unitHolder.getTokenList();
-            hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"));
+            hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"))
+                && (tile.getPlanetUnitHolders().size() != 3+1);
         }
 
         boolean isCabalJail = "s11".equals(tile.getTileID());
@@ -5265,13 +5297,25 @@ public class MapGenerator {
                 int imageY = position != null ? position.y : yOriginal - (unitImage.getHeight() / 2);
                 imageY += TILE_PADDING;
                 if (isMirage) {
-                    imageX += Constants.MIRAGE_POSITION.x;
-                    imageY += Constants.MIRAGE_POSITION.y;
+                    if (tile.getPlanetUnitHolders().size() == 3+1)
+                    {
+                        imageX += Constants.MIRAGE_TRIPLE_POSITION.x;
+                        imageY += Constants.MIRAGE_TRIPLE_POSITION.y;
+                    }
+                    else
+                    {
+                        imageX += Constants.MIRAGE_POSITION.x;
+                        imageY += Constants.MIRAGE_POSITION.y;
+                    }
                 }
-                if (hasMirage)
+                else if (hasMirage)
                 {
+                    imageX += (unitImage.getWidth() / 2);
+                    imageY += (unitImage.getHeight() / 2);
                     imageX = Math.round(mirageDragRatio * imageX) + mirageDragX + (fighterOrInfantry ? 60 : 0);
                     imageY = Math.round(mirageDragRatio * imageY) + mirageDragY;
+                    imageX -= (unitImage.getWidth() / 2);
+                    imageY -= (unitImage.getHeight() / 2);
                 }
 
                 tileGraphics.drawImage(unitImage, imageX, imageY, null);
