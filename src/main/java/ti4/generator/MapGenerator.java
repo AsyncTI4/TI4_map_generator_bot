@@ -4984,6 +4984,10 @@ public class MapGenerator {
         int y = 0;
         int deltaX = 80;
         int deltaY = 0;
+        float mirageDragRatio = 2.0f/3;
+        int mirageDragX = Math.round((345/8 + TILE_PADDING) * (1-mirageDragRatio));
+        int mirageDragY = Math.round((3*300/4 + TILE_PADDING) * (1-mirageDragRatio));
+        boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"));
         List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = centerPosition.x;
@@ -5025,6 +5029,11 @@ public class MapGenerator {
                     deltaX += 30;
                     deltaY += 30;
                 }
+                if (hasMirage)
+                {
+                    drawX = Math.round(mirageDragRatio * drawX) + mirageDragX;
+                    drawY = Math.round(mirageDragRatio * drawY) + mirageDragY;
+                }
                 tileGraphics.drawImage(tokenImage, drawX, drawY, null);
 
                 // add icons to wormholes for agendas
@@ -5062,6 +5071,16 @@ public class MapGenerator {
         Map<UnitKey, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        
+        float mirageDragRatio = 2.0f/3;
+        int mirageDragX = Math.round((345/8 + TILE_PADDING) * (1-mirageDragRatio));
+        int mirageDragY = Math.round((3*300/4 + TILE_PADDING) * (1-mirageDragRatio));
+        boolean hasMirage = false;
+        if (isSpace)
+        {
+            Set<String> tokenList = unitHolder.getTokenList();
+            hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"));
+        }
 
         boolean isCabalJail = "s11".equals(tile.getTileID());
         boolean isNekroJail = "s12".equals(tile.getTileID());
@@ -5242,26 +5261,33 @@ public class MapGenerator {
                 int xOriginal = centerPosition.x + x;
                 int yOriginal = centerPosition.y + y;
                 int imageX = position != null ? position.x : xOriginal - (unitImage.getWidth() / 2);
+                imageX += TILE_PADDING;
                 int imageY = position != null ? position.y : yOriginal - (unitImage.getHeight() / 2);
+                imageY += TILE_PADDING;
                 if (isMirage) {
                     imageX += Constants.MIRAGE_POSITION.x;
                     imageY += Constants.MIRAGE_POSITION.y;
                 }
+                if (hasMirage)
+                {
+                    imageX = Math.round(mirageDragRatio * imageX) + mirageDragX + (fighterOrInfantry ? 60 : 0);
+                    imageY = Math.round(mirageDragRatio * imageY) + mirageDragY;
+                }
 
-                tileGraphics.drawImage(unitImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                tileGraphics.drawImage(unitImage, imageX, imageY, null);
                 if (unitKey.getUnitType() == UnitType.Mech && (ButtonHelper.isLawInPlay(game, "articles_war") || ButtonHelper.isLawInPlay(game, "absol_articleswar"))) {
                     BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_articles_of_war" + getBlackWhiteFileSuffix(unitKey.getColorID())));
-                    tileGraphics.drawImage(mechTearImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    tileGraphics.drawImage(mechTearImage, imageX, imageY, null);
                 }
                 else if (unitKey.getUnitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
                     BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + getBlackWhiteFileSuffix(unitKey.getColorID())));
-                    tileGraphics.drawImage(wsCrackImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
                 }
                 if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
-                    tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    tileGraphics.drawImage(decal, imageX, imageY, null);
                 }
                 if (spoopy != null) {
-                    tileGraphics.drawImage(spoopy, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    tileGraphics.drawImage(spoopy, imageX, imageY, null);
                 }
 
                 // UNIT TAGS
@@ -5275,15 +5301,15 @@ public class MapGenerator {
                             .read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
                         Point plaquetteOffset = getUnitTagLocation(id);
 
-                        tileGraphics.drawImage(plaquette, TILE_PADDING + imageX + plaquetteOffset.x,
-                            TILE_PADDING + imageY + plaquetteOffset.y, null);
-                        drawPlayerFactionIconImage(tileGraphics, player, TILE_PADDING + imageX + plaquetteOffset.x,
-                            TILE_PADDING + imageY + plaquetteOffset.y, 32, 32);
+                        tileGraphics.drawImage(plaquette, imageX + plaquetteOffset.x,
+                            imageY + plaquetteOffset.y, null);
+                        drawPlayerFactionIconImage(tileGraphics, player, imageX + plaquetteOffset.x,
+                            imageY + plaquetteOffset.y, 32, 32);
 
                         tileGraphics.setColor(Color.WHITE);
                         drawCenteredString(tileGraphics, factionTag,
-                            new Rectangle(TILE_PADDING + imageX + plaquetteOffset.x + 25,
-                                TILE_PADDING + imageY + plaquetteOffset.y + 17, 40, 13),
+                            new Rectangle(imageX + plaquetteOffset.x + 25,
+                                imageY + plaquetteOffset.y + 17, 40, 13),
                             Storage.getFont13());
                     }
                 }
@@ -5299,8 +5325,8 @@ public class MapGenerator {
                         scaledNumberPositionY = scaledNumberPositionY + 5;
                     }
                     tileGraphics.drawString(Integer.toString(bulkUnitCount),
-                        TILE_PADDING + imageX + scaledNumberPositionX,
-                        TILE_PADDING + imageY + scaledNumberPositionY);
+                        imageX + scaledNumberPositionX,
+                        imageY + scaledNumberPositionY);
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
@@ -5314,8 +5340,8 @@ public class MapGenerator {
                         ? position.y + (unitImage.getHeight() / 2) - (dmgImage.getHeight() / 2)
                         : yOriginal - (dmgImage.getHeight() / 2);
                     if (isMirage) {
-                        imageDmgX = imageX;
-                        imageDmgY = imageY;
+                        imageDmgX = imageX - TILE_PADDING;
+                        imageDmgY = imageY - TILE_PADDING;
                     } else if (unitKey.getUnitType() == UnitType.Mech) {
                         imageDmgX = position != null ? position.x : xOriginal - (dmgImage.getWidth());
                         imageDmgY = position != null ? position.y : yOriginal - (dmgImage.getHeight());
