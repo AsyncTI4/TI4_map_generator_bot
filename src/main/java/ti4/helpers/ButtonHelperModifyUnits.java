@@ -702,7 +702,7 @@ public class ButtonHelperModifyUnits {
                     } else {
                         msg += "> Would repair 1 " + unitModel.getUnitEmoji() + " due to Duranium Armor\n";
                     }
-                    usedDuraniumAlready = true;
+                    break;
                 }
             }
         }
