@@ -1071,6 +1071,7 @@ public class MapGenerator {
             betaOnMap |= tileTokens.contains(betaID);
             gammaOnMap |= tileTokens.contains(gammaID);
         }
+        yPlayAreaSecondRow += 25;
 
         xDeltaSecondRowFromRightSide += (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 90);
         boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
@@ -1079,38 +1080,41 @@ public class MapGenerator {
         if (!gammaOnMap) {
             String tokenFile = Mapper.getTokenPath(gammaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             xDeltaSecondRowFromRightSide += 40;
+            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
         }
 
         if (!betaOnMap) {
             String tokenFile = Mapper.getTokenPath(betaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
                 BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
+                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 40, null);
             }
             if (reconstruction) {
                 BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whalpha.png"), 40.0f / 65);
-                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             }
             xDeltaSecondRowFromRightSide += 40;
+            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
         }
 
         if (!alphaOnMap) {
             String tokenFile = Mapper.getTokenPath(alphaID);
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
-            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+            graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
                 BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
-                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 80, null);
+                graphics.drawImage(blockedWormholeImage, width - xDeltaSecondRowFromRightSide + 40, yPlayAreaSecondRow + 40, null);
             }
             if (reconstruction) {
                 BufferedImage doubleWormholeImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTokenFile("token_whbeta.png"), 40.0f / 65);
-                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 40, null);
+                graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             }
             xDeltaSecondRowFromRightSide += 40;
+            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
         }
 
         xDeltaSecondRowFromRightSide -= (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 40);
@@ -2376,6 +2380,15 @@ public class MapGenerator {
 
     private int techFieldUnit(int x, int y, List<String> techs, int deltaX, Player player, Game game) {
         drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
+        
+        boolean brokenWarSun = false;
+        if (ButtonHelper.isLawInPlay(game, "schematics"))
+        {
+            for (Player p2: game.getPlayers().values())
+            {
+                brokenWarSun |= p2.hasWarsunTech();
+            }
+        }
 
         // Add unit upgrade images
         if (techs != null) {
@@ -2395,6 +2408,15 @@ public class MapGenerator {
                 UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
             }
+        }
+        if (brokenWarSun)
+        {
+            UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
+            Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
+            UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
+            BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile(
+                "agenda_publicize_weapon_schematics" + (player.hasWarsunTech() ? getBlackWhiteFileSuffix(unitKey.getColorID()) : "_blk.png")));
+            graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }
 
         // Add faction icons on top of upgraded or upgradable units
@@ -4650,9 +4672,16 @@ public class MapGenerator {
                 boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
                 Point position = unitTokenPosition.getPosition(controlID);
                 if (isMirage) {
-                    if (position == null) {
-                        position = new Point(Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y);
-                    } else {
+                    if (tile.getPlanetUnitHolders().size() == 3+1)
+                    {
+                        position = Constants.MIRAGE_TRIPLE_POSITION;
+                    }
+                    else if (position == null)
+                    {
+                        position = Constants.MIRAGE_POSITION;
+                    }
+                    else
+                    {
                         position.x += Constants.MIRAGE_POSITION.x;
                         position.y += Constants.MIRAGE_POSITION.y;
                     }
@@ -4700,6 +4729,11 @@ public class MapGenerator {
         Function<String, Boolean> isValid, Game game) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
+        if (unitHolder.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
+        {
+            centerPosition = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
+                Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
+        }
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.remove(null);
         tokenList.sort((o1, o2) -> {
@@ -4790,6 +4824,11 @@ public class MapGenerator {
     }
 
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
+
+        if (unitHolder.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
+        {
+            return false;
+        }
 
         Map<UnitKey, Integer> units = unitHolder.getUnits();
 
@@ -4901,11 +4940,18 @@ public class MapGenerator {
                 } else {
                     Point position = unitTokenPosition.getPosition(tokenID);
                     boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
-
                     if (isMirage) {
-                        if (position == null) {
-                            position = new Point(Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y);
-                        } else {
+                        if (tile.getPlanetUnitHolders().size() == 3+1)
+                        {
+                            position.x += Constants.MIRAGE_TRIPLE_POSITION.x;
+                            position.y += Constants.MIRAGE_TRIPLE_POSITION.y;
+                        }
+                        else if (position == null)
+                        {
+                            position = Constants.MIRAGE_POSITION;
+                        }
+                        else
+                        {
                             position.x += Constants.MIRAGE_POSITION.x;
                             position.y += Constants.MIRAGE_POSITION.y;
                         }
@@ -4957,6 +5003,10 @@ public class MapGenerator {
         int y = 0;
         int deltaX = 80;
         int deltaY = 0;
+        float mirageDragRatio = 2.0f/3;
+        int mirageDragX = Math.round((345/8 + TILE_PADDING) * (1-mirageDragRatio));
+        int mirageDragY = Math.round((3*300/4 + TILE_PADDING) * (1-mirageDragRatio));
+        boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage")) && (tile.getPlanetUnitHolders().size() != 3+1);
         List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = centerPosition.x;
@@ -4975,8 +5025,16 @@ public class MapGenerator {
                 return;
 
             if (tokenPath.contains(Constants.MIRAGE)) {
-                tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_POSITION.x,
-                    TILE_PADDING + Constants.MIRAGE_POSITION.y, null);
+                if (tile.getPlanetUnitHolders().size() == 3+1)
+                {
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.x,
+                        TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.y, null);
+                }
+                else
+                {
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_POSITION.x,
+                        TILE_PADDING + Constants.MIRAGE_POSITION.y, null);
+                }
             } else if (tokenPath.contains(Constants.SLEEPER)) {
                 tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
                     TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
@@ -4997,6 +5055,15 @@ public class MapGenerator {
                     drawY += deltaY;
                     deltaX += 30;
                     deltaY += 30;
+                }
+                if (hasMirage)
+                {
+                    drawX += (tokenImage.getWidth() / 2);
+                    drawY += (tokenImage.getHeight() / 2);
+                    drawX = Math.round(mirageDragRatio * drawX) + mirageDragX;
+                    drawY = Math.round(mirageDragRatio * drawY) + mirageDragY;
+                    drawX -= (tokenImage.getWidth() / 2);
+                    drawY -= (tokenImage.getHeight() / 2);
                 }
                 tileGraphics.drawImage(tokenImage, drawX, drawY, null);
 
@@ -5035,6 +5102,17 @@ public class MapGenerator {
         Map<UnitKey, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        
+        float mirageDragRatio = 2.0f/3;
+        int mirageDragX = Math.round((345/8 + TILE_PADDING) * (1-mirageDragRatio));
+        int mirageDragY = Math.round((3*300/4 + TILE_PADDING) * (1-mirageDragRatio));
+        boolean hasMirage = false;
+        if (isSpace)
+        {
+            Set<String> tokenList = unitHolder.getTokenList();
+            hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"))
+                && (tile.getPlanetUnitHolders().size() != 3+1);
+        }
 
         boolean isCabalJail = "s11".equals(tile.getTileID());
         boolean isNekroJail = "s12".equals(tile.getTileID());
@@ -5215,22 +5293,45 @@ public class MapGenerator {
                 int xOriginal = centerPosition.x + x;
                 int yOriginal = centerPosition.y + y;
                 int imageX = position != null ? position.x : xOriginal - (unitImage.getWidth() / 2);
+                imageX += TILE_PADDING;
                 int imageY = position != null ? position.y : yOriginal - (unitImage.getHeight() / 2);
+                imageY += TILE_PADDING;
                 if (isMirage) {
-                    imageX += Constants.MIRAGE_POSITION.x;
-                    imageY += Constants.MIRAGE_POSITION.y;
+                    if (tile.getPlanetUnitHolders().size() == 3+1)
+                    {
+                        imageX += Constants.MIRAGE_TRIPLE_POSITION.x;
+                        imageY += Constants.MIRAGE_TRIPLE_POSITION.y;
+                    }
+                    else
+                    {
+                        imageX += Constants.MIRAGE_POSITION.x;
+                        imageY += Constants.MIRAGE_POSITION.y;
+                    }
+                }
+                else if (hasMirage)
+                {
+                    imageX += (unitImage.getWidth() / 2);
+                    imageY += (unitImage.getHeight() / 2);
+                    imageX = Math.round(mirageDragRatio * imageX) + mirageDragX + (fighterOrInfantry ? 60 : 0);
+                    imageY = Math.round(mirageDragRatio * imageY) + mirageDragY;
+                    imageX -= (unitImage.getWidth() / 2);
+                    imageY -= (unitImage.getHeight() / 2);
                 }
 
-                tileGraphics.drawImage(unitImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                tileGraphics.drawImage(unitImage, imageX, imageY, null);
                 if (unitKey.getUnitType() == UnitType.Mech && (ButtonHelper.isLawInPlay(game, "articles_war") || ButtonHelper.isLawInPlay(game, "absol_articleswar"))) {
                     BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_articles_of_war" + getBlackWhiteFileSuffix(unitKey.getColorID())));
-                    tileGraphics.drawImage(mechTearImage, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    tileGraphics.drawImage(mechTearImage, imageX, imageY, null);
+                }
+                else if (unitKey.getUnitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
+                    BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + getBlackWhiteFileSuffix(unitKey.getColorID())));
+                    tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
                 }
                 if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
-                    tileGraphics.drawImage(decal, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    tileGraphics.drawImage(decal, imageX, imageY, null);
                 }
                 if (spoopy != null) {
-                    tileGraphics.drawImage(spoopy, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
+                    tileGraphics.drawImage(spoopy, imageX, imageY, null);
                 }
 
                 // UNIT TAGS
@@ -5244,15 +5345,15 @@ public class MapGenerator {
                             .read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
                         Point plaquetteOffset = getUnitTagLocation(id);
 
-                        tileGraphics.drawImage(plaquette, TILE_PADDING + imageX + plaquetteOffset.x,
-                            TILE_PADDING + imageY + plaquetteOffset.y, null);
-                        drawPlayerFactionIconImage(tileGraphics, player, TILE_PADDING + imageX + plaquetteOffset.x,
-                            TILE_PADDING + imageY + plaquetteOffset.y, 32, 32);
+                        tileGraphics.drawImage(plaquette, imageX + plaquetteOffset.x,
+                            imageY + plaquetteOffset.y, null);
+                        drawPlayerFactionIconImage(tileGraphics, player, imageX + plaquetteOffset.x,
+                            imageY + plaquetteOffset.y, 32, 32);
 
                         tileGraphics.setColor(Color.WHITE);
                         drawCenteredString(tileGraphics, factionTag,
-                            new Rectangle(TILE_PADDING + imageX + plaquetteOffset.x + 25,
-                                TILE_PADDING + imageY + plaquetteOffset.y + 17, 40, 13),
+                            new Rectangle(imageX + plaquetteOffset.x + 25,
+                                imageY + plaquetteOffset.y + 17, 40, 13),
                             Storage.getFont13());
                     }
                 }
@@ -5268,8 +5369,8 @@ public class MapGenerator {
                         scaledNumberPositionY = scaledNumberPositionY + 5;
                     }
                     tileGraphics.drawString(Integer.toString(bulkUnitCount),
-                        TILE_PADDING + imageX + scaledNumberPositionX,
-                        TILE_PADDING + imageY + scaledNumberPositionY);
+                        imageX + scaledNumberPositionX,
+                        imageY + scaledNumberPositionY);
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
@@ -5283,8 +5384,8 @@ public class MapGenerator {
                         ? position.y + (unitImage.getHeight() / 2) - (dmgImage.getHeight() / 2)
                         : yOriginal - (dmgImage.getHeight() / 2);
                     if (isMirage) {
-                        imageDmgX = imageX;
-                        imageDmgY = imageY;
+                        imageDmgX = imageX - TILE_PADDING;
+                        imageDmgY = imageY - TILE_PADDING;
                     } else if (unitKey.getUnitType() == UnitType.Mech) {
                         imageDmgX = position != null ? position.x : xOriginal - (dmgImage.getWidth());
                         imageDmgY = position != null ? position.y : yOriginal - (dmgImage.getHeight());
