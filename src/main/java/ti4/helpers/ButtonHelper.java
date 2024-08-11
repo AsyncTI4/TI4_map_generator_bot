@@ -10440,7 +10440,7 @@ public class ButtonHelper {
         if (("scepter".equalsIgnoreCase(id))) {
             String message = player.getRepresentation(true, true) + " Use buttons choose which system to mahact diplo";
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), message,
-                Helper.getPlanetSystemDiploButtons(event, player, game, false, owner));
+                Helper.getPlanetSystemDiploButtons(player, game, false, owner));
         }
         if (("dspnkoll".equalsIgnoreCase(id))) {
             ButtonHelperFactionSpecific.offerKolleccPNButtons(game, player);

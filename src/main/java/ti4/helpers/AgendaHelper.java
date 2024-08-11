@@ -2318,7 +2318,7 @@ public class AgendaHelper {
                         if (specificVote.contains("Diplomacy Rider")) {
                             String message = identity
                                 + " You have a Diplomacy Rider to resolve. Click the name of the planet who's system you wish to Diplo";
-                            List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, winningR, game, true,
+                            List<Button> buttons = Helper.getPlanetSystemDiploButtons(winningR, game, true,
                                 null);
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }

@@ -129,7 +129,7 @@ public class PlayAC extends ACCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getPing()).append(" ").append(game.getName()).append("\n");
         if (game.isFowMode()) {
-            sb.append("Someone played the Action Card " + actionCardTitle + ":\n");
+            sb.append("Someone played the Action Card ").append(actionCardTitle).append(":\n");
         } else {
             sb.append(player.getRepresentation()).append(" played the Action Card " + actionCardTitle + ":\n");
         }
