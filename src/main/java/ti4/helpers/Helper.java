@@ -2126,7 +2126,7 @@ public class Helper {
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                 unitButtons.add(argentButton);
             }
-            if (checkIfPlayerHasWarMachine(player)) {
+            if (playerHasWarMachine(player)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
                     + " Reminder that you have War Machine and this is the window for it");
             }
