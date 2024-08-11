@@ -121,10 +121,10 @@
             "sabotage2_acd2",
             "sabotage3_acd2",
             "sabotage4_acd2",
-            "war_machine1",
-            "war_machine2",
-            "war_machine3",
-            "war_machine4"
+            "war_machine1_acd2",
+            "war_machine2_acd2",
+            "war_machine3_acd2",
+            "war_machine4_acd2"
         ],
         "source": "action_deck_2"
     }
