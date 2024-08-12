@@ -277,7 +277,7 @@ public class CombatRoll extends CombatSubcommandData {
                     if (opponent.hasTech("vpw")) {
                         msg = player.getRepresentation(true, true) + " you got hit by Valkyrie Particle Weave. You may autoassign 1 hit.";
                         buttons = new ArrayList<>();
-                        buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        buttons.add(Button.success(opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Button.secondary(opponent.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_1", "Cancel a Hit"));
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);

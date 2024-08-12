@@ -361,6 +361,7 @@ public class Constants {
     public static final String TOKEN_ION_ALPHA_PNG = "token_ionalpha.png";
     public static final String TOKEN_ION_BETA_PNG = "token_ionbeta.png";
     public static final String SWAP_SYSTEMS = "swap_systems";
+    public static final String MOVE_ALL_UNITS = "move_all_units";
     public static final String ADJUST_ROUND_NUMBER = "adjust_round_number";
 
     public static final String MAHACT_CC = "mahact_cc";
