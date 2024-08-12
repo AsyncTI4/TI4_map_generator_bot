@@ -1868,6 +1868,13 @@ public class ButtonListener extends ListenerAdapter {
                         game)
                         + " has chosen to discard Committee Formation to choose the winner. Note that afters may be played before this occurs, and that confounding may still be played. You should probably wait and confirm no confounding before resolving");
                     boolean success = game.removeLaw(game.getLaws().get("committee"));
+                    String message = game.getPing() + " please confirm no Confounding Legal Texts.";
+                    Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
+                    List<Button> buttons = List.of(noConfounding);
+                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, "shenanigans");
+                    if (game.isACInDiscard("Confounding")) {
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Confounding was found in the discard pile, so you should be good to resolve");
+                    }
                 }
                 String resMessage3 = "Please select the winner.";
                 List<Button> deadlyActionRow3 = AgendaHelper.getAgendaButtons(null, game, "agendaResolution");
@@ -5924,13 +5931,13 @@ public class ButtonListener extends ListenerAdapter {
             }
             case "no_sabotage" -> {
                 String msg = "All players have indicated 'No Sabotage'";
+                String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
+                faction = faction.split("_")[1];
+                Player p2 = game.getPlayerFromColorOrFaction(faction);
+                if (p2 != null && !game.isFowMode()) {
+                    msg = p2.getRepresentation() + " " + msg;
+                }
                 if (game.getMessageIDsForSabo().contains(event.getMessageId())) {
-                    String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
-                    faction = faction.split("_")[1];
-                    Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null && !game.isFowMode()) {
-                        msg = p2.getRepresentation() + " " + msg;
-                    }
                     game.removeMessageIDForSabo(event.getMessageId());
                 }
                 event.getInteraction().getMessage().reply(msg).queueAfter(1, TimeUnit.SECONDS);

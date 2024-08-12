@@ -876,8 +876,11 @@ public class Player {
                 if (p.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN))
                     return false;
             return true;
-        } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN))
+        } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
             return true;
+        } else if (getGame().getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction())) {
+            return true;
+        }
         return false;
     }
 
