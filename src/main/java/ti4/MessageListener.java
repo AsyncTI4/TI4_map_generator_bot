@@ -104,6 +104,7 @@ public class MessageListener extends ListenerAdapter {
                     && (event.getInteraction().getSubcommandName() == null || !event.getInteraction()
                         .getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
                     && !event.getInteraction().getName().equals(Constants.SEARCH)
+                    && !event.getInteraction().getName().equals(Constants.USER)
                         & !event.getInteraction().getName().equals(Constants.SHOW_GAME)
                     && event.getOption(Constants.GAME_NAME) == null) {
 
@@ -111,7 +112,7 @@ public class MessageListener extends ListenerAdapter {
                     harmless = true;
                 }
                 if (userActiveGame != null && !userActiveGame.isFowMode() && !harmless
-                    && userActiveGame.getName().contains("pbd")) {
+                    && userActiveGame.getName().contains("pbd") && !userActiveGame.getName().contains("pbd1000")) {
                     if (event.getMessageChannel() instanceof ThreadChannel thread) {
                         if (!thread.isPublic()) {
                             reportSusSlashCommand(event, m);

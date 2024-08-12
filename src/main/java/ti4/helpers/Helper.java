@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -881,7 +882,12 @@ public class Helper {
         players.add(p1);
         players.add(p2);
         boolean debtOnly = true;
-        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
+        MessageChannel channel = p1.getCorrectChannel();
+        if (game.getName().equalsIgnoreCase("pbd1000")) {
+            channel = game.getTableTalkChannel();
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
+        }
+        MessageHelper.sendMessageToChannel(channel, "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
         for (Player sender : players) {
             Player receiver = p2;
             if (sender == p2) {
@@ -3177,7 +3183,24 @@ public class Helper {
     }
 
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
-        return guild.getDefaultChannel().createInvite().setMaxUses(uses).setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS).complete().getUrl();
+        DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
+        if (defaultChannel == null || !(defaultChannel instanceof TextChannel)) {
+            BotLogger.log("Default channel is not available or is not a text channel on " + guild.getName());
+        }
+        TextChannel textChannel = (TextChannel) defaultChannel;
+        if (!textChannel.getPermissionOverride(guild.getSelfMember()).getAllowed().contains(Permission.CREATE_INSTANT_INVITE)) {
+            BotLogger.log("Bot does not have permission to create invites in this channel on " + guild.getName());
+        }
+        try {
+            return textChannel.createInvite()
+                .setMaxUses(uses)
+                .setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS)
+                .complete()
+                .getUrl();
+        } catch (Exception e) {
+            BotLogger.log("Failed to create invite: " + e.getMessage() + " on " + guild.getName());
+        }
+        return "Whoops invalid url. Have one of the players on the server generate an invite";
     }
 
     public static String getTimeRepresentationToSeconds(long totalMillis) {

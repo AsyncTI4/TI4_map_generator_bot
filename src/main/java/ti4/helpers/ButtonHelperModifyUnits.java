@@ -702,7 +702,7 @@ public class ButtonHelperModifyUnits {
                     } else {
                         msg += "> Would repair 1 " + unitModel.getUnitEmoji() + " due to Duranium Armor\n";
                     }
-                    usedDuraniumAlready = true;
+                    break;
                 }
             }
         }
@@ -1976,7 +1976,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " moved 1 " + unit + " from "
                 + tile1.getRepresentationForButtons(game, player) + " to "
-                + tile2.getRepresentationForButtons(game, player) + "an ability.");
+                + tile2.getRepresentationForButtons(game, player) + " with an ability.");
         event.getMessage().delete().queue();
     }
 
