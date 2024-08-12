@@ -3188,9 +3188,6 @@ public class Helper {
             BotLogger.log("Default channel is not available or is not a text channel on " + guild.getName());
         }
         TextChannel textChannel = (TextChannel) defaultChannel;
-        if (!textChannel.getPermissionOverride(guild.getSelfMember()).getAllowed().contains(Permission.CREATE_INSTANT_INVITE)) {
-            BotLogger.log("Bot does not have permission to create invites in this channel on " + guild.getName());
-        }
         try {
             return textChannel.createInvite()
                 .setMaxUses(uses)
