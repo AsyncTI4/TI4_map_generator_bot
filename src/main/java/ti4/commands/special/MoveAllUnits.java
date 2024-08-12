@@ -9,6 +9,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -21,6 +22,7 @@ public class MoveAllUnits extends SpecialSubcommandData {
         super(Constants.MOVE_ALL_UNITS, "Move All Units From One System To Another");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to move from").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to move to").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
@@ -43,6 +45,13 @@ public class MoveAllUnits extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
             return;
         }
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
+        }
 
         String tile2ID = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
         Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, game);
@@ -50,14 +59,16 @@ public class MoveAllUnits extends SpecialSubcommandData {
         UnitHolder space = tile2.getUnitHolders().get("space");
         for (UnitHolder uH : tile1.getUnitHolders().values()) {
             for (UnitKey key : uH.getUnits().keySet()) {
+                if (!player.unitBelongsToPlayer(key)) continue;
                 space.addUnit(key, uH.getUnits().get(key));
             }
             for (UnitKey key : uH.getUnitDamage().keySet()) {
+                if (!player.unitBelongsToPlayer(key)) continue;
                 space.addUnitDamage(key, uH.getUnitDamage().get(key));
             }
-            for (Player p : game.getRealPlayers()) {
-                uH.removeAllUnits(p.getColor());
-            }
+
+            uH.removeAllUnits(player.getColor());
+
         }
 
         ShowGame.simpleShowGame(game, event, DisplayType.map);
