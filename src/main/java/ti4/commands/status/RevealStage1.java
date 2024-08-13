@@ -51,7 +51,7 @@ public class RevealStage1 extends StatusSubcommandData {
                         ListPlayerInfoButton.representScoring(game, objective.getKey(), 0));
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    game.getPing() + "Status Cleanup Run!");
+                    game.getPing() + " **Status Cleanup Run!**");
                 if (!game.isFowMode()) {
                     DisplayType displayType = DisplayType.map;
                     MapGenerator.saveImage(game, displayType, event)
