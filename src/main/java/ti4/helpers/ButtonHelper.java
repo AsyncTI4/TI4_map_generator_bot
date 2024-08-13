@@ -7521,7 +7521,7 @@ public class ButtonHelper {
         if (playersWithSCs > 0) {
             new Cleanup().runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                game.getPing() + "Status Cleanup Run!");
+                game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 DisplayType displayType = DisplayType.map;
                 MapGenerator.saveImage(game, displayType, event)
@@ -7656,6 +7656,10 @@ public class ButtonHelper {
             buttons.add(yssarilPolicy);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Remember to click Ready for " 
+                + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
+        }
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
