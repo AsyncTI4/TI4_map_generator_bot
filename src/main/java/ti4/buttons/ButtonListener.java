@@ -705,7 +705,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (playersWithSCs > 0) {
                     new Cleanup().runStatusCleanup(game);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        game.getPing() + "Status Cleanup Run!");
+                        game.getPing() + " **Status Cleanup Run!**");
                 }
             }
 
