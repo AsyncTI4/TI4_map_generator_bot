@@ -2812,6 +2812,9 @@ public class Player {
     }
 
     public boolean unitBelongsToPlayer(UnitKey unit) {
+        if (unit == null) {
+            return false;
+        }
         return getColor().equals(AliasHandler.resolveColor(unit.getColorID()));
     }
 
