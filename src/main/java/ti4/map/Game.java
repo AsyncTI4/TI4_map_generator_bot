@@ -861,7 +861,7 @@ public class Game extends GameProperties {
             }
         }
         setStoredValue("factionsInCombat", "");
-
+        setTemporaryPingDisable(false);
         // reset timers for ping and stats
         setActivePlayerID(player == null ? null : player.getUserID());
         setLastActivePlayerChange(newTime);
@@ -2471,6 +2471,15 @@ public class Game extends GameProperties {
         discardActionCards.put(id, identifier);
     }
 
+    public void setDiscardActionCard(String id, int oldNum) {
+        Collection<Integer> values = discardActionCards.values();
+        int identifier = oldNum;
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        discardActionCards.put(id, identifier);
+    }
+
     public void setPurgedActionCard(String id) {
         Collection<Integer> values = purgedActionCards.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -2494,7 +2503,7 @@ public class Game extends GameProperties {
             }
             if (!acID.isEmpty()) {
                 player.removeActionCard(acIDNumber);
-                setDiscardActionCard(acID);
+                setDiscardActionCard(acID, acIDNumber);
                 return true;
             }
         }
@@ -2545,7 +2554,7 @@ public class Game extends GameProperties {
             }
             if (!acID.isEmpty()) {
                 discardActionCards.remove(acID);
-                player.setActionCard(acID);
+                player.setActionCard(acID, acIDNumber);
                 return true;
             }
         }

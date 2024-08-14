@@ -1009,6 +1009,15 @@ public class Player {
         actionCards.put(id, identifier);
     }
 
+    public void setActionCard(String id, int oldID) {
+        Collection<Integer> values = actionCards.values();
+        int identifier = oldID;
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        actionCards.put(id, identifier);
+    }
+
     public void setEvent(String id) {
         Collection<Integer> values = events.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -2835,28 +2844,28 @@ public class Player {
     }
 
     @JsonIgnore
-    public float getTotalResourceValueOfUnits() {
+    public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile);
+            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile, type);
         }
         return count;
     }
 
     @JsonIgnore
-    public int getTotalHPValueOfUnits() {
+    public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile);
+            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile, type);
         }
         return count;
     }
 
     @JsonIgnore
-    public float getTotalCombatValueOfUnits() {
+    public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile);
+            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile, type);
         }
         return Math.round(count * 10) / (float) 10.0;
     }
