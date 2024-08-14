@@ -316,8 +316,9 @@ public class ButtonHelperModifyUnits {
                     }
                     new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, game);
 
-                    handleCabalConsumption(cabal, player, tile, planet, min, unitName, event, game, cabalMech);
-                    msg.append(handleMechSpecificTriggers(player, min, game, msg, unitHolder, tile, event));
+                    handleCabalConsumption(cabal, player, tile, planet, min, unitName, event, game, false);
+                    StringBuilder msg3 = new StringBuilder();
+                    msg.append(handleMechSpecificTriggers(player, min, game, msg3, unitHolder, tile, event));
                 }
             }
         }
