@@ -441,8 +441,8 @@ public class MessageListener extends ListenerAdapter {
                                     long milliSinceLastTurnChange = new Date().getTime()
                                         - game.getLastActivePlayerChange().getTime();
                                     int autoPingSpacer = (int) spacer;
-                                    int pingNumber = (int) (milliSinceLastTurnChange)
-                                        / (60 * 60 * multiplier * autoPingSpacer);
+                                    int pingNumber = (int) (milliSinceLastTurnChange
+                                        / (60 * 60 * multiplier * autoPingSpacer));
                                     if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * 2)) {
                                         ping = realIdentity
                                             + " this is a courtesy notice that the game is waiting (impatiently).";
@@ -616,33 +616,31 @@ public class MessageListener extends ListenerAdapter {
                                         ping = realIdentity
                                             + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down, it is simply a matter of time.";
                                     }
-                                    if (pingNumber > maxSoFar + 1 && !game.isFowMode()) {
-                                        continue;
-                                    }
-                                    if (pingNumber == maxSoFar + 2 && !game.isFowMode()) {
+                                    if (milliSinceLastTurnChange > (60 * 60 * multiplier * spacer * (maxSoFar + 3)) && !game.isFowMode()) {
                                         ping = realIdentity
                                             + " this is your final reminder. Stopping pinging now so we don't come back in 2 months and find 600+ messages.";
                                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                                             game.getPing()
                                                 + " the game has stalled on a player, and autoping will now stop pinging them.");
-                                    }
-
-                                    if (game.isFowMode()) {
-                                        MessageHelper.sendPrivateMessageToPlayer(player, game, ping);
-                                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                                            "Active player has been pinged. This is ping #" + pingNumber);
+                                        game.setTemporaryPingDisable(true);
                                     } else {
-                                        MessageChannel gameChannel = game.getMainGameChannel();
-                                        if (gameChannel != null) {
-                                            MessageHelper.sendMessageToChannel(gameChannel, ping);
-                                            if (ping != null && ping.contains("courtesy notice")) {
-                                                List<Button> buttons = new ArrayList<>();
-                                                buttons.add(Button.danger("temporaryPingDisable",
-                                                    "Disable Pings For Turn"));
-                                                buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
-                                                MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
-                                                    + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
-                                                    buttons);
+                                        if (game.isFowMode()) {
+                                            MessageHelper.sendPrivateMessageToPlayer(player, game, ping);
+                                            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                                                "Active player has been pinged. This is ping #" + pingNumber);
+                                        } else {
+                                            MessageChannel gameChannel = game.getMainGameChannel();
+                                            if (gameChannel != null) {
+                                                MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                                if (ping != null && ping.contains("courtesy notice")) {
+                                                    List<Button> buttons = new ArrayList<>();
+                                                    buttons.add(Button.danger("temporaryPingDisable",
+                                                        "Disable Pings For Turn"));
+                                                    buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
+                                                    MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
+                                                        + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
+                                                        buttons);
+                                                }
                                             }
                                         }
                                     }

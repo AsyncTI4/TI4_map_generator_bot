@@ -2188,7 +2188,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static float checkValuesOfUnits(Player player, Game game, Tile tile) {
+    public static float checkValuesOfUnits(Player player, Game game, Tile tile, String type) {
         float count = 0;
         for (UnitHolder uh : tile.getUnitHolders().values()) {
             for (UnitKey unit : uh.getUnits().keySet()) {
@@ -2200,6 +2200,9 @@ public class ButtonHelper {
                 }
                 UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                 if (removedUnit.getIsShip() || removedUnit.getIsGroundForce()) {
+                    if ((type.equalsIgnoreCase("ground") && removedUnit.getIsShip()) || (type.equalsIgnoreCase("space") && removedUnit.getIsGroundForce())) {
+                        continue;
+                    }
                     count = count + removedUnit.getCost() * uh.getUnits().get(unit);
                 }
             }
@@ -2245,7 +2248,7 @@ public class ButtonHelper {
         return Math.round(count * 10) / (float) 10.0;
     }
 
-    public static float checkCombatValuesOfUnits(Player player, Game game, Tile tile) {
+    public static float checkCombatValuesOfUnits(Player player, Game game, Tile tile, String type) {
         float count = 0;
         for (UnitHolder uh : tile.getUnitHolders().values()) {
             for (UnitKey unit : uh.getUnits().keySet()) {
@@ -2263,6 +2266,9 @@ public class ButtonHelper {
                     unrelententing = (float) -0.1;
                 }
                 if (removedUnit.getIsShip() || removedUnit.getIsGroundForce()) {
+                    if ((type.equalsIgnoreCase("ground") && removedUnit.getIsShip()) || (type.equalsIgnoreCase("space") && removedUnit.getIsGroundForce())) {
+                        continue;
+                    }
                     count = count + removedUnit.getCombatDieCount()
                         * (((float) 11.0 - removedUnit.getCombatHitsOn()) / 10 + unrelententing)
                         * uh.getUnits().get(unit);
@@ -2272,7 +2278,7 @@ public class ButtonHelper {
         return Math.round(count * 10) / (float) 10.0;
     }
 
-    public static int checkHPOfUnits(Player player, Game game, Tile tile) {
+    public static int checkHPOfUnits(Player player, Game game, Tile tile, String type) {
         int count = 0;
         for (UnitHolder uh : tile.getUnitHolders().values()) {
             for (UnitKey unit : uh.getUnits().keySet()) {
@@ -2284,6 +2290,9 @@ public class ButtonHelper {
                 }
                 UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                 if (removedUnit.getIsShip() || removedUnit.getIsGroundForce()) {
+                    if ((type.equalsIgnoreCase("ground") && removedUnit.getIsShip()) || (type.equalsIgnoreCase("space") && removedUnit.getIsGroundForce())) {
+                        continue;
+                    }
                     int sustain = 0;
                     if (removedUnit.getSustainDamage()) {
                         sustain = 1;

@@ -1000,7 +1000,9 @@ public class GameSaveLoadManager {
             StringBuilder units = new StringBuilder();
             if (unitHolder != null) {
                 for (Map.Entry<UnitKey, Integer> entry : unitHolder.getUnits().entrySet()) {
-                    units.append(entry.getKey().outputForSave()).append(",").append(entry.getValue()).append(";");
+                    if (Mapper.isValidColor(entry.getKey().getColor())) {
+                        units.append(entry.getKey().outputForSave()).append(",").append(entry.getValue()).append(";");
+                    }
                 }
             }
             writer.write(Constants.CAPTURE + " " + units);

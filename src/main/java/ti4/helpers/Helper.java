@@ -1109,7 +1109,7 @@ public class Helper {
     }
 
     public static String getNothingMessage() {
-        int result = ThreadLocalRandom.current().nextInt(1, 11);
+        int result = ThreadLocalRandom.current().nextInt(1, 21);
         switch (result) {
             case 1:
                 return "Nothing But Respect And Good Will";
@@ -1131,6 +1131,26 @@ public class Helper {
                 return "A Bot's Blessing For Your Trouble";
             case 10:
                 return "Good Karma";
+            case 11:
+                return "A Mewling Kitten";
+            case 12:
+                return "A Lost Virtual Puppy";
+            case 13:
+                return "A Fortune Cookie";
+            case 14:
+                return "A Firm Handshake";
+            case 15:
+                return "A Friendy Wave";
+            case 16:
+                return "Well Wishes";
+            case 17:
+                return "A Home-cooked Meal";
+            case 18:
+                return "$1000 In Monopoly Money";
+            case 19:
+                return "Forgiveness For Past Mistakes";
+            case 20:
+                return "A Lucky Rock";
         }
         return "Nothing";
     }
