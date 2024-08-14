@@ -131,7 +131,9 @@ abstract public class AddRemoveUnits implements Command {
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game game) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
-
+        if (!Mapper.isValidColor(color)) {
+            return;
+        }
         if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
             game.setupNeutralPlayer(color);
         }

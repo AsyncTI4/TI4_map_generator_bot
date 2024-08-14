@@ -49,7 +49,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static void resolveDefenseInstallationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
-        new AddUnits().unitParsing(event, buttonID, game.getTileFromPlanet(planet), "pds " + planet, game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "pds " + planet, game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");

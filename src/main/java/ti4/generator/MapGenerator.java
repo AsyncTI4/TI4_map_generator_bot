@@ -1703,26 +1703,57 @@ public class MapGenerator {
         }
     }
 
+    public static boolean isWholeNumber(float number) {
+        return number == Math.floor(number);
+    }
+
     private int unitValues(Player player, int xDeltaFromRightSide, int y) {
-        int widthOfSection = 120;
+        int widthOfSection = 180;
         int leftSide = width - widthOfSection - xDeltaFromRightSide;
         int verticalSpacing = 39;
         int imageSize = verticalSpacing - 2;
-        drawPAImageScaled(leftSide, y + verticalSpacing * 0, "pa_resources.png", imageSize);
-        drawPAImageScaled(leftSide, y + verticalSpacing * 1, "pa_health.png", imageSize);
-        drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_hit.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 1, "pa_resources.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_hit.png", imageSize);
-        drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_unitimage.png", imageSize);
+        //drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_hit.png", imageSize);
+        //drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_unitimage.png", imageSize);
         graphics.setColor(Color.WHITE);
         leftSide += verticalSpacing + 10;
-        drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits()),
-            new Rectangle(leftSide, y + verticalSpacing * 0, 50, verticalSpacing), Storage.getFont24());
-        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits()),
-            new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
-        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits()),
+        drawCenteredString(graphics, "Space |",
+            new Rectangle(leftSide - 4, y + verticalSpacing * 0, 50, verticalSpacing), Storage.getFont18());
+        drawCenteredString(graphics, "____________",
+            new Rectangle(leftSide, y + verticalSpacing * 0, 110, verticalSpacing), Storage.getFont24());
+        float val = player.getTotalResourceValueOfUnits("space");
+        if (isWholeNumber(val)) {
+            drawCenteredString(graphics, String.valueOf((int) val),
+                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+        } else {
+            drawCenteredString(graphics, String.valueOf(val),
+                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+        }
+        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("space")),
             new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
-        drawCenteredString(graphics, String.valueOf(player.getTotalUnitAbilityValueOfUnits()),
+        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits("space")),
             new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
+        leftSide += verticalSpacing + 20;
+        drawCenteredString(graphics, "  Ground",
+            new Rectangle(leftSide, y + verticalSpacing * 0, 50, verticalSpacing), Storage.getFont18());
+        // drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits("ground")),
+        //     new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+        val = player.getTotalResourceValueOfUnits("ground");
+        if (isWholeNumber(val)) {
+            drawCenteredString(graphics, String.valueOf((int) val),
+                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+        } else {
+            drawCenteredString(graphics, String.valueOf(val),
+                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+        }
+        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("ground")),
+            new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits("ground")),
+            new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
+        //drawCenteredString(graphics, String.valueOf(player.getTotalUnitAbilityValueOfUnits()),
+        //    new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
         return xDeltaFromRightSide + widthOfSection;
     }
 
@@ -2380,12 +2411,10 @@ public class MapGenerator {
 
     private int techFieldUnit(int x, int y, List<String> techs, int deltaX, Player player, Game game) {
         drawPAImage(x + deltaX, y, "pa_tech_unitupgrade_outlines.png");
-        
+
         boolean brokenWarSun = false;
-        if (ButtonHelper.isLawInPlay(game, "schematics"))
-        {
-            for (Player p2: game.getPlayers().values())
-            {
+        if (ButtonHelper.isLawInPlay(game, "schematics")) {
+            for (Player p2 : game.getPlayers().values()) {
                 brokenWarSun |= p2.hasWarsunTech();
             }
         }
@@ -2409,8 +2438,7 @@ public class MapGenerator {
                 drawPAUnitUpgrade(deltaX + x + unitOffset.x, y + unitOffset.y, unitKey);
             }
         }
-        if (brokenWarSun)
-        {
+        if (brokenWarSun) {
             UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
             Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
             UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
@@ -4672,16 +4700,11 @@ public class MapGenerator {
                 boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
                 Point position = unitTokenPosition.getPosition(controlID);
                 if (isMirage) {
-                    if (tile.getPlanetUnitHolders().size() == 3+1)
-                    {
+                    if (tile.getPlanetUnitHolders().size() == 3 + 1) {
                         position = Constants.MIRAGE_TRIPLE_POSITION;
-                    }
-                    else if (position == null)
-                    {
+                    } else if (position == null) {
                         position = Constants.MIRAGE_POSITION;
-                    }
-                    else
-                    {
+                    } else {
                         position.x += Constants.MIRAGE_POSITION.x;
                         position.y += Constants.MIRAGE_POSITION.y;
                     }
@@ -4729,8 +4752,7 @@ public class MapGenerator {
         Function<String, Boolean> isValid, Game game) {
         BufferedImage tokenImage;
         Point centerPosition = unitHolder.getHolderCenterPosition();
-        if (unitHolder.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
-        {
+        if (unitHolder.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3 + 1)) {
             centerPosition = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
                 Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
         }
@@ -4825,8 +4847,7 @@ public class MapGenerator {
 
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
 
-        if (unitHolder.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
-        {
+        if (unitHolder.getTokenList().contains(Constants.WORLD_DESTROYED_PNG)) {
             return false;
         }
 
@@ -4941,17 +4962,12 @@ public class MapGenerator {
                     Point position = unitTokenPosition.getPosition(tokenID);
                     boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
                     if (isMirage) {
-                        if (tile.getPlanetUnitHolders().size() == 3+1)
-                        {
+                        if (tile.getPlanetUnitHolders().size() == 3 + 1) {
                             position.x += Constants.MIRAGE_TRIPLE_POSITION.x;
                             position.y += Constants.MIRAGE_TRIPLE_POSITION.y;
-                        }
-                        else if (position == null)
-                        {
+                        } else if (position == null) {
                             position = Constants.MIRAGE_POSITION;
-                        }
-                        else
-                        {
+                        } else {
                             position.x += Constants.MIRAGE_POSITION.x;
                             position.y += Constants.MIRAGE_POSITION.y;
                         }
@@ -5003,10 +5019,10 @@ public class MapGenerator {
         int y = 0;
         int deltaX = 80;
         int deltaY = 0;
-        float mirageDragRatio = 2.0f/3;
-        int mirageDragX = Math.round((345/8 + TILE_PADDING) * (1-mirageDragRatio));
-        int mirageDragY = Math.round((3*300/4 + TILE_PADDING) * (1-mirageDragRatio));
-        boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage")) && (tile.getPlanetUnitHolders().size() != 3+1);
+        float mirageDragRatio = 2.0f / 3;
+        int mirageDragX = Math.round((345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragY = Math.round((3 * 300 / 4 + TILE_PADDING) * (1 - mirageDragRatio));
+        boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage")) && (tile.getPlanetUnitHolders().size() != 3 + 1);
         List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = centerPosition.x;
@@ -5025,13 +5041,10 @@ public class MapGenerator {
                 return;
 
             if (tokenPath.contains(Constants.MIRAGE)) {
-                if (tile.getPlanetUnitHolders().size() == 3+1)
-                {
+                if (tile.getPlanetUnitHolders().size() == 3 + 1) {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.x,
                         TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.y, null);
-                }
-                else
-                {
+                } else {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_POSITION.x,
                         TILE_PADDING + Constants.MIRAGE_POSITION.y, null);
                 }
@@ -5056,8 +5069,7 @@ public class MapGenerator {
                     deltaX += 30;
                     deltaY += 30;
                 }
-                if (hasMirage)
-                {
+                if (hasMirage) {
                     drawX += (tokenImage.getWidth() / 2);
                     drawY += (tokenImage.getHeight() / 2);
                     drawX = Math.round(mirageDragRatio * drawX) + mirageDragX;
@@ -5102,16 +5114,15 @@ public class MapGenerator {
         Map<UnitKey, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
-        
-        float mirageDragRatio = 2.0f/3;
-        int mirageDragX = Math.round((345/8 + TILE_PADDING) * (1-mirageDragRatio));
-        int mirageDragY = Math.round((3*300/4 + TILE_PADDING) * (1-mirageDragRatio));
+
+        float mirageDragRatio = 2.0f / 3;
+        int mirageDragX = Math.round((345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragY = Math.round((3 * 300 / 4 + TILE_PADDING) * (1 - mirageDragRatio));
         boolean hasMirage = false;
-        if (isSpace)
-        {
+        if (isSpace) {
             Set<String> tokenList = unitHolder.getTokenList();
             hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"))
-                && (tile.getPlanetUnitHolders().size() != 3+1);
+                && (tile.getPlanetUnitHolders().size() != 3 + 1);
         }
 
         boolean isCabalJail = "s11".equals(tile.getTileID());
@@ -5150,6 +5161,9 @@ public class MapGenerator {
 
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
+            if (!Mapper.isValidColor(unitKey.getColor())) {
+                continue;
+            }
             Integer unitCount = unitEntry.getValue();
 
             if (isJail && frogPlayer != null) {
@@ -5297,19 +5311,14 @@ public class MapGenerator {
                 int imageY = position != null ? position.y : yOriginal - (unitImage.getHeight() / 2);
                 imageY += TILE_PADDING;
                 if (isMirage) {
-                    if (tile.getPlanetUnitHolders().size() == 3+1)
-                    {
+                    if (tile.getPlanetUnitHolders().size() == 3 + 1) {
                         imageX += Constants.MIRAGE_TRIPLE_POSITION.x;
                         imageY += Constants.MIRAGE_TRIPLE_POSITION.y;
-                    }
-                    else
-                    {
+                    } else {
                         imageX += Constants.MIRAGE_POSITION.x;
                         imageY += Constants.MIRAGE_POSITION.y;
                     }
-                }
-                else if (hasMirage)
-                {
+                } else if (hasMirage) {
                     imageX += (unitImage.getWidth() / 2);
                     imageY += (unitImage.getHeight() / 2);
                     imageX = Math.round(mirageDragRatio * imageX) + mirageDragX + (fighterOrInfantry ? 60 : 0);
@@ -5322,8 +5331,7 @@ public class MapGenerator {
                 if (unitKey.getUnitType() == UnitType.Mech && (ButtonHelper.isLawInPlay(game, "articles_war") || ButtonHelper.isLawInPlay(game, "absol_articleswar"))) {
                     BufferedImage mechTearImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_articles_of_war" + getBlackWhiteFileSuffix(unitKey.getColorID())));
                     tileGraphics.drawImage(mechTearImage, imageX, imageY, null);
-                }
-                else if (unitKey.getUnitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
+                } else if (unitKey.getUnitType() == UnitType.Warsun && ButtonHelper.isLawInPlay(game, "schematics")) {
                     BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + getBlackWhiteFileSuffix(unitKey.getColorID())));
                     tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
                 }
