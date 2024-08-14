@@ -1724,7 +1724,7 @@ public class MapGenerator {
         drawCenteredString(graphics, "____________",
             new Rectangle(leftSide, y + verticalSpacing * 0, 110, verticalSpacing), Storage.getFont24());
         float val = player.getTotalResourceValueOfUnits("space");
-        if (isWholeNumber(val)) {
+        if (isWholeNumber(val) || val > 10) {
             drawCenteredString(graphics, String.valueOf((int) val),
                 new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
         } else {
@@ -1741,7 +1741,7 @@ public class MapGenerator {
         // drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits("ground")),
         //     new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
         val = player.getTotalResourceValueOfUnits("ground");
-        if (isWholeNumber(val)) {
+        if (isWholeNumber(val) || val > 10) {
             drawCenteredString(graphics, String.valueOf((int) val),
                 new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
         } else {
@@ -5161,7 +5161,7 @@ public class MapGenerator {
 
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
-            if (!Mapper.isValidColor(unitKey.getColor())) {
+            if (unitKey != null && !Mapper.isValidColor(unitKey.getColor())) {
                 continue;
             }
             Integer unitCount = unitEntry.getValue();
