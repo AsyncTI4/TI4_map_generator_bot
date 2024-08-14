@@ -725,7 +725,7 @@ public class StartCombat extends CombatSubcommandData {
         Player nomad = Helper.getPlayerFromUnlockedLeader(game, "nomadagentthundarian");
         if ((!game.isFowMode() || nomad == p1) && nomad != null && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {
             String finChecker = "FFCC_" + nomad.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Use The Thundarian)")
+            buttons.add(Button.secondary(finChecker + "exhaustAgent_nomadagentthundarian", "Use The Thundarian")
                 .withEmoji(Emoji.fromFormatted(Emojis.Nomad)));
         }
 
