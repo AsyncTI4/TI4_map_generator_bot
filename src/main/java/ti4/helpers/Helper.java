@@ -1140,7 +1140,7 @@ public class Helper {
             case 14:
                 return "A Firm Handshake";
             case 15:
-                return "A Friendy Wave";
+                return "A Friendly Wave";
             case 16:
                 return "Well Wishes";
             case 17:
