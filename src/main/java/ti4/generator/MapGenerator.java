@@ -120,6 +120,7 @@ public class MapGenerator {
     private final int scoreTokenWidth;
     private final Game game;
     private final DisplayType displayType;
+    private final DisplayType displayTypeBasic;
     private final boolean uploadToDiscord;
     private final boolean debug;
     private final int width;
@@ -201,19 +202,33 @@ public class MapGenerator {
         if (extraRow) {
             mapWidth += EXTRA_X;
         }
-
         width = mapWidth;
-        if (displayType == DisplayType.stats) {
-            heightForGameInfo = 40;
-            height = heightStats;
-        } else if (displayType == DisplayType.map) {
-            heightForGameInfo = mapHeight;
-            height = mapHeight + 600;
-        } else {
-            heightForGameInfo = mapHeight;
-            height = mapHeight + heightStats;
+        switch (displayType)
+        {
+            case stats:
+                heightForGameInfo = 40;
+                height = heightStats;
+                displayTypeBasic = DisplayType.stats;
+                break;
+            case map:
+            case wormholes:
+            case anomalies:
+            case legendaries:
+            case empties:
+            case aetherstream:
+            case spacecannon:
+            case traits:
+            case techskips:
+            case attachments:
+                heightForGameInfo = mapHeight;
+                height = mapHeight + 600;
+                displayTypeBasic = DisplayType.map;
+                break;
+            default:
+                heightForGameInfo = mapHeight;
+                height = mapHeight + heightStats;
+                displayTypeBasic = DisplayType.all;
         }
-
         ImageIO.setUseCache(false);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
@@ -266,7 +281,7 @@ public class MapGenerator {
     }
 
     private void setupTilesForDisplayTypeAllAndMap(Map<String, Tile> tilesToDisplay) {
-        if (displayType != DisplayType.all && displayType != DisplayType.map) {
+        if (displayTypeBasic != DisplayType.all && displayTypeBasic != DisplayType.map) {
             return;
         }
         if (debug) {
@@ -317,9 +332,32 @@ public class MapGenerator {
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Distance));
             game.setTileDistances(new HashMap<>()); // clear distances after consuming them
         }
-        if (!game.getStoredValue("checkWHs").isEmpty()) {
-            game.setStoredValue("checkWHs", "");
+        if (displayType == DisplayType.wormholes) {
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Wormholes));
+        }
+        else if (displayType == DisplayType.anomalies) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Anomalies));
+        }
+        else if (displayType == DisplayType.aetherstream) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Aetherstream));
+        }
+        else if (displayType == DisplayType.legendaries) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Legendaries));
+        }
+        else if (displayType == DisplayType.empties) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Empties));
+        }
+        else if (displayType == DisplayType.spacecannon) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.SpaceCannon));
+        }
+        else if (displayType == DisplayType.traits) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Traits));
+        }
+        else if (displayType == DisplayType.techskips) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.TechSkips));
+        }
+        else if (displayType == DisplayType.attachments) {
+            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
         }
         if (debug)
             debugTileTime = System.nanoTime() - debugStartTime;
@@ -373,7 +411,7 @@ public class MapGenerator {
 
     private void sendToWebsite(GenericInteractionCreateEvent event) {
         String testing = System.getenv("TESTING");
-        if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
+        if (testing == null && displayTypeBasic == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
             WebHelper.putMap(game.getName(), mainImage);
             WebHelper.putData(game.getName(), game);
         } else if (isFoWPrivate != null && isFoWPrivate) {
@@ -652,7 +690,7 @@ public class MapGenerator {
         y = laws(y);
         y = events(y);
         tempY = drawScoreTrack(tempY + 20);
-        if (displayType != DisplayType.stats) {
+        if (displayTypeBasic != DisplayType.stats) {
             playerInfo(game);
         }
         if (finRun) {
@@ -660,7 +698,7 @@ public class MapGenerator {
             checkpoint++;
         }
 
-        if (displayType == DisplayType.all || displayType == DisplayType.stats) {
+        if (displayTypeBasic == DisplayType.all || displayTypeBasic == DisplayType.stats) {
             graphics.setFont(Storage.getFont32());
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setStroke(stroke5);
@@ -4171,7 +4209,8 @@ public class MapGenerator {
     }
 
     enum TileStep {
-        Setup, Tile, Extras, Units, Distance, Wormholes
+        Setup, Tile, Extras, Units, Distance,
+        Wormholes, Anomalies, Aetherstream, Legendaries, Empties, SpaceCannon, Traits, TechSkips, Attachments
     }
 
     private void addTile(Tile tile, TileStep step) {
@@ -4502,18 +4541,27 @@ public class MapGenerator {
             }
             case Distance -> {
                 if (game.isFowMode())
+                {
                     break;
+                }
                 Integer distance = game.getTileDistances().get(tile.getPosition());
                 if (distance == null)
+                {
                     break;
+                }
 
                 BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
                 if (tileImage == null)
+                {
                     break;
+                }
+
+                int x = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
+                int y = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
 
                 BufferedImage distanceColor = ImageHelper
                     .read(ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
-                tileGraphics.drawImage(distanceColor, TILE_PADDING, TILE_PADDING, null);
+                tileGraphics.drawImage(distanceColor, x, y, null);
                 tileGraphics.setColor(Color.WHITE);
                 drawCenteredString(tileGraphics, distance.toString(),
                     new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()),
@@ -4521,19 +4569,32 @@ public class MapGenerator {
             }
             case Wormholes -> {
                 if (game.isFowMode())
+                {
                     break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
 
                 BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
                 if (tileImage == null)
+                {
                     break;
-
-                BufferedImage distanceColor = ImageHelper
-                    .read(ResourceHelper.getInstance().getTileFile(getColorFilterForWormhole(FoWHelper.doesTileHaveWHs(game, tile.getPosition()))));
-                if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
-                    tileGraphics.drawImage(distanceColor, TILE_PADDING, TILE_PADDING, null);
                 }
-                if (FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
-                    int count = 0;
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+                
+                if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                } else {
+                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
+                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    int count = FoWHelper.getTileWHs(game, tile.getPosition()).size();
+                    x += (count == 1 ? 76 : 30);
+                    y += (count == 1 ? 52 : 26);
                     for (String wh : FoWHelper.getTileWHs(game, tile.getPosition())) {
 
                         String whFile = ResourceHelper.getInstance().getTokenFile("token_wh" + wh + ".png");
@@ -4542,21 +4603,726 @@ public class MapGenerator {
                         }
                         if (whFile != null) {
                             BufferedImage bufferedImage = ImageHelper.readScaled(whFile, 3);
-                            tileGraphics.drawImage(bufferedImage, TILE_PADDING + 70 + (count * 30), TILE_PADDING + 70 + (count * 30), null);
+                            tileGraphics.drawImage(bufferedImage, x, y, null);
                         }
+                        x += (count <= 1 ? 0 : 91/(count-1));
+                        y += (count <= 1 ? 0 : 52/(count-1));
+                    }
+                }
+            }
+            case Anomalies -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+                
+                if (!tile.isAnomaly(game)) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                } else {
+                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
+                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += 33;
+                    y += 101;
+                    String chevronFile = ResourceHelper.getInstance().getTileFile("tile_anomaly_chevron.png");
+                    BufferedImage bufferedImage = ImageHelper.read(chevronFile);
+                    tileGraphics.drawImage(bufferedImage, x, y, null);
+                }
+            }
+            case Aetherstream -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+                boolean anomalyIsAdjacent = FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), null);
+                
+                if (!anomalyIsAdjacent) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                } else {
+                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
+                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    String batFile = ResourceHelper.getInstance().getGeneralFile("zobat" + (ThreadLocalRandom.current().nextInt(4096) == 0 ? "_shiny" : "") + ".png");
+                    BufferedImage bufferedImage = ImageHelper.read(batFile);
+                    x += (345 - bufferedImage.getWidth())/2;
+                    y += (300 - bufferedImage.getHeight())/2;
+                    tileGraphics.drawImage(bufferedImage, x, y, null);
+                }
+            }
+            case Legendaries -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+                boolean isLegendary = ButtonHelper.isTileLegendary(tile, game) || tile.isMecatol();
+                
+                if (!isLegendary) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                } else if (tile.isMecatol()) {
+                    String councilFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
+                    BufferedImage bufferedImage = ImageHelper.readScaled(councilFile, 2.0f);
+                    int w = bufferedImage.getWidth();
+                    int h = bufferedImage.getHeight();
+                    int border = 3;
+                    int padding = border + 2;
+                    BufferedImage backgroundImage = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
+                    x += (345-w)/2;
+                    y += (300-w)/2;
+                    
+                    for (int i=-padding; i<w+padding; i++)
+                    {
+                        for (int j=-padding; j<h+padding; j++)
+                        {
+                            int bestAlpha = 0;
+                            for (int p=-padding; p<=padding; p++)
+                            {
+                                if (i+p < 0 || i+p >= w) continue;
+                                for (int q=-padding; q<=padding; q++)
+                                {
+                                    if (j+q < 0 || j+q >= h) continue;
+                                    int alpha = new Color(bufferedImage.getRGB(i+p, j+q), true).getAlpha();
+                                    if (p*p + q*q <= border*border)
+                                    {
+                                        bestAlpha = Math.max(bestAlpha, alpha);
+                                    }
+                                }
+                            }
+                            backgroundImage.setRGB(i+padding, j+padding, new Color(0, 0, 0, bestAlpha).getRGB());
+                        }
+                    }
+                    
+                    tileGraphics.drawImage(backgroundImage, x - padding, y - padding, null);
+                    tileGraphics.drawImage(bufferedImage, x, y, null);
+                } else {
+                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
+                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += 86;
+                    y += 64;
+                    String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
+                    BufferedImage bufferedImage = ImageHelper.readScaled(legendaryFile, 0.5f);
+                    tileGraphics.drawImage(bufferedImage, x, y, null);
+                }
+            }
+            case Empties -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+                boolean isEmpty = tile.getPlanetUnitHolders().size() == 0;
+                
+                if (!isEmpty) {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                } else {
+                    Graphics graph = tileImage.getGraphics();
+                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
+                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += 93;
+                    y += 70;
+                    tileGraphics.setColor(Color.RED);
+                    tileGraphics.fillOval(x,y,159,159);
+                    tileGraphics.setColor(Color.WHITE);
+                    drawCenteredString(tileGraphics, "!", new Rectangle(x, y, 159, 159), Storage.getFont80());
+                }
+            }
+            case SpaceCannon -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+
+                int x = TILE_PADDING;
+                int y = TILE_PADDING;
+                String tilePos = tile.getPosition();
+                HashMap<Player, List<Integer>> pdsDice = new HashMap<Player, List<Integer>>();
+                
+                for (Player player: game.getRealPlayers())
+                {
+                    List<Integer> diceCount = new ArrayList<Integer>();
+                    List<Integer> diceCountMirveda = new ArrayList<Integer>();
+                    int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
+
+                    if (player.hasAbility("starfall_gunnery"))
+                    {
+                        for (int i=ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, game, tile); i>0; i--)
+                        {
+                            diceCount.add(8 - mod);
+                        }
+                    }
+
+                    for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {
+                        Tile adjTile = game.getTileByPosition(adjTilePos);
+                        if (adjTile == null) {
+                            continue;
+                        }
+                        boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);
+                        for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
+                            if (sameTile && Constants.MECATOLS.contains(unitHolder.getName())) {
+                                if (player.controlsMecatol(false) && player.getTechs().contains("iihq")) {
+                                    diceCount.add(5 - mod);
+                                }
+                            }
+                            for (Map.Entry<UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
+                                if (unitEntry.getValue() == 0) {
+                                    continue;
+                                }
+
+                                UnitKey unitKey = unitEntry.getKey();
+                                if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != player) {
+                                    continue;
+                                }
+
+                                UnitModel model = player.getUnitFromUnitKey(unitKey);
+                                if (model == null || (model.getId().equalsIgnoreCase("xxcha_mech")
+                                    && ButtonHelper.isLawInPlay(game, "articles_war"))) {
+                                    continue;
+                                }
+                                int tempMod = 0;
+                                if (model.getId().equalsIgnoreCase("bentor_flagship"))
+                                {
+                                    tempMod += player.getNumberOfBluePrints();
+                                }
+                                if (model.getDeepSpaceCannon() || sameTile) {
+                                    for (int i=model.getSpaceCannonDieCount() * unitEntry.getValue(); i>0; i--)
+                                    {
+                                        diceCount.add(model.getSpaceCannonHitsOn() - mod - tempMod);
+                                    }
+                                }
+                                else if (game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander"))
+                                {
+                                    diceCountMirveda.add(model.getSpaceCannonHitsOn() - mod - tempMod);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (diceCountMirveda.size() > 0)
+                    {
+                        Collections.sort(diceCountMirveda);
+                        diceCount.add(diceCountMirveda.get(0));
+                    }
+
+                    if (diceCount.size() > 0)
+                    {
+                        Collections.sort(diceCount);
+                        if (player.getTechs().contains("ps"))
+                        {
+                            diceCount.add(0, diceCount.get(0));
+                        }
+                        if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander"))
+                        {
+                            diceCount.add(0, diceCount.get(0));
+                        }
+                        pdsDice.put(player, diceCount);
+                    }
+                }
+                
+                if (pdsDice.size() == 0)
+                {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, x, y, null);
+                }
+                else
+                {
+                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
+                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    float scale = pdsDice.size() >= 3 ? 6.0f/pdsDice.size() : 3.0f;
+                    
+                    Font bigFont = Storage.getFont64();
+                    Font smallFont = Storage.getFont32();
+                    switch (pdsDice.size())
+                    {
+                        case 1:
+                        case 2:
+                            bigFont = Storage.getFont64();
+                            smallFont = Storage.getFont32();
+                            break;
+                        case 3:
+                            bigFont = Storage.getFont40();
+                            smallFont = Storage.getFont20();
+                            break;
+                        case 4:
+                            bigFont = Storage.getFont32();
+                            smallFont = Storage.getFont16();
+                            break;
+                        case 5:
+                            bigFont = Storage.getFont24();
+                            smallFont = Storage.getFont12();
+                            break;
+                        default:
+                            bigFont = Storage.getFont16();
+                            smallFont = Storage.getFont8();
+                            break;
+                    }
+                    
+                    x += (345 - 73*scale) / 2;
+                    y += (300 - pdsDice.size()*48*scale) / 2;
+                    for (Player player: pdsDice.keySet())
+                    {
+                        int numberOfDice = pdsDice.get(player).size();
+                        float expectedHits = (11.0f*numberOfDice - pdsDice.get(player).stream().mapToInt(Integer::intValue).sum()) / 10;
+                        if (getBlackWhiteFileSuffix(player.getColorID()).equals("_wht.png"))
+                        {
+                            tileGraphics.setColor(Color.WHITE);
+                        }
+                        else
+                        {
+                            tileGraphics.setColor(Color.BLACK);
+                        }
+                        BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(player.getColor())), scale);
+                        drawControlToken(tileGraphics, bufferedImage, player, x, y, false, scale/2);
+                        drawCenteredString(tileGraphics, ""+numberOfDice,
+                            new Rectangle(Math.round(x+6*scale), Math.round(y+12*scale), Math.round(61*scale/2), Math.round(24*scale*2/3)),
+                            bigFont);
+                        drawCenteredString(tileGraphics, "(" + expectedHits + ")",
+                            new Rectangle(Math.round(x+6*scale), Math.round(y+12*scale + 24*scale*2/3), Math.round(61*scale/2), Math.round(24*scale/3)),
+                            smallFont);
+                        if (numberOfDice >= 5)
+                        {
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice/3).stream().map(i->i.toString()).collect(Collectors.joining(",")) + ",",
+                                new Rectangle(Math.round(x+73*scale/2), Math.round(y+6*scale), Math.round(73*scale/2), Math.round(36*scale/3)),
+                                smallFont);
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice/3, 2*numberOfDice/3).stream().map(i->i.toString()).collect(Collectors.joining(",")) + ",",
+                                new Rectangle(Math.round(x+73*scale/2), Math.round(y+6*scale+36*scale/3), Math.round(73*scale/2), Math.round(36*scale/3)),
+                                smallFont);
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(2*numberOfDice/3, numberOfDice).stream().map(i->i.toString()).collect(Collectors.joining(",")),
+                                new Rectangle(Math.round(x+73*scale/2), Math.round(y+6*scale+36*scale*2/3), Math.round(73*scale/2), Math.round(36*scale/3)),
+                                smallFont);
+                        }
+                        else if (numberOfDice >= 3)
+                        {
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice/2).stream().map(i->i.toString()).collect(Collectors.joining(",")) + ",",
+                                new Rectangle(Math.round(x+73*scale/2), Math.round(y+12*scale), Math.round(73*scale/2), Math.round(24*scale/2)),
+                                smallFont);
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice/2, numberOfDice).stream().map(i->i.toString()).collect(Collectors.joining(",")),
+                                new Rectangle(Math.round(x+73*scale/2), Math.round(y+12*scale+24*scale/2), Math.round(73*scale/2), Math.round(24*scale/2)),
+                                smallFont);
+                        }
+                        else
+                        {
+                            drawCenteredString(tileGraphics, pdsDice.get(player).stream().map(i->i.toString()).collect(Collectors.joining(",")),
+                                new Rectangle(Math.round(x+73*scale/2), y, Math.round(73*scale/2), Math.round(48*scale)),
+                                smallFont);
+                        }
+                        y += 48*scale;
+                    }
+                }
+            }
+            case Traits -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+                BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
+
+                int planets = tile.getPlanetUnitHolders().size();
+                for (Planet planet : tile.getPlanetUnitHolders())
+                {
+                    String traitFile = "";
+                    List<String> traits = planet.getPlanetType();
+                    if (traits.size() == 0)
+                    {
+                        traits.add(planet.getOriginalPlanetType());
+                    }
+
+                    if (tile.isMecatol())
+                    {
+                        traitFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
+                    }
+                    else if (planet.getOriginalPlanetType().equals("faction"))
+                    {
+                        traitFile = ResourceHelper.getInstance().getFactionFile(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
+                        BotLogger.log(traitFile);
+                    }
+                    else if (traits.size() == 1)
+                    {
+                        String t = planet.getPlanetType().get(0);
+                        traitFile = ResourceHelper.getInstance().getGeneralFile(("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
+                    }
+                    else if (traits.size() == 0)
+                    {
+                    }
+                    else
+                    {
+                        String t = "";
+                        t += traits.contains("cultural") ? "C" : "";
+                        t += traits.contains("hazardous") ? "H" : "";
+                        t += traits.contains("industrial") ? "I" : "";
+                        if (t.equals("CHI"))
+                        {
+                            traitFile = ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_CHI_big.png");
+                        }
+                        else
+                        {
+                            traitFile = ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_" + t + ".png");
+                        }
+                    }
+                    
+                    if (!traitFile.equals(""))
+                    {
+                        BufferedImage bufferedImage = ImageHelper.read(traitFile);
+                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(9200.0f/bufferedImage.getWidth()/bufferedImage.getHeight()));
+                        int w = bufferedImage.getWidth();
+                        int h = bufferedImage.getHeight();
+                        int innerBorder = (tile.isMecatol() ? 3 : 2);
+                        int outerBorder = innerBorder + (tile.isMecatol() ? -1 : 2);
+                        int padding = outerBorder + (tile.isMecatol() ? 3 : 2);
+                        BufferedImage backgroundInner = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
+                        BufferedImage backgroundOuter = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
+                        for (int i=-padding; i<w+padding; i++)
+                        {
+                            for (int j=-padding; j<h+padding; j++)
+                            {
+                                int bestInnerAlpha = 0;
+                                int bestOuterAlpha = 0;
+                                for (int p=-padding; p<=padding; p++)
+                                {
+                                    if (i+p < 0 || i+p >= w) continue;
+                                    for (int q=-padding; q<=padding; q++)
+                                    {
+                                        if (j+q < 0 || j+q >= h) continue;
+                                        int alpha = new Color(bufferedImage.getRGB(i+p, j+q), true).getAlpha();
+                                        if (p*p + q*q <= innerBorder*innerBorder)
+                                        {
+                                            bestInnerAlpha = Math.max(bestInnerAlpha, alpha);
+                                        }
+                                        if (p*p + q*q <= outerBorder*outerBorder)
+                                        {
+                                            bestOuterAlpha = Math.max(bestOuterAlpha, alpha);
+                                        }
+                                    }
+                                }
+                                backgroundInner.setRGB(i+padding, j+padding, new Color(0, 0, 0, bestInnerAlpha).getRGB());
+                                backgroundOuter.setRGB(i+padding, j+padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
+                            }
+                        }
+                        
+                        Point position  = planet.getHolderCenterPosition();
+                        if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
+                        {
+                            position  = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
+                                Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
+                        }
+                        position = new Point(position.x - w/2 + TILE_PADDING, position.y - h/2 + TILE_PADDING);
+                        
+                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
+                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
+                        tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
+                    }
+                }
+            }
+            case TechSkips -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+
+                int planets = tile.getPlanetUnitHolders().size();
+                if (planets == 0)
+                {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
+                    break;
+                }
+                boolean anySkips = false;
+                for (Planet planet : tile.getPlanetUnitHolders())
+                {
+                    List<String> skips = planet.getTechSpeciality();
+                    if (!skips.contains(planet.getOriginalTechSpeciality()))
+                    {
+                        skips.add(planet.getOriginalTechSpeciality());
+                    }
+                    skips.removeAll(Collections.singleton(null));
+                    skips.removeAll(Collections.singleton(""));
+                    int number = skips.size();
+                    if (number == 0)
+                    {
+                        continue;
+                    }
+                    anySkips = true;
+                    int count = 0;
+                    
+                    for (String skip: skips)
+                    {
+                        String skipFile;
+                        switch (skip.toLowerCase())
+                        {
+                            case "biotic":
+                                skipFile = ResourceHelper.getInstance().getGeneralFile("Biotic light.png");
+                                break;
+                            case "cybernetic":
+                                skipFile = ResourceHelper.getInstance().getGeneralFile("Cybernetic light.png");
+                                break;
+                            case "propulsion":
+                                skipFile = ResourceHelper.getInstance().getGeneralFile("Propulsion_light.png");
+                                break;
+                            case "warfare":
+                                skipFile = ResourceHelper.getInstance().getGeneralFile("Warfare_light.png");
+                                break;
+                            default:
+                                skipFile = ResourceHelper.getInstance().getGeneralFile("Generic_Technology.png");
+                        }
+                        
+                        BufferedImage bufferedImage = ImageHelper.read(skipFile);
+                        bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(9200.0f/bufferedImage.getWidth()/bufferedImage.getHeight()/Math.sqrt(1.0f*number)));
+                        int w = bufferedImage.getWidth();
+                        int h = bufferedImage.getHeight();
+                        int innerBorder = 3;
+                        int outerBorder = innerBorder + 3;
+                        int padding = outerBorder + 2;
+                        BufferedImage backgroundInner = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
+                        BufferedImage backgroundOuter = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
+                        for (int i=-padding; i<w+padding; i++)
+                        {
+                            for (int j=-padding; j<h+padding; j++)
+                            {
+                                int bestInnerAlpha = 0;
+                                int bestOuterAlpha = 0;
+                                for (int p=-padding; p<=padding; p++)
+                                {
+                                    if (i+p < 0 || i+p >= w) continue;
+                                    for (int q=-padding; q<=padding; q++)
+                                    {
+                                        if (j+q < 0 || j+q >= h) continue;
+                                        int alpha = new Color(bufferedImage.getRGB(i+p, j+q), true).getAlpha();
+                                        if (p*p + q*q <= innerBorder*innerBorder)
+                                        {
+                                            bestInnerAlpha = Math.max(bestInnerAlpha, alpha);
+                                        }
+                                        if (p*p + q*q <= outerBorder*outerBorder)
+                                        {
+                                            bestOuterAlpha = Math.max(bestOuterAlpha, alpha);
+                                        }
+                                    }
+                                }
+                                backgroundInner.setRGB(i+padding, j+padding, new Color(0, 0, 0, bestInnerAlpha).getRGB());
+                                backgroundOuter.setRGB(i+padding, j+padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
+                            }
+                        }
+                        
+                        Point position  = planet.getHolderCenterPosition();
+                        if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
+                        {
+                            position  = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
+                                Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
+                        }
+                        if (number > 1)
+                        {
+                            position = new Point(position.x - 20 + count*40/(number-1), position.y - 20 + count*40/(number-1));
+                        }
+                        position = new Point(position.x - w/2 + TILE_PADDING, position.y - h/2 + TILE_PADDING);
+                        
+                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
+                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
+                        tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
                         count++;
                     }
+                }
+                if (!anySkips)
+                {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
+                }
+            }
+            case Attachments -> {
+                if (game.isFowMode())
+                {
+                    break;
+                }
+                if (tile.getRepresentation().contains("Hyperlane"))
+                {
+                    break;
+                }
+
+                BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
+                if (tileImage == null)
+                {
+                    break;
+                }
+
+                int planets = tile.getPlanetUnitHolders().size();
+                if (planets == 0)
+                {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
+                    break;
+                }
+                boolean anyAttachments = false;
+                for (Planet planet : tile.getPlanetUnitHolders())
+                {
+                    List<String> attachments = new ArrayList<String>(planet.getAttachments());
+                    attachments.removeAll(Collections.singleton(null));
+                    attachments.removeAll(Collections.singleton(""));
+                    int number = attachments.size();
+                    if (number == 0)
+                    {
+                        continue;
+                    }
+                    anyAttachments = true;
+                        
+                    String chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_basic.png");
+                    if (attachments.contains("attachment_tombofemphidia.png"))
+                    {
+                        chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_toe.png");
+                    }
+                    BufferedImage bufferedImage = ImageHelper.read(chevronFile);
+                    bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(9200.0f/bufferedImage.getWidth()/bufferedImage.getHeight()));
+                    int w = bufferedImage.getWidth();
+                    int h = bufferedImage.getHeight();
+                    int innerBorder = 3;
+                    int outerBorder = innerBorder + 3;
+                    int padding = outerBorder + 2;
+                    BufferedImage backgroundInner = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
+                    BufferedImage backgroundOuter = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
+                    for (int i=-padding; i<w+padding; i++)
+                    {
+                        for (int j=-padding; j<h+padding; j++)
+                        {
+                            int bestInnerAlpha = 0;
+                            int bestOuterAlpha = 0;
+                            for (int p=-padding; p<=padding; p++)
+                            {
+                                if (i+p < 0 || i+p >= w) continue;
+                                for (int q=-padding; q<=padding; q++)
+                                {
+                                    if (j+q < 0 || j+q >= h) continue;
+                                    int alpha = new Color(bufferedImage.getRGB(i+p, j+q), true).getAlpha();
+                                    if (p*p + q*q <= innerBorder*innerBorder)
+                                    {
+                                        bestInnerAlpha = Math.max(bestInnerAlpha, alpha);
+                                    }
+                                    if (p*p + q*q <= outerBorder*outerBorder)
+                                    {
+                                        bestOuterAlpha = Math.max(bestOuterAlpha, alpha);
+                                    }
+                                }
+                            }
+                            backgroundInner.setRGB(i+padding, j+padding, new Color(0, 0, 0, bestInnerAlpha).getRGB());
+                            backgroundOuter.setRGB(i+padding, j+padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
+                        }
+                    }
+                        
+                    Point position  = planet.getHolderCenterPosition();
+                    if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
+                    {
+                        position  = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
+                            Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
+                    }
+                    position = new Point(position.x - w/2 + TILE_PADDING, position.y - h/2 + TILE_PADDING);
+                    if (number == 1)
+                    {
+                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
+                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
+                        tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
+                    }
+                    else
+                    {
+                        tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding - 36, null);
+                        tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding - 36, null);
+                        tileGraphics.drawImage(bufferedImage, position.x, position.y - 36, null);
+                        tileGraphics.setColor(Color.WHITE);
+                        tileGraphics.fillOval(position.x + w/2 - 40, position.y + h/2 - 8, 80, 80);
+                        tileGraphics.setColor(Color.BLACK);
+                        tileGraphics.fillOval(position.x + w/2 - 36, position.y + h/2 - 8 + 4, 72, 72);
+                        tileGraphics.setColor(Color.WHITE);
+                        drawCenteredString(tileGraphics, "" + number,
+                            new Rectangle(position.x + w/2 - 40, position.y + h/2 - 8, 80, 80),
+                            Storage.getFont48());
+                    }
+                    
+                }
+                if (!anyAttachments)
+                {
+                    BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
+                    tileGraphics.drawImage(fogging, TILE_PADDING, TILE_PADDING, null);
                 }
             }
         }
         return tileOutput;
-    }
-
-    public static String getColorFilterForWormhole(boolean hasWormhole) {
-        if (hasWormhole) {
-            return "Distance0.png";
-        }
-        return "Distance3.png";
     }
 
     public static String getColorFilterForDistance(int distance) {
