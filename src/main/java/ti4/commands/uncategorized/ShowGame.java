@@ -66,19 +66,20 @@ public class ShowGame implements Command {
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
         if (statsOption != null) {
             String temp = statsOption.getAsString();
-            if (temp.equals(DisplayType.all.getValue())) {
-                displayType = DisplayType.all;
-            } else if (temp.equals(DisplayType.map.getValue())) {
-                displayType = DisplayType.map;
-            } else if (temp.equals(DisplayType.stats.getValue())) {
-                displayType = DisplayType.stats;
-            } else if (temp.equals(DisplayType.split.getValue())) {
+            if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
                 MapGenerator.saveImage(game, displayType, event)
                     .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
-            } else if (temp.equals(DisplayType.system.getValue())) {
-                displayType = DisplayType.system;
+            }
+            else {
+                for (DisplayType i: DisplayType.values())
+                {
+                    if (temp.equals(i.getValue())) {
+                        displayType = i;
+                        break;
+                    }
+                }
             }
         }
         simpleShowGame(game, event, displayType);

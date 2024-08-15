@@ -7160,9 +7160,7 @@ public class ButtonHelper {
     }
 
     public static void showWormholes(GenericInteractionCreateEvent event, Game game) {
-        game.setStoredValue("checkWHs", "yes");
-
-        MapGenerator.saveImage(game, DisplayType.map, event, true)
+        MapGenerator.saveImage(game, DisplayType.wormholes, event, true)
             .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 

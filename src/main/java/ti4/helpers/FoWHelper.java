@@ -410,9 +410,8 @@ public class FoWHelper {
 				}
 				for (WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if (tokenName.contains(wh.getWhString())) {
-						wormholeIDs.add(wh.getWhString());
+						//wormholeIDs.add(wh.getWhString());
 						wormholeIDs.add(wh.toString());
-
 						break;
 					}
 				}
