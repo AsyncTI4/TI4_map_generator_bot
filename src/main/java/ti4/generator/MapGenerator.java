@@ -203,7 +203,7 @@ public class MapGenerator {
             mapWidth += EXTRA_X;
         }
         width = mapWidth;
-        switch (displayType)
+        switch (this.displayType)
         {
             case stats:
                 heightForGameInfo = 40;
