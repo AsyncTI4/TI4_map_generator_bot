@@ -203,7 +203,7 @@ public class MapGenerator {
             mapWidth += EXTRA_X;
         }
         width = mapWidth;
-        switch (displayType)
+        switch (this.displayType)
         {
             case stats:
                 heightForGameInfo = 40;
@@ -2637,7 +2637,7 @@ public class MapGenerator {
     };
 
     /**
-     * 
+     *
      * @param g graphics object
      * @param txt string to print
      * @param x x-position of the string (Left side, unless horizontalAlignment is set)
@@ -4585,7 +4585,7 @@ public class MapGenerator {
 
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
-                
+
                 if (!FoWHelper.doesTileHaveWHs(game, tile.getPosition())) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
@@ -4628,7 +4628,7 @@ public class MapGenerator {
 
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
-                
+
                 if (!tile.isAnomaly(game)) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
@@ -4661,7 +4661,7 @@ public class MapGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
                 boolean anomalyIsAdjacent = FoWHelper.isTileAdjacentToAnAnomaly(game, tile.getPosition(), null);
-                
+
                 if (!anomalyIsAdjacent) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
@@ -4694,7 +4694,7 @@ public class MapGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
                 boolean isLegendary = ButtonHelper.isTileLegendary(tile, game) || tile.isMecatol();
-                
+
                 if (!isLegendary) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
@@ -4708,7 +4708,7 @@ public class MapGenerator {
                     BufferedImage backgroundImage = new BufferedImage(w+2*padding, h+2*padding, bufferedImage.getType());
                     x += (345-w)/2;
                     y += (300-w)/2;
-                    
+
                     for (int i=-padding; i<w+padding; i++)
                     {
                         for (int j=-padding; j<h+padding; j++)
@@ -4730,7 +4730,7 @@ public class MapGenerator {
                             backgroundImage.setRGB(i+padding, j+padding, new Color(0, 0, 0, bestAlpha).getRGB());
                         }
                     }
-                    
+
                     tileGraphics.drawImage(backgroundImage, x - padding, y - padding, null);
                     tileGraphics.drawImage(bufferedImage, x, y, null);
                 } else {
@@ -4762,7 +4762,7 @@ public class MapGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
                 boolean isEmpty = tile.getPlanetUnitHolders().size() == 0;
-                
+
                 if (!isEmpty) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
@@ -4798,7 +4798,7 @@ public class MapGenerator {
                 int y = TILE_PADDING;
                 String tilePos = tile.getPosition();
                 HashMap<Player, List<Integer>> pdsDice = new HashMap<Player, List<Integer>>();
-                
+
                 for (Player player: game.getRealPlayers())
                 {
                     List<Integer> diceCount = new ArrayList<Integer>();
@@ -4858,7 +4858,7 @@ public class MapGenerator {
                             }
                         }
                     }
-                    
+
                     if (diceCountMirveda.size() > 0)
                     {
                         Collections.sort(diceCountMirveda);
@@ -4879,7 +4879,7 @@ public class MapGenerator {
                         pdsDice.put(player, diceCount);
                     }
                 }
-                
+
                 if (pdsDice.size() == 0)
                 {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
@@ -4890,7 +4890,7 @@ public class MapGenerator {
                     x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
                     y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
                     float scale = pdsDice.size() >= 3 ? 6.0f/pdsDice.size() : 3.0f;
-                    
+
                     Font bigFont = Storage.getFont64();
                     Font smallFont = Storage.getFont32();
                     switch (pdsDice.size())
@@ -4917,7 +4917,7 @@ public class MapGenerator {
                             smallFont = Storage.getFont8();
                             break;
                     }
-                    
+
                     x += (345 - 73*scale) / 2;
                     y += (300 - pdsDice.size()*48*scale) / 2;
                     for (Player player: pdsDice.keySet())
@@ -5031,7 +5031,7 @@ public class MapGenerator {
                             traitFile = ResourceHelper.getInstance().getPlanetResource("pc_attribute_combo_" + t + ".png");
                         }
                     }
-                    
+
                     if (!traitFile.equals(""))
                     {
                         BufferedImage bufferedImage = ImageHelper.read(traitFile);
@@ -5070,7 +5070,7 @@ public class MapGenerator {
                                 backgroundOuter.setRGB(i+padding, j+padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
                             }
                         }
-                        
+
                         Point position  = planet.getHolderCenterPosition();
                         if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
                         {
@@ -5078,7 +5078,7 @@ public class MapGenerator {
                                 Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
                         }
                         position = new Point(position.x - w/2 + TILE_PADDING, position.y - h/2 + TILE_PADDING);
-                        
+
                         tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
                         tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
                         tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
@@ -5125,7 +5125,7 @@ public class MapGenerator {
                     }
                     anySkips = true;
                     int count = 0;
-                    
+
                     for (String skip: skips)
                     {
                         String skipFile;
@@ -5146,7 +5146,7 @@ public class MapGenerator {
                             default:
                                 skipFile = ResourceHelper.getInstance().getGeneralFile("Generic_Technology.png");
                         }
-                        
+
                         BufferedImage bufferedImage = ImageHelper.read(skipFile);
                         bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(9200.0f/bufferedImage.getWidth()/bufferedImage.getHeight()/Math.sqrt(1.0f*number)));
                         int w = bufferedImage.getWidth();
@@ -5183,7 +5183,7 @@ public class MapGenerator {
                                 backgroundOuter.setRGB(i+padding, j+padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
                             }
                         }
-                        
+
                         Point position  = planet.getHolderCenterPosition();
                         if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
                         {
@@ -5195,7 +5195,7 @@ public class MapGenerator {
                             position = new Point(position.x - 20 + count*40/(number-1), position.y - 20 + count*40/(number-1));
                         }
                         position = new Point(position.x - w/2 + TILE_PADDING, position.y - h/2 + TILE_PADDING);
-                        
+
                         tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
                         tileGraphics.drawImage(backgroundInner, position.x - padding, position.y - padding, null);
                         tileGraphics.drawImage(bufferedImage, position.x, position.y, null);
@@ -5243,7 +5243,7 @@ public class MapGenerator {
                         continue;
                     }
                     anyAttachments = true;
-                        
+
                     String chevronFile = ResourceHelper.getInstance().getGeneralFile("misc_chevrons_basic.png");
                     if (attachments.contains("attachment_tombofemphidia.png"))
                     {
@@ -5285,7 +5285,7 @@ public class MapGenerator {
                             backgroundOuter.setRGB(i+padding, j+padding, new Color(255, 255, 255, bestOuterAlpha).getRGB());
                         }
                     }
-                        
+
                     Point position  = planet.getHolderCenterPosition();
                     if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3+1))
                     {
@@ -5313,7 +5313,7 @@ public class MapGenerator {
                             new Rectangle(position.x + w/2 - 40, position.y + h/2 - 8, 80, 80),
                             Storage.getFont48());
                     }
-                    
+
                 }
                 if (!anyAttachments)
                 {
