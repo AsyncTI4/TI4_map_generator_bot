@@ -408,13 +408,20 @@ public class GameStats extends StatisticsSubcommandData {
 
     private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
         Map<String, Integer> factionCount = new HashMap<>();
-
+        Map<String, Integer> custodians = new HashMap<>();
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
                 factionCount.put(faction,
                     1 + factionCount.getOrDefault(faction, 0));
+                if (game.getCustodiansTaker() != null && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
+                    if (custodians.containsKey(faction)) {
+                        custodians.put(faction, custodians.get(faction) + 1);
+                    } else {
+                        custodians.put(faction, 1);
+                    }
+                }
             }
         }
         StringBuilder sb = new StringBuilder();
@@ -428,6 +435,7 @@ public class GameStats extends StatisticsSubcommandData {
                 .append("x` ")
                 .append(entry.getKey().getFactionEmoji()).append(" ")
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
+                .append(" (Took Custodians a total of  " + custodians.getOrDefault(entry.getKey(), 0) + " times, or " + ((float) custodians.getOrDefault(entry.getKey(), 0) / entry.getValue()) + ")")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
