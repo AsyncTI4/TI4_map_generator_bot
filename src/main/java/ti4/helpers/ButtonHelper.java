@@ -132,7 +132,7 @@ import ti4.selections.selectmenus.SelectFaction;
 public class ButtonHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealAndEliminatedPlayers()) {
             String msg = player.getRepresentation()
                 + " you have the opportunity to anonymously bestow one title on someone else in this game. Titles are just for fun, and have no real significance, but could a nice way to take something away from this game. Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you want to bestow it upon.";
             List<Button> buttons = new ArrayList<>();
@@ -7664,7 +7664,7 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Remember to click Ready for " 
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Remember to click Ready for "
                 + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
         }
     }
