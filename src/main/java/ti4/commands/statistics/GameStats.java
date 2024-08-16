@@ -435,7 +435,7 @@ public class GameStats extends StatisticsSubcommandData {
                 .append("x` ")
                 .append(entry.getKey().getFactionEmoji()).append(" ")
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
-                .append(" (Took Custodians a total of  " + custodians.getOrDefault(entry.getKey(), 0) + " times, or " + ((float) custodians.getOrDefault(entry.getKey(), 0) / entry.getValue()) + ")")
+                .append(" (Took Custodians a total of  " + custodians.getOrDefault(entry.getKey().getAlias(), 0) + " times, or " + ((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue()) + ")")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
