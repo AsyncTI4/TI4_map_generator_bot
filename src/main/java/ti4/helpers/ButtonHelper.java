@@ -132,7 +132,7 @@ import ti4.selections.selectmenus.SelectFaction;
 public class ButtonHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealAndEliminatedPlayers()) {
             String msg = player.getRepresentation()
                 + " you have the opportunity to anonymously bestow one title on someone else in this game. Titles are just for fun, and have no real significance, but could a nice way to take something away from this game. Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you want to bestow it upon.";
             List<Button> buttons = new ArrayList<>();
@@ -2188,7 +2188,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static float checkValuesOfUnits(Player player, Game game, Tile tile) {
+    public static float checkValuesOfUnits(Player player, Game game, Tile tile, String type) {
         float count = 0;
         for (UnitHolder uh : tile.getUnitHolders().values()) {
             for (UnitKey unit : uh.getUnits().keySet()) {
@@ -2200,6 +2200,9 @@ public class ButtonHelper {
                 }
                 UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                 if (removedUnit.getIsShip() || removedUnit.getIsGroundForce()) {
+                    if ((type.equalsIgnoreCase("ground") && removedUnit.getIsShip()) || (type.equalsIgnoreCase("space") && removedUnit.getIsGroundForce())) {
+                        continue;
+                    }
                     count = count + removedUnit.getCost() * uh.getUnits().get(unit);
                 }
             }
@@ -2245,7 +2248,7 @@ public class ButtonHelper {
         return Math.round(count * 10) / (float) 10.0;
     }
 
-    public static float checkCombatValuesOfUnits(Player player, Game game, Tile tile) {
+    public static float checkCombatValuesOfUnits(Player player, Game game, Tile tile, String type) {
         float count = 0;
         for (UnitHolder uh : tile.getUnitHolders().values()) {
             for (UnitKey unit : uh.getUnits().keySet()) {
@@ -2263,6 +2266,9 @@ public class ButtonHelper {
                     unrelententing = (float) -0.1;
                 }
                 if (removedUnit.getIsShip() || removedUnit.getIsGroundForce()) {
+                    if ((type.equalsIgnoreCase("ground") && removedUnit.getIsShip()) || (type.equalsIgnoreCase("space") && removedUnit.getIsGroundForce())) {
+                        continue;
+                    }
                     count = count + removedUnit.getCombatDieCount()
                         * (((float) 11.0 - removedUnit.getCombatHitsOn()) / 10 + unrelententing)
                         * uh.getUnits().get(unit);
@@ -2272,7 +2278,7 @@ public class ButtonHelper {
         return Math.round(count * 10) / (float) 10.0;
     }
 
-    public static int checkHPOfUnits(Player player, Game game, Tile tile) {
+    public static int checkHPOfUnits(Player player, Game game, Tile tile, String type) {
         int count = 0;
         for (UnitHolder uh : tile.getUnitHolders().values()) {
             for (UnitKey unit : uh.getUnits().keySet()) {
@@ -2284,6 +2290,9 @@ public class ButtonHelper {
                 }
                 UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).get(0);
                 if (removedUnit.getIsShip() || removedUnit.getIsGroundForce()) {
+                    if ((type.equalsIgnoreCase("ground") && removedUnit.getIsShip()) || (type.equalsIgnoreCase("space") && removedUnit.getIsGroundForce())) {
+                        continue;
+                    }
                     int sustain = 0;
                     if (removedUnit.getSustainDamage()) {
                         sustain = 1;
@@ -7151,9 +7160,7 @@ public class ButtonHelper {
     }
 
     public static void showWormholes(GenericInteractionCreateEvent event, Game game) {
-        game.setStoredValue("checkWHs", "yes");
-
-        MapGenerator.saveImage(game, DisplayType.map, event, true)
+        MapGenerator.saveImage(game, DisplayType.wormholes, event, true)
             .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
@@ -7521,7 +7528,7 @@ public class ButtonHelper {
         if (playersWithSCs > 0) {
             new Cleanup().runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                game.getPing() + "Status Cleanup Run!");
+                game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 DisplayType displayType = DisplayType.map;
                 MapGenerator.saveImage(game, displayType, event)
@@ -7656,6 +7663,10 @@ public class ButtonHelper {
             buttons.add(yssarilPolicy);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Remember to click Ready for "
+                + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
+        }
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
@@ -7887,6 +7898,16 @@ public class ButtonHelper {
         game.setStoredValue("fleetLogWhenSCFinished", sc + player.getFaction());
         ButtonHelper.deleteTheOneButton(event);
         ButtonHelper.deleteTheOneButton(event, "endTurnWhenAllReactedTo_" + sc, true);
+    }
+
+    @ButtonHandler("moveAlongAfterAllHaveReactedToAC_")
+    public static void moveAlonAfterAC(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String ac = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+            game.getPing() + " the active player has elected to move the game along after everyone has said no sabo to "
+                + ac + ". Please respond as soon as possible so the game may progress.");
+        game.setTemporaryPingDisable(true);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     public static void resolveTwilightMirror(Game game, Player player, ButtonInteractionEvent event) {
@@ -8822,7 +8843,11 @@ public class ButtonHelper {
             }
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message2);
+            TextChannel channel = game.getMainGameChannel();
+            if (game.getName().equalsIgnoreCase("pbd1000")) {
+                channel = game.getTableTalkChannel();
+            }
+            MessageHelper.sendMessageToChannel(channel, message2);
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                     ident + " Use Buttons To Complete Transaction", goAgainButtons);
@@ -8930,8 +8955,8 @@ public class ButtonHelper {
             String techEmoji = techRep.getCondensedReqsEmojis(true);
             String techText = techRep.getText();
 
-            if (techText.contains("ACTION") || 
-              ((tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det")) && game.isAgeOfExplorationMode())) {
+            if (techText.contains("ACTION") ||
+                ((tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det")) && game.isAgeOfExplorationMode())) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
@@ -10484,6 +10509,8 @@ public class ButtonHelper {
         }
         if ("gift".equalsIgnoreCase(id)) {
             startActionPhase(event, game);
+            //in case Naalu gets eliminated and the PN goes away
+            game.setStoredValue("naaluPNUser", player.getFaction());
         }
         if ("bmf".equalsIgnoreCase(id)) {
             if (fromHand) {

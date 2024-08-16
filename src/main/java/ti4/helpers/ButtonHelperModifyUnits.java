@@ -316,8 +316,9 @@ public class ButtonHelperModifyUnits {
                     }
                     new RemoveUnits().removeStuff(event, tile, min, unitHolder.getName(), unitKey, player.getColor(), false, game);
 
-                    handleCabalConsumption(cabal, player, tile, planet, min, unitName, event, game, cabalMech);
-                    msg.append(handleMechSpecificTriggers(player, min, game, msg, unitHolder, tile, event));
+                    handleCabalConsumption(cabal, player, tile, planet, min, unitName, event, game, false);
+                    StringBuilder msg3 = new StringBuilder();
+                    msg.append(handleMechSpecificTriggers(player, min, game, msg3, unitHolder, tile, event));
                 }
             }
         }
@@ -702,7 +703,7 @@ public class ButtonHelperModifyUnits {
                     } else {
                         msg += "> Would repair 1 " + unitModel.getUnitEmoji() + " due to Duranium Armor\n";
                     }
-                    usedDuraniumAlready = true;
+                    break;
                 }
             }
         }
@@ -1976,7 +1977,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " moved 1 " + unit + " from "
                 + tile1.getRepresentationForButtons(game, player) + " to "
-                + tile2.getRepresentationForButtons(game, player) + "an ability.");
+                + tile2.getRepresentationForButtons(game, player) + " with an ability.");
         event.getMessage().delete().queue();
     }
 

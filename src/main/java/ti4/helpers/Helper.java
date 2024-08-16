@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -887,7 +888,12 @@ public class Helper {
         players.add(p1);
         players.add(p2);
         boolean debtOnly = true;
-        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
+        MessageChannel channel = p1.getCorrectChannel();
+        if (game.getName().equalsIgnoreCase("pbd1000")) {
+            channel = game.getTableTalkChannel();
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
+        }
+        MessageHelper.sendMessageToChannel(channel, "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
         for (Player sender : players) {
             Player receiver = p2;
             if (sender == p2) {
@@ -1109,7 +1115,7 @@ public class Helper {
     }
 
     public static String getNothingMessage() {
-        int result = ThreadLocalRandom.current().nextInt(1, 11);
+        int result = ThreadLocalRandom.current().nextInt(1, 21);
         switch (result) {
             case 1:
                 return "Nothing But Respect And Good Will";
@@ -1131,6 +1137,26 @@ public class Helper {
                 return "A Bot's Blessing For Your Trouble";
             case 10:
                 return "Good Karma";
+            case 11:
+                return "A Mewling Kitten";
+            case 12:
+                return "A Lost Virtual Puppy";
+            case 13:
+                return "A Fortune Cookie";
+            case 14:
+                return "A Firm Handshake";
+            case 15:
+                return "A Friendly Wave";
+            case 16:
+                return "Well Wishes";
+            case 17:
+                return "A Home-cooked Meal";
+            case 18:
+                return "$1000 In Monopoly Money";
+            case 19:
+                return "Forgiveness For Past Mistakes";
+            case 20:
+                return "A Lucky Rock";
         }
         return "Nothing";
     }
@@ -3191,7 +3217,21 @@ public class Helper {
     }
 
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
-        return guild.getDefaultChannel().createInvite().setMaxUses(uses).setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS).complete().getUrl();
+        DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
+        if (defaultChannel == null || !(defaultChannel instanceof TextChannel)) {
+            BotLogger.log("Default channel is not available or is not a text channel on " + guild.getName());
+        }
+        TextChannel textChannel = (TextChannel) defaultChannel;
+        try {
+            return textChannel.createInvite()
+                .setMaxUses(uses)
+                .setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS)
+                .complete()
+                .getUrl();
+        } catch (Exception e) {
+            BotLogger.log("Failed to create invite: " + e.getMessage() + " on " + guild.getName());
+        }
+        return "Whoops invalid url. Have one of the players on the server generate an invite";
     }
 
     public static String getTimeRepresentationToSeconds(long totalMillis) {
