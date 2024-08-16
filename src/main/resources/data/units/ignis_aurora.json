@@ -92,7 +92,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "sdn2"
+        "homebrewReplacesID": "l1z1x_dreadnought2"
     },
     {
         "id": "baldrick_fighter",
@@ -126,7 +126,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
-        "homebrewReplacesID": "hcf2",
+        "homebrewReplacesID": "naalu_fighter2",
         "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
