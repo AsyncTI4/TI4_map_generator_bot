@@ -1306,6 +1306,32 @@ public class Game extends GameProperties {
         return false;
     }
 
+    public String getCustodiansTaker() {
+        if (!isCustodiansScored()) {
+            return null;
+        }
+        String idC = "";
+        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(0)) {
+                idC = po.getKey();
+                break;
+            }
+        }
+        if (!idC.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
+            if (scoredPlayerList.size() > 0) {
+                String playerID = scoredPlayerList.get(0);
+                for (Player player : getRealAndEliminatedPlayers()) {
+                    if (player.getUserID().equalsIgnoreCase(playerID)) {
+                        return player.getFaction();
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public boolean isCustodiansScored() {
         boolean custodiansTaken = false;
         String idC = "";

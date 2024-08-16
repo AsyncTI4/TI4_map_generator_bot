@@ -85,7 +85,7 @@ public class Replace extends GameSubcommandData {
         }
 
         //REMOVE ROLE
-        Guild guild = event.getGuild();
+        Guild guild = game.getGuild();
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (removedMember != null && roles.size() == 1) {
