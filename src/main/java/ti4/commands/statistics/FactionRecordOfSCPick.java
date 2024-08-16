@@ -65,6 +65,7 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
                 .toList();
         }
         Map<String, Integer> scsPicked = new HashMap<>();
+        Map<String, Integer> custodians = new HashMap<>();
         int gamesThatHadThem = 0;
 
         for (Game game : filteredGames) {
@@ -79,6 +80,13 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
                             scsPicked.put(sc, scsPicked.get(sc) + 1);
                         } else {
                             scsPicked.put(sc, 1);
+                        }
+                        if (game.getCustodiansTaker() != null && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
+                            if (custodians.containsKey(sc)) {
+                                custodians.put(sc, custodians.get(sc) + 1);
+                            } else {
+                                custodians.put(sc, 1);
+                            }
                         }
 
                     }
@@ -106,6 +114,9 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
                 sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
                 sb.append("` ").append(techResearched.getKey());
                 sb.append(": " + techResearched.getValue());
+                if (round == 1) {
+                    sb.append(" (Took Custodians a total of  " + custodians.getOrDefault(techResearched.getKey(), 0) + " times)");
+                }
                 sb.append("\n");
                 index.getAndIncrement();
             });
