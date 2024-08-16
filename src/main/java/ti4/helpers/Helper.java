@@ -156,10 +156,7 @@ public class Helper {
         if ("pbd100".equalsIgnoreCase(game.getName())) {
             return true;
         }
-        if (game.getDiscardActionCards().containsKey("sabo1")
-            && game.getDiscardActionCards().containsKey("sabo2")
-            && game.getDiscardActionCards().containsKey("sabo3")
-            && game.getDiscardActionCards().containsKey("sabo4")) {
+        if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return false;
         }
         if (player.hasTech("tp") && game.getActivePlayerID() != null
@@ -177,13 +174,19 @@ public class Helper {
         return true;
     }
 
-    public static boolean doesAnyoneOwnPlanet(Game game, String planet) {
-        for (Player player : game.getRealPlayers()) {
-            if (player.getPlanets().contains(planet)) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean checkForAllSabotagesDiscarded(Game game) {
+        return game.getDiscardActionCards().containsKey("sabo1")
+                && game.getDiscardActionCards().containsKey("sabo2")
+                && game.getDiscardActionCards().containsKey("sabo3")
+                && game.getDiscardActionCards().containsKey("sabo4");
+    }
+
+    private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
+        return "action_deck_2".equals(game.getAcDeckID())
+                && game.getDiscardActionCards().containsKey("sabotage1_acd2")
+                && game.getDiscardActionCards().containsKey("sabotage2_acd2")
+                && game.getDiscardActionCards().containsKey("sabotage3_acd2")
+                && game.getDiscardActionCards().containsKey("sabotage4_acd2");
     }
 
     public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {
@@ -225,7 +228,7 @@ public class Helper {
         List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(getUnusedTiles(game).stream()
             .filter(tile -> tile.getTierList().isBlue())
             .toList());
-        if (unusedBlueTiles.size() == 0) {
+        if (unusedBlueTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no blue tiles available to draw.");
         } else {
             Collections.shuffle(unusedBlueTiles);
@@ -238,7 +241,7 @@ public class Helper {
         List<MiltyDraftTile> unusedRedTiles = new ArrayList<>(getUnusedTiles(game).stream()
             .filter(tile -> !tile.getTierList().isBlue())
             .toList());
-        if (unusedRedTiles.size() == 0) {
+        if (unusedRedTiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There are no red tiles available to draw.");
         } else {
             Collections.shuffle(unusedRedTiles);
@@ -252,7 +255,7 @@ public class Helper {
             return true;
         }
         if (player.hasUnit("empyrean_mech")
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size() > 0) {
+            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).isEmpty()) {
             return true;
         }
         return player.getAc() > 0;
@@ -263,16 +266,14 @@ public class Helper {
         if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
             return false;
         }
-        if ((player.getActionCards().containsKey("sabo1") || player.getActionCards().containsKey("sabotage_ds")
-            || player.getActionCards().containsKey("sabo2") ||
-            player.getActionCards().containsKey("sabo3") || player.getActionCards().containsKey("sabo4")
-            || (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180)
+        if ((playerHasSabotage(player)
+                || (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180)
             && !ButtonHelper.isPlayerElected(game, player, "censure")
             && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
             return false;
         }
         if (player.hasUnit("empyrean_mech")
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size() > 0) {
+            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).isEmpty()) {
             return false;
         }
         if (player.getAc() == 0) {
@@ -285,13 +286,18 @@ public class Helper {
             return false;
         }
         return !ButtonListener.checkForASpecificPlayerReact(messageID, player, game);
-        // int highNum = player.getAutoSaboPassMedian()*6*3/2;
-        // int result = ThreadLocalRandom.current().nextInt(1,highNum+1);
-        // if(result == highNum){
-        // return true;
-        // }else{
-        // return false;
-        // }
+    }
+
+    private static boolean playerHasSabotage(Player player) {
+        return player.getActionCards().containsKey("sabo1")
+                || player.getActionCards().containsKey("sabo2")
+                || player.getActionCards().containsKey("sabo3")
+                || player.getActionCards().containsKey("sabo4")
+                || player.getActionCards().containsKey("sabotage_ds")
+                || player.getActionCards().containsKey("sabotage1_acd2")
+                || player.getActionCards().containsKey("sabotage2_acd2")
+                || player.getActionCards().containsKey("sabotage3_acd2")
+                || player.getActionCards().containsKey("sabotage4_acd2");
     }
 
     public static void giveMeBackMyAgendaButtons(Game game) {
@@ -1275,7 +1281,7 @@ public class Helper {
                 button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, label)
                     .withEmoji(scEmoji);
             } else {
-                button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, "" + sc + " " + label);
+                button = Button.secondary("FFCC_" + playerPicker.getFaction() + "_scPick_" + sc, sc + " " + label);
             }
             scButtons.add(button);
         }
@@ -2146,11 +2152,7 @@ public class Helper {
                 argentButton = argentButton.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
                 unitButtons.add(argentButton);
             }
-            if (player.getActionCards().containsKey("war_machine1")
-                || player.getActionCards().containsKey("war_machine2")
-                || player.getActionCards().containsKey("war_machine3")
-                || player.getActionCards().containsKey("war_machine4")
-                || player.getActionCards().containsKey("war_machine_ds")) {
+            if (playerHasWarMachine(player)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
                     + " Reminder that you have War Machine and this is the window for it");
             }
@@ -2219,7 +2221,7 @@ public class Helper {
                     && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
                     && !"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && unitHolders.size() < 4
                     && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)
-                    && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).size() == 0) {
+                    && getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix).isEmpty()) {
                     Button inf2Button = Button.success(
                         "FFCC_" + player.getFaction() + "_" + placePrefix + "_2gf_space" + tile.getPosition(),
                         "Produce 2 Infantry in space");
@@ -2257,8 +2259,20 @@ public class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player,
-        Game game, boolean ac, Player mahact) {
+    private static boolean playerHasWarMachine(Player player) {
+        return player.getActionCards().containsKey("war_machine1")
+                || player.getActionCards().containsKey("war_machine2")
+                || player.getActionCards().containsKey("war_machine3")
+                || player.getActionCards().containsKey("war_machine4")
+                || player.getActionCards().containsKey("war_machine_ds")
+                || player.getActionCards().containsKey("war_machine1_acd2")
+                || player.getActionCards().containsKey("war_machine2_acd2")
+                || player.getActionCards().containsKey("war_machine3_acd2")
+                || player.getActionCards().containsKey("war_machine4_acd2");
+    }
+
+    public static List<Button> getPlanetSystemDiploButtons(Player player, Game game, boolean ac,
+                                                           Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
