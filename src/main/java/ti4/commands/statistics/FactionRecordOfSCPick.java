@@ -29,7 +29,7 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
     private static final String FACTION_WON_FILTER = "faction_won";
 
     public FactionRecordOfSCPick() {
-        super(Constants.FACTION_RECORD_OF_SCPICK, "# of times a tech has been acquired by a faction");
+        super(Constants.FACTION_RECORD_OF_SCPICK, "# of times an SC has been picked by a faction, by round");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want History Of").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
