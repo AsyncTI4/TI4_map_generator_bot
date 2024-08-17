@@ -175,6 +175,7 @@ public class PlayAC extends ACCardsSubcommandData {
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage")
             .withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
         buttons.add(noSabotageButton);
+        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle, "Pause Timer While Waiting For Sabo"));
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
         } else {

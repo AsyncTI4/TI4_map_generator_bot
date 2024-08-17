@@ -288,6 +288,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 ButtonHelper.checkACLimit(game, event, player);
+                ButtonHelper.fullCommanderUnlockCheck(player, game, "yssaril", event);
             }
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective.";

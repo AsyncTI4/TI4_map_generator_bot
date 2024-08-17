@@ -93,7 +93,8 @@ public class SpecialCommand implements Command {
         subcommands.add(new WormholeResearchFor());
         subcommands.add(new FighterConscription());
         subcommands.add(new SwapSC());
-        subcommands.add(new KeleresHeroMentak());
+        //subcommands.add(new KeleresHeroMentak());
+        subcommands.add(new MoveAllUnits());
         subcommands.add(new NovaSeed());
         subcommands.add(new StasisInfantry());
         subcommands.add(new NaaluCommander());

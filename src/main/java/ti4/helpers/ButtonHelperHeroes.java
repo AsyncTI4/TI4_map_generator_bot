@@ -938,15 +938,22 @@ public class ButtonHelperHeroes {
                 }
                 String name = unitHolder.getName().replace("space", "");
                 if (tile.containsPlayersUnits(p2)) {
+                    int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                     if (p2.hasInf2Tech()) {
-                        int amount = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
-                        ButtonHelper.resolveInfantryDeath(game, p2, amount);
+                        ButtonHelper.resolveInfantryDeath(game, p2, amountInf);
                     }
-                    new RemoveUnits().unitParsing(event, p2.getColor(), tile, "200 ff, 200 inf " + name, game);
-
-                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                        p2.getRepresentation()
-                            + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, removing all fighters and infantry.");
+                    if (amountInf > 0) {
+                        new RemoveUnits().unitParsing(event, p2.getColor(), tile, amountInf + " inf " + name, game);
+                    }
+                    int amountFF = unitHolder.getUnitCount(UnitType.Fighter, p2.getColor());
+                    if (amountFF > 0) {
+                        new RemoveUnits().unitParsing(event, p2.getColor(), tile, amountFF + " ff", game);
+                    }
+                    if (amountFF + amountInf > 0) {
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
+                            p2.getRepresentation()
+                                + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, removing all fighters and infantry.");
+                    }
                 }
 
             }

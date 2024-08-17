@@ -116,6 +116,7 @@ import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
@@ -707,7 +708,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (playersWithSCs > 0) {
                     new Cleanup().runStatusCleanup(game);
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        game.getPing() + "Status Cleanup Run!");
+                        game.getPing() + " **Status Cleanup Run!**");
                 }
             }
 
@@ -1874,6 +1875,13 @@ public class ButtonListener extends ListenerAdapter {
                         game)
                         + " has chosen to discard Committee Formation to choose the winner. Note that \"after\"s may be played before this occurs, and that Confounding (or Confusing) Legal Text may still be played (you should probably wait and confirm no Legal Texts before resolving).");
                     boolean success = game.removeLaw(game.getLaws().get("committee"));
+                    String message = game.getPing() + " please confirm no Confounding Legal Texts.";
+                    Button noConfounding = Button.primary("generic_button_id_3", "Refuse Confounding Legal Text");
+                    List<Button> buttons = List.of(noConfounding);
+                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message, game, buttons, "shenanigans");
+                    if (game.isACInDiscard("Confounding")) {
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Confounding was found in the discard pile, so you should be good to resolve");
+                    }
                 }
                 String resMessage3 = "Please select the winner.";
                 List<Button> deadlyActionRow3 = AgendaHelper.getAgendaButtons(null, game, "agendaResolution");
@@ -3639,7 +3647,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "spyNetPlayerChooses" -> ButtonHelperFactionSpecific.resolveSpyNetPlayerChooses(player, game, event);
                 case "diploSystem" -> {
                     String message = trueIdentity + " Click the name of the planet in the system you wish to lock down with Diplomacy.";
-                    List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, player, game, false, null);
+                    List<Button> buttons = Helper.getPlanetSystemDiploButtons(player, game, false, null);
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", buttons);
                 }
                 case "sc_ac_draw" -> {
@@ -5048,7 +5056,31 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
                 }
                 case "eraseMyRiders" -> AgendaHelper.reverseAllRiders(event, game, player);
-                case "checkWHView" -> ButtonHelper.showWormholes(event, game);
+                case "chooseMapView" ->
+                {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Button.primary("checkWHView", "Find Wormholes"));
+                    buttons.add(Button.danger("checkAnomView", "Find Anomalies"));
+                    buttons.add(Button.success("checkLegendView", "Find Legendaries"));
+                    buttons.add(Button.secondary("checkEmptyView", "Find Empties"));
+                    buttons.add(Button.primary("checkAetherView", "Determine Aetherstreamable Systems"));
+                    buttons.add(Button.danger("checkCannonView", "Calculate Space Cannon Offense Shots"));
+                    buttons.add(Button.success("checkTraitView", "Find Traits"));
+                    buttons.add(Button.success("checkTechSkipView", "Find Technology Specialties"));
+                    buttons.add(Button.primary("checkAttachmView", "Find Attachments"));
+                    buttons.add(Button.secondary("checkShiplessView", "Show Map Without Ships"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
+                }
+                case "checkWHView" -> ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
+                case "checkAnomView" -> ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
+                case "checkLegendView" -> ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
+                case "checkEmptyView" -> ButtonHelper.showFeatureType(event, game, DisplayType.empties);
+                case "checkAetherView" -> ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
+                case "checkCannonView" -> ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
+                case "checkTraitView" -> ButtonHelper.showFeatureType(event, game, DisplayType.traits);
+                case "checkTechSkipView" -> ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
+                case "checkAttachmView" -> ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
+                case "checkShiplessView" -> ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
                 case "resetSpend" -> {
                     Helper.refreshPlanetsOnTheRevote(player, game);
                     String whatIsItFor = "both";
@@ -5918,13 +5950,13 @@ public class ButtonListener extends ListenerAdapter {
             }
             case "no_sabotage" -> {
                 String msg = "All players have indicated \"No Sabotage\"";
+                String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
+                faction = faction.split("_")[1];
+                Player p2 = game.getPlayerFromColorOrFaction(faction);
+                if (p2 != null && !game.isFowMode()) {
+                    msg = p2.getRepresentation() + " " + msg;
+                }
                 if (game.getMessageIDsForSabo().contains(event.getMessageId())) {
-                    String faction = "bob_" + game.getStoredValue(event.getMessageId()) + "_";
-                    faction = faction.split("_")[1];
-                    Player p2 = game.getPlayerFromColorOrFaction(faction);
-                    if (p2 != null && !game.isFowMode()) {
-                        msg = p2.getRepresentation() + " " + msg;
-                    }
                     game.removeMessageIDForSabo(event.getMessageId());
                 }
                 event.getInteraction().getMessage().reply(msg).queueAfter(1, TimeUnit.SECONDS);

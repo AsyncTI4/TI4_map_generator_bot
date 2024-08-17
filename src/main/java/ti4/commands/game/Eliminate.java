@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -17,6 +18,7 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -137,6 +139,7 @@ public class Eliminate extends AddRemovePlayer {
                 }
                 player.setEliminated(true);
                 player.setDummy(true);
+                Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game);
             } else {
                 game.removePlayer(player.getUserID());
             }

@@ -524,6 +524,7 @@ public class ButtonHelperCommanders {
             game);
 
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message);
+        ButtonHelper.fullCommanderUnlockCheck(p1, game, "naaz", event);
         ButtonHelper.deleteTheOneButton(event);
     }
 

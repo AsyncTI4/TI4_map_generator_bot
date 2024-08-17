@@ -230,7 +230,10 @@ public class AutoCompleteProvider {
             }
             case Constants.DISPLAY_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("all", "map", "stats", "split", "none")
+                List<Command.Choice> options = Stream.of("all", "map", "stats", "split",
+                    "wormholes", "anomalies", "legendaries", "empties", "aetherstream", "space_cannon_offense",
+                        "traits", "technology_specialties", "attachments", "shipless",
+                    "none")
                     .filter(value -> value.contains(enteredValue))
                     .limit(25)
                     .map(value -> new Command.Choice(value, value))

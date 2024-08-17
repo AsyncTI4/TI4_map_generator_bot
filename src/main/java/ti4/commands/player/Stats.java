@@ -332,9 +332,9 @@ public class Stats extends PlayerSubcommandData {
         sb.append("> Followed Strategy Cards: `").append(player.getFollowedSCs().toString()).append("`\n");
         sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
         sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
-        sb.append("> Total Unit Resource Value: ").append(Emojis.resources).append("`").append(player.getTotalResourceValueOfUnits()).append("`\n");
-        sb.append("> Total Unit Hit-point Value: ").append(Emojis.PinkHeart).append("`").append(player.getTotalHPValueOfUnits()).append("`\n");
-        sb.append("> Total Unit Combat Expected Hits: ").append("💥").append("`").append(player.getTotalCombatValueOfUnits()).append("`\n");
+        sb.append("> Total Unit Resource Value: ").append(Emojis.resources).append("`").append(player.getTotalResourceValueOfUnits("both")).append("`\n");
+        sb.append("> Total Unit Hit-point Value: ").append(Emojis.PinkHeart).append("`").append(player.getTotalHPValueOfUnits("both")).append("`\n");
+        sb.append("> Total Unit Combat Expected Hits: ").append("💥").append("`").append(player.getTotalCombatValueOfUnits("both")).append("`\n");
         sb.append("> Total Unit Ability Expected Hits: ").append(Emojis.UnitUpgradeTech).append("`").append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
         sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
 

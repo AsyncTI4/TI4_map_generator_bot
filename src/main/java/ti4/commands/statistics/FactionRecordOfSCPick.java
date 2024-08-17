@@ -29,8 +29,8 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
     private static final String FACTION_WON_FILTER = "faction_won";
 
     public FactionRecordOfSCPick() {
-        super(Constants.FACTION_RECORD_OF_SCPICK, "Number of times a technology has been acquired by a faction.");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want the technology history of").setRequired(true).setAutoComplete(true));
+        super(Constants.FACTION_RECORD_OF_SCPICK, "Number of times a strategy card has been acquired by a faction.");
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you want the strategy card history of").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
         addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
         addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, PoK, absol, DS, action_deck_2, little_omega"));
@@ -65,6 +65,7 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
                 .toList();
         }
         Map<String, Integer> scsPicked = new HashMap<>();
+        Map<String, Integer> custodians = new HashMap<>();
         int gamesThatHadThem = 0;
 
         for (Game game : filteredGames) {
@@ -79,6 +80,13 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
                             scsPicked.put(sc, scsPicked.get(sc) + 1);
                         } else {
                             scsPicked.put(sc, 1);
+                        }
+                        if (game.getCustodiansTaker() != null && game.getCustodiansTaker().equalsIgnoreCase(faction)) {
+                            if (custodians.containsKey(sc)) {
+                                custodians.put(sc, custodians.get(sc) + 1);
+                            } else {
+                                custodians.put(sc, 1);
+                            }
                         }
 
                     }
@@ -106,6 +114,9 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
                 sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
                 sb.append("` ").append(techResearched.getKey());
                 sb.append(": " + techResearched.getValue());
+                if (round == 1) {
+                    sb.append(" (Took Custodians a total of  " + custodians.getOrDefault(techResearched.getKey(), 0) + " times)");
+                }
                 sb.append("\n");
                 index.getAndIncrement();
             });
