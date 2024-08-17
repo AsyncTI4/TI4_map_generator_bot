@@ -14,7 +14,8 @@ public enum DisplayType {
     spacecannon("space_cannon_offense"),
     traits("traits"),
     techskips("technology_specialties"),
-    attachments("attachments");
+    attachments("attachments"),
+    shipless("shipless");
 
     public final String value;
 
