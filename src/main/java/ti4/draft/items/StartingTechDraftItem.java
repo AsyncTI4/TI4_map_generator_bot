@@ -28,7 +28,7 @@ public class StartingTechDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return getFaction().getFactionName() + " Starting Tech";
+        return getFaction().getFactionName() + " Starting Technology";
     }
 
     public static Map<String, String> selectableStartingTechs = Map.ofEntries(

@@ -15,9 +15,9 @@ import java.util.Map;
 public class DrawSpecificSOForPlayer extends AdminSubcommandData {
 
     public DrawSpecificSOForPlayer() {
-        super(Constants.DRAW_SPECIFIC_SO_FOR_PLAYER, "Draw specific SO for player");
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "SO ID").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do draw SO").setRequired(true));
+        super(Constants.DRAW_SPECIFIC_SO_FOR_PLAYER, "Draw a specific secret objective for a specific player.");
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player that will draw the secret objective").setRequired(true));
     }
 
     @Override
@@ -26,21 +26,21 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping option = event.getOption(Constants.SO_ID);
         if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "SO ID needs to be specified");
+            MessageHelper.sendMessageToEventChannel(event, "Secret objectives ID needs to be specified.");
             return;
         }
         if (playerOption == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player option was null");
+            MessageHelper.sendMessageToEventChannel(event, "Player option was null.");
             return;
         }
 
         User user = playerOption.getAsUser();
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(option.getAsString(), user.getId());
         if (secrets == null) {
-            MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
+            MessageHelper.sendMessageToEventChannel(event, "Secret objectives not retrieved.");
             return;
         }
         GameSaveLoadManager.saveMap(game, event);
-        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
+        MessageHelper.sendMessageToEventChannel(event, "Secret objectives sent to player's hand - please check `/sop info`.");
     }
 }

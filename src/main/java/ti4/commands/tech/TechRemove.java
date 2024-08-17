@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class TechRemove extends TechAddRemove {
     public TechRemove() {
-        super(Constants.TECH_REMOVE, "Remove Tech");
+        super(Constants.TECH_REMOVE, "Remove Technology");
     }
 
     @Override
@@ -19,6 +19,6 @@ public class TechRemove extends TechAddRemove {
 
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed tech: " + Mapper.getTech(techID).getRepresentation(false));
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed technology: " + Mapper.getTech(techID).getRepresentation(false));
     }
 }

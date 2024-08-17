@@ -10,8 +10,8 @@ import ti4.message.MessageHelper;
 
 public class Rematch extends SpecialSubcommandData {
     public Rematch() {
-        super(Constants.REMATCH, "New game, same players");
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
+        super(Constants.REMATCH, "New game, same players.");
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm with YES").setRequired(true));
     }
 
     @Override
@@ -20,7 +20,7 @@ public class Rematch extends SpecialSubcommandData {
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
             ButtonHelper.rematch(game, event);
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "Please type YES.");
+            MessageHelper.sendMessageToEventChannel(event, "Please confirm with `YES`.");
         }
 
     }

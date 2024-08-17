@@ -20,7 +20,7 @@ public class PNAdd extends PNAddRemove {
     }
 
     public static void addPromissoryNotes(GenericInteractionCreateEvent event, Game game, Player player, List<String> pnIDs) {
-        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added PNs:\n");
+        StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added promissory notes:\n");
         for (String pnID : pnIDs ){
             Player pnOwner = game.getPNOwner(pnID);
             sb.append("> ");
@@ -31,7 +31,7 @@ public class PNAdd extends PNAddRemove {
             }
 
             if (player.ownsPromissoryNote(pnID)) {
-                sb.append(pnID).append(" (player already owned this PN)");
+                sb.append(pnID).append(" (player already owned this promissory note).");
                 sb.append("\n");
                 continue;
             }

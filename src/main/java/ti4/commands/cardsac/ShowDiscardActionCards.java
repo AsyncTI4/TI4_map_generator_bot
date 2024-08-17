@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 
 public class ShowDiscardActionCards extends ACCardsSubcommandData {
     public ShowDiscardActionCards() {
-        super(Constants.SHOW_AC_DISCARD_LIST, "Show Action Card discard list");
+        super(Constants.SHOW_AC_DISCARD_LIST, "Show list of discarded action card.");
     }
 
     @Override

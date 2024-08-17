@@ -24,8 +24,8 @@ public class ButtonHelperActionCardsWillHomebrew {
 
     public static void resolveDataArchive(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game, true);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #1", buttons);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #2 (different planet from #1)", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #1.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #2 (different planet from #1).", buttons);
         if (game.getPhaseOfGame().toLowerCase().contains("agenda")) {
             for (String planet : player.getPlanets()) {
                 player.exhaustPlanet(planet);
@@ -171,13 +171,13 @@ public class ButtonHelperActionCardsWillHomebrew {
                 buttons.add(button);
             }
         }
-        buttons.add(Button.danger("deleteButtons", "Don't give comms"));
+        buttons.add(Button.danger("deleteButtons", "Don't give commodities"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to give 2 comms to",
+            player.getRepresentation(true, true) + " tell the bot who you wish to give 2 commodities to",
             buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who else you want to give 2 comms to (different from the first time)",
+            player.getRepresentation(true, true) + " tell the bot who else you wish to give 2 commodities to (different from the first time)",
             buttons);
     }
 
@@ -199,7 +199,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
+            player.getRepresentation(true, true) + " tell the bot which neighbor you wish to get 1 cruiser and 1 destroyer",
             buttons);
     }
 
@@ -221,7 +221,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to ancient trade routes and is neighbors with " + ButtonHelper.getIdentOrColor(player, game) + " for this turn");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to Ancient Trade Routes and is neighbors with " + ButtonHelper.getIdentOrColor(player, game) + " for this turn");
         event.getMessage().delete().queue();
     }
 
@@ -257,7 +257,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " readied every tech skip planet");
+            player.getFactionEmoji() + " readied each of their planets with a technology specialty.");
         event.getMessage().delete().queue();
 
     }
@@ -267,7 +267,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to place a Ghost Ship in",
+            player.getRepresentation(true, true) + " tell the bot which tile you wish to summon a Ghost Ship into.",
             buttons);
     }
 
@@ -329,7 +329,7 @@ public class ButtonHelperActionCardsWillHomebrew {
 
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " Chose the tile you want to swap places with "
+            player.getRepresentation(true, true) + " Chose the tile you wish to swap places with "
                 + tile1.getRepresentationForButtons(game, player),
             buttons);
         event.getMessage().delete().queue();
@@ -369,7 +369,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         String buttonID) {
         Player p1 = player;
         if (p1.getStrategicCC() > 0) {
-            String successMessage = p1.getFactionEmoji() + " Reduced strategy pool CCs by 1 (" + (p1.getStrategicCC()) + " -> " + (p1.getStrategicCC() - 1) + ")";
+            String successMessage = p1.getFactionEmoji() + " Spent 1 command token from your strategy pool (" + (p1.getStrategicCC()) + " -> " + (p1.getStrategicCC() - 1) + ").";
             p1.setStrategicCC(p1.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, Emojis.ActionCard + "Side Project");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
@@ -389,7 +389,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             buttons.add(Button.success("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose which planet to Brutally Occupy.");
     }
 
     public static void resolveShrapnelTurrets(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -398,7 +398,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();
@@ -411,12 +411,12 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         if (!buttons.isEmpty()) {
             String message = player.getFactionEmoji() + " Click button to explore "
-                + Helper.getPlanetRepresentation(planet, game);
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 message, buttons);
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentation(planet, game));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " readied and explored " + Helper.getPlanetRepresentation(planet, game));
     }
 
 }

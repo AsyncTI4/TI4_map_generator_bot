@@ -153,9 +153,9 @@ public class FrankenDraftHelper {
         if (draftQueueCount > 0) {
             List<Button> queueButtons = new ArrayList<>();
             if (isQueueFull || draftables.isEmpty()) {
-                queueButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I want to draft these cards."));
+                queueButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I wish to draft these cards."));
             }
-            queueButtons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I want to draft different cards."));
+            queueButtons.add(Button.danger(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I wish to draft different cards."));
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Queue:__\n> You are drafting the following from this bag:\n" + getDraftQueueRepresentation(game, player), queueButtons);
 
             if (isQueueFull || draftables.isEmpty()) {
@@ -194,7 +194,7 @@ public class FrankenDraftHelper {
 
         if (!undraftables.isEmpty()) {
             sb.append("# __Undraftable:__\n");
-            sb.append("> The following items are in your bag but may not be drafted, either because you:\n");
+            sb.append("> The following items are in your bag but cannot be drafted, either because you:\n");
             sb.append("> - are at your hand limit\n");
             sb.append("> - just drafted a similar item\n");
             sb.append("> - have not drafted one of each item type yet\n");

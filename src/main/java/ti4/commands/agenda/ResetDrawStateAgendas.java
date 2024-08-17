@@ -17,7 +17,7 @@ public class ResetDrawStateAgendas extends AgendaSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())){
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
         getActiveGame().resetDrawStateAgendas();

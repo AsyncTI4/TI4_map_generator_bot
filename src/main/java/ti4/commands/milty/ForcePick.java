@@ -15,7 +15,7 @@ public class ForcePick extends MiltySubcommandData {
     public static final String PICK = "draft_pick";
 
     public ForcePick() {
-        super(commandName, "Pick for the active player in milty draft");
+        super(commandName, "Pick for the active player in Milty draft");
         addOptions(new OptionData(OptionType.STRING, PICK, "What should be picked").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
@@ -24,7 +24,7 @@ public class ForcePick extends MiltySubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
 
@@ -32,7 +32,7 @@ public class ForcePick extends MiltySubcommandData {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         Player player = manager.getCurrentDraftPlayer(game);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is not an active milty draft for this game.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is not an active Milty draft for this game.");
         }
 
         boolean error = false;
@@ -57,7 +57,7 @@ public class ForcePick extends MiltySubcommandData {
         }
 
         if (error) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), pick + " is not a valid choice");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), pick + " is not a valid choice.");
         } else {
             manager.doMiltyPick(event, game, fauxButton, player);
         }

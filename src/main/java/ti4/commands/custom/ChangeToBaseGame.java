@@ -14,8 +14,8 @@ import ti4.message.MessageHelper;
 
 public class ChangeToBaseGame extends CustomSubcommandData {
     public ChangeToBaseGame() {
-        super(Constants.CHANGE_TO_BASE_GAME, "Remove PoK ACs/SOs/POs/Agendas");
-        addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex AC too? (y/n)").setRequired(false));
+        super(Constants.CHANGE_TO_BASE_GAME, "Remove PoK action cards, objectives and agendas.");
+        addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex action cards too? (y/n)").setRequired(false));
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ChangeToBaseGame extends CustomSubcommandData {
         if (codexOption != null) {
             codex = codexOption.getAsString();
             if ("y".equalsIgnoreCase(codex)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex ACs.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex action cards.");
             }
 
         }

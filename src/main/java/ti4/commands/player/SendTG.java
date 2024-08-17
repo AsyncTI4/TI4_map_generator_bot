@@ -16,9 +16,9 @@ import ti4.message.MessageHelper;
 
 public class SendTG extends PlayerSubcommandData {
     public SendTG() {
-        super(Constants.SEND_TG, "Sent TG(s) to player/faction");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send TG(s)").setAutoComplete(true).setRequired(true));
+        super(Constants.SEND_TG, "Sent trade goods to a player.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Number of trade goods to send").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send trade goods").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
     }
 
@@ -29,12 +29,12 @@ public class SendTG extends PlayerSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         Player player_ = Helper.getPlayer(game, player, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player to send TGs/Commodities could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player to send trade goods to could not be found.");
             return;
         }
 
@@ -54,12 +54,12 @@ public class SendTG extends PlayerSubcommandData {
         String p2 = player_.getRepresentation();
         ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
         String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(game) + " trade goods";
-        String message = p1 + " sent " + tgString + " to " + p2;
+        String message = p1 + " sent " + tgString + " to " + p2 + ".";
         MessageHelper.sendMessageToEventChannel(event, message);
 
         if (event.getOption(Constants.CLEAR_DEBT, false, OptionMapping::getAsBoolean)) {
             ClearDebt.clearDebt(player_, player, sendTG);
-            MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendTG + " debt tokens owned by " + player.getRepresentation());
+            MessageHelper.sendMessageToEventChannel(event, player_.getRepresentation() + " cleared " + sendTG + " debt chit" + (sendTG == 1 ? "" : "s") + " owned by " + player.getRepresentation() + ".");
         }
 
         if (game.isFowMode()) {

@@ -48,11 +48,11 @@ import ti4.message.MessageHelper;
 public class GameEnd extends GameSubcommandData {
 
     public GameEnd() {
-        super(Constants.GAME_END, "Declare the game has ended");
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS, "True to archive the channels and delete the game role (Default: True)"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.REMATCH, "True to start another game using the same channels (Default: False)"));
+        super(Constants.GAME_END, "Declare the game has ended.");
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with YES").setRequired(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles (default: True)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS, "True to archive the channels and delete the game role (default: True)"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.REMATCH, "True to start another game using the same channels (default: False)"));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -60,7 +60,7 @@ public class GameEnd extends GameSubcommandData {
         Game game = gameManager.getUserActiveGame(event.getUser().getId());
 
         if (game == null) {
-            MessageHelper.replyToMessage(event, "Must set active Game");
+            MessageHelper.replyToMessage(event, "Must set active game.");
             return;
         }
         String gameName = game.getName();
@@ -70,7 +70,7 @@ public class GameEnd extends GameSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())) {
-            MessageHelper.replyToMessage(event, "Must confirm with 'YES'");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
         boolean publish = event.getOption(Constants.PUBLISH, true, OptionMapping::getAsBoolean);
@@ -85,9 +85,9 @@ public class GameEnd extends GameSubcommandData {
         boolean deleteRole = true;
         if (gameRoles.size() > 1) {
             MessageHelper.replyToMessage(event,
-                "There are multiple roles that match this game name (" + gameName + "): " + gameRoles);
+                "There are multiple roles that match this game name (" + gameName + "): " + gameRoles + ".");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Please call a @Bothelper to fix this before using `/game end`");
+                "Please call a @Bothelper to fix this before using `/game end`.");
             return;
         } else if (gameRoles.isEmpty()) {
             MessageHelper.replyToMessage(event, "No roles match the game name (" + gameName + ") - no role will be deleted.");
@@ -103,7 +103,7 @@ public class GameEnd extends GameSubcommandData {
         if (deleteRole && archiveChannels) {
             Role gameRole = gameRoles.get(0);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
+                "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players.");
             gameRole.delete().queue();
 
             if (game.isFowMode()) {
@@ -238,7 +238,7 @@ public class GameEnd extends GameSubcommandData {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         getTIGLFormattedGameEndText(game, event));
                     String blt = Constants.bltPing();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), blt + " bot has been told to ping you when TIGL games end");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), blt + " bot has been told to ping you when TIGL games end.");
                 }
             });
         } else if (publish) { //FOW SUMMARY
@@ -247,8 +247,8 @@ public class GameEnd extends GameSubcommandData {
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
-            summaryChannel.createThreadChannel(gameName, true).queue( 
-                t -> { 
+            summaryChannel.createThreadChannel(gameName, true).queue(
+                t -> {
                     MessageHelper.sendMessageToChannel(t, gameEndText);
                     sendFeedbackMessage(t, game);
                     sendRoundSummariesToThread(t, game);
@@ -286,7 +286,7 @@ public class GameEnd extends GameSubcommandData {
         }
         message.append(
             "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
-        
+
         MessageHelper.sendMessageToChannel(t, message.toString());
     }
 

@@ -10,9 +10,9 @@ import ti4.message.MessageHelper;
 
 public class AddCustomPO extends StatusSubcommandData {
     public AddCustomPO() {
-        super(Constants.ADD_CUSTOM, "Add custom Public Objective");
-        addOptions(new OptionData(OptionType.STRING, Constants.PO_NAME, "Public Objective name").setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_VP_WORTH, "Public Objective worth in VP").setRequired(true));
+        super(Constants.ADD_CUSTOM, "Add custom public objective.");
+        addOptions(new OptionData(OptionType.STRING, Constants.PO_NAME, "Public objective name").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_VP_WORTH, "Public objective victory point value.").setRequired(true));
     }
 
     @Override
@@ -21,23 +21,23 @@ public class AddCustomPO extends StatusSubcommandData {
 
         OptionMapping poNameOption = event.getOption(Constants.PO_NAME);
         if (poNameOption == null || poNameOption.getName().trim().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify a name for the public objective.");
             return;
         }
 
         if (poNameOption.getName().contains(",") || poNameOption.getName().contains(";")) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Symbol ; or , is not allowed");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Symbol `;` or `,` is not allowed.");
             return;
         }
         OptionMapping vpOption = event.getOption(Constants.PO_VP_WORTH);
         if (vpOption == null || vpOption.getName().trim().isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify a name for the public objective.");
             return;
 
         }
         String poName = poNameOption.getAsString();
         if (poName.contains(",")) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Objective must not contain comma ,");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective must not contain comma `,`.");
             return;
         }
         int vp = vpOption.getAsInt();

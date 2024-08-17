@@ -17,10 +17,10 @@ public class ResetAgendas extends AgendaSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())){
-            MessageHelper.replyToMessage(event, "Must confirm with YES");
+            MessageHelper.replyToMessage(event, "Must confirm with `YES`.");
             return;
         }
         getActiveGame().resetAgendas();
-        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveGame().getAgendaDeckID() + "`. Discards removed. All shuffled as new");
+        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getActiveGame().getAgendaDeckID() + "`. Discards have been removed and deck has been shuffled.");
     }
 }

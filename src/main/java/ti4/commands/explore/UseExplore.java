@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 public class UseExplore extends ExploreSubcommandData {
 
     public UseExplore() {
-        super(Constants.USE, "Draw and activate an explore card from the deck or discard");
+        super(Constants.USE, "Draw and activate an explore card from the deck or discard.");
         addOptions(idOption.setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
@@ -61,14 +61,14 @@ public class UseExplore extends ExploreSubcommandData {
                     }
                 }
                 if (tile == null) {
-                    MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet: " + planetName);
+                    MessageHelper.sendMessageToEventChannel(event, "System not found that contains planet: " + planetName + ".");
                     return;
                 }
             }
             Player player = game.getPlayer(event.getUser().getId());
             player = Helper.getGamePlayer(game, player, event, null);
-            String messageText = player.getRepresentation() + " used explore card: " + id;
-            if (force) messageText += "\nTHIS CARD WAS DRAWN FORCEFULLY (if the card wasn't in the deck, it was created from thin air)";
+            String messageText = player.getRepresentation() + " used explore card: " + id + ".";
+            if (force) messageText += "\nTHIS CARD WAS DRAWN FORCEFULLY (if the card wasn't in the deck, it was created from thin air).";
             resolveExplore(event, id, tile, planetName, messageText, player, game);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Explore Card ID: `" + id + "` is not in the deck or discard pile.");

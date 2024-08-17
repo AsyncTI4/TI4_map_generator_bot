@@ -15,8 +15,8 @@ import ti4.model.ActionCardModel;
 
 public class MakeCopiesOfACs extends ACCardsSubcommandData {
     public MakeCopiesOfACs() {
-        super(Constants.MAKE_AC_COPIES, "Make Copies of ACS");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many copies to make, 2 or 3").setRequired(true));
+        super(Constants.MAKE_AC_COPIES, "Make a copy of the action card deck.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many copies to make; 2 or 3").setRequired(true));
     }
 
     @Override

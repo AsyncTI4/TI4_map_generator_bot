@@ -14,10 +14,10 @@ import ti4.message.MessageHelper;
 
 public class ReviseLaw extends AgendaSubcommandData {
     public ReviseLaw() {
-        super(Constants.REVISE_LAW, "Revise a law");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything other than Faction").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected Faction").setRequired(false).setAutoComplete(true));
+        super(Constants.REVISE_LAW, "Revise a law.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "ID of the agenda to be revised").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected public objective or anything other than faction").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected faction").setRequired(false).setAutoComplete(true));
     }
 
     @Override

@@ -16,9 +16,9 @@ import ti4.message.MessageHelper;
 
 public class SwapSC extends SpecialSubcommandData {
     public SwapSC() {
-        super(Constants.SWAP_SC, "Swap your SC with player2. Use OPTIONAL faction_or_color_2 to swap two other players' SCs");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(false));
+        super(Constants.SWAP_SC, "Swap your strategy card with another player.");
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "First Faction or Color to swap strategy card with").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Optional second Faction or Color to swap strategy card with (default: you)").setAutoComplete(true).setRequired(false));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SwapSC extends SpecialSubcommandData {
         }
 
         if (player1.getSCs().size() > 1 || player2.getSCs().size() > 1) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap SCs because One or more players have multiple SCs. Command not yet implemented for this scenario");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap strategy cards because one or more players have multiple strategy cards. Command not yet implemented for this scenario.");
             return;
         }
 
@@ -78,7 +78,7 @@ public class SwapSC extends SpecialSubcommandData {
         Integer player2SC = player2.getSCs().stream().findFirst().get();
 
         if (player1SC == 0 || player2SC == 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap SCs because One or more players have no selected an SC yet");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap strategy cards because 1 or more players have no selected a strategy card yet.");
             return;
         }
 
@@ -88,7 +88,7 @@ public class SwapSC extends SpecialSubcommandData {
         player2.addSC(player1SC);
         player2.removeSC(player2SC);
 
-        String sb = player1.getRepresentation() + " swapped SC with " + player2.getRepresentation() + "\n" +
+        String sb = player1.getRepresentation() + " swapped strategy card with " + player2.getRepresentation() + "\n" +
             "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
             "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:" + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);

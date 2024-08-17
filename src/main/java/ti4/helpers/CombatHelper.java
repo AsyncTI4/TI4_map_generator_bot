@@ -456,11 +456,14 @@ public class CombatHelper {
                 }
             }
             if (rollType == CombatRollType.combatround && player.hasAbility("valor") && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                int crits = 0;
                 for (Die die : resultRolls) {
-                    if (die.getResult() > 9) {
-                        hitRolls = hitRolls + 1;
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " got an extra hit due to the valor ability (it has been accounted for in the hit count).");
-                    }
+                    crits += die.getResult() == 10 ? 1 : 0;
+                }
+                if (crits > 0) {
+                    hitRolls = hitRolls + crits;
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                        + " produced " + crits + " additional hit" + (crits == 1 ? "" : "s") + " due to rolling that many 10s with their Valor faction ability; these have been accounted for in the hit count.");
                 }
             }
             if (unit.getId().equalsIgnoreCase("vaden_flagship") && CombatRollType.bombardment == rollType) {
@@ -469,7 +472,7 @@ public class CombatHelper {
                         player.setTg(player.getTg() + 1);
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1TG due to hitting on a bombardment roll with the Aurum Vadra (the Vaden flagship).");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 trade good due to hitting on a bombardment roll with the Aurum Vadra (the Vaden flagship).");
                         break;
 
                     }
@@ -501,8 +504,8 @@ public class CombatHelper {
                             if (player.hasTech("sar")) {
                                 for (int x = 0; x < misses; x++) {
                                     player.setTg(player.getTg() + 1);
-                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1TG (" + (player.getTg() - 1)
-                                        + "->" + player.getTg() + ") from 1 of your mechs dying while you own Self-Assembly Routines. This is not an optional gain.");
+                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 1 trade good (" + (player.getTg() - 1)
+                                        + "->" + player.getTg() + ") Self-Assembly Routines because of a dead mech (this is a mandatory gain).");
                                     ButtonHelperAbilities.pillageCheck(player, game);
                                 }
                                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
@@ -543,7 +546,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Munitions rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + ": " + unitRoll2);
+                resultBuilder.append("Munitions Reserves rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + ": " + unitRoll2);
             }
 
             int argentInfKills = 0;
@@ -572,7 +575,7 @@ public class CombatHelper {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-            result = result + "\n" + player.getFactionEmoji() + " You have the Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
+            result = result + "\n" + player.getFactionEmoji() + " You have The Crown of Thalnos and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
                 + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
         }
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {

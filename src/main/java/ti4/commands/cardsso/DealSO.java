@@ -14,9 +14,9 @@ import ti4.message.MessageHelper;
 
 public class DealSO extends SOCardsSubcommandData {
     public DealSO() {
-        super(Constants.DEAL_SO, "Deal Secret Objective");
+        super(Constants.DEAL_SO, "Deal secret objective(s) to a player.");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to deal, default 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many secret objectives to deal (default: 1)"));
     }
 
     @Override
@@ -31,19 +31,19 @@ public class DealSO extends SOCardsSubcommandData {
 
         Player player_ = Helper.getPlayer(game, null, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player not found");
+            MessageHelper.sendMessageToEventChannel(event, "Player not found.");
             return;
         }
         User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
         if (user == null) {
-            MessageHelper.sendMessageToEventChannel(event, "User for faction not found. Report to ADMIN");
+            MessageHelper.sendMessageToEventChannel(event, "User for faction not found. Report to ADMIN.");
             return;
         }
 
         for (int i = 0; i < count; i++) {
             game.drawSecretObjective(player_.getUserID());
         }
-        MessageHelper.sendMessageToEventChannel(event, count + " SO Dealt");
+        MessageHelper.sendMessageToEventChannel(event, count + " secret objective" + (count == 1 ? "" : "s") + " dealt/");
         SOInfo.sendSecretObjectiveInfo(game, player_, event);
     }
 }

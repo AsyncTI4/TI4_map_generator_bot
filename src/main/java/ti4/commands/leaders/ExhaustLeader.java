@@ -17,7 +17,7 @@ import ti4.model.LeaderModel;
 public class ExhaustLeader extends LeaderAction {
 	public ExhaustLeader() {
 		super(Constants.EXHAUST_LEADER, "Exhaust leader");
-		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "TG count to add to leader").setRequired(false));
+		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count to add to leader").setRequired(false));
 	}
 
 	@Override

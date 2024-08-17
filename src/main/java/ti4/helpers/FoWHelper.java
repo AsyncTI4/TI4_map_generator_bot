@@ -592,7 +592,7 @@ public class FoWHelper {
 	/**
 	 * Return the list of players that are adjacent to a particular position
 	 * <p>
-	 * WARNING: This function returns information that certain players may not be
+	 * WARNING: This function returns information that certain players might not be
 	 * privy to
 	 */
 	public static List<Player> getAdjacentPlayers(Game game, String position, boolean includeSweep) {
@@ -932,7 +932,7 @@ public class FoWHelper {
 			.toList();
 		if (badEmojis.size() > 0) {
 			StringBuilder sb = new StringBuilder(Constants.jazzPing());
-			sb.append(" Bad emojis are being used for FOW reacts:\n");
+			sb.append(" Bad emojis are being used for fog of war reacts:\n");
 			for (String err : badEmojis) {
 				sb.append("```\n").append(err).append("\n```");
 			}

@@ -16,8 +16,8 @@ import ti4.message.MessageHelper;
 
 public class ShowPNToAll extends PNCardsSubcommandData {
     public ShowPNToAll() {
-        super(Constants.SHOW_PN_TO_ALL, "Show Promissory Note to table");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "PN ID that is sent between ()").setRequired(true));
+        super(Constants.SHOW_PN_TO_ALL, "Show promissory note to the entire table.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "ID of the promissory note to show").setRequired(true));
     }
 
     @Override
@@ -26,12 +26,12 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found.");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to show to All");
+            MessageHelper.sendMessageToEventChannel(event, "Please select what promissory note (by ID) to show to all.");
             return;
         }
 
@@ -45,7 +45,7 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         }
 
         if (pnID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Promissory Note ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such promissory note ID found, please retry.");
             return;
         }
 

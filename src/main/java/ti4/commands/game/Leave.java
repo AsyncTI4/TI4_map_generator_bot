@@ -16,13 +16,14 @@ public class Leave extends JoinLeave {
         if (game.getPlayer(user.getId()) != null && game.getPlayer(user.getId()).isRealPlayer()) {
             return "Did not leave game: " + game.getName() + ". Try a different method or set status to dummy. ";
         }
-        return "Left map: " + game.getName() + " successful";
+        return "Left map: " + game.getName() + " successful.";
     }
 
     @Override
     protected void action(Game game, User user) {
         if (game.getPlayer(user.getId()).isRealPlayer()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "You are a real player, and thus should not do /game leave. You should do /game eliminate, or /game replace, depending on what you are looking for.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "You are a real player, and thus should not do `/game leave`."
+                + " You should do `/game eliminate`, or `/game replace`, depending on what you are looking for.");
             return;
         }
         game.removePlayer(user.getId());

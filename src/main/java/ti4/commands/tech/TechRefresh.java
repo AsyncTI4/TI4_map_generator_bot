@@ -8,12 +8,12 @@ import ti4.message.MessageHelper;
 
 public class TechRefresh extends TechAddRemove {
     public TechRefresh() {
-        super(Constants.TECH_REFRESH, "Ready Tech");
+        super(Constants.TECH_REFRESH, "Ready Technology");
     }
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         player.refreshTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied tech: " + Mapper.getTech(techID).getRepresentation(false));
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied technology: " + Mapper.getTech(techID).getRepresentation(false));
     }
 }

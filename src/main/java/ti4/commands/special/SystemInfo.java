@@ -33,13 +33,13 @@ import ti4.model.UnitModel;
 
 public class SystemInfo extends SpecialSubcommandData {
     public SystemInfo() {
-        super(Constants.SYSTEM_INFO, "Info for system (all units)");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.EXTRA_RINGS, "Show additional rings around the selected system for context (Max 2)").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/Tile name").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_5, "System/Tile name").setRequired(false).setAutoComplete(true));
+        super(Constants.SYSTEM_INFO, "Info for system (all units).");
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/tile name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EXTRA_RINGS, "Show additional rings around the selected system for context (maximum 2)").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/tile name").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/tile name").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/tile name").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_5, "System/tile name").setRequired(false).setAutoComplete(true));
     }
 
     @Override
@@ -94,7 +94,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 boolean hasCC = false;
                 for (String cc : unitHolder.getCCList()) {
                     if (!hasCC) {
-                        sb.append("Command Counters: ");
+                        sb.append("Command Tokens: ");
                         hasCC = true;
                     }
                     appendFactionIcon(game, sb, cc, privateGame);

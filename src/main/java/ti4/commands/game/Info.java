@@ -55,8 +55,8 @@ public class Info extends GameSubcommandData {
         sb.append("Game Completed: `").append(game.getWinner().isPresent()).append("`").append(NEW_LINE);
 
         sb.append("### Setup: ").append(NEW_LINE);
-        sb.append("VP Count: ").append(game.getVp()).append(NEW_LINE);
-        sb.append("SO Count: ").append(game.getMaxSOCountPerPlayer()).append(NEW_LINE);
+        sb.append("Victory Point Count: ").append(game.getVp()).append(NEW_LINE);
+        sb.append("Secret Objective Count: ").append(game.getMaxSOCountPerPlayer()).append(NEW_LINE);
         sb.append("Private Game: ").append(privateGame).append(NEW_LINE);
         sb.append("Game Modes: ").append(game.getGameModesText()).append(NEW_LINE);
         sb.append("Map Template: `").append(game.getMapTemplateID()).append("`").append(NEW_LINE);
@@ -125,9 +125,9 @@ public class Info extends GameSubcommandData {
         sb.append("Current Phase: ").append(game.getPhaseOfGame()).append(NEW_LINE);
         sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append(NEW_LINE);
         sb.append("Game Real Player Count: ").append(game.getRealPlayers().size()).append(NEW_LINE);
-        sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append(NEW_LINE);
+        sb.append("Strategy Cards per player: ").append(game.getStrategyCardsPerPlayer()).append(NEW_LINE);
         sb.append("Map Images Generated: ").append(game.getMapImageGenerationCount()).append(NEW_LINE);
-        sb.append("SC Trade Goods: `").append(game.getScTradeGoods()).append("`").append(NEW_LINE);
+        sb.append("Strategy Card Trade Goods: `").append(game.getScTradeGoods()).append("`").append(NEW_LINE);
         sb.append("Public Objectives: `").append(game.getRevealedPublicObjectives()).append("`").append(NEW_LINE);
         sb.append("Laws: `").append(game.getLaws()).append("`").append(NEW_LINE);
         sb.append("Laws Info: `").append(game.getLawsInfo()).append("`").append(NEW_LINE);

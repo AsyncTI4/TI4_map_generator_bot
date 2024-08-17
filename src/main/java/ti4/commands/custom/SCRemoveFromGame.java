@@ -11,8 +11,8 @@ import ti4.message.MessageHelper;
 public class SCRemoveFromGame extends CustomSubcommandData {
 
     public SCRemoveFromGame() {
-        super(Constants.REMOVE_SC_FROM_GAME, "Remove a Stategy Card # from the game");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to remove").setRequired(true));
+        super(Constants.REMOVE_SC_FROM_GAME, "Remove a strategy card from the game.");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Initiative value of strategy card to remove").setRequired(true));
     }
 
     @Override
@@ -21,14 +21,14 @@ public class SCRemoveFromGame extends CustomSubcommandData {
 
         Integer sc = event.getOption(Constants.STRATEGY_CARD, null, OptionMapping::getAsInt);
         if (sc == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "SC was null?");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No initiative value given.");
             return;
         }
 
         if (game.removeSC(sc)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Strategy Card: " + sc);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed strategy card: " + sc);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card did not exist: " + sc);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card did not exist: " + sc);
         }
     }
 

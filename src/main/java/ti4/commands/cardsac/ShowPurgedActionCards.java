@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 public class ShowPurgedActionCards extends ACCardsSubcommandData {
     public ShowPurgedActionCards() {
-        super(Constants.SHOW_AC_PURGED_LIST, "Show Action Card purged list");
+        super(Constants.SHOW_AC_PURGED_LIST, "Show list of purged action card.");
     }
 
     @Override

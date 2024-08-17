@@ -10,8 +10,8 @@ import ti4.message.MessageHelper;
 
 public class ACRemoveFromGame extends CustomSubcommandData {
     public ACRemoveFromGame() {
-        super(Constants.REMOVE_AC_FROM_GAME, "AC remove from game");
-        addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "AC ID").setRequired(true).setAutoComplete(true));
+        super(Constants.REMOVE_AC_FROM_GAME, "Remove an action card from the game.");
+        addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the action card to remove.").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -20,14 +20,14 @@ public class ACRemoveFromGame extends CustomSubcommandData {
 
         OptionMapping soOption = event.getOption(Constants.AC_ID);
         if (soOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify AC");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Action card not specified.");
             return;
         }
         boolean removed = game.removeACFromGame(soOption.getAsString());
         if (removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "AC removed from game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Action card removed from game deck.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "AC not found in game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Action card not found in game deck.");
         }
     }
 }

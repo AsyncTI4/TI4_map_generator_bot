@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 
 public class TechAdd extends TechAddRemove {
     public TechAdd() {
-        super(Constants.TECH_ADD, "Add Tech");
+        super(Constants.TECH_ADD, "Add Technology");
     }
 
     @Override
@@ -24,9 +24,9 @@ public class TechAdd extends TechAddRemove {
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
-        String message = player.getRepresentation() + " added tech: " + Mapper.getTech(techID).getRepresentation(false);
+        String message = player.getRepresentation() + " added technology: " + Mapper.getTech(techID).getRepresentation(false);
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
-            message = message + "\n Automatically added the Custodia Vigilia planet";
+            message = message + "\n Automatically added the Custodia Vigilia planet.";
         }
         if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "mirveda", event);

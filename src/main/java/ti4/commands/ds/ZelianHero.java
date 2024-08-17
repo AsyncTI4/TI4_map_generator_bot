@@ -80,7 +80,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
             resourcesSum += p.getResources();
         }
         StringBuilder tgGainMsg = new StringBuilder(player.getFactionEmoji());
-        tgGainMsg.append(" gained ").append(resourcesSum).append("TG" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (");
+        tgGainMsg.append(" gained ").append(resourcesSum).append(" trade good" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (");
         tgGainMsg.append(player.getTg()).append("->").append(player.getTg() + resourcesSum).append(").");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg.toString());
         player.gainTG(resourcesSum);
@@ -105,7 +105,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
             StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Zelian R, the Zelian heRo, has been purged");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + "\n(Zelian R, the Zelian heRo, has been purged.)");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Zelian R, the Zelian heRo, was not purged - something went wrong");
             }

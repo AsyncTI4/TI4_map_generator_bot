@@ -43,10 +43,10 @@ public class StartCombat extends CombatSubcommandData {
 
     public StartCombat() {
         super(Constants.START_COMBAT, "Start a new combat thread for a given tile.");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from")
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/tile where combat is taking place")
             .setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_TYPE,
-            "Type of combat to start 'space' or 'ground' - Default: space").setRequired(false)
+            "Type of combat to start; \"space\" or \"ground\" (default: space)").setRequired(false)
                 .setAutoComplete(true));
     }
 
@@ -83,7 +83,7 @@ public class StartCombat extends CombatSubcommandData {
 
         if (playersForCombat.size() > 2) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                "There are more than 2 players in this system - something may not work correctly *yet*.");
+                "There are more than 2 players in this system - something might not work correctly *yet*.");
         } else if (playersForCombat.size() < 2) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "There are less than 2 players in this system - a combat thread could not be created.");
@@ -185,7 +185,7 @@ public class StartCombat extends CombatSubcommandData {
                 && (unitHolder.getUnitCount(UnitType.Pds, player2.getColor()) > 0
                     || unitHolder.getUnitCount(UnitType.Spacedock, player2.getColor()) > 0)) {
                 String msg2 = player2.getRepresentation()
-                    + " you may want to remove structures on " + unitHolder.getName() + " if your opponent is not playing Infiltrate or using Assimilate. Use buttons to resolve.";
+                    + " you may wish to remove structures on " + unitHolder.getName() + " if your opponent is not playing Infiltrate or using Assimilate. Use buttons to resolve.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
                     Button.danger(player2.getFinsFactionCheckerPrefix() + "removeAllStructures_" + unitHolder.getName(),
@@ -325,7 +325,7 @@ public class StartCombat extends CombatSubcommandData {
                     autoButtons.add(automate);
                 }
             }
-            if (autoButtons.size() > 0) {
+            if (!autoButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm.", autoButtons);
             }
         }
@@ -340,14 +340,14 @@ public class StartCombat extends CombatSubcommandData {
         Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
         if (game.isFowMode()) {
-            pdsMessage.append("In fog, it is the Players' responsibility to check for PDS2\n");
+            pdsMessage.append("In fog of war, it is the players' responsibility to check for PDS2\n");
         }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
-        if (playersWithPds2.size() < 1) {
+        if (playersWithPds2.isEmpty()) {
             return;
         }
-        if (!game.isFowMode() && playersWithPds2.size() > 0) {
-            pdsMessage.append("These players have space cannon offense coverage in this system:\n");
+        if (!game.isFowMode() && !playersWithPds2.isEmpty()) {
+            pdsMessage.append("These players have units with space cannon offense that can fire at this system:\n");
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append("> ").append(playerWithPds.getRepresentation()).append("\n");
             }
@@ -417,10 +417,10 @@ public class StartCombat extends CombatSubcommandData {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons.add(Button
-                    .secondary(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent CC to Fleet")
+                    .secondary(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add Opponent Token to Fleet Pool")
                     .withEmoji(Emoji.fromFormatted(Emojis.Mahact)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win this combat, you may add the opponents CC to your fleet pool.",
+                    + " this is a reminder that if you win this combat, you may add 1 of your opponent's command token to your fleet pool.",
                     buttons);
             }
             if (player.hasTechReady("dskortg") && AddCC.hasCC(player, tile)) {
@@ -428,16 +428,16 @@ public class StartCombat extends CombatSubcommandData {
                 buttons.add(Button.secondary("exhaustTech_dskortg_" + tile.getPosition(), "Tempest Drive")
                     .withEmoji(Emoji.fromFormatted(Emojis.kortali)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat, you may use this button to remove a CC from the system.",
+                    + " this is a reminder that if you win the combat, you may use this button to remove 1 command token from the system.",
                     buttons);
             }
             if (player.hasAbility("technological_singularity")) {
                 buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + player.getFaction() + "_";
-                buttons.add(Button.secondary(finChecker + "nekroStealTech_" + otherPlayer.getFaction(), "Steal Tech")
+                buttons.add(Button.secondary(finChecker + "nekroStealTech_" + otherPlayer.getFaction(), "Copy Technology")
                     .withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + " this is a reminder that when you first kill an opponent unit this combat, you may use the button to steal a tech.",
+                    + " this is a reminder that when you first kill an opponent unit this combat, you may use the button to copy a technology.",
                     buttons);
             }
             if (player.hasUnit("ghemina_mech") && type.equalsIgnoreCase("ground") && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, game).getUnitCount(UnitType.Mech, player) == 2) {
@@ -485,10 +485,10 @@ public class StartCombat extends CombatSubcommandData {
                 && "space".equalsIgnoreCase(type)) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
-                buttons.add(Button.secondary(finChecker + "startFacsimile_" + tile.getPosition(), "Play Mortheus PN")
+                buttons.add(Button.secondary(finChecker + "startFacsimile_" + tile.getPosition(), "Play Mortheus Promissory Note")
                     .withEmoji(Emoji.fromFormatted(Emojis.cheiran)));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + " this is a reminder that you may play Morpheus PN here to spend influence equal to the cost of 1 of the opponent ships to place 1 of that type of ship in the system.",
+                    + " this is a reminder that you may play Secrets of the Weave, the Mortheus promissory note, here to spend influence equal to the cost of 1 of the opponent ships to place 1 of that type of ship in the system.",
                     buttons);
             }
             boolean techOrLegendary = false;
@@ -531,10 +531,10 @@ public class StartCombat extends CombatSubcommandData {
 
         List<Button> afbButtons = new ArrayList<>();
         afbButtons.add(Button.secondary("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue()));
-        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll AFB:", afbButtons);
+        MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll anti-fighter barrage:", afbButtons);
         for (Player player : combatPlayers) {
             if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use AFB against " + ButtonHelper.getIdentOrColor(player, game) + " due to their mech power");
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use anti-fighter barrage against " + ButtonHelper.getIdentOrColor(player, game) + " due to their mech power.");
             }
         }
 
@@ -762,12 +762,12 @@ public class StartCombat extends CombatSubcommandData {
         // }
 
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !game.isFowMode() && isGroundCombat
-            && p1.getFragments().size() > 0) {
+            && !p1.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p1.getColor(),
                 "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
         }
-        if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && p2.getFragments().size() > 0) {
+        if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && !p2.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(),
                 "Use Kortali Agent").withEmoji(Emoji.fromFormatted(Emojis.kortali)));
@@ -786,7 +786,7 @@ public class StartCombat extends CombatSubcommandData {
         // }
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+            if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
                     .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
             } else {
@@ -800,7 +800,7 @@ public class StartCombat extends CombatSubcommandData {
         }
         if (p1.hasAbility("glory") && ButtonHelperAgents.getGloryTokenTiles(game).size() < 3) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+            if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Button.secondary(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)")
                     .withEmoji(Emoji.fromFormatted(Emojis.kjalengard)));
             } else {
@@ -1078,7 +1078,7 @@ public class StartCombat extends CombatSubcommandData {
                     String finChecker = "FFCC_" + p1.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "assimilate_" + unitH.getName(),
-                            "Assimilate Structures on " + nameOfHolder)
+                            "Assimilate structures on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
                 }
                 if (p1.hasUnit("letnev_mech") && isGroundCombat
@@ -1113,7 +1113,7 @@ public class StartCombat extends CombatSubcommandData {
                     String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "assimilate_" + unitH.getName(),
-                            "Assimilate Structures on " + nameOfHolder)
+                            "Assimilate structures on " + nameOfHolder)
                         .withEmoji(Emoji.fromFormatted(Emojis.L1Z1X)));
                 }
             }
@@ -1166,7 +1166,7 @@ public class StartCombat extends CombatSubcommandData {
     private static String getGroundCombatIntroMessage() {
         StringBuilder sb = new StringBuilder();
         sb.append("Steps for Invasion:\n");
-        sb.append("> 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)\n");
+        sb.append("> 1. Start of invasion abilities (Tekklar Legion, Blitz, Bunker, etc.)\n");
         sb.append("> 2. Bombardment\n");
         sb.append("> 3. Commit Ground Forces\n");
         sb.append("> 4. After commit window (Parley, Ghost Squad, etc.)\n");

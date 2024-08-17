@@ -78,7 +78,8 @@ public class ScoreSO extends SOCardsSubcommandData {
                     String soStringID = entry.getKey();
                     buttons.add(Button.success("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
+                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored secret objective " + Mapper.getSecretObjectivesJustNames().get(soStringID) + "."
+                        + " Use buttons to resolve.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
@@ -91,13 +92,7 @@ public class ScoreSO extends SOCardsSubcommandData {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                     }
-                    Player lanefirPlayer = game.getPlayers().values().stream().filter(
-                        p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
-
-                    if (lanefirPlayer != null) {
-                        ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
-                    }
-                    String message2 = player.getRepresentation() + " purged fragments: "
+                    String message2 = player.getRepresentation() + " purged relic fragments: "
                         + fragmentsToPurge;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 } else {
@@ -125,7 +120,7 @@ public class ScoreSO extends SOCardsSubcommandData {
                     Button transact2 = Button.success(finChecker + "deleteButtons", "Done purging");
                     purgeFragButtons.add(transact2);
 
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Purge 2 fragments please", purgeFragButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Purge 2 relic fragments, please.", purgeFragButtons);
                 }
             }
         }
