@@ -13,7 +13,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "homebrewReplacesID": "cv2"
+        "homebrewReplacesID": "carrier2"
     },
     {
         "id": "baldrick_sol_carrier2",
@@ -29,7 +29,7 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "homebrewReplacesID": "ac2"
+        "homebrewReplacesID": "sol_carrier2"
     },
     {
         "id": "baldrick_dreadnought2",
@@ -49,7 +49,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "dn2"
+        "homebrewReplacesID": "dreadnought2"
     },
     {
         "id": "baldrick_exotrireme2",
@@ -70,15 +70,15 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "exo2",
+        "homebrewReplacesID": "exotrireme2",
         "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system."
     },
     {
-        "id": "baldrick_superdreadnought2",
+        "id": "baldrick_l1z1x_dreadnought2",
         "baseType": "dreadnought",
         "asyncId": "dn",
         "name": "Super Dreadnought II",
-        "upgradesFromUnitId": "superdreadnought",
+        "upgradesFromUnitId": "l1z1x_dreadnought",
         "requiredTechId": "baldrick_sdn2",
         "source": "ignis_aurora",
         "faction": "L1Z1X",
@@ -95,7 +95,7 @@
         "homebrewReplacesID": "l1z1x_dreadnought2"
     },
     {
-        "id": "baldrick_fighter",
+        "id": "baldrick_fighter2",
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Fighter II",
@@ -108,11 +108,11 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "homebrewReplacesID": "ff2",
+        "homebrewReplacesID": "fighter2",
         "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
     },
     {
-        "id": "baldrick_naalu_fighter",
+        "id": "baldrick_naalu_fighter2",
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Hybrid Crystal Fighter II",
@@ -137,7 +137,7 @@
         "requiredTechId": "baldrick_inf2",
         "source": "ignis_aurora",
         "isGroundForce": true,
-        "homebrewReplacesID": "inf2",
+        "homebrewReplacesID": "infantry2",
         "ability": "You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
     },
     {
@@ -154,7 +154,7 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "homebrewReplacesID": "so2",
+        "homebrewReplacesID": "sol_infantry2",
         "ability": "You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
     },
     {
@@ -171,7 +171,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "homebrewReplacesID": "cl2",
+        "homebrewReplacesID": "mahact_infantry2",
         "ability": "After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. You may produce 1 additional infantry for their cost. These infantry do not count against your production limit."
     },
     {
@@ -209,7 +209,7 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "homebrewReplacesID": "pds2",
+        "homebrewReplacesID": "titans_pds2",
         "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. \nYou may use this unit's Space Cannon against ships that are adjacent to this unit's system.\nWhen your units use Space Cannon, at least half of the hits produced by those units (rounded up) must be assigned to non-fighter ships if able."
     },
     {
@@ -223,7 +223,7 @@
         "productionValue": "+5",
         "capacityValue": 6,
         "isStructure": true,
-        "homebrewReplacesID": "sd2"
+        "homebrewReplacesID": "spacedock2"
     },
     {
         "id": "baldrick_warsun",
@@ -265,7 +265,7 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "homebrewReplacesID": "pws2",
+        "homebrewReplacesID": "muaat_warsun",
         "ability": "Other players units in this system lose PLANETARY SHIELD ability. This unit cannot be destroyed by Direct Hit action cards."
     }
 ]
