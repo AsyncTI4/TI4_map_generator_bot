@@ -214,7 +214,7 @@
     },
     {
         "id": "baldrick_spacedock2",
-        "baseType": "space_dock",
+        "baseType": "spacedock",
         "asyncId": "sd",
         "name": "Space Dock II",
         "upgradesFromUnitId": "spacedock",
