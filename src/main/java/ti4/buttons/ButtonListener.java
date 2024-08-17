@@ -116,6 +116,7 @@ import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
@@ -5063,7 +5064,31 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
                 }
                 case "eraseMyRiders" -> AgendaHelper.reverseAllRiders(event, game, player);
-                case "checkWHView" -> ButtonHelper.showWormholes(event, game);
+                case "chooseMapView" -> 
+                {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Button.primary("checkWHView", "Find Wormholes"));
+                    buttons.add(Button.danger("checkAnomView", "Find Anomalies"));
+                    buttons.add(Button.success("checkLegendView", "Find Legendaries"));
+                    buttons.add(Button.secondary("checkEmptyView", "Find Empties"));
+                    buttons.add(Button.primary("checkAetherView", "Determine Aetherstreamable Systems"));
+                    buttons.add(Button.danger("checkCannonView", "Calculate Space Cannon Offense Shots"));
+                    buttons.add(Button.success("checkTraitView", "Find Traits"));
+                    buttons.add(Button.success("checkTechSkipView", "Find Technology Specialties"));
+                    buttons.add(Button.primary("checkAttachmView", "Find Attachments"));
+                    buttons.add(Button.secondary("checkShiplessView", "Show Map Without Ships"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
+                }
+                case "checkWHView" -> ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
+                case "checkAnomView" -> ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
+                case "checkLegendView" -> ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
+                case "checkEmptyView" -> ButtonHelper.showFeatureType(event, game, DisplayType.empties);
+                case "checkAetherView" -> ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
+                case "checkCannonView" -> ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
+                case "checkTraitView" -> ButtonHelper.showFeatureType(event, game, DisplayType.traits);
+                case "checkTechSkipView" -> ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
+                case "checkAttachmView" -> ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
+                case "checkShiplessView" -> ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
                 case "resetSpend" -> {
                     Helper.refreshPlanetsOnTheRevote(player, game);
                     String whatIsItFor = "both";

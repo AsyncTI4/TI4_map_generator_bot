@@ -7159,8 +7159,8 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void showWormholes(GenericInteractionCreateEvent event, Game game) {
-        MapGenerator.saveImage(game, DisplayType.wormholes, event, true)
+    public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
+        MapGenerator.saveImage(game, feature, event, true)
             .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 

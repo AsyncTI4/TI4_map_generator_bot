@@ -151,6 +151,16 @@ public class MapGenerator {
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
     private static final BasicStroke stroke7 = new BasicStroke(7.0f);
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
+    
+    private static Color EliminatedColor = new Color(150, 0, 24);
+    private static Color PassedColor = new Color(220, 20, 60);
+    private static Color ActiveColor = new Color(80, 200, 120);
+    private static Color Stage1RevealedColor = new Color(230, 126, 34);
+    private static Color Stage1HiddenColor = new Color(130, 70, 0);
+    private static Color Stage2RevealedColor = new Color(93, 173, 226);
+    private static Color Stage2HiddenColor = new Color(30, 60, 128);
+    private static Color LawColor = new Color(228, 255, 0);
+    private static Color TradeGoodColor = new Color(241, 176, 0);
 
     private MapGenerator(Game game) {
         this(game, null, true);
@@ -219,6 +229,7 @@ public class MapGenerator {
             case traits:
             case techskips:
             case attachments:
+            case shipless:
                 heightForGameInfo = mapHeight;
                 height = mapHeight + 600;
                 displayTypeBasic = DisplayType.map;
@@ -414,8 +425,22 @@ public class MapGenerator {
     private FileUpload uploadToDiscord() {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
+        float quality = 1/6.0f;
+        switch (displayType) {
+            case wormholes:
+            case anomalies:
+            case legendaries:
+            case empties:
+            case aetherstream:
+            case spacecannon:
+            case traits:
+            case techskips:
+            case attachments:
+            case shipless:
+                quality = 1/4.0f;
+        }
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, 0.15f, game.getName());
+        FileUpload fileUpload = uploadToDiscord(mainImage, quality, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
@@ -432,7 +457,7 @@ public class MapGenerator {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             // CONVERT PNG TO JPG
             BufferedImage convertedImage = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
-            convertedImage.createGraphics().drawImage(imageToUpload, 0, 0, Color.black, null);
+            convertedImage.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpg").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(out));
             ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
@@ -852,14 +877,28 @@ public class MapGenerator {
                 // Status
                 String activePlayerID = game.getActivePlayerID();
                 String phase = game.getPhaseOfGame();
-                if (player.isPassed()) {
-                    graphics.setFont(Storage.getFont20());
-                    graphics.setColor(new Color(238, 58, 80));
-                    graphics.drawString("PASSED", x + 5, y + 95 + yDelta);
+                
+                if (player.isEliminated()) {
+                    AffineTransform transform = g2.getTransform();
+                    g2.translate(x + 47-3, y + 47 - 6);
+                    g2.rotate(-Math.PI/4);
+                    g2.setFont(Storage.getFont20());
+                    superDrawString(g2, "ELIMINATED", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke2, Color.BLACK);
+                    g2.setTransform(transform);
+                } else if (player.isPassed()) {
+                    AffineTransform transform = g2.getTransform();
+                    g2.translate(x + 47-3, y + 47 - 6);
+                    g2.rotate(-Math.PI/4);
+                    g2.setFont(Storage.getFont20());
+                    superDrawString(g2, "PASSED", 0, 0, PassedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke2, Color.BLACK);
+                    g2.setTransform(transform);
                 } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
-                    graphics.setFont(Storage.getFont20());
-                    graphics.setColor(new Color(50, 230, 80));
-                    graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
+                    AffineTransform transform = g2.getTransform();
+                    g2.translate(x + 47-3, y + 47 - 6);
+                    g2.rotate(-Math.PI/4);
+                    g2.setFont(Storage.getFont20());
+                    superDrawString(g2, "ACTIVE", 0, 0, ActiveColor, HorizontalAlign.Center, VerticalAlign.Center, stroke2, Color.BLACK);
+                    g2.setTransform(transform);
                 }
                 int xSpacer = 0;
                 // Unfollowed SCs
@@ -1423,7 +1462,7 @@ public class MapGenerator {
             }
 
             if (leader.getTgCount() != 0) {
-                graphics.setColor(new Color(241, 176, 0));
+                graphics.setColor(TradeGoodColor);
                 graphics.setFont(Storage.getFont32());
                 graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
             } else {
@@ -2661,8 +2700,8 @@ public class MapGenerator {
         }
         if (outlineSize == null) outlineSize = stroke2;
         if (outlineColor == null && textColor == null) {
-            outlineColor = Color.black;
-            textColor = Color.white;
+            outlineColor = Color.BLACK;
+            textColor = Color.WHITE;
         }
         if (outlineSize == null || outlineColor == null) {
             g.drawString(txt, x, y);
@@ -2816,7 +2855,7 @@ public class MapGenerator {
         String activePlayerUserID = game.getActivePlayerID();
         if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getPhaseOfGame())) {
             graphics.setFont(Storage.getFont20());
-            graphics.setColor(new Color(50, 230, 80));
+            graphics.setColor(ActiveColor);
             graphics.drawString("ACTIVE", x + 10, y + 35);
             graphics.setFont(Storage.getFont16());
             graphics.setColor(Color.LIGHT_GRAY);
@@ -3042,7 +3081,7 @@ public class MapGenerator {
         //corners.forEach(c -> c.translate(10, 10)); // offset by 10 pixels so that our border can slightly overlap the bounds of the hex
 
         // Draw outlines
-        g2.setColor(Color.black);
+        g2.setColor(Color.BLACK);
         for (int i = 0; i < 6; i++) {
             if (openSides.contains(i)) g2.setStroke(outlineSparse);
             if (!openSides.contains(i)) g2.setStroke(outline);
@@ -3159,7 +3198,7 @@ public class MapGenerator {
             point = PositionMapper.getPlayerStats("newuserName");
             if (!Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES))) {
                 String name = userName.substring(0, Math.min(userName.length(), 15));
-                superDrawString(graphics, name, tile.x + point.x, tile.y + point.y, Color.white, center, null, stroke5, Color.black);
+                superDrawString(graphics, name, tile.x + point.x, tile.y + point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
             }
         }
 
@@ -3172,7 +3211,7 @@ public class MapGenerator {
                 factionText = player.getDisplayName();
             }
             factionText = StringUtils.capitalize(factionText);
-            superDrawString(graphics, factionText, point.x, point.y, Color.white, center, null, stroke5, Color.black);
+            superDrawString(graphics, factionText, point.x, point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
 
             BufferedImage img = ImageHelper.readEmojiImageScaled(Emojis.getColorEmoji(player.getColor()), 30);
             int offset = graphics.getFontMetrics().stringWidth(factionText) / 2 + 10;
@@ -3186,7 +3225,7 @@ public class MapGenerator {
             String vpCount = "VP: " + player.getTotalVictoryPoints() + " / " + game.getVp();
             point = PositionMapper.getPlayerStats("newvp");
             point.translate(statTileMid.x, statTileMid.y);
-            superDrawString(graphics, vpCount, point.x, point.y, Color.white, center, null, stroke5, Color.black);
+            superDrawString(graphics, vpCount, point.x, point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
         }
 
         { // PAINT SO ICONS
@@ -3231,7 +3270,7 @@ public class MapGenerator {
                     point.translate(scsize, 0);
                 } else {
                     int fontYoffset = (scsize / 2) + 25;
-                    superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.black);
+                    superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     point.translate(scsize, 0);
                 }
             }
@@ -3279,9 +3318,9 @@ public class MapGenerator {
             graphics.setFont(Storage.getFont28());
             point.translate(rightAlign ? 58 : -3, 32);
             String fleetCCs = Integer.toString(player.getFleetCC() + additionalFleetSupply) + addFS;
-            superDrawString(graphics, reps.get(0), point.x, point.y, Color.white, align, null, stroke4, Color.black);
-            superDrawString(graphics, fleetCCs, point.x, point.y + 65, Color.white, align, null, stroke4, Color.black);
-            superDrawString(graphics, reps.get(2), point.x, point.y + 130, Color.white, align, null, stroke4, Color.black);
+            superDrawString(graphics, reps.get(0), point.x, point.y, Color.WHITE, align, null, stroke4, Color.BLACK);
+            superDrawString(graphics, fleetCCs, point.x, point.y + 65, Color.WHITE, align, null, stroke4, Color.BLACK);
+            superDrawString(graphics, reps.get(2), point.x, point.y + 130, Color.WHITE, align, null, stroke4, Color.BLACK);
         }
 
         { // PAINT SPEAKER
@@ -3303,18 +3342,18 @@ public class MapGenerator {
             if (player.isPassed()) {
                 point = PositionMapper.getPlayerStats("newpassed");
                 point.translate(miscTile.x, miscTile.y);
-                superDrawString(graphics, "PASSED", point.x, point.y, new Color(238, 58, 80), center, null, stroke4, Color.black);
+                superDrawString(graphics, "PASSED", point.x, point.y, PassedColor, center, null, stroke4, Color.BLACK);
             } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
                 point = PositionMapper.getPlayerStats("newpassed");
                 point.translate(miscTile.x, miscTile.y);
-                superDrawString(graphics, "ACTIVE", point.x, point.y, new Color(50, 230, 80), center, null, stroke4, Color.black);
+                superDrawString(graphics, "ACTIVE", point.x, point.y, ActiveColor, center, null, stroke4, Color.BLACK);
             }
             if (player.isAFK()) {
                 point = PositionMapper.getPlayerStats("newafk");
                 point.translate(miscTile.x, miscTile.y);
-                superDrawString(graphics, "AFK", point.x, point.y, Color.gray, center, null, stroke4, Color.black);
+                superDrawString(graphics, "AFK", point.x, point.y, Color.gray, center, null, stroke4, Color.BLACK);
             }
-            graphics.setColor(Color.white);
+            graphics.setColor(Color.WHITE);
         }
     }
 
@@ -3474,12 +3513,12 @@ public class MapGenerator {
         String phase = game.getPhaseOfGame();
         if (player.isPassed()) {
             point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
-            graphics.setColor(new Color(238, 58, 80));
+            graphics.setColor(PassedColor);
             graphics.drawString("PASSED", point.x + deltaX, point.y + deltaY);
             graphics.setColor(Color.WHITE);
         } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
             point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
-            graphics.setColor(new Color(50, 230, 80));
+            graphics.setColor(ActiveColor);
             graphics.drawString("ACTIVE", point.x + deltaX + 4, point.y + deltaY);
 
             if (player.isAFK()) {
@@ -3610,11 +3649,11 @@ public class MapGenerator {
         // STAGE 1
         Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         Set<String> po1 = publicObjectivesState1.keySet();
-        graphics.setColor(new Color(230, 126, 34));
+        graphics.setColor(Stage1RevealedColor);
         Coord coord = coord(left, y);
         coord = displayObjectives(top, coord.x, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, null);
         boxWidth = coord.x;
-        graphics.setColor(new Color(130, 70, 0));
+        graphics.setColor(Stage1HiddenColor );
         int y1b = displayUnrevealedObjectives(coord.y, left, boxWidth, game.getPublicObjectives1Peakable(), 1, game);
         maxYFound = Math.max(maxYFound, y1b);
 
@@ -3623,10 +3662,10 @@ public class MapGenerator {
         Set<String> po2 = publicObjectivesState2.keySet();
         left += coord.x + spacingBetweenObjectiveTypes;
         coord = coord(left, top);
-        graphics.setColor(new Color(93, 173, 226));
+        graphics.setColor(Stage2RevealedColor);
         coord = displayObjectives(top, left, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, null);
         boxWidth = coord.x;
-        graphics.setColor(new Color(30, 60, 128));
+        graphics.setColor(Stage2HiddenColor);
         int y2b = displayUnrevealedObjectives(coord.y, left, boxWidth, game.getPublicObjectives2Peakable(), 2, game);
         maxYFound = Math.max(maxYFound, y2b);
 
@@ -3661,7 +3700,7 @@ public class MapGenerator {
             String lawNumberID = "(" + lawEntry.getValue() + ") ";
             String optionalText = lawsInfo.get(lawID);
             graphics.setFont(Storage.getFont35());
-            graphics.setColor(new Color(228, 255, 0));
+            graphics.setColor(LawColor);
 
             graphics.drawRect(x, y, 1178, 110);
             String agendaTitle = Mapper.getAgendaTitle(lawID);
@@ -3820,7 +3859,7 @@ public class MapGenerator {
         Map<String, Integer> customPublicVP = game.getCustomPublicVP();
         Set<String> secret = secretObjectives.keySet();
         graphics.setFont(Storage.getFont26());
-        graphics.setColor(new Color(230, 126, 34));
+        graphics.setColor(Stage1RevealedColor );
 
         Map<String, List<String>> scoredSecretObjectives = new LinkedHashMap<>();
         Map<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
@@ -4368,12 +4407,12 @@ public class MapGenerator {
                     tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
                     int labelX = TILE_PADDING + labelPositionPoint.x;
                     int labelY = TILE_PADDING + labelPositionPoint.y;
-                    superDrawString(tileGraphics, tile.getFogLabel(frogPlayer), labelX, labelY, Color.white, null, null, null, null);
+                    superDrawString(tileGraphics, tile.getFogLabel(frogPlayer), labelX, labelY, Color.WHITE, null, null, null, null);
                 }
 
                 int textX = TILE_PADDING + tilePositionPoint.x;
                 int textY = TILE_PADDING + tilePositionPoint.y;
-                superDrawString(tileGraphics, tile.getPosition(), textX, textY, Color.white, HorizontalAlign.Right, VerticalAlign.Bottom, stroke7, Color.black);
+                superDrawString(tileGraphics, tile.getPosition(), textX, textY, Color.WHITE, HorizontalAlign.Right, VerticalAlign.Bottom, stroke7, Color.BLACK);
 
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
                     String tileID = tile.getTileID();
@@ -4390,12 +4429,12 @@ public class MapGenerator {
                         tileGraphics.setFont(Storage.getFont50());
                         int numX = TILE_PADDING + draftNumPosition.x;
                         int numY = TILE_PADDING + draftNumPosition.y;
-                        superDrawString(tileGraphics, draftNum, numX, numY, Color.white, HorizontalAlign.Center, VerticalAlign.Center, stroke8, Color.black);
+                        superDrawString(tileGraphics, draftNum, numX, numY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke8, Color.BLACK);
                     }
                     tileGraphics.setFont(Storage.getFont24());
                     int numX = TILE_PADDING + 172; //172 //320
                     int numY = TILE_PADDING + 228; //50  //161
-                    superDrawString(tileGraphics, draftColor, numX, numY, Color.white, HorizontalAlign.Center, VerticalAlign.Bottom, stroke6, Color.black);
+                    superDrawString(tileGraphics, draftColor, numX, numY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, stroke6, Color.BLACK);
                 }
 
                 // pa_unitimage.png
@@ -5760,6 +5799,10 @@ public class MapGenerator {
         Map<UnitKey, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        if (isSpace && displayType == DisplayType.shipless)
+        {
+            return;
+        }
 
         float mirageDragRatio = 2.0f / 3;
         int mirageDragX = Math.round((345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
@@ -5823,8 +5866,8 @@ public class MapGenerator {
 
             Integer bulkUnitCount = null;
             Color groupUnitColor = switch (Mapper.getColor(unitKey.getColorID()).getTextColor()) {
-                case "black" -> Color.black;
-                default -> Color.white;
+                case "black" -> Color.BLACK;
+                default -> Color.WHITE;
             };
 
             try {
