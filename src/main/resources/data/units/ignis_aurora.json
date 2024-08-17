@@ -52,11 +52,11 @@
         "homebrewReplacesID": "dreadnought2"
     },
     {
-        "id": "baldrick_exotrireme2",
+        "id": "baldrick_sardakk_dreadnought2",
         "baseType": "dreadnought",
         "asyncId": "dn",
         "name": "Exotrireme II",
-        "upgradesFromUnitId": "exotrireme",
+        "upgradesFromUnitId": "sardakk_dreadnought",
         "requiredTechId": "baldrick_exo2",
         "source": "ignis_aurora",
         "faction": "Sardakk",
@@ -70,7 +70,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "exotrireme2",
+        "homebrewReplacesID": "sardakk_dreadnought2",
         "ability": "After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system."
     },
     {
