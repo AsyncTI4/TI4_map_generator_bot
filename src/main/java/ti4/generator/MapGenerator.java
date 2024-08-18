@@ -919,6 +919,13 @@ public class MapGenerator {
                     superDrawString(g2, "ACTIVE", 0, 0, ActiveColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 }
+                
+                if (player.isEliminated())
+                {
+                    y += 120;
+                    continue;
+                }
+                
                 int xSpacer = 0;
                 // Unfollowed SCs
                 if (!player.getUnfollowedSCs().isEmpty()) {
