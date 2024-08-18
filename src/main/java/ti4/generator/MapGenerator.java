@@ -656,7 +656,6 @@ public class MapGenerator {
             //BotLogger.log("Show game made it past checkpoint #" + checkpoint);
             checkpoint++;
         }
-        int widthOfLine = width - 50;
         int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         int y = heightForGameInfo + 60;
         int x = landscapeShift + 10;
@@ -922,6 +921,8 @@ public class MapGenerator {
                 
                 if (player.isEliminated())
                 {
+                    g2.setColor(color);
+                    g2.drawRect(realX - 5, baseY, mapWidth - realX, 105);
                     y += 120;
                     continue;
                 }
@@ -1097,7 +1098,7 @@ public class MapGenerator {
                 if (soCount > 4) {
                     y += (soCount - 4) * 43;
                 }
-                g2.drawRect(realX - 5, baseY, x + widthOfLine, y - baseY);
+                g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
                 y += 15;
 
             }
