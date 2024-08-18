@@ -239,7 +239,7 @@ public class MapGenerator {
                 break;
             case landscape:
                 heightForGameInfo = 40;
-                height = Math.max(heightStats, mapHeight + 600);
+                height = Math.max(heightStats, mapHeight);
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth + 4 * 520 + EXTRA_X * 2;
                 break;
