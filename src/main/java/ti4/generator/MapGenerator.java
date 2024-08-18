@@ -4111,6 +4111,10 @@ public class MapGenerator {
     }
 
     private int laws(int y) {
+        if (displayTypeBasic == displayType.map)
+        {
+            return y;
+        }
         int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke3);
