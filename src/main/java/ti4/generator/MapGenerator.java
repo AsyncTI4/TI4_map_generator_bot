@@ -153,9 +153,10 @@ public class MapGenerator {
     private static final BasicStroke stroke7 = new BasicStroke(7.0f);
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
     
-    private static Color EliminatedColor = new Color(150, 0, 24);
-    private static Color PassedColor = new Color(220, 20, 60);
-    private static Color ActiveColor = new Color(80, 200, 120);
+    private static Color EliminatedColor = new Color(150, 0, 24); // Carmine
+    private static Color ActiveColor = new Color(80, 200, 120); // Emerald  
+    private static Color PassedColor = new Color(220, 20, 60); // Crimson
+    private static Color DummyColor = new Color(0, 128, 255); // Azure
     private static Color Stage1RevealedColor = new Color(230, 126, 34);
     private static Color Stage1HiddenColor = new Color(130, 70, 0);
     private static Color Stage2RevealedColor = new Color(93, 173, 226);
@@ -884,21 +885,28 @@ public class MapGenerator {
                     g2.translate(x + 47-3, y + 47 - 6);
                     g2.rotate(-Math.PI/4);
                     g2.setFont(Storage.getFont20());
-                    superDrawString(g2, "ELIMINATED", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke3, Color.BLACK);
+                    superDrawString(g2, "ELIMINATED", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
+                    g2.setTransform(transform);
+                } else if (player.isDummy()) {
+                    AffineTransform transform = g2.getTransform();
+                    g2.translate(x + 47-3, y + 47 - 6);
+                    g2.rotate(-Math.PI/4);
+                    g2.setFont(Storage.getFont20());
+                    superDrawString(g2, "DUMMY", 0, 0, DummyColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 } else if (player.isPassed()) {
                     AffineTransform transform = g2.getTransform();
                     g2.translate(x + 47-3, y + 47 - 6);
                     g2.rotate(-Math.PI/4);
                     g2.setFont(Storage.getFont20());
-                    superDrawString(g2, "PASSED", 0, 0, PassedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke3, Color.BLACK);
+                    superDrawString(g2, "PASSED", 0, 0, PassedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
                     AffineTransform transform = g2.getTransform();
                     g2.translate(x + 47-3, y + 47 - 6);
                     g2.rotate(-Math.PI/4);
                     g2.setFont(Storage.getFont20());
-                    superDrawString(g2, "ACTIVE", 0, 0, ActiveColor, HorizontalAlign.Center, VerticalAlign.Center, stroke3, Color.BLACK);
+                    superDrawString(g2, "ACTIVE", 0, 0, ActiveColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 }
                 int xSpacer = 0;
@@ -920,13 +928,21 @@ public class MapGenerator {
                 if (!game.isFowMode()) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.RED);
-                    graphics.drawString("Neighbors: ", x + 9 + xSpacer, y + 125 + yDelta);
-                    xSpacer = xSpacer + 115;
-                    for (Player p2 : player.getNeighbouringPlayers()) {
-                        String faction2 = p2.getFaction();
-                        if (faction2 != null) {
-                            drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 + yDelta - 20, 26, 26);
-                            xSpacer = xSpacer + 26;
+                    if (player.getNeighbouringPlayers().size() == 0)
+                    {
+                        graphics.drawString("No Neighbors", x + 9 + xSpacer, y + 125 + yDelta);
+                        xSpacer = xSpacer + 115;
+                    }
+                    else
+                    {
+                        graphics.drawString("Neighbors: ", x + 9 + xSpacer, y + 125 + yDelta);
+                        xSpacer = xSpacer + 115;
+                        for (Player p2 : player.getNeighbouringPlayers()) {
+                            String faction2 = p2.getFaction();
+                            if (faction2 != null) {
+                                drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 + yDelta - 20, 26, 26);
+                                xSpacer = xSpacer + 26;
+                            }
                         }
                     }
                 }
