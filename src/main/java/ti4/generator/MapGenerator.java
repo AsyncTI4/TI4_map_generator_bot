@@ -202,6 +202,17 @@ public class MapGenerator {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
         playerY += unrealPlayers * 20;
+        for (Player player: game.getRealPlayers())
+        {
+            if (player.isEliminated())
+            {
+                playerY -= 190;
+            }
+            else if (player.getSecretsScored().size() > 4)
+            {
+                playerY += (player.getSecretsScored().size() - 4) * 43;
+            }
+        }
 
         int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
         int heightStats = playerY + lawsY + objectivesY + 600;
@@ -922,8 +933,9 @@ public class MapGenerator {
                 if (player.isEliminated())
                 {
                     g2.setColor(color);
-                    g2.drawRect(realX - 5, baseY, mapWidth - realX, 105);
-                    y += 120;
+                    y += 95;
+                    g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
+                    y += 15;
                     continue;
                 }
                 
