@@ -15,7 +15,8 @@ public enum DisplayType {
     traits("traits"),
     techskips("technology_specialties"),
     attachments("attachments"),
-    shipless("shipless");
+    shipless("shipless"),
+    landscape("landscape");
 
     public final String value;
 

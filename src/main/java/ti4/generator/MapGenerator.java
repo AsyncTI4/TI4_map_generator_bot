@@ -202,6 +202,17 @@ public class MapGenerator {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
         playerY += unrealPlayers * 20;
+        for (Player player: game.getRealPlayers())
+        {
+            if (player.isEliminated())
+            {
+                playerY -= 190;
+            }
+            else if (player.getSecretsScored().size() > 4)
+            {
+                playerY += (player.getSecretsScored().size() - 4) * 43;
+            }
+        }
 
         int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
         int heightStats = playerY + lawsY + objectivesY + 600;
@@ -214,12 +225,12 @@ public class MapGenerator {
         if (extraRow) {
             mapWidth += EXTRA_X;
         }
-        width = mapWidth;
         switch (this.displayType) {
             case stats:
                 heightForGameInfo = 40;
                 height = heightStats;
                 displayTypeBasic = DisplayType.stats;
+                width = mapWidth;
                 break;
             case map:
             case wormholes:
@@ -235,11 +246,19 @@ public class MapGenerator {
                 heightForGameInfo = mapHeight;
                 height = mapHeight + 600;
                 displayTypeBasic = DisplayType.map;
+                width = mapWidth;
+                break;
+            case landscape:
+                heightForGameInfo = 40;
+                height = Math.max(heightStats, mapHeight);
+                displayTypeBasic = DisplayType.all;
+                width = mapWidth + 4 * 520 + EXTRA_X * 2;
                 break;
             default:
                 heightForGameInfo = mapHeight;
                 height = mapHeight + heightStats;
                 displayTypeBasic = DisplayType.all;
+                width = mapWidth;
         }
         ImageIO.setUseCache(false);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -439,6 +458,7 @@ public class MapGenerator {
             case techskips:
             case attachments:
             case shipless:
+            case landscape:
                 quality = 1/4.0f;
         }
 
@@ -647,9 +667,9 @@ public class MapGenerator {
             //BotLogger.log("Show game made it past checkpoint #" + checkpoint);
             checkpoint++;
         }
-        int widthOfLine = width - 50;
+        int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         int y = heightForGameInfo + 60;
-        int x = 10;
+        int x = landscapeShift + 10;
         Coord coord = coord(x, y);
 
         int deltaX = 0;
@@ -678,7 +698,7 @@ public class MapGenerator {
         deltaY = 35;
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        graphics.drawString(game.getCustomName(), 0, y);
+        graphics.drawString(game.getCustomName(), landscapeShift, y);
         deltaX = graphics.getFontMetrics().stringWidth(game.getCustomName());
 
         // STRATEGY CARDS
@@ -691,7 +711,7 @@ public class MapGenerator {
         String roundString = "ROUND: " + game.getRound();
         int roundLen = graphics.getFontMetrics().stringWidth(roundString);
         if (coord.x > mapWidth - roundLen - 100 * game.getRealPlayers().size()) {
-            coord = coord(20, coord.y + 100);
+            coord = coord(landscapeShift + 20, coord.y + 100);
         }
         graphics.drawString(roundString, coord.x, coord.y);
 
@@ -699,10 +719,10 @@ public class MapGenerator {
         drawCardDecks(Math.max(x + deltaX, coord.x), y - 75);
 
         // TURN ORDER
-        coord = drawTurnOrderTracker(coord.x + roundLen + 100, coord.y);
+        coord = drawTurnOrderTracker(coord.x + roundLen + 100 + landscapeShift, coord.y);
 
         y = coord.y + 30;
-        x = 10;
+        x = 10 + landscapeShift;
         int tempY = y;
         y = drawObjectives(y + 180);
         y = laws(y);
@@ -909,6 +929,16 @@ public class MapGenerator {
                     superDrawString(g2, "ACTIVE", 0, 0, ActiveColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 }
+                
+                if (player.isEliminated())
+                {
+                    g2.setColor(color);
+                    y += 95;
+                    g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
+                    y += 15;
+                    continue;
+                }
+                
                 int xSpacer = 0;
                 // Unfollowed SCs
                 if (!player.getUnfollowedSCs().isEmpty()) {
@@ -1080,7 +1110,7 @@ public class MapGenerator {
                 if (soCount > 4) {
                     y += (soCount - 4) * 43;
                 }
-                g2.drawRect(realX - 5, baseY, x + widthOfLine, y - baseY);
+                g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
                 y += 15;
 
             }
@@ -2753,6 +2783,7 @@ public class MapGenerator {
     }
 
     private int drawScoreTrack(int y) {
+        int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke5);
         graphics.setFont(Storage.getFont50());
@@ -2764,10 +2795,10 @@ public class MapGenerator {
         }
         for (int i = 0; i <= game.getVp(); i++) {
             graphics.setColor(Color.WHITE);
-            Rectangle rect = new Rectangle(i * boxWidth, y, boxWidth, boxHeight);
+            Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
             drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
             g2.setColor(Color.RED);
-            g2.drawRect(i * boxWidth, y, boxWidth, boxHeight);
+            g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
         }
 
         List<Player> players = new ArrayList<>(game.getRealPlayers());
@@ -2799,7 +2830,7 @@ public class MapGenerator {
                     int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) / 2);
 
                     int vpCount = player.getTotalVictoryPoints();
-                    int tokenX = vpCount * boxWidth + Math.min(boxBuffer + (availableSpacePerColumn * col) + centreHorizontally, boxWidth - tokenWidth - boxBuffer);
+                    int tokenX = vpCount * boxWidth + Math.min(boxBuffer + (availableSpacePerColumn * col) + centreHorizontally, boxWidth - tokenWidth - boxBuffer) + landscapeShift;
                     int tokenY = y + boxBuffer + (availableSpacePerRow * row) + centreVertically;
                     drawControlToken(graphics, controlTokenImage, getPlayerByControlMarker(game.getPlayers().values(), controlID), tokenX, tokenY, convertToGeneric, scale);
                 } catch (Exception e) {
@@ -2816,7 +2847,7 @@ public class MapGenerator {
     }
 
     private Coord drawStrategyCards(Coord coord) {
-        int x = 20;
+        int x = coord.x;
         int y = coord.y;
         boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         int deltaY = y + 80;
@@ -2858,8 +2889,8 @@ public class MapGenerator {
             x += textWidth + 25;
 
             // Drop down a level if there are a lot of SC cards
-            if (x > mapWidth - 100) {
-                x = 20;
+            if (x > (displayType == DisplayType.landscape ? mapWidth + 4 * 520 + EXTRA_X * 2 : mapWidth) - 100) {
+                x = 20 + (displayType == DisplayType.landscape ? mapWidth : 0);
                 deltaY += 100;
             }
         }
@@ -4056,7 +4087,7 @@ public class MapGenerator {
         int maxYFound = 0;
 
         int top = y;
-        int left = 5;
+        int left = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
         int boxWidth = 0;
         // STAGE 1
         Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
@@ -4100,7 +4131,11 @@ public class MapGenerator {
     }
 
     private int laws(int y) {
-        int x = 5;
+        if (displayTypeBasic == displayType.map)
+        {
+            return y;
+        }
+        int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke3);
 
@@ -4183,14 +4218,14 @@ public class MapGenerator {
             } else {
                 secondColumn = false;
                 y += 112;
-                x = 5;
+                x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
             }
         }
         return secondColumn ? y + 115 : y + 3;
     }
 
     private int events(int y) {
-        int x = 5;
+        int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke3);
 
@@ -4239,7 +4274,7 @@ public class MapGenerator {
             } else {
                 secondColumn = false;
                 y += 112;
-                x = 5;
+                x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
             }
         }
         return secondColumn ? y + 115 : y + 3;
