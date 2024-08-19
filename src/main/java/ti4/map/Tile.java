@@ -459,7 +459,7 @@ public class Tile {
     public boolean hasCabalSpaceDockOrGravRiftToken(Game game) {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
             Set<String> tokenList = unitHolder.getTokenList();
-            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png")) {
+            if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png")) {
                 return true;
             }
             for (UnitKey unit : unitHolder.getUnits().keySet()) {

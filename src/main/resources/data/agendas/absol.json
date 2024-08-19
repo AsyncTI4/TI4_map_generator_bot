@@ -32,7 +32,7 @@
         "name": "Armed Forces Standardization",
         "type": "Directive",
         "target": "Elect Player",
-        "text1": "The elected player places command tokens from their reinforcements until they they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements, then may look at the promissory notes of the other player who cast the most votes for them and take any 1 promissory note.",
+        "text1": "The elected player places command tokens from their reinforcements until they they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements, then the other player who cast the most votes for the elected player gives them 1 promissory note from their hand.",
         "source": "absol"
     },
     {
@@ -139,8 +139,8 @@
         "name": "Economic Equality",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: Each player returns all their trade goods to the supply. Each player gains 2 commodities. The player who cast the most votes \"For\" gains the speaker token.",
-        "text2": "Against: The player who cast the most votes \"Against\" gains a number of trade goods equal to their current number of trade goods. If they gained more trade goods than the number of players, all other players lose 1 trade good, if able.",
+        "text1": "Each player returns all their trade goods to the supply. All players have a commodity value of 3.  The player that cast the most votes \"For\" replenishes their commodities.",
+        "text2": "Against: The player who cast the most votes \"Against\" gains a number of trade goods equal to their current number of trade goods. If they gained 4 or more trade goods this way, all other players lose 1 trade good, if able.",
         "source": "absol"
     },
     {
@@ -148,7 +148,7 @@
         "name": "Emergency Session",
         "type": "Agenda Phase",
         "target": "",
-        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nFor each copy of Emergency Session in the common play area, players vote on 1 additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nAfter all other agendas are resolved during the agenda phase, the speaker reveals and the players vote on 1 additional agenda. Then discard this card.",
         "source": "absol"
     },
     {
@@ -156,7 +156,7 @@
         "name": "Emergency Session",
         "type": "Agenda Phase",
         "target": "",
-        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nFor each copy of Emergency Session in the common play area, players vote on 1 additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nAfter all other agendas are resolved during the agenda phase, the speaker reveals and the players vote on 1 additional agenda. Then discard this card.",
         "source": "absol"
     },
     {
@@ -164,7 +164,7 @@
         "name": "Emergency Session",
         "type": "Agenda Phase",
         "target": "",
-        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nFor each copy of Emergency Session in the common play area, players vote on 1 additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nAfter all other agendas are resolved during the agenda phase, the speaker reveals and the players vote on 1 additional agenda. Then discard this card.",
         "source": "absol"
     },
     {
@@ -172,7 +172,7 @@
         "name": "Emergency Session",
         "type": "Agenda Phase",
         "target": "",
-        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nFor each copy of Emergency Session in the common play area, players vote on 1 additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+        "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card.\nAfter all other agendas are resolved during the agenda phase, the speaker reveals and the players vote on 1 additional agenda. Then discard this card.",
         "source": "absol"
     },
     {
@@ -182,7 +182,7 @@
         "target": "For/Against",
         "text1": "For: The player who cast the most votes \"For\" places 3 of their control tokens on this card. Alpha and beta wormholes have no effect during movement. A player whose control token is on this card may discard 1 control token at any time to allow the current active player to ignore the effects of this law for the duration of their turn.",
         "text2": "Against: Players who voted \"Against\" gain 1 trade good for each wormhole in systems that contain 1 or more of their units. Players that gained trade goods also gain 1 commodity for each of their neighbors.",
-        "mapText": "Place a control token for the player that cast the most votes 'For' on this card. Alpha and beta wormholes have no effect during movement. When activating a system, a player whose control token is on this card may discard that control token to ignore the effects of this law during that activation.",
+        "mapText": "Place 3 control tokens for the player that cast the most votes 'For' on this card. Alpha and beta wormholes have no effect during movement. When activating a system, a player whose control token is on this card may discard that control token to ignore the effects of this law during that activation.",
         "source": "absol"
     },
     {
@@ -210,7 +210,7 @@
         "name": "Galactic Crisis Pact",
         "type": "Directive",
         "target": "Elect Strategy Card",
-        "text1": "Each player may resolve the secondary ability of the elected strategy card without spending a command token; command tokens placed by the ability are placed from a player's reinforcements, instead.\nThe player who cast the most votes for the elected strategy card may choose to resolve the primary ability, instead.",
+        "text1": "Each player may resolve the secondary ability of the elected strategy card without spending a command token; command tokens placed by the ability are placed from a player's reinforcements, instead.\nThe player who cast the most votes for the elected strategy card may choose to spend a token from their strategy pool in order to resolve the primary ability, instead.",
         "source": "absol"
     },
     {
@@ -228,8 +228,8 @@
         "name": "Hyperlane Development Program",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes \"For\" may research 1 propulsion [propulsion symbol] technology. Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through their ships in those systems.",
-        "text2": "Against: Exhaust the Trade strategy card. All players lose 3 trade goods, or all of their trade goods if they have less than 3. The player who cast the most votes \"Against\" may place 1 cruiser or destroyer from their reinforcements in each system that contains their ships and no planets or anomalies.",
+        "text1": "For: The player who cast the most votes \"For\" may research 1 propulsion technology. Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through their ships in those systems.",
+        "text2": "Against: Exhaust the Trade strategy card. All players lose 3 trade goods to the supply, or all of their trade goods if they have less than 3. The player who cast the most votes \"Against\" may place 1 cruiser or destroyer from their reinforcements in each system that contains their ships and no planets or anomalies.",
         "mapText": "Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players' ships to move through those systems.",
         "source": "absol"
     },
@@ -410,8 +410,8 @@
         "name": "Prophecy of Ixth",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card applies +1 to the results of their fighter's combat rolls. Hits produced by their fighters must be applied to non-fighter ships, if possible. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
-        "mapText": "Fighters get +1 combat. Hits from fighters must be applied to non-fighter ships first. When use production, discard this card unless produce 2 or more fighters.",
+        "text1": "The elected player gains this card. The owner of this card may ignore the prerequisites on fighter unit upgrade technologies and applies +1 to the results of their fighter's combat rolls. Hits produced by their fighters must be applied to non-fighter ships, if possible. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "mapText": "Can ignore pre-req on Fighter 2 tech. Fighters get +1 combat. Hits from fighters must be applied to non-fighter ships first. When use production, discard this card unless produce 2 or more fighters.",
         "source": "absol"
     },
     {
@@ -419,7 +419,7 @@
         "name": "Public Execution",
         "type": "Directive",
         "target": "Elect Player",
-        "text1": "The elected player exhausts all of their planets, then reveals the action cards in their hand. The players that voted for the elected player (in order of most to least votes) may each take 1 action card from that player's hand. If the elected player has the speaker token, they give it to the player who cast the most votes for them.",
+        "text1": "The elected player exhausts all of their planets, then reveals the action cards in their hand. The players that voted for the elected player (in order of most to least votes) may each take 1 action card from that player's hand, then the rest are discarded. If the elected player has the speaker token, they give it to the player who cast the most votes for them.",
         "source": "absol"
     },
     {
@@ -510,7 +510,7 @@
         "name": "Term Limits",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: When a player takes or receives the speaker token, they place 1 of their control tokens on this card. The non-speaker player who cast the most votes \"For\" takes the speaker token. A player whose control token is on this card may not take or receive the speaker token. If a control token from every player is on this card, remove them.",
+        "text1": "For: The speaker places 1 of their control tokens on this card. When a player takes or receives the speaker token, they place 1 of their control tokens on this card. A player whose control token is on this card may not take or receive the speaker token. If a control token from every player is on this card, remove them.",
         "text2": "Against: The player who cast the most votes \"Against\" draws 2 action cards. Exhaust the Politics strategy card. Players who voted \"Against\" or abstained must give 1 promissory note from their hand to a player who voted \"For,\" if able.",
         "mapText": "When resolving an agenda, if the agenda resolves in the way the speaker voted or predicted, or if the speaker broke a tie to choose the resolution, the other player who cast the most votes for an outcome that was not resolved takes the speaker token.",
         "source": "absol"

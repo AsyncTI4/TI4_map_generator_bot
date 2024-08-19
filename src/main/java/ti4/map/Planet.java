@@ -94,6 +94,20 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
+    public List<String> getAttachments() {
+        return tokenList.stream().filter(token -> {
+            AttachmentModel attach = Mapper.getAttachmentInfo(token);
+            if (attach != null && attach.isFakeAttachment()) return false;
+
+            if (token.contains("sleeper")) return false;
+            if (token.contains("dmz_large")) return false;
+            if (token.contains("custodiavigilia")) return false;
+            return !Helper.isFakeAttachment(token);
+        }).toList();
+    }
+
+    @JsonIgnore
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
             .map(UnitKey::asyncID)

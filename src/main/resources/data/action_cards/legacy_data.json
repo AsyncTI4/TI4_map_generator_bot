@@ -216,33 +216,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "side_project2",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "side_project3",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "side_project4",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "steal_prototype2",
         "name": "Steal Prototype",
         "phase": "Action",
@@ -603,15 +576,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "sensor_jam",
-        "name": "Sensor Jam",
-        "phase": "Action",
-        "window": "At the start of a round of space combat",
-        "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
-        "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and, with that, it displayed the enemy's signature in a thirteenth different location.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "grand_heist",
         "name": "Heist",
         "phase": "Action",
@@ -819,12 +783,21 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "foreign_aid",
-        "name": "Foreign Aid",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Spend 8 resources and choose up to 2 other players. You and each of those players gain 1 command token.",
-        "flavorText": "\"Alone, we're vulnerable to looming threats,\" Odlynn projected dire scenes as he spoke, then pivoted to their reconstruction efforts. \"United, we're unstoppable.\"",
+        "alias": "side_project",
+        "name": "Side Project",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
+        "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "defense_installation",
+        "name": "Defense Installation",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
+        "flavorText": "Tellurian had heard rumors of their kind roaming to the far corners of the galaxy. However, many such tales had led them to nothing more than decrepit defense systems. Alas, no stone could be left unturned.",
         "source": "action_deck_2_old"
     }
 ]

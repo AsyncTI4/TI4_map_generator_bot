@@ -350,7 +350,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
             "> `/player setup` to set player faction and color\n" +
             "> `/game setup` to set player count and additional options\n" +
-            "> `/game set_order` to set the starting speaker order\n" +
+            "> `/game set_order` to set the starting speaker order if you're using a weird map\n" +
+            "> `/milty setup` to bring up a menu for handling a specific milty draft\n" +
+            "> `/milty quickstart` to quickly launch a milty draft that doesnt deviate too much\n" +
             "\n" +
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
@@ -406,7 +408,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sb.append(
                 "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
             sb.append(guild.getName()).append("** server.\n");
-            sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 1)).append("\n");
+            sb.append(Helper.getGuildInviteURL(guild, missingMembers.size() + 10)).append("\n");
             sb.append("The following players need to join the server:\n");
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");

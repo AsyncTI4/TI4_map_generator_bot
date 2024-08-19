@@ -129,7 +129,7 @@ public class PlayAC extends ACCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(game.getPing()).append(" ").append(game.getName()).append("\n");
         if (game.isFowMode()) {
-            sb.append("Someone played the Action Card " + actionCardTitle + ":\n");
+            sb.append("Someone played the Action Card ").append(actionCardTitle).append(":\n");
         } else {
             sb.append(player.getRepresentation()).append(" played the Action Card " + actionCardTitle + ":\n");
         }
@@ -175,6 +175,7 @@ public class PlayAC extends ACCardsSubcommandData {
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage")
             .withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
         buttons.add(noSabotageButton);
+        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "moveAlongAfterAllHaveReactedToAC_" + actionCardTitle, "Pause Timer While Waiting For Sabo"));
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
         } else {
@@ -789,7 +790,7 @@ public class PlayAC extends ACCardsSubcommandData {
                     String message2 = player.getRepresentation(true, true)
                         + " you may " + (unleash ? "unleash" : "unlock") + " Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Button.success("pay1tgforKeleres"+(unleash ? "U" : ""), "Pay 1TG to " + (unleash ? "Unleash" : "Unlock") + " Suffi An"));
+                    buttons2.add(Button.success("pay1tgforKeleres" + (unleash ? "U" : ""), "Pay 1TG to " + (unleash ? "Unleash" : "Unlock") + " Suffi An"));
                     buttons2.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }

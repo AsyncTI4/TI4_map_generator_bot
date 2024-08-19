@@ -2318,7 +2318,7 @@ public class AgendaHelper {
                         if (specificVote.contains("Diplomacy Rider")) {
                             String message = identity
                                 + " You have a Diplomacy Rider to resolve. Click the name of the planet who's system you wish to Diplo";
-                            List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, winningR, game, true,
+                            List<Button> buttons = Helper.getPlanetSystemDiploButtons(winningR, game, true,
                                 null);
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
@@ -2930,7 +2930,7 @@ public class AgendaHelper {
         }
         // Absol's Syncretone - +1 vote for each neighbour
         if (player.hasRelicReady("absol_syncretone")) {
-            int count = player.getNeighbourCount();
+            int count = game.getRealPlayers().size();
             Button button = Button
                 .secondary("exhaustForVotes_absolsyncretone_" + count, "Use Syncretone Votes (" + count + ")")
                 .withEmoji(Emoji.fromFormatted(Emojis.Absol));
@@ -3403,7 +3403,7 @@ public class AgendaHelper {
 
         // Absol's Syncretone - +1 vote for each neighbour
         if (player.hasRelicReady("absol_syncretone")) {
-            int count = player.getNeighbourCount();
+            int count = game.getRealPlayers().size();
             additionalVotesAndSources.put(Emojis.Relic + "Syncretone", count);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
