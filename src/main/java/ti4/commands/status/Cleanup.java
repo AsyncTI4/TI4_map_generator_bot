@@ -91,6 +91,11 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
         }
+        for (int x = 0; x < 13; x++) {
+            if (!game.getStoredValue("exhaustedSC" + x).isEmpty()) {
+                game.setStoredValue("exhaustedSC" + x, "");
+            }
+        }
         game.setStoredValue("absolMOW", "");
         game.setStoredValue("naaluPNUser", "");
         game.setStoredValue("agendaCount", "0");
