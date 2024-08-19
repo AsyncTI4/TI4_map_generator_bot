@@ -771,8 +771,16 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             } else {
+                String empelar = "";
+                List<Character> letters = Arrays.asList('m','e','l','p','a');
+                Collections.shuffle(letters);
+                for (Character c: letters)
+                {
+                    empelar += c;
+                }
+                empelar = "E" + empelar + "r";
                 MessageHelper.sendMessageToChannel(channel,
-                    trueIdentity + " exhausted Scepter of Silly Spelling to follow " + Helper.getSCName(scnum, game));
+                    trueIdentity + " exhausted Scepter of " + empelar + " to follow " + Helper.getSCName(scnum, game) + ".");
                 player.addExhaustedRelic("emelpar");
             }
             Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
