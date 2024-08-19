@@ -58,6 +58,8 @@ public class Constants {
     public static final String ELIMINATE = "eliminate";
     public static final String FIX_SO_DECK = "fix_so_deck";
     public static final String REVISE_LAW = "revise_law";
+    public static final String ADD_CONTROL_TOKEN = "add_control_token";
+    public static final String EXHAUST_SC = "exhuast_sc";
     public static final String SET_THREAD_NAME = "set_thread_name";
     public static final String THREAD_NAME = "thread_name";
     public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
@@ -867,6 +869,7 @@ public class Constants {
     public static final String RE_EXPORT_TILES = "re_export_tiles";
     public static final String THREAD_COUNT = "thread_count";
     public static final String LIST_OLD_CHANNELS = "list_old_channels";
+    public static final String LIST_DEAD_GAMES = "list_dead_games";
     public static final String LIST_SLASH_COMMANDS_USED = "list_slash_commands_used";
     public static final String LIST_OLD_THREADS = "list_old_threads";
     public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";
