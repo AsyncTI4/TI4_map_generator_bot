@@ -350,7 +350,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
             "> `/player setup` to set player faction and color\n" +
             "> `/game setup` to set player count and additional options\n" +
-            "> `/game set_order` to set the starting speaker order\n" +
+            "> `/game set_order` to set the starting speaker order if you're using a weird map\n" +
+            "> `/milty setup` to bring up a menu for handling a specific milty draft\n" +
+            "> `/milty quickstart` to quickly launch a milty draft that doesnt deviate too much\n" +
             "\n" +
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
