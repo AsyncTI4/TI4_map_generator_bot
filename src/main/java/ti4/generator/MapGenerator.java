@@ -202,7 +202,7 @@ public class MapGenerator {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
         playerY += unrealPlayers * 20;
-        for (Player player: game.getRealPlayers())
+        for (Player player: game.getPlayers())
         {
             if (player.isEliminated())
             {
@@ -739,7 +739,6 @@ public class MapGenerator {
         if (displayTypeBasic == DisplayType.all || displayTypeBasic == DisplayType.stats) {
             graphics.setFont(Storage.getFont32());
             Graphics2D g2 = (Graphics2D) graphics;
-            g2.setStroke(stroke5);
             int realX = x;
             Map<UnitKey, Integer> unitCount = new HashMap<>();
             for (Player player : players) {
@@ -930,6 +929,7 @@ public class MapGenerator {
                     g2.setTransform(transform);
                 }
                 
+                g2.setStroke(stroke5);
                 if (player.isEliminated())
                 {
                     g2.setColor(color);
