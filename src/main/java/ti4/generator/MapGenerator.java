@@ -202,7 +202,7 @@ public class MapGenerator {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
         playerY += unrealPlayers * 20;
-        for (Player player : game.getPlayers()) {
+        for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
             } else if (player.getSecretsScored().size() > 4) {
