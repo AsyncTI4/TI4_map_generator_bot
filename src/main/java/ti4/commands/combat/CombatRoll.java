@@ -250,7 +250,8 @@ public class CombatRoll extends CombatSubcommandData {
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (message.contains("adding +1, at the risk of your")) {
-            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos,", Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos. Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc. Sol and Letnev agents automatically are given as extra dice for unit 1.",
+                Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         }
         if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h + " hit" + (h == 1 ? "" : "s") + " in round #" + round2;
