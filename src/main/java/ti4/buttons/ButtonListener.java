@@ -3779,8 +3779,8 @@ public class ButtonListener extends ListenerAdapter {
                             message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear."
                                 + " They may cancel this by hitting 'No Follow'/";
                             if (!game.isFowMode()) {
-                                message = message + player2.getRepresentation(true, true)
-                                    + " is the one the game is currently waiting on";
+                                message = message + "\n" + player2.getRepresentation(true, true)
+                                    + " is the one the game is currently waiting on. Remember it is not enough to simply draw an SO, they will also need to discard one. ";
                             }
                             game.setStoredValue(key2,
                                 game.getStoredValue(key2) + player.getFaction() + "*");
@@ -5064,8 +5064,7 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
                 }
                 case "eraseMyRiders" -> AgendaHelper.reverseAllRiders(event, game, player);
-                case "chooseMapView" -> 
-                {
+                case "chooseMapView" -> {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Button.primary("checkWHView", "Find Wormholes"));
                     buttons.add(Button.danger("checkAnomView", "Find Anomalies"));
