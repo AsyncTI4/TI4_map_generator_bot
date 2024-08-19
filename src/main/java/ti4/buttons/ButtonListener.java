@@ -3183,6 +3183,8 @@ public class ButtonListener extends ListenerAdapter {
             FrankenApplicator.resolveFrankenItemRemoveButton(event, buttonID, player);
         } else if (buttonID.startsWith("addToken_")) {
             ButtonHelper.addTokenToTile(event, game, player, buttonID);
+        } else if (buttonID.startsWith("geneticRecombination")) {
+            ButtonHelperFactionSpecific.resolveGeneticRecombination(buttonID, event, game, player);
         } else {
             switch (buttonID) {
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
