@@ -242,6 +242,9 @@ public class SCPick extends PlayerSubcommandData {
         if (maxSCsPerPlayer < 1) {
             maxSCsPerPlayer = 1;
         }
+        if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
+            game.setSCPlayed(scPicked, true);
+        }
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);

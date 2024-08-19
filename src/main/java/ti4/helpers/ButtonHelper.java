@@ -2052,14 +2052,17 @@ public class ButtonHelper {
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly()
                 && !tile.isHomeSystem()) {
-                if (tile.isGravityRift(game)) {
+                if (tile.isGravityRift(game) && grav < 1) {
                     grav = 1;
-                } else if (tile.isNebula()) {
+                }
+                if (tile.isNebula() && nebula < 1) {
                     nebula = 1;
-                } else if (tile.isAsteroidField()) {
+                } else if (tile.isAsteroidField() && asteroids < 1) {
                     asteroids = 1;
                 } else {
-                    count = 1;
+                    if (!tile.isGravityRift(game) && !tile.isNebula() && !tile.isAsteroidField()) {
+                        count = 1;
+                    }
                 }
             }
         }
