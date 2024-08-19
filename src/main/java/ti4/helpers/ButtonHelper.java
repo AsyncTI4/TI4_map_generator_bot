@@ -1095,6 +1095,10 @@ public class ButtonHelper {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
+        if (techM.isUnitUpgrade() && player.hasTechReady("absol_aida")) {
+            Button aiDEVButton = Button.danger("exhaustTech_absol_aida", "Exhaust AI Development Algorithm");
+            buttons.add(aiDEVButton);
+        }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
             for (int x = 1; x < player.getCrf() + 1; x++) {
@@ -1339,12 +1343,6 @@ public class ButtonHelper {
                 amount = amount + 1;
             }
         }
-
-        // if (player.getRelics().contains("absol_codex")) {
-        // amount = amount + 1;
-        // game.drawActionCard(player.getUserID());
-        // message = message + " Absol Codex has been accounted for.";
-        // }
 
         StringBuilder messageBuilder = new StringBuilder(message);
         if (isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
@@ -1878,9 +1876,7 @@ public class ButtonHelper {
                 limit = 5;
             }
         }
-        if (player.getRelics().contains("absol_codex")) {
-            limit = limit + 5;
-        }
+
         if (player.getTechs().contains("absol_nm")) {
             limit = limit + 3;
         }
@@ -5397,7 +5393,7 @@ public class ButtonHelper {
                         int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem());
                         int moveValue = uni.getMoveValue();
-                        if (tile.isNebula() && !player.hasAbility("voidborn")) {
+                        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
                             moveValue = 1;
                         }
                         if (player.hasTech("as")

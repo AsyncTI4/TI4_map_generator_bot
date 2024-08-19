@@ -1595,7 +1595,7 @@ public class Helper {
                     found = true;
                 }
                 case "absol_sarween" -> {
-                    int sarweenVal = 1 + calculateCostOfProducedUnits(player, game, true) / 5;
+                    int sarweenVal = 1 + calculateCostOfProducedUnits(player, game, true) / 10;
                     msg += "> Used Sarween Tools " + Emojis.CyberneticTech + " for " + sarweenVal + " resources\n";
                     res += sarweenVal;
                     found = true;
@@ -1702,7 +1702,7 @@ public class Helper {
         res = res + tg + keleresAgent;
         inf = inf + tg + keleresAgent;
         if (tg > 0) {
-            msg = msg + "> Spent " + tg + "trade good" + (tg == 1 ? "" : "s") + " " + Emojis.getTGorNomadCoinEmoji(game) + " ("
+            msg = msg + "> Spent " + tg + " trade good" + (tg == 1 ? "" : "s") + " " + Emojis.getTGorNomadCoinEmoji(game) + " ("
                 + (player.getTg() + tg) + "->" + player.getTg() + ") \n";
             if (player.hasTech("mc")) {
                 res = res + tg + keleresAgent;
