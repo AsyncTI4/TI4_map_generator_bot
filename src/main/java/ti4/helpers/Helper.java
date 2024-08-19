@@ -176,17 +176,17 @@ public class Helper {
 
     private static boolean checkForAllSabotagesDiscarded(Game game) {
         return game.getDiscardActionCards().containsKey("sabo1")
-                && game.getDiscardActionCards().containsKey("sabo2")
-                && game.getDiscardActionCards().containsKey("sabo3")
-                && game.getDiscardActionCards().containsKey("sabo4");
+            && game.getDiscardActionCards().containsKey("sabo2")
+            && game.getDiscardActionCards().containsKey("sabo3")
+            && game.getDiscardActionCards().containsKey("sabo4");
     }
 
     private static boolean checkAcd2ForAllSabotagesDiscarded(Game game) {
         return "action_deck_2".equals(game.getAcDeckID())
-                && game.getDiscardActionCards().containsKey("sabotage1_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage2_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage3_acd2")
-                && game.getDiscardActionCards().containsKey("sabotage4_acd2");
+            && game.getDiscardActionCards().containsKey("sabotage1_acd2")
+            && game.getDiscardActionCards().containsKey("sabotage2_acd2")
+            && game.getDiscardActionCards().containsKey("sabotage3_acd2")
+            && game.getDiscardActionCards().containsKey("sabotage4_acd2");
     }
 
     public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {
@@ -267,7 +267,7 @@ public class Helper {
             return false;
         }
         if ((playerHasSabotage(player)
-                || (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180)
+            || (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180)
             && !ButtonHelper.isPlayerElected(game, player, "censure")
             && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
             return false;
@@ -290,14 +290,14 @@ public class Helper {
 
     private static boolean playerHasSabotage(Player player) {
         return player.getActionCards().containsKey("sabo1")
-                || player.getActionCards().containsKey("sabo2")
-                || player.getActionCards().containsKey("sabo3")
-                || player.getActionCards().containsKey("sabo4")
-                || player.getActionCards().containsKey("sabotage_ds")
-                || player.getActionCards().containsKey("sabotage1_acd2")
-                || player.getActionCards().containsKey("sabotage2_acd2")
-                || player.getActionCards().containsKey("sabotage3_acd2")
-                || player.getActionCards().containsKey("sabotage4_acd2");
+            || player.getActionCards().containsKey("sabo2")
+            || player.getActionCards().containsKey("sabo3")
+            || player.getActionCards().containsKey("sabo4")
+            || player.getActionCards().containsKey("sabotage_ds")
+            || player.getActionCards().containsKey("sabotage1_acd2")
+            || player.getActionCards().containsKey("sabotage2_acd2")
+            || player.getActionCards().containsKey("sabotage3_acd2")
+            || player.getActionCards().containsKey("sabotage4_acd2");
     }
 
     public static void giveMeBackMyAgendaButtons(Game game) {
@@ -451,7 +451,7 @@ public class Helper {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
                     String message = player.getRepresentation(true, true)
-                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued public objective scpring.";
+                        + " is the one the game is currently waiting on before advancing to the next player, with regards to queued public objective scoring.";
                     if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring.";
                     }
@@ -1274,6 +1274,9 @@ public class Helper {
             }
             if (sc == ButtonHelper.getKyroHeroSC(game)) {
                 label += " - Kyro Hero Cursed";
+            }
+            if (!game.getStoredValue("exhaustedSC" + sc).isEmpty()) {
+                label += " - Exhausted";
             }
             if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
                 && !game.isHomebrewSCMode()) {
@@ -2261,18 +2264,18 @@ public class Helper {
 
     private static boolean playerHasWarMachine(Player player) {
         return player.getActionCards().containsKey("war_machine1")
-                || player.getActionCards().containsKey("war_machine2")
-                || player.getActionCards().containsKey("war_machine3")
-                || player.getActionCards().containsKey("war_machine4")
-                || player.getActionCards().containsKey("war_machine_ds")
-                || player.getActionCards().containsKey("war_machine1_acd2")
-                || player.getActionCards().containsKey("war_machine2_acd2")
-                || player.getActionCards().containsKey("war_machine3_acd2")
-                || player.getActionCards().containsKey("war_machine4_acd2");
+            || player.getActionCards().containsKey("war_machine2")
+            || player.getActionCards().containsKey("war_machine3")
+            || player.getActionCards().containsKey("war_machine4")
+            || player.getActionCards().containsKey("war_machine_ds")
+            || player.getActionCards().containsKey("war_machine1_acd2")
+            || player.getActionCards().containsKey("war_machine2_acd2")
+            || player.getActionCards().containsKey("war_machine3_acd2")
+            || player.getActionCards().containsKey("war_machine4_acd2");
     }
 
     public static List<Button> getPlanetSystemDiploButtons(Player player, Game game, boolean ac,
-                                                           Player mahact) {
+        Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
