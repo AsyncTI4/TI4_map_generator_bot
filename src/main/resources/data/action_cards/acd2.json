@@ -328,7 +328,7 @@
     "name": "Efficiency Initiative",
     "phase": "Action",
     "window": "When 1 or more of your units use PRODUCTION",
-    "text": "Reduce the total PRODUCTION value of those units by up to 4 to gain an equal number of trade goods. Then, gain 2 commodities. [Note: These trade goods are available to be spent during this production.]",
+    "text": "Reduce the total PRODUCTION value of those units by up to 3 to gain an equal number of commodities and trade goods. [Note: These trade goods are available to be spent during this production.]",
     "flavorText": "I48S surveyed the new installation, noting several blocking routines. The new processes increased output by nearly 11%—and with a little work, he was sure the enhancers could achieve another 4%.",
     "source": "action_deck_2"
   },
@@ -498,7 +498,7 @@
     "alias": "joint_research",
     "name": "Joint Research",
     "phase": "Any",
-    "window": "After you research a non-faction technology",
+    "window": "After you gain a non-faction technology",
     "text": "Choose another player. That player gains that technology.",
     "flavorText": "Rin had received multiple warnings to avoid working with the Vuil'Raith. However, existential threats to the galaxy had never been enough to stifle her curiosity.",
     "source": "action_deck_2"
@@ -516,9 +516,9 @@
     "alias": "lazax_cache",
     "name": "Lazax Cache",
     "phase": "Action",
-    "window": "Action",
+    "window": "At the end of your turn",
     "text": "Exhaust 1 non-home planet you control other than Mecatol Rex to gain trade goods equal to the combined value of its resources and influence.",
-    "flavorText": "Berekar nearly broke down in tears at the final reports. The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but they were the coin required to reclaim their home.",
+    "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
     "source": "action_deck_2"
   },
   {
@@ -913,7 +913,7 @@
     "name": "Sister Ship",
     "phase": "Any",
     "window": "After 1 of your non-fighter ships is destroyed",
-    "text": "Produce 1 ship of that type in a different system that contains 1 of your units with Production; reduce the cost of that ship by up to 4.",
+    "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of that ship by up to 4.",
     "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
     "source": "action_deck_2"
   },
@@ -995,7 +995,7 @@
     "phase": "Action",
     "window": "After you destroy 1 of another player's units",
     "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
-    "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only after they cleared the blast radius did he loosen his grip on the stolen plans.",
+    "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only after they cleared the blast radius did he loosen his grip on the stolen schematics.",
     "source": "action_deck_2"
   },
   {
@@ -1056,8 +1056,8 @@
     "alias": "war_machine1_acd2",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "The prisoners trudged into the factory like a silent gray mass. For a moment, the gate seemed like a dark maw swallowing them whole.",
     "source": "action_deck_2"
   },
@@ -1065,8 +1065,8 @@
     "alias": "war_machine2_acd2",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "Warden Gim shuddered as one of the prisoners fell from exhaustion and was trampled by the others. The munitions were crucial to his alliance, but the price weighed heavily on his soul.",
     "source": "action_deck_2"
   },
@@ -1074,8 +1074,8 @@
     "alias": "war_machine3_acd2",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "Like clockwork, transport ships landed every cycle with new workers, freshly captured on the frontlines. The same ships departed with munitions in place of flesh.",
     "source": "action_deck_2"
   },
@@ -1083,8 +1083,8 @@
     "alias": "war_machine4_acd2",
     "name": "War Machine",
     "phase": "Action",
-    "window": "When 1 or more of your units use Production",
-    "text": "Apply +4 to the total Production value of your units and reduce the combined cost of the produced units by 1.",
+    "window": "When 1 or more of your units use PRODUCTION",
+    "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
     "flavorText": "Gim wondered which would give out first: the mines, the machines, the men, or his own fragile mind.",
     "source": "action_deck_2"
   }
