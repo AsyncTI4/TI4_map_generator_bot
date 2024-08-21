@@ -13,7 +13,7 @@
     "name": "Annexation",
     "phase": "Action",
     "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
-    "text": "That player must remove all of their ground forces from that planet and place them on a different planet they control, if able.",
+    "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
     "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
     "source": "action_deck_2"
   },
@@ -31,7 +31,7 @@
     "name": "Armistice",
     "phase": "Action",
     "window": "When another player activates a system that contains your units",
-    "text": "That player discards 1 random action card from their hand and returns their command token from that system to their tactic pool. Then, end that player's turn.",
+    "text": "That player may discard 1 random action card from their hand to return their command token from that system to their tactic pool. Then, end that player's turn.",
     "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
     "source": "action_deck_2"
   },
