@@ -43,6 +43,7 @@ import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetExhaust;
+import ti4.commands.player.SCPlay;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.commands.special.WormholeResearchFor;
@@ -910,7 +911,8 @@ public class AgendaHelper {
                             scButtons.add(Buttons.GET_A_TECH);
                         }
                         case "8" -> {
-                            scButtons.add(Button.secondary("non_sc_draw_so", "Draw Secret Objective")
+                            SCPlay.handleSOQueueing(game, false);
+                            scButtons.add(Button.secondary("sc_draw_so", "Draw Secret Objective")
                                 .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
                         }
                     }

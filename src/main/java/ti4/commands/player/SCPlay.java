@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.Route;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
@@ -423,13 +422,16 @@ public class SCPlay extends PlayerSubcommandData {
         };
     }
 
-    private static void handleSOQueueing(Game game, boolean winnuHero) {
+    public static void handleSOQueueing(Game game, boolean winnuHero) {
         if (winnuHero) {
             String message = "# Since this is the result of playing Mathis Mathinus, the Winnu hero, SO draws will not be queued or resolved in a particular order.";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
             return;
         }
         Player imperialHolder = Helper.getPlayerWithThisSC(game, 8);
+        if (game.getPhaseOfGame().contains("agenda")) {
+            imperialHolder = game.getPlayer(game.getSpeaker());
+        }
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
