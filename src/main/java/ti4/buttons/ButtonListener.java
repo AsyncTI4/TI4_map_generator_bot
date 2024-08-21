@@ -3742,7 +3742,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID, game, player, event, "");
                     StrategyCardModel scModel = game.getStrategyCardModelByName("imperial").orElse(null);
-                    if (!used && scModel != null && scModel.usesAutomationForSCID("pok8imperial")
+                    if (!game.getPhaseOfGame().contains("agenda") && !used && scModel != null && scModel.usesAutomationForSCID("pok8imperial")
                         && !player.getFollowedSCs().contains(scModel.getInitiative())
                         && game.getPlayedSCs().contains(scModel.getInitiative())) {
                         int scNum = scModel.getInitiative();

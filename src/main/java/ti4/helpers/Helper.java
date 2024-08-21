@@ -373,6 +373,9 @@ public class Helper {
     public static void resolveQueue(Game game) {
 
         Player imperialHolder = getPlayerWithThisSC(game, 8);
+        if (game.getPhaseOfGame().contains("agenda")) {
+            imperialHolder = game.getPlayer(game.getSpeaker());
+        }
         //String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
