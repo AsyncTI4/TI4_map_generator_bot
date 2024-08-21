@@ -1095,6 +1095,10 @@ public class ButtonHelper {
             Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
+        if (techM.isUnitUpgrade() && player.hasTechReady("absol_aida")) {
+            Button aiDEVButton = Button.danger("exhaustTech_absol_aida", "Exhaust AI Development Algorithm");
+            buttons.add(aiDEVButton);
+        }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
             for (int x = 1; x < player.getCrf() + 1; x++) {
@@ -1339,12 +1343,6 @@ public class ButtonHelper {
                 amount = amount + 1;
             }
         }
-
-        // if (player.getRelics().contains("absol_codex")) {
-        // amount = amount + 1;
-        // game.drawActionCard(player.getUserID());
-        // message = message + " Absol Codex has been accounted for.";
-        // }
 
         StringBuilder messageBuilder = new StringBuilder(message);
         if (isPlayerElected(game, player, "minister_policy") && !player.hasAbility("scheming")) {
@@ -1878,9 +1876,7 @@ public class ButtonHelper {
                 limit = 5;
             }
         }
-        if (player.getRelics().contains("absol_codex")) {
-            limit = limit + 5;
-        }
+
         if (player.getTechs().contains("absol_nm")) {
             limit = limit + 3;
         }
@@ -3445,28 +3441,30 @@ public class ButtonHelper {
         return hasAbility;
     }
 
-    public static void checkFleetInEveryTile(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static int checkFleetInEveryTile(Player player, Game game, GenericInteractionCreateEvent event) {
+        int highest = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                checkFleetAndCapacity(player, game, tile, event);
+                highest = Math.max(highest, checkFleetAndCapacity(player, game, tile, event));
             }
         }
         Helper.isCCCountCorrect(event, game, player.getColor());
+        return highest;
     }
 
-    public static void checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+    public static int checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
         if (tile.getRepresentation() == null || "null".equalsIgnoreCase(tile.getRepresentation())) {
-            return;
+            return 0;
         }
         if (tile.getRepresentation().toLowerCase().contains("nombox")) {
-            return;
+            return 0;
         }
         if (!game.isCcNPlasticLimit()) {
-            return;
+            return 0;
         }
         int armadaValue = 0;
         if (player == null) {
-            return;
+            return 0;
         }
         if (player.hasAbility("armada")) {
             armadaValue = 2;
@@ -3647,6 +3645,7 @@ public class ButtonHelper {
                 "Remove units in " + tile.getRepresentationForButtons(game, player));
             MessageHelper.sendMessageToChannelWithButton(getCorrectChannel(player, game), message, remove);
         }
+        return (numFighter2sFleet + numOfCapitalShips + 1) / 2;
     }
 
     public static List<Tile> getAllTilesWithProduction(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -5397,7 +5396,7 @@ public class ButtonHelper {
                         int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
                             game.getActiveSystem());
                         int moveValue = uni.getMoveValue();
-                        if (tile.isNebula() && !player.hasAbility("voidborn")) {
+                        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
                             moveValue = 1;
                         }
                         if (player.hasTech("as")
@@ -8775,7 +8774,7 @@ public class ButtonHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
-                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
+                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
                     return;
                 }
                 for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
