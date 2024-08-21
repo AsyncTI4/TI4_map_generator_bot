@@ -1901,9 +1901,14 @@ public class Game extends GameProperties {
                 }
             }
             if ("censure".equalsIgnoreCase(id)) {
-                if (getCustomPublicVP().get("Political Censure") != null) {
-                    removeCustomPO(getCustomPublicVP().get("Political Censure"));
+
+                Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
+                for (String customPO : customPOs.keySet()) {
+                    if (customPO.toLowerCase().contains("political censure")) {
+                        removeCustomPO(customPOs.get(customPO));
+                    }
                 }
+
             }
             laws.remove(id);
             lawsInfo.remove(id);
@@ -1924,7 +1929,12 @@ public class Game extends GameProperties {
             }
             if ("censure".equalsIgnoreCase(id)) {
                 if (getCustomPublicVP().get("Political Censure") != null) {
-                    removeCustomPO(getCustomPublicVP().get("Political Censure"));
+                    Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
+                    for (String customPO : customPOs.keySet()) {
+                        if (customPO.toLowerCase().contains("political censure")) {
+                            removeCustomPO(customPOs.get(customPO));
+                        }
+                    }
                 }
             }
             laws.remove(id);

@@ -1304,6 +1304,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true) + " you killed the space dock in " + tile.getRepresentation());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentation(true, true) + " your space dock in " + tile.getRepresentation() + " was melted.");
+        ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
         ButtonHelper.deleteMessage(event);
     }
 
