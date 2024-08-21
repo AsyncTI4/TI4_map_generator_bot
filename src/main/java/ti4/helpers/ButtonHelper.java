@@ -3441,28 +3441,30 @@ public class ButtonHelper {
         return hasAbility;
     }
 
-    public static void checkFleetInEveryTile(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static int checkFleetInEveryTile(Player player, Game game, GenericInteractionCreateEvent event) {
+        int highest = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                checkFleetAndCapacity(player, game, tile, event);
+                highest = Math.max(highest, checkFleetAndCapacity(player, game, tile, event));
             }
         }
         Helper.isCCCountCorrect(event, game, player.getColor());
+        return highest;
     }
 
-    public static void checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+    public static int checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
         if (tile.getRepresentation() == null || "null".equalsIgnoreCase(tile.getRepresentation())) {
-            return;
+            return 0;
         }
         if (tile.getRepresentation().toLowerCase().contains("nombox")) {
-            return;
+            return 0;
         }
         if (!game.isCcNPlasticLimit()) {
-            return;
+            return 0;
         }
         int armadaValue = 0;
         if (player == null) {
-            return;
+            return 0;
         }
         if (player.hasAbility("armada")) {
             armadaValue = 2;
@@ -3643,6 +3645,7 @@ public class ButtonHelper {
                 "Remove units in " + tile.getRepresentationForButtons(game, player));
             MessageHelper.sendMessageToChannelWithButton(getCorrectChannel(player, game), message, remove);
         }
+        return (numFighter2sFleet + numOfCapitalShips + 1) / 2;
     }
 
     public static List<Tile> getAllTilesWithProduction(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -8771,7 +8774,7 @@ public class ButtonHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
-                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
+                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
                     return;
                 }
                 for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {

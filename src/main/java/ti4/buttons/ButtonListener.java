@@ -3574,7 +3574,10 @@ public class ButtonListener extends ListenerAdapter {
                                     player.getRepresentation(true, true) + " heads up, bot thinks you should gain "
                                         + properGain + " CC now due to: " + reasons);
                             }
-
+                        }
+                        if (game.isCcNPlasticLimit()) {
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                                "Your highest fleet count in a system is currently " + ButtonHelper.checkFleetInEveryTile(player, game, event) + ". That's how many fleet CC you need to avoid removing ships");
                         }
                     }
                 }
