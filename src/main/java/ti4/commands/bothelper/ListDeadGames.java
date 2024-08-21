@@ -25,7 +25,7 @@ public class ListDeadGames extends BothelperSubcommandData {
         int channelCount = 0;
         int roleCount = 0;
         for (Game game : mapList.values()) {
-            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
+            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30) {
                 continue;
             }
             long milliSinceLastTurnChange = new Date().getTime()
