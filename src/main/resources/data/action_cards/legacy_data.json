@@ -216,33 +216,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "side_project2",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "side_project3",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "side_project4",
-        "name": "Side Project",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Spend 3 influence or resources to research a technology that has no prerequisites.",
-        "flavorText": "After the meeting, Xander wore a look of endearment. \"I swear, Suffi. Where did you even find the time to fund and organize this project? Do you not sleep?\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "steal_prototype2",
         "name": "Steal Prototype",
         "phase": "Action",
