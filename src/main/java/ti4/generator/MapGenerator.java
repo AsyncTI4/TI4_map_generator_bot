@@ -154,7 +154,7 @@ public class MapGenerator {
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
 
     private static Color EliminatedColor = new Color(150, 0, 24); // Carmine
-    private static Color ActiveColor = new Color(80, 200, 120); // Emerald  
+    private static Color ActiveColor = new Color(80, 200, 120); // Emerald
     private static Color PassedColor = new Color(220, 20, 60); // Crimson
     private static Color DummyColor = new Color(0, 128, 255); // Azure
     private static Color Stage1RevealedColor = new Color(230, 126, 34);
@@ -202,7 +202,7 @@ public class MapGenerator {
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
         playerY += unrealPlayers * 20;
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
             } else if (player.getSecretsScored().size() > 4) {
@@ -735,7 +735,6 @@ public class MapGenerator {
         if (displayTypeBasic == DisplayType.all || displayTypeBasic == DisplayType.stats) {
             graphics.setFont(Storage.getFont32());
             Graphics2D g2 = (Graphics2D) graphics;
-            g2.setStroke(stroke5);
             int realX = x;
             Map<UnitKey, Integer> unitCount = new HashMap<>();
             for (Player player : players) {
@@ -933,6 +932,7 @@ public class MapGenerator {
                     g2.setTransform(transform);
                 }
 
+                g2.setStroke(stroke5);
                 if (player.isEliminated()) {
                     g2.setColor(color);
                     y += 95;
