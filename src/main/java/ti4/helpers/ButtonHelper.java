@@ -6585,10 +6585,15 @@ public class ButtonHelper {
 
         buttons.add(Button.success("startPlayerSetup", "Setup a Player"));
         for (Player player : game.getPlayers().values()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentation()
-                    + "After setting up the map, you may use this button instead of /player setup if you wish.",
-                buttons);
+            try {
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                    player.getRepresentation()
+                        + "After setting up the map, you may use this button instead of /player setup if you wish.",
+                    buttons);
+            } catch (Exception e) {
+                BotLogger.log("Failing to set up player cards info threads in " + game.getName());
+            }
+
         }
         MessageHelper.sendMessageToChannelWithButtons(channel,
             "After setting up the map, you may use this button instead of /player setup if you wish.", buttons);
