@@ -25,7 +25,7 @@ public class ListDeadGames extends BothelperSubcommandData {
         int channelCount = 0;
         int roleCount = 0;
         for (Game game : mapList.values()) {
-            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30) {
+            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
             long milliSinceLastTurnChange = new Date().getTime()
@@ -38,6 +38,7 @@ public class ListDeadGames extends BothelperSubcommandData {
 
                 if (game.getActionsChannel() != null && !game.getActionsChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
                     sb.append(game.getActionsChannel().getJumpUrl() + "\n");
+                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " this is a warning that this game will be cleaned up in 5 days, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
                     channelCount++;
                 }
                 if (game.getTableTalkChannel() != null && !game.getTableTalkChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
