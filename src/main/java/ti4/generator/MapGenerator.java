@@ -2967,6 +2967,9 @@ public class MapGenerator {
             drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
             superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
             x += horSpacing;
+            drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
+            superDrawString(graphics, Integer.toString(game.getRelicDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+            x += horSpacing;
         }
         return x;
     }

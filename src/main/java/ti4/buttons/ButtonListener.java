@@ -3576,7 +3576,10 @@ public class ButtonListener extends ListenerAdapter {
                                     player.getRepresentation(true, true) + " heads up, bot thinks you should gain "
                                         + properGain + " CC now due to: " + reasons);
                             }
-
+                        }
+                        if (game.isCcNPlasticLimit()) {
+                            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                                "Your highest fleet count in a system is currently " + ButtonHelper.checkFleetInEveryTile(player, game, event) + ". That's how many fleet CC you need to avoid removing ships");
                         }
                     }
                 }
@@ -3741,7 +3744,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID, game, player, event, "");
                     StrategyCardModel scModel = game.getStrategyCardModelByName("imperial").orElse(null);
-                    if (!used && scModel != null && scModel.usesAutomationForSCID("pok8imperial")
+                    if (!game.getPhaseOfGame().contains("agenda") && !used && scModel != null && scModel.usesAutomationForSCID("pok8imperial")
                         && !player.getFollowedSCs().contains(scModel.getInitiative())
                         && game.getPlayedSCs().contains(scModel.getInitiative())) {
                         int scNum = scModel.getInitiative();
