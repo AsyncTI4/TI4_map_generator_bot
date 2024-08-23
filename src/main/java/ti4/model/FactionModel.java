@@ -189,6 +189,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         }
         eb.addField("__Leaders__", sb.toString(), false);
 
+        sb = new StringBuilder();
+        sb.append(getStartingFleet() + "\n");
+        eb.addField("__Starting Fleet__", sb.toString(), false);
+
         return eb.build();
     }
 
