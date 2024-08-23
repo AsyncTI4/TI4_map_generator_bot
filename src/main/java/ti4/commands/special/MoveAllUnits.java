@@ -4,8 +4,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.tokens.AddCC;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -23,6 +25,7 @@ public class MoveAllUnits extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to move from").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to move to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type t or tactics to add a CC from tactics, r or retreat to add a CC without taking it from tactics").setAutoComplete(true));
     }
 
     @Override
@@ -69,6 +72,18 @@ public class MoveAllUnits extends SpecialSubcommandData {
 
             uH.removeAllUnits(player.getColor());
 
+        }
+
+        OptionMapping optionCC = event.getOption(Constants.CC_USE);
+        if (optionCC != null) {
+          String value = optionCC.getAsString().toLowerCase();
+            if ("t".equals(value) || "tactics".equals(value) || "t/tactics".equals(value)) {
+                MoveUnits.removeTacticsCC(event, player.getColor(), tile2, game);
+            }
+            if (!"no".equals(value)) {
+                AddCC.addCC(event, player.getColor(), tile2, false);
+            }
+            Helper.isCCCountCorrect(event, game, player.getColor());
         }
 
         ShowGame.simpleShowGame(game, event, DisplayType.map);
