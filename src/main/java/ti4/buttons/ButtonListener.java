@@ -3977,6 +3977,11 @@ public class ButtonListener extends ListenerAdapter {
                                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, player,
                                     p2.getCommoditiesTotal());
                             }
+                        } else {
+                            if (p2.getSCs().contains(5)) {
+                                ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
+                                    player.getCommoditiesTotal());
+                            }
                         }
                         if (p2.getSCs().contains(5)) {
                             ButtonHelper.checkTransactionLegality(game, player, p2);
