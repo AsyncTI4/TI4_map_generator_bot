@@ -622,7 +622,7 @@ public class GameStats extends StatisticsSubcommandData {
         final float millisecondsInADay = 24 * 60 * 60 * 1000; // milliseconds in a day  
 
         // Convert milliseconds to days  
-        float days = milliseconds / millisecondsInADay;
+        float days = (float) milliseconds / millisecondsInADay;
 
         // Format to 2 decimal points  
         DecimalFormat df = new DecimalFormat("#.00");
@@ -630,13 +630,13 @@ public class GameStats extends StatisticsSubcommandData {
     }
 
     private static void showTimeOfRounds(SlashCommandInteractionEvent event) {
-        Map<String, Float> timeCount = new HashMap<>();
+        Map<String, Long> timeCount = new HashMap<>();
         Map<String, Integer> amountCount = new HashMap<>();
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         for (Game game : filteredGames) {
             for (int x = 1; x < game.getRound() + 1; x++) {
-                float time1;
-                float time2;
+                long time1;
+                long time2;
                 String key1 = "";
                 String key2 = "";
 
@@ -645,9 +645,9 @@ public class GameStats extends StatisticsSubcommandData {
                 key2 = "startTimeOfRound" + x + "StatusScoring";
                 if (!game.getStoredValue(key1).isEmpty() && !game.getStoredValue(key2).isEmpty()) {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
-                    time1 = Float.parseFloat(game.getStoredValue(key1));
-                    time2 = Float.parseFloat(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + amountCount.getOrDefault(name, 0));
+                    time1 = Long.parseLong(game.getStoredValue(key1));
+                    time2 = Long.parseLong(game.getStoredValue(key2));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
                 }
 
                 name = "Round " + x + " Status Phase";
@@ -655,9 +655,9 @@ public class GameStats extends StatisticsSubcommandData {
                 key2 = "startTimeOfRound" + x + "Agenda1";
                 if (!game.getStoredValue(key1).isEmpty() && !game.getStoredValue(key2).isEmpty()) {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
-                    time1 = Float.parseFloat(game.getStoredValue(key1));
-                    time2 = Float.parseFloat(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + amountCount.getOrDefault(name, 0));
+                    time1 = Long.parseLong(game.getStoredValue(key1));
+                    time2 = Long.parseLong(game.getStoredValue(key2));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
                 }
 
                 name = "Round " + x + " Agenda  1";
@@ -665,9 +665,9 @@ public class GameStats extends StatisticsSubcommandData {
                 key2 = "startTimeOfRound" + x + "Agenda2";
                 if (!game.getStoredValue(key1).isEmpty() && !game.getStoredValue(key2).isEmpty()) {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
-                    time1 = Float.parseFloat(game.getStoredValue(key1));
-                    time2 = Float.parseFloat(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + amountCount.getOrDefault(name, 0));
+                    time1 = Long.parseLong(game.getStoredValue(key1));
+                    time2 = Long.parseLong(game.getStoredValue(key2));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
                 }
 
                 name = "Round " + x + " Agenda  2";
@@ -675,18 +675,17 @@ public class GameStats extends StatisticsSubcommandData {
                 key2 = "startTimeOfRound" + (x + 1) + "Strategy";
                 if (!game.getStoredValue(key1).isEmpty() && !game.getStoredValue(key2).isEmpty()) {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
-                    time1 = Float.parseFloat(game.getStoredValue(key1));
-                    time2 = Float.parseFloat(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + amountCount.getOrDefault(name, 0));
+                    time1 = Long.parseLong(game.getStoredValue(key1));
+                    time2 = Long.parseLong(game.getStoredValue(key2));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
                 }
             }
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Time Per Phase:").append("\n");
         timeCount.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue())
             .forEach(entry -> sb.append(entry.getKey() + ": ")
-                .append(StringUtils.leftPad(convertMillisecondsToDays(entry.getValue()), 4))
+                .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4))
                 .append(" days (based on " + amountCount.get(entry.getKey()) + " games)")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
