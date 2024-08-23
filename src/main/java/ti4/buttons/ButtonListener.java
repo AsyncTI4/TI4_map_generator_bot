@@ -3776,7 +3776,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                         if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                             message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear."
-                                + " They may cancel this by hitting 'No Follow'/";
+                                + " They may cancel this by hitting 'No Follow'";
                             if (!game.isFowMode()) {
                                 message = message + player2.getRepresentation(true, true)
                                     + " is the one the game is currently waiting on";
