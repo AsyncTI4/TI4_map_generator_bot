@@ -1170,6 +1170,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getRepresentation()
                     + " has removed a CC from their fleet pool and may vote freely.");
+            ButtonHelper.checkFleetInEveryTile(player, game, event);
         }
         event.getMessage().delete().queue();
     }
