@@ -5,7 +5,7 @@
     "phase": "Action",
     "window": "At the start of a round of combat",
     "text": "Your opponent cannot make combat rolls for more units than you during this combat round.",
-    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift’s horizon. His crew clung to their stations, eyes wide, sweat pooling on brows, as the enemy's firepower vanished into the void like pebbles dropped into an endless well.",
+    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, sweat pooling on brows, as the enemy's firepower vanished into the void like pebbles dropped into an endless well.",
     "source": "action_deck_2"
   },
   {
@@ -302,7 +302,7 @@
     "phase": "Action",
     "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
-    "flavorText": "The Loncara Ssodu’s secondary batteries made quick work of the escorts as the dreadnought’s crew abandoned ship.",
+    "flavorText": "The Loncara Ssodu's secondary batteries made quick work of the escorts as the dreadnought's crew abandoned ship.",
     "source": "action_deck_2"
   },
   {
@@ -392,7 +392,7 @@
     "phase": "Action",
     "window": "After you activate a system",
     "text": "Apply +1 to the move value of each of your ships during this tactical action.",
-    "flavorText": "Alerts flashed as they screamed ahead. “Wait for the computer to chart, Douglas!” Mendosa barked. The pilot laughed and pointed to his head. “Oy, they call me Doug, sir—Deft Doug if ye like. I’ve got a keen eye for charting, and a good nose too.” Then, it was dark.",
+    "flavorText": "Alerts flashed as they screamed ahead. \"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
     "source": "action_deck_2"
   },
   {
@@ -842,7 +842,7 @@
     "phase": "Action",
     "window": "After a player moves ships into the active system",
     "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
-    "flavorText": "“What's wrong with these blasted sensors?“ The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"
   },
   {
