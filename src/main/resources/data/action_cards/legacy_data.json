@@ -765,15 +765,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "final_mission",
-        "name": "Final Mission",
-        "phase": "Action",
-        "window": "After 1 of your mechs is destroyed during a ground combat",
-        "text": "Roll 1 die for each of up to 3 of your opponent's ground forces; on a result of 6 or greater, produce 1 hit and assign it to that unit.",
-        "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "boarding_torpedoes",
         "name": "Boarding Torpedoes",
         "phase": "Action",
@@ -799,5 +790,23 @@
         "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
         "flavorText": "Tellurian had heard rumors of their kind roaming to the far corners of the galaxy. However, many such tales had led them to nothing more than decrepit defense systems. Alas, no stone could be left unturned.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "meteor_pods",
+        "name": "Meteor Pods",
+        "phase": "Action",
+        "window": "After you commit a ground force to land on another player's planet",
+        "text": "Roll 2 dice. For each result equal to or greater than that unit's combat value, produce 1 hit against that player's ground forces on that planet.",
+        "flavorText": "A tendril-like formation of ships swarmed around the planet. It whipped furiously as they seeded the surface with brood.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "diverse_strategies",
+        "name": "Diverse Strategies",
+        "phase": "Action",
+        "window": "When you would perform the primary ability of your strategy card",
+        "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place command tokens to resolve these abilities.",
+        "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
+        "source": "action_deck_2"
     }
 ]
