@@ -1,5 +1,14 @@
 [
   {
+    "alias": "advantageous_position",
+    "name": "Advantageous Position",
+    "phase": "Action",
+    "window": "At the start of a round of combat",
+    "text": "Your opponent cannot make combat rolls for more units than you during this combat round.",
+    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift’s horizon. His crew clung to their stations, eyes wide, sweat pooling on brows, as the enemy's firepower vanished into the void like pebbles dropped into an endless well.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "ancient_trade_routes",
     "name": "Ancient Trade Routes",
     "phase": "Action",
@@ -84,8 +93,8 @@
     "alias": "boarding_party",
     "name": "Boarding Party",
     "phase": "Action",
-    "window": "When a hit is assigned to your opponent's non-fighter ship that has a cost of 4 or less",
-    "text": "Replace that ship with a matching ship from your reinforcements. [Note: SUSTAIN DAMAGE is before the assignment of hits. If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+    "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
+    "text": "Place 1 ship of that type from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
     "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
     "source": "action_deck_2"
   },
@@ -306,15 +315,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "diverse_strategies",
-    "name": "Diverse Strategies",
-    "phase": "Action",
-    "window": "When you would perform the primary ability of your strategy card",
-    "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place command tokens to resolve these abilities.",
-    "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "early_voting",
     "name": "Early Voting",
     "phase": "Agenda",
@@ -366,6 +366,15 @@
     "window": "At the start of your turn",
     "text": "Choose 1 technology in your technology deck. During this turn, treat that technology as if you own it.",
     "flavorText": "Another jolt from the machine surged through Rin's limbs. It no longer bothered her. She was changing. Not just mentally, but physically as well.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "final_mission",
+    "name": "Final Mission",
+    "phase": "Action",
+    "window": "Before you assign hits to your units during a combat",
+    "text": "Destroy 1 of your damaged units that is participating in this combat to cancel 2 hits and produce 1 hit against your opponent's units.",
+    "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
   {
@@ -528,15 +537,6 @@
     "window": "After a player activates a system that contains your units",
     "text": "Produce up to 2 ships in that system that have a combined cost of 4 or less.",
     "flavorText": "There is an old adage present in nearly every galactic civilization that money cannot buy true happiness, but money could, in fact, buy a new ship. And that made Tai very, very happy indeed.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "meteor_pods",
-    "name": "Meteor Pods",
-    "phase": "Action",
-    "window": "After you commit a ground force to land on another player's planet",
-    "text": "Roll 2 dice. For each result equal to or greater than that unit's combat value, produce 1 hit against that player's ground forces on that planet.",
-    "flavorText": "A tendril-like formation of ships swarmed around the planet. It whipped furiously as they seeded the surface with brood.",
     "source": "action_deck_2"
   },
   {
@@ -840,8 +840,8 @@
     "alias": "sensor_jam",
     "name": "Sensor Jam",
     "phase": "Action",
-    "window": "At the start of a round of space combat",
-    "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain SUSTAIN DAMAGE until the end of this combat round.",
+    "window": "After a player moves ships into the active system",
+    "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
     "flavorText": "“What's wrong with these blasted sensors?“ The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"
   },
