@@ -5,7 +5,7 @@
     "phase": "Action",
     "window": "After another player makes a combat or unit ability roll against your units",
     "text": "That player rerolls all of their dice.",
-    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy’s munitions vanished into the void like pebbles dropped into a well.",
+    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
     "source": "action_deck_2"
   },
   {
