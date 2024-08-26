@@ -4458,7 +4458,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "forwardSupplyBase" -> ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, game, event, buttonID);
                 case "economicInitiative" -> ButtonHelperActionCards.economicInitiative(player, game, event);
                 case "breakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveBreakthrough(player, game, event);
-                case "sideProject" -> ButtonHelperActionCardsWillHomebrew.resolveSideProject(player, game, event, buttonID);
+                case "sideProject" -> ButtonHelperActionCardsWillHomebrew.resolveSideProject(player, game, event);
                 case "brutalOccupation" -> ButtonHelperActionCardsWillHomebrew.resolveBrutalOccupationStep1(player, game, event);
                 case "getRepealLawButtons" -> {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
@@ -4504,8 +4504,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveEmergencyMeeting" -> ButtonHelperActionCards.resolveEmergencyMeeting(player, game, event);
                 case "resolveSalvageStep1" -> ButtonHelperActionCards.resolveSalvageStep1(player, game, event, buttonID);
                 case "resolveGhostShipStep1" -> ButtonHelperActionCards.resolveGhostShipStep1(player, game, event, buttonID);
-                case "strandedShipStep1" -> ButtonHelperActionCardsWillHomebrew.resolveStrandedShipStep1(player, game, event, buttonID);
-                case "spatialCollapseStep1" -> ButtonHelperActionCardsWillHomebrew.resolveSpatialCollapseStep1(player, game, event, buttonID);
+                case "strandedShipStep1" -> ButtonHelperActionCardsWillHomebrew.resolveStrandedShipStep1(player, game, event);
+                case "spatialCollapseStep1" -> ButtonHelperActionCardsWillHomebrew.resolveSpatialCollapseStep1(player, game, event);
                 case "resolveTacticalBombardmentStep1" -> ButtonHelperActionCards.resolveTacticalBombardmentStep1(player, game, event, buttonID);
                 case "resolveProbeStep1" -> ButtonHelperActionCards.resolveProbeStep1(player, game, event, buttonID);
                 case "resolvePSStep1" -> ButtonHelperActionCards.resolvePSStep1(player, game, event, buttonID);
@@ -4848,7 +4848,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelperActionCardsWillHomebrew.resolveRendezvousPoint(player, game, event);
                 }
                 case "resolveFlawlessStrategy" -> {
-                    ButtonHelperActionCardsWillHomebrew.resolveFlawlessStrategy(player, game, event);
+                    ButtonHelperActionCardsWillHomebrew.resolveFlawlessStrategy(player, event);
                 }
                 case "resolveChainReaction" -> {
                     ButtonHelperActionCardsWillHomebrew.resolveChainReaction(player, game, event);
