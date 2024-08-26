@@ -91,7 +91,7 @@ public class Whisper extends FOWSubcommandData {
         } else {
             String fail = "Could not notify receiving player.";
             String success;
-            String player2 = Emojis.getColorEmojiWithName(player_.getColor());
+            String player2 = player_.getFactionEmoji() + "(" + StringUtils.capitalize(player_.getFaction()) + ") " + Emojis.getColorEmojiWithName(player_.getColor());
             if (message.contains("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {
