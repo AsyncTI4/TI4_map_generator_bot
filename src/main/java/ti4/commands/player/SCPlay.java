@@ -132,6 +132,9 @@ public class SCPlay extends PlayerSubcommandData {
 
         String gamePing = game.getPing();
         List<Player> playersToFollow = game.getRealPlayers();
+        for (Player p2 : game.getRealPlayers()) {
+
+        }
         if (game.getName().equalsIgnoreCase("pbd1000")) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
@@ -200,6 +203,18 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay, event);
             }
+            if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && !p2.hasRelicReady("absol_emphidia") && !p2.hasRelicReady("emphidia") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                        Emoji reactionEmoji2 = Helper.getPlayerEmoji(game, p2, message_);
+                        if (reactionEmoji2 != null) {
+                            message_.addReaction(reactionEmoji2).queue();
+                            p2.addFollowedSC(scToPlay, event);
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot thought you couldn't follow. Ping Fin if this was an error");
+                        }
+                    }
+                }
+            }
             game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl());
             game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId());
             game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
@@ -220,41 +235,37 @@ public class SCPlay extends PlayerSubcommandData {
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
                 threadChannel.queue(m5 -> {
-                    List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-                    // SEARCH FOR EXISTING OPEN THREAD
-                    for (ThreadChannel threadChannel_ : threadChannels) {
-                        if (threadChannel_.getName().equals(threadName)) {
-                            if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
-                                MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, game));
-                            }
-                            if (scModel.usesAutomationForSCID("pok5trade")) {
-                                Button transaction = Button.primary("transaction", "Transaction");
-                                scButtons.add(transaction);
-                                scButtons.add(Button.success("sendTradeHolder_tg", "Send 1TG"));
-                                scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
-                            }
-                            MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
-                                "These buttons will work inside the thread", scButtons);
-                            if (scToPlay == 5) {
-                                String neighborsMsg = "NOT neighbors with the trade holder:";
-                                for (Player p2 : game.getRealPlayers()) {
-                                    if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                        neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
-                                    }
-                                }
-                                String neighborsMsg2 = "Neighbors with the trade holder:";
-                                for (Player p2 : game.getRealPlayers()) {
-                                    if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                        neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
-                                    }
-                                }
-                                if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
-                                    MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg);
-                                    MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2);
-                                }
+                    ThreadChannel threadChannel_ = m5;
+                    if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
+                        MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, game));
+                    }
+                    if (scModel.usesAutomationForSCID("pok5trade")) {
+                        Button transaction = Button.primary("transaction", "Transaction");
+                        scButtons.add(transaction);
+                        scButtons.add(Button.success("sendTradeHolder_tg", "Send 1TG"));
+                        scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
+                        "These buttons will work inside the thread", scButtons);
+                    if (scToPlay == 5) {
+                        String neighborsMsg = "NOT neighbors with the trade holder:";
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
+                                neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
                             }
                         }
+                        String neighborsMsg2 = "Neighbors with the trade holder:";
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
+                                neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
+                            }
+                        }
+                        if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
+                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg);
+                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2);
+                        }
                     }
+
                 });
 
             }

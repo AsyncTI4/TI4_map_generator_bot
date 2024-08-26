@@ -65,8 +65,6 @@ public class RevealAgenda extends AgendaSubcommandData {
             MapGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
         }
 
-        game.setStoredValue("noWhenThisAgenda", "");
-        game.setStoredValue("noAfterThisAgenda", "");
         game.setStoredValue("AssassinatedReps", "");
         game.setStoredValue("riskedPredictive", "");
         game.setStoredValue("conspiratorsFaction", "");
@@ -91,6 +89,8 @@ public class RevealAgenda extends AgendaSubcommandData {
         if ("Emergency Session".equalsIgnoreCase(agendaName)) {
             MessageHelper.sendMessageToChannel(channel, "# " + game.getPing()
                 + " __Emergency Session__ revealed.\n## This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
+            aCount = Integer.parseInt(agendaCount) - 1;
+            game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
             return;
         }
@@ -99,6 +99,8 @@ public class RevealAgenda extends AgendaSubcommandData {
             MessageHelper.sendMessageToChannel(channel,
                 game.getPing() + "A Law Related Agenda (" + agendaName
                     + ") was revealed when no laws in play, flipping next agenda");
+            aCount = Integer.parseInt(agendaCount) - 1;
+            game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
             return;
         }
@@ -160,14 +162,19 @@ public class RevealAgenda extends AgendaSubcommandData {
         game.setPlayersWhoHitPersistentNoAfter("");
         game.setPlayersWhoHitPersistentNoWhen("");
         game.setLatestOutcomeVotedFor("");
+        for (Player p2 : game.getRealPlayers()) {
+            game.setStoredValue("latestOutcomeVotedFor" + p2.getFaction(), "");
+            game.setStoredValue("preVoting" + p2.getFaction(), "");
+        }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + "\nAn agenda has been revealed";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
         if (!action) {
-            MessageHelper.sendMessageToChannel(channel,
-                "The game believes this is agenda #" + aCount + " of this agenda phase");
+            MapGenerator.drawAgendaBanner(aCount, game);
+            // MessageHelper.sendMessageToChannel(channel,"The game believes this is agenda #" + aCount + " of this agenda phase");
+
         }
         StringBuilder whensAftersMessage = new StringBuilder(
             "Please indicate whether you abstain from playing whens/afters below.\nIf you have an action card with those windows, you may simply play it.");
