@@ -47,6 +47,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
+import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -112,6 +113,7 @@ public class MapGenerator {
     public static final int TILE_PADDING = 100;
     private static final int EXTRA_X = 300;
     private static final int EXTRA_Y = 200;
+    public static final int spacingBetweenObjectiveTypes = 10;
     private static final Point tilePositionPoint = new Point(255, 295);
     private static final Point labelPositionPoint = new Point(90, 295);
     private static final Point numberPositionPoint = new Point(40, 27);
@@ -213,10 +215,8 @@ public class MapGenerator {
         int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
         int heightStats = playerY + lawsY + objectivesY + 600;
 
-        int ringCount = game.getRingCount();
-        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-        int mapHeight = (ringCount + 1) * 600 + EXTRA_Y * 2;
-        mapWidth = (ringCount + 1) * 520 + EXTRA_X * 2;
+        int mapHeight = GetMapHeight(game);
+        mapWidth = GetMapWidth(game);
         extraRow = (mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
         if (extraRow) {
             mapWidth += EXTRA_X;
@@ -410,6 +410,10 @@ public class MapGenerator {
             debugFowTime = System.nanoTime() - debugStartTime;
     }
 
+    public boolean shouldConvertToGeneric(Player player) {
+        return isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+    }
+
     private void logDebug(GenericInteractionCreateEvent event) {
         ImageHelper.getCacheStats().ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
         if (!debug)
@@ -537,14 +541,14 @@ public class MapGenerator {
         return getPlayerFactionIconImageScaled(player, 95, 95);
     }
 
-    private static BufferedImage getPlayerFactionIconImageScaled(Player player, float scale) {
+    public static BufferedImage getPlayerFactionIconImageScaled(Player player, float scale) {
         int scaledWidth = (int) (95 * scale);
         int scaledHeight = (int) (95 * scale);
         return getPlayerFactionIconImageScaled(player, scaledWidth, scaledHeight);
     }
 
     @Nullable
-    private static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
+    public static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
         if (player == null)
             return null;
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
@@ -1646,7 +1650,7 @@ public class MapGenerator {
         drawControlToken(graphics, controlToken, p, x, y, hideFactionIcon, scale);
     }
 
-    private static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, boolean hideFactionIcon, float scale) {
+    public static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, boolean hideFactionIcon, float scale) {
         graphics.drawImage(bottomTokenImage, x, y, null);
 
         if (hideFactionIcon)
@@ -4034,7 +4038,6 @@ public class MapGenerator {
 
         graphics.setFont(Storage.getFont26());
 
-        int spacingBetweenObjectiveTypes = 10;
         int maxObjWidth = (mapWidth - spacingBetweenObjectiveTypes * 4) / 3;
         int maxYFound = 0;
 
@@ -6642,4 +6645,31 @@ public class MapGenerator {
         return text;
     }
 
+    public static Integer GetRingCount(Game game) {
+        return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
+    }
+
+    public static Integer GetMapHeight(Game game) {
+        return (GetRingCount(game) + 1) * 600 + EXTRA_Y * 2;
+    }
+
+    public static Integer GetMapPlayerCount(Game game) {
+        return game.getRealPlayers().size() + game.getDummies().size();
+    }
+
+    public static Boolean HasExtraRow(Game game) {
+        return (GetMapHeight(game) - EXTRA_Y) < (GetMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
+    }
+
+    public static Integer GetMapWidth(Game game) {
+        int mapWidth = (GetRingCount(game) + 1) * 520 + EXTRA_X * 2;
+        if (HasExtraRow(game)) {
+            mapWidth += EXTRA_X;
+        }
+        return mapWidth;
+    }
+
+    public static Integer GetMaxObjectWidth(Game game) {
+        return (MapGenerator.GetMapWidth(game) - MapGenerator.spacingBetweenObjectiveTypes * 4) / 3;
+    }
 }
