@@ -2045,6 +2045,7 @@ public class ButtonHelper {
         int asteroids = 0;
         int grav = 0;
         int nebula = 0;
+        int totalNumber = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly()
                 && !tile.isHomeSystem()) {
@@ -2053,16 +2054,19 @@ public class ButtonHelper {
                 }
                 if (tile.isNebula() && nebula < 1) {
                     nebula = 1;
-                } else if (tile.isAsteroidField() && asteroids < 1) {
-                    asteroids = 1;
-                } else {
-                    if (!tile.isGravityRift(game) && !tile.isNebula() && !tile.isAsteroidField()) {
-                        count = 1;
-                    }
                 }
+                if (tile.isAsteroidField() && asteroids < 1) {
+                    asteroids = 1;
+                }
+                if (!tile.isGravityRift(game) && !tile.isNebula() && !tile.isAsteroidField()) {
+                    count = 1;
+                }
+
+                totalNumber++;
             }
         }
-        return count + asteroids + grav + nebula;
+
+        return Math.min(count + asteroids + grav + nebula, totalNumber);
     }
 
     public static int getNumberOfAsteroidsPlayerIsIn(Game game, Player player) {
@@ -8474,7 +8478,14 @@ public class ButtonHelper {
             "Successfully sent " + p2.getFactionEmoji() + " a transaction offer. You may use this button to rescind the offer.", buttons);
         event.getMessage().delete().queue();
         buttons = new ArrayList<>();
-        buttons.add(Button.success("acceptOffer_" + player.getFaction(), "Accept"));
+        int offerNumber = 1;
+        String key = "offerFrom" + player.getFaction() + "To" + p2.getFaction();
+        if (!game.getStoredValue(key).isEmpty()) {
+            offerNumber = Integer.parseInt(game.getStoredValue(key)) + 1;
+        }
+        game.setStoredValue(key, offerNumber + "");
+
+        buttons.add(Button.success("acceptOffer_" + player.getFaction() + "_" + offerNumber, "Accept"));
         buttons.add(Button.danger("rejectOffer_" + player.getFaction(), "Reject"));
         buttons.add(Button.danger("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));
         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
