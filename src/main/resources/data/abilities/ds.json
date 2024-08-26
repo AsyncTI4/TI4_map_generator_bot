@@ -444,7 +444,7 @@
         "id": "plague_reservoir",
         "name": "Plague Reservoir",
         "faction": "kyro",
-        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.",
+        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.[Note: designer intent seems to be that during invasion should refer to immediately after the space cannon defense window (this is the same as when ground combat normally starts)]",
         "source": "ds"
     },
     {

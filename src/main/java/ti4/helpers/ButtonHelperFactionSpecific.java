@@ -684,7 +684,6 @@ public class ButtonHelperFactionSpecific {
 
     public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
         String planet = buttonID.split("_")[1];
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
             "1 mech " + planet, game);
@@ -2005,8 +2004,8 @@ public class ButtonHelperFactionSpecific {
         String tokenName = "creuss" + type;
         Tile tile = game.getTileByPosition(tilePos);
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        String msg =  player.getRepresentation() + " moved " + Emojis.getEmojiFromDiscord(tokenName)
-             + " " + type + " wormhole to " + tile.getRepresentationForButtons(game, player);
+        String msg = player.getRepresentation() + " moved " + Emojis.getEmojiFromDiscord(tokenName)
+            + " " + type + " wormhole to " + tile.getRepresentationForButtons(game, player);
         for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 msg += " (from " + tile_.getRepresentationForButtons(game, player) + ")";

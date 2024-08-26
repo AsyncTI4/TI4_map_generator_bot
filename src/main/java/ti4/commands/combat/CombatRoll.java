@@ -407,7 +407,7 @@ public class CombatRoll extends CombatSubcommandData {
             }
 
         }
-        if (rollType == CombatRollType.bombardment && h > 0 && player.hasAbility("meteor_slings") || player.getPromissoryNotes().keySet().contains("dspnkhra")) {
+        if (rollType == CombatRollType.bombardment && h > 0 && (player.hasAbility("meteor_slings") || player.getPromissoryNotes().keySet().contains("dspnkhra"))) {
             List<Button> buttons = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + uH.getName(), "Infantry on " + Helper.getPlanetRepresentation(uH.getName(), game)));
