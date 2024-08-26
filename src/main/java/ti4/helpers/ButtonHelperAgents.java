@@ -1359,7 +1359,7 @@ public class ButtonHelperAgents {
                 if (!token.contains("attachment")) {
                     continue;
                 }
-                token = token.replace(".png", "").replace("attachment_", "");
+                token = token.replace(".png", "").replace("attachment_", "").replace("_", ";");
 
                 String s = uh.getName() + "_" + token;
                 if (!token.contains("sleeper") && !token.contains("control") && !legendaries.contains(s)) {
@@ -1497,6 +1497,7 @@ public class ButtonHelperAgents {
         String planet = buttonID.split("_")[1];
         String planet2 = buttonID.split("_")[2];
         String attachment = buttonID.split("_")[3];
+        attachment = attachment.replace(";", "_");
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         UnitHolder uH2 = ButtonHelper.getUnitHolderFromPlanetName(planet2, game);
         uH.removeToken("attachment_" + attachment + ".png");

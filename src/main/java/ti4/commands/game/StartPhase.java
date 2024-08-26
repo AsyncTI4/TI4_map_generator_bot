@@ -72,7 +72,7 @@ public class StartPhase extends GameSubcommandData {
                 }
             }
             case "statusHomework" -> ButtonHelper.startStatusHomework(event, game);
-            case "agendaResolve" -> AgendaHelper.resolveTime(event, game, null);
+            case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
             case "pbd1000decks" -> {
                 game.pbd1000decks();
                 GameSaveLoadManager.saveMap(game, event);
