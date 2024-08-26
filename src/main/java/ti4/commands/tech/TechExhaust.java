@@ -192,7 +192,6 @@ public class TechExhaust extends TechAddRemove {
             }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
-                //List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "getACFrom", null); old way
                 List<Button> buttons = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player || p2.getAc() == 0) {

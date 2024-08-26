@@ -758,6 +758,28 @@ public class Game extends GameProperties {
         setPlayersWhoHitPersistentNoWhen(existing + faction);
     }
 
+    public void removePlayersWhoHitPersistentNoAfter(String faction) {
+        String existing = getPlayersWhoHitPersistentNoAfter();
+        if (existing != null && existing.length() > 0) {
+            if (existing.contains(faction + "_")) {
+                faction = faction + "_";
+            }
+            existing = existing.replace(faction, "");
+        }
+        setPlayersWhoHitPersistentNoAfter(existing);
+    }
+
+    public void removePlayersWhoHitPersistentNoWhen(String faction) {
+        String existing = getPlayersWhoHitPersistentNoWhen();
+        if (existing != null && existing.length() > 0) {
+            if (existing.contains(faction + "_")) {
+                faction = faction + "_";
+            }
+            existing = existing.replace(faction, "");
+        }
+        setPlayersWhoHitPersistentNoWhen(existing);
+    }
+
     @JsonIgnore
     public Player getActivePlayer() {
         return getPlayer(getActivePlayerID());

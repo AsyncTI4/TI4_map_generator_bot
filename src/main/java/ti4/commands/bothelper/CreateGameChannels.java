@@ -332,7 +332,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Button.success("getHomebrewButtons", "Yes, have homebrew"));
         buttons2.add(Button.danger("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons", buttons2);
+        MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", buttons2);
 
         List<Button> buttons3 = new ArrayList<>();
         buttons3.add(Button.success("enableAidReacts", "Yes, Enable Aid Reacts"));

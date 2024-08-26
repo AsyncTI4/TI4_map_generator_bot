@@ -140,6 +140,10 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         game.setPlayersWhoHitPersistentNoAfter("");
         game.setPlayersWhoHitPersistentNoWhen("");
         game.setLatestOutcomeVotedFor("");
+        for (Player p2 : game.getRealPlayers()) {
+            game.setStoredValue("latestOutcomeVotedFor" + p2.getFaction(), "");
+            game.setStoredValue("preVoting" + p2.getFaction(), "");
+        }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));

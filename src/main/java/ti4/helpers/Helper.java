@@ -1509,12 +1509,12 @@ public class Helper {
 
             }
         }
-        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor()) != null) {
+        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())) != null) {
             msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
-                + Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor());
+                + Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()));
         } else {
             msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
-                + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
+                + StringUtils.capitalize(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()));
         }
         if (justVoteTotal) {
             return "" + votes;

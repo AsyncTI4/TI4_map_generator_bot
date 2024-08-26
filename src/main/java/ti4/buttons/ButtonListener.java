@@ -1582,13 +1582,6 @@ public class ButtonListener extends ListenerAdapter {
             String faction = buttonID.replace("forceAbstainForPlayer_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
-        } else if (buttonID.startsWith("fixerVotes_")) {
-            String voteMessage = "Thank you for specifying, please select from the available buttons to vote.";
-            String vote = buttonID.substring(buttonID.indexOf("_") + 1);
-            int votes = Integer.parseInt(vote);
-            List<Button> voteActionRow = AgendaHelper.getVoteButtons(votes - 9, votes);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
-            ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("useRelic_")) {
             String relic = buttonID.replace("useRelic_", "");
             ButtonHelper.deleteTheOneButton(event);
@@ -1833,8 +1826,6 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("outcome_")) {
-            // AgendaHelper.offerVoteAmounts(buttonID, event, game, player, ident,
-            // buttonLabel);
             if (game.getLaws() != null
                 && (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government"))) {
                 player.resetSpentThings();
@@ -1845,15 +1836,13 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
                 String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome);
+                game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
                 game.setLatestOutcomeVotedFor(outcome);
                 MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
                 AgendaHelper.proceedToFinalizingVote(game, player, event);
             } else {
                 AgendaHelper.exhaustPlanetsForVotingVersion2(buttonID, event, game, player);
             }
-        } else if (buttonID.startsWith("votes_")) {
-            AgendaHelper.exhaustPlanetsForVoting(buttonID, event, game, player, ident, buttonLabel,
-                finsFactionCheckerPrefix);
         } else if (buttonID.startsWith("dacxive_")) {
             String planet = buttonID.replace("dacxive_", "");
             new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)),
@@ -2821,6 +2810,15 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("acceptOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+            if (buttonID.split("_").length > 2) {
+                String offerNum = buttonID.split("_")[2];
+                String key = "offerFrom" + p1.getFaction() + "To" + player.getFaction();
+                String oldOffer = game.getStoredValue(key);
+                if (!offerNum.equalsIgnoreCase(oldOffer)) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Only the most recent offer is acceptable. This is an old transaction offer and it can no longer be accepted");
+                    return;
+                }
+            }
             Helper.acceptTransactionOffer(p1, player, game, event);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("sendOffer_")) {
@@ -4069,9 +4067,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "no_when" -> {
                     String message = game.isFowMode() ? "No whens" : null;
-                    if (game.getStoredValue("noWhenThisAgenda") == null) {
-                        game.setStoredValue("noWhenThisAgenda", "");
-                    }
+                    game.removePlayersWhoHitPersistentNoWhen(player.getFaction());
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "offerPlayerPref" -> {
@@ -4079,41 +4075,21 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "no_after" -> {
                     String message = game.isFowMode() ? "No afters" : null;
-                    if (game.getStoredValue("noAfterThisAgenda") == null) {
-                        game.setStoredValue("noAfterThisAgenda", "");
-                    }
+                    game.removePlayersWhoHitPersistentNoAfter(player.getFaction());
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
                 case "no_after_persistent" -> {
                     String message = game.isFowMode() ? "No afters (locked in)" : null;
                     game.addPlayersWhoHitPersistentNoAfter(player.getFaction());
-                    if (game.getStoredValue("noAfterThisAgenda") == null) {
-                        game.setStoredValue("noAfterThisAgenda", "");
-                    }
-                    // game.getStoredValue("noAfterThisAgenda").contains(player.getFaction())
-                    if (!"".equalsIgnoreCase(game.getStoredValue("noAfterThisAgenda"))) {
-                        game.setStoredValue("noAfterThisAgenda",
-                            game.getStoredValue("noAfterThisAgenda") + "_"
-                                + player.getFaction());
-                    } else {
-                        game.setStoredValue("noAfterThisAgenda", player.getFaction());
-                    }
                     ButtonHelper.addReaction(event, false, false, message, "");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You hit no afters for this entire agenda. If you change your mind, you can just play an after or remove this setting by hitting no afters (for now)");
                 }
                 case "no_when_persistent" -> {
                     String message = game.isFowMode() ? "No whens (locked in)" : null;
                     game.addPlayersWhoHitPersistentNoWhen(player.getFaction());
-                    if (game.getStoredValue("noWhenThisAgenda") == null) {
-                        game.setStoredValue("noWhenThisAgenda", "");
-                    }
-                    if (!"".equalsIgnoreCase(game.getStoredValue("noWhenThisAgenda"))) {
-                        game.setStoredValue("noWhenThisAgenda",
-                            game.getStoredValue("noWhenThisAgenda") + "_"
-                                + player.getFaction());
-                    } else {
-                        game.setStoredValue("noWhenThisAgenda", player.getFaction());
-                    }
                     ButtonHelper.addReaction(event, false, false, message, "");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You hit no whens for this entire agenda. If you change your mind, you can just play a when or remove this setting by hitting no whens (for now)");
+
                 }
                 case "munitionsReserves" -> {
                     ButtonHelperAbilities.munitionsReserves(event, game, player);
@@ -4714,38 +4690,22 @@ public class ButtonListener extends ListenerAdapter {
                 case "showPlayerAreas" -> ShowGame.showPlayArea(game, event);
                 case "mitosisInf" -> ButtonHelperAbilities.resolveMitosisInf(buttonID, event, game, player, ident);
                 case "doneLanding" -> ButtonHelperModifyUnits.finishLanding(buttonID, event, game, player);
+                case "preVote" -> {
+                    game.setStoredValue("preVoting" + player.getFaction(), "0");
+                    AgendaHelper.firstStepOfVoting(game, event, player);
+                }
+                case "erasePreVote" -> {
+                    game.setStoredValue("preVoting" + player.getFaction(), "");
+                    player.resetSpentThings();
+                    event.getMessage().delete().queue();
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Button.success("preVote", "Pre-Vote"));
+                    buttons.add(Button.primary("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
+                    buttons.add(Button.danger("deleteButtons", "Don't do anything"));
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Erased the pre-vote", buttons);
+                }
                 case "vote" -> {
-                    String pfaction2 = null;
-                    if (player != null) {
-                        pfaction2 = player.getFaction();
-                    }
-                    if (pfaction2 != null) {
-                        String voteMessage = "Chose to Vote. Click buttons for which outcome to vote for.";
-                        String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
-                        List<Button> outcomeActionRow;
-                        if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
-                            outcomeActionRow = AgendaHelper.getForAgainstOutcomeButtons(null, "outcome");
-                        } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
-                            outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(game, null, "outcome", null);
-                        } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
-                            voteMessage = "Chose to Vote. Too many planets in the game to represent all as buttons. Click buttons for which player owns the planet you wish to elect.";
-                            outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(game, null, "planetOutcomes",
-                                null);
-                        } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
-                            outcomeActionRow = AgendaHelper.getSecretOutcomeButtons(game, null, "outcome");
-                        } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
-                            outcomeActionRow = AgendaHelper.getStrategyOutcomeButtons(null, "outcome");
-                        } else if (agendaDetails.contains("unit upgrade")) {
-                            outcomeActionRow = AgendaHelper.getUnitUpgradeOutcomeButtons(game, null, "outcome");
-                        } else if (agendaDetails.contains("Unit") || agendaDetails.contains("unit")) {
-                            outcomeActionRow = AgendaHelper.getUnitOutcomeButtons(game, null, "outcome");
-                        } else {
-                            outcomeActionRow = AgendaHelper.getLawOutcomeButtons(game, null, "outcome");
-                        }
-                        ButtonHelper.deleteMessage(event);
-                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
-                            outcomeActionRow);
-                    }
+                    AgendaHelper.firstStepOfVoting(game, event, player);
                 }
                 case "sc_no_follow" -> {
                     int scnum2 = 1;
@@ -5812,7 +5772,7 @@ public class ButtonListener extends ListenerAdapter {
         for (Player player : game.getRealPlayers()) {
             boolean factionReacted = false;
             if (buttonID.contains("no_after")) {
-                if (game.getStoredValue("noAfterThisAgenda").contains(player.getFaction())) {
+                if (game.getPlayersWhoHitPersistentNoAfter().contains(player.getFaction())) {
                     factionReacted = true;
                 }
                 Message mainMessage = event.getMessage();
@@ -5832,7 +5792,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             if (buttonID.contains("no_when")) {
-                if (game.getStoredValue("noWhenThisAgenda").contains(player.getFaction())) {
+                if (game.getPlayersWhoHitPersistentNoWhen().contains(player.getFaction())) {
                     factionReacted = true;
                 }
                 Message mainMessage = event.getMessage();
