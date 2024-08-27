@@ -300,7 +300,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(listGames);
         buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
         if (!game.isFowMode()) {
-            buttons.add(Button.secondary("checkWHView", "Check Wormholes"));
+            buttons.add(Button.secondary("chooseMapView", "Highlight Map Features"));
         }
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {

@@ -58,6 +58,8 @@ public class Constants {
     public static final String ELIMINATE = "eliminate";
     public static final String FIX_SO_DECK = "fix_so_deck";
     public static final String REVISE_LAW = "revise_law";
+    public static final String ADD_CONTROL_TOKEN = "add_control_token";
+    public static final String EXHAUST_SC = "exhuast_sc";
     public static final String SET_THREAD_NAME = "set_thread_name";
     public static final String THREAD_NAME = "thread_name";
     public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
@@ -312,8 +314,9 @@ public class Constants {
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172, 150);
-    public static final Point MIRAGE_POSITION = new Point(172, 43); // 55, 5
-    public static final Point MIRAGE_CENTER_POSITION = new Point(71, 69);
+    public static final Point MIRAGE_POSITION = new Point(172, 33); // 55, 5
+    public static final Point MIRAGE_TRIPLE_POSITION = new Point(38, 178);
+    public static final Point MIRAGE_CENTER_POSITION = new Point(71, 59);
     public static final String MIRAGE = "mirage";
     public static final String SLEEPER = "sleeper";
     public static final String DMZ = "dmz";
@@ -360,6 +363,7 @@ public class Constants {
     public static final String TOKEN_ION_ALPHA_PNG = "token_ionalpha.png";
     public static final String TOKEN_ION_BETA_PNG = "token_ionbeta.png";
     public static final String SWAP_SYSTEMS = "swap_systems";
+    public static final String MOVE_ALL_UNITS = "move_all_units";
     public static final String ADJUST_ROUND_NUMBER = "adjust_round_number";
 
     public static final String MAHACT_CC = "mahact_cc";
@@ -865,6 +869,7 @@ public class Constants {
     public static final String RE_EXPORT_TILES = "re_export_tiles";
     public static final String THREAD_COUNT = "thread_count";
     public static final String LIST_OLD_CHANNELS = "list_old_channels";
+    public static final String LIST_DEAD_GAMES = "list_dead_games";
     public static final String LIST_SLASH_COMMANDS_USED = "list_slash_commands_used";
     public static final String LIST_OLD_THREADS = "list_old_threads";
     public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";

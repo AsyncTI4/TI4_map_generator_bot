@@ -361,9 +361,9 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveFreeTrade(Game game, Player player, ButtonInteractionEvent event) {
-        Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG")
+        Button convert2CommButton = Button.success("convert_2_comms_stay", "Convert 2 Commodities Into TG")
             .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities")
+        Button get2CommButton = Button.primary("gain_2_comms_stay", "Gain 2 Commodities")
             .withEmoji(Emoji.fromFormatted(Emojis.comm));
         List<Button> buttons = List.of(convert2CommButton, get2CommButton,
             Button.danger("deleteButtons", "Done resolving"));
@@ -1304,6 +1304,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true) + " you killed the space dock in " + tile.getRepresentation());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentation(true, true) + " your space dock in " + tile.getRepresentation() + " was melted.");
+        ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
         ButtonHelper.deleteMessage(event);
     }
 

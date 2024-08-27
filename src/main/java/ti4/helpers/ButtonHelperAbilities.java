@@ -1446,8 +1446,9 @@ public class ButtonHelperAbilities {
             if (p2.getColor() == null || p2 == player) {
                 continue; // fix indoctrinate vs neutral
             }
-            if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet)) {
+            if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet) && !player.getAllianceMembers().contains(p2.getFaction())) {
                 new RemoveUnits().unitParsing(event, p2.getColor(), tile, "1 infantry " + planet, game);
+                break;
             }
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
