@@ -167,7 +167,7 @@ public class StartCombat extends CombatSubcommandData {
                 if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
                     continue;
                 }
-                createSpectatorThread(game, player3.getPrivateChannel(), player3, threadName, tile, event);
+                createSpectatorThread(game, player3, threadName, tile, event);
             }
         }
     }
@@ -206,7 +206,7 @@ public class StartCombat extends CombatSubcommandData {
                 if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
                     continue;
                 }
-                createSpectatorThread(game, player3.getPrivateChannel(), player3, threadName, tile, event);
+                createSpectatorThread(game, player3, threadName, tile, event);
             }
         }
     }
@@ -334,12 +334,13 @@ public class StartCombat extends CombatSubcommandData {
         }
     }
 
-    private static void createSpectatorThread(Game game, MessageChannel channel, Player player, String threadName, Tile tile, 
+    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, 
         GenericInteractionCreateEvent event) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),
             event, player);
 
+        MessageChannel channel = player.getPrivateChannel();
         channel.sendMessage("Spectate Combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = ((TextChannel) channel).createThreadChannel(threadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
@@ -347,6 +348,7 @@ public class StartCombat extends CombatSubcommandData {
                 StringBuilder message = new StringBuilder();
                 message.append(player.getRepresentation(true, true));
                 message.append(" Please spectate the interaction here.\n");
+                message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
                 message.append("\nImage of System:");
                 MessageHelper.sendMessageWithFile(tc, systemWithContext, message.toString(), false);
                 sendGeneralCombatButtonsToThread(tc, game, player, player, tile, "justPicture", event);
