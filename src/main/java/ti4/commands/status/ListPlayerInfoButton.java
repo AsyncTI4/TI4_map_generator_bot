@@ -637,7 +637,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "distant_lands" -> {
                 int count = 0;
-                for (Player p2 : game.getRealPlayers()) {
+                for (Player p2 : game.getRealAndEliminatedPlayers()) {
                     if (p2 == player) {
                         continue;
                     }

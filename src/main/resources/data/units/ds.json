@@ -1574,7 +1574,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "DEPLOY: After you move a destroyer into a non-home system other than Mecatol Rex, you may spend 3 resources to place 1 mech on a planet in that system."
+        "ability": "DEPLOY: After you move a destroyer into a non-home system other than Mecatol Rex, you may spend 3 resources to place 1 mech on a planet in that system. [Note: can deploy 1 mech for each destroyer that moves]"
     },
     {
         "id": "vaden_flagship",

@@ -55,7 +55,7 @@ public class StartMilty extends MiltySubcommandData {
         // slice generation settings
         Boolean anomaliesCanTouch = false, extraWHs = true;
         Double minRes = 2.0, minInf = 3.0;
-        Integer minTot = 7, maxTot = 13;
+        Integer minTot = 9, maxTot = 13;
         Integer minLegend = 1, maxLegend = 2;
 
         //other

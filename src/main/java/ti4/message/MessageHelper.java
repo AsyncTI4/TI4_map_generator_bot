@@ -774,7 +774,11 @@ public class MessageHelper {
 						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel()
 							+ "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " "
 							+ emoji.getId());
-					button = Button.of(button.getStyle(), button.getId(), button.getLabel());
+					String label = button.getLabel();
+					if (label.isBlank()) {
+						label = String.format(":%s:", emoji.getName());
+					}
+					button = Button.of(button.getStyle(), button.getId(), label);
 				}
 			}
 			newButtons.add(button);

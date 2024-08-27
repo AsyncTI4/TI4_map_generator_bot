@@ -455,7 +455,7 @@ public class CombatHelper {
                     }
                 }
             }
-            if (rollType == CombatRollType.combatround && player.hasAbility("valor") && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+            if (rollType == CombatRollType.combatround && (player.hasAbility("valor") || opponent.hasAbility("valor")) && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                 for (Die die : resultRolls) {
                     if (die.getResult() > 9) {
                         hitRolls = hitRolls + 1;

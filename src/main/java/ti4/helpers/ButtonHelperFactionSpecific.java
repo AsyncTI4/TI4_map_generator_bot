@@ -684,7 +684,6 @@ public class ButtonHelperFactionSpecific {
 
     public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
         String planet = buttonID.split("_")[1];
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
             "1 mech " + planet, game);
@@ -1129,13 +1128,50 @@ public class ButtonHelperFactionSpecific {
                 if (game.getStoredValue("Genetic Recombination " + p2.getFaction())
                     .contains(voter.getFaction())) {
                     p2.exhaustTech("gr");
-                    String msg = p2.getRepresentation(false, true) + " is using genetic recombination to force "
+                    String msg = p2.getRepresentation(false, true) + " is using Genetic Recombination to force "
                         + voter.getRepresentation(false, true)
-                        + " to vote a particular way. Tech has been exhausted, the owner should elaborate on which way to vote";
+                        + " to vote a particular way. Tech has been exhausted, the owner should elaborate on which way to vote.";
                     MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), msg);
+                    if (voter.getFleetCC() > 0) {
+                        msg = voter.getRepresentation(false, true) +
+                            " has the option to remove 1 CC from their fleet pool to ignore the effect of Genetic Recombination.";
+                        List<Button> conclusionButtons = new ArrayList<>();
+                        String finChecker = "FFCC_" + voter.getFaction() + "_";
+                        Button accept = Button.primary(finChecker
+                            + "geneticRecombination_"
+                            + p2.getUserID() + "_"
+                            + "accept", "Vote For Chosen Outcome");
+                        conclusionButtons.add(accept);
+                        Button decline = Button.danger(finChecker
+                            + "geneticRecombination_"
+                            + p2.getUserID() + "_"
+                            + "decline", "Remove Fleet Token");
+                        conclusionButtons.add(decline);
+                        MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), msg, conclusionButtons);
+                    }
                 }
             }
         }
+    }
+
+    public static void resolveGeneticRecombination(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String[] fields = buttonID.split("_");
+        Player mahactPlayer = game.getPlayer(fields[1]);
+        String choice = fields[2];
+        if (choice.equals("accept")) {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getRepresentation()
+                    + " has chosen to vote for the outcome indicated by "
+                    + mahactPlayer.getRepresentation()
+                    + ".");
+        } else {
+            player.setFleetCC(player.getFleetCC() - 1);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getRepresentation()
+                    + " has removed a CC from their fleet pool and may vote freely.");
+            ButtonHelper.checkFleetInEveryTile(player, game, event);
+        }
+        event.getMessage().delete().queue();
     }
 
     public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game,
@@ -1968,8 +2004,8 @@ public class ButtonHelperFactionSpecific {
         String tokenName = "creuss" + type;
         Tile tile = game.getTileByPosition(tilePos);
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        String msg =  player.getRepresentation() + " moved " + Emojis.getEmojiFromDiscord(tokenName)
-             + " " + type + " wormhole to " + tile.getRepresentationForButtons(game, player);
+        String msg = player.getRepresentation() + " moved " + Emojis.getEmojiFromDiscord(tokenName)
+            + " " + type + " wormhole to " + tile.getRepresentationForButtons(game, player);
         for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 msg += " (from " + tile_.getRepresentationForButtons(game, player) + ")";

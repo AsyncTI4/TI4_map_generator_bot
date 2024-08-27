@@ -876,8 +876,11 @@ public class Player {
                 if (p.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN))
                     return false;
             return true;
-        } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN))
+        } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
             return true;
+        } else if (getGame().getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction())) {
+            return true;
+        }
         return false;
     }
 
@@ -1000,6 +1003,15 @@ public class Player {
     public void setActionCard(String id) {
         Collection<Integer> values = actionCards.values();
         int identifier = ThreadLocalRandom.current().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = ThreadLocalRandom.current().nextInt(1000);
+        }
+        actionCards.put(id, identifier);
+    }
+
+    public void setActionCard(String id, int oldID) {
+        Collection<Integer> values = actionCards.values();
+        int identifier = oldID;
         while (values.contains(identifier)) {
             identifier = ThreadLocalRandom.current().nextInt(1000);
         }
@@ -2341,20 +2353,22 @@ public class Player {
             UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
             List<TechnologyModel> relevantTechs = getTechs().stream().map(Mapper::getTech)
                 .filter(tech -> tech.getBaseUpgrade().orElse("").equals(unitModel.getBaseType())).toList();
+
             removeOwnedUnitByID(unitModel.getId());
 
             // Find another unit model to replace this lost model
             String replacementUnit = unitModel.getBaseType(); // default
-            if (unitModel.getUpgradesFromUnitId().isPresent() && !unitModel.getUpgradesFromUnitId().isEmpty()) {
-                addOwnedUnitByID(unitModel.getUpgradesFromUnitId().orElse(replacementUnit));
-                return;
-            }
+            // if (unitModel.getUpgradesFromUnitId().isPresent() && !unitModel.getUpgradesFromUnitId().isEmpty()) {
+            //     addOwnedUnitByID(unitModel.getUpgradesFromUnitId().orElse(replacementUnit));
+            //     return;
+            // }
             if (relevantTechs.isEmpty() && unitModel.getBaseType() != null) {
                 // No other relevant unit upgrades
+                System.out.println("boop");
                 FactionModel factionSetup = getFactionSetupInfo();
                 replacementUnit = factionSetup.getUnits().stream().map(Mapper::getUnit)
                     .map(UnitModel::getId)
-                    .filter(id -> id.equals(unitModel.getBaseType())).findFirst()
+                    .filter(id -> id.contains(unitModel.getBaseType())).findFirst()
                     .orElse(replacementUnit);
             } else if (relevantTechs.size() > 0) {
                 // Ignore the case where there's multiple faction techs and also
@@ -2800,6 +2814,9 @@ public class Player {
     }
 
     public boolean unitBelongsToPlayer(UnitKey unit) {
+        if (unit == null) {
+            return false;
+        }
         return getColor().equals(AliasHandler.resolveColor(unit.getColorID()));
     }
 
@@ -2832,28 +2849,28 @@ public class Player {
     }
 
     @JsonIgnore
-    public float getTotalResourceValueOfUnits() {
+    public float getTotalResourceValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile);
+            count = count + ButtonHelper.checkValuesOfUnits(this, getGame(), tile, type);
         }
         return count;
     }
 
     @JsonIgnore
-    public int getTotalHPValueOfUnits() {
+    public int getTotalHPValueOfUnits(String type) {
         int count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile);
+            count = count + ButtonHelper.checkHPOfUnits(this, getGame(), tile, type);
         }
         return count;
     }
 
     @JsonIgnore
-    public float getTotalCombatValueOfUnits() {
+    public float getTotalCombatValueOfUnits(String type) {
         float count = 0;
         for (Tile tile : getGame().getTileMap().values()) {
-            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile);
+            count = count + ButtonHelper.checkCombatValuesOfUnits(this, getGame(), tile, type);
         }
         return Math.round(count * 10) / (float) 10.0;
     }

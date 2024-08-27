@@ -118,7 +118,7 @@ public class TechExhaust extends TechAddRemove {
                     .secondary(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards")
                     .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
-                sendNextActionButtonsIfButtonEvent(event, game, player);
+                //sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dskortg" -> {
                 Tile tile = null;
@@ -165,9 +165,10 @@ public class TechExhaust extends TechAddRemove {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor()
                     + " use button to gain 1 CC or spend 1 strat CC to ready your agent", buttons);
             }
-            case "aida", "sar", "htp" -> {
+            case "aida", "sar", "htp", "absol_aida" -> {
                 if (event instanceof ButtonInteractionEvent) {
                     ButtonInteractionEvent buttonEvent = (ButtonInteractionEvent) event;
+                    tech = tech.replace("absol_", "");
                     ButtonHelper.deleteTheOneButton(buttonEvent);
                     if (buttonEvent.getButton().getLabel().contains("(")) {
                         player.addSpentThing(tech + "_");
@@ -191,7 +192,6 @@ public class TechExhaust extends TechAddRemove {
             }
             case "mi" -> { // Mageon
                 deleteIfButtonEvent(event);
-                //List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "getACFrom", null); old way
                 List<Button> buttons = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player || p2.getAc() == 0) {

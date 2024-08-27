@@ -250,7 +250,8 @@ public class CombatRoll extends CombatSubcommandData {
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (message.contains("adding +1, at the risk of your")) {
-            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos,", Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos. Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc. Sol and Letnev agents automatically are given as extra dice for unit 1.",
+                Button.success("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
         }
         if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h + " hit" + (h == 1 ? "" : "s") + " in round #" + round2;
@@ -277,7 +278,7 @@ public class CombatRoll extends CombatSubcommandData {
                     if (opponent.hasTech("vpw")) {
                         msg = player.getRepresentation(true, true) + " you got hit by Valkyrie Particle Weave. You may autoassign 1 hit.";
                         buttons = new ArrayList<>();
-                        buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        buttons.add(Button.success(opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Button.danger("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Button.secondary(opponent.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_1", "Cancel a Hit"));
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -406,7 +407,7 @@ public class CombatRoll extends CombatSubcommandData {
             }
 
         }
-        if (rollType == CombatRollType.bombardment && h > 0 && player.hasAbility("meteor_slings") || player.getPromissoryNotes().keySet().contains("dspnkhra")) {
+        if (rollType == CombatRollType.bombardment && h > 0 && (player.hasAbility("meteor_slings") || player.getPromissoryNotes().keySet().contains("dspnkhra"))) {
             List<Button> buttons = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + uH.getName(), "Infantry on " + Helper.getPlanetRepresentation(uH.getName(), game)));
