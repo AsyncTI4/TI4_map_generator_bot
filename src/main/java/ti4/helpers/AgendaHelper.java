@@ -40,6 +40,7 @@ import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
+import ti4.commands.cardsac.DrawAC;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetExhaust;
@@ -383,7 +384,7 @@ public class AgendaHelper {
             if (game.getCurrentAgendaInfo().contains("Player")) {
                 Player player2 = game.getPlayerFromColorOrFaction(winner);
                 if ("secret".equalsIgnoreCase(agID)) {
-                    String message = "Drew Secret Objective for the elected player.";
+                    String message = "Drew A Secret Objective for the elected player.";
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player2.getUserID());
@@ -792,6 +793,45 @@ public class AgendaHelper {
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
             }
+            if ("absol_seeds".equalsIgnoreCase(agID)) {
+                List<Player> winOrLose;
+                StringBuilder message = new StringBuilder();
+                Integer poIndex;
+                poIndex = game.addCustomPO("Seed", 1);
+                if ("for".equalsIgnoreCase(winner)) {
+                    winOrLose = getPlayersWithMostPoints(game);
+                } else {
+                    winOrLose = getPlayersWithLeastPoints(game);
+
+                }
+                message.append("Custom PO 'Seed' has been added.\n");
+                if (winOrLose.size() == 1) {
+                    Player playerWL = winOrLose.get(0);
+                    game.scorePublicObjective(playerWL.getUserID(), poIndex);
+                    message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
+                    Helper.checkEndGame(game, playerWL);
+                    if ("for".equalsIgnoreCase(winner)) {
+                        game.setSpeaker(playerWL.getUserID());
+                        message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
+                        for (Player p2 : getWinningVoters(winner, game)) {
+                            if (p2 == playerWL) {
+                                continue;
+                            } else {
+                                MessageHelper.sendMessageToChannel(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() + "a PN", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
+                            }
+                        }
+                    } else {
+                        DrawAC.drawActionCards(game, playerWL, aID, true);
+                        playerWL.setFleetCC(playerWL.getFleetCC() + 1);
+                        playerWL.setTacticalCC(playerWL.getTacticalCC() + 1);
+                        playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);
+                        message.append(playerWL.getRepresentation()).append(" drew some ACs and was given a CC for each pool\n");
+
+                    }
+
+                }
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
+            }
             if ("plowshares".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
                     for (Player playerB : game.getRealPlayers()) {
@@ -846,6 +886,42 @@ public class AgendaHelper {
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Drew 2 ACs for each of the players who voted for");
+                }
+            }
+            if ("absol_measures".equalsIgnoreCase(agID)) {
+                List<Player> winOrLose;
+                if ("for".equalsIgnoreCase(winner)) {
+                    winOrLose = getWinningVoters(winner, game);
+                    for (Player playerWL : winOrLose) {
+                        if (playerWL.hasAbility("autonetic_memory")) {
+                            ButtonHelperAbilities.autoneticMemoryStep1(game, playerWL, 2);
+                        } else {
+                            game.drawActionCard(playerWL.getUserID());
+                            game.drawActionCard(playerWL.getUserID());
+                            if (playerWL.hasAbility("scheming")) {
+                                game.drawActionCard(playerWL.getUserID());
+                                ACInfo.sendActionCardInfo(game, playerWL, event);
+                                MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(),
+                                    playerWL.getRepresentation(true, true) + " use buttons to discard",
+                                    ACInfo.getDiscardActionCardButtons(game, playerWL, false));
+                            } else {
+                                ACInfo.sendActionCardInfo(game, playerWL, event);
+                            }
+                        }
+
+                        if (playerWL.getLeaderIDs().contains("yssarilcommander")
+                            && !playerWL.hasLeaderUnlocked("yssarilcommander")) {
+                            ButtonHelper.commanderUnlockCheck(playerWL, game, "yssaril", event);
+                        }
+                        ButtonHelper.checkACLimit(game, event, playerWL);
+                    }
+                    for (Player p2 : getLosingVoters(winner, game)) {
+                        p2.setStrategicCC(p2.getStrategicCC());
+                    }
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                        "Drew 2 ACs for each of the players who voted for and gave 1 strat CC to those who voted against");
+                } else {
+
                 }
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
@@ -1446,9 +1522,6 @@ public class AgendaHelper {
                 }
                 game.setCurrentAgendaVote(outcome, existingData);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Helper.buildSpentThingsMessageForVoting(player, game, false));
-                if (event != null) {
-                    event.getMessage().delete().queue();
-                }
             }
 
             String message = " up to vote! Resolve using buttons.";
@@ -1463,7 +1536,7 @@ public class AgendaHelper {
             while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor()))
                 || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction()) || !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()) {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
-                    + "You are being skipped because you cannot vote";
+                    + " You are being skipped because you cannot vote";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     skippedMessage = realIdentity2
                         + "You are being skipped because you told the bot you wanted to preset an abstain";
@@ -2371,7 +2444,7 @@ public class AgendaHelper {
                         }
                         if (specificVote.contains("Tarrock Ability")) {
                             Player player = winningR;
-                            String message = player.getFactionEmoji() + " Drew Secret Objective.";
+                            String message = player.getFactionEmoji() + " Drew A Secret Objective.";
                             game.drawSecretObjective(player.getUserID());
                             if (player.hasAbility("plausible_deniability")) {
                                 game.drawSecretObjective(player.getUserID());
