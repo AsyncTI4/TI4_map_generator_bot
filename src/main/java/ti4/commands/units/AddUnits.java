@@ -11,7 +11,11 @@ import ti4.commands.tokens.AddCC;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
@@ -30,15 +34,17 @@ public class AddUnits extends AddRemoveUnits {
         OptionMapping option = event.getOption(Constants.CC_USE);
         if (option != null) {
             String value = option.getAsString().toLowerCase();
-            switch (value) {
-                case "t/tactics", "t", "tactics", "tac", "tact" -> {
-                    MoveUnits.removeTacticsCC(event, color, tile, GameManager.getInstance().getUserActiveGame(event.getUser().getId()));
-                    AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
-                }
-                case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
-                    AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
+            if (!event.getInteraction().getName().equals(Constants.MOVE_UNITS)) {
+                switch (value) {
+                    case "t/tactics", "t", "tactics", "tac", "tact" -> {
+                        MoveUnits.removeTacticsCC(event, color, tile, GameManager.getInstance().getUserActiveGame(event.getUser().getId()));
+                        AddCC.addCC(event, color, tile);
+                        Helper.isCCCountCorrect(event, game, color);
+                    }
+                    case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
+                        AddCC.addCC(event, color, tile);
+                        Helper.isCCCountCorrect(event, game, color);
+                    }
                 }
             }
         }

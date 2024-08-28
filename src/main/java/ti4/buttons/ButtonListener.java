@@ -4213,6 +4213,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "resolveResearch" -> ButtonHelperActionCards.resolveResearch(game, player, buttonID, event);
+                case "focusedResearch" -> ButtonHelperActionCards.focusedResearch(game, player, buttonID, event);
                 case "lizhoHeroFighterResolution" -> ButtonHelperHeroes.lizhoHeroFighterDistribution(player, game, event);
                 case "resolveReparationsStep1" -> ButtonHelperActionCards.resolveReparationsStep1(player, game, event, buttonID);
                 case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
