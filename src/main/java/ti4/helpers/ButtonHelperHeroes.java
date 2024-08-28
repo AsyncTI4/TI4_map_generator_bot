@@ -90,7 +90,7 @@ public class ButtonHelperHeroes {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                     continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null)
+                if (unitModel == null || unitModel.getIsStructure())
                     continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());

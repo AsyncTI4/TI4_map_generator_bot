@@ -232,7 +232,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("all", "map", "stats", "split", "landscape",
                     "wormholes", "anomalies", "legendaries", "empties", "aetherstream", "space_cannon_offense",
-                        "traits", "technology_specialties", "attachments", "shipless",
+                    "traits", "technology_specialties", "attachments", "shipless",
                     "none")
                     .filter(value -> value.contains(enteredValue))
                     .limit(25)
@@ -246,11 +246,11 @@ public class AutoCompleteProvider {
 
                 List<String> tableRelics = new ArrayList<>();
                 if (game != null) {
-                    for (Player player_ : game.getPlayers().values()) {
-                        List<String> playerRelics = player_.getRelics();
-                        tableRelics.addAll(playerRelics);
-                    }
-                    List<String> relicDeck = game.getAllRelics();
+                    // for (Player player_ : game.getPlayers().values()) {
+                    //     List<String> playerRelics = player_.getRelics();
+                    //     tableRelics.addAll(playerRelics);
+                    // }
+                    List<String> relicDeck = Mapper.getDecks().get(game.getRelicDeckID()).getNewShuffledDeck();
                     tableRelics.addAll(relicDeck);
                     Collections.shuffle(tableRelics);
                 }
