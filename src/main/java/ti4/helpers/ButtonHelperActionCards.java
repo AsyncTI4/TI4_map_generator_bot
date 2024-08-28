@@ -460,7 +460,7 @@ public class ButtonHelperActionCards {
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " removed the tech " + techM1.getName());
-        resolveFocusedResearch(game, player, buttonID, event);
+        resolveResearch(game, player, buttonID, event);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -906,7 +906,7 @@ public class ButtonHelperActionCards {
     public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        String message = player.getFactionEmoji() + " Drew Secret Objective.";
+        String message = player.getFactionEmoji() + " Drew A Secret Objective.";
         game.drawSecretObjective(player.getUserID());
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
@@ -1769,7 +1769,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveFocusedResearch(Game game, Player player, String buttonID,
+    public static void resolveResearch(Game game, Player player, String buttonID,
         ButtonInteractionEvent event) {
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
