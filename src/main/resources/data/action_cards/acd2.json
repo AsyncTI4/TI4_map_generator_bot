@@ -659,7 +659,7 @@
   {
     "alias": "patronage",
     "name": "Patronage",
-    "phase": "Status",
+    "phase": "Any",
     "window": "After the speaker reveals a public objective",
     "text": "Look at the top 2 cards of the matching public objective deck; you may reveal 1 of those cards and purge the objective the speaker revealed.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
