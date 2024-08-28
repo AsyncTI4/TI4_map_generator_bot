@@ -330,6 +330,51 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
+    public static void mahactStealCC(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String color = buttonID.replace("mahactStealCC_", "");
+        String ident = player.getRepresentation(true, false);
+        if (!player.getMahactCC().contains(color)) {
+            player.addMahactCC(color);
+            Helper.isCCCountCorrect(event, game, color);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                ident + " added a " + color + " CC to their fleet pool");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                ident + " already had a " + color + " CC in their fleet pool");
+        }
+        if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "mahact", event);
+        }
+        if (ButtonHelper.isLawInPlay(game, "regulations")
+            && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                + " reminder that there is Fleet Regulations in place, which is limiting fleet pool to 4");
+        }
+        ButtonHelper.deleteTheOneButton(event);
+
+    }
+
+    public static void nekroStealTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String trueIdentity = player.getRepresentation();
+        String faction = buttonID.replace("nekroStealTech_", "");
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 != null) {
+            List<String> potentialTech = new ArrayList<>();
+            game.setComponentAction(true);
+            potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech, game);
+            List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
+            if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
+            } else if (buttons.size() > 0 && p2 != null) {
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), trueIdentity + " get enemy tech using the buttons", buttons);
+            } else {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), trueIdentity + " there are no techs available to gain.");
+            }
+            ButtonHelper.deleteTheOneButton(event);
+        }
+
+    }
+
     public static void handleTitansConstructionMechDeployStep2(Game game, Player player,
         ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
@@ -1177,8 +1222,8 @@ public class ButtonHelperFactionSpecific {
     public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game,
         Player player,
         String ident) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), game.getPing()
-            + " the Maximus (the Dih-Mohn flagship) is producing units. They may produce up to 2 units with a combined cost of 4.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation()
+            + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4.");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff

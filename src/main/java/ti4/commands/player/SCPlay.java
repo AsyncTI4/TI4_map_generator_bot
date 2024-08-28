@@ -205,12 +205,15 @@ public class SCPlay extends PlayerSubcommandData {
             }
             if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1) {
                 for (Player p2 : game.getRealPlayers()) {
-                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && !p2.hasRelicReady("absol_emphidia") && !p2.hasRelicReady("emphidia") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
                         Emoji reactionEmoji2 = Helper.getPlayerEmoji(game, p2, message_);
                         if (reactionEmoji2 != null) {
                             message_.addReaction(reactionEmoji2).queue();
                             p2.addFollowedSC(scToPlay, event);
-                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot thought you couldn't follow. Ping Fin if this was an error");
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot believes you can't follow");
                         }
                     }
                 }
