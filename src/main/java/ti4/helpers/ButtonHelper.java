@@ -3119,23 +3119,23 @@ public class ButtonHelper {
     }
 
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent)
+        if (event != null && event instanceof ButtonInteractionEvent bevent && bevent.getMessage() != null)
             bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void deleteAllButtons(ButtonInteractionEvent event) {
-        if (event == null)
+        if (event == null || event.getMessage() == null)
             return;
         event.editComponents(Collections.emptyList()).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent)
+        if (event != null && event instanceof ButtonInteractionEvent bevent && bevent.getMessage() != null)
             deleteTheOneButton(bevent, bevent.getButton().getId(), true);
     }
 
     public static void deleteTheOneButton(ButtonInteractionEvent event, String buttonID, boolean deleteMsg) {
-        if (event == null)
+        if (event == null || event.getMessage() == null)
             return;
         String exhaustedMessage = event.getMessage().getContentRaw();
         if ("".equalsIgnoreCase(exhaustedMessage)) {
@@ -7222,7 +7222,7 @@ public class ButtonHelper {
                     if (model != null && model.getSpaceCannonDieCount() > 0
                         && (model.getDeepSpaceCannon() || tilePos.equalsIgnoreCase(adjTilePos)
                             || game.playerHasLeaderUnlockedOrAlliance(owningPlayer, "mirvedacommander"))) {
-                        if (owningPlayer == player) {
+                        if (owningPlayer == player || player.getAllianceMembers().contains(owningPlayer.getFaction())) {
                             if (FoWHelper.otherPlayersHaveShipsInSystem(player, game.getTileByPosition(tilePos),
                                 game)) {
                                 playersWithPds2.add(owningPlayer);
@@ -10027,7 +10027,7 @@ public class ButtonHelper {
 
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
-            case "enigmaticdevice" -> ButtonHelperActionCards.resolveFocusedResearch(game, player, relicID, event);
+            case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, relicID, event);
             case "codex", "absol_codex" -> offerCodexButtons(player, game, event);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);

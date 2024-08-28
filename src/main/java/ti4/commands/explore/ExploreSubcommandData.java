@@ -291,10 +291,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelper.fullCommanderUnlockCheck(player, game, "yssaril", event);
             }
             case "dv1", "dv2" -> {
-                message = "Drew Secret Objective.";
+                message = "Drew A Secret Objective.";
                 game.drawSecretObjective(player.getUserID());
                 if (game.isFowMode()) {
-                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew An SO");
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());

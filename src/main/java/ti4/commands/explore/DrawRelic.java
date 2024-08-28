@@ -2,11 +2,13 @@ package ti4.commands.explore;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -102,7 +104,7 @@ public class DrawRelic extends GenericRelicAction {
                 game.drawSecretObjective(player.getUserID());
 
                 if (game.isFowMode()) {
-                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew An SO");
                 }
 
                 helpMessage.append("\nAn SO has been automatically drawn.");

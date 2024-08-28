@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,8 +84,40 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void olradinCommanderStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void mentakCommander(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String color = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(color);
+        if (p2 != null) {
+            List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
+            String message = p2.getRepresentation(true, true)
+                + " You've been hit by"
+                + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+                + " S'ula Mentarion, the Mentak commander. Please select the PN you would like to send.";
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                "Sent " + color + " the buttons for resolving S'ula Mentarion.");
+            ButtonHelper.deleteTheOneButton(event);
+        }
+
+    }
+
+    public static void arboCommanderBuild(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.replace("arboCommanderBuild_", "");
+        List<Button> buttons;
+        Tile tile = game.getTile(AliasHandler.resolveTile(planet));
+        if (tile == null) {
+            tile = game.getTileByPosition(planet);
+        }
+        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "arboCommander",
+            "placeOneNDone_dontskiparboCommander");
+        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
+            + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+
+    }
+
+    public static void olradinCommanderStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         int oldTg = player.getTg();
         int count = 0;
