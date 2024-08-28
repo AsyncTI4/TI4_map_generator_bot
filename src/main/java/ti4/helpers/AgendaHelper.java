@@ -1,17 +1,7 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +9,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -868,13 +859,13 @@ public class AgendaHelper {
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     game.getPing() + " Set all players' trade goods to " + finalTG + ".");
-                if (comrades.size() > 0 && AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
-                    TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
+                if (!comrades.isEmpty() && !AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).isEmpty() && !game.isFowMode()) {
+                    TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
                     for (Player playerB : comrades) {
-                        MessageHelper.sendMessageToChannel(watchPary,
+                        MessageHelper.sendMessageToChannel(watchParty,
                             "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
                     }
-                    MessageHelper.sendMessageToChannel(watchPary,
+                    MessageHelper.sendMessageToChannel(watchParty,
                         Emojis.tg.repeat(maxLoss));
                 }
             }
@@ -929,8 +920,7 @@ public class AgendaHelper {
         for (Player voter : voters) {
             if (voter.hasTech("dskyrog")) {
                 MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to Kyro green tech");
-                List<Button> buttons = new ArrayList<>();
-                buttons.addAll(Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
+                List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
                 MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), "Use buttons to drop 2 infantry on a planet", buttons);
             }
         }
@@ -963,7 +953,7 @@ public class AgendaHelper {
 
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Sent pings to all those who Rider'd.");
-        } else if (riders.size() > 0) {
+        } else if (!riders.isEmpty()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), ridSum);
         }
         String resMes = "Resolving vote for " + StringUtils.capitalize(winner) + ".";
@@ -983,7 +973,7 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
             if ("action_deck_2".equals(game.getAcDeckID()) && aCount > 2) {
-                String acd2Shenanigans = "This is the window for *Last Minute Deliberations* and *Data Archive*! " + game.getPing();
+                String acd2Shenanigans = getAcd2Shenanigans(game);
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), acd2Shenanigans);
             }
         } else {
@@ -993,6 +983,23 @@ public class AgendaHelper {
         }
 
         event.getMessage().delete().queue();
+    }
+
+    private static String getAcd2Shenanigans(Game game) {
+        boolean lmdDiscarded = game.isACInDiscard("Last Minute Deliberations");
+        boolean daDiscarded = game.isACInDiscard("Data Archive");
+        StringJoiner stringJoiner = new StringJoiner(" and ");
+        if (!lmdDiscarded)
+            stringJoiner.add("*Last Minute Deliberations*");
+        if (!daDiscarded)
+            stringJoiner.add("*Data Archive*");
+        String acd2Shenanigans;
+        if (stringJoiner.length() > 0) {
+            acd2Shenanigans = "This is the window for " + stringJoiner + "! " + game.getPing();
+        } else {
+            acd2Shenanigans = "*Last Minute Deliberations* and *Data Archive* are in the discard pile. Feel free to move forward.";
+        }
+        return acd2Shenanigans;
     }
 
     @Nullable
