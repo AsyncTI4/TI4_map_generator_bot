@@ -272,7 +272,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
             codedName = "Reveal Prototype";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "focusedResearch",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveResearch",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
@@ -296,7 +296,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             codedName = "Stolen Prototype";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "focusedResearch",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveResearch",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
@@ -707,7 +707,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
             codedName = "Focused Research";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "focusedResearch",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveResearch",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
