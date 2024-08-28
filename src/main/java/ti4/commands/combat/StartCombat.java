@@ -1048,7 +1048,7 @@ public class StartCombat extends CombatSubcommandData {
                 }
                 if (p2.hasUnit("vaden_mech")
                     && unitH.getUnitCount(UnitType.Mech, p2) > 0 && isGroundCombat && p2.getDebtTokenCount(p1.getColor()) > 0) {
-                    String finChecker = "FFCC_" + p1.getFaction() + "_";
+                    String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "resolveVadenMech_" + unitH.getName() + "_" + p1.getColor(),
                             "Vaden Mech Ability on " + nameOfHolder)

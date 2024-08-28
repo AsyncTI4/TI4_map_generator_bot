@@ -151,6 +151,7 @@ public class ButtonHelper {
             buttons.add(Button.primary("bestowTitleStep1_A Brilliant Tactician", "A Brilliant Tactician"));
             buttons.add(Button.primary("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
             buttons.add(Button.primary("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
+            buttons.add(Button.secondary("bestowTitleStep1_Observer", "Observer"));
 
             buttons.add(Button.danger("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
             buttons.add(Button.danger("bestowTitleStep1_You Made Me Mad", "You Made Me Mad"));
@@ -159,6 +160,7 @@ public class ButtonHelper {
             buttons.add(Button.danger("bestowTitleStep1_Space Risker", "Space Risker"));
             buttons.add(Button.danger("bestowTitleStep1_A Warlord", "A Warlord"));
             buttons.add(Button.danger("bestowTitleStep1_Traitor", "Traitor"));
+            buttons.add(Button.danger("bestowTitleStep1_Saltshaker", "Saltshaker"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tiles here", buttons);
@@ -4424,6 +4426,7 @@ public class ButtonHelper {
         return unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.WARFARE)) ||
             unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.CYBERNETIC)) ||
             unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.BIOTIC)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath("encryptionkey")) ||
             unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.PROPULSION));
     }
 
