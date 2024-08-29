@@ -707,7 +707,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
             codedName = "Focused Research";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveResearch",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "focusedResearch",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
