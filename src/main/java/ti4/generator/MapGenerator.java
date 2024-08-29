@@ -6457,7 +6457,7 @@ public class MapGenerator {
                         position = new Point(x2 + 30 * (mult - 1), y2);
                     }
                 }
-                if (fighterOrInfantry && position == null) {
+                if (unitKey.getUnitType() == UnitType.Infantry && position == null) {
                     UnitTokenPosition unitTokenPosition2 = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
                     if (unitTokenPosition2 == null) {
                         unitTokenPosition2 = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());

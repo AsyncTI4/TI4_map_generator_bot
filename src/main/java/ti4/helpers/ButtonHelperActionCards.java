@@ -1785,6 +1785,29 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    public static void focusedResearch(Game game, Player player, String buttonID,
+        ButtonInteractionEvent event) {
+        if (player.getTg() < 4) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "You did not have 4tgs and thus cannot resolve focused research");
+            return;
+        } else {
+            player.setTg(player.getTg() - 4);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " has spent 4tg (" + (player.getTg() + 4) + " ->" + player.getTg() + ") on focused research");
+        }
+        if (!player.hasAbility("propagation")) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentation(true, true) + " you may use the button to get your tech.",
+                List.of(Buttons.GET_A_TECH));
+        } else {
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
+                + ". Use buttons to gain CCs";
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static void repealLaw(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String numID = buttonID.split("_")[1];
         String name = "";
