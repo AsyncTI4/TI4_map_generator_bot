@@ -372,8 +372,8 @@
     "alias": "final_mission",
     "name": "Final Mission",
     "phase": "Action",
-    "window": "After your opponent makes a combat roll",
-    "text": "Destroy 1 of your damaged units to choose any number of that player's dice. That player rerolls those dice; on a result of 1 or 2, produce 1 additional hit against their units participating in this combat instead.",
+    "window": "After you and your opponent make combat rolls",
+    "text": "Destroy 1 of your damaged units to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
