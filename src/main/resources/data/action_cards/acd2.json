@@ -1039,7 +1039,7 @@
     "name": "Unexpected Strategy",
     "phase": "Any",
     "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
-    "text": "That command token is not spent and/or placed on the game board.",
+    "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
     "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
     "source": "action_deck_2"
   },

@@ -1695,7 +1695,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+                                                       String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tilePos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(tilePos);
@@ -1706,7 +1706,8 @@ public class ButtonHelperActionCards {
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
             for (int x = 0; x < amount; x++) {
-                Die d1 = new Die(6);
+                int threshold ="action_deck_2".equals(game.getAcDeckID()) ? 7 : 6;
+                Die d1 = new Die(threshold);
                 msg.append(d1.getResult()).append(", ");
                 if (d1.isSuccess()) {
                     hits++;
