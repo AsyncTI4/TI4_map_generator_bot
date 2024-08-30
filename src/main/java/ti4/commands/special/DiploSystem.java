@@ -10,7 +10,9 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class DiploSystem extends SpecialSubcommandData {
@@ -43,7 +45,7 @@ public class DiploSystem extends SpecialSubcommandData {
 
     public static boolean diploSystem(GenericInteractionCreateEvent event, Game game, Player player, String tileToResolve) {
         String tileID = AliasHandler.resolveTile(tileToResolve);
-        
+
         Tile tile = game.getTile(tileID);
         if (tile == null) {
             tile = game.getTileByPosition(tileID);
@@ -52,9 +54,9 @@ public class DiploSystem extends SpecialSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return false;
         }
-        
+
         for (Player player_ : game.getPlayers().values()) {
-            if (player_ != player && player_.isRealPlayer()) {
+            if (player_ != player && player_.isRealPlayer() && !player.getAllianceMembers().contains(player_.getFaction())) {
                 String color = player_.getColor();
                 if (Mapper.isValidColor(color)) {
                     AddCC.addCC(event, color, tile);
@@ -62,7 +64,7 @@ public class DiploSystem extends SpecialSubcommandData {
                 }
             }
         }
-      
+
         return true;
     }
 }

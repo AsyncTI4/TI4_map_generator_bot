@@ -169,7 +169,7 @@ public class HeroPlay extends LeaderAction {
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                        if (player.getPlanets().contains(uH.getName())
+                        if (player.getPlanetsAllianceMode().contains(uH.getName())
                             && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", game);
                             break;

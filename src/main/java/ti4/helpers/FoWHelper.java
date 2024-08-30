@@ -629,7 +629,7 @@ public class FoWHelper {
 	/** Check if the specified player should have vision on the system */
 	public static boolean playerIsInSystem(Game game, Tile tile, Player player) {
 		Set<String> unitHolderNames = tile.getUnitHolders().keySet();
-		List<String> playerPlanets = player.getPlanets();
+		List<String> playerPlanets = player.getPlanetsAllianceMode();
 		if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
 			return true;
 		} else if (tile.isMecatol() && player.hasTech("iihq")) {
