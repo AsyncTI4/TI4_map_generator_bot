@@ -384,19 +384,11 @@ public class Game extends GameProperties {
     }
 
     public boolean isACInDiscard(String name) {
-        boolean isInDiscard = false;
-        for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
-
-            if (Mapper.getActionCard(ac.getKey()) != null
-                && Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
-                return true;
-            } else {
-                if (Mapper.getActionCard(ac.getKey()) == null) {
-                    BotLogger.log(ac.getKey() + " is returning a null AC when sent to Mapper in game " + getName());
-                }
-            }
-        }
-        return isInDiscard;
+        return discardActionCards.keySet().stream()
+                .map(Mapper::getActionCard)
+                .anyMatch(ac ->
+                        ac.getName() != null &&
+                        ac.getName().toLowerCase().contains(name.toLowerCase()));
     }
 
     public String[] getListOfTilesPinged() {

@@ -1,14 +1,5 @@
 [
   {
-    "alias": "advantageous_position",
-    "name": "Advantageous Position",
-    "phase": "Action",
-    "window": "After another player makes a combat or unit ability roll against your units",
-    "text": "That player rerolls all of their dice.",
-    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "ancient_trade_routes",
     "name": "Ancient Trade Routes",
     "phase": "Action",
@@ -24,6 +15,15 @@
     "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
     "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
     "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "anomalous_conditions",
+    "name": "Anomalous Conditions",
+    "phase": "Action",
+    "window": "At the start of a round of combat",
+    "text": "Choose 1 unit type. Units of that type cannot make combat rolls during this combat round.",
+    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
     "source": "action_deck_2"
   },
   {
@@ -372,8 +372,8 @@
     "alias": "final_mission",
     "name": "Final Mission",
     "phase": "Action",
-    "window": "Before you assign hits to your units during a combat",
-    "text": "Destroy 1 of your damaged units that is participating in this combat to cancel 2 hits and produce 1 hit against your opponent's units.",
+    "window": "After you and your opponent make combat rolls",
+    "text": "Destroy 1 of your damaged units to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
