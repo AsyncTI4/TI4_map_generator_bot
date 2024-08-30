@@ -4398,7 +4398,7 @@ public class ButtonListener extends ListenerAdapter {
                         "No such Action Card ID found, please retry");
                     return;
                 }
-                String sb = "Player: " + player.getUserName() + " - " +
+                String sb = player.getRepresentation() + " - " +
                     "Discarded Action Card:" + "\n" +
                     Mapper.getActionCard(acID).getRepresentation() + "\n";
                 MessageChannel channel2 = game.getMainGameChannel();
