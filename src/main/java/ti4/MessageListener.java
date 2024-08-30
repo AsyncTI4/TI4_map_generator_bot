@@ -805,21 +805,22 @@ public class MessageListener extends ListenerAdapter {
                     MessageChannel pChannel = player.getPrivateChannel();
                     TextChannel pChan = (TextChannel) pChannel;
                     if (pChan != null) {
-                        String newMessage = player.getRepresentation(true, true) + " Someone said: " + messageText;
+                        String threadName = event.getChannel().getName();
+                        boolean combatParticipant = threadName.contains("-" + player.getColor() + "-");
+                        String newMessage = player.getRepresentation(true, combatParticipant) + " Someone said: " + messageText;
                         if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
                             String hits = StringUtils.substringAfter(messageText, "Total hits ");
                             String location = StringUtils.substringAfter(messageText, "rolls for ");
                             location = StringUtils.substringBefore(location, " Combat");
-                            newMessage = player.getRepresentation(true, true) + " Someone rolled dice for " + location
+                            newMessage = player.getRepresentation(true, combatParticipant) + " Someone rolled dice for " + location
                                 + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "" : "s");
                         }
                         if (!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()) {
-                            newMessage = player.getRepresentation(true, true) + " "
+                            newMessage = player.getRepresentation(true, combatParticipant) + " "
                                 + StringUtils.capitalize(player3.getColor()) + " said: " + messageText;
                         }
 
                         newMessage = newMessage.replace("Total hits", "");
-                        String threadName = event.getChannel().getName();
                         List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                         for (ThreadChannel threadChannel_ : threadChannels) {
                             if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {

@@ -161,9 +161,9 @@
         "category": "agenda",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: At the end of the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
+        "text1": "For: After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
         "text2": "Against: Each player that voted Against or abstained must remove 4 units from the gameboard, if possible.",
-        "mapText": "At the end of the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
+        "mapText": "After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
         "source": "ignis_aurora"
     },
     {
