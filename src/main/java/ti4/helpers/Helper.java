@@ -932,7 +932,7 @@ public class Helper {
                         case "PNs" -> {
                             switch (furtherDetail) {
                                 case "generic" -> {
-                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, receiver);
+                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, receiver, sender);
                                     String message = sender.getRepresentation(true, true)
                                         + "Please select the promissory note you would like to send.";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
