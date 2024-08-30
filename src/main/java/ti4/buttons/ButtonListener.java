@@ -698,7 +698,7 @@ public class ButtonListener extends ListenerAdapter {
                     "In Red Tape, no objective is revealed at this stage");
                 int playersWithSCs = 0;
                 for (Player player2 : game.getRealPlayers()) {
-                    if (player2.getSCs() != null && player2.getSCs().size() > 0 && !player2.getSCs().contains(0)) {
+                    if (player2.getSCs() != null && !player2.getSCs().isEmpty() && !player2.getSCs().contains(0)) {
                         playersWithSCs++;
                     }
                 }
@@ -4194,7 +4194,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "miningInitiative" -> ButtonHelperActionCards.miningInitiative(player, game, event);
-                case "forwardSupplyBase" -> ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, game, event, buttonID);
+                case "forwardSupplyBase" -> ButtonHelperActionCards.resolveForwardSupplyBaseStep1(player, game, event);
                 case "economicInitiative" -> ButtonHelperActionCards.economicInitiative(player, game, event);
                 case "breakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveBreakthrough(player, game, event);
                 case "sideProject" -> ButtonHelperActionCardsWillHomebrew.resolveSideProject(player, game, event);
@@ -4215,7 +4215,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveResearch" -> ButtonHelperActionCards.resolveResearch(game, player, buttonID, event);
                 case "focusedResearch" -> ButtonHelperActionCards.focusedResearch(game, player, buttonID, event);
                 case "lizhoHeroFighterResolution" -> ButtonHelperHeroes.lizhoHeroFighterDistribution(player, game, event);
-                case "resolveReparationsStep1" -> ButtonHelperActionCards.resolveReparationsStep1(player, game, event, buttonID);
+                case "resolveReparationsStep1" -> ButtonHelperActionCards.resolveReparationsStep1(player, game, event);
                 case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
                 case "resolveDiplomaticPressureStep1" -> ButtonHelperActionCards.resolveDiplomaticPressureStep1(player, game, event, buttonID);
                 case "resolveImpersonation" -> ButtonHelperActionCards.resolveImpersonation(player, game, event, buttonID);
