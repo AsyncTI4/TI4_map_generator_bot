@@ -326,7 +326,7 @@ public class StartCombat extends CombatSubcommandData {
                 }
             }
             if (autoButtons.size() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm.", autoButtons);
+                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm. Note that PDS fire and BOMBARDMENT are NOT part of combat and will not be automated.", autoButtons);
             }
         }
         // DS Lanefir ATS Armaments

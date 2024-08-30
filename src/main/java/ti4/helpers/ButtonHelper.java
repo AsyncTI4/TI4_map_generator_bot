@@ -564,7 +564,7 @@ public class ButtonHelper {
 
     public static Set<String> getTypesOfPlanetPlayerHas(Game game, Player player) {
         Set<String> types = new HashSet<>();
-        for (String planet : player.getPlanets()) {
+        for (String planet : player.getPlanetsAllianceMode()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
             if (unitHolder == null)
                 continue;
@@ -2081,9 +2081,13 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int getNumberOfXTypePlanets(Player player, Game game, String type) {
+    public static int getNumberOfXTypePlanets(Player player, Game game, String type, boolean alliance) {
         int count = 0;
-        for (String planet : player.getPlanetsAllianceMode()) {
+        List<String> planets = player.getPlanetsAllianceMode();
+        if (!alliance) {
+            planets = player.getPlanets();
+        }
+        for (String planet : planets) {
             Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getPlanetTypes().contains(type)) {
                 count++;
@@ -2442,16 +2446,16 @@ public class ButtonHelper {
                 }
             }
             case "olradin" -> {
-                if (getNumberOfXTypePlanets(player, game, "industrial") > 0
-                    && getNumberOfXTypePlanets(player, game, "cultural") > 0
-                    && getNumberOfXTypePlanets(player, game, "hazardous") > 0) {
+                if (getNumberOfXTypePlanets(player, game, "industrial", true) > 0
+                    && getNumberOfXTypePlanets(player, game, "cultural", true) > 0
+                    && getNumberOfXTypePlanets(player, game, "hazardous", true) > 0) {
                     shouldBeUnlocked = true;
                 }
             }
             case "vaylerian" -> {
-                if (getNumberOfXTypePlanets(player, game, "industrial") > 2
-                    || getNumberOfXTypePlanets(player, game, "cultural") > 2
-                    || getNumberOfXTypePlanets(player, game, "hazardous") > 2) {
+                if (getNumberOfXTypePlanets(player, game, "industrial", true) > 2
+                    || getNumberOfXTypePlanets(player, game, "cultural", true) > 2
+                    || getNumberOfXTypePlanets(player, game, "hazardous", true) > 2) {
                     shouldBeUnlocked = true;
                 }
             }
@@ -9673,7 +9677,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (sc) {
             game.setComponentAction(false);
-            boolean used = ButtonListener.addUsedSCPlayer(messageID, game, player, event, "");
+            boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player, event, "");
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
             if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology")
                 && !player.getFollowedSCs().contains(scModel.getInitiative())) {
@@ -9683,7 +9687,7 @@ public class ButtonHelper {
                 if (player.getStrategicCC() > 0) {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Tech");
                 }
-                String message = ButtonListener.deductCC(player, event);
+                String message = ButtonHelperSCs.deductCC(player, event);
                 addReaction(event, false, false, message, "");
             }
         } else {
@@ -10113,7 +10117,7 @@ public class ButtonHelper {
 
     public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanets()) {
+        for (String planet : player.getPlanetsAllianceMode()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
             Planet planetReal = unitHolder;
             if (planetReal == null)
