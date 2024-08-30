@@ -1062,18 +1062,18 @@ public class AgendaHelper {
     }
 
     private static String getAcd2Shenanigans(Game game) {
-        boolean lmdDiscarded = game.isACInDiscard("Last Minute Deliberations");
+        boolean lmdDiscarded = game.isACInDiscard("Last Minute Deliberation");
         boolean daDiscarded = game.isACInDiscard("Data Archive");
         StringJoiner stringJoiner = new StringJoiner(" and ");
         if (!lmdDiscarded)
-            stringJoiner.add("*Last Minute Deliberations*");
+            stringJoiner.add("*Last Minute Deliberation*");
         if (!daDiscarded)
             stringJoiner.add("*Data Archive*");
         String acd2Shenanigans;
         if (stringJoiner.length() > 0) {
             acd2Shenanigans = "This is the window for " + stringJoiner + "! " + game.getPing();
         } else {
-            acd2Shenanigans = "*Last Minute Deliberations* and *Data Archive* are in the discard pile. Feel free to move forward.";
+            acd2Shenanigans = "*Last Minute Deliberation* and *Data Archive* are in the discard pile. Feel free to move forward.";
         }
         return acd2Shenanigans;
     }

@@ -807,6 +807,15 @@
         "window": "When you would perform the primary ability of your strategy card",
         "text": "Perform the secondary ability of that strategy card and 1 other instead; do not spend or place command tokens to resolve these abilities.",
         "flavorText": "\"We will win this war, Rickar, based on how we adapt to it,\" Claire said sternly. \"Humanity has honed its differences into strength. Your people must do the same.\"",
-        "source": "action_deck_2"
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "advantageous_position",
+        "name": "Advantageous Position",
+        "phase": "Action",
+        "window": "After another player makes a combat or unit ability roll against your units",
+        "text": "That player rerolls all of their dice.",
+        "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
+        "source": "action_deck_2_old"
     }
 ]
