@@ -1750,7 +1750,7 @@ public class AgendaHelper {
 
         }
 
-        event.getChannel().sendMessage(voteMessage).queue();
+        player.getCorrectChannel().sendMessage(voteMessage).queue();
         // event.getMessage().delete().queue();
     }
 
