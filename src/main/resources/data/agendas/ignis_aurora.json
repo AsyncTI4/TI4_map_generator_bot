@@ -162,7 +162,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
-        "text2": "Against: Each player that voted Against or abstained must remove 4 units from the gameboard, if possible.",
+        "text2": "Against: Each player that did not predict or cast at least 1 vote For must remove 4 units from the gameboard, if possible.",
         "mapText": "After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
         "source": "ignis_aurora"
     },
@@ -330,7 +330,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
-        "text2": "Against: Each player that voted Against or abstained removes a command token from their player sheet. Each player that voted For gains a command token.",
+        "text2": "Against: Each player that did not predict or cast at least 1 vote For must remove a command token from their player sheet. Each player that voted For may gain a command token.",
         "mapText": "Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
         "source": "ignis_aurora"
     },
