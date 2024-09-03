@@ -1951,7 +1951,7 @@ public class ButtonHelperActionCards {
 
     public static void industrialInitiative(Player player, Game game, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
-        int count = ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial");
+        int count = ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", true);
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");

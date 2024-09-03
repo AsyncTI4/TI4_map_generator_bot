@@ -356,7 +356,7 @@ public class TurnEnd extends PlayerSubcommandData {
             }
 
             if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {
-                for (String pl : player.getPlanets()) {
+                for (String pl : player.getPlanetsAllianceMode()) {
                     Tile tile = game.getTile(AliasHandler.resolveTile(pl));
                     if (tile == null) {
                         continue;

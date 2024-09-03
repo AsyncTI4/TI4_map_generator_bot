@@ -603,7 +603,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
 
         if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
-            && player.getPlanets().contains(planetID)) {
+            && player.getPlanetsAllianceMode().contains(planetID)) {
             Button placeSleeper = Button.success("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID)
                 .withEmoji(Emoji.fromFormatted(Emojis.Sleeper));
             Button decline = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
