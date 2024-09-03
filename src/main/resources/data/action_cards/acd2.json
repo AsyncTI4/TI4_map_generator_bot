@@ -94,7 +94,7 @@
     "name": "Boarding Party",
     "phase": "Action",
     "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
-    "text": "Place 1 ship of that type from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+    "text": "Place 1 matching ship from your reinforcements in the active system. That ship becomes damaged. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
     "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
     "source": "action_deck_2"
   },
@@ -1039,7 +1039,7 @@
     "name": "Unexpected Strategy",
     "phase": "Any",
     "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
-    "text": "That command token is not spent and/or placed on the game board.",
+    "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
     "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
     "source": "action_deck_2"
   },
