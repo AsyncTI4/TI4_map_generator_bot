@@ -504,7 +504,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: A player must give the Letnev player 1 trade good or commodity before moving ships into a system that contains or is adjacent to a system that contains a Letnev unit with bombardment",
-        "text2": "Against: Each ship with sustain damage that belongs to a player that did not cast at least 1 vote forr becomes damaged.",
+        "text2": "Against: Each ship with sustain damage that belongs to a player that did not cast at least 1 vote For becomes damaged.",
         "mapText": "You must give the Letnev player 1 trade good or commodity before moving ships into or adjacent to a system containing a Letnev unit with bombardment",
         "source": "ignis_aurora"
     },
@@ -598,7 +598,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: The Mahact player may add 1 command token to their player sheet from a faction whose token is not already on the sheet.",
-        "text2": "Against: Each player  that did not cast at least 1 vote For must give the Mahact player a random action card, if able.",
+        "text2": "Against: Each player that did not cast at least 1 vote For must give the Mahact player a random action card, if able.",
         "source": "ignis_aurora"
     },
     {
