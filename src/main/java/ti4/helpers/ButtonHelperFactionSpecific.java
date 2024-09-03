@@ -43,6 +43,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
@@ -314,7 +315,20 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 
-    public static void handleTitansConstructionMechDeployStep1(Game game, Player player) {
+    public static void handleTitansConstructionMechDeployStep1(Game game, Player player, ButtonInteractionEvent event, String messageID) {
+        boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player, event, "");
+        StrategyCardModel scModel = game.getStrategyCardModelByName("construction").orElse(null);
+        boolean construction = scModel != null && scModel.usesAutomationForSCID("pok4construction");
+        if (!used && scModel != null && construction && !player.getFollowedSCs().contains(scModel.getInitiative())
+            && game.getPlayedSCs().contains(scModel.getInitiative())) {
+            player.addFollowedSC(scModel.getInitiative(), event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
+            if (player.getStrategicCC() > 0) {
+                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
+            }
+            String message = ButtonHelperSCs.deductCC(player, event);
+            ButtonHelper.addReaction(event, false, false, message, "");
+        }
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),

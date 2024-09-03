@@ -74,7 +74,7 @@ public class Eliminate extends AddRemovePlayer {
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
             if (player != null && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
-                if (player.getPlanets().size() > 0) {
+                if (player.getPlanetsAllianceMode().size() > 0) {
                     Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
                     String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
                     if (bothelperRole != null) {

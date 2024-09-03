@@ -484,9 +484,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return counter;
             }
             case "corner", "unify_colonies" -> {
-                int max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial"),
-                    ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural"));
-                max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous"), max);
+                int max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false),
+                    ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false));
+                max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false), max);
                 return max;
             }
             case "develop", "revolutionize" -> {
@@ -772,7 +772,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 }
             }
             case "mrm" -> {
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous"); //4 hazardous
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false); //4 hazardous
             }
             case "mlp" -> {//4 techs of a color
                 int maxNum = 0;
@@ -783,7 +783,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return maxNum;
             }
             case "mp" -> {
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial"); // 4 industrial
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false); // 4 industrial
             }
             case "lsc" -> {
                 int count = 0;
@@ -868,7 +868,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds"); // 4 PDS
             }
             case "faa" -> { // 4 cultural
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural");
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false);
             }
             case "fc" -> {
                 return player.getNeighbourCount(); // neighbors
