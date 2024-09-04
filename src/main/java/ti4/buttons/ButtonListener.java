@@ -3769,7 +3769,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "announceARetreat" -> {
-                    String msg = ident + " announces a retreat";
+                    String msg = "# " + ident + " announces a retreat";
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
                         msg = msg
                             + ". Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";

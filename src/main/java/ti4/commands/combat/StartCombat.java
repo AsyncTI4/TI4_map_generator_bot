@@ -312,6 +312,9 @@ public class StartCombat extends CombatSubcommandData {
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (!uH.getName().equalsIgnoreCase(unitHolderName)) {
+                    continue;
+                }
                 List<Player> playersWithGF = new ArrayList<>();
                 for (Player player : game.getRealPlayersNDummies()) {
                     if (ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(uH, player)) {
@@ -334,7 +337,7 @@ public class StartCombat extends CombatSubcommandData {
         }
     }
 
-    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, 
+    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile,
         GenericInteractionCreateEvent event) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),

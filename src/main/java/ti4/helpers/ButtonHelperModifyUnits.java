@@ -816,7 +816,7 @@ public class ButtonHelperModifyUnits {
         List<String> checked = new ArrayList<>();
         for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false)) {
             Tile tile = game.getTileByPosition(pos2);
-            if (pos1.equalsIgnoreCase(pos2) || checked.contains(pos2) || (!Mapper.getFrontierTileIds().contains(tile.getTileID()) && tile.getPlanetUnitHolders().size() == 0)) {
+            if (pos1.equalsIgnoreCase(pos2) || checked.contains(pos2) || (!Mapper.getFrontierTileIds().contains(tile.getTileID()) && tile.getPlanetUnitHolders().size() == 0 && tile.getUnitHolders().size() != 2)) {
                 continue;
             }
             if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) || (tile.isSupernova() && !player.getTechs().contains("mr"))) {

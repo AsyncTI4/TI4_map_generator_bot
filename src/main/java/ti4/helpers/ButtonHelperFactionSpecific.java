@@ -70,6 +70,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " is paying TGs to boost their non-fighter ships.");
         List<Button> buttons = new ArrayList<>();
+        player.resetSpentThings();
         String whatIsItFor = "both";
         if (player.getTg() > 0) {
             Button lost1TG = Button.danger("reduceTG_1_" + whatIsItFor, "Spend 1TG");
@@ -1952,6 +1953,7 @@ public class ButtonHelperFactionSpecific {
             "# " + player2.getRepresentation(true, true) + " Lost " + acID + " to a players ability");
         ACInfo.sendActionCardInfo(game, player2);
         ACInfo.sendActionCardInfo(game, player);
+        ButtonHelper.checkACLimit(game, event, player);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
         }
