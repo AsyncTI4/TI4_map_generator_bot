@@ -5438,7 +5438,7 @@ public class ButtonHelper {
                                     + "), probably used gravity drive)");
                             } else {
                                 messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue
-                                    + "), did not have gravity drive)");
+                                    + "), **did not have gravity drive**)");
                             }
                             if (player.getTechs().contains("dsgledb")) {
                                 messageBuilder.append("(did have lightning drives for +1 if not transporting)");
@@ -8779,6 +8779,7 @@ public class ButtonHelper {
                 }
                 p1.removeActionCard(acNum);
                 p2.setActionCard(acID);
+                ButtonHelper.checkACLimit(game, event, p2);
                 ACInfo.sendActionCardInfo(game, p2);
                 ACInfo.sendActionCardInfo(game, p1);
                 if (!p1.hasAbility("arbiters") && !p2.hasAbility("arbiters")) {

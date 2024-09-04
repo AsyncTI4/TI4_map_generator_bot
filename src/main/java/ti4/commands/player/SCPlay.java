@@ -213,6 +213,11 @@ public class SCPlay extends PlayerSubcommandData {
                         if (reactionEmoji2 != null) {
                             message_.addReaction(reactionEmoji2).queue();
                             p2.addFollowedSC(scToPlay, event);
+                            if (scToPlay == 8) {
+                                String key = "factionsThatAreNotDiscardingSOs";
+                                game.setStoredValue(key,
+                                    game.getStoredValue(key) + player.getFaction() + "*");
+                            }
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot believes you can't follow");
                         }
                     }
