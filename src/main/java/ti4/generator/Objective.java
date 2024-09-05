@@ -2,7 +2,6 @@ package ti4.generator;
 
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.model.PublicObjectiveModel;
 
 import java.util.*;
 import java.util.List;
@@ -12,7 +11,8 @@ public record Objective(
 	String key,
 	ti4.generator.Objective.Type type,
 	Integer index, Boolean revealed,
-	List<String> scoredPlayerIDs) {
+	List<String> scoredPlayerIDs,
+	List<String> peekPlayerIDs) {
 
 	public enum Type {Stage1, Stage2, Custom}
 
@@ -79,7 +79,7 @@ public record Objective(
 	private static void appendRevealedObjectives(Game game, List<Objective> objectives, Type type) {
 		Integer index = 1;
 		for (String key : getObjectiveList(game, type)) {
-			objectives.add(new Objective(key, type, index, Boolean.TRUE, getScoredPlayerIDs(game, key)));
+			objectives.add(new Objective(key, type, index, Boolean.TRUE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
 			index++;
 		}
 	}
@@ -95,12 +95,22 @@ public record Objective(
 		}
 
 		for (String key : inputList) {
-			objectives.add(new Objective(key, type, index, Boolean.FALSE, getScoredPlayerIDs(game, key)));
+			objectives.add(new Objective(key, type, index, Boolean.FALSE, getScoredPlayerIDs(game, key), getPeekPlayerIDs(game, key)));
 			index++;
 		}
 	}
 
 	private static List<String> getScoredPlayerIDs(Game game, String objectiveKey) {
-		return new LinkedHashMap<>(game.getScoredPublicObjectives()).get(objectiveKey);
+		return game.getScoredPublicObjectives().getOrDefault(objectiveKey, Collections.emptyList());
+	}
+
+	private static List<String> getPeekPlayerIDs(Game game, String objectiveKey) {
+		if (game.getPublicObjectives1Peeked().containsKey(objectiveKey)) {
+			return new LinkedHashMap<>(game.getPublicObjectives1Peeked()).get(objectiveKey);
+		} else if (game.getPublicObjectives2Peeked().containsKey(objectiveKey)) {
+			return new LinkedHashMap<>(game.getPublicObjectives2Peeked()).get(objectiveKey);
+		} else {
+			return new ArrayList<>();
+		}
 	}
 }

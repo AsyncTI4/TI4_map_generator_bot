@@ -73,11 +73,16 @@ public class ObjectiveBox {
 	}
 
 	private void displayScoreMarkers(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
-		if (objective.scoredPlayerIDs() == null) {
+		List<String> playerIDs;
+		if (objective.revealed() && objective.scoredPlayerIDs() != null) {
+			playerIDs = objective.scoredPlayerIDs();
+		} else if (objective.peekPlayerIDs() != null) {
+			playerIDs = objective.peekPlayerIDs();
+		} else {
 			return;
 		}
 		try {
-			for (String playerID: objective.scoredPlayerIDs()) {
+			for (String playerID: playerIDs) {
 				Player player = game.getPlayer(playerID);
 				boolean convertToGeneric = generator.shouldConvertToGeneric(player);
 				String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
@@ -89,7 +94,7 @@ public class ObjectiveBox {
 				BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
 
 				if (objective.IsMultiScoring(game)) {
-					int frequency = Collections.frequency(objective.scoredPlayerIDs(), playerID);
+					int frequency = Collections.frequency(playerIDs, playerID);
 					for (int i = 0; i < frequency; i++) {
 						MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
 						x += scoreTokenWidth;
