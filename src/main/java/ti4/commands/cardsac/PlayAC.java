@@ -261,18 +261,18 @@ public class PlayAC extends ACCardsSubcommandData {
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("autoresolve_manual",
                     "Resolve " + codedName));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                sendResolveMsgToMainChannel(codedMessage + codedName, codedButtons, player, game);
             }
             codedName = "Confusing Legal Text";
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(Button.success("autoresolve_manual",
                     "Resolve " + codedName));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+                sendResolveMsgToMainChannel(codedMessage + codedName, codedButtons, player, game);
             }
 
             codedName = "Reveal Prototype";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "focusedResearch",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveResearch",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
@@ -296,7 +296,7 @@ public class PlayAC extends ACCardsSubcommandData {
             }
             codedName = "Stolen Prototype";
             if (actionCardTitle.contains(codedName)) {
-                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "focusedResearch",
+                codedButtons.add(Button.success(player.getFinsFactionCheckerPrefix() + "resolveResearch",
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
@@ -730,8 +730,7 @@ public class PlayAC extends ACCardsSubcommandData {
             if (actionCardTitle.contains(codedName)) {
                 codedButtons.add(
                     Button.primary(player.getFinsFactionCheckerPrefix() + "resolveVeto", "Reveal next Agenda"));
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), codedMessage + codedName,
-                    codedButtons);
+                sendResolveMsgToMainChannel(codedMessage + codedName, codedButtons, player, game);
             }
 
             codedName = "Fighter Conscription";
@@ -839,4 +838,11 @@ public class PlayAC extends ACCardsSubcommandData {
         ACInfo.sendActionCardInfo(game, player);
         return null;
     }
+
+    private static void sendResolveMsgToMainChannel(String message, List<Button> buttons, Player player, Game game) {
+      if (game.isFowMode()) {
+          message = message.replace(player.getRepresentation(), "");
+      }
+      MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+  }
 }

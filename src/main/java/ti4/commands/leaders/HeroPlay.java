@@ -6,6 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -51,12 +52,15 @@ public class HeroPlay extends LeaderAction {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        action(event, "hero", game, player);
+        
+        String leader = event.getOption(Constants.LEADER, "hero", OptionMapping::getAsString);
+        action(event, leader, game, player);
     }
 
     @Override
@@ -165,7 +169,7 @@ public class HeroPlay extends LeaderAction {
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                        if (player.getPlanets().contains(uH.getName())
+                        if (player.getPlanetsAllianceMode().contains(uH.getName())
                             && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", game);
                             break;

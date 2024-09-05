@@ -167,8 +167,7 @@ public class StartCombat extends CombatSubcommandData {
                 if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
                     continue;
                 }
-                findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
-                    threadName, tile, event, "space", "space");
+                createSpectatorThread(game, player3, threadName, tile, event);
             }
         }
     }
@@ -207,8 +206,7 @@ public class StartCombat extends CombatSubcommandData {
                 if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
                     continue;
                 }
-                StartCombat.findOrCreateCombatThread(game, player3.getPrivateChannel(), player3, player3,
-                    threadName, tile, event, "ground", unitHolder.getName());
+                createSpectatorThread(game, player3, threadName, tile, event);
             }
         }
     }
@@ -314,6 +312,9 @@ public class StartCombat extends CombatSubcommandData {
         if (isGroundCombat && !game.isFowMode()) {
             List<Button> autoButtons = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                if (!uH.getName().equalsIgnoreCase(unitHolderName)) {
+                    continue;
+                }
                 List<Player> playersWithGF = new ArrayList<>();
                 for (Player player : game.getRealPlayersNDummies()) {
                     if (ButtonHelperModifyUnits.doesPlayerHaveGfOnPlanet(uH, player)) {
@@ -326,7 +327,7 @@ public class StartCombat extends CombatSubcommandData {
                 }
             }
             if (autoButtons.size() > 0) {
-                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm.", autoButtons);
+                MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm. Note that PDS fire and BOMBARDMENT are NOT part of combat and will not be automated.", autoButtons);
             }
         }
         // DS Lanefir ATS Armaments
@@ -334,6 +335,28 @@ public class StartCombat extends CombatSubcommandData {
             List<Button> lanefirATSButtons = ButtonHelperFactionSpecific.getLanefirATSButtons(player1, player2);
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from ATS Armaments:", lanefirATSButtons);
         }
+    }
+
+    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile,
+        GenericInteractionCreateEvent event) {
+        Helper.checkThreadLimitAndArchive(event.getGuild());
+        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),
+            event, player);
+
+        MessageChannel channel = player.getPrivateChannel();
+        channel.sendMessage("Spectate Combat in this thread:").queue(m -> {
+            ThreadChannelAction threadChannel = ((TextChannel) channel).createThreadChannel(threadName, m.getId());
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+            threadChannel.queue(tc -> {
+                StringBuilder message = new StringBuilder();
+                message.append(player.getRepresentation(true, true));
+                message.append(" Please spectate the interaction here.\n");
+                message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
+                message.append("\nImage of System:");
+                MessageHelper.sendMessageWithFile(tc, systemWithContext, message.toString(), false);
+                sendGeneralCombatButtonsToThread(tc, game, player, player, tile, "justPicture", event);
+            });
+        });
     }
 
     public static void sendSpaceCannonButtonsToThread(MessageChannel threadChannel, Game game,
@@ -1048,7 +1071,7 @@ public class StartCombat extends CombatSubcommandData {
                 }
                 if (p2.hasUnit("vaden_mech")
                     && unitH.getUnitCount(UnitType.Mech, p2) > 0 && isGroundCombat && p2.getDebtTokenCount(p1.getColor()) > 0) {
-                    String finChecker = "FFCC_" + p1.getFaction() + "_";
+                    String finChecker = "FFCC_" + p2.getFaction() + "_";
                     buttons.add(Button
                         .secondary(finChecker + "resolveVadenMech_" + unitH.getName() + "_" + p1.getColor(),
                             "Vaden Mech Ability on " + nameOfHolder)

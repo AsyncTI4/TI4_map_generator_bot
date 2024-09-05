@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.franken.LeaderAdd;
@@ -39,6 +40,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 import ti4.model.PublicObjectiveModel;
@@ -88,7 +90,7 @@ public class ButtonHelperHeroes {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                     continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                if (unitModel == null)
+                if (unitModel == null || unitModel.getIsStructure())
                     continue;
                 UnitKey unitKey = unitEntry.getKey();
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
@@ -1924,6 +1926,19 @@ public class ButtonHelperHeroes {
         }
     }
 
+    public static void yssarilHeroRejection(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
+        Player notYssaril = game.getPlayerFromColorOrFaction(playerFaction);
+        if (notYssaril != null) {
+            String message = notYssaril.getRepresentation(true, true)
+                + " Kyver, Blade and Key, the Yssaril hero, has rejected your offering and is forcing you to discard 3 random ACs. The ACs have been automatically discarded.";
+            MessageHelper.sendMessageToChannel(notYssaril.getCardsInfoThread(), message);
+            new DiscardACRandom().discardRandomAC(event, game, notYssaril, 3);
+            ButtonHelper.deleteMessage(event);
+        }
+
+    }
+
     public static void resolveMykoHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String hero = buttonID.split("_")[1];
         HeroPlay.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
@@ -2004,6 +2019,46 @@ public class ButtonHelperHeroes {
         scButtons.add(Button.danger("deleteButtons", "Done resolving"));
 
         return scButtons;
+    }
+
+    public static void yssarilHeroInitialOffering(Game game, Player player, ButtonInteractionEvent event,
+        String buttonID, String buttonLabel) {
+
+        List<Button> acButtons = new ArrayList<>();
+        buttonID = buttonID.replace("yssarilHeroInitialOffering_", "");
+        String acID = buttonID.split("_")[0];
+        String yssarilFaction = buttonID.split("_")[1];
+        Player yssaril = game.getPlayerFromColorOrFaction(yssarilFaction);
+        if (yssaril != null) {
+            String offerName = player.getFaction();
+            if (game.isFowMode()) {
+                offerName = player.getColor();
+            }
+            ButtonHelper.deleteMessage(event);
+            acButtons.add(Button.success("takeAC_" + acID + "_" + player.getFaction(), buttonLabel)
+                .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+            acButtons.add(Button.danger("yssarilHeroRejection_" + player.getFaction(),
+                "Reject " + buttonLabel + " and force them to discard of 3 random ACs"));
+            String message = yssaril.getRepresentation(true, true) + " " + offerName
+                + " has offered you the action card " + buttonLabel
+                + " for Kyver, Blade and Key, the Yssaril hero. Use buttons to accept or reject it";
+            MessageHelper.sendMessageToChannelWithButtons(yssaril.getCardsInfoThread(), message, acButtons);
+            String acStringID = "";
+            for (String acStrId : player.getActionCards().keySet()) {
+                if ((player.getActionCards().get(acStrId) + "").equalsIgnoreCase(acID)) {
+                    acStringID = acStrId;
+                }
+            }
+
+            ActionCardModel ac = Mapper.getActionCard(acStringID);
+            if (ac != null) {
+                MessageHelper.sendMessageToChannelWithEmbed(
+                    yssaril.getCardsInfoThread(), "For your reference, the text of the AC offered reads as",
+                    ac.getRepresentationEmbed());
+
+            }
+
+        }
     }
 
     public static void resolveGhostHeroStep2(Game game, Player player, ButtonInteractionEvent event,

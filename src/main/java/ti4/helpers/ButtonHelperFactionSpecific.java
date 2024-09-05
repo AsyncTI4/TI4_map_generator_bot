@@ -43,6 +43,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperFactionSpecific {
@@ -69,6 +70,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " is paying TGs to boost their non-fighter ships.");
         List<Button> buttons = new ArrayList<>();
+        player.resetSpentThings();
         String whatIsItFor = "both";
         if (player.getTg() > 0) {
             Button lost1TG = Button.danger("reduceTG_1_" + whatIsItFor, "Spend 1TG");
@@ -314,7 +316,20 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 
-    public static void handleTitansConstructionMechDeployStep1(Game game, Player player) {
+    public static void handleTitansConstructionMechDeployStep1(Game game, Player player, ButtonInteractionEvent event, String messageID) {
+        boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player, event, "");
+        StrategyCardModel scModel = game.getStrategyCardModelByName("construction").orElse(null);
+        boolean construction = scModel != null && scModel.usesAutomationForSCID("pok4construction");
+        if (!used && scModel != null && construction && !player.getFollowedSCs().contains(scModel.getInitiative())
+            && game.getPlayedSCs().contains(scModel.getInitiative())) {
+            player.addFollowedSC(scModel.getInitiative(), event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
+            if (player.getStrategicCC() > 0) {
+                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
+            }
+            String message = ButtonHelperSCs.deductCC(player, event);
+            ButtonHelper.addReaction(event, false, false, message, "");
+        }
         List<Button> buttons = new ArrayList<>();
         if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 3) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
@@ -328,6 +343,51 @@ public class ButtonHelperFactionSpecific {
         String msg = player.getRepresentation(true, true)
             + " select the planet that you wish to drop 1 mech and 1 infantry on";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void mahactStealCC(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String color = buttonID.replace("mahactStealCC_", "");
+        String ident = player.getRepresentation(true, false);
+        if (!player.getMahactCC().contains(color)) {
+            player.addMahactCC(color);
+            Helper.isCCCountCorrect(event, game, color);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                ident + " added a " + color + " CC to their fleet pool");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                ident + " already had a " + color + " CC in their fleet pool");
+        }
+        if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
+            ButtonHelper.commanderUnlockCheck(player, game, "mahact", event);
+        }
+        if (ButtonHelper.isLawInPlay(game, "regulations")
+            && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                + " reminder that there is Fleet Regulations in place, which is limiting fleet pool to 4");
+        }
+        ButtonHelper.deleteTheOneButton(event);
+
+    }
+
+    public static void nekroStealTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String trueIdentity = player.getRepresentation();
+        String faction = buttonID.replace("nekroStealTech_", "");
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 != null) {
+            List<String> potentialTech = new ArrayList<>();
+            game.setComponentAction(true);
+            potentialTech = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech, game);
+            List<Button> buttons = ButtonHelperAbilities.getButtonsForPossibleTechForNekro(player, potentialTech, game);
+            if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
+            } else if (buttons.size() > 0 && p2 != null) {
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), trueIdentity + " get enemy tech using the buttons", buttons);
+            } else {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), trueIdentity + " there are no techs available to gain.");
+            }
+            ButtonHelper.deleteTheOneButton(event);
+        }
+
     }
 
     public static void handleTitansConstructionMechDeployStep2(Game game, Player player,
@@ -684,7 +744,6 @@ public class ButtonHelperFactionSpecific {
 
     public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
-        ButtonHelper.deleteTheOneButton(event);
         String planet = buttonID.split("_")[1];
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
             "1 mech " + planet, game);
@@ -1178,8 +1237,8 @@ public class ButtonHelperFactionSpecific {
     public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game,
         Player player,
         String ident) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), game.getPing()
-            + " the Maximus (the Dih-Mohn flagship) is producing units. They may produce up to 2 units with a combined cost of 4.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation()
+            + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4.");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff
@@ -1894,6 +1953,7 @@ public class ButtonHelperFactionSpecific {
             "# " + player2.getRepresentation(true, true) + " Lost " + acID + " to a players ability");
         ACInfo.sendActionCardInfo(game, player2);
         ACInfo.sendActionCardInfo(game, player);
+        ButtonHelper.checkACLimit(game, event, player);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
         }
@@ -2005,8 +2065,8 @@ public class ButtonHelperFactionSpecific {
         String tokenName = "creuss" + type;
         Tile tile = game.getTileByPosition(tilePos);
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        String msg =  player.getRepresentation() + " moved " + Emojis.getEmojiFromDiscord(tokenName)
-             + " " + type + " wormhole to " + tile.getRepresentationForButtons(game, player);
+        String msg = player.getRepresentation() + " moved " + Emojis.getEmojiFromDiscord(tokenName)
+            + " " + type + " wormhole to " + tile.getRepresentationForButtons(game, player);
         for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 msg += " (from " + tile_.getRepresentationForButtons(game, player) + ")";

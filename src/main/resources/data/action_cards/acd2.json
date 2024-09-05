@@ -1,14 +1,5 @@
 [
   {
-    "alias": "advantageous_position",
-    "name": "Advantageous Position",
-    "phase": "Action",
-    "window": "At the start of a round of combat",
-    "text": "Your opponent cannot make combat rolls for more units than you during this combat round.",
-    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift’s horizon. His crew clung to their stations, eyes wide, sweat pooling on brows, as the enemy's firepower vanished into the void like pebbles dropped into an endless well.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "ancient_trade_routes",
     "name": "Ancient Trade Routes",
     "phase": "Action",
@@ -24,6 +15,15 @@
     "window": "After you commit units to land on another player's non-legendary, non-home planet other than Mecatol Rex",
     "text": "That player must remove each of their units from that planet and place them on any other planets they control, if able.",
     "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand. \"Our dominion knows no border.\"",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "anomalous_conditions",
+    "name": "Anomalous Conditions",
+    "phase": "Action",
+    "window": "At the start of a round of combat",
+    "text": "Choose 1 unit type. Units of that type cannot make combat rolls during this combat round.",
+    "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
     "source": "action_deck_2"
   },
   {
@@ -94,7 +94,7 @@
     "name": "Boarding Party",
     "phase": "Action",
     "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
-    "text": "Place 1 ship of that type from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+    "text": "Place 1 matching ship from your reinforcements in the active system. That ship becomes damaged. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
     "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
     "source": "action_deck_2"
   },
@@ -302,7 +302,7 @@
     "phase": "Action",
     "window": "After another player's ship uses Sustain Damage to cancel a hit produced by your units or abilities",
     "text": "Destroy that ship.",
-    "flavorText": "The Loncara Ssodu’s secondary batteries made quick work of the escorts as the dreadnought’s crew abandoned ship.",
+    "flavorText": "The Loncara Ssodu's secondary batteries made quick work of the escorts as the dreadnought's crew abandoned ship.",
     "source": "action_deck_2"
   },
   {
@@ -372,8 +372,8 @@
     "alias": "final_mission",
     "name": "Final Mission",
     "phase": "Action",
-    "window": "Before you assign hits to your units during a combat",
-    "text": "Destroy 1 of your damaged units that is participating in this combat to cancel 2 hits and produce 1 hit against your opponent's units.",
+    "window": "After you and your opponent make combat rolls",
+    "text": "Destroy 1 of your damaged units to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
@@ -392,7 +392,7 @@
     "phase": "Action",
     "window": "After you activate a system",
     "text": "Apply +1 to the move value of each of your ships during this tactical action.",
-    "flavorText": "Alerts flashed as they screamed ahead. “Wait for the computer to chart, Douglas!” Mendosa barked. The pilot laughed and pointed to his head. “Oy, they call me Doug, sir—Deft Doug if ye like. I’ve got a keen eye for charting, and a good nose too.” Then, it was dark.",
+    "flavorText": "Alerts flashed as they screamed ahead. \"Wait for the computer to chart, Douglas!\" Mendosa barked. The pilot laughed and pointed to his head. \"Oy, they call me Doug, sir—Deft Doug if ye like. I've got a keen eye for charting, and a good nose too.\" Then, it was dark.",
     "source": "action_deck_2"
   },
   {
@@ -659,7 +659,7 @@
   {
     "alias": "patronage",
     "name": "Patronage",
-    "phase": "Status",
+    "phase": "Any",
     "window": "After the speaker reveals a public objective",
     "text": "Look at the top 2 cards of the matching public objective deck; you may reveal 1 of those cards and purge the objective the speaker revealed.",
     "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
@@ -778,7 +778,7 @@
     "name": "Renegotiation",
     "phase": "Any",
     "window": "After another player plays 1 of your promissory notes",
-    "text": "That player must give you 1 promissory note from their hand.",
+    "text": "That player must give you 1 action card and 1 promissory note from their hand.",
     "flavorText": "The Creuss merchants were overwhelmed by the bazaar's wares: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
     "source": "action_deck_2"
   },
@@ -842,7 +842,7 @@
     "phase": "Action",
     "window": "After a player moves ships into the active system",
     "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
-    "flavorText": "“What's wrong with these blasted sensors?“ The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
+    "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"
   },
   {
@@ -1039,7 +1039,7 @@
     "name": "Unexpected Strategy",
     "phase": "Any",
     "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
-    "text": "That command token is not spent and/or placed on the game board.",
+    "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
     "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
     "source": "action_deck_2"
   },

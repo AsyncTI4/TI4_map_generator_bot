@@ -291,10 +291,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelper.fullCommanderUnlockCheck(player, game, "yssaril", event);
             }
             case "dv1", "dv2" -> {
-                message = "Drew Secret Objective.";
+                message = "Drew A Secret Objective.";
                 game.drawSecretObjective(player.getUserID());
                 if (game.isFowMode()) {
-                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew An SO");
                 }
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
@@ -603,7 +603,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
 
         if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
-            && player.getPlanets().contains(planetID)) {
+            && player.getPlanetsAllianceMode().contains(planetID)) {
             Button placeSleeper = Button.success("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID)
                 .withEmoji(Emoji.fromFormatted(Emojis.Sleeper));
             Button decline = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");

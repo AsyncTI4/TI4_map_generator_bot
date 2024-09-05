@@ -932,7 +932,7 @@ public class Helper {
                         case "PNs" -> {
                             switch (furtherDetail) {
                                 case "generic" -> {
-                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, sender, receiver);
+                                    List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, receiver, sender);
                                     String message = sender.getRepresentation(true, true)
                                         + "Please select the promissory note you would like to send.";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
@@ -1509,12 +1509,12 @@ public class Helper {
 
             }
         }
-        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor()) != null) {
+        if (game.getCurrentAgendaInfo().contains("Secret") && Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction())) != null) {
             msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
-                + Mapper.getSecretObjectivesJustNames().get(game.getLatestOutcomeVotedFor());
+                + Mapper.getSecretObjectivesJustNames().get(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()));
         } else {
             msg = msg + "For a total of **" + votes + "** vote" + (votes == 1 ? "" : "s") + " on the outcome "
-                + StringUtils.capitalize(game.getLatestOutcomeVotedFor());
+                + StringUtils.capitalize(game.getStoredValue("latestOutcomeVotedFor" + player.getFaction()));
         }
         if (justVoteTotal) {
             return "" + votes;

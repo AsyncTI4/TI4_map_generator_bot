@@ -2364,10 +2364,11 @@ public class Player {
             // }
             if (relevantTechs.isEmpty() && unitModel.getBaseType() != null) {
                 // No other relevant unit upgrades
+                System.out.println("boop");
                 FactionModel factionSetup = getFactionSetupInfo();
                 replacementUnit = factionSetup.getUnits().stream().map(Mapper::getUnit)
                     .map(UnitModel::getId)
-                    .filter(id -> id.equals(unitModel.getBaseType())).findFirst()
+                    .filter(id -> id.contains(unitModel.getBaseType())).findFirst()
                     .orElse(replacementUnit);
             } else if (relevantTechs.size() > 0) {
                 // Ignore the case where there's multiple faction techs and also
