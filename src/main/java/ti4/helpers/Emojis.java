@@ -776,6 +776,8 @@ public class Emojis {
     public static final String splitteal = "<:splitteal:1165037010910728242>";
     public static final String splittorquoise = "<:splittorquoise:1165037013486022726>";
     public static final String splityellow = "<:splityellow:1165037014995963965>";
+    public static final String riftset = "<:riftset:1281263062715990057>";
+
 
     // END EMOJI FARM 10
 
