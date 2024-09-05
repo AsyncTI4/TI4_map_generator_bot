@@ -14,7 +14,6 @@ public class ObjectiveBox {
 	public static final int objectiveBoxHeight = 38;
 	public static final int spacingBetweenBoxes = 5;
 	private static final int bufferBetweenTextAndTokens = 15;
-	private static final int scoreTokenWidth = 14;
 	private static final int textVerticalOffset = 23;
 	private static final int horizontalBoxOffset = 4;
 	private static final float controlTokenScale = 0.55f;
@@ -24,50 +23,59 @@ public class ObjectiveBox {
 	private static final Color Stage2RevealedColor = new Color(93, 173, 226);
 	private static final Color Stage2HiddenColor = new Color(30, 60, 128);
 
-	public static void Display(Game game, Graphics graphics, MapGenerator generator, Objective objective, int x, int y, int boxWidth, int maxTextWidth) {
+	private int x;
+	private int y;
+	private final int boxWidth;
+	private final int maxTextWidth;
+	private final int scoreTokenWidth;
+
+	ObjectiveBox(int x, int y, int boxWidth, int maxTextWidth, int scoreTokenWidth) {
+		this.x = x;
+		this.y = y;
+		this.boxWidth = boxWidth;
+		this.maxTextWidth = maxTextWidth;
+		this.scoreTokenWidth = scoreTokenWidth;
+	}
+
+	public void Display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
 		setColor(graphics, objective);
 
 		graphics.drawString(objective.GetDisplayText(game), x, y + textVerticalOffset);
 		graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
 
-		y += objectiveBoxHeight + spacingBetweenBoxes;
 		x += maxTextWidth + bufferBetweenTextAndTokens;
-
-		displayScoreMarkers(game, graphics, generator, objective, x, y);
+		displayScoreMarkers(game, graphics, generator, objective);
 	}
 
-	public static Integer GetMaxTextWidth(Game game, List<Objective> objectives) {
+	public static Integer GetMaxTextWidth(Game game, Graphics graphics, List<Objective> objectives) {
 		int maxTextWidth = 0;
-		Objective.Type lastType = Objective.Type.Stage1;
-		Boolean lastRevealed = true;
 		for (Objective objective : objectives) {
-			if (objective.type() != lastType) {
-				lastType = objective.type();
-			} else if (objective.revealed() != lastRevealed) {
-				lastRevealed = objective.revealed();
-			}
-			maxTextWidth = Math.max(maxTextWidth, objective.GetDisplayText(game).length());
+			maxTextWidth = Math.max(maxTextWidth, graphics.getFontMetrics().stringWidth(objective.GetDisplayText(game)));
 		}
 		return maxTextWidth;
 	}
 
-	public static Integer GetMaxLengthOfTokens(Game game, Integer maxTextWidth) {
-		return maxTextWidth + (bufferBetweenTextAndTokens * 2) + (game.getPlayers().size() * scoreTokenWidth);
-	}
 
 	public static Integer GetMinimumBoxWidth(Game game) {
 		return game.isRedTapeMode() ? 800: 400;
 	}
 
-	public static Integer GetBoxWidth(Game game, Integer maxTextWidth) {
-		return Math.max(GetMinimumBoxWidth(game), Math.min(MapGenerator.GetMaxObjectWidth(game), GetMaxLengthOfTokens(game, maxTextWidth)));
+	public static Integer GetBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
+		return Math.max(GetMinimumBoxWidth(game), Math.min(MapGenerator.GetMaxObjectWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
 	}
 
 	public static Integer GetVerticalSpacing() {
 		return objectiveBoxHeight + spacingBetweenBoxes;
 	}
 
-	private static void displayScoreMarkers(Game game, Graphics graphics, MapGenerator generator, Objective objective, int x, int y) {
+	private static Integer getMaxLengthOfTokens(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
+		return maxTextWidth + (bufferBetweenTextAndTokens * 2) + (game.getPlayers().size() * scoreTokenWidth);
+	}
+
+	private void displayScoreMarkers(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
+		if (objective.scoredPlayerIDs() == null) {
+			return;
+		}
 		try {
 			for (String playerID: objective.scoredPlayerIDs()) {
 				Player player = game.getPlayer(playerID);

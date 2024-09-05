@@ -2,6 +2,7 @@ package ti4.generator;
 
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.model.PublicObjectiveModel;
 
 import java.util.*;
 import java.util.List;
@@ -36,6 +37,9 @@ public record Objective(
 	}
 
 	public String GetName() {
+		if (type == Type.Custom) {
+			return key;
+		}
 		return Mapper.getPublicObjective(key).getName();
 	}
 
@@ -66,8 +70,8 @@ public record Objective(
 
 	private static List<String> getObjectiveList(Game game, Type type) {
 		return switch (type) {
-			case Stage1 -> game.getCustomPublicVP().keySet().stream().filter(Mapper.getPublicObjectivesStage1()::containsKey).toList();
-			case Stage2 -> game.getCustomPublicVP().keySet().stream().filter(Mapper.getPublicObjectivesStage2()::containsKey).toList();
+			case Stage1 -> game.getRevealedPublicObjectives().keySet().stream().filter(Mapper.getPublicObjectivesStage1().keySet()::contains).collect(Collectors.toList());
+			case Stage2 -> game.getRevealedPublicObjectives().keySet().stream().filter(Mapper.getPublicObjectivesStage2().keySet()::contains).collect(Collectors.toList());
 			case Custom -> getCustomObjectives(game).keySet().stream().toList();
 		};
 	}

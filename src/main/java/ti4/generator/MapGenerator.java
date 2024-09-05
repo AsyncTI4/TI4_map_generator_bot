@@ -4032,19 +4032,31 @@ public class MapGenerator {
     private int drawObjectives(int y) {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke3);
-        Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(game.getScoredPublicObjectives());
-        Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(game.getRevealedPublicObjectives());
-        Map<String, Player> players = game.getPlayers();
-
         graphics.setFont(Storage.getFont26());
 
-        int maxObjWidth = (mapWidth - spacingBetweenObjectiveTypes * 4) / 3;
-        int maxYFound = 0;
-
         int top = y;
-        int left = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
-        int boxWidth = 0;
+        int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
+        int maxY = y;
+
+        List<Objective> objectives = Objective.Retrieve(game);
+        int maxTextWidth = ObjectiveBox.GetMaxTextWidth(game, graphics, objectives);
+        int boxWidth = ObjectiveBox.GetBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        Objective.Type lastType = Objective.Type.Stage1;
+
+        for (Objective objective : objectives) {
+            if (objective.type() != lastType) {
+                x += boxWidth + spacingBetweenObjectiveTypes;
+                maxY = Math.max(y, maxY);
+                y = top;
+                lastType = objective.type();
+            }
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            box.Display(game, graphics, this, objective);
+            y += ObjectiveBox.GetVerticalSpacing();
+        }
+
         // STAGE 1
+        /*
         Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         Set<String> po1 = publicObjectivesState1.keySet();
         graphics.setColor(Stage1RevealedColor);
@@ -4082,7 +4094,8 @@ public class MapGenerator {
         graphics.setColor(Color.WHITE);
         coord = displayObjectives(top, coord.x, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, customPublicVP);
         maxYFound = Math.max(maxYFound, coord.y) + 15;
-        return maxYFound;
+         */
+        return maxY + 15;
     }
 
     private int laws(int y) {
