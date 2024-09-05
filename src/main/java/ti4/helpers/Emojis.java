@@ -1435,6 +1435,7 @@ public class Emojis {
             case "splitnvy", "splitnavy" -> splitnavy + "**SplitNavy**";
             case "splitptr", "splitpetrol" -> splitpetrol + "**SplitPetrol**";
             case "splitrbw", "splitrainbow" -> splitrainbow + "**SplitRainbow**";
+            case "ero", "riftset" -> riftset + "**RiftSet**";
             default -> color;
         };
     }
