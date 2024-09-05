@@ -3873,6 +3873,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "rematch" -> ButtonHelper.rematch(game, event);
+                case "offerToGiveTitles" -> {
+                    ButtonHelper.offerEveryoneTitlePossibilities(game);
+                    ButtonHelper.deleteMessage(event);
+                }
                 case "enableAidReacts" -> {
                     game.setBotFactionReacts(true);
                     ButtonHelper.deleteMessage(event);
