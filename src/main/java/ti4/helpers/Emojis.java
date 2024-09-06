@@ -1490,6 +1490,7 @@ public class Emojis {
             case "splitnvy", "splitnavy" -> splitnavy;
             case "splitptr", "splitpetrol" -> splitpetrol;
             case "splitrbw", "splitrainbow" -> splitrainbow;
+            case "ero", "riftset" -> riftset;
 
             default -> getRandomGoodDog();
         };
