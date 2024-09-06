@@ -1077,7 +1077,12 @@ public class Player {
     }
 
     public void setActionCard(String id, Integer identifier) {
-        actionCards.put(id, identifier);
+        Collection<Integer> values = actionCards.values();
+        int identifier2 = identifier;
+        while (values.contains(identifier2)) {
+            identifier2 = ThreadLocalRandom.current().nextInt(1000);
+        }
+        actionCards.put(id, identifier2);
     }
 
     public void setEvent(String id, Integer identifier) {

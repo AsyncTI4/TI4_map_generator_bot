@@ -298,7 +298,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(playerPref);
         Button listGames = Button.secondary("searchMyGames", "List All My Games");
         buttons.add(listGames);
-        buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
+        buttons.add(Button.success("showObjInfo_both", "Scoring Info"));
         if (!game.isFowMode()) {
             buttons.add(Button.secondary("chooseMapView", "Highlight Map Features"));
         }

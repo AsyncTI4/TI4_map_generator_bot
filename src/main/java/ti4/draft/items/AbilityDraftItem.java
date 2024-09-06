@@ -1,12 +1,14 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
+import ti4.map.Game;
 import ti4.model.AbilityModel;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -47,9 +49,29 @@ public class AbilityDraftItem extends DraftItem {
         return Mapper.getAbility(ItemId);
     }
 
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions, game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.ABILITY);
+        return allItems;
+    }
+
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
         List<DraftItem> allItems = buildAllItems(factions);
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.ABILITY);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        for (FactionModel faction : factions) {
+            String[] results = game.getStoredValue("bannedAbilities").split("finSep");
+            for (String ability : faction.getAbilities()) {
+                if (Arrays.asList(results).contains(ability)) {
+                    continue;
+                }
+                allItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
+            }
+        }
         return allItems;
     }
 

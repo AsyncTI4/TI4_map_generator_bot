@@ -6,8 +6,8 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -274,9 +274,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
         String extent = buttonID.split("_")[1];
         if (extent.equalsIgnoreCase("both")) {
-            ListPlayerInfoButton.displayerScoringProgression(game, true, event, "both");
+            ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
         } else {
-            ListPlayerInfoButton.displayerScoringProgression(game, false, event, extent);
+            ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), extent);
             event.getMessage().delete().queue();
         }
     }
@@ -360,7 +360,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static void displayerScoringProgression(Game game, boolean onlyThisGameObj,
-        GenericInteractionCreateEvent event, String stage1sOrTwos) {
+        MessageChannel channel, String stage1sOrTwos) {
         String msg = "";
         int x = 1;
         if (onlyThisGameObj) {
@@ -374,6 +374,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 msg = msg + representScoring(game, id, x, true) + "\n";
                 x++;
             }
+            msg = msg + representSecrets(game) + "\n";
+            msg = msg + representSupports(game) + "\n";
+            msg = msg + representTotalVPs(game) + "\n";
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id).getSource() == ComponentSource.pok
@@ -387,7 +390,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        MessageHelper.sendMessageToChannel(channel, msg);
     }
 
     public static String representScoring(Game game, String objID, int x) {
@@ -428,6 +431,36 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                             + getObjectiveThreshold(objID, game) + "  ";
                     }
                 }
+            }
+        }
+        return representation;
+    }
+
+    public static String representSecrets(Game game) {
+        String representation = "__**Scored Secrets**__\n> ";
+        if (!game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                representation = representation + player.getFactionEmoji() + ": " + player.getSoScored() + "/" + player.getMaxSOCount() + "  ";
+            }
+        }
+        return representation;
+    }
+
+    public static String representSupports(Game game) {
+        String representation = "__**Support VPs**__\n> ";
+        if (!game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                representation = representation + player.getFactionEmoji() + ": " + player.getSupportForTheThroneVictoryPoints() + "/1  ";
+            }
+        }
+        return representation;
+    }
+
+    public static String representTotalVPs(Game game) {
+        String representation = "__**Total VPs**__\n> ";
+        if (!game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                representation = representation + player.getFactionEmoji() + ": " + player.getTotalVictoryPoints() + "/" + game.getVp() + "  ";
             }
         }
         return representation;

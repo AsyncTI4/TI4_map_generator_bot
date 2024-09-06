@@ -658,7 +658,7 @@ public class ButtonHelperAgents {
         if ("winnuagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Berekar Berekon, the Winnu" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel2, exhaustText);
-            player.addSpentThing("Exhausted " + ssruuClever + "Berekar Berekon, the Winnu" + ssruuSlash + " agent, for 2 resources.");
+            player.addSpentThing("Exhausted " + ssruuClever + "Berekar Berekon, the Winnu Agent, for 2 resources.");
         }
         if ("lizhoagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Vasra Ivo, the Li-Zho" + ssruuSlash + " agent.";

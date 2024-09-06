@@ -1808,9 +1808,14 @@ public class MapGenerator {
         UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
         if (reinforcementsPosition != null && playerColor != null) {
             int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
+            if (!game.getStoredValue("ccLimit").isEmpty()) {
+                positionCount = Integer.parseInt(game.getStoredValue("ccLimit"));
+            }
+            System.out.println("" + positionCount);
+            System.out.println("" + game.getStoredValue("ccLimit"));
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {
-                for (int i = 0; i < remainingReinforcements; i++) {
+                for (int i = 0; i < remainingReinforcements && i < 16; i++) {
                     try {
                         String ccID = Mapper.getCCID(playerColor);
                         Point position = reinforcementsPosition.getPosition(CC_TAG);
