@@ -723,6 +723,7 @@ public class Constants {
     public static final String RESULT = "result";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "draw";
+    public static final String ONLY_PHASE = "only_phase";
     public static final String DEAL_SO = "deal";
     public static final String DEAL_SO_TO_ALL = "deal_to_all";
     public static final String SHOW_SO = "show";
@@ -900,6 +901,7 @@ public class Constants {
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
 
     public static final String ABILITY = "ability";
+    public static final String BAN_ABILITY = "ban_ability";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
     public static final String ABILITY_3 = "ability_3";
@@ -959,6 +961,7 @@ public class Constants {
         VERBOSITY_OPTIONS.add(VERBOSITY_MINIMAL);
     }
     public static final String BETA_TEST_MODE = "beta_test_mode";
+    public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";

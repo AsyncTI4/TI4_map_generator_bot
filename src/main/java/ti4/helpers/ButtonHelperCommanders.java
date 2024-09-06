@@ -334,11 +334,15 @@ public class ButtonHelperCommanders {
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-        String msg = "Used Tungstantus, the Ul commander, to gain 1TG (" + cTG + "->" + fTG + "). ";
+        String msg = " Automatically used Tungstantus, the Ul commander, to gain 1 TG (" + cTG + "->" + fTG + "). ";
+        if (Helper.getPlayerFromAbility(game, "pillage") != null) {
+            msg = msg + "This tg can be spent before pillage resolves, since it is a when.";
+        }
         player.addSpentThing(msg);
-        String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-        ButtonHelper.deleteTheOneButton(event);
-        event.getMessage().editMessage(exhaustedMessage).queue();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + msg);
+        //String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
+        //ButtonHelper.deleteTheOneButton(event);
+        //event.getMessage().editMessage(exhaustedMessage).queue();
     }
 
     public static void resolveLetnevCommanderCheck(Player player, Game game,
@@ -513,8 +517,9 @@ public class ButtonHelperCommanders {
         }
         if ("pn".equalsIgnoreCase(type)) {
             new ShowAllPN().showAll(enemy, player, game, false);
-            message = " used So Ata, the Yssaril commander, to look at PNs";
+            message = " used So Ata, the Yssaril commander, to look at PNs ";
         }
+        message = message + " of " + enemy.getRepresentation(false, false);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + message);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(enemy.getPrivateChannel(), message);

@@ -1176,7 +1176,7 @@ public class StartCombat extends CombatSubcommandData {
 
     private static String getSpaceCombatIntroMessage() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Steps for Space Combat:\n");
+        sb.append("## Steps for Space Combat:\n");
         sb.append("> 1. End of movement abilities (Foresight, Stymie, etc.)\n");
         sb.append("> 2. Firing of PDS\n");
         sb.append("> 3. Start of Combat (Skilled Retreat, Morale Boost, etc.)\n");
@@ -1188,7 +1188,7 @@ public class StartCombat extends CombatSubcommandData {
 
     private static String getGroundCombatIntroMessage() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Steps for Invasion:\n");
+        sb.append("## Steps for Invasion:\n");
         sb.append("> 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)\n");
         sb.append("> 2. Bombardment\n");
         sb.append("> 3. Commit Ground Forces\n");

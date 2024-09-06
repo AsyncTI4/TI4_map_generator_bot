@@ -26,6 +26,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "CC limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
     }
 
@@ -59,6 +60,9 @@ public class WeirdGameSetup extends GameSubcommandData {
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
+
+        Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
+        if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {

@@ -5151,7 +5151,7 @@ public class ButtonHelper {
             }
 
         }
-        Button concludeMove = Button.secondary(finChecker + "doneLanding_" + tile.getPosition(), "Done landing troops");
+        Button concludeMove = Button.danger(finChecker + "doneLanding_" + tile.getPosition(), "Done landing troops");
         buttons.add(concludeMove);
         if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
             commanderUnlockCheck(player, game, "naaz", event);
@@ -5435,7 +5435,7 @@ public class ButtonHelper {
                         if (distance > moveValue && distance < 90) {
                             if (player.hasTech("gd")) {
                                 messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue
-                                    + "), probably used gravity drive)");
+                                    + "), used gravity drive)");
                             } else {
                                 messageBuilder.append(" (Distance exceeds move value (" + distance + " > " + moveValue
                                     + "), **did not have gravity drive**)");
@@ -5849,7 +5849,7 @@ public class ButtonHelper {
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
             if (unitHolder instanceof Planet) {
-                if ((type.equalsIgnoreCase("spacecombat") || type.equalsIgnoreCase("assaultcannon"))
+                if ((type.equalsIgnoreCase("spacecombat") || type.equalsIgnoreCase("assaultcannoncombat"))
                     && !ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)) {
                     continue;
                 }
@@ -5868,7 +5868,9 @@ public class ButtonHelper {
                         damagedUnits = unitHolder.getUnitDamage().get(unitKey);
                     }
                     int totalUnits = unitEntry.getValue() - damagedUnits;
-
+                    if (type.equalsIgnoreCase("assaultcannoncombat") && unitKey.getUnitType() == UnitType.Fighter) {
+                        continue;
+                    }
                     EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
                     for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
                         String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_"
@@ -5879,7 +5881,7 @@ public class ButtonHelper {
                         validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
 
-                        if (unitModel.getSustainDamage()) {
+                        if (unitModel.getSustainDamage() && !type.equalsIgnoreCase("assaultcannoncombat")) {
                             buttonID = finChecker + "assignDamage_" + tile.getPosition() + "_" + x + unitName + "_"
                                 + representation;
                             buttonText = "Sustain " + x + " " + unitModel.getBaseType() + " from "
@@ -8473,7 +8475,7 @@ public class ButtonHelper {
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " sent " + p2.getFactionEmoji() + " a transaction offer");
+            player.getFactionEmoji() + " sent a transaction offer to " + p2.getFactionEmoji());
         if (game.getTableTalkChannel() != null) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(),
                 "An offer has been sent by " + player.getFactionEmoji() + " to " + p2.getFactionEmoji()
