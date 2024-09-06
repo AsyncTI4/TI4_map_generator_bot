@@ -1879,8 +1879,7 @@ public class ButtonHelperModifyUnits {
             buttons = getOpposingUnitsToHit(player, game, event, tile);
             msg = player.getRepresentation() + " choose which opposing unit to hit";
         } else {
-            msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
-                + " used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
+            msg = opponent.getRepresentation(true, true) + " your opponent used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);

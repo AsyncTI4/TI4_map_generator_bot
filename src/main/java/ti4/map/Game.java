@@ -385,10 +385,9 @@ public class Game extends GameProperties {
 
     public boolean isACInDiscard(String name) {
         return discardActionCards.keySet().stream()
-                .map(Mapper::getActionCard)
-                .anyMatch(ac ->
-                        ac.getName() != null &&
-                        ac.getName().toLowerCase().contains(name.toLowerCase()));
+            .map(Mapper::getActionCard)
+            .anyMatch(ac -> ac.getName() != null &&
+                ac.getName().toLowerCase().contains(name.toLowerCase()));
     }
 
     public String[] getListOfTilesPinged() {
@@ -2375,7 +2374,9 @@ public class Game extends GameProperties {
 
     public void triplicateExplores() {
         explore = Mapper.getDecks().get("explores_pok").getNewDeck();
-        for (String card : explore) {
+        List<String> exp2 = new ArrayList<>();
+        exp2.addAll(explore);
+        for (String card : exp2) {
             explore.add(card + "extra1");
             explore.add(card + "extra2");
         }
@@ -2397,11 +2398,13 @@ public class Game extends GameProperties {
 
     private List<String> multiplyDeck(int totalCopies, String... deckIDs) {
         List<String> newDeck = Arrays.stream(deckIDs).flatMap(deckID -> Mapper.getDecks().get(deckID).getNewDeck().stream()).toList();
+        List<String> newDeck2 = new ArrayList<>();
+        newDeck2.addAll(newDeck);
         for (String card : newDeck)
             for (int i = 1; i < totalCopies; i++)
-                newDeck.add(card + "extra" + i);
-        Collections.shuffle(newDeck);
-        return newDeck;
+                newDeck2.add(card + "extra" + i);
+        Collections.shuffle(newDeck2);
+        return newDeck2;
     }
 
     public String drawRelic() {
