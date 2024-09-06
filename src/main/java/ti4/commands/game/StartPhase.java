@@ -36,8 +36,8 @@ public class StartPhase extends GameSubcommandData {
             case "voting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "shuffleDecks" -> game.shuffleDecks();
-            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event, "both");
-            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event, "1");
+            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
+            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
             // case "unleashTheNames" -> OtherStats.sendAllNames(event);
             // case "unleashTheNamesDS" -> OtherStats.sendAllNames(event, true, false);
             // case "unleashTheNamesAbsol" -> OtherStats.sendAllNames(event, false, true);

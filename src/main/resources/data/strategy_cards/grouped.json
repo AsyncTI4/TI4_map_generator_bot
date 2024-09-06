@@ -33,6 +33,39 @@
         "source": "other"
     },
     {
+        "id": "grouped3A",
+        "initiative": 31,
+        "group": "All",
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "botSCAutomationID": "pok3politics",
+        "imageFileName": "base_game_3",
+        "source": "other"
+    },
+    {
+        "id": "grouped3B",
+        "initiative": 32,
+        "group": "All",
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "botSCAutomationID": "pok3politics",
+        "imageFileName": "base_game_3",
+        "source": "other"
+    },
+    {
+        "id": "grouped3C",
+        "initiative": 33,
+        "group": "All",
+        "name": "Politics",
+        "primaryTexts": [],
+        "secondaryTexts": [],
+        "botSCAutomationID": "pok3politics",
+        "imageFileName": "base_game_3",
+        "source": "other"
+    },
+    {
         "id": "grouped4A",
         "initiative": 41,
         "group": "A",

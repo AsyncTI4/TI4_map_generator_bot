@@ -132,9 +132,6 @@ public class SCPlay extends PlayerSubcommandData {
 
         String gamePing = game.getPing();
         List<Player> playersToFollow = game.getRealPlayers();
-        for (Player p2 : game.getRealPlayers()) {
-
-        }
         if (game.getName().equalsIgnoreCase("pbd1000")) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
@@ -183,13 +180,14 @@ public class SCPlay extends PlayerSubcommandData {
 
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
-        if (scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
+        if (scModel != null && scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
             scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
         }
 
-        if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
+        if (scModel != null && scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
             scButtons.add(Button.secondary("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
         }
+        scButtons.add(Button.secondary("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
         // set the action rows
         if (!scButtons.isEmpty()) {
