@@ -1811,8 +1811,6 @@ public class MapGenerator {
             if (!game.getStoredValue("ccLimit").isEmpty()) {
                 positionCount = Integer.parseInt(game.getStoredValue("ccLimit"));
             }
-            System.out.println("" + positionCount);
-            System.out.println("" + game.getStoredValue("ccLimit"));
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {
                 for (int i = 0; i < remainingReinforcements && i < 16; i++) {
