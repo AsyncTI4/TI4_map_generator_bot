@@ -447,7 +447,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getTechs()) {
             TechnologyModel techM = Mapper.getTech(tech);
-            if (!techM.isUnitUpgrade() && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").length() < 1)) {
+            if (!techM.isUnitUpgrade() && (techM.getFaction().isEmpty() || techM.getFaction().orElse("").isEmpty())) {
                 buttons.add(Button.secondary(finChecker + "divertFunding@" + tech, techM.getName()));
             }
         }
@@ -483,8 +483,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveForwardSupplyBaseStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveForwardSupplyBaseStep1(Player player, Game game, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
         player.setTg(oldTg + 3);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -510,8 +509,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true) + " choose who should get 1TG", buttons);
     }
 
-    public static void resolveReparationsStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveReparationsStep1(Player player, Game game, ButtonInteractionEvent event) {
 
         String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to ready";
 
@@ -1695,7 +1693,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+                                                       String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tilePos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(tilePos);
@@ -1705,8 +1703,9 @@ public class ButtonHelperActionCards {
         int hits = 0;
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
+            int threshold = "action_deck_2".equals(game.getAcDeckID()) ? 7 : 6;
             for (int x = 0; x < amount; x++) {
-                Die d1 = new Die(6);
+                Die d1 = new Die(threshold);
                 msg.append(d1.getResult()).append(", ");
                 if (d1.isSuccess()) {
                     hits++;
@@ -1834,7 +1833,7 @@ public class ButtonHelperActionCards {
         }
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+            if (Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()) {
                 if (Mapper.getTech(tech).isUnitUpgrade()) {
                     boolean hasSpecialUpgrade = false;
                     for (String factionTech : player.getNotResearchedFactionTechs()) {
@@ -1965,7 +1964,7 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         int count = 0;
         for (String planet : player.getPlanetsAllianceMode()) {
-            Planet p = (Planet) game.getPlanetsInfo().get(planet);
+            Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getResources() > count) {
                 count = p.getResources();
             }

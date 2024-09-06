@@ -3145,6 +3145,14 @@ public class Helper {
                 game.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, game)
                     + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
+            if (game.isFowMode()) {
+                List<Button> titleButton = new ArrayList<>();
+                titleButton.add(Button.primary("offerToGiveTitles", "Offer to bestow a Title"));
+                titleButton.add(Button.secondary("deleteButtons", "No titles for this game"));
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), 
+                    "Offer everyone a chance to bestow a title. This is totally optional.\n"
+                    + "Press **End Game** only after done giving titles.", titleButton);
+            }
         }
     }
 

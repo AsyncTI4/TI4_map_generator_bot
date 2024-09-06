@@ -162,7 +162,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
-        "text2": "Against: Each player that voted Against or abstained must remove 4 units from the gameboard, if possible.",
+        "text2": "Against: Each player that did not predict or cast at least 1 vote For must remove 4 units from the gameboard, if possible.",
         "mapText": "After assigning hits in the first round of ground combat, roll a die. On a result of 6 or higher, the defending player may place 3 infantry from their reinforcements on the planet.",
         "source": "ignis_aurora"
     },
@@ -330,7 +330,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
-        "text2": "Against: Each player that voted Against or abstained removes a command token from their player sheet. Each player that voted For gains a command token.",
+        "text2": "Against: Each player that did not predict or cast at least 1 vote For must remove a command token from their player sheet. Each player that voted For may gain a command token.",
         "mapText": "Each player may have no more than 6 ground forces on a planet. Any ground forces above 6 are removed",
         "source": "ignis_aurora"
     },
@@ -436,7 +436,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: For each 5 fighters (round down) the Naalu player has on the board, they gain 1 trade good.",
-        "text2": "Against: Each player that voted against or abstained must reveal 1 secret objective from their hand to the Naalu player, if possible.",
+        "text2": "Against: Each player that did not cast at least 1 vote For must reveal 1 secret objective from their hand to the Naalu player, if possible.",
         "source": "ignis_aurora"
     },
     {
@@ -469,7 +469,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: At any time, the Cabal player may return captured units to the supply and gain trade goods equivalent to half the printed cost of the unit (round down).",
-        "text2": "Against: The Cabal player may capture one unit costing 2 resources or less from the reinforcements of each player that abstained or voted Against.",
+        "text2": "Against: The Cabal player may capture one unit costing 2 resources or less from the reinforcements of each player that did not cast at least 1 vote For.",
         "mapText": "At any time, the Cabal player may return captured units to the supply and gain trade goods equivalent to half the printed cost of the unit (round down).",
         "source": "ignis_aurora"
     },
@@ -504,7 +504,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: A player must give the Letnev player 1 trade good or commodity before moving ships into a system that contains or is adjacent to a system that contains a Letnev unit with bombardment",
-        "text2": "Against: Each ship with sustain damage that belongs to a player that voted against or abstained becomes damaged.",
+        "text2": "Against: Each ship with sustain damage that belongs to a player that did not cast at least 1 vote For becomes damaged.",
         "mapText": "You must give the Letnev player 1 trade good or commodity before moving ships into or adjacent to a system containing a Letnev unit with bombardment",
         "source": "ignis_aurora"
     },
@@ -539,7 +539,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: The Sardakk player may research a technology.",
-        "text2": "Against: At the start of the strategy phase, each player that voted against or abstained must exhaust 1 planet for each technology that they own.",
+        "text2": "Against: At the start of the strategy phase, each player that did not cast at least 1 vote For must exhaust 1 planet for each technology that they own.",
         "source": "ignis_aurora"
     },
     {
@@ -598,7 +598,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: The Mahact player may add 1 command token to their player sheet from a faction whose token is not already on the sheet.",
-        "text2": "Against: Each player that voted Against or abstained must give the Mahact player a random action card, if able.",
+        "text2": "Against: Each player that did not cast at least 1 vote For must give the Mahact player a random action card, if able.",
         "source": "ignis_aurora"
     },
     {
