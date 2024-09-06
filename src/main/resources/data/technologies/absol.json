@@ -38,7 +38,7 @@
         ],
         "requirements": "B",
         "source": "absol",
-        "text": "Your non-blockaded space docks have PRODUCTION 1 in adjacent systems that do not contain other players' ships.  If you have a space dock unit upgrade technology, they instead have PRODUCTION 2 in those systems. Units produced in adjacent systems are placed in the space area.",
+        "text": "During your tactical actions, your non-blockaded space docks in adjacent systems may use the PRODUCTION 1 ability in the active system if it does not contain other players' ships.  If you have a space dock unit upgrade technology, they instead may use PRODUCTION 2. All units produced are placed in the space area.",
         "homebrewReplacesID": "sr"
     },
     {

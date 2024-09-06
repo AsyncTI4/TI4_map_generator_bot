@@ -1881,7 +1881,7 @@ public class ButtonHelperModifyUnits {
         } else {
             msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
                 + " used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
-            buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannon");
+            buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
 
@@ -1902,12 +1902,42 @@ public class ButtonHelperModifyUnits {
         } else {
             unitName = rest;
         }
+        boolean damaged = false;
         if (buttonLabel.toLowerCase().contains("damaged")) {
             unitName = unitName.replace("damaged", "");
+            damaged = true;
+        }
+        boolean doesUnitExist = true;
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder space = tile.getSpaceUnitHolder();
+        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
+        if (space.getUnitCount(unitKey.getUnitType(), player.getColor()) < amount) {
+            doesUnitExist = false;
+        }
+        if (damaged) {
+            if (space.getUnitDamage().get(unitKey) == null || space.getUnitDamage().get(unitKey) < amount) {
+                doesUnitExist = false;
+            }
+        } else {
+            int damagedUnits = 0;
+            if (space.getUnitDamage().get(unitKey) != null) {
+                damagedUnits = space.getUnitDamage().get(unitKey);
+            }
+            int undamaged = space.getUnitCount(unitKey.getUnitType(), player.getColor()) - damagedUnits;
+            if (undamaged < amount) {
+                doesUnitExist = false;
+            }
+        }
+        if (!doesUnitExist) {
+            List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "That unit amount did not exist, attempting to regenerate correct landing buttons. Try now");
+            event.getMessage().editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+            return;
         }
 
-        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unitName), player.getColor());
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
+        new AddUnits().unitParsing(event, player.getColor(), tile,
             amount + " " + unitName + " " + planet, game);
         if (buttonLabel.toLowerCase().contains("damaged")) {
             game.getTileByPosition(pos).removeUnitDamage("space", unitKey, amount);
@@ -1923,7 +1953,11 @@ public class ButtonHelperModifyUnits {
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             ident + " Landed " + amount + " " + unitName + " on " + planet);
-        event.getMessage().editMessage(event.getMessage().getContentRaw())
+        String oldMessage = event.getMessage().getContentRaw();
+        if (space.getUnitCount(UnitType.Infantry, player.getColor()) < 1 && space.getUnitCount(UnitType.Mech, player.getColor()) < 1) {
+            oldMessage = "Remember to click done landing troops if everything is landed correctly.";
+        }
+        event.getMessage().editMessage(oldMessage)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 

@@ -1,10 +1,12 @@
 package ti4.commands.cardsso;
 
 import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -16,6 +18,8 @@ public class ShowSO extends SOCardsSubcommandData {
         super(Constants.SHOW_SO, "Show a Secret Objective to a player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the SO (action/agenda/status). Default false"));
+
     }
 
     @Override
@@ -40,16 +44,24 @@ public class ShowSO extends SOCardsSubcommandData {
                 soID = so.getKey();
             }
         }
+        boolean onlyPhase = false;
+        if (event.getOption(Constants.ONLY_PHASE) != null && event.getOption(Constants.ONLY_PHASE).getAsBoolean()) {
+            onlyPhase = true;
+        }
 
         if (soID == null) {
             MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
             return;
         }
-
+        String info = SOInfo.getSecretObjectiveRepresentation(soID);
+        if (onlyPhase) {
+            info = Mapper.getSecretObjective(soID).getPhase();
+        }
         String sb = "Game: " + game.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +
             "Showed Secret Objectives:" + "\n" +
-            SOInfo.getSecretObjectiveRepresentation(soID) + "\n";
+            info + "\n";
+
         player.setSecret(soID);
 
         Player player_ = Helper.getPlayer(game, null, event);

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -96,7 +97,7 @@ public class GameCommand implements Command {
         subcommands.add(new SetUnitCap());
         subcommands.add(new StartPhase());
         subcommands.add(new SetDeck());
-        // subcommands.add(new GameCreate());
+        //subcommands.add(new GameCreate());
         subcommands.add(new CreateGameButton());
         subcommands.add(new WeirdGameSetup());
         subcommands.add(new Swap());
