@@ -78,11 +78,15 @@ public class ColorModelTest extends BaseTi4Test {
 
         for (UnitType type : unitsToTest) {
             UnitKey uk = Units.getUnitKey(type.getValue(), color.getAlias());
-            File f = new File(unitPath(uk, false));
+            String path = unitPath(uk, false);
+            assertTrue(path != null, "path config bad");
+            File f = new File(path);
             assertTrue(f.exists(), "Unit [" + color.getAlias() + " " + uk.asyncID() + "] does not have an associated file");
 
             if (type == UnitType.Destroyer) {
-                f = new File(unitPath(uk, true));
+                path = unitPath(uk, true);
+                assertTrue(path != null, "path config bad 2");
+                f = new File(path);
                 assertTrue(f.exists(), "Unit [" + color.getAlias() + " " + uk.asyncID() + " eyes] does not have an associated file");
             }
         }
