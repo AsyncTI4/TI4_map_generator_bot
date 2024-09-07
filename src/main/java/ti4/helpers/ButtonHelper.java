@@ -67,7 +67,6 @@ import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.explore.SendFragments;
 import ti4.commands.explore.ShowRemainingRelics;
 import ti4.commands.game.GameCreate;
 import ti4.commands.game.GameEnd;
@@ -77,7 +76,6 @@ import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
@@ -90,7 +88,6 @@ import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
-import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -9007,7 +9004,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         if (sc) {
             game.setComponentAction(false);
-            boolean used = ButtonHelperSCs.addUsedSCPlayer(messageID, game, player, event, "");
+            boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player, event, "");
             StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
             if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology")
                 && !player.getFollowedSCs().contains(scModel.getInitiative())) {
@@ -9109,8 +9106,8 @@ public class ButtonHelper {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, Emojis.Sol + "Orbital Drop");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Select the planet you would like to place 2 infantry on.";
-                    List<Button> buttons = Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "place");
-                    buttons.add(Button.danger("orbitolDropFollowUp", "Done Dropping Infantry"));
+                    List<Button> buttons = new ArrayList<>(
+                        Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("muaatFS".equalsIgnoreCase(buttonID)) {
                     String successMessage = p1.getFactionEmoji() + " Spent 1 strategy token using " + Emojis.Muaat
