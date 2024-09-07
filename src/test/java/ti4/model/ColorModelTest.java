@@ -66,8 +66,8 @@ public class ColorModelTest extends BaseTi4Test {
 
     private static String unitPath(UnitKey uk, boolean eyes) {
         String fileName = uk.getFileName(eyes);
-        String path = ResourceHelper.getInstance().getResourceFromFolder("units/", fileName, "Could not find unit file");
-        assertTrue(path != null, "Could not format path for " + fileName);
+        String path = ResourceHelper.getInstance().getResourceFromFolder("units/", fileName, "");
+        assertTrue(path != null, "Could not find unit file: " + fileName);
         return path;
     }
 
@@ -79,12 +79,9 @@ public class ColorModelTest extends BaseTi4Test {
 
         for (UnitType type : unitsToTest) {
             UnitKey uk = Units.getUnitKey(type.getValue(), color.getAlias());
-            File f = new File(unitPath(uk, false));
-            assertTrue(f.exists(), "Unit [" + color.getAlias() + " " + uk.asyncID() + "] does not have an associated file");
-
+            unitPath(uk, false));
             if (type == UnitType.Destroyer) {
-                f = new File(unitPath(uk, true));
-                assertTrue(f.exists(), "Unit [" + color.getAlias() + " " + uk.asyncID() + " eyes] does not have an associated file");
+                unitPath(uk, true);
             }
         }
     }
