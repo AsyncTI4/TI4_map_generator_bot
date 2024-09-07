@@ -28,6 +28,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -884,10 +885,9 @@ public class Helper {
     }
 
     public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
-
         String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted:\n" + buildTransactionOffer(p1, p2, game, false);
         List<String> transactionItems = p1.getTransactionItems();
-        List<Player> players = new ArrayList<Player>();
+        List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
         boolean debtOnly = true;
@@ -896,6 +896,11 @@ public class Helper {
             channel = game.getTableTalkChannel();
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
         }
+
+        String messageText = "A transaction has been ratified between:\n- " + p1.getRepresentation() + "\n- " + p2.getRepresentation();
+        MessageEmbed embed = getTransactionEmbed(p1, p2, game, true);
+        MessageHelper.sendMessageToChannelWithEmbed(channel, messageText, embed);
+
         MessageHelper.sendMessageToChannel(channel, "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
         for (Player sender : players) {
             Player receiver = p2;
@@ -975,10 +980,32 @@ public class Helper {
         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), summary);
     }
 
+    private static MessageEmbed getTransactionEmbed(Player p1, Player p2, Game game, boolean publiclyShared) {
+        EmbedBuilder eb = new EmbedBuilder();
+        String trans = buildTransactionOffer(p1, p2, game, publiclyShared);
+        if (trans.startsWith("\n")) {
+            trans = StringUtils.substringAfter(trans, "\n");
+        }
+
+        String trans1 = StringUtils.substringBefore(trans, "\n");
+        String title1 = StringUtils.substringBefore(trans1, " gives") + " gives:";
+        String text1 = "> " + StringUtils.substringAfter(trans1, ": ").replace("; ", "\n> ");
+        eb.addField(title1, text1, true);
+
+        eb.addBlankField(true);
+
+        String trans2 = StringUtils.substringAfter(trans, "\n");
+        String title2 = StringUtils.substringBefore(trans2, " gives") + " gives:";
+        String text2 = "> " + StringUtils.substringAfter(trans2, ": ").replace("; ", "\n> ");
+        eb.addField(title2, text2, true);
+
+        return eb.build();
+    }
+
     public static String buildTransactionOffer(Player p1, Player p2, Game game, boolean publiclyShared) {
         List<String> transactionItems = p1.getTransactionItems();
         String wholeSummary = "";
-        List<Player> players = new ArrayList<Player>();
+        List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
         for (Player sender : players) {
