@@ -777,6 +777,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 List<Button> whenButtons = AgendaHelper.getWhenButtons(game);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
                     "Please indicate no whens again.", game, whenButtons, "when");
+                List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
+                    "Please indicate no afters again.", game, afterButtons, "after");
             }
             if ("Action".equalsIgnoreCase(actionCardWindow)) {
                 String message = "Use buttons to end turn or do another action.";
@@ -840,9 +843,9 @@ public class PlayAC extends ACCardsSubcommandData {
     }
 
     private static void sendResolveMsgToMainChannel(String message, List<Button> buttons, Player player, Game game) {
-      if (game.isFowMode()) {
-          message = message.replace(player.getRepresentation(), "");
-      }
-      MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
-  }
+        if (game.isFowMode()) {
+            message = message.replace(player.getRepresentation(), "");
+        }
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message, buttons);
+    }
 }
