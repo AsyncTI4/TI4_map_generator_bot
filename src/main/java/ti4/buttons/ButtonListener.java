@@ -2401,8 +2401,6 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.checkTransactionLegality(game, player, p2);
                 ButtonHelper.deleteMessage(event);
             }
-        } else if (buttonID.startsWith("getNewTransaction_")) {
-            TransactionHelper.getNewTransaction(game, player, buttonID, event);
         } else if (buttonID.startsWith("rejectOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             if (p1 != null) {
@@ -2436,15 +2434,6 @@ public class ButtonListener extends ListenerAdapter {
             }
             TransactionHelper.acceptTransactionOffer(p1, player, game, event);
             ButtonHelper.deleteMessage(event);
-        // } else if (buttonID.startsWith("sendOffer_")) {
-        //     ButtonHelper.sendOffer(game, player, buttonID, event);
-        } else if (buttonID.startsWith("offerToTransact_")) {
-            TransactionHelper.resolveOfferToTransact(game, player, buttonID, event);
-        } else if (buttonID.startsWith("newTransact_")) {
-            TransactionHelper.resolveSpecificTransButtonsNew(game, player, buttonID, event);
-            ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("transact_")) {
-            TransactionHelper.resolveSpecificTransButtonsOld(game, player, buttonID, event);
         } else if (buttonID.startsWith("play_after_")) {
             String riderName = buttonID.replace("play_after_", "");
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");

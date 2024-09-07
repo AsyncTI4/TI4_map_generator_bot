@@ -115,13 +115,13 @@ public class TransactionHelper {
                 }
             }
         }
-        
+
         // Send Summary to Player's CardsInfo threads
         embed = getTransactionEmbed(p1, p2, game, false);
         String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted";
         MessageHelper.sendMessageToChannelWithEmbed(p1.getCardsInfoThread(), summary, embed);
         MessageHelper.sendMessageToChannelWithEmbed(p2.getCardsInfoThread(), summary, embed);
-        
+
         p1.clearTransactionItemsWith(p2);
         if (!debtOnly) {
             ButtonHelperAbilities.pillageCheck(p2, game);
@@ -326,6 +326,7 @@ public class TransactionHelper {
         };
     }
 
+    @ButtonHandler("newTransact_")
     public static void resolveSpecificTransButtonsNew(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         buttonID = buttonID.replace("newTransact_", "");
@@ -546,6 +547,7 @@ public class TransactionHelper {
 
     }
 
+    @ButtonHandler("offerToTransact_")
     public static void resolveOfferToTransact(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String item = buttonID.split("_")[1];
         String sender = buttonID.split("_")[2];
@@ -569,6 +571,7 @@ public class TransactionHelper {
             ButtonHelper.getStuffToTransButtonsNew(game, player, p1, p2));
     }
 
+    @ButtonHandler("getNewTransaction_")
     public static void getNewTransaction(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String sender = buttonID.split("_")[1];
         String receiver = buttonID.split("_")[2];
@@ -619,8 +622,8 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer from " + player.getRepresentationNoPing() + ":", Collections.singletonList(embed), buttons);
     }
 
-    public static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("transact_")
+    public static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
 
         List<Button> stuffToTransButtons = new ArrayList<>();
@@ -774,8 +777,7 @@ public class TransactionHelper {
         }
     }
 
-    public static void resolveSpecificTransButtonPress(Game game, Player p1, String buttonID,
-        ButtonInteractionEvent event, boolean oldWay) {
+    public static void resolveSpecificTransButtonPress(Game game, Player p1, String buttonID, ButtonInteractionEvent event, boolean oldWay) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         buttonID = buttonID.replace("send_", "");
         List<Button> goAgainButtons = new ArrayList<>();
