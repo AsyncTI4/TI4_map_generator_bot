@@ -102,8 +102,8 @@
     "alias": "bounty",
     "name": "Bounty",
     "phase": "Action",
-    "window": "After a player destroys 1 or more of another player's units that have a combined cost of 4 or more",
-    "text": "The player that destroyed those units gains 3 trade goods. [Note: This can be played after a round of combat, as assigning hits/destruction happens simultaneously.]",
+    "window": "After you destroy 1 or more of another player's units",
+    "text": "Gain a number of trade goods equal to half of the combined cost of those units, rounded up. [Note: This can be played after a round of combat, as assigning hits/destruction happens simultaneously.]",
     "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
     "source": "action_deck_2"
   },
@@ -446,7 +446,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed",
     "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, explore up to 2 frontier tokens on the game board.",
-    "flavorText": "Acamar had sealed the fates of many within the void, not out of malice, but as a warning. Yet, they knew that this greedy lot would not heed those tales.",
+    "flavorText": "The document in Acamar's hand described a treatise written long before the fall of the Lazax. With the Mahact's return, finding this detailed analysis of the Lazax's greatest victories was imperative.",
     "source": "action_deck_2"
   },
   {
