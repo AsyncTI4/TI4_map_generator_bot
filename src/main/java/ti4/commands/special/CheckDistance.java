@@ -85,10 +85,10 @@ public class CheckDistance extends SpecialSubcommandData {
                 if (AddCC.hasCC(player, game.getTileByPosition(tilePos))) {
                     continue;
                 }
-                if (distances.get(tilePos) == null) {
+                if (distances.get(tilePos) == null && someDistances.get(tilePos) != null) {
                     distances.put(tilePos, someDistances.get(tilePos));
                 } else {
-                    if (distances.get(tilePos) > someDistances.get(tilePos)) {
+                    if (distances.get(tilePos) != null && someDistances.get(tilePos) != null && distances.get(tilePos) > someDistances.get(tilePos)) {
                         distances.put(tilePos, someDistances.get(tilePos));
                     }
                 }
