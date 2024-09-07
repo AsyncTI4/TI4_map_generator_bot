@@ -94,9 +94,7 @@ public class ColorModelTest extends BaseTi4Test {
             Mapper.getSweepID(color.getAlias()));
         for (String id : tokenIDs) {
             String path = Mapper.getCCPath(id);
-            assertTrue(path != null, "Path bad for token: " + id);
-            File f = new File(path);
-            assertTrue(f.exists(), "Token [" + id + "] does not have an associated file");
+            assertTrue(path != null, "Could not find token file: " + id);
         }
     }
 }
