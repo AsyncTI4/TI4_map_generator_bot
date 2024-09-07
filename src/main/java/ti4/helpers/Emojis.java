@@ -188,6 +188,16 @@ public class Emojis {
     public static final String Hazardous = "<:Hazardous:1159118854987976734>";
     public static final String Frontier = "<:Frontier:1156670537699971082>";
 
+    public static String getFragEmoji(String frag) {
+        frag = frag.toLowerCase();
+        return switch (frag) {
+            case "crf" -> CFrag;
+            case "irf" -> IFrag;
+            case "hrf" -> HFrag;
+            default -> UFrag;
+        };
+    }
+
     // CARDS
     public static final String SC1 = "<:SC1:1056594715673366548>";
     public static final String SC1Back = "<:SC1Back:1065285486425411705>";

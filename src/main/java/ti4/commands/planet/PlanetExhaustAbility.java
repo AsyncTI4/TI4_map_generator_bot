@@ -17,6 +17,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.TransactionHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -201,7 +202,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
         } else {
             String buttonID2 = "transact_ACs_" + p2.getFaction();
-            ButtonHelper.resolveSpecificTransButtonsOld(game, player, buttonID2, event);
+            TransactionHelper.resolveSpecificTransButtonsOld(game, player, buttonID2, event);
         }
 
     }
