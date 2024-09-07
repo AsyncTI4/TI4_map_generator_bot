@@ -108,35 +108,49 @@ public class TransactionHelper {
                 }
             }
         }
+        
+        // Send Summary to Player's CardsInfo threads
+        embed = getTransactionEmbed(p1, p2, game, false);
+        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted";
+        MessageHelper.sendMessageToChannelWithEmbed(p1.getCardsInfoThread(), summary, embed);
+        MessageHelper.sendMessageToChannelWithEmbed(p2.getCardsInfoThread(), summary, embed);
+        
         p1.clearTransactionItemsWith(p2);
         if (!debtOnly) {
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(p1, game);
         }
-
-        // Send Summary to Player's CardsInfo threads
-        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted";
-        MessageHelper.sendMessageToChannelWithEmbed(p1.getCardsInfoThread(), summary, embed);
-        MessageHelper.sendMessageToChannelWithEmbed(p2.getCardsInfoThread(), summary, embed);
     }
 
-    private static MessageEmbed getTransactionEmbed(Player p1, Player p2, Game game, boolean publiclyShared) {
+    public static MessageEmbed getTransactionEmbed(Player p1, Player p2, Game game, boolean publiclyShared) {
         EmbedBuilder eb = new EmbedBuilder();
         String trans = buildTransactionOffer(p1, p2, game, publiclyShared);
         if (trans.startsWith("\n")) {
             trans = StringUtils.substringAfter(trans, "\n");
         }
+        trans = trans.replace("**", ""); // kill all the bold formatting
 
-        String trans1 = StringUtils.substringBefore(trans, "\n");
-        String title1 = StringUtils.substringBefore(trans1, " gives") + " gives:";
-        String text1 = "> " + StringUtils.substringAfter(trans1, ": ").replace("; ", "\n> ");
+        // Handle the formatting of buildTransactionOffer based on publiclyShared
+        if (!publiclyShared) {
+            trans = StringUtils.substringBeforeLast(trans, "\n");
+        }
+        String transactionSeparator = publiclyShared ? "\n" : "\n\n";
+        String itemSeparator = publiclyShared ? ": " : ":\n";
+        String target = publiclyShared ? "; " : "\n";
+        String replacement = "\n> - ";
+
+        // Player 1
+        String trans1 = StringUtils.substringBefore(trans, transactionSeparator);
+        String title1 = "> " + StringUtils.substringBefore(trans1, ">") + "> gives:";
+        String items1 = StringUtils.substringAfter(trans1, itemSeparator);
+        String text1 = items1.isEmpty() ? "> - " + getNothingMessage() : "> - " + items1.replace(target, replacement);
         eb.addField(title1, text1, true);
 
-        // eb.addBlankField(true);
-
-        String trans2 = StringUtils.substringAfter(trans, "\n");
-        String title2 = StringUtils.substringBefore(trans2, " gives") + " gives:";
-        String text2 = "> " + StringUtils.substringAfter(trans2, ": ").replace("; ", "\n> ");
+        // Player 2
+        String trans2 = StringUtils.substringAfter(trans, transactionSeparator);
+        String title2 = "> " + StringUtils.substringBefore(trans2, ">") + "> gives:";
+        String items2 = StringUtils.substringAfter(trans2, itemSeparator);
+        String text2 = items2.isEmpty() ? "> - " + getNothingMessage() : "> - " + items2.replace(target, replacement);
         eb.addField(title2, text2, true);
 
         return eb.build();
