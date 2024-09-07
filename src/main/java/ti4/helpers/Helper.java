@@ -1050,7 +1050,11 @@ public class Helper {
                         case "PNs" -> {
                             switch (furtherDetail) {
                                 case "generic" -> {
-                                    summary = summary + amountToTransact + " " + Emojis.PN + " to be specified verbally\n";
+                                    if (publiclyShared) {
+                                        summary = summary + Emojis.PN + "\n";
+                                    } else {
+                                        summary = summary + amountToTransact + " " + Emojis.PN + " to be specified verbally\n";
+                                    }
                                 }
                                 default -> {
                                     String id = null;
@@ -2018,12 +2022,14 @@ public class Helper {
                         || player.getUnitsOwned().contains("saar_spacedock2")
                         || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
                         if (uH instanceof Planet planet) {
-                            String pp = planet.getName();
-                            Button inf1Button = Button.success(
-                                "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
-                                "Produce 1 Infantry on " + getPlanetRepresentation(pp, game));
-                            inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
-                            unitButtons.add(inf1Button);
+                            if (player.getPlanetsAllianceMode().contains(uH.getName())) {
+                                String pp = planet.getName();
+                                Button inf1Button = Button.success(
+                                    "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_" + pp,
+                                    "Produce 1 Infantry on " + getPlanetRepresentation(pp, game));
+                                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Emojis.Saar));
+                                unitButtons.add(inf1Button);
+                            }
                         } else {
                             Button inf1Button = Button.success(
                                 "FFCC_" + player.getFaction() + "_" + placePrefix + "_infantry_space"
@@ -2432,7 +2438,11 @@ public class Helper {
 
     private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Game game, String color,
         int ccCount) {
-        boolean ccCountIsOver = ccCount > 16;
+        int limit = 16;
+        if (!game.getStoredValue("ccLimit").isEmpty()) {
+            limit = Integer.parseInt(game.getStoredValue("ccLimit"));
+        }
+        boolean ccCountIsOver = ccCount > limit;
         if (ccCountIsOver && game.isCcNPlasticLimit()) {
             Player player = null;
             String factionColor = AliasHandler.resolveColor(color.toLowerCase());
@@ -2452,7 +2462,7 @@ public class Helper {
                 }
             }
 
-            msg += "(" + color + ") is over the command token limit of 16. Command tokens used: " + ccCount;
+            msg += "(" + color + ") is over the command token limit of " + limit + ". Command tokens used: " + ccCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
     }
@@ -3064,8 +3074,10 @@ public class Helper {
             if ((player.getFaction().contains("ghost") && game.getTile("17") != null) || ghosty) {
                 tile = game.getTile("17");
             }
-            hsLocations.add(Integer.parseInt(tile.getPosition()));
-            unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
+            if (tile != null) {
+                hsLocations.add(Integer.parseInt(tile.getPosition()));
+                unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
+            }
         }
         Collections.sort(hsLocations);
         int ringWithHomes = 0;
@@ -3133,6 +3145,14 @@ public class Helper {
                 game.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, game)
                     + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
+            if (game.isFowMode()) {
+                List<Button> titleButton = new ArrayList<>();
+                titleButton.add(Button.primary("offerToGiveTitles", "Offer to bestow a Title"));
+                titleButton.add(Button.secondary("deleteButtons", "No titles for this game"));
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), 
+                    "Offer everyone a chance to bestow a title. This is totally optional.\n"
+                    + "Press **End Game** only after done giving titles.", titleButton);
+            }
         }
     }
 

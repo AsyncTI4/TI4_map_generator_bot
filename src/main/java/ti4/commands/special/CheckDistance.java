@@ -14,10 +14,13 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class CheckDistance extends SpecialSubcommandData {
@@ -112,7 +115,15 @@ public class CheckDistance extends SpecialSubcommandData {
         for (int i = 1; i <= maxDistance; i++) {
             Map<String, Integer> distancesCopy = new HashMap<>(distances);
             for (String existingPosition : distancesCopy.keySet()) {
-                addAdjacentPositionsIfNotThereYet(game, existingPosition, distances, player, i);
+                Tile tile = game.getTileByPosition(existingPosition);
+                if (tile == null || (tile.isNebula() && player != null && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research")) || (tile.isSupernova() && player != null && !player.getAbilities().contains("gashlai_physiology")) || (tile.isAsteroidField() && player != null && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd"))) {
+                    continue;
+                }
+                int num = 0;
+                if (tile != null && tile.isGravityRift(game)) {
+                    num = -1;
+                }
+                addAdjacentPositionsIfNotThereYet(game, existingPosition, distances, player, i + num);
             }
         }
 
@@ -125,6 +136,9 @@ public class CheckDistance extends SpecialSubcommandData {
 
     private static void addAdjacentPositionsIfNotThereYet(Game game, String position, Map<String, Integer> distances, Player player, int distance) {
         for (String tilePosition : adjacentPositions(game, position, player)) {
+            if (distances.get(tilePosition) != null && distances.get(tilePosition) > distance) {
+                distances.remove(tilePosition);
+            }
             distances.putIfAbsent(tilePosition, distance);
         }
     }

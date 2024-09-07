@@ -2093,6 +2093,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveNaaluHeroSend(player, game, buttonID, event);
         } else if (buttonID.startsWith("landUnits_")) {
             ButtonHelperModifyUnits.landingUnits(buttonID, event, game, player, ident, buttonLabel);
+        } else if (buttonID.startsWith("requestAllFollow_")) {
+            event.getMessage().reply(game.getPing() + " someone has requested that everyone resolve this SC before play continues. Please do so as soon as you can. The active player should not take an action until this is done").queue();
         } else if (buttonID.startsWith("reparationsStep2_")) {
             ButtonHelperActionCards.resolveReparationsStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("seizeArtifactStep2_")) {
@@ -3873,6 +3875,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "rematch" -> ButtonHelper.rematch(game, event);
+                case "offerToGiveTitles" -> {
+                    ButtonHelper.offerEveryoneTitlePossibilities(game);
+                    ButtonHelper.deleteMessage(event);
+                }
                 case "enableAidReacts" -> {
                     game.setBotFactionReacts(true);
                     ButtonHelper.deleteMessage(event);
@@ -4628,9 +4634,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "titanscommander")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)
                     && !buttonID.contains("integrated")) {
-                    Button sar2 = Button.success("titansCommanderUsage", "Use Ul Commander")
-                        .withEmoji(Emoji.fromFormatted(Emojis.Titans));
-                    buttons.add(sar2);
+                    ButtonHelperCommanders.titansCommanderUsage(buttonID, event, game, player, player.getRepresentation(false, false));
                 }
                 if (player.hasTechReady("dsbenty")
                     && !"muaatagent".equalsIgnoreCase(buttonID) && !"arboHeroBuild".equalsIgnoreCase(buttonID)

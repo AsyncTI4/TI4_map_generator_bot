@@ -35,7 +35,7 @@ public class ListDeadGames extends BothelperSubcommandData {
             if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
-            if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100")) {
+            if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100") || game.getName().equalsIgnoreCase("pbd100two")) {
                 continue;
             }
             long milliSinceLastTurnChange = new Date().getTime()
@@ -44,7 +44,7 @@ public class ListDeadGames extends BothelperSubcommandData {
             if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000l) {
                 continue;
             }
-
+            boolean warned = false;
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000l) {
                 if (game.getActionsChannel() != null && !game.getActionsChannel().getName().equalsIgnoreCase(game.getName() + "-actions")) {
                     continue;
@@ -56,17 +56,25 @@ public class ListDeadGames extends BothelperSubcommandData {
                     if (delete) {
                         game.getActionsChannel().delete().queue();
                     } else {
+                        warned = true;
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
                     }
                 }
                 if (game.getTableTalkChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getTableTalkChannel().getParentCategory()) && !game.getTableTalkChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
-                    sb.append(game.getTableTalkChannel().getJumpUrl() + "\n");
-                    channelCount++;
-                    if (delete) {
-                        game.getTableTalkChannel().delete().queue();
+                    if (game.getTableTalkChannel().getName().contains(game.getName() + "-")) {
+                        sb.append(game.getTableTalkChannel().getJumpUrl() + "\n");
+                        channelCount++;
+                        if (delete) {
+                            game.getTableTalkChannel().delete().queue();
+                        } else if (!warned) {
+                            MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
+                        }
                     }
                 }
                 Guild guild = game.getGuild();
+                if (!AsyncTI4DiscordBot.guilds.contains(guild)) {
+                    continue;
+                }
                 if (guild != null) {
                     Role r = null;
                     for (Role role : guild.getRoles()) {

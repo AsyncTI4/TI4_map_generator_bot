@@ -3,6 +3,7 @@ package ti4.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -154,13 +155,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getAfbDieCount(Player player, Game game) {
         if (getCapacityValue() > 0 &&
-                player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction")) &&
-                getExpectedAfbHits() < .6) {
+            player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction")) &&
+            getExpectedAfbHits() < .6) {
             return 2;
         }
         if (getAfbDieCount() == 0 &&
-                isWarsunOrDreadnought() &&
-                game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            isWarsunOrDreadnought() &&
+            game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 1;
         }
         return getAfbDieCount();
@@ -172,7 +173,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private boolean isWarsunOrDreadnought() {
         return getBaseType().equalsIgnoreCase("warsun") ||
-                getBaseType().equalsIgnoreCase("dreadnought");
+            getBaseType().equalsIgnoreCase("dreadnought");
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
@@ -187,13 +188,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public int getAfbHitsOn(Player player, Game game) {
         if (getCapacityValue() > 0 &&
-                game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction()) &&
-                getExpectedAfbHits() < .6) {
+            game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction()) &&
+            getExpectedAfbHits() < .6) {
             return 8;
         }
         if (getAfbDieCount() == 0 &&
-                isWarsunOrDreadnought() &&
-                game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            isWarsunOrDreadnought() &&
+            game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
             return 5;
         }
         return getAfbHitsOn();
@@ -234,7 +235,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return getBombardHitsOn();
         } else {
-            if (isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+            if (isShip != null && isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
                 return 6;
             } else {
                 return getBombardHitsOn();

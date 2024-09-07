@@ -156,7 +156,7 @@ public class GameSaveLoadManager {
                 boolean thread = button.getMessageChannel() instanceof ThreadChannel;
                 boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
                 boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
-                if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare")) {
+                if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
                     reason = username + " pressed button: [CLASSIFIED]";
                 } else {
                     reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();

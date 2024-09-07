@@ -110,6 +110,10 @@ public class Cleanup extends StatusSubcommandData {
         if (game.isSpinMode()) {
             SpinTilesInRings.spinRings(game);
         }
+        if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
+            ListPlayerInfoButton.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
+        }
     }
 
     public void returnEndStatusPNs(Game game) {
