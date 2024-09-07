@@ -79,7 +79,7 @@ public class ColorModelTest extends BaseTi4Test {
 
         for (UnitType type : unitsToTest) {
             UnitKey uk = Units.getUnitKey(type.getValue(), color.getAlias());
-            unitPath(uk, false));
+            unitPath(uk, false);
             if (type == UnitType.Destroyer) {
                 unitPath(uk, true);
             }
