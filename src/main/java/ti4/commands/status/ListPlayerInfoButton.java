@@ -841,7 +841,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return player.getAc(); // 5 AC
             }
             case "gamf" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought"); // 5 dreads
+                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false); // 5 dreads
             }
             case "ans" -> {
                 int count = 0;

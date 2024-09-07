@@ -1595,7 +1595,9 @@ public class ButtonHelperModifyUnits {
         String planetName = unitNPlanet.replace(unitLong + "_", "");
         String unit = AliasHandler.resolveUnit(unitLong);
         String producedOrPlaced = "Produced";
-        if ("skipbuild".equalsIgnoreCase(skipbuild)) {
+        boolean willSkipBuild = skipbuild.contains("skipbuild");
+        boolean orbitalDrop = skipbuild.contains("orbital");
+        if (willSkipBuild) {
             producedOrPlaced = "Placed";
         }
         String successMessage;
@@ -1689,7 +1691,7 @@ public class ButtonHelperModifyUnits {
                             "You may use your cloaked fleets ability to capture this produced ship.",
                             shroadedFleets);
                     }
-                    if (tile2 != null && !"skipbuild".equalsIgnoreCase(skipbuild) && player.hasAbility("rally_to_the_cause")
+                    if (tile2 != null && !willSkipBuild && player.hasAbility("rally_to_the_cause")
                         && player.getHomeSystemTile() == tile2
                         && ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).size() > 0) {
                         String msg = player.getRepresentation()
@@ -1756,9 +1758,16 @@ public class ButtonHelperModifyUnits {
             DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
         }
         buttons.add(DoneExhausting);
-        if (!"skipbuild".equalsIgnoreCase(skipbuild)) {
+        if (!willSkipBuild) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2,
                 buttons);
+        } else {
+            if (orbitalDrop) {
+                List<Button> orbFollowUp = new ArrayList<>();
+                orbFollowUp.add(Button.success("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
+                orbFollowUp.add(Button.danger("finishComponentAction_spitItOut", "Decline"));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you can pay 3r to drop a mech on the planet too", orbFollowUp);
+            }
         }
 
         if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {

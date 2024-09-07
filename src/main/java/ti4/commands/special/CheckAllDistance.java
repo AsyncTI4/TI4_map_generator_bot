@@ -14,7 +14,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class CheckAllDistance extends SpecialSubcommandData {
@@ -47,7 +49,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
         data.add(sb.toString());
 
         for (String pos : positions) {
-            Map<String, Integer> distances = CheckDistance.getTileDistances(game, player, pos, maxDistance);
+            Map<String, Integer> distances = CheckDistance.getTileDistances(game, player, pos, maxDistance, true);
             String row = distances.entrySet().stream()
                 .filter(dist -> positions.contains(dist.getKey()))
                 .sorted(Comparator.comparing(Entry::getKey))
