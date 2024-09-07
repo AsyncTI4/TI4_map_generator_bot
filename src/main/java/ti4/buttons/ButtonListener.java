@@ -118,6 +118,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TransactionHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -2433,7 +2434,7 @@ public class ButtonListener extends ListenerAdapter {
                     return;
                 }
             }
-            Helper.acceptTransactionOffer(p1, player, game, event);
+            TransactionHelper.acceptTransactionOffer(p1, player, game, event);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("sendOffer_")) {
             ButtonHelper.sendOffer(game, player, buttonID, event);

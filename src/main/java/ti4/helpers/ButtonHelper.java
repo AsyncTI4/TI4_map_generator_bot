@@ -8224,8 +8224,7 @@ public class ButtonHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
-            + "\n";
+        String message = "Current Transaction Offer is: " + TransactionHelper.buildTransactionOffer(player, opposing, game, false) + "\n";
         String requestOrOffer = "offer";
         if (requesting) {
             requestOrOffer = "request";
@@ -8441,10 +8440,10 @@ public class ButtonHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
+        String message = "Current Transaction Offer is: " + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
             + "\n## Click something else that you want to request from " + p1.getRepresentation(false, false);
         if (p1 == player) {
-            message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
+            message = "Current Transaction Offer is: " + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
                 + "\n## Click something else that YOU want to offer";
         }
         event.getMessage().delete().queue();
@@ -8461,10 +8460,10 @@ public class ButtonHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
+        String message = "Current Transaction Offer is: " + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
             + "\n## Click something that you want to request from " + p1.getRepresentation(false, false);
         if (p1 == player) {
-            message = "Current Transaction Offer is: " + Helper.buildTransactionOffer(player, opposing, game, false)
+            message = "Current Transaction Offer is: " + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
                 + "\n## Click something that YOU want to offer";
         }
         event.getMessage().delete().queue();
@@ -8479,7 +8478,7 @@ public class ButtonHelper {
         if (game.getTableTalkChannel() != null) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(),
                 "An offer has been sent by " + player.getFactionEmoji() + " to " + p2.getFactionEmoji()
-                    + ". The offer is: " + Helper.buildTransactionOffer(player, p2, game, true));
+                    + ". The offer is: " + TransactionHelper.buildTransactionOffer(player, p2, game, true));
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.danger("rescindOffer_" + p2.getFaction(), "Rescind Offer"));
@@ -8499,7 +8498,7 @@ public class ButtonHelper {
         buttons.add(Button.danger("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));
         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
             p2.getRepresentation() + " you have received a transaction offer. The offer is: "
-                + Helper.buildTransactionOffer(player, p2, game, false)
+                + TransactionHelper.buildTransactionOffer(player, p2, game, false)
                 + "\n Click to accept, reject, or counteroffer",
             buttons);
     }
@@ -8657,7 +8656,6 @@ public class ButtonHelper {
 
             }
         }
-
     }
 
     public static void resolveSpecificTransButtonPress(Game game, Player p1, String buttonID,
