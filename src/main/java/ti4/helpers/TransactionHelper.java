@@ -31,11 +31,14 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
         }
 
-        String messageText = "A transaction has been ratified between:\n- " + p1.getRepresentation() + "\n- " + p2.getRepresentation();
+        String messageText = "A transaction has been ratified between:\n-# - " + p1.getRepresentation() + "\n-# - " + p2.getRepresentation();
         MessageEmbed embed = getTransactionEmbed(p1, p2, game, true);
         MessageHelper.sendMessageToChannelWithEmbed(channel, messageText, embed);
-
-        MessageHelper.sendMessageToChannel(channel, "A transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been ratified");
+        embed = getTransactionEmbed(p1, p2, game, false);
+        MessageHelper.sendMessageToChannelWithEmbed(channel, messageText, embed); // del
+        MessageHelper.sendMessageToChannel(channel, buildTransactionOffer(p1, p2, game, true)); //del
+        MessageHelper.sendMessageToChannel(channel, buildTransactionOffer(p1, p2, game, false)); //del
+        MessageHelper.sendMessageToChannel(channel, p1.getFactionEmoji() + p2.getFactionEmoji() + " transaction details below: ");
         for (Player sender : players) {
             Player receiver = p2;
             if (sender == p2) {
@@ -110,8 +113,11 @@ public class TransactionHelper {
             ButtonHelperAbilities.pillageCheck(p2, game);
             ButtonHelperAbilities.pillageCheck(p1, game);
         }
-        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), summary);
-        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), summary);
+
+        // Send Summary to Player's CardsInfo threads
+        String summary = "The following transaction between " + p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " has been accepted";
+        MessageHelper.sendMessageToChannelWithEmbed(p1.getCardsInfoThread(), summary, embed);
+        MessageHelper.sendMessageToChannelWithEmbed(p2.getCardsInfoThread(), summary, embed);
     }
 
     private static MessageEmbed getTransactionEmbed(Player p1, Player p2, Game game, boolean publiclyShared) {
@@ -126,7 +132,7 @@ public class TransactionHelper {
         String text1 = "> " + StringUtils.substringAfter(trans1, ": ").replace("; ", "\n> ");
         eb.addField(title1, text1, true);
 
-        eb.addBlankField(true);
+        // eb.addBlankField(true);
 
         String trans2 = StringUtils.substringAfter(trans, "\n");
         String title2 = StringUtils.substringBefore(trans2, " gives") + " gives:";
@@ -250,6 +256,9 @@ public class TransactionHelper {
                         case "action" -> {
                             summary = summary + "An in-game " + furtherDetail + " action\n";
                         }
+                        default -> {
+                            summary += " some odd thing: `" + thingToTransact + "`\n";
+                        }
                     }
 
                 }
@@ -271,48 +280,28 @@ public class TransactionHelper {
 
     public static String getNothingMessage() {
         int result = ThreadLocalRandom.current().nextInt(1, 21);
-        switch (result) {
-            case 1:
-                return "Nothing But Respect And Good Will";
-            case 2:
-                return "Some Pocket Lint";
-            case 3:
-                return "Sunshine and Rainbows";
-            case 4:
-                return "A Feeling Of Accomplishment";
-            case 5:
-                return "A Crisp High Five";
-            case 6:
-                return "A Well Written Thank-You Note";
-            case 7:
-                return "Heartfelt Thanks";
-            case 8:
-                return "The Best Vibes";
-            case 9:
-                return "A Bot's Blessing For Your Trouble";
-            case 10:
-                return "Good Karma";
-            case 11:
-                return "A Mewling Kitten";
-            case 12:
-                return "A Lost Virtual Puppy";
-            case 13:
-                return "A Fortune Cookie";
-            case 14:
-                return "A Firm Handshake";
-            case 15:
-                return "A Friendly Wave";
-            case 16:
-                return "Well Wishes";
-            case 17:
-                return "A Home-cooked Meal";
-            case 18:
-                return "$1000 In Monopoly Money";
-            case 19:
-                return "Forgiveness For Past Mistakes";
-            case 20:
-                return "A Lucky Rock";
-        }
-        return "Nothing";
+        return switch (result) {
+            case 1 -> "Nothing But Respect And Good Will";
+            case 2 -> "Some Pocket Lint";
+            case 3 -> "Sunshine and Rainbows";
+            case 4 -> "A Feeling Of Accomplishment";
+            case 5 -> "A Crisp High Five";
+            case 6 -> "A Well Written Thank-You Note";
+            case 7 -> "Heartfelt Thanks";
+            case 8 -> "The Best Vibes";
+            case 9 -> "A Bot's Blessing For Your Trouble";
+            case 10 -> "Good Karma";
+            case 11 -> "A Mewling Kitten";
+            case 12 -> "A Lost Virtual Puppy";
+            case 13 -> "A Fortune Cookie";
+            case 14 -> "A Firm Handshake";
+            case 15 -> "A Friendly Wave";
+            case 16 -> "Well Wishes";
+            case 17 -> "A Home-cooked Meal";
+            case 18 -> "$1000 In Monopoly Money";
+            case 19 -> "Forgiveness For Past Mistakes";
+            case 20 -> "A Lucky Rock";
+            default -> "Nothing";
+        };
     }
 }
