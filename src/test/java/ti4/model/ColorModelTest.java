@@ -67,7 +67,7 @@ public class ColorModelTest extends BaseTi4Test {
     private static String unitPath(UnitKey uk, boolean eyes) {
         String fileName = uk.getFileName(eyes);
         String path = ResourceHelper.getInstance().getResourceFromFolder("units/", fileName, "Could not find unit file");
-        assertTrue(path != null, "Could not format path for " + uk.toString() + (eyes?" [eyes]":""));
+        assertTrue(path != null, "Could not format path for " + fileName);
         return path;
     }
 
