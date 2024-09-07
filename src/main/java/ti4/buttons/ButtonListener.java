@@ -118,6 +118,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TransactionHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -2400,8 +2401,6 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.checkTransactionLegality(game, player, p2);
                 ButtonHelper.deleteMessage(event);
             }
-        } else if (buttonID.startsWith("getNewTransaction_")) {
-            ButtonHelper.getNewTransaction(game, player, buttonID, event);
         } else if (buttonID.startsWith("rejectOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             if (p1 != null) {
@@ -2433,17 +2432,8 @@ public class ButtonListener extends ListenerAdapter {
                     return;
                 }
             }
-            Helper.acceptTransactionOffer(p1, player, game, event);
+            TransactionHelper.acceptTransactionOffer(p1, player, game, event);
             ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("sendOffer_")) {
-            ButtonHelper.sendOffer(game, player, buttonID, event);
-        } else if (buttonID.startsWith("offerToTransact_")) {
-            ButtonHelper.resolveOfferToTransact(game, player, buttonID, event);
-        } else if (buttonID.startsWith("newTransact_")) {
-            ButtonHelper.resolveSpecificTransButtonsNew(game, player, buttonID, event);
-            ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("transact_")) {
-            ButtonHelper.resolveSpecificTransButtonsOld(game, player, buttonID, event);
         } else if (buttonID.startsWith("play_after_")) {
             String riderName = buttonID.replace("play_after_", "");
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
@@ -2654,7 +2644,7 @@ public class ButtonListener extends ListenerAdapter {
             }
 
         } else if (buttonID.startsWith("send_")) {
-            ButtonHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+            TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("replacePDSWithFS_")) {
             ButtonHelperFactionSpecific.replacePDSWithFS(buttonID, event, game, player, ident);
