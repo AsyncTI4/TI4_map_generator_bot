@@ -13,7 +13,6 @@ import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Units;
-import ti4.helpers.Emojis.TI4Emoji;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
@@ -47,11 +46,12 @@ public class ColorModelTest extends BaseTi4Test {
     }
 
     private static void checkEmojisConfig(ColorModel color) {
-        try {
-            TI4Emoji.valueOf(color.getName());
-        } catch (Exception e) {
-            assertTrue(false, "Color has no emoji configured: " + color.getName());
-        }
+        // TOOD: Enable this when switching to Application Emojis
+        // try {
+        //     TI4Emoji.valueOf(color.getName());
+        // } catch (Exception e) {
+        //     assertTrue(false, "Color has no emoji configured: " + color.getName());
+        // }
 
         // Verify the emoji file
         String r1 = Emojis.getColorEmoji(color.getAlias());
