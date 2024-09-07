@@ -611,7 +611,7 @@ public class ButtonHelperFactionSpecific {
         String buttonID = "transact_ACs_" + player.getFaction();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
             "Sent Yssaril buttons so that they can send you 1AC.");
-        ButtonHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
+        TransactionHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
 
