@@ -697,7 +697,7 @@ public class FoWHelper {
 
 	public static boolean otherPlayersHaveShipsInSystem(Player player, Tile tile, Game game) {
 		for (Player p2 : game.getRealPlayersNDummies()) {
-			if (p2 == player) {
+			if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
 				continue;
 			}
 			if (playerHasShipsInSystem(p2, tile)) {
@@ -709,7 +709,7 @@ public class FoWHelper {
 
 	public static boolean otherPlayersHaveUnitsInSystem(Player player, Tile tile, Game game) {
 		for (Player p2 : game.getRealPlayersNDummies()) {
-			if (p2 == player) {
+			if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
 				continue;
 			}
 			if (playerHasUnitsInSystem(p2, tile)) {

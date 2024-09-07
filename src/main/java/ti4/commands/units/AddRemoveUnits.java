@@ -261,7 +261,7 @@ abstract public class AddRemoveUnits implements Command {
                         break;
                     }
                 }
-                if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox")) {
+                if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox") && !player1.getAllianceMembers().contains(player2.getFaction())) {
                     if ("ground".equals(combatType)) {
                         StartCombat.startGroundCombat(player1, player2, game, event, tile.getUnitHolderFromPlanet(planetName), tile);
                     } else {

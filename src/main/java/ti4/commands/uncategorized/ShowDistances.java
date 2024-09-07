@@ -75,7 +75,7 @@ public class ShowDistances implements Command {
         }
 
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
-        game.setTileDistances(CheckDistance.getTileDistances(game, player, tile.getPosition(), maxDistance));
+        game.setTileDistances(CheckDistance.getTileDistances(game, player, tile.getPosition(), maxDistance, true));
 
         MapGenerator.saveImage(game, DisplayType.map, event, true)
             .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));

@@ -774,31 +774,18 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static void oribtalDropFollowUp(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player, String ident) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            event.getMessage().getContentRaw());
-        List<Button> startButtons = new ArrayList<>();
-        Button tacticalAction = Button.success("dropAMechToo", "Spend 3 resource to drop 1 mech too");
-        startButtons.add(tacticalAction);
-        Button componentAction = Button.danger("finishComponentAction_spitItOut", "Decline Mech");
-        startButtons.add(componentAction);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            "Decide whether to drop mech",
-            startButtons);
-        event.getMessage().delete().queue();
-    }
-
-    public static void oribtalDropExhaust(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            event.getMessage().getContentRaw());
+    public static void orbitalMechDrop(String buttonID, ButtonInteractionEvent event, Game game,
+        Player player) {
+        String planet = buttonID.split("_")[1];
+        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "1 mech " + planet, game);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false) + " dropped a mech on " + Helper.getPlanetRepresentation(planet, game) + " for the cost of 3 resources");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         Button DoneExhausting = Button.danger("finishComponentAction_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             "Use Buttons to Pay For The Mech", buttons);
         event.getMessage().delete().queue();
+
     }
 
     public static List<Button> getMantleCrackingButtons(Player player, Game game) {
