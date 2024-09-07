@@ -30,6 +30,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
 public class TransactionHelper {
+    
     public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItems();
         List<Player> players = new ArrayList<>();
@@ -129,7 +130,7 @@ public class TransactionHelper {
         }
     }
 
-    public static MessageEmbed getTransactionEmbed(Player p1, Player p2, Game game, boolean publiclyShared) {
+    private static MessageEmbed getTransactionEmbed(Player p1, Player p2, Game game, boolean publiclyShared) {
         EmbedBuilder eb = new EmbedBuilder();
         String trans = buildTransactionOffer(p1, p2, game, publiclyShared);
         if (trans.startsWith("\n")) {
@@ -163,7 +164,7 @@ public class TransactionHelper {
         return eb.build();
     }
 
-    public static String buildTransactionOffer(Player p1, Player p2, Game game, boolean publiclyShared) {
+    private static String buildTransactionOffer(Player p1, Player p2, Game game, boolean publiclyShared) {
         List<String> transactionItems = p1.getTransactionItems();
         String wholeSummary = "";
         List<Player> players = new ArrayList<>();
