@@ -202,7 +202,7 @@
     "name": "Defectors",
     "phase": "Action",
     "window": "Action",
-    "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend trade goods equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
+    "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend influence equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
     "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
     "source": "action_deck_2"
   },
