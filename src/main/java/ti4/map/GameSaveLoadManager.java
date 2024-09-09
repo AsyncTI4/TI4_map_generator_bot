@@ -1,36 +1,7 @@
 package ti4.map;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -39,20 +10,14 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.Constants;
-import ti4.helpers.DiscordantStarsHelper;
-import ti4.helpers.DisplayType;
-import ti4.helpers.GlobalSettings;
-import ti4.helpers.Helper;
-import ti4.helpers.Storage;
-import ti4.helpers.Units;
+import ti4.helpers.*;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.json.ObjectMapperFactory;
@@ -60,6 +25,21 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toConcurrentMap;
 
 public class GameSaveLoadManager {
 
@@ -1220,16 +1200,19 @@ public class GameSaveLoadManager {
 
     public static void loadMaps() {
         long loadStart = System.nanoTime();
-        ConcurrentMap<String, Game> games = new ConcurrentHashMap<>();
-        Arrays.stream(readAllTxtMapFiles()).forEach(file -> {
-            try {
-                Game game = loadMap(file);
-                if (game != null && game.getName() != null)
-                    games.put(game.getName(), game);
-            } catch (Exception e) {
-                BotLogger.log("Could not load game: " + file.getName(), e);
-            }
-        });
+        ConcurrentMap<String, Game> games = Arrays.stream(readAllTxtMapFiles()).parallel()
+                .map(file -> {
+                    try {
+                        Game game = loadMap(file);
+                        if (game != null && game.getName() != null)
+                            return game;
+                    } catch (Exception e) {
+                        BotLogger.log("Could not load game: " + file.getName(), e);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(toConcurrentMap(Game::getName, Function.identity()));
         GameManager.getInstance().setGameNameToGame(games);
         long loadTime = System.nanoTime() - loadStart;
         BotLogger.logWithTimestamp(debugString("Time to load `" + games.size() + "` games: ", loadTime, loadTime));
