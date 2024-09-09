@@ -282,7 +282,7 @@ public class AsyncTI4DiscordBot {
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         BotLogger.log("# `" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING GAMES");
 
-        // Register Shutdown Hook to run when SIGTERM is recieved from docker stop
+        // Register Shutdown Hook to run when SIGTERM is received from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
@@ -306,16 +306,16 @@ public class AsyncTI4DiscordBot {
         }));
     }
 
-    private static void startBot(CommandManager commandManager, Guild guildQuaternary) {
-        if (guildQuaternary == null) {
+    private static void startBot(CommandManager commandManager, Guild guild) {
+        if (guild == null) {
             return;
         }
-        CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
+        CommandListUpdateAction commandsD = guild.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
         commandsD.queue();
-        BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuaternary.getName());
-        guilds.add(guildQuaternary);
-        serversToCreateNewGamesOn.add(guildQuaternary);
+        BotLogger.logWithTimestamp(" BOT STARTED UP: " + guild.getName());
+        guilds.add(guild);
+        serversToCreateNewGamesOn.add(guild);
     }
 
     /**
