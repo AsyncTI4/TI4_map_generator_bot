@@ -1171,13 +1171,7 @@ public class GameSaveLoadManager {
     private static File[] readAllTxtMapFiles() {
         File folder = Storage.getMapImageDirectory();
         if (!folder.exists()) {
-            try {
-                if (folder.createNewFile()) {
-                    folder = Storage.getMapImageDirectory();
-                }
-            } catch (IOException e) {
-                BotLogger.log("Could not create folder for maps", e);
-            }
+            folder.mkdirs();
         }
         File[] files = folder.listFiles((directory, fileName) -> fileName.endsWith(".txt"));
         return files == null ? new File[0] : files;
@@ -1262,7 +1256,6 @@ public class GameSaveLoadManager {
                         data = tmpData != null ? tmpData : gameFileLines.next();
                         tmpData = null;
                         if (PLAYER.equals(data)) {
-
                             player = game.addPlayerLoad(gameFileLines.next(), gameFileLines.next());
                             continue;
                         }
@@ -1273,94 +1266,7 @@ public class GameSaveLoadManager {
                     }
                 }
             }
-            Map<String, Tile> tileMap = new HashMap<>();
-            try {
-                while (gameFileLines.hasNext()) {
-                    String tileData = gameFileLines.next();
-                    if (TILE.equals(tileData)) {
-                        continue;
-                    }
-                    if (ENDTILE.equals(tileData)) {
-                        continue;
-                    }
-                    if (tileData.isEmpty()) {
-                        continue;
-                    }
-                    Tile tile = readTile(tileData);
-                    if (tile != null) {
-                        tileMap.put(tile.getPosition(), tile);
-                    } else {
-                        BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `"
-                            + tileData + "` - tile will be skipped - check save file");
-                    }
-
-                    while (gameFileLines.hasNext()) {
-                        String tmpData = gameFileLines.next();
-                        if (UNITHOLDER.equals(tmpData)) {
-                            continue;
-                        }
-                        if (ENDUNITHOLDER.equals(tmpData)) {
-                            break;
-                        }
-                        String spaceHolder = null;
-                        while (gameFileLines.hasNext()) {
-                            String data = tmpData != null ? tmpData : gameFileLines.next();
-                            tmpData = null;
-                            if (UNITS.equals(data)) {
-                                spaceHolder = gameFileLines.next().toLowerCase();
-                                if (tile != null) {
-                                    if (Constants.MIRAGE.equals(spaceHolder)) {
-                                        Helper.addMirageToTile(tile);
-                                    } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                        BotLogger.log(game.getName() + ": Not valid space holder detected: "
-                                            + spaceHolder);
-                                    }
-                                }
-                                continue;
-                            }
-                            if (ENDUNITS.equals(data)) {
-                                break;
-                            }
-                            readUnit(tile, data, spaceHolder);
-                        }
-
-                        while (gameFileLines.hasNext()) {
-                            String data = gameFileLines.next();
-                            if (UNITDAMAGE.equals(data)) {
-                                continue;
-                            }
-                            if (ENDUNITDAMAGE.equals(data)) {
-                                break;
-                            }
-                            readUnitDamage(tile, data, spaceHolder);
-                        }
-
-                        while (gameFileLines.hasNext()) {
-                            String data = gameFileLines.next();
-                            if (PLANET_TOKENS.equals(data)) {
-                                continue;
-                            }
-                            if (PLANET_ENDTOKENS.equals(data)) {
-                                break;
-                            }
-                            readPlanetTokens(tile, data, spaceHolder);
-                        }
-                    }
-
-                    while (gameFileLines.hasNext()) {
-                        String data = gameFileLines.next();
-                        if (TOKENS.equals(data)) {
-                            continue;
-                        }
-                        if (ENDTOKENS.equals(data)) {
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                BotLogger.log("Data read error: " + mapFile.getName(), e);
-            }
-            game.setTileMap(tileMap);
+            game.setTileMap(getTileMap(gameFileLines, game, mapFile));
             game.endGameIfOld();
             return game;
         } catch (Exception e) {
@@ -1368,6 +1274,97 @@ public class GameSaveLoadManager {
         }
 
         return null;
+    }
+
+    private static Map<String, Tile> getTileMap(Iterator<String> gameFileLines, Game game, File mapFile) {
+        Map<String, Tile> tileMap = new HashMap<>();
+        try {
+            while (gameFileLines.hasNext()) {
+                String tileData = gameFileLines.next();
+                if (TILE.equals(tileData)) {
+                    continue;
+                }
+                if (ENDTILE.equals(tileData)) {
+                    continue;
+                }
+                if (tileData.isEmpty()) {
+                    continue;
+                }
+                Tile tile = readTile(tileData);
+                if (tile != null) {
+                    tileMap.put(tile.getPosition(), tile);
+                } else {
+                    BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `"
+                            + tileData + "` - tile will be skipped - check save file");
+                }
+
+                while (gameFileLines.hasNext()) {
+                    String tmpData = gameFileLines.next();
+                    if (UNITHOLDER.equals(tmpData)) {
+                        continue;
+                    }
+                    if (ENDUNITHOLDER.equals(tmpData)) {
+                        break;
+                    }
+                    String spaceHolder = null;
+                    while (gameFileLines.hasNext()) {
+                        String data = tmpData != null ? tmpData : gameFileLines.next();
+                        tmpData = null;
+                        if (UNITS.equals(data)) {
+                            spaceHolder = gameFileLines.next().toLowerCase();
+                            if (tile != null) {
+                                if (Constants.MIRAGE.equals(spaceHolder)) {
+                                    Helper.addMirageToTile(tile);
+                                } else if (!tile.isSpaceHolderValid(spaceHolder)) {
+                                    BotLogger.log(game.getName() + ": Not valid space holder detected: "
+                                            + spaceHolder);
+                                }
+                            }
+                            continue;
+                        }
+                        if (ENDUNITS.equals(data)) {
+                            break;
+                        }
+                        readUnit(tile, data, spaceHolder);
+                    }
+
+                    while (gameFileLines.hasNext()) {
+                        String data = gameFileLines.next();
+                        if (UNITDAMAGE.equals(data)) {
+                            continue;
+                        }
+                        if (ENDUNITDAMAGE.equals(data)) {
+                            break;
+                        }
+                        readUnitDamage(tile, data, spaceHolder);
+                    }
+
+                    while (gameFileLines.hasNext()) {
+                        String data = gameFileLines.next();
+                        if (PLANET_TOKENS.equals(data)) {
+                            continue;
+                        }
+                        if (PLANET_ENDTOKENS.equals(data)) {
+                            break;
+                        }
+                        readPlanetTokens(tile, data, spaceHolder);
+                    }
+                }
+
+                while (gameFileLines.hasNext()) {
+                    String data = gameFileLines.next();
+                    if (TOKENS.equals(data)) {
+                        continue;
+                    }
+                    if (ENDTOKENS.equals(data)) {
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            BotLogger.log("Data read error: " + mapFile.getName(), e);
+        }
+        return tileMap;
     }
 
     private static void readGameInfo(Game game, String data) {
