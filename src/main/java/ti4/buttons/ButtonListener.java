@@ -119,6 +119,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.helpers.TransactionHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.AnnotationHandler;
@@ -1670,6 +1671,8 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 AgendaHelper.exhaustPlanetsForVotingVersion2(buttonID, event, game, player);
             }
+        } else if (buttonID.startsWith("orbitalMechDrop_")) {
+            ButtonHelperAbilities.orbitalMechDrop(buttonID, event, game, player);
         } else if (buttonID.startsWith("dacxive_")) {
             String planet = buttonID.replace("dacxive_", "");
             new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)),
@@ -2400,8 +2403,6 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.checkTransactionLegality(game, player, p2);
                 ButtonHelper.deleteMessage(event);
             }
-        } else if (buttonID.startsWith("getNewTransaction_")) {
-            ButtonHelper.getNewTransaction(game, player, buttonID, event);
         } else if (buttonID.startsWith("rejectOffer_")) {
             Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
             if (p1 != null) {
@@ -2433,17 +2434,8 @@ public class ButtonListener extends ListenerAdapter {
                     return;
                 }
             }
-            Helper.acceptTransactionOffer(p1, player, game, event);
+            TransactionHelper.acceptTransactionOffer(p1, player, game, event);
             ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("sendOffer_")) {
-            ButtonHelper.sendOffer(game, player, buttonID, event);
-        } else if (buttonID.startsWith("offerToTransact_")) {
-            ButtonHelper.resolveOfferToTransact(game, player, buttonID, event);
-        } else if (buttonID.startsWith("newTransact_")) {
-            ButtonHelper.resolveSpecificTransButtonsNew(game, player, buttonID, event);
-            ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("transact_")) {
-            ButtonHelper.resolveSpecificTransButtonsOld(game, player, buttonID, event);
         } else if (buttonID.startsWith("play_after_")) {
             String riderName = buttonID.replace("play_after_", "");
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
@@ -2654,7 +2646,7 @@ public class ButtonListener extends ListenerAdapter {
             }
 
         } else if (buttonID.startsWith("send_")) {
-            ButtonHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+            TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("replacePDSWithFS_")) {
             ButtonHelperFactionSpecific.replacePDSWithFS(buttonID, event, game, player, ident);
@@ -2891,8 +2883,8 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     ButtonHelper.deleteMessage(event);
                 }
-                case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, buttonID, false);
-                case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, buttonID, true);
+                case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, messageID, false);
+                case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, messageID, true);
                 case Constants.SO_NO_SCORING -> {
                     String message = player.getRepresentation()
                         + " - no Secret Objective scored.";
@@ -4064,16 +4056,6 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteTheOneButton(event);
                     game.setStoredValue("lawsDisabled", "yes");
                 }
-                case "orbitolDropFollowUp" -> ButtonHelperAbilities.oribtalDropFollowUp(buttonID, event, game, player, ident);
-                case "dropAMechToo" -> {
-                    String message = "Please select the same planet you dropped the infantry on";
-                    List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "mech", "place");
-                    buttons.add(Button.danger("orbitolDropExhaust", "Pay for mech"));
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        message, buttons);
-                    ButtonHelper.deleteMessage(event);
-                }
-                case "orbitolDropExhaust" -> ButtonHelperAbilities.oribtalDropExhaust(buttonID, event, game, player, ident);
                 case "dominusOrb" -> {
                     game.setDominusOrb(true);
                     String purgeOrExhaust = "Purged ";

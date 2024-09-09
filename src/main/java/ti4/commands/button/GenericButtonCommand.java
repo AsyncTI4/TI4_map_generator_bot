@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -52,7 +53,9 @@ public class GenericButtonCommand implements Command {
             buttonText = "Record Response";
         }
 
-        Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), buttonText);
+        String id = event.getOption("spoof_id", Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), OptionMapping::getAsString);
+
+        Button button = Buttons.gray(id, buttonText);
 
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
     }
@@ -68,6 +71,7 @@ public class GenericButtonCommand implements Command {
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true))
+                .addOptions(new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"))
         );
     }
 }

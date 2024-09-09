@@ -53,6 +53,7 @@ public class TurnStart extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
             return;
         }
+        mainPlayer.setTurnCount(mainPlayer.getTurnCount() - 1);
         turnStart(event, game, mainPlayer);
     }
 
