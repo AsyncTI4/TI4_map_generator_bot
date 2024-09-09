@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.generator.TileHelper;
 import ti4.message.BotLogger;
+import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 
