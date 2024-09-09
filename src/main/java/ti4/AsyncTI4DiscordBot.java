@@ -212,67 +212,56 @@ public class AsyncTI4DiscordBot {
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
-        CommandListUpdateAction commands = guildPrimary.updateCommands();
-        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
-        commands.queue();
-        BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildPrimary.getName());
-        guilds.add(guildPrimary);
+        startBot(commandManager, guildPrimary);
 
         // Community Plays TI
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
-            if (guildCommunityPlays != null) {
-                CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
-                commandsC.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildCommunityPlays.getName());
-                guilds.add(guildCommunityPlays);
-            }
+            startBot(commandManager, guildCommunityPlays);
         }
 
         // Async: FOW Chapter
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
-            if (guildFogOfWar != null) {
-                CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
-                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-                commandsD.queue();
-                BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildFogOfWar.getName());
-                guilds.add(guildFogOfWar);
+            startBot(commandManager, guildFogOfWar);
 
-                // JAZZ WILL GET PINGED IF SHIT IS BROKEN FOR FOG GAMES
-                FoWHelper.sanityCheckFowReacts();
-            }
+            // JAZZ WILL GET PINGED IF SHIT IS BROKEN FOR FOG GAMES
+            FoWHelper.sanityCheckFowReacts();
         }
 
         // Async: Stroter's Paradise
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
             startBot(commandManager, guildSecondary);
+            serversToCreateNewGamesOn.add(guildSecondary);
         }
 
         // Async: Dreadn't
         if (args.length >= 7) {
             guildTertiary = jda.getGuildById(args[6]);
             startBot(commandManager, guildTertiary);
+            serversToCreateNewGamesOn.add(guildTertiary);
         }
 
         // Async: War Sun Tzu
         if (args.length >= 8) {
             guildQuaternary = jda.getGuildById(args[7]);
             startBot(commandManager, guildQuaternary);
+            serversToCreateNewGamesOn.add(guildQuaternary);
         }
 
         // Async: Fighter Club
         if (args.length >= 9) {
             guildQuinary = jda.getGuildById(args[8]);
             startBot(commandManager, guildQuinary);
+            serversToCreateNewGamesOn.add(guildQuinary);
         }
 
         // Async: Tommer Hawk
         if (args.length >= 10) {
             guildSenary = jda.getGuildById(args[9]);
             startBot(commandManager, guildSenary);
+            serversToCreateNewGamesOn.add(guildSenary);
         }
 
         // LOAD DATA
@@ -330,12 +319,11 @@ public class AsyncTI4DiscordBot {
         if (guild == null) {
             return;
         }
-        CommandListUpdateAction commandsD = guild.updateCommands();
-        commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-        commandsD.queue();
+        CommandListUpdateAction commands = guild.updateCommands();
+        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
+        commands.queue();
         BotLogger.logWithTimestamp(" BOT STARTED UP: " + guild.getName());
         guilds.add(guild);
-        serversToCreateNewGamesOn.add(guild);
     }
 
     /**
