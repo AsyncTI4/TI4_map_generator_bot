@@ -221,8 +221,8 @@ public class GameSaveLoadManager {
         }
         undoTime += System.nanoTime() - undoStart;
 
-        long savetime = System.nanoTime() - saveStart;
-        saveTimes.add(savetime);
+        long saveTime = System.nanoTime() - saveStart;
+        saveTimes.add(saveTime);
     }
 
     public static void saveMapJson(Game game) {
@@ -238,11 +238,8 @@ public class GameSaveLoadManager {
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
         File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
-        if (originalMapFile != null) {
+        if (originalMapFile.exists()) {
             File mapUndoDirectory = Storage.getMapUndoDirectory();
-            if (mapUndoDirectory == null) {
-                return;
-            }
             if (!mapUndoDirectory.exists()) {
                 return;
             }
@@ -309,7 +306,7 @@ public class GameSaveLoadManager {
 
     public static void reload(Game game) {
         File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
-        if (originalMapFile != null) {
+        if (originalMapFile.exists()) {
             Game loadedGame = loadMap(originalMapFile);
             GameManager.getInstance().deleteGame(game.getName());
             GameManager.getInstance().addGame(loadedGame);
@@ -318,9 +315,6 @@ public class GameSaveLoadManager {
 
     private static void saveUndo(Game game, File originalMapFile) {
         File mapUndoDirectory = Storage.getMapUndoDirectory();
-        if (mapUndoDirectory == null) {
-            return;
-        }
         if (!mapUndoDirectory.exists()) {
             mapUndoDirectory.mkdir();
         }

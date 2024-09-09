@@ -1,24 +1,5 @@
 package ti4;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -30,6 +11,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.autocomplete.AutoCompleteListener;
 import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
@@ -62,25 +47,9 @@ import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
-import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.AddFrontierTokens;
-import ti4.commands.tokens.AddToken;
-import ti4.commands.tokens.RemoveAllCC;
-import ti4.commands.tokens.RemoveCC;
-import ti4.commands.tokens.RemoveToken;
-import ti4.commands.uncategorized.AllInfo;
-import ti4.commands.uncategorized.CardsInfo;
-import ti4.commands.uncategorized.DeleteGame;
-import ti4.commands.uncategorized.SelectionBoxDemo;
-import ti4.commands.uncategorized.ShowDistances;
-import ti4.commands.uncategorized.ShowGame;
-import ti4.commands.units.AddUnitDamage;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveAllUnitDamage;
-import ti4.commands.units.RemoveAllUnits;
-import ti4.commands.units.RemoveUnitDamage;
-import ti4.commands.units.RemoveUnits;
+import ti4.commands.tokens.*;
+import ti4.commands.uncategorized.*;
+import ti4.commands.units.*;
 import ti4.commands.user.UserCommand;
 import ti4.commands.user.UserSettingsManager;
 import ti4.generator.Mapper;
@@ -97,6 +66,16 @@ import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
+
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import static org.reflections.scanners.Scanners.SubTypes;
 
 public class AsyncTI4DiscordBot {
 
@@ -322,20 +301,21 @@ public class AsyncTI4DiscordBot {
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }));
     }
 
     private static void startBot(CommandManager commandManager, Guild guildQuaternary) {
-        if (guildQuaternary != null) {
-            CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
-            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-            commandsD.queue();
-            BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuaternary.getName());
-            guilds.add(guildQuaternary);
-            serversToCreateNewGamesOn.add(guildQuaternary);
+        if (guildQuaternary == null) {
+            return;
         }
+        CommandListUpdateAction commandsD = guildQuaternary.updateCommands();
+        commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+        commandsD.queue();
+        BotLogger.logWithTimestamp(" BOT STARTED UP: " + guildQuaternary.getName());
+        guilds.add(guildQuaternary);
+        serversToCreateNewGamesOn.add(guildQuaternary);
     }
 
     /**
