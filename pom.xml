@@ -169,7 +169,7 @@
                 <version>3.2.5</version>
                 <configuration>
                     <environmentVariables>
-                        <DB_PATH>./db_storage</DB_PATH>
+                        <DB_PATH>./src/test/resources</DB_PATH>
                         <RESOURCE_PATH>./src/main/resources</RESOURCE_PATH>
                     </environmentVariables>
                 </configuration>
