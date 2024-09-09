@@ -1,13 +1,15 @@
 {
-    "id": "92",
-    "name": "Archon Ren/Archon Tau Keleres",
+    "id": "er116b",
+    "name": "Phylob",
     "aliases": [
-        "ArchonRenKeleres",
-        "ArchonRenKel",
-        "ArchonRenKOld"
+        "er116b",
+        "phylob"
     ],
-    "imagePath": "92_ArchonRenKeleres.png",
-    "shipPositionsType": "TYPE02",
+    "imagePath": "er_116edited_async.png",
+    "planets": [
+        "phylob"
+    ],
+    "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [
         {
             "x": 180.0,
@@ -26,10 +28,9 @@
             "y": 170.0
         }
     ],
-    "wormholes": [],
-    "planets": [
-        "archonren",
-        "archontau"
-    ],
-    "source": "codex3"
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous"
 }

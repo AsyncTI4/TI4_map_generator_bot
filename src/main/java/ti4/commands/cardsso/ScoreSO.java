@@ -1,6 +1,11 @@
 package ti4.commands.cardsso;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,11 +23,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class ScoreSO extends SOCardsSubcommandData {
     public ScoreSO() {
@@ -78,7 +78,7 @@ public class ScoreSO extends SOCardsSubcommandData {
                     String soStringID = entry.getKey();
                     buttons.add(Button.success("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach your hero to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve";
+                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
@@ -90,6 +90,12 @@ public class ScoreSO extends SOCardsSubcommandData {
                     for (String fragid : fragmentsToPurge) {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
+                    }
+                    Player lanefirPlayer = game.getPlayers().values().stream().filter(
+                        p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
+
+                    if (lanefirPlayer != null) {
+                        ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
                     }
                     String message2 = player.getRepresentation() + " purged fragments: "
                         + fragmentsToPurge;
@@ -130,7 +136,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
 
         // FoW logic, specific for players with visilibty, generic for the rest
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             FoWHelper.pingPlayersDifferentMessages(game, event, player, message.toString(), "Scores changed");
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }

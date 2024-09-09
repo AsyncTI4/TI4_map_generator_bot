@@ -44,11 +44,11 @@ public abstract class BagDraft {
     public abstract int getBagSize();
 
     public int getPicksFromFirstBag() {
-      return 3;
+        return 3;
     }
 
     public int getPicksFromNextBags() {
-      return 2;
+        return 2;
     }
 
     public boolean isDraftStageComplete() {
@@ -140,7 +140,7 @@ public abstract class BagDraft {
         }
 
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
-        if (owner.isFoWMode()) {
+        if (owner.isFowMode()) {
             threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
         }
 
@@ -158,7 +158,7 @@ public abstract class BagDraft {
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!owner.isCommunityMode() && !owner.isFoWMode());
+        boolean isPrivateChannel = (!owner.isCommunityMode() && !owner.isFowMode());
         if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
@@ -174,7 +174,7 @@ public abstract class BagDraft {
 
     public ThreadChannel findExistingBagChannel(Player player) {
         String threadName = Constants.BAG_INFO_THREAD_PREFIX + owner.getName() + "-" + player.getUserName().replaceAll("/", "");
-        if (owner.isFoWMode()) {
+        if (owner.isFowMode()) {
             threadName = owner.getName() + "-" + "bag-info-" + player.getUserName().replaceAll("/", "") + "-private";
         }
         return findExistingBagChannel(player, threadName);

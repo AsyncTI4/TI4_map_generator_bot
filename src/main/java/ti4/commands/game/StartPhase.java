@@ -35,8 +35,9 @@ public class StartPhase extends GameSubcommandData {
             case "strategy" -> ButtonHelper.startStrategyPhase(event, game);
             case "voting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
-            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event, "both");
-            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event, "1");
+            case "shuffleDecks" -> game.shuffleDecks();
+            case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
+            case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
             // case "unleashTheNames" -> OtherStats.sendAllNames(event);
             // case "unleashTheNamesDS" -> OtherStats.sendAllNames(event, true, false);
             // case "unleashTheNamesAbsol" -> OtherStats.sendAllNames(event, false, true);
@@ -71,7 +72,7 @@ public class StartPhase extends GameSubcommandData {
                 }
             }
             case "statusHomework" -> ButtonHelper.startStatusHomework(event, game);
-            case "agendaResolve" -> AgendaHelper.resolveTime(event, game, null);
+            case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
             case "pbd1000decks" -> {
                 game.pbd1000decks();
                 GameSaveLoadManager.saveMap(game, event);

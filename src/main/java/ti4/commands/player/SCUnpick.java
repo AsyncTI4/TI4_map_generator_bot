@@ -21,7 +21,7 @@ import ti4.message.MessageHelper;
 
 public class SCUnpick extends PlayerSubcommandData {
     public SCUnpick() {
-        super(Constants.SC_UNPICK, "Unpick an SC");
+        super(Constants.SC_UNPICK, "Unpick a Strategy Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -66,7 +66,7 @@ public class SCUnpick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentation(true, true) + " To Pick SC";
+                msgExtra += player_.getRepresentation(true, true) + " To Pick Strategy Card.";
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -81,7 +81,7 @@ public class SCUnpick extends PlayerSubcommandData {
 
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
-            msgExtra += "\nAll players picked SC";
+            msgExtra += "\nAll players picked strategy cards.";
 
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {

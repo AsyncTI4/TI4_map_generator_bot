@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -32,7 +31,7 @@ public class ListTurnOrder extends StatusSubcommandData {
 
     public static void turnOrder(GenericInteractionCreateEvent event, Game game, boolean pingPeople) {
 
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
             return;
         }
@@ -66,7 +65,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (passed) {
                 text += "~~";
             }
-            if (pingPeople || game.isFoWMode()) {
+            if (pingPeople || game.isFowMode()) {
                 text += player.getRepresentation();
             } else {
                 text += player.getFactionEmoji() + " " + player.getUserName();

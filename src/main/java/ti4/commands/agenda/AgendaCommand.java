@@ -1,8 +1,10 @@
 package ti4.commands.agenda;
 
-import net.dv8tion.jda.api.entities.User;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
@@ -12,11 +14,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class AgendaCommand implements Command {
 
@@ -77,6 +74,8 @@ public class AgendaCommand implements Command {
         subcommands.add(new ShuffleAgendas());
         subcommands.add(new ResetAgendas());
         subcommands.add(new Cleanup());
+        subcommands.add(new ExhaustSC());
+        subcommands.add(new AddControlToken());
         subcommands.add(new ResetDrawStateAgendas());
         subcommands.add(new PutDiscardBackIntoDeckAgendas());
         subcommands.add(new LawInfo());

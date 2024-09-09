@@ -20,12 +20,13 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class StellarConverter extends SpecialSubcommandData {
 
     public StellarConverter() {
-        super(Constants.STELLAR_CONVERTER, "Select planet to use Stellar Converter on it");
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
+        super(Constants.STELLAR_CONVERTER, "Stellar Convert a planet.");
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to be converted.").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -35,7 +36,7 @@ public class StellarConverter extends SpecialSubcommandData {
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found.");
             return;
         }
 
@@ -45,7 +46,7 @@ public class StellarConverter extends SpecialSubcommandData {
         }
         String planetName = planetOption.getAsString();
         if (!game.getPlanets().contains(planetName)) {
-            MessageHelper.replyToMessage(event, "Planet not found in map");
+            MessageHelper.replyToMessage(event, "Planet not found in map.");
             return;
         }
         secondHalfOfStellar(game, planetName, event);
@@ -55,23 +56,24 @@ public class StellarConverter extends SpecialSubcommandData {
 
         Tile tile = game.getTileFromPlanet(planetName);
         if (tile == null) {
-            MessageHelper.replyToMessage(event, "System not found that contains planet");
+            MessageHelper.replyToMessage(event, "System not found that contains planet.");
             return;
         }
         UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
         if (unitHolder == null) {
-            MessageHelper.replyToMessage(event, "System not found that contains planet");
+            MessageHelper.replyToMessage(event, "System not found that contains planet.");
             return;
         }
 
-        String message1 = "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced";
+        String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" :
+            "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
         postTileInDisasterWatch(game, tile, 1, "Moments before disaster in game " + game.getName());
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                    p2.getRepresentation(true, true) + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been stellar converted");
+                    p2.getRepresentation(true, true) + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been Stellar Converted.");
                 int amountToKill = 0;
                 amountToKill = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                 if (p2.hasInf2Tech()) {
@@ -105,7 +107,7 @@ public class StellarConverter extends SpecialSubcommandData {
     }
 
     public static void postTileInDisasterWatch(Game game, Tile tile, Integer rings, String message) {
-        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFoWMode()) {
+        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
             TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, rings, tile.getPosition(), null);
             MessageHelper.sendMessageWithFile(watchPary, systemWithContext, message, false);

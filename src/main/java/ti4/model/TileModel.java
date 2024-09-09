@@ -35,7 +35,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @Override
     @JsonIgnore
     public boolean isValid() {
-        return id != null 
+        return id != null
             && imagePath != null
             && source != null;
     }

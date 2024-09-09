@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.messages.MessagePoll.LayoutType;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -93,7 +94,7 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithEmbedsAndButtons(MessageChannel channel, String messageText, List<MessageEmbed> embeds, List<Button> buttons) {
 		Game game = getGameFromChannelName(channel.getName());
 		if (buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")
-			&& !messageText.contains("end of turn ability") && game != null && game.getUndoButton()) {
+			&& !messageText.contains("end of turn ability") && game != null && game.isUndoButtonOffered()) {
 			buttons = addUndoButtonToList(buttons, game);
 		}
 		splitAndSent(messageText, channel, embeds, buttons);
@@ -225,6 +226,7 @@ public class MessageHelper {
 		sendFileUploadToChannel(channel, fileUpload);
 	}
 
+	//.setEphemeral(true).queue();
 	public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
 		if (fileUpload == null) {
 			BotLogger.log("FileUpload null");
@@ -232,6 +234,14 @@ public class MessageHelper {
 		}
 		channel.sendFiles(fileUpload).queue(null,
 			error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error)));
+	}
+
+	public static void sendEphemeralFileInResponseToButtonPress(FileUpload fileUpload, ButtonInteractionEvent event) {
+		if (fileUpload == null) {
+			BotLogger.log("FileUpload null");
+			return;
+		}
+		event.getHook().sendMessage("Here is your requested image").addFiles(fileUpload).setEphemeral(true).queue();
 	}
 
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
@@ -250,6 +260,18 @@ public class MessageHelper {
 	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload,
 		boolean forceShowMap) {
 		replyToMessage(event, fileUpload, forceShowMap, null, false);
+	}
+
+	public static void editMessageWithButtons(ButtonInteractionEvent event, String message, List<Button> buttons) {
+		editMessageWithButtonsAndFiles(event, message, buttons, Collections.emptyList());
+	}
+
+	public static void editMessageWithButtonsAndFiles(ButtonInteractionEvent event, String message, List<Button> buttons, List<FileUpload> files) {
+		editMessageWithActionRowsAndFiles(event, message, ActionRow.partitionOf(buttons), files);
+	}
+
+	public static void editMessageWithActionRowsAndFiles(ButtonInteractionEvent event, String message, List<ActionRow> rows, List<FileUpload> files) {
+		event.getHook().editOriginal(message).setComponents(rows).setFiles(files).queue();
 	}
 
 	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap,
@@ -310,10 +332,24 @@ public class MessageHelper {
 		if (channel == null) {
 			return;
 		}
+
+		if (channel instanceof ThreadChannel thread) {
+			if (thread.isArchived() && !thread.isLocked()) {
+				String txt = messageText;
+				List<Button> butts = buttons;
+				thread.getManager().setArchived(false).queue((v) -> {
+					splitAndSentWithAction(txt, channel, restAction, embeds, butts);
+				}, BotLogger::catchRestError);
+				return;
+			} else if (thread.isLocked()) {
+				BotLogger.log("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
+			}
+		}
+
 		buttons = sanitizeButtons(buttons, channel);
 
 		Game game = getGameFromChannelName(channel.getName());
-		if (game != null && game.isInjectRulesLinks() && !game.isFoWMode()) {
+		if (game != null && game.isInjectRulesLinks() && !game.isFowMode()) {
 			messageText = injectRules(messageText);
 		}
 		final String message = messageText;
@@ -326,7 +362,7 @@ public class MessageHelper {
 					error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
 			} else { // last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
-					if (message != null && game != null && !game.isFoWMode()) {
+					if (message != null && game != null && !game.isFowMode()) {
 						if (message.contains("Use buttons to do your turn") || message.contains("Use buttons to end turn")) {
 							game.setLatestTransactionMsg(complete.getId());
 						}
@@ -425,7 +461,7 @@ public class MessageHelper {
 			return false;
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
-			if (!game.isFoWMode()) {
+			if (!game.isFowMode()) {
 				privateChannel = player.getCardsInfoThread();
 			}
 			if (privateChannel == null) {
@@ -738,7 +774,11 @@ public class MessageHelper {
 						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel()
 							+ "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " "
 							+ emoji.getId());
-					button = Button.of(button.getStyle(), button.getId(), button.getLabel());
+					String label = button.getLabel();
+					if (label.isBlank()) {
+						label = String.format(":%s:", emoji.getName());
+					}
+					button = Button.of(button.getStyle(), button.getId(), label);
 				}
 			}
 			newButtons.add(button);

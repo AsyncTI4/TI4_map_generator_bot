@@ -41,7 +41,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.FOWGM, "Default GM is whoever runs this command"));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next fow###)"));
+        // addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next fow###)"));
     }
 
     @Override
@@ -129,7 +129,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
 
         // CREATE GAME
         Game newGame = GameCreate.createNewGame(event, gameName, gameOwner);
-        newGame.setFoWMode(true);
+        newGame.setFowMode(true);
 
         //ADD PLAYERS
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
@@ -162,7 +162,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         MessageHelper.sendMessageToChannel(actionsChannel, role.getAsMention() + " - actions channel");
-        newGame.setMainGameChannelID(actionsChannel.getId());
+        newGame.setMainChannelID(actionsChannel.getId());
 
         // Individual player channels
         for (Member member : members) {

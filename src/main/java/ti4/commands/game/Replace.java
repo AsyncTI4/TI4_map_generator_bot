@@ -85,7 +85,7 @@ public class Replace extends GameSubcommandData {
         }
 
         //REMOVE ROLE
-        Guild guild = event.getGuild();
+        Guild guild = game.getGuild();
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (removedMember != null && roles.size() == 1) {
@@ -106,6 +106,7 @@ public class Replace extends GameSubcommandData {
 
         message = "Game: " + game.getName() + "  Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
         Player player = game.getPlayer(removedPlayer.getUserID());
+        boolean speaker = player.isSpeaker();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         for (Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
             List<String> value = poEntry.getValue();
@@ -124,7 +125,7 @@ public class Replace extends GameSubcommandData {
         }
         if (removedPlayer.getUserID().equals(game.getActivePlayerID())) {
             // do not update stats for this action
-            game.setActivePlayer(addedUser.getId());
+            game.setActivePlayerID(addedUser.getId());
         }
 
         Helper.fixGameChannelPermissions(event.getGuild(), game);
@@ -133,6 +134,9 @@ public class Replace extends GameSubcommandData {
         }
         game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, player.getUserID());
 
+        if (speaker) {
+            game.setSpeaker(player.getUserID());
+        }
         GameSaveLoadManager.saveMap(game, event);
         GameSaveLoadManager.reload(game);
 

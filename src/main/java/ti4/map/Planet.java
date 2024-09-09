@@ -50,8 +50,9 @@ public class Planet extends UnitHolder {
             } else if (planetInfo.getPlanetType() != null) {
                 originalPlanetType = planetInfo.getPlanetType().toString();
             }
-
-            contrastColor = planetInfo.getContrastColor().orElse("");
+            if (planetInfo.getContrastColor() != null) {
+                contrastColor = planetInfo.getContrastColor();
+            }
             if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0) {
                 originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString();
                 techSpeciality.addAll(planetInfo.getTechSpecialties().stream().map(x -> x.toString()).toList());
@@ -79,6 +80,7 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(token -> {
             AttachmentModel attach = Mapper.getAttachmentInfo(token);
@@ -86,8 +88,23 @@ public class Planet extends UnitHolder {
 
             if (token.contains("sleeper")) return false;
             if (token.contains("dmz_large")) return false;
+            if (token.contains("custodiavigilia")) return false;
             return !Helper.isFakeAttachment(token);
         });
+    }
+
+    @JsonIgnore
+    @SuppressWarnings("deprecation") // TODO (Jazz): add a better way to handle fake attachies
+    public List<String> getAttachments() {
+        return tokenList.stream().filter(token -> {
+            AttachmentModel attach = Mapper.getAttachmentInfo(token);
+            if (attach != null && attach.isFakeAttachment()) return false;
+
+            if (token.contains("sleeper")) return false;
+            if (token.contains("dmz_large")) return false;
+            if (token.contains("custodiavigilia")) return false;
+            return !Helper.isFakeAttachment(token);
+        }).toList();
     }
 
     @JsonIgnore

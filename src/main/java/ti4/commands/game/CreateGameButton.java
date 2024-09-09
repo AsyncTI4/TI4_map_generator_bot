@@ -91,12 +91,12 @@ public class CreateGameButton extends GameSubcommandData {
                     + ")\n";
                 counter++;
             }
-            Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
             buttonMsg = buttonMsg + "\n\n" + " Please hit this button after confirming that the members are the correct ones.";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg);
             MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
             ActionRow actionRow = ActionRow.of(buttons);
             baseMessageObject.addComponents(actionRow);
+            // Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
             // event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
             //     String msg = bothelperRole.getAsMention() + " this game is ready for launching "
             //         + message_.getJumpUrl();
@@ -128,7 +128,7 @@ public class CreateGameButton extends GameSubcommandData {
 
         if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when its fixed.");
+                "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
         if (member != null) {

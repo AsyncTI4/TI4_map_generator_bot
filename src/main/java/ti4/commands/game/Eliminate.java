@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -17,6 +18,7 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -72,7 +74,7 @@ public class Eliminate extends AddRemovePlayer {
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
             if (player != null && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
-                if (player.getPlanets().size() > 0) {
+                if (player.getPlanetsAllianceMode().size() > 0) {
                     Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
                     String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
                     if (bothelperRole != null) {
@@ -115,16 +117,14 @@ public class Eliminate extends AddRemovePlayer {
                 //discard all of a players ACs
                 Map<String, Integer> acs = new LinkedHashMap<>(player.getActionCards());
                 for (Map.Entry<String, Integer> ac : acs.entrySet()) {
-                    boolean removed = game.discardActionCard(player.getUserID(), ac.getValue());
-                    String sb = "Player: " + player.getUserName() + " - " +
-                        "Discarded Action Card:" + "\n" +
-                        Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
+                    game.discardActionCard(player.getUserID(), ac.getValue());
+                    String sb = "Player: " + player.getUserName() + " - " + "Discarded Action Card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb);
                 }
                 //unscore all of a players SOs
                 acs = new LinkedHashMap<>(player.getSecretsScored());
                 for (int so : acs.values()) {
-                    boolean scored = game.unscoreSecretObjective(player.getUserID(), so);
+                    game.unscoreSecretObjective(player.getUserID(), so);
                 }
                 //discard all of a players SOs
 
@@ -139,6 +139,7 @@ public class Eliminate extends AddRemovePlayer {
                 }
                 player.setEliminated(true);
                 player.setDummy(true);
+                Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game);
             } else {
                 game.removePlayer(player.getUserID());
             }

@@ -28,6 +28,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -130,7 +131,9 @@ abstract public class AddRemoveUnits implements Command {
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Game game) {
         unitList = unitList.replace(", ", ",").replace("-", "").replace("'", "").toLowerCase();
-
+        if (!Mapper.isValidColor(color)) {
+            return;
+        }
         if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
             game.setupNeutralPlayer(color);
         }
@@ -223,13 +226,13 @@ abstract public class AddRemoveUnits implements Command {
             int numPlayersNew = 0;
             if (event instanceof SlashCommandInteractionEvent) {
                 List<Player> playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
-                if (!planetName.equalsIgnoreCase("space") && !game.isFoWMode()) {
+                if (!planetName.equalsIgnoreCase("space") && !game.isFowMode()) {
                     playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, planetName);
                 }
                 numPlayersOld = playersForCombat.size();
             }
             unitAction(event, tile, count, planetName, unitID, color, game);
-            if (event instanceof SlashCommandInteractionEvent && !game.isFoWMode()) {
+            if (event instanceof SlashCommandInteractionEvent && !game.isFowMode()) {
                 List<Player> playersForCombat = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
                 if (!planetName.equalsIgnoreCase("space")) {
                     playersForCombat = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, planetName);
@@ -258,7 +261,7 @@ abstract public class AddRemoveUnits implements Command {
                         break;
                     }
                 }
-                if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox")) {
+                if (player1 != player2 && !tile.getPosition().equalsIgnoreCase("nombox") && !player1.getAllianceMembers().contains(player2.getFaction())) {
                     if ("ground".equals(combatType)) {
                         StartCombat.startGroundCombat(player1, player2, game, event, tile.getUnitHolderFromPlanet(planetName), tile);
                     } else {
@@ -268,7 +271,7 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
 
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             boolean pingedAlready = false;
             int countF = 0;
             String[] tileList = game.getListOfTilesPinged();
@@ -325,7 +328,9 @@ abstract public class AddRemoveUnits implements Command {
                 Set<String> unitColors = new HashSet<>();
                 for (UnitKey unit_ : allUnitsOnPlanet) {
                     String unitColor = unit_.getColorID();
-                    unitColors.add(unitColor);
+                    if (unit_.getUnitType() != UnitType.Fighter) {
+                        unitColors.add(unitColor);
+                    }
                 }
 
                 if (unitColors.size() == 1) {

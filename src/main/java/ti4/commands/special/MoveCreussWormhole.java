@@ -23,7 +23,7 @@ import ti4.message.MessageHelper;
 public class MoveCreussWormhole extends SpecialSubcommandData {
 
     public MoveCreussWormhole() {
-        super(Constants.MOVE_CREUSS_WORMHOLE, "Adds or moves a creuss wormhole token to the target system.");
+        super(Constants.MOVE_CREUSS_WORMHOLE, "Adds or moves a Creuss wormhole token to the target system.");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name").setRequired(true).setAutoComplete(true));
     }

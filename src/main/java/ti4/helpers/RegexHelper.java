@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 
@@ -104,13 +106,14 @@ public class RegexHelper {
         return regexBuilder("genericcard", cards);
     }
 
-    /** @return group matching any number of digits 0-9 */
+    /** @return group matching [+-] and any number of digits 0-9 */
     public static String intRegex(String group) {
-        return regexBuilder(group, "[0-9]+");
+        return regexBuilder(group, "[\\+\\-]?[0-9]+");
     }
 
     /** @return group matching any legal tile position on the map */
     public static String posRegex(Game game, String group) {
+        if (game == null) return posRegex(group);
         Set<String> positions = game.getTileMap().keySet();
         return regexBuilder(group, positions);
     }
@@ -118,6 +121,21 @@ public class RegexHelper {
     /** @return group "pos" matching any tile position on the map */
     public static String posRegex(Game game) {
         return posRegex(game, "pos");
+    }
+
+    /** @return group matching any legal tile position in the bot */
+    public static String posRegex(String group) {
+        return regexBuilder(group, PositionMapper.getTilePositions());
+    }
+
+    /** @return group "pos" matching any legal tile position in the bot */
+    public static String posRegex() {
+        return posRegex("pos");
+    }
+
+    /** @return group "tileID" matching any legal tile ID in the bot */
+    public static String tileIDRegex() {
+        return regexBuilder("tileID", TileHelper.getAllTiles().keySet());
     }
 
     /** @return group matching any planet on the map, and also "space" */
@@ -146,7 +164,7 @@ public class RegexHelper {
         return regexBuilder("ac", allACs);
     }
 
-    /** @return group "page" */
+    /** @return group "page" matching an integer */
     public static String pageRegex() {
         return "page" + RegexHelper.intRegex("page") + "$";
     }
@@ -157,7 +175,7 @@ public class RegexHelper {
         return regexBuilder("token", tokens);
     }
 
-    // TODO: Use this
+    // TODO (Jazz): Use this
     /** format "__{Pfstkx}" @return groups ["type", "free", "swap", "tgsOnly", "share", "faction"] */
     public static String techMenuSuffixRegex() {
         String regex = "__\\{";

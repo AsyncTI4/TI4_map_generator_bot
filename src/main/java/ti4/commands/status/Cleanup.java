@@ -1,23 +1,26 @@
 package ti4.commands.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.custom.SpinTilesInRings;
-import ti4.helpers.Constants;
-import ti4.map.*;
-import ti4.message.MessageHelper;
-import ti4.helpers.ButtonHelper;
+import ti4.commands.leaders.RefreshLeader;
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.map.Leader;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public class Cleanup extends StatusSubcommandData {
     public Cleanup() {
@@ -88,7 +91,13 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
         }
+        for (int x = 0; x < 13; x++) {
+            if (!game.getStoredValue("exhaustedSC" + x).isEmpty()) {
+                game.setStoredValue("exhaustedSC" + x, "");
+            }
+        }
         game.setStoredValue("absolMOW", "");
+        game.setStoredValue("naaluPNUser", "");
         game.setStoredValue("agendaCount", "0");
         game.setStoredValue("politicalStabilityFaction", "");
         game.setStoredValue("forcedScoringOrder", "");
@@ -100,6 +109,10 @@ public class Cleanup extends StatusSubcommandData {
         game.setHasHadAStatusPhase(true);
         if (game.isSpinMode()) {
             SpinTilesInRings.spinRings(game);
+        }
+        if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
+            ListPlayerInfoButton.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
         }
     }
 

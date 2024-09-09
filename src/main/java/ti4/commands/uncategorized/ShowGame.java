@@ -6,6 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -65,20 +66,25 @@ public class ShowGame implements Command {
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
         if (statsOption != null) {
             String temp = statsOption.getAsString();
-            if (temp.equals(DisplayType.all.getValue())) {
-                displayType = DisplayType.all;
-            } else if (temp.equals(DisplayType.map.getValue())) {
-                displayType = DisplayType.map;
-            } else if (temp.equals(DisplayType.stats.getValue())) {
-                displayType = DisplayType.stats;
-            } else if (temp.equals(DisplayType.split.getValue())) {
+            if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
                 MapGenerator.saveImage(game, displayType, event)
                     .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
-            } else if (temp.equals(DisplayType.system.getValue())) {
-                displayType = DisplayType.system;
             }
+            else {
+                for (DisplayType i: DisplayType.values())
+                {
+                    if (temp.equals(i.getValue())) {
+                        displayType = i;
+                        break;
+                    }
+                }
+            }
+        }
+        if (displayType == null)
+        {
+            displayType = DisplayType.all;
         }
         simpleShowGame(game, event, displayType);
     }
@@ -87,26 +93,68 @@ public class ShowGame implements Command {
         simpleShowGame(game, event, DisplayType.all);
     }
 
+    public static void showMap(Game game, ButtonInteractionEvent event) {
+        MapGenerator.saveImage(game, DisplayType.map, event).thenAccept(fileUpload -> {
+            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
+        });
+    }
+
+    public static void showPlayArea(Game game, ButtonInteractionEvent event) {
+        MapGenerator.saveImage(game, DisplayType.stats, event).thenAccept(fileUpload -> {
+            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
+        });
+    }
+
+    public static boolean includeButtons(DisplayType displayType) {
+        switch (displayType) {
+            case wormholes:
+            case anomalies:
+            case legendaries:
+            case empties:
+            case aetherstream:
+            case spacecannon:
+            case traits:
+            case techskips:
+            case attachments:
+            case shipless:
+                return false;
+        }
+        return true;
+    }
+
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapGenerator.saveImage(game, displayType, event).thenAccept(fileUpload -> {
-            List<Button> buttons = new ArrayList<>();
-            if (!game.isFoWMode()) {
-                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
-                buttons.add(linkToWebsite);
-                buttons.add(Button.success("gameInfoButtons", "Player Info"));
-            }
-            buttons.add(Button.success("cardsInfo", "Cards Info"));
-            buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
-            buttons.add(Button.secondary("showGameAgain", "Show Game"));
+            if (includeButtons(displayType))
+            {
+                List<Button> buttons = new ArrayList<>();
+                if (!game.isFowMode()) {
+                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
+                    buttons.add(linkToWebsite);
+                    buttons.add(Button.success("gameInfoButtons", "Player Info"));
+                }
+                buttons.add(Button.success("cardsInfo", "Cards Info"));
+                buttons.add(Button.primary("offerDeckButtons", "Show Decks"));
+                buttons.add(Button.secondary("showGameAgain", "Show Game"));
 
-            // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
-            MessageChannel channel = event.getMessageChannel();
-            if (!game.isFoWMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
-                channel = game.getBotMapUpdatesThread();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
-            }
+                // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
+                MessageChannel channel = event.getMessageChannel();
+                if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
+                    channel = game.getBotMapUpdatesThread();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+                }
 
-            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
+                MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
+            }
+            else
+            {
+                MessageChannel channel = event.getMessageChannel();
+                if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
+                    channel = game.getBotMapUpdatesThread();
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
+                }
+
+                MessageHelper.sendFileUploadToChannel(channel, fileUpload);
+            }
         });
     }
 

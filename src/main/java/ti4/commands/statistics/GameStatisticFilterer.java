@@ -53,8 +53,8 @@ public final class GameStatisticFilterer {
 
     private static boolean filterOnFogType(Boolean fogFilter, Game game) {
         return fogFilter == null
-            || (fogFilter && (game.isFoWMode() || game.isLightFogMode()))
-            || (!fogFilter && (!game.isFoWMode() && !game.isLightFogMode()));
+            || (fogFilter && (game.isFowMode() || game.isLightFogMode()))
+            || (!fogFilter && (!game.isFowMode() && !game.isLightFogMode()));
     }
 
     private static boolean filterOnGameType(String gameTypeFilter, Game game) {
@@ -79,6 +79,24 @@ public final class GameStatisticFilterer {
             }
             case "little_omega" -> {
                 return game.isLittleOmega();
+            }
+            case "franken" -> {
+                return game.isFrankenGame();
+            }
+            case "milty_mod" -> {
+                return game.isMiltyModMode();
+            }
+            case "red_tape" -> {
+                return game.isRedTapeMode();
+            }
+            case "age_of_exploration" -> {
+                return game.isAgeOfExplorationMode();
+            }
+            case "minor_factions" -> {
+                return game.isMinorFactionsMode();
+            }
+            case "alliance" -> {
+                return game.isAllianceMode();
             }
             default -> {
                 return false;

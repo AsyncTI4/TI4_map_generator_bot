@@ -15,12 +15,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.imageio.ImageIO;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.generator.MapGenerator.TileStep;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -111,7 +114,7 @@ public class GenerateTile {
         }
 
         // Resolve fog of war vision limitations
-        if (game.isFoWMode() && event != null) {
+        if (game.isFowMode() && event != null) {
             isFoWPrivate = false;
             if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
@@ -119,8 +122,6 @@ public class GenerateTile {
                 if (p1 != null) {
                     player = p1;
                 }
-                // IMPORTANT NOTE : This method used to be local and was refactored to extract
-                // any references to tilesToDisplay
                 fowPlayer = Helper.getGamePlayer(game, player, event, null);
                 if (p1 != null) {
                     fowPlayer = p1;
@@ -200,7 +201,7 @@ public class GenerateTile {
 
     @NotNull
     public static String getTimeStamp() {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss.SSS");
         return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 

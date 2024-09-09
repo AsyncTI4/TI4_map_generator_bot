@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -56,10 +57,11 @@ public class GameCommand implements Command {
         CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(game, event);
         if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
             && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
-            && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)) {
+            && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)
+            && !Constants.OBSERVER.equalsIgnoreCase(subcommandName)) {
             fileFuture.thenAccept(fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
-                if (!game.isFoWMode()) {
+                if (!game.isFowMode()) {
                     Button linkToWebsite = Button.link(
                         "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
                     buttons.add(linkToWebsite);
@@ -95,11 +97,12 @@ public class GameCommand implements Command {
         subcommands.add(new SetUnitCap());
         subcommands.add(new StartPhase());
         subcommands.add(new SetDeck());
-        // subcommands.add(new GameCreate());
+        //subcommands.add(new GameCreate());
         subcommands.add(new CreateGameButton());
         subcommands.add(new WeirdGameSetup());
         subcommands.add(new Swap());
         subcommands.add(new Observer());
+        subcommands.add(new Tags());
         // subcommands.add(new ReverseSpeakerOrder());
         return subcommands;
     }

@@ -1,0 +1,22 @@
+[
+    {
+        "id": "orbital_foundries",
+        "imagePath": "attachment_orbital_foundries.png",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "arcane_shield",
+        "imagePath": "attachment_arc_shield.png",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "arcane_citadel",
+        "imagePath": "attachment_arcane_citadel.png",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "council_preserve",
+        "imagePath": "attachment_council_preserve.png",
+        "source": "uncharted_space"
+    }
+]

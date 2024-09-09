@@ -89,7 +89,7 @@ public class SendPN extends PNCardsSubcommandData {
 		Player pnOwner = game.getPNOwner(id);
 		if (player.getPromissoryNotesInPlayArea().contains(id)) {
 			if (!targetPlayer.equals(pnOwner)) {
-				MessageHelper.sendMessageToEventChannel(event, "Promissory Notes in Play Area can only be sent to the owner of the PN");
+				MessageHelper.sendMessageToEventChannel(event, "Promissory Notes in Play Area may only be sent to the owner of the PN.");
 				return;
 			}
 		}
@@ -112,7 +112,7 @@ public class SendPN extends PNCardsSubcommandData {
 
 		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.getName() + "**" : "";
 		String message = player.getRepresentation() + " sent " + Emojis.PN + extraText + " to " + targetPlayer.getRepresentation();
-		if (game.isFoWMode()) {
+		if (game.isFowMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = message + "\nThe other player has been notified";
 			MessageHelper.sendPrivateMessageToPlayer(targetPlayer, game, event, message, fail, success);
@@ -122,7 +122,7 @@ public class SendPN extends PNCardsSubcommandData {
 		}
 
 		// FoW specific pinging
-		if (game.isFoWMode()) {
+		if (game.isFowMode()) {
 			String extra = null;
 			if (id.endsWith("_sftt")) extra = "Scores changed.";
 			FoWHelper.pingPlayersTransaction(game, event, player, targetPlayer, Emojis.PN + extraText + "PN", extra);

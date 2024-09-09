@@ -26,6 +26,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "CC limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
     }
 
@@ -37,7 +38,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         if (communityMode != null) game.setCommunityMode(communityMode);
 
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
-        if (fowMode != null) game.setFoWMode(fowMode);
+        if (fowMode != null) game.setFowMode(fowMode);
 
         String customGameName = event.getOption(Constants.GAME_CUSTOM_NAME, null, OptionMapping::getAsString);
         if (customGameName != null) {
@@ -59,6 +60,9 @@ public class WeirdGameSetup extends GameSubcommandData {
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
+
+        Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
+        if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
@@ -75,10 +79,9 @@ public class WeirdGameSetup extends GameSubcommandData {
     }
 
     // TODO: find a better way to handle this - this is annoying
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode,
-        boolean isTIGLGame) {
-        if (isTIGLGame
-            && (baseGameMode || absolMode || discordantStarsMode || game.isHomeBrewSCMode() || game.isFoWMode() || game.isAllianceMode() || game.isCommunityMode())) {
+    // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode, boolean isTIGLGame) {
+        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {

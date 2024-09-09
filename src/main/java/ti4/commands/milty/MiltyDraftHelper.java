@@ -6,18 +6,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -77,6 +70,8 @@ public class MiltyDraftHelper {
         int index = 0;
         int deltaX = 0;
         int deltaY = 0;
+
+        String desc = "";
         for (MiltyDraftSlice slice : slices) {
             Player playerPicked = game.getPlayers().values().stream()
                 .filter(player -> manager.getPlayerDraft(player) != null)
@@ -84,7 +79,7 @@ public class MiltyDraftHelper {
                 .findFirst().orElse(null);
 
             BufferedImage sliceImage;
-            if (game.isFoWMode()) {
+            if (game.isFowMode()) {
                 sliceImage = partialSliceImage(slice, mapTemplate, playerPicked != null);
             } else {
                 sliceImage = sliceImageWithPlayerInfo(slice, manager, playerPicked);
@@ -102,27 +97,13 @@ public class MiltyDraftHelper {
                 deltaY += heightSlice;
                 deltaX = 0;
             }
+
+            if (!desc.isBlank()) desc += ";\n";
+            desc += slice.ttsString();
         }
 
-        FileUpload fileUpload = null;
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            String ext = "jpg";
-            BufferedImage jpgImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            jpgImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(ext).next();
-            imageWriter.setOutput(ImageIO.createImageOutputStream(out));
-            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-            if (defaultWriteParam.canWriteCompressed()) {
-                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                defaultWriteParam.setCompressionQuality(1.0f);
-            }
-            imageWriter.write(null, new IIOImage(jpgImage, null, null), defaultWriteParam);
-            String fileName = game.getName() + "_miltydraft_" + MapGenerator.getTimeStamp() + "." + ext;
-            fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
-        } catch (IOException e) {
-            BotLogger.log("Could not create FileUpload for milty draft", e);
-        }
-
+        FileUpload fileUpload = MapGenerator.uploadToDiscord(mainImage, 1.0f, game.getName() + "_miltydraft", false);
+        fileUpload.setDescription(desc);
         return fileUpload;
     }
 
@@ -381,7 +362,7 @@ public class MiltyDraftHelper {
         MapTemplateHelper.buildMapFromMiltyData(game, mapTemplate);
     }
 
-    // TODO: add map template
+    // TODO (Jazz): add map template
     public static List<MiltyDraftSlice> parseSlicesFromString(String sliceString, List<ComponentSource> allowedSources) {
         try {
             MiltyDraftManager manager = new MiltyDraftManager();

@@ -1,5 +1,7 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +13,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -60,7 +68,12 @@ import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveAllCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.tokens.RemoveToken;
-import ti4.commands.uncategorized.*;
+import ti4.commands.uncategorized.AllInfo;
+import ti4.commands.uncategorized.CardsInfo;
+import ti4.commands.uncategorized.DeleteGame;
+import ti4.commands.uncategorized.SelectionBoxDemo;
+import ti4.commands.uncategorized.ShowDistances;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -106,6 +119,8 @@ public class AsyncTI4DiscordBot {
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
+
+    private static final List<Class<?>> classes = new ArrayList<>();
 
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
@@ -326,9 +341,9 @@ public class AsyncTI4DiscordBot {
     /**
      * Initializes the whitelisted roles for the bot, including admin, developer, and bothelper roles.
      * <ul>
-     * <li>Admins can execute /admin, /developer, and /bothelper commands</li>
-     * <li>Developers can execute /developer commands</li>
-     * <li>Bothelpers can execute /bothelper commands</li>
+     * <li>Admins may execute /admin, /developer, and /bothelper commands</li>
+     * <li>Developers may execute /developer commands</li>
+     * <li>Bothelpers may execute /bothelper commands</li>
      * </ul>
      *
      * Add your test server's role ID to enable access to these commands on your server
@@ -359,7 +374,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
-        developerRoles.addAll(adminRoles); //admins can also execute developer commands
+        developerRoles.addAll(adminRoles); //admins may also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async Primary (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary (Stroter's Paradise)
         developerRoles.add(jda.getRoleById("1146529125184581733")); // Async Tertiary (Dreadn't)
@@ -415,4 +430,16 @@ public class AsyncTI4DiscordBot {
             .toList();
     }
 
+    public static List<Class<?>> getAllClasses() {
+        if (classes.isEmpty()) {
+            Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forJavaClassPath())
+                .setScanners(new SubTypesScanner(false)));
+            reflections.get(SubTypes.of(Object.class).asClass()).stream()
+                .filter(c -> c.getPackageName().startsWith("ti4"))
+                .forEach(classes::add);
+        }
+        // classes.sort(Comparator.comparing(Class<?>::getName));
+        return classes;
+    }
 }

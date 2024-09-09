@@ -1,19 +1,111 @@
 package ti4.helpers;
 
+import java.io.File;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jetbrains.annotations.NotNull;
 
+import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.map.Game;
 import ti4.map.Leader;
 
 public class Emojis {
+    // APPLICATION EMOJIS
+    public static final Map<String, EmojiUnion> emojis = new HashMap<>();
+
+    public static void initApplicationEmojis() {
+        List<EmojiUnion> all = getAllApplicationEmojis();
+        all.forEach(e -> emojis.put(e.getName(), e));
+        reloadAllApplicationEmojis();
+    }
+
+    private static void reloadAllApplicationEmojis() {
+        Map<String, Boolean> emojiExists = new HashMap<>();
+        emojis.keySet().forEach(k -> emojiExists.put(k, false));
+
+        List<File> emojiFiles = enumerateEmojiFilesRecursive(Storage.getAppEmojiDirectory());
+        List<File> toUpload = new ArrayList<>();
+        List<String> toDelete = new ArrayList<>();
+        for (File emoji : emojiFiles) {
+            EmojiUnion existingEmoji = getApplicationEmoji(emoji.getName());
+            if (existingEmoji == null) {
+                toUpload.add(emoji);
+            } else {
+                LocalDateTime lastModified = LocalDateTime.ofInstant(Instant.ofEpochMilli(emoji.lastModified()), ZoneId.systemDefault());
+                OffsetDateTime emojiUploadTime = existingEmoji.asCustom().getTimeCreated();
+                OffsetDateTime fileModTime = lastModified.atOffset(emojiUploadTime.getOffset());
+                if (emojiUploadTime.isBefore(fileModTime)) {
+                    toUpload.add(emoji);
+                    toDelete.add(emoji.getName());
+                }
+            }
+            emojiExists.put(emoji.getName(), true);
+        }
+
+        // Remove unused emojis from the application
+        for (String key : emojis.keySet()) {
+            if (!emojiExists.get(key)) {
+                toDelete.add(key);
+            }
+        }
+
+        // Delete emojis that have been removed and also out-of-date emojis
+        toDelete.parallelStream().forEach(key -> deleteApplicationEmoji(key));
+        toDelete.forEach(key -> emojis.remove(key));
+
+        // (Re-)Upload emojis
+        Map<String, EmojiUnion> uploaded = toUpload.parallelStream()
+            .map(file -> createApplicationEmoji(file))
+            .collect(Collectors.toConcurrentMap(e -> e.getName(), e -> e));
+        emojis.putAll(uploaded);
+    }
+
+    private static List<File> enumerateEmojiFilesRecursive(File folder) {
+        List<File> filesAndDirectories = Arrays.asList(folder.listFiles());
+        return filesAndDirectories.stream().flatMap(fileOrDir -> {
+            if (fileOrDir == null) return null;
+            if (isValidEmojiFile(fileOrDir)) return Stream.of(fileOrDir);
+            if (fileOrDir.isDirectory()) return enumerateEmojiFilesRecursive(fileOrDir).stream();
+            return null;
+        }).toList();
+    }
+
+    private static boolean isValidEmojiFile(File file) {
+        return file.isFile() && (file.getName().endsWith(".png") || file.getName().endsWith(".jpg"));
+    }
+
+    private static EmojiUnion getApplicationEmoji(String name) {
+        if (emojis.containsKey(name))
+            return emojis.get(name);
+        return null;
+    }
+
+    private static List<EmojiUnion> getAllApplicationEmojis() {
+        return new ArrayList<>(); // TODO (Jazz): fill this in when we get the JDA update
+    }
+
+    private static void deleteApplicationEmoji(String name) {
+        // TODO (Jazz): fill this in when we get the JDA update
+    }
+
+    private static EmojiUnion createApplicationEmoji(File emoji) {
+        return null; // TODO (Jazz): fill this in when we get the JDA update
+    }
+
     // FACTIONS
     public static final String Arborec = "<:Arborec:1156670455856513175>";
     public static final String Argent = "<:Argent:1156670457123192873>";
@@ -40,7 +132,7 @@ public class Emojis {
     public static final String Xxcha = "<:Xxcha:1156670723541180547>";
     public static final String Yin = "<:Yin:1156670724438769754>";
     public static final String Lazax = "<:Lazax:946891797639073884>";
-    public static final String Neutral = "<:neutral:1245950121485664276>";
+    public static final String Neutral = "<:neutral:1269693830639390720>";
     public static final String Keleres = "<:Keleres:1156670565793398875>";
     public static final String RandomFaction = "<a:factions:1193971011633291284>";
 
@@ -95,6 +187,16 @@ public class Emojis {
     public static final String Industrial = "<:Industrial:1159118817029533706>";
     public static final String Hazardous = "<:Hazardous:1159118854987976734>";
     public static final String Frontier = "<:Frontier:1156670537699971082>";
+
+    public static String getFragEmoji(String frag) {
+        frag = frag.toLowerCase();
+        return switch (frag) {
+            case "crf" -> CFrag;
+            case "irf" -> IFrag;
+            case "hrf" -> HFrag;
+            default -> UFrag;
+        };
+    }
 
     // CARDS
     public static final String SC1 = "<:SC1:1056594715673366548>";
@@ -386,6 +488,7 @@ public class Emojis {
     public static final String Meer = "<:Meer:1159512956778856519>";
     public static final String MeharXull = "<:MeharXull:1159512958821466243>";
     public static final String Mellon = "<:Mellon:1159512961006714951>";
+    public static final String Mirage = "<:Mirage:1262599635676041357>";
     public static final String MollPrimus = "<:MollPrimus:1159512963347132436>";
     public static final String Mordai = "<:Mordai:1159512965398138960>";
     public static final String PlanetMuaat = "<:Muaat:1159512985757307030>";
@@ -683,6 +786,8 @@ public class Emojis {
     public static final String splitteal = "<:splitteal:1165037010910728242>";
     public static final String splittorquoise = "<:splittorquoise:1165037013486022726>";
     public static final String splityellow = "<:splityellow:1165037014995963965>";
+    public static final String riftset = "<:riftset:1281263062715990057>";
+
 
     // END EMOJI FARM 10
 
@@ -885,6 +990,8 @@ public class Emojis {
     public static final String TI4BaseGame = "<:TI4BaseGame:1181341816688222378>";
     public static final String TI4PoK = "<:TI4PoK:1181341818676334683>";
     public static final String Absol = "<:Absol:1180154956372783177>"; // Symbol for Absol's stuff https://discord.com/channels/743629929484386395/1023681580989939712
+    public static final String Flagshipping = "<:Flagshipping:1261527033834373203>";
+    public static final String PromisesPromises = "<:PromisesPromises:1261526966499283054>";
     public static final String DiscordantStars = "<:DS:1180154970381754409>"; // Symbol for Discordant Stars https://discord.com/channels/743629929484386395/990061481238364160
     public static final String UnchartedSpace = "<:UnchartedSpace:1250241051755544657>";
     public static final String ActionDeck2 = "<:ActionDeck2:1180154984743063572>"; // Symbol for Will's Action Deck 2 mod https://discord.com/channels/743629929484386395/1111799687184396338
@@ -1064,7 +1171,7 @@ public class Emojis {
             case "centauri" -> Centauri;
             case "cormund" -> Cormund;
             case "corneeq" -> Corneeq;
-            case "creuss" -> Creuss;
+            case "creuss", "hexcreuss" -> Creuss;
             case "dalbootha" -> DalBootha;
             case "darien" -> Darien;
             case "druaa" -> Druaa;
@@ -1088,11 +1195,12 @@ public class Emojis {
             case "loki" -> Loki;
             case "lor" -> Lor;
             case "maaluuk" -> Maaluuk;
-            case "mallice", "lockedmallice" -> Mallice;
+            case "mallice", "lockedmallice", "hexmallice", "hexlockedmalice" -> Mallice;
             case "mr" -> Mecatol;
             case "meer" -> Meer;
             case "meharxull" -> MeharXull;
             case "mellon" -> Mellon;
+            case "mirage" -> Mirage;
             case "mollprimus", "mollprimusk" -> MollPrimus;
             case "mordaiii", "mordai" -> Mordai;
             case "muaat" -> PlanetMuaat;
@@ -1337,6 +1445,7 @@ public class Emojis {
             case "splitnvy", "splitnavy" -> splitnavy + "**SplitNavy**";
             case "splitptr", "splitpetrol" -> splitpetrol + "**SplitPetrol**";
             case "splitrbw", "splitrainbow" -> splitrainbow + "**SplitRainbow**";
+            case "ero", "riftset" -> riftset + "**RiftSet**";
             default -> color;
         };
     }
@@ -1391,6 +1500,7 @@ public class Emojis {
             case "splitnvy", "splitnavy" -> splitnavy;
             case "splitptr", "splitpetrol" -> splitpetrol;
             case "splitrbw", "splitrainbow" -> splitrainbow;
+            case "ero", "riftset" -> riftset;
 
             default -> getRandomGoodDog();
         };
@@ -1772,7 +1882,7 @@ public class Emojis {
     public static String getTGorNomadCoinEmoji(Game game) {
         if (game == null)
             return tg;
-        return game.getNomadCoin() ? nomadcoin : tg;
+        return game.isNomadCoin() ? nomadcoin : tg;
     }
 
     public static String getLeaderTypeEmoji(String type) {

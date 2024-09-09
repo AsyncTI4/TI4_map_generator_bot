@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -24,7 +25,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
     }
 
     public static void showUnscored(Game game, GenericInteractionCreateEvent event) {
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
             return;
         }
@@ -52,8 +53,19 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
         x = 1;
         sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
+
             if (SOInfo.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
-                sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+                if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
+                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+                    sb.append("> ");
+                    for (Player player : game.getRealPlayers()) {
+                        sb.append(player.getFactionEmoji() + ": " + ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(id, game) + " ");
+                    }
+                    sb.append("\n");
+
+                } else {
+                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+                }
                 x++;
             }
         }
@@ -61,7 +73,17 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
             if (SOInfo.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
-                sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+                if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
+                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+                    sb.append("> ");
+                    for (Player player : game.getRealPlayers()) {
+                        sb.append(player.getFactionEmoji() + ": " + ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(id, game) + " ");
+                    }
+                    sb.append("\n");
+
+                } else {
+                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+                }
                 x++;
             }
         }

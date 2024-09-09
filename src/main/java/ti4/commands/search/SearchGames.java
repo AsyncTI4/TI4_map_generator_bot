@@ -54,8 +54,9 @@ public class SearchGames extends SearchSubcommandData {
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeTIGLGames && map.getValue().isCompetitiveTIGLGame()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeCommunityGames && map.getValue().isCommunityMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAllianceGames && map.getValue().isAllianceMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFoWGames && map.getValue().isFoWMode()).toList());
+        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFoWGames && map.getValue().isFowMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAbsolGames && map.getValue().isAbsolMode()).toList());
+        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeMiltyModGames && map.getValue().isMiltyModMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeDSGames && map.getValue().isDiscordantStarsMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFrankenGames && map.getValue().isFrankenGame()).toList());
 
@@ -80,7 +81,7 @@ public class SearchGames extends SearchSubcommandData {
         representationText.append("   Created: ").append(gameToShow.getCreationDate());
         representationText.append("   Last Modified: ").append(Helper.getDateRepresentation(gameToShow.getLastModifiedDate())).append("  ");
         for (Player player : gameToShow.getPlayers().values()) {
-            if (!gameToShow.isFoWMode() && player.getFaction() != null) {
+            if (!gameToShow.isFowMode() && player.getFaction() != null) {
                 representationText.append(player.getFactionEmoji());
             }
         }

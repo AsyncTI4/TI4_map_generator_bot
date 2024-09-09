@@ -35,12 +35,12 @@ public class NaaluCommander extends SpecialSubcommandData {
     public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
 
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
-            MessageHelper.sendMessageToEventChannel(event, "Only players with access to an unlocked Naalu Commander can use this ability");
+            MessageHelper.sendMessageToEventChannel(event, "Only players with access to M'aban, the Naalu Commander, unlocked may use this ability.");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" you are using the Naalu Commander:");
+        sb.append(player.getRepresentation(true, true)).append(" you are using the M'aban, the Naalu Commander:");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
 
         // Top Agenda
@@ -73,8 +73,8 @@ public class NaaluCommander extends SpecialSubcommandData {
             sb.append(PNInfo.getPromissoryNoteCardInfo(game, player_, false, true));
         }
 
-        if (!game.isFoWMode()) MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            player.getRepresentation() + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
+        if (!game.isFowMode()) MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+            player.getRepresentation() + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
     }
 
@@ -84,9 +84,9 @@ public class NaaluCommander extends SpecialSubcommandData {
         String agendaID = game.lookAtTopAgenda(0);
         MessageEmbed embed = null;
         if (game.getSentAgendas().get(agendaID) != null) {
-            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getCurrentPhase().startsWith("agenda")) {
-                sb.append("You are currently voting on covert legislation and the top agenda is in the speaker's hand.");
-                sb.append(" Showing the next agenda because thats how it should be by the RULEZ\n");
+            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
+                sb.append("You are currently voting on Covert Legislation and the top agenda is in the speaker's hand.");
+                sb.append(" Showing the next agenda because that's how it should be by the RULEZ\n");
                 agendaID = game.lookAtTopAgenda(1);
 
                 if (game.getSentAgendas().get(agendaID) != null) {
@@ -102,6 +102,11 @@ public class NaaluCommander extends SpecialSubcommandData {
         } else {
             sb.append("Could not find agenda");
         }
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        if (embed != null) {
+            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+        }
+
     }
 }

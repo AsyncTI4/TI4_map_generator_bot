@@ -19,7 +19,6 @@ import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.UnitInfo;
 import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -68,7 +67,7 @@ public class AllInfo implements Command {
                 return false;
             }
             if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
-                MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
+                MessageHelper.replyToMessage(event, "Commands may be executed only in game specific channels.");
                 return false;
             }
             return true;

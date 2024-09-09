@@ -21,10 +21,11 @@ import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.map.AddTileList;
 import ti4.commands.player.Setup;
@@ -106,6 +107,7 @@ public class MiltyDraftManager {
     }
 
     public String getCurrentDraftPlayer() {
+        if (draftOrder.size() <= draftIndex) return null;
         return draftOrder.get(draftIndex);
     }
 
@@ -115,12 +117,15 @@ public class MiltyDraftManager {
     }
 
     public Player getCurrentDraftPlayer(Game game) {
-        return game.getPlayer(draftOrder.get(draftIndex));
+        String user = getCurrentDraftPlayer();
+        if (user == null) return null;
+        return game.getPlayer(user);
     }
 
     public Player getNextDraftPlayer(Game game) {
-        if (draftOrder.size() <= draftIndex + 1) return null;
-        return game.getPlayer(draftOrder.get(draftIndex + 1));
+        String user = getNextDraftPlayer();
+        if (user == null) return null;
+        return game.getPlayer(user);
     }
 
     public void setNextPlayerInDraft() {
@@ -182,6 +187,28 @@ public class MiltyDraftManager {
         factionDraft.addAll(factions);
     }
 
+    public List<String> allRemainingOptionsForActive() {
+        List<String> remaining = new ArrayList<>();
+        if (getCurrentDraftPlayer() == null) return remaining;
+        PlayerDraft active = getPlayerDraft(getCurrentDraftPlayer());
+        if (active.getSlice() == null) {
+            for (MiltyDraftSlice slice : slices)
+                if (!isSliceTaken(slice.getName()))
+                    remaining.add("Slice " + slice.getName());
+        }
+        if (active.getFaction() == null) {
+            for (String faction : factionDraft)
+                if (!isFactionTaken(faction))
+                    remaining.add(faction);
+        }
+        if (active.getPosition() == null) {
+            for (int i = 1; i <= players.size(); i++)
+                if (!isOrderTaken(i))
+                    remaining.add(StringHelper.ordinal(i) + " pick");
+        }
+        return remaining;
+    }
+
     public List<FactionModel> remainingFactions() {
         List<FactionModel> ls = new ArrayList<>();
         for (String faction : factionDraft) {
@@ -217,7 +244,7 @@ public class MiltyDraftManager {
         MiltyDraftHelper.initDraftTiles(this, game);
     }
 
-    //TODO: Integrate this directly in the manager. For now, it's just dumb and hacky
+    //TODO (Jazz): Integrate this directly in the manager. For now, it's just dumb and hacky
     public void init(List<ComponentSource> sources) {
         clear();
         MiltyDraftHelper.initDraftTiles(this, sources);
@@ -286,20 +313,25 @@ public class MiltyDraftManager {
     }
 
     @JsonIgnore
-    public void doMiltyPick(ButtonInteractionEvent event, Game game, String buttonID, Player player) {
+    public void doMiltyPick(GenericInteractionCreateEvent event, Game game, String buttonID, Player player) {
         String userId = player.getUserID();
         MessageChannel mainGameChannel = game.getMainGameChannel();
         if (draftIndex >= draftOrder.size()) {
             finishDraft(game, event);
             return;
         }
-        if (!userId.equals(getCurrentDraftPlayer())) {
-            event.getHook().sendMessage("You are not up to draft").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+        if (getCurrentDraftPlayer() == null || !userId.equals(getCurrentDraftPlayer())) {
+            if (event instanceof ButtonInteractionEvent bevent) {
+                bevent.getHook().sendMessage("You are not up to draft").setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+            } else {
+                event.getMessageChannel().sendMessage("Something went wrong").queue();
+            }
             return;
         }
 
         boolean auto = buttonID.startsWith("miltyAuto_");
-        String draftPick = buttonID.replace("milty_", "").replace("miltyAuto_", "");
+        boolean force = buttonID.startsWith("miltyForce_");
+        String draftPick = buttonID.replace("milty_", "").replace("miltyAuto_", "").replace("miltyForce_", "");
         String category = draftPick.substring(0, draftPick.indexOf("_"));
         String item = draftPick.substring(draftPick.indexOf("_") + 1);
 
@@ -312,12 +344,18 @@ public class MiltyDraftManager {
 
         //Oopsiedoops
         if (errorMessage != null) {
-            event.getHook().sendMessage(errorMessage).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+            if (event instanceof ButtonInteractionEvent bevent) {
+                bevent.getHook().sendMessage(errorMessage).setEphemeral(true).queue(Consumers.nop(), BotLogger::catchRestError);
+            } else {
+                event.getMessageChannel().sendMessage(errorMessage).queue();
+            }
             return;
         }
 
         // Send success message
-        String middle = auto ? " only had one option available to draft, so they were given " : " drafted ";
+        String middle = " drafted ";
+        if (auto) middle = " only had one option available to draft, so they were given ";
+        if (force) middle = " was forced to take ";
         try {
             String drafted = player.getPing() + middle + switch (category) {
                 case "slice" -> "Slice " + item;
@@ -368,7 +406,7 @@ public class MiltyDraftManager {
         return null;
     }
 
-    private void finishDraft(Game game, ButtonInteractionEvent event) {
+    private void finishDraft(Game game, GenericInteractionCreateEvent event) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
@@ -377,7 +415,7 @@ public class MiltyDraftManager {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = getPlayerDraft(playerId);
                 String color = player.getNextAvailableColour();
-                if (playerId.equals(Constants.chassitId) && game.getUnusedColors().contains("lightgray")) {
+                if (playerId.equals(Constants.chassitId) && game.getUnusedColors().contains(Mapper.getColor("lightgray"))) {
                     color = "lightgray";
                 }
                 String faction = picks.getFaction();
@@ -558,13 +596,15 @@ public class MiltyDraftManager {
             sb.append("\n> `").append(Helper.leftpad(pickNum + ".", padding)).append("` ");
             sb.append(picks.summary(goodDogOfTheDay)).append(" ");
 
-            if (p.equals(getNextDraftPlayer())) sb.append("*");
-            if (p.equals(getCurrentDraftPlayer())) sb.append("**__");
+            String next = getNextDraftPlayer();
+            String current = getCurrentDraftPlayer();
+            if (next != null && p.equals(getNextDraftPlayer())) sb.append("*");
+            if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("**__");
             sb.append(player.getUserName());
-            if (p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
-            if (p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
-            if (p.equals(getCurrentDraftPlayer())) sb.append("__**");
-            if (p.equals(getNextDraftPlayer())) sb.append("*");
+            if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("   <- CURRENTLY DRAFTING");
+            if (next != null && p.equals(getNextDraftPlayer())) sb.append("   <- on deck");
+            if (current != null && p.equals(getCurrentDraftPlayer())) sb.append("__**");
+            if (next != null && p.equals(getNextDraftPlayer())) sb.append("*");
 
             pickNum++;
         }
@@ -588,8 +628,11 @@ public class MiltyDraftManager {
 
     public void ping(Game game) {
         clearOldPing(game);
-        Player p = game.getPlayer(getCurrentDraftPlayer());
-        String ping = p.getPing() + " is up to draft!";
+        String ping = "Nobody is up to draft!";
+        if (getCurrentDraftPlayer() != null) {
+            Player p = getCurrentDraftPlayer(game);
+            ping = p.getPing() + " is up to draft!";
+        }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("showMiltyDraft", "Show draft again"));
         buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));

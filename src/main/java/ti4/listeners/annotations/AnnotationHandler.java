@@ -1,6 +1,7 @@
 package ti4.listeners.annotations;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -12,14 +13,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
-import ti4.helpers.async.NotepadHelper;
-import ti4.helpers.async.RoundSummaryHelper;
-import ti4.helpers.async.WhisperHelper;
 import ti4.listeners.context.ButtonContext;
 import ti4.listeners.context.ListenerContext;
 import ti4.listeners.context.ModalContext;
@@ -31,11 +31,7 @@ import ti4.message.BotLogger;
 public class AnnotationHandler {
 
     private static <H extends Annotation> List<Class<?>> classesToCheck(Class<H> handlerClass) {
-        List<Class<?>> classesWithHandlers = new ArrayList<>();
-        // Async
-        classesWithHandlers.addAll(List.of(RoundSummaryHelper.class, WhisperHelper.class, NotepadHelper.class));
-
-        return classesWithHandlers;
+        return AsyncTI4DiscordBot.getAllClasses();
     }
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
@@ -47,6 +43,7 @@ public class AnnotationHandler {
             if (param.getType().equals(Game.class)) continue;
             if (param.getType().equals(Player.class)) continue;
             if (param.getType().equals(GenericInteractionCreateEvent.class)) continue;
+            if (param.getType().equals(MessageChannel.class)) continue;
 
             // other event parameters
             if (param.getType().equals(ButtonInteractionEvent.class) && contextClass.equals(ButtonContext.class)) continue;
@@ -114,6 +111,7 @@ public class AnnotationHandler {
                 if (param.getType().equals(ButtonInteractionEvent.class) && contextClass.equals(ButtonContext.class)) args.add(ctx.getEvent());
                 if (param.getType().equals(ModalInteractionEvent.class) && contextClass.equals(ModalContext.class)) args.add(ctx.getEvent());
                 if (param.getType().equals(StringSelectInteractionEvent.class) && contextClass.equals(SelectionMenuContext.class)) args.add(ctx.getEvent());
+                if (param.getType().equals(MessageChannel.class)) args.add(ctx.getEvent().getMessageChannel());
 
                 // string parameters
                 // if the string is unnamed, assume it is the componentID
@@ -152,7 +150,10 @@ public class AnnotationHandler {
         return context -> {
             List<Object> args = getArgs.apply(context);
             try {
+                method.setAccessible(true);
                 method.invoke(null, args.toArray());
+            } catch (InvocationTargetException e) {
+                BotLogger.log("Error within button handler:", e.getCause());
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.asList(method.getParameters()).stream().map(param -> param.getType().getSimpleName()).toList();
                 List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
@@ -204,7 +205,8 @@ public class AnnotationHandler {
             }
 
             for (Class<?> klass : classesToCheck(handlerClass)) {
-                for (Method method : Arrays.asList(klass.getMethods())) {
+                for (Method method : Arrays.asList(klass.getDeclaredMethods())) {
+                    method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
                     if (handlers == null || handlers.isEmpty()) continue;
 

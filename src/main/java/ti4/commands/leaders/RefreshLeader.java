@@ -1,7 +1,6 @@
 package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -49,7 +48,8 @@ public class RefreshLeader extends LeaderAction {
             tg += tgCount;
             player.setTg(tg);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you gained " + tgCount + " tgs (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied");
+                player.getRepresentation(true, true) + " you gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s")
+                    + " (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied");
             ButtonHelperAbilities.pillageCheck(player, game);
             playerLeader.setTgCount(0);
         }

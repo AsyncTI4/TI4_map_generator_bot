@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -61,7 +60,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             return;
         }
 
-        game.setCurrentPhase("agendawaiting");
+        game.setPhaseOfGame("agendawaiting");
         AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
         String agendaTarget = agendaDetails.getTarget();
         String agendaType = agendaDetails.getType();
@@ -120,30 +119,36 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                     }
 
                     if (speaker != null) {
-                        StringBuilder sb = new StringBuilder();
                         Map.Entry<String, Integer> entry = game.drawAgenda();
-                        sb.append("-----------\n");
-                        sb.append("Game: ").append(game.getName()).append("\n");
-                        sb.append(speaker.getRepresentation(true, true)).append("\n");
-                        sb.append("Drawn Agendas:\n");
-                        sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
-                        sb.append("\n");
-                        MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(), sb.toString());
+                        if (entry != null) {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("-----------\n");
+                            sb.append("Game: ").append(game.getName()).append("\n");
+                            sb.append(speaker.getRepresentation(true, true)).append("\n");
+                            sb.append("Drawn Agendas:\n");
+                            sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
+                            sb.append("\n");
+                            MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(), sb.toString());
+                        }
                     }
                 }
             }
         }
 
         game.resetCurrentAgendaVotes();
-        game.setHackElectionStatus(false);
+        game.setHasHackElectionBeenPlayed(false);
         game.setPlayersWhoHitPersistentNoAfter("");
         game.setPlayersWhoHitPersistentNoWhen("");
         game.setLatestOutcomeVotedFor("");
+        for (Player p2 : game.getRealPlayers()) {
+            game.setStoredValue("latestOutcomeVotedFor" + p2.getFaction(), "");
+            game.setStoredValue("preVoting" + p2.getFaction(), "");
+        }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(agendaID, uniqueID));
         String text = game.getPing()
-            + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you can simply play it.";
+            + " Please indicate whether you abstain from playing whens/afters below. If you have an action card with those windows, you may simply play it.";
 
         Date newTime = new Date();
         game.setLastActivePlayerPing(newTime);
@@ -170,7 +175,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you have Florzen commander and can thus explore and ready a planet",
+                    player.getRepresentation(true, true) + " you have Florzen commander and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
         }

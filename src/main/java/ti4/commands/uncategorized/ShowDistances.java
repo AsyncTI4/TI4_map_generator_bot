@@ -1,6 +1,5 @@
 package ti4.commands.uncategorized;
 
-import java.util.HashMap;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -76,7 +75,7 @@ public class ShowDistances implements Command {
         }
 
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
-        game.setTileDistances(CheckDistance.getTileDistances(game, player, tile.getPosition(), maxDistance));
+        game.setTileDistances(CheckDistance.getTileDistances(game, player, tile.getPosition(), maxDistance, true));
 
         MapGenerator.saveImage(game, DisplayType.map, event, true)
             .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));

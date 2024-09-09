@@ -1,13 +1,13 @@
 package ti4.commands.fow;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import software.amazon.awssdk.utils.StringUtils;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -38,7 +38,7 @@ public class Whisper extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to send message to could not be found");
             return;
         }
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game is not fog mode, and should not use this command. Instead whisper by beginning your message with to[color] or to[faction] from inside your cards info thread (for instance saying toblue hi)");
             return;
         }
@@ -59,11 +59,11 @@ public class Whisper extends FOWSubcommandData {
         String message;
         String realIdentity = player_.getRepresentation(true, true);
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
-        if (!game.isFoWMode() && !(feedbackChannel instanceof ThreadChannel)) {
+        if (!game.isFowMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();
             MessageHelper.sendMessageToChannel(feedbackChannel, player.getRepresentation() + " Reminder you should start all whispers from your cards info channel, and do not need to use the /fow whisper command, you can just start a message with toblue or something");
         }
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             player1 = player.getFactionEmoji() + "(" + StringUtils.capitalize(player.getFaction()) + ") " + player1;
         }
         for (Player player2 : game.getRealPlayers()) {
@@ -75,7 +75,7 @@ public class Whisper extends FOWSubcommandData {
         } else {
             message = "Attention " + realIdentity + "! " + player1 + " says: " + msg;
         }
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             String fail = "Could not notify receiving player.";
             String success;
             String player2 = Emojis.getColorEmojiWithName(player_.getColor());
@@ -92,6 +92,7 @@ public class Whisper extends FOWSubcommandData {
             String fail = "Could not notify receiving player.";
             String success;
             String player2 = Emojis.getColorEmojiWithName(player_.getColor());
+            player2 = player_.getFactionEmoji() + "(" + StringUtils.capitalize(player_.getFaction()) + ") " + player2;
             if (message.contains("[REDACTED]")) {
                 success = player1 + "(You) anonymously said: \"" + msg + "\" to " + player2;
             } else {
@@ -99,15 +100,17 @@ public class Whisper extends FOWSubcommandData {
             }
             String key = player.getFaction() + "whisperHistoryTo" + player_.getFaction();
             String whisperHistory = game.getStoredValue(key);
-            if (whisperHistory.isEmpty()) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is whispering for the first time this turn to " + player_.getFactionEmoji());
-                game.setStoredValue(key, "1");
-            } else {
-                int num = Integer.parseInt(whisperHistory);
-                num = num + 1;
-                game.setStoredValue(key, "" + num);
-                if (num == 5 || num == 10) {
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to " + player_.getFactionEmoji());
+            if (!game.getName().equalsIgnoreCase("pbd1000")) {
+                if (whisperHistory.isEmpty()) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is whispering for the first time this turn to " + player_.getFactionEmoji());
+                    game.setStoredValue(key, "1");
+                } else {
+                    int num = Integer.parseInt(whisperHistory);
+                    num = num + 1;
+                    game.setStoredValue(key, "" + num);
+                    if ((num == 5 || num == 10)) {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " is sending whisper #" + num + " of this turn to " + player_.getFactionEmoji());
+                    }
                 }
             }
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);

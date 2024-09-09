@@ -53,6 +53,7 @@ public class TurnStart extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
             return;
         }
+        mainPlayer.setTurnCount(mainPlayer.getTurnCount() - 1);
         turnStart(event, game, mainPlayer);
     }
 
@@ -95,7 +96,7 @@ public class TurnStart extends PlayerSubcommandData {
             : game.getMainGameChannel();
 
         game.updateActivePlayer(player);
-        game.setCurrentPhase("action");
+        game.setPhaseOfGame("action");
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
@@ -123,7 +124,7 @@ public class TurnStart extends PlayerSubcommandData {
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -136,7 +137,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
         } else {
             //checkhere
-            if (game.getShowBanners()) {
+            if (game.isShowBanners()) {
                 MapGenerator.drawBanner(player);
             }
             MessageHelper.sendMessageToChannel(gameChannel, text);
@@ -156,7 +157,7 @@ public class TurnStart extends PlayerSubcommandData {
                 } else {
                     privatePlayer.setStasisInfantry(0);
                     MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                        + " You had infantry2 to be revived, but the bot couldnt find planets you own in your HS to place them, so per the rules they now disappear into the ether");
+                        + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
                 }
             }
@@ -192,11 +193,11 @@ public class TurnStart extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()
-                    + " since you have absol AIDEV, you can research 1 Unit Upgrade here for 6 influence";
+                    + " since you have AI Development Algorithm, you may research 1 Unit Upgrade now for 6 influence.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you can use the button to get your tech",
+                        player.getRepresentation(true, true) + " you may use the button to get your tech.",
                         List.of(Buttons.GET_A_TECH));
                 } else {
                     List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
@@ -210,7 +211,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             if (player.hasAbility("deliberate_action") && (player.getTacticalCC() == 0 || player.getStrategicCC() == 0 || player.getFleetCC() == 0)) {
                 String msg = player.getRepresentation()
-                    + " since you have deliberate action ability and passed while one of your pools was at 0, you can gain a CC to that pool";
+                    + " since you have deliberate action ability and passed while one of your pools was at 0, you may gain 1 CC to that pool.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
@@ -229,8 +230,18 @@ public class TurnStart extends PlayerSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentation(true, true));
         sb.append(" Please resolve these before doing anything else:\n");
-        int count = 0;
         for (int sc : game.getPlayedSCsInOrder(player)) {
+            if (game.getName().equalsIgnoreCase("pbd1000")) {
+                String num = sc + "";
+                num = num.substring(num.length() - 1, num.length());
+                for (Integer sc2 : player.getSCs()) {
+                    String num2 = sc2 + "";
+                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    if (!num2.equalsIgnoreCase(num) && !player.hasFollowedSC(sc)) {
+                        player.addFollowedSC(sc);
+                    }
+                }
+            }
             if (!player.hasFollowedSC(sc)) {
                 sb.append("> ").append(Helper.getSCRepresentation(game, sc));
                 if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
@@ -238,7 +249,6 @@ public class TurnStart extends PlayerSubcommandData {
                 }
                 sb.append("\n");
                 sendReminder = true;
-                count++;
             }
         }
         sb.append("You currently have ").append(player.getStrategicCC()).append(" CC in your strategy pool.");
@@ -262,8 +272,7 @@ public class TurnStart extends PlayerSubcommandData {
         Button tacticalAction = Button.success(finChecker + "tacticalAction",
             "Tactical Action (" + player.getTacticalCC() + ")");
         int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
-        Button componentAction = Button.success(finChecker + "componentAction",
-            "Component Action (" + numOfComponentActions + ")");
+        Button componentAction = Button.success(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
         startButtons.add(tacticalAction);
         startButtons.add(componentAction);
@@ -271,11 +280,15 @@ public class TurnStart extends PlayerSubcommandData {
         for (Integer SC : player.getSCs()) {
             if (!game.getPlayedSCs().contains(SC)) {
                 hadAnyUnplayedSCs = true;
-                if (game.isHomeBrewSCMode()) {
-                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC);
+                String name = Helper.getSCName(SC, game);
+                if (game.getName().equalsIgnoreCase("pbd1000")) {
+                    name = name + "(" + SC + ")";
+                }
+                if (game.isHomebrewSCMode()) {
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + name);
                     startButtons.add(strategicAction);
                 } else {
-                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play SC #" + SC)
+                    Button strategicAction = Button.success(finChecker + "strategicAction_" + SC, "Play " + name)
                         .withEmoji(Emoji.fromFormatted(Emojis.getSCEmojiFromInteger(SC)));
                     startButtons.add(strategicAction);
                 }
@@ -290,14 +303,12 @@ public class TurnStart extends PlayerSubcommandData {
             }
 
             startButtons.add(pass);
-            if (!game.isFoWMode()) {
+            if (!game.isFowMode()) {
                 for (Player p2 : game.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentation(true, true));
-                        sb.append(" You are getting this ping because SC #").append(sc)
-                            .append(
-                                " has been played and now it is their turn again and you still havent reacted. If you already reacted, check if your reaction got undone");
+                        sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                         }
@@ -321,7 +332,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (ButtonHelper.isPlayerElected(game, player, "minister_war")) {
                 startButtons.add(Button.secondary(finChecker + "ministerOfWar", "Use Minister of War"));
             }
-            if (!game.getJustPlayedComponentAC()) {
+            if (!game.isJustPlayedComponentAC()) {
                 player.setWhetherPlayerShouldBeTenMinReminded(true);
             }
         } else {
@@ -354,7 +365,8 @@ public class TurnStart extends PlayerSubcommandData {
                     .withEmoji(Emoji.fromFormatted(Emojis.Keleres));
                 startButtons.add(chaos);
             }
-            if (player.hasTech("td") && !player.getExhaustedTechs().contains("td")) {
+            if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td")) ||
+                (player.hasTech("absol_td") && !player.getExhaustedTechs().contains("absol_td"))) {
                 Button transit = Button.secondary(finChecker + "exhaustTech_td", "Exhaust Transit Diodes");
                 transit = transit.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
                 startButtons.add(transit);
@@ -390,7 +402,7 @@ public class TurnStart extends PlayerSubcommandData {
                         if (p1.hasExternalAccessToLeader(led)) {
                             Button lButton = Button
                                 .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Z'eu (Naalu Agent)")
+                                    "Use " + leaderName + " as Naalu Agent")
                                 .withEmoji(Emoji.fromFormatted(factionEmoji));
                             startButtons.add(lButton);
                         }
@@ -443,9 +455,12 @@ public class TurnStart extends PlayerSubcommandData {
         // startButtons.addAll(getButtonsToSwitchWithAllianceMembers(player, game,
         // false));
         // }
-        if (!doneActionThisTurn && game.isFoWMode()) {
+        if (!doneActionThisTurn && game.isFowMode()) {
             startButtons.add(Button.secondary("showGameAgain", "Show Game"));
         }
+
+        startButtons.add(Button.secondary("showMap", "Show Map"));
+        startButtons.add(Button.secondary("showPlayerAreas", "Show Player Areas"));
 
         return startButtons;
     }

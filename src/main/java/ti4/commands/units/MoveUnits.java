@@ -142,6 +142,24 @@ public class MoveUnits extends AddRemoveUnits {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
+        } else if ("82ah".equals(tile.getTileID())) {
+            String position = tile.getPosition();
+            game.removeTile(position);
+
+            String planetTileName = AliasHandler.resolveTile("82bh");
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                return null;
+            }
+
+            String tileName = Mapper.getTileID(planetTileName);
+            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            if (tilePath == null) {
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                return null;
+            }
+            tile = new Tile(planetTileName, position);
+            game.setTile(tile);
         }
         return tile;
     }
@@ -151,6 +169,23 @@ public class MoveUnits extends AddRemoveUnits {
             String position = tile.getPosition();
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82b");
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                return null;
+            }
+
+            String tileName = Mapper.getTileID(planetTileName);
+            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            if (tilePath == null) {
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                return null;
+            }
+            tile = new Tile(planetTileName, position);
+            game.setTile(tile);
+        } else if ("82ah".equals(tile.getTileID())) {
+            String position = tile.getPosition();
+            game.removeTile(position);
+            String planetTileName = AliasHandler.resolveTile("82bh");
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;

@@ -37,13 +37,11 @@ public class StartMilty extends MiltySubcommandData {
     public static final int SLICE_GENERATION_CYCLES = 1000;
 
     public StartMilty() {
-        super(Constants.START, "Start Milty Draft");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count").setRequired(false).setRequiredRange(1, 25));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ANOMALIES_CAN_TOUCH, "Anomalies can touch").setRequired(false));
+        super(Constants.QUICKSTART, "Start Milty Draft with default settings");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count (default = players + 1)").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count (default = players + 1)").setRequired(false).setRequiredRange(1, 25));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_FACTIONS, "Include Discordant Stars Factions").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_DS_TILES, "Include Uncharted Space Tiles (ds)").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.USE_MAP_TEMPLATE, "Use map template").setAutoComplete(true).setRequired(false));
     }
 
     @Data
@@ -57,7 +55,7 @@ public class StartMilty extends MiltySubcommandData {
         // slice generation settings
         Boolean anomaliesCanTouch = false, extraWHs = true;
         Double minRes = 2.0, minInf = 3.0;
-        Integer minTot = 7, maxTot = 13;
+        Integer minTot = 9, maxTot = 13;
         Integer minLegend = 1, maxLegend = 2;
 
         //other
@@ -99,7 +97,7 @@ public class StartMilty extends MiltySubcommandData {
             specs.factionSources.add(ComponentSource.ds);
 
         // Faction count & setup ------------------------------------------------------------------
-        int factionCount = game.getPlayerCountForMap() + 3;
+        int factionCount = game.getPlayerCountForMap() + 1;
         OptionMapping factionOption = event.getOption(Constants.FACTION_COUNT);
         if (factionOption != null) {
             factionCount = factionOption.getAsInt();
@@ -460,7 +458,7 @@ public class StartMilty extends MiltySubcommandData {
         MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
 
         if (validTemplates.size() == 0) {
-            String msg = "Milty draft in this bot does not know about any map layouts that support " + players + " player(s) yet.";
+            String msg = "Milty draft in this bot does not know about any map layouts that support " + players + " player" + (players == 1 ? "" : "s") + " yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;
         }

@@ -95,7 +95,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {
                 String reportMessage = "Garbozia exploration with Distant Suns is not implemented.\nPlease use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\n(NB: Player chooses a trait, reveals two of that trait and one of each other; reveal four cards total.)";
-                if (!game.isFoWMode() && event.getChannel() != game.getActionsChannel()) {
+                if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
@@ -111,7 +111,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             ExploreModel exploreModelI = Mapper.getExplore(cardIDI);
 
             String reportMessage = player.getFactionEmoji() + " explored " + Emojis.LegendaryPlanet + "**Garbozia** ability and found a **" + exploreModelC.getName() + "**, **" + exploreModelH.getName() + "** and a **" + exploreModelI.getName() + "**";
-            if (!game.isFoWMode() && event.getChannel() != game.getActionsChannel()) {
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
@@ -132,8 +132,8 @@ public class ExpPlanet extends ExploreSubcommandData {
             if (Helper.mechCheck(planetName, game, player)) {
                 if (!NRACheck) {
                     if (player.hasTech("pfa")) { //Pre-Fab Arcologies
-                        new PlanetRefresh().doAction(player, planetName, game);
-                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+                        PlanetRefresh.doAction(player, planetName, game);
+                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
                     }
                     String message = "Please decide whether or not to use your " + Emojis.Naaz + "**Distant Suns** (explore twice) ability.";
                     Button resolveExplore1 = Button.success("distant_suns_accept_" + planetName + "_" + drawColor, "Choose to Explore Twice");
@@ -153,7 +153,7 @@ public class ExpPlanet extends ExploreSubcommandData {
 
                     // Report to common channel
                     String reportMessage = player.getFactionEmoji() + " used their " + Emojis.Naaz + "**Distant Suns** ability and found a **" + exploreModel1.getName() + "** and a **" + exploreModel2.getName() + "** on " + Helper.getPlanetRepresentationPlusEmoji(planetName);
-                    if (!game.isFoWMode() && event.getChannel() != game.getActionsChannel()) {
+                    if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
                     } else {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
@@ -173,8 +173,8 @@ public class ExpPlanet extends ExploreSubcommandData {
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
             if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                 if (!NRACheck) {
-                    String message = "Please decide whether or not to use your " + Emojis.gledge + "**Deep Mining** (gain tg instead of explore) ability.";
-                    Button resolveExplore1 = Button.success("deep_mining_accept", "Choose to Gain Tg instead of exploring");
+                    String message = "Please decide whether or not to use your " + Emojis.gledge + "**Deep Mining** (gain 1TG instead of explore) ability.";
+                    Button resolveExplore1 = Button.success("deep_mining_accept", "Choose to Gain 1TG instead of exploring");
                     Button resolveExplore2 = Button.danger("deep_mining_decline_" + planetName + "_" + drawColor, "Choose to Explore");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -198,8 +198,9 @@ public class ExpPlanet extends ExploreSubcommandData {
             Button resolveExplore2 = Button.success("lanefirAgentRes_Accept_" + drawColor + "_" + planetName,
                 "Use Lanefir Agent");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentation(true, true) + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Vassa Hagi (Lanefir Agent), and thus can decline this explore to draw another one instead.";
-            if (!game.isFoWMode() && event.getChannel() != game.getActionsChannel()) {
+            String message = player.getRepresentation(true, true) + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Vassa Hagi, the Lanefir" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, and thus may decline this explore to draw another one instead.";
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
             } else {
@@ -214,10 +215,10 @@ public class ExpPlanet extends ExploreSubcommandData {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
             Button resolveExplore1 = Button.success("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
-            Button resolveExplore2 = Button.success("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1tg");
+            Button resolveExplore2 = Button.success("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1TG");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentation(true, true) + " You have Absol Scanlink, and thus can decline this explore to get a tg.";
-            if (!game.isFoWMode() && event.getChannel() != game.getActionsChannel()) {
+            String message = player.getRepresentation(true, true) + " You have Scanlink Drone Network, and thus may decline this explore to get 1TG.";
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
             } else {
@@ -230,27 +231,27 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
-            new PlanetRefresh().doAction(player, planetName, game);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+            PlanetRefresh.doAction(player, planetName, game);
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
         }
         if (ButtonHelper.doesPlayerHaveFSHere("ghemina_flagship_lord", player, tile)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 inf " + planetName, game);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord FS. Technically happens after exploring");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Infantry added due to presence of The Lord (a Ghemina flagship) . Technically happens after exploring.");
         }
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getCurrentPhase().contains("agenda")) {
-            new PlanetRefresh().doAction(player, planetName, game);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Florzen Commander");
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
+            PlanetRefresh.doAction(player, planetName, game);
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
             ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             Tile tileWithPlanet = game.getTileFromPlanet(planetName);
             if (tileWithPlanet == null) {
-                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing an infantry. Resolve manually.");
+                MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing 1 infantry. Resolve manually.");
                 return;
             }
             tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added inf to planet because of Lanefir Commander");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added infantry to planet because of Master Halbert, the Lanefir Commander.");
         }
         if (player.hasTech("dslaner")) {
             player.setAtsCount(player.getAtsCount() + numExplores);
@@ -263,7 +264,8 @@ public class ExpPlanet extends ExploreSubcommandData {
                     buttons.add(Button.success("exhaustAgent_augersagent_" + player.getFaction(),
                         "Use Augers Agent on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
-                    String msg2 = p2.getRepresentation(true, true) + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Clodho (Augers Agent) on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2tg";
+                    String msg2 = p2.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2TGs.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }
             }

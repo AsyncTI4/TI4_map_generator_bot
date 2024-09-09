@@ -3,10 +3,7 @@ package ti4.commands.cardspn;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
@@ -53,7 +50,7 @@ public class PNCardsCommand implements Command {
                 return false;
             }
             if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
-                MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
+                MessageHelper.replyToMessage(event, "Commands may be executed only in game specific channels.");
                 return false;
             }
             return true;

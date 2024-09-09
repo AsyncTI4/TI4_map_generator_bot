@@ -9,7 +9,7 @@
         "capacityValue": 8,
         "planetaryShield": true,
         "isStructure": true,
-        "ability": "Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in the system do not count against your fleet pool. This unit cannot be destroyed or replaced."
+        "ability": "Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in the system do not count against your fleet pool.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card."
     },
     {
         "id": "tyrantslament",
@@ -22,8 +22,8 @@
         "combatDieCount": 3,
         "afbHitsOn": 5,
         "afbDieCount": 3,
-        "bombardHitsOn": 5,
-        "bombardDieCount": 3,
+        "spaceCannonHitsOn": 5,
+        "spaceCannonDieCount": 3,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
@@ -220,7 +220,8 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "homebrewReplacesID": "destroyer2"
+        "homebrewReplacesID": "destroyer2",
+        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able."
     },
     {
         "id": "absol_cruiser2",
@@ -453,7 +454,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die.  If the result is 6 or greater, place the unit on this card.  At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
+        "ability": "After this unit is destroyed, place the unit on this card. At the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control and return the rest to your reinforcements.",
         "homebrewReplacesID": "arborec_infantry2"
     },
     {
@@ -515,7 +516,7 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
+        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able. When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
         "homebrewReplacesID": "argent_destroyer2"
     },
     {
@@ -555,7 +556,7 @@
         "requiredTechId": "absol_m2",
         "source": "absol",
         "faction": "nomad",
-        "moveValue": 2,
+        "moveValue": 3,
         "capacityValue": 6,
         "capacityUsed": 1,
         "cost": 8,
@@ -583,7 +584,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system or that contains 1 of your space docks.",
+        "ability": "After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet that contains 1 of your structures.",
         "homebrewReplacesID": "mahact_infantry2"
     }
 ]

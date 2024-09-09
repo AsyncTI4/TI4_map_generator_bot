@@ -12,10 +12,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class CheckAllDistance extends SpecialSubcommandData {
@@ -48,7 +49,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
         data.add(sb.toString());
 
         for (String pos : positions) {
-            Map<String, Integer> distances = CheckDistance.getTileDistances(game, player, pos, maxDistance);
+            Map<String, Integer> distances = CheckDistance.getTileDistances(game, player, pos, maxDistance, true);
             String row = distances.entrySet().stream()
                 .filter(dist -> positions.contains(dist.getKey()))
                 .sorted(Comparator.comparing(Entry::getKey))
@@ -67,7 +68,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "Something broke. Ping jazz");
         }
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             sb.append("Map String: `").append(Helper.getMapString(game)).append("`").append("\n");
         } else {
             sb.append("Map String: Cannot show map string for private games").append("\n");

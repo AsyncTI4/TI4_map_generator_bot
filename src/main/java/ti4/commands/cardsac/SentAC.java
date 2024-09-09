@@ -1,12 +1,14 @@
 package ti4.commands.cardsac;
 
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -62,12 +64,13 @@ public class SentAC extends ACCardsSubcommandData {
         }
 
         // FoW specific pinging
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
         }
 
         player.removeActionCard(acIndex);
         player_.setActionCard(acID);
+        ButtonHelper.checkACLimit(game, event, player_);
         ACInfo.sendActionCardInfo(game, player_);
         ACInfo.sendActionCardInfo(game, player);
     }

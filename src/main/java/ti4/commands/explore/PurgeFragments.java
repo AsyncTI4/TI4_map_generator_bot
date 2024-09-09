@@ -19,9 +19,9 @@ import ti4.generator.Mapper;
 public class PurgeFragments extends ExploreSubcommandData {
 
 	public PurgeFragments() {
-		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic. Can use unknown fragments)");
+		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).");
 		addOptions(typeOption.setRequired(true),
-			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA or black market forgery)"));
+			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
 	}
@@ -75,7 +75,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 			p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
 
 		if (lanefirPlayer != null) {
-			ButtonHelper.commanderUnlockCheck(activePlayer, game, "lanefir", event);
+			ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
 		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		MessageHelper.sendMessageToEventChannel(event, message);

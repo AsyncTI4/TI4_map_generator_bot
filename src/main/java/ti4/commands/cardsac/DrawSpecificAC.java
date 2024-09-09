@@ -32,7 +32,7 @@ public class DrawSpecificAC extends ACCardsSubcommandData {
             game.drawSpecificActionCard(providedID, player.getUserID());
         }
         if (ac == player.getAc()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID. Remember, you need the word ID (i.e scramble for scramble frequency) and not the number ID. You can find the word ID by proper usage of the /search command");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Card not drawn. It could be in someone's hand, or you could be using the wrong ID. Remember, you need the word ID (i.e scramble for Scramble Frequency) and not the number ID. You may find the word ID by proper usage of the /search command.");
             return;
         }
         ACInfo.sendActionCardInfo(game, player);

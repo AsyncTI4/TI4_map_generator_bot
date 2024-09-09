@@ -2,9 +2,12 @@ package ti4.buttons;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.Constants;
+import ti4.message.BotLogger;
 
 public class Buttons {
     public static final Button GET_A_TECH = green("acquireATech", "Get a Tech");
@@ -41,35 +44,70 @@ public class Buttons {
         REFRESH_PLANET_INFO,
         FACTION_EMBED);
 
+    /**
+     * A blue button (primary style)
+     */
     public static Button blue(String buttonID, String buttonLabel) {
         return Button.primary(buttonID, buttonLabel);
     }
 
+    /**
+     * A blue button (primary style) with an emoji
+     */
     public static Button blue(String buttonID, String buttonLabel, String emoji) {
-        return Button.primary(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
+        return Button.primary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
+    /**
+     * A gray button (secondary style)
+     */
     public static Button gray(String buttonID, String buttonLabel) {
         return Button.secondary(buttonID, buttonLabel);
     }
 
+    /**
+     * A gray button (secondary style) with an emoji
+     */
     public static Button gray(String buttonID, String buttonLabel, String emoji) {
-        return Button.secondary(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
+        return Button.secondary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
+    /**
+     * A green button (success style)
+     */
     public static Button green(String buttonID, String buttonLabel) {
         return Button.success(buttonID, buttonLabel);
     }
 
+    /**
+     * A green button (success style) with an emoji
+     */
     public static Button green(String buttonID, String buttonLabel, String emoji) {
-        return Button.success(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
+        return Button.success(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
+    /**
+     * A red button (danger style) with an emoji
+     */
     public static Button red(String buttonID, String buttonLabel) {
         return Button.danger(buttonID, buttonLabel);
     }
 
+    /**
+     * A red button (danger style) with an emoji
+     */
     public static Button red(String buttonID, String buttonLabel, String emoji) {
-        return Button.danger(buttonID, buttonLabel).withEmoji(Emoji.fromFormatted(emoji));
+        return Button.danger(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
+    }
+
+    private static Emoji getEmoji(String emoji) {
+        if (StringUtils.isBlank(emoji)) return null; // no need to error on null/blank
+        try {
+            Emoji output = Emoji.fromFormatted(emoji);
+            return output;
+        } catch (Exception e) {
+            BotLogger.log("Failed to load emoji [" + emoji + "]", e);
+        }
+        return null;
     }
 }

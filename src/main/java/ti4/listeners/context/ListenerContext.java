@@ -73,8 +73,8 @@ public abstract class ListenerContext {
                 game.increaseButtonPressCount();
             }
 
-            if (game.isFoWMode()) {
-                if (player != null && player.getPrivateChannel() == null) {
+            if (game.isFowMode()) {
+                if (player != null && player.isRealPlayer() && player.getPrivateChannel() == null) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
                     privateChannel = null;
                 } else if (player != null) {

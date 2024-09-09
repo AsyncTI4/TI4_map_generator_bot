@@ -76,7 +76,7 @@
         "name": "Projection of Power",
         "faction": "celdauri",
         "window": "At the start of a space combat in a system that is adjacent to or contains 1 or more of your space docks",
-        "windowEffect": "Choose up to 1 ship in that system to gain ANTI-FIGHTER BARRAGE 6(x2) until the end of that combat.",
+        "windowEffect": "Choose up to 1 ship in that system to gain ANTI-FIGHTER BARRAGE 6 until the end of that combat.",
         "source": "ds"
     },
     {
@@ -444,7 +444,7 @@
         "id": "plague_reservoir",
         "name": "Plague Reservoir",
         "faction": "kyro",
-        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.",
+        "permanentEffect": "Once per action, during invasion on a planet that contains your units, you may resolve ground combat on that planet, even if it does not contain another player's ground forces.[Note: designer intent seems to be that during invasion should refer to immediately after the space cannon defense window (this is the same as when ground combat normally starts)]",
         "source": "ds"
     },
     {

@@ -80,10 +80,10 @@ public class CardsInfo implements Command, InfoThreadCommand {
         PNInfo.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game,
-            "You can whisper to people from here by starting a message with to[color] or to[faction]." +
-                "\nYou can schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme"
+            "You may whisper to people from here by starting a message with to[color] or to[faction]." +
+                "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme"
                 +
-                "\nYou can schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]");
+                "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]");
 
     }
 
@@ -105,7 +105,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         }
         if (player.hasUnexhaustedLeader("mykomentoriagent")) {
             Button nekroButton = Button.secondary("exhaustAgent_mykomentoriagent",
-                "Use Myko Agent")
+                "Use Myko-Mentori Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             buttons.add(nekroButton);
         }
@@ -193,7 +193,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         }
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             Button hacanButton = Button.secondary("getAgentSelection_zealotsagent",
-                "Use Zealot Agent")
+                "Use Rhodun Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.zealots));
             buttons.add(hacanButton);
         }
@@ -261,7 +261,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         if (player.ownsUnit("ghost_mech")
             && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", false) > 0
             && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            Button ghostButton = Button.secondary("creussMechStep1_", "Use Ghost Mech")
+            Button ghostButton = Button.secondary("creussMechStep1_", "Use Creuss Mech")
                 .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
             buttons.add(ghostButton);
         }
@@ -298,9 +298,9 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(playerPref);
         Button listGames = Button.secondary("searchMyGames", "List All My Games");
         buttons.add(listGames);
-        buttons.add(Button.success("showObjInfo_both", "Objectives Info"));
-        if (!game.isFoWMode()) {
-            buttons.add(Button.secondary("checkWHView", "Check Wormholes"));
+        buttons.add(Button.success("showObjInfo_both", "Scoring Info"));
+        if (!game.isFowMode()) {
+            buttons.add(Button.secondary("chooseMapView", "Highlight Map Features"));
         }
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
@@ -319,7 +319,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
             if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty())
                 hasSummary = true;
         }
-        if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getCurrentPhase()) || hasSummary) {
+        if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getPhaseOfGame()) || hasSummary) {
             // after the action phase round 1, show the edit summary button by default
             buttons.add(Buttons.EDIT_SUMMARIES);
         }
@@ -328,7 +328,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(Button.success("cardsInfo", "Cards Info Refresh"));
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            "You can use these buttons to do various things", buttons);
+            "You may use these buttons to do various things.", buttons);
     }
 
     protected String getActionDescription() {

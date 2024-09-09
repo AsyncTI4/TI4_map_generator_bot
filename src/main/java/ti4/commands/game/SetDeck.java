@@ -13,7 +13,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
-import ti4.model.StrategyCardSetModel;
 
 public class SetDeck extends GameSubcommandData {
 
@@ -32,6 +31,7 @@ public class SetDeck extends GameSubcommandData {
         addDefaultOption(Constants.EXPLORATION_DECKS, "Exploration");
         addDefaultOption(Constants.STRATEGY_CARD_SET, "Strategy card");
         addDefaultOption(Constants.TECHNOLOGY_DECK, "Technology");
+        addOptions(new OptionData(OptionType.BOOLEAN, "reset_deck", "True to completely reset deck"));
     }
 
     @Override
@@ -75,8 +75,13 @@ public class SetDeck extends GameSubcommandData {
 
     public static boolean setDeck(SlashCommandInteractionEvent event, Game game, String deckType, DeckModel deckModel) {
         if (Optional.ofNullable(deckModel).isPresent()) {
+            boolean resetDeck = event.getOption("reset_deck", false, OptionMapping::getAsBoolean);
             switch (deckType) {
                 case Constants.AC_DECK -> {
+                    if (resetDeck) {
+                        game.resetActionCardDeck(deckModel);
+                        return true;
+                    }
                     return game.validateAndSetActionCardDeck(event, deckModel);
                 }
                 case Constants.SO_DECK -> {

@@ -7,6 +7,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 
 public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
 
@@ -28,9 +29,10 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
         String[] idList = ids.split(",");
         StringBuilder sb = new StringBuilder();
         for (String id : idList) {
-            if (Mapper.getExplore(id) != null) {
+            ExploreModel explore = Mapper.getExplore(id);
+            if (explore != null) {
                 activePlayer.removeFragment(id);
-                sb.append("Fragment discarded: ").append(displayExplore(id)).append(System.lineSeparator());
+                sb.append("Fragment discarded: ").append(explore.textRepresentation()).append(System.lineSeparator());
                 game.addExplore(id);
             } else {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());

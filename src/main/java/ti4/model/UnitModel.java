@@ -3,6 +3,7 @@ package ti4.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -47,6 +48,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean isGroundForce;
     private Boolean isShip;
     private String ability;
+    private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
     private List<String> searchTags = new ArrayList<>();
 
@@ -114,6 +116,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
         if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
+        if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
 
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
@@ -151,45 +154,50 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getAfbDieCount(Player player, Game game) {
-        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
-            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
-                return 2;
-            }
-            return getAfbDieCount();
-        } else {
-            if (getAfbDieCount() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
-                return 1;
-            } else {
-                return getAfbDieCount();
-            }
+        if (getCapacityValue() > 0 &&
+            player.getFaction().equalsIgnoreCase(game.getStoredValue("ShrapnelTurretsFaction")) &&
+            getExpectedAfbHits() < .6) {
+            return 2;
         }
+        if (getAfbDieCount() == 0 &&
+            isWarsunOrDreadnought() &&
+            game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            return 1;
+        }
+        return getAfbDieCount();
+    }
+
+    private double getExpectedAfbHits() {
+        return getAfbDieCount() * ((10 - getAfbHitsOn()) / 10d);
+    }
+
+    private boolean isWarsunOrDreadnought() {
+        return getBaseType().equalsIgnoreCase("warsun") ||
+            getBaseType().equalsIgnoreCase("dreadnought");
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
         if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
             return getSpaceCannonDieCount();
-        } else {
-            if (getBaseType().equalsIgnoreCase("spacedock")) {
-                return 3;
-            } else {
-                return getSpaceCannonDieCount();
-            }
         }
+        if (getBaseType().equalsIgnoreCase("spacedock")) {
+            return 3;
+        }
+        return getSpaceCannonDieCount();
     }
 
     public int getAfbHitsOn(Player player, Game game) {
-        if (!game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
-            if (game.getStoredValue("ShrapnelTurrentsFaction").equalsIgnoreCase(player.getFaction()) && getAfbHitsOn() == 0) {
-                return 9;
-            }
-            return getAfbHitsOn();
-        } else {
-            if (getAfbHitsOn() == 0 && (getBaseType().equalsIgnoreCase("warsun") || getBaseType().equalsIgnoreCase("dreadnought"))) {
-                return 5;
-            } else {
-                return getAfbHitsOn();
-            }
+        if (getCapacityValue() > 0 &&
+            game.getStoredValue("ShrapnelTurretsFaction").equalsIgnoreCase(player.getFaction()) &&
+            getExpectedAfbHits() < .6) {
+            return 8;
         }
+        if (getAfbDieCount() == 0 &&
+            isWarsunOrDreadnought() &&
+            game.playerHasLeaderUnlockedOrAlliance(player, "zeliancommander")) {
+            return 5;
+        }
+        return getAfbHitsOn();
     }
 
     public int getSpaceCannonHitsOn(Player player, Game game) {
@@ -227,7 +235,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             }
             return getBombardHitsOn();
         } else {
-            if (isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
+            if (isShip != null && isShip && !getBaseType().equalsIgnoreCase("fighter") && getBombardDieCount() == 0) {
                 return 6;
             } else {
                 return getBombardHitsOn();
@@ -431,6 +439,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getAbility() {
         return Optional.ofNullable(ability);
+    }
+
+    public Optional<String> getUnlock() {
+        return Optional.ofNullable(unlock);
     }
 
     public Optional<String> getHomebrewReplacesID() {

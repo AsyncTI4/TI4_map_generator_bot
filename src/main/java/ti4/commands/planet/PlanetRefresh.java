@@ -18,7 +18,7 @@ public class PlanetRefresh extends PlanetAddRemove {
 
     public static void doAction(Player player, String planet, Game game) {
         if (!player.getPlanets().contains(planet)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " the bot doesnt think you have a planet by the name of " + planet);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " the bot doesn't think you have a planet by the name of " + planet);
         }
         player.refreshPlanet(planet);
     }

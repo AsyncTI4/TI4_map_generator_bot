@@ -1,7 +1,6 @@
 package ti4.map;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -9,10 +8,18 @@ import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -118,11 +125,11 @@ public class GameSaveLoadManager {
                 tot += time;
 
             String sb = "Map save time stats:\n```fix" + "\n" + debugString("        total:", tot, tot) +
-                    "\n" + debugString("          txt:", txtTime, tot) +
-                    "\n" + debugString("         json:", jsonTime, tot) +
-                    "\n" + debugString("    undo file:", undoTime, tot) +
-                    "\n" + debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot) +
-                    "\n```";
+                "\n" + debugString("          txt:", txtTime, tot) +
+                "\n" + debugString("         json:", jsonTime, tot) +
+                "\n" + debugString("    undo file:", undoTime, tot) +
+                "\n" + debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot) +
+                "\n```";
             BotLogger.logWithTimestamp(sb);
         }
     }
@@ -149,7 +156,7 @@ public class GameSaveLoadManager {
                 boolean thread = button.getMessageChannel() instanceof ThreadChannel;
                 boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
                 boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
-                if (cardThread || draftThread || game.isFoWMode() || button.getButton().getId().contains("anonDeclare")) {
+                if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
                     reason = username + " pressed button: [CLASSIFIED]";
                 } else {
                     reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
@@ -176,7 +183,7 @@ public class GameSaveLoadManager {
         boolean lastSaveTrivial = trivialSaveReasons.contains(game.getLatestCommand());
         boolean thisSaveTrivial = saveReason == null || trivialSaveReasons.contains(saveReason);
         if (keepModifiedDate && game.isHasEnded() && lastSaveTrivial && thisSaveTrivial) {
-            //return;
+            // return;
         }
 
         if (saveReason != null) {
@@ -294,14 +301,14 @@ public class GameSaveLoadManager {
                     } else {
                         sb.append(loadedGame.getLatestCommand());
                     }
-                    if (game.isFoWMode()) {
+                    if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
                     } else {
                         ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
                     }
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
-                            && !game.getCurrentPhase().contains("status")) {
+                            && !game.getPhaseOfGame().contains("status")) {
                             // MessageHelper.sendMessageToChannel(loadedGame.getSavedChannel(), "Attempting
                             // to regenerate buttons:");
                             MessageHelper.sendMessageToChannelWithButtons(loadedGame.getSavedChannel(),
@@ -375,7 +382,7 @@ public class GameSaveLoadManager {
         // game information
         writer.write(Constants.LATEST_COMMAND + " " + game.getLatestCommand());
         writer.write(System.lineSeparator());
-        writer.write(Constants.PHASE_OF_GAME + " " + game.getCurrentPhase());
+        writer.write(Constants.PHASE_OF_GAME + " " + game.getPhaseOfGame());
         writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + game.getLatestOutcomeVotedFor());
         writer.write(System.lineSeparator());
@@ -426,17 +433,15 @@ public class GameSaveLoadManager {
         writer.write(Constants.AUTO_PING + " " + game.getAutoPingSpacer());
         writer.write(System.lineSeparator());
 
-        writer.write(
-            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + game.getPlayersWhoHitPersistentNoAfter());
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + game.getPlayersWhoHitPersistentNoAfter());
         writer.write(System.lineSeparator());
 
-        writer.write(
-            Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + game.getPlayersWhoHitPersistentNoWhen());
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + game.getPlayersWhoHitPersistentNoWhen());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.CURRENT_AGENDA_INFO + " " + game.getCurrentAgendaInfo());
         writer.write(System.lineSeparator());
-        writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + game.getACDrawStatusInfo());
+        writer.write(Constants.CURRENT_ACDRAWSTATUS_INFO + " " + game.getCurrentACDrawStatusInfo());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + game.getLastActivePlayerChange().getTime());
@@ -616,7 +621,7 @@ public class GameSaveLoadManager {
 
         writer.write(Constants.TABLE_TALK_CHANNEL + " " + game.getTableTalkChannelID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.MAIN_GAME_CHANNEL + " " + game.getMainGameChannelID());
+        writer.write(Constants.MAIN_GAME_CHANNEL + " " + game.getMainChannelID());
         writer.write(System.lineSeparator());
         writer.write(Constants.SAVED_CHANNEL + " " + game.getSavedChannelID());
         writer.write(System.lineSeparator());
@@ -636,7 +641,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ALLIANCE_MODE + " " + game.isAllianceMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.FOW_MODE + " " + game.isFoWMode());
+        writer.write(Constants.FOW_MODE + " " + game.isFowMode());
         writer.write(System.lineSeparator());
         StringBuilder fowOptions = new StringBuilder();
         for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
@@ -644,37 +649,39 @@ public class GameSaveLoadManager {
         }
         writer.write(Constants.FOW_OPTIONS + " " + fowOptions);
         writer.write(System.lineSeparator());
-        writer.write(Constants.NAALU_AGENT + " " + game.getNaaluAgent());
+        writer.write(Constants.NAALU_AGENT + " " + game.isNaaluAgent());
         writer.write(System.lineSeparator());
-        writer.write(Constants.L1_HERO + " " + game.getL1Hero());
+        writer.write(Constants.L1_HERO + " " + game.isL1Hero());
         writer.write(System.lineSeparator());
-        writer.write(Constants.NOMAD_COIN + " " + game.getNomadCoin());
+        writer.write(Constants.NOMAD_COIN + " " + game.isNomadCoin());
         writer.write(System.lineSeparator());
-        writer.write(Constants.UNDO_BUTTON + " " + game.getUndoButton());
+        writer.write(Constants.UNDO_BUTTON + " " + game.isUndoButtonOffered());
         writer.write(System.lineSeparator());
         writer.write(Constants.FAST_SC_FOLLOW + " " + game.isFastSCFollowMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.QUEUE_SO + " " + game.getQueueSO());
+        writer.write(Constants.QUEUE_SO + " " + game.isQueueSO());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_BUBBLES + " " + game.getShowBubbles());
+        writer.write(Constants.SHOW_BUBBLES + " " + game.isShowBubbles());
         writer.write(System.lineSeparator());
-        writer.write(Constants.TRANSACTION_METHOD + " " + game.getWhetherNewTransactionMethod());
+        writer.write(Constants.TRANSACTION_METHOD + " " + game.isNewTransactionMethod());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HOMEBREW_MODE + " " + game.isHomeBrew());
+        writer.write(Constants.HOMEBREW_MODE + " " + game.isHomebrew());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_GEARS + " " + game.getShowGears());
+        writer.write(Constants.SHOW_GEARS + " " + game.isShowGears());
         writer.write(System.lineSeparator());
-        writer.write(Constants.SHOW_BANNERS + " " + game.getShowBanners());
+        writer.write(Constants.SHOW_BANNERS + " " + game.isShowBanners());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.SHOW_HEX_BORDERS + " " + game.getHexBorderStyle());
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_FRAGMENTS + " " + game.getNumberOfPurgedFragments());
         writer.write(System.lineSeparator());
-        writer.write(Constants.TEMPORARY_PING_DISABLE + " " + game.getTemporaryPingDisable());
+        writer.write(Constants.TEMPORARY_PING_DISABLE + " " + game.isTemporaryPingDisable());
         writer.write(System.lineSeparator());
-        writer.write(Constants.DOMINUS_ORB + " " + game.getDominusOrbStatus());
+        writer.write(Constants.DOMINUS_ORB + " " + game.isDominusOrb());
         writer.write(System.lineSeparator());
-        writer.write(Constants.COMPONENT_ACTION + " " + game.getComponentAction());
+        writer.write(Constants.COMPONENT_ACTION + " " + game.isComponentAction());
         writer.write(System.lineSeparator());
-        writer.write(Constants.JUST_PLAYED_COMPONENT_AC + " " + game.getJustPlayedComponentAC());
+        writer.write(Constants.JUST_PLAYED_COMPONENT_AC + " " + game.isJustPlayedComponentAC());
         writer.write(System.lineSeparator());
         writer.write(Constants.ACTIVATION_COUNT + " " + game.getActivationCount());
         writer.write(System.lineSeparator());
@@ -689,6 +696,10 @@ public class GameSaveLoadManager {
         writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + game.isMiltyModMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.PROMISES_PROMISES + " " + game.isPromisesPromisesMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.FLAGSHIPPING + " " + game.isFlagshippingMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_MAP_SETUP + " " + game.isShowMapSetup());
         writer.write(System.lineSeparator());
@@ -706,17 +717,17 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HACK_ELECTION_STATUS + " " + game.getHackElectionStatus());
+        writer.write(Constants.HACK_ELECTION_STATUS + " " + game.isHasHackElectionBeenPlayed());
         writer.write(System.lineSeparator());
-        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + game.getCCNPlasticLimit());
+        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + game.isCcNPlasticLimit());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BOT_FACTION_REACTS + " " + game.getBotFactionReacts());
+        writer.write(Constants.BOT_FACTION_REACTS + " " + game.isBotFactionReacts());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + game.getHasHadAStatusPhase());
+        writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + game.isHasHadAStatusPhase());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BOT_SHUSHING + " " + game.getBotShushing());
+        writer.write(Constants.BOT_SHUSHING + " " + game.isBotShushing());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HOMEBREW_SC_MODE + " " + game.isHomeBrewSCMode());
+        writer.write(Constants.HOMEBREW_SC_MODE + " " + game.isHomebrewSCMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.INJECT_RULES_LINKS + " " + game.isInjectRulesLinks());
         writer.write(System.lineSeparator());
@@ -747,6 +758,9 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.BAG_DRAFT + " " + (game.getActiveBagDraft() == null ? "" : game.getActiveBagDraft().getSaveString()));
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.GAME_TAGS + " " + String.join(",", game.getTags()));
         writer.write(System.lineSeparator());
 
         MiltyDraftManager manager = game.getMiltyDraftManager();
@@ -924,6 +938,8 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.SPENT_THINGS + " " + String.join(",", player.getSpentThingsThisWindow()));
             writer.write(System.lineSeparator());
+            writer.write(Constants.BOMBARD_UNITS + " " + String.join(",", player.getBombardUnits()));
+            writer.write(System.lineSeparator());
             writer.write(Constants.TRANSACTION_ITEMS + " " + String.join(",", player.getTransactionItems()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TEAMMATE_IDS + " " + String.join(",", player.getTeamMateIDs()));
@@ -984,7 +1000,9 @@ public class GameSaveLoadManager {
             StringBuilder units = new StringBuilder();
             if (unitHolder != null) {
                 for (Map.Entry<UnitKey, Integer> entry : unitHolder.getUnits().entrySet()) {
-                    units.append(entry.getKey().outputForSave()).append(",").append(entry.getValue()).append(";");
+                    if (Mapper.isValidColor(entry.getKey().getColor())) {
+                        units.append(entry.getKey().outputForSave()).append(",").append(entry.getValue()).append(";");
+                    }
                 }
             }
             writer.write(Constants.CAPTURE + " " + units);
@@ -1360,7 +1378,6 @@ public class GameSaveLoadManager {
                         if (ENDTOKENS.equals(data)) {
                             break;
                         }
-                        // readTokens(tile, data);
                     }
                 }
             } catch (Exception e) {
@@ -1387,7 +1404,7 @@ public class GameSaveLoadManager {
                 case Constants.LATEST_AFTER_MSG -> game.setLatestAfterMsg(info);
                 case Constants.LATEST_WHEN_MSG -> game.setLatestWhenMsg(info);
                 case Constants.LATEST_TRANSACTION_MSG -> game.setLatestTransactionMsg(info);
-                case Constants.PHASE_OF_GAME -> game.setCurrentPhase(info);
+                case Constants.PHASE_OF_GAME -> game.setPhaseOfGame(info);
                 case Constants.LATEST_UPNEXT_MSG -> game.setLatestUpNextMsg(info);
                 case Constants.SO -> game.setSecretObjectives(getCardList(info));
                 case Constants.MESSAGEID_FOR_SABOS -> game.setMessageIDForSabo(getCardList(info));
@@ -1487,7 +1504,7 @@ public class GameSaveLoadManager {
                     game.setScTradeGoods(scTradeGoods);
                 }
                 case Constants.SPEAKER -> game.setSpeaker(info);
-                case Constants.ACTIVE_PLAYER -> game.setActivePlayer(info);
+                case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {
                     try {
@@ -1525,7 +1542,7 @@ public class GameSaveLoadManager {
                 }
                 case Constants.CURRENT_ACDRAWSTATUS_INFO -> {
                     try {
-                        game.setACDrawStatusInfo(info);
+                        game.setCurrentACDrawStatusInfo(info);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1725,7 +1742,7 @@ public class GameSaveLoadManager {
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> game.setPlayersWhoHitPersistentNoAfter(info);
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> game.setPlayersWhoHitPersistentNoWhen(info);
                 case Constants.TABLE_TALK_CHANNEL -> game.setTableTalkChannelID(info);
-                case Constants.MAIN_GAME_CHANNEL -> game.setMainGameChannelID(info);
+                case Constants.MAIN_GAME_CHANNEL -> game.setMainChannelID(info);
                 case Constants.SAVED_CHANNEL -> game.setSavedChannelID(info);
                 case Constants.SAVED_MESSAGE -> game.setSavedMessage(info);
                 case Constants.BOT_MAP_CHANNEL -> game.setBotMapUpdatesThreadID(info);
@@ -1744,7 +1761,7 @@ public class GameSaveLoadManager {
                 case Constants.HACK_ELECTION_STATUS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHackElectionStatus(value);
+                        game.setHasHackElectionBeenPlayed(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1752,7 +1769,7 @@ public class GameSaveLoadManager {
                 case Constants.CC_N_PLASTIC_LIMIT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setCCNPlasticLimit(value);
+                        game.setCcNPlasticLimit(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1760,7 +1777,7 @@ public class GameSaveLoadManager {
                 case Constants.BOT_FACTION_REACTS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setBotFactionReactions(value);
+                        game.setBotFactionReacts(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1776,7 +1793,7 @@ public class GameSaveLoadManager {
                 case Constants.BOT_SHUSHING -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setShushing(value);
+                        game.setBotShushing(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1800,12 +1817,12 @@ public class GameSaveLoadManager {
                 case Constants.FOW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setFoWMode(value);
+                        game.setFowMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
                 }
-                case "fow_hide_names" -> { //TODO REMOVE THIS AFTER ONE SAVE/LOAD GAMES
+                case "fow_hide_names" -> { // TODO REMOVE THIS AFTER ONE SAVE/LOAD GAMES
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         if (value)
@@ -1841,7 +1858,7 @@ public class GameSaveLoadManager {
                 case Constants.UNDO_BUTTON -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setUndoButton(value);
+                        game.setUndoButtonOffered(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1873,7 +1890,7 @@ public class GameSaveLoadManager {
                 case Constants.TRANSACTION_METHOD -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setTransactionMethod(value);
+                        game.setNewTransactionMethod(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1894,10 +1911,11 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.SHOW_HEX_BORDERS -> game.setHexBorderStyle(info);
                 case Constants.HOMEBREW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHomeBrew(value);
+                        game.setHomebrew(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -1969,7 +1987,7 @@ public class GameSaveLoadManager {
                 case Constants.HOMEBREW_SC_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setHomeBrewSCMode(value);
+                        game.setHomebrewSCMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -2017,6 +2035,22 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setAbsolMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.PROMISES_PROMISES -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setPromisesPromisesMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.FLAGSHIPPING -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setFlagshippingMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -2154,6 +2188,7 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
+                case Constants.GAME_TAGS -> game.setTags(getCardList(info));
             }
         }
     }
@@ -2328,6 +2363,7 @@ public class GameSaveLoadManager {
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
                 case Constants.SPENT_THINGS -> player.setSpentThings(getCardList(tokenizer.nextToken()));
+                case Constants.BOMBARD_UNITS -> player.setBombardUnits(getCardList(tokenizer.nextToken()));
                 case Constants.TRANSACTION_ITEMS -> player.setTransactionItems(getCardList(tokenizer.nextToken()));
                 case Constants.TEAMMATE_IDS -> player.setTeamMateIDs(getCardList(tokenizer.nextToken()));
                 case Constants.FACTION_TECH -> player.setFactionTechs(getCardList(tokenizer.nextToken()));

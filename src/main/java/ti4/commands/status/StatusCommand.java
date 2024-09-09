@@ -3,6 +3,7 @@ package ti4.commands.status;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -82,6 +83,7 @@ public class StatusCommand implements Command {
         subcommands.add(new ListTurnStats());
         subcommands.add(new ListDiceLuck());
         subcommands.add(new ListSpends());
+        subcommands.add(new MarkFollowed());
         subcommands.add(new POInfo());
         return subcommands;
     }

@@ -1,0 +1,115 @@
+[
+    {
+        "id": "encryptionkey",
+        "imagePath": "attachment_encryptionkey.png",
+        "techSpeciality": [
+            "biotic",
+            "cybernetic",
+            "propulsion",
+            "warfare"
+        ],
+        "source": "ds"
+    },
+    {
+        "id": "gledgebase",
+        "imagePath": "attachment_gledgebase.png",
+        "resourcesModifier": 2,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap",
+        "imagePath": "attachment_lizhotrap.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap2",
+        "imagePath": "attachment_lizhotrap2.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap3",
+        "imagePath": "attachment_lizhotrap3.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap4",
+        "imagePath": "attachment_lizhotrap4.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap5",
+        "imagePath": "attachment_lizhotrap5.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap6",
+        "imagePath": "attachment_lizhotrap6.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap1",
+        "imagePath": "attachment_lizhotrap1.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "veldyrtaxhaven",
+        "imagePath": "attachment_veldyrtaxhaven.png",
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "veldyrbroadcasthub",
+        "imagePath": "attachment_veldyrbroadcasthub.png",
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "veldyrreservebank",
+        "imagePath": "attachment_veldyrreservebank.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "veldyrorbitalshipyard",
+        "imagePath": "attachment_veldyrorbitalshipyard.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "automatons",
+        "imagePath": "attachment_automatons.png",
+        "source": "ds"
+    },
+    {
+        "id": "garden_worlds",
+        "imagePath": "attachment_garden_worlds.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "olradin_mech_res",
+        "imagePath": "attachment_olradin_mech_res.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "olradin_mech_inf",
+        "imagePath": "attachment_olradin_mech_inf.png",
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    }
+]

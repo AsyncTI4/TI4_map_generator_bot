@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.ListUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -18,14 +20,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.ListUtils;
-
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.status.ListPlayerInfoButton;
-import ti4.generator.Mapper;
 import ti4.generator.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -65,7 +65,7 @@ public class TurnEnd extends PlayerSubcommandData {
             return;
         }
 
-        if (game.isFoWMode() && !mainPlayer.equals(game.getActivePlayer())) {
+        if (game.isFowMode() && !mainPlayer.equals(game.getActivePlayer())) {
             OptionMapping confirm = event.getOption(Constants.CONFIRM);
             if (confirm == null || !"YES".equals(confirm.getAsString())) {
                 MessageHelper.sendMessageToEventChannel(event, "You are not the active player. Confirm End Turn with YES.");
@@ -108,7 +108,10 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setTemporaryPingDisable(false);
         game.setStoredValue("lawsDisabled", "no");
         game.setStoredValue("endTurnWhenSCFinished", "");
+        game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
+        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "sol", event);
+        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "hacan", event);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -122,11 +125,11 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         game.setStoredValue("mahactHeroTarget", "");
         game.setActiveSystem("");
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
                 + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation() + " ended turn");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn");
         }
 
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
@@ -142,11 +145,12 @@ public class TurnEnd extends PlayerSubcommandData {
             showPublicObjectivesWhenAllPassed(event, game, gameChannel);
             game.updateActivePlayer(null);
             ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, mainPlayer, event);
+            ButtonHelperAgents.checkForEdynAgentActive(game, event);
             return;
         }
 
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
-        if (!game.isFoWMode()) {
+        if (!game.isFowMode()) {
             String lastTransaction = game.getLatestTransactionMsg();
             try {
                 if (lastTransaction != null && !"".equals(lastTransaction)) {
@@ -166,6 +170,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
+        ButtonHelper.fullCommanderUnlockCheck(nextPlayer, game, "sol", event);
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);
@@ -228,7 +233,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFoWMode()) {
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
                 poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
                 break;
             }
@@ -239,12 +244,12 @@ public class TurnEnd extends PlayerSubcommandData {
 
     public static void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Game game, MessageChannel gameChannel) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
-        if (game.getShowBanners()) {
-            MapGenerator.drawPhaseBanner("status", game.getRound(), event);
+        if (game.isShowBanners()) {
+            MapGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
         }
         String message = "Please score objectives, " + game.getPing() + ".";
 
-        game.setCurrentPhase("statusScoring");
+        game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", new Date().getTime() + "");
         for (Player player : game.getRealPlayers()) {
             SOInfo.sendSecretObjectiveInfo(game, player);
@@ -259,9 +264,9 @@ public class TurnEnd extends PlayerSubcommandData {
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You can pay 1tg to get 2 debt tokens forgiven. ";
+                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 tg"));
+                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
                     buttons.add(Button.danger("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
@@ -306,11 +311,11 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " tg and " + numScoredPos + " commodities due to Vaden Commander");
+                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
         }
         // if(maxVP+4 > game.getVp()){
-        //     String msg = "You can use these buttons to force scoring to go in iniative order";
+        //     String msg = "You may use these buttons to force scoring to go in iniative order";
         //     List<Button> buttons = new ArrayList<>();
         //     buttons.add(Button.primary("forceACertainScoringOrder", "Force Scoring in Order"));
         //     buttons.add(Button.danger("deleteButtons", "Decline to force order"));
@@ -336,7 +341,7 @@ public class TurnEnd extends PlayerSubcommandData {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you can use the button to pay 3tg and get a tech, using your Sentient Datapool technology", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentation(true, true) + " you may use the button to pay 3TGs and get a tech, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
@@ -346,12 +351,12 @@ public class TurnEnd extends PlayerSubcommandData {
                 buttons.add(Button.danger("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentation()
-                        + " Reminder this is the window to do Kyro Hero. You can use the buttons to start the process",
+                        + " Reminder this is the window to play Speygh, the Kyro hero. You may use the buttons to start the process.",
                     buttons);
             }
 
             if (player.getRelics() != null && (player.hasRelic("emphidia") || player.hasRelic("absol_emphidia"))) {
-                for (String pl : player.getPlanets()) {
+                for (String pl : player.getPlanetsAllianceMode()) {
                     Tile tile = game.getTile(AliasHandler.resolveTile(pl));
                     if (tile == null) {
                         continue;
@@ -360,11 +365,11 @@ public class TurnEnd extends PlayerSubcommandData {
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "Crown of Emphidia. You can purge " +
-                                    Emojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear");
+                                player.getRepresentation() + "Reminder this is not the window to use " + Emojis.Relic + "Crown of Emphidia. You may purge " +
+                                    Emojis.Relic + "Crown of Emphidia in the status homework phase, which is when buttons will appear.");
                         } else {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "Reminder this is the window to use " + Emojis.Relic + "Crown of Emphidia.");
-                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You can use these buttons to resolve " + Emojis.Relic + "Crown of Emphidia", ButtonHelper.getCrownButtons());
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You may use these buttons to resolve " + Emojis.Relic + "Crown of Emphidia.", ButtonHelper.getCrownButtons());
                         }
                     }
                 }
@@ -408,9 +413,10 @@ public class TurnEnd extends PlayerSubcommandData {
             if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), ms2);
             }
+
             Button editSummary = RoundSummaryHelper.editSummaryButton(game, p2, game.getRound());
             String endOfRoundMessage = p2.getRepresentation();
-            endOfRoundMessage += " you can write down your end of round thoughts, to be shared at the end of the game.";
+            endOfRoundMessage += " you may write down your end of round thoughts, to be shared at the end of the game.";
             endOfRoundMessage += " Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing).";
             MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), endOfRoundMessage, editSummary);
         }
@@ -429,7 +435,7 @@ public class TurnEnd extends PlayerSubcommandData {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing() +
-                "Players will be forced to score in order. Any preemptive scores will be queued. You can turn this off at any time by pressing this button", buttons);
+                "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
             for (Player player : Helper.getInitativeOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
@@ -455,8 +461,8 @@ public class TurnEnd extends PlayerSubcommandData {
                         if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
                             String genesisMessage = solPlayer.getRepresentation(true, true)
-                                + " an infantry was added to the space area of your flagship automatically.";
-                            if (game.isFoWMode()) {
+                                + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
+                            if (game.isFowMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
                             } else {
                                 MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);

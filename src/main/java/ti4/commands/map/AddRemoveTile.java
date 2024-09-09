@@ -66,10 +66,10 @@ abstract public class AddRemoveTile extends MapSubcommandData {
 
         Game userActiveGame = gameManager.getUserActiveGame(userID);
         Boolean isFowPrivate = null;
-        if (userActiveGame.isFoWMode()) {
+        if (userActiveGame.isFowMode()) {
             isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
-        if (isFowPrivate != null && isFowPrivate) {
+        if (isFowPrivate != null && isFowPrivate && !userActiveGame.isAgeOfExplorationMode()) {
             MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
             return null;
         }

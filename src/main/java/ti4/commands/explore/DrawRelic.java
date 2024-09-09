@@ -2,11 +2,13 @@ package ti4.commands.explore;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -82,7 +84,7 @@ public class DrawRelic extends GenericRelicAction {
         RelicModel relicModel = Mapper.getRelic(relicID);
 
         String message = player.getRepresentation() + " drew a Relic:";
-        if (game.isFoWMode()) {
+        if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
         }
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), message, relicModel.getRepresentationEmbed(false, true));
@@ -101,14 +103,14 @@ public class DrawRelic extends GenericRelicAction {
             case "obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
 
-                if (game.isFoWMode()) {
-                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew SO");
+                if (game.isFowMode()) {
+                    FoWHelper.pingAllPlayersWithFullStats(game, event, player, "Drew An SO");
                 }
 
-                helpMessage.append("\nAn SO has been automatically drawn");
+                helpMessage.append("\nAn SO has been automatically drawn.");
                 if (player.hasAbility("plausible_deniability")) {
                     game.drawSecretObjective(player.getUserID());
-                    helpMessage.append(". Drew a second SO due to plausible deniability");
+                    helpMessage.append(" Drew a second SO due to Plausible Deniability.");
                 }
                 SOInfo.sendSecretObjectiveInfo(game, player, event);
             }
