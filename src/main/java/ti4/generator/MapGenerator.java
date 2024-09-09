@@ -47,7 +47,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
-import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -113,7 +112,7 @@ public class MapGenerator {
     public static final int TILE_PADDING = 100;
     private static final int EXTRA_X = 300;
     private static final int EXTRA_Y = 200;
-    public static final int spacingBetweenObjectiveTypes = 10;
+    public static final int SPACING_BETWEEN_OBJECTIVE_TYPES = 10;
     private static final Point tilePositionPoint = new Point(255, 295);
     private static final Point labelPositionPoint = new Point(90, 295);
     private static final Point numberPositionPoint = new Point(40, 27);
@@ -215,8 +214,8 @@ public class MapGenerator {
         int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
         int heightStats = playerY + lawsY + objectivesY + 600;
 
-        int mapHeight = GetMapHeight(game);
-        mapWidth = GetMapWidth(game);
+        int mapHeight = getMapHeight(game);
+        mapWidth = getMapWidth(game);
         extraRow = (mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
         if (extraRow) {
             mapWidth += EXTRA_X;
@@ -4068,14 +4067,14 @@ public class MapGenerator {
         int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
         int maxY = y;
 
-        List<Objective> objectives = Objective.Retrieve(game);
+        List<Objective> objectives = Objective.retrieve(game);
         int maxTextWidth = ObjectiveBox.GetMaxTextWidth(game, graphics, objectives);
         int boxWidth = ObjectiveBox.GetBoxWidth(game, maxTextWidth, scoreTokenWidth);
         Objective.Type lastType = Objective.Type.Stage1;
 
         for (Objective objective : objectives) {
             if (objective.type() != lastType) {
-                x += boxWidth + spacingBetweenObjectiveTypes;
+                x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
                 maxY = Math.max(y, maxY);
                 y = top;
                 lastType = objective.type();
@@ -6508,31 +6507,29 @@ public class MapGenerator {
         return text;
     }
 
-    public static Integer GetRingCount(Game game) {
+    public static int getRingCount(Game game) {
         return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
     }
 
-    public static Integer GetMapHeight(Game game) {
-        return (GetRingCount(game) + 1) * 600 + EXTRA_Y * 2;
+    private static int getMapHeight(Game game) {
+        return (getRingCount(game) + 1) * 600 + EXTRA_Y * 2;
     }
 
-    public static Integer GetMapPlayerCount(Game game) {
+    private static int getMapPlayerCount(Game game) {
         return game.getRealPlayers().size() + game.getDummies().size();
     }
 
-    public static Boolean HasExtraRow(Game game) {
-        return (GetMapHeight(game) - EXTRA_Y) < (GetMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
+    private static boolean hasExtraRow(Game game) {
+        return (getMapHeight(game) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
     }
 
-    public static Integer GetMapWidth(Game game) {
-        int mapWidth = (GetRingCount(game) + 1) * 520 + EXTRA_X * 2;
-        if (HasExtraRow(game)) {
-            mapWidth += EXTRA_X;
-        }
+    private static int getMapWidth(Game game) {
+        int mapWidth = (getRingCount(game) + 1) * 520 + EXTRA_X * 2;
+        mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
         return mapWidth;
     }
 
-    public static Integer GetMaxObjectWidth(Game game) {
-        return (MapGenerator.GetMapWidth(game) - MapGenerator.spacingBetweenObjectiveTypes * 4) / 3;
+    protected static int getMaxObjectWidth(Game game) {
+        return (MapGenerator.getMapWidth(game) - MapGenerator.SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
     }
 }

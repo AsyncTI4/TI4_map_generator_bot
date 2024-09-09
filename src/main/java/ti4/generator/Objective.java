@@ -2,6 +2,8 @@ package ti4.generator;
 
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.message.BotLogger;
+import ti4.model.PublicObjectiveModel;
 
 import java.util.*;
 import java.util.List;
@@ -16,7 +18,7 @@ public record Objective(
 
 	public enum Type {Stage1, Stage2, Custom}
 
-	public static List<Objective> Retrieve(Game game) {
+	public static List<Objective> retrieve(Game game) {
 		List<Objective> objectives = new ArrayList<>();
 
 		appendRevealedObjectives(game, objectives, Type.Stage1);
@@ -28,7 +30,7 @@ public record Objective(
 		return objectives;
 	}
 
-	public Integer GetWorth(Game game) {
+	public Integer getWorth(Game game) {
 		return switch (type) {
 			case Stage1 -> 1;
 			case Stage2 -> 2;
@@ -36,16 +38,21 @@ public record Objective(
 		};
 	}
 
-	public String GetName() {
+	public String getName() {
 		if (type == Type.Custom) {
 			return key;
 		}
-		return Mapper.getPublicObjective(key).getName();
+		PublicObjectiveModel po = Mapper.getPublicObjective(key);
+		if (po == null) {
+			BotLogger.log(String.format("Objective not found: key = %s", key));
+			return "";
+		}
+		return po.getName();
 	}
 
-	public String GetDisplayText(Game game) {
-		String name = this.GetName();
-		Integer worth = this.GetWorth(game);
+	public String getDisplayText(Game game) {
+		String name = this.getName();
+		Integer worth = this.getWorth(game);
 		if (revealed) {
 			return String.format("(%d) %s - %d VP", index, name, worth);
 		} else if (game.isRedTapeMode()) {
@@ -54,7 +61,7 @@ public record Objective(
 		return String.format("(%d) <Unrevealed> - %d VP", index, worth);
 	}
 
-	public Boolean IsMultiScoring(Game game) {
+	public Boolean isMultiScoring(Game game) {
 		return Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || game.isFowMode();
 	}
 

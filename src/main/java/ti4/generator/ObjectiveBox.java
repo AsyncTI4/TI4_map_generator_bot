@@ -40,7 +40,7 @@ public class ObjectiveBox {
 	public void Display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
 		setColor(graphics, objective);
 
-		graphics.drawString(objective.GetDisplayText(game), x, y + textVerticalOffset);
+		graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
 		graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
 
 		x += maxTextWidth + bufferBetweenTextAndTokens;
@@ -50,7 +50,7 @@ public class ObjectiveBox {
 	public static Integer GetMaxTextWidth(Game game, Graphics graphics, List<Objective> objectives) {
 		int maxTextWidth = 0;
 		for (Objective objective : objectives) {
-			maxTextWidth = Math.max(maxTextWidth, graphics.getFontMetrics().stringWidth(objective.GetDisplayText(game)));
+			maxTextWidth = Math.max(maxTextWidth, graphics.getFontMetrics().stringWidth(objective.getDisplayText(game)));
 		}
 		return maxTextWidth;
 	}
@@ -61,7 +61,7 @@ public class ObjectiveBox {
 	}
 
 	public static Integer GetBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
-		return Math.max(GetMinimumBoxWidth(game), Math.min(MapGenerator.GetMaxObjectWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
+		return Math.max(GetMinimumBoxWidth(game), Math.min(MapGenerator.getMaxObjectWidth(game), getMaxLengthOfTokens(game, maxTextWidth, scoreTokenWidth)));
 	}
 
 	public static Integer GetVerticalSpacing() {
@@ -93,7 +93,7 @@ public class ObjectiveBox {
 
 				BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
 
-				if (objective.IsMultiScoring(game)) {
+				if (objective.isMultiScoring(game)) {
 					int frequency = Collections.frequency(playerIDs, playerID);
 					for (int i = 0; i < frequency; i++) {
 						MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
@@ -102,7 +102,7 @@ public class ObjectiveBox {
 				} else {
 					MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
 				}
-				if (!objective.IsMultiScoring(game)) {
+				if (!objective.isMultiScoring(game)) {
 					x += scoreTokenWidth;
 				}
 			}
