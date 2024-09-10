@@ -21,12 +21,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -315,7 +313,7 @@ public class Mapper {
         return TileHelper.getAllTiles().values().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
             .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
-            .filter(tileModel -> tileModel.isEmpty())
+            .filter(TileModel::isEmpty)
             .map(TileModel::getId)
             .toList();
     }

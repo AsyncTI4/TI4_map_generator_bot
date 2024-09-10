@@ -4,18 +4,7 @@ import java.io.File;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -7838,8 +7827,7 @@ public class ButtonHelper {
                 "Start of Strategy Phase For Round #" + game.getRound());
         }
         for (Player player2 : game.getRealPlayers()) {
-            if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")
-                && game.isCustodiansScored()) {
+            if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")) {
                 MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(),
                     player2.getRepresentation(true, true)
                         + "Reminder this is the window to play Summit.");
@@ -7866,6 +7854,43 @@ public class ButtonHelper {
         }
         if (game.getTile("SIG02") != null && !game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Please destroy all units in the pulsar.");
+        }
+        if ("action_deck_2".equals(game.getAcDeckID())) {
+            handleStartOfStrategyForAcd2(game);
+        }
+    }
+
+    private static void handleStartOfStrategyForAcd2(Game game) {
+        boolean deflectionDiscarded = game.isACInDiscard("Deflection");
+        boolean revolutionDiscarded = game.isACInDiscard("Revolution");
+        StringJoiner stringJoiner = new StringJoiner(" and ");
+        if (!deflectionDiscarded)
+            stringJoiner.add("*Deflection*");
+        if (!revolutionDiscarded)
+            stringJoiner.add("*Revolution*");
+        String acd2Shenanigans;
+        if (stringJoiner.length() > 0) {
+            acd2Shenanigans = "This is the window for " + stringJoiner + "! " + game.getPing();
+            handleStartOfStrategyForAcd2Player(game);
+        } else {
+            acd2Shenanigans = "*Deflection* and *Revolution* are in the discard pile. Feel free to move forward.";
+        }
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), acd2Shenanigans);
+
+    }
+
+    private static void handleStartOfStrategyForAcd2Player(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.getActionCards().containsKey("deflection")) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                        player.getRepresentation(true, true)
+                                + "Reminder this is the window to play Deflection.");
+            }
+            if (player.getActionCards().containsKey("revolution")) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                        player.getRepresentation(true, true)
+                                + "Reminder this is the window to play Revolution.");
+            }
         }
     }
 

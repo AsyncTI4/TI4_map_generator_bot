@@ -51,7 +51,11 @@ public class Units {
 
         @JsonIgnore
         public String getFileName() {
-            if (unitType == UnitType.Destroyer && ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0) {
+            return getFileName(ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0);
+        }
+
+        public String getFileName(boolean eyes) {
+            if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
             if (UnitType.TyrantsLament == unitType || UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
