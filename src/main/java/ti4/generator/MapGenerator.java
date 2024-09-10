@@ -205,8 +205,8 @@ public class MapGenerator {
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
-            } else if (player.getSecretsScored().size() > 4) {
-                playerY += (player.getSecretsScored().size() - 4) * 43;
+            } else if (player.getSecretsScored().size() > 3) {
+                playerY += (player.getSecretsScored().size() - 3) * 43;
             }
         }
 
@@ -1133,8 +1133,8 @@ public class MapGenerator {
                 }
 
                 g2.setColor(color);
-                if (soCount > 4) {
-                    y += (soCount - 4) * 43;
+                if (soCount > 3) {
+                    y += (soCount - 3) * 43;
                 }
                 g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
                 y += 15;
