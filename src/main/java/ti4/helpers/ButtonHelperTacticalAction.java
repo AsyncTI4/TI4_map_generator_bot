@@ -458,7 +458,11 @@ public class ButtonHelperTacticalAction {
             }
         }
 
-        if (systemButtons.size() == 2 || game.isL1Hero()) {
+        int landingButtons = 1;
+        if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
+            landingButtons = 2;
+        }
+        if (systemButtons.size() == landingButtons || game.isL1Hero()) {
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         }
         if (player.getLeaderIDs().contains("nivyncommander") && !player.hasLeaderUnlocked("nivyncommander")) {
