@@ -1216,8 +1216,10 @@ public class GameSaveLoadManager {
                 .map(file -> {
                     try {
                         Game game = loadMap(file);
-                        if (game != null && game.getName() != null)
+                        if (game != null && game.getName() != null) {
                             return game;
+                        }
+                        BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                     } catch (Exception e) {
                         BotLogger.log("Could not load game: " + file.getName(), e);
                     }
