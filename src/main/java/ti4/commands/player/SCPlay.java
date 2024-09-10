@@ -253,7 +253,7 @@ public class SCPlay extends PlayerSubcommandData {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
                         "These buttons will work inside the thread", scButtons);
-                    if (scToPlay == 5) {
+                    if (scModel.usesAutomationForSCID("pok5trade")) {
                         String neighborsMsg = "NOT neighbors with the trade holder:";
                         for (Player p2 : game.getRealPlayers()) {
                             if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {

@@ -1910,9 +1910,6 @@ public class ButtonHelper {
     }
 
     public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player) {
-        if (!player.getSCs().contains(5) || player.getFollowedSCs().contains(5)) {
-            return;
-        }
         int tg = player.getTg();
         player.setTg(tg + 3);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
