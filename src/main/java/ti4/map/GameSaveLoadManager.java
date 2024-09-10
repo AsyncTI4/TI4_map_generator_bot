@@ -1056,7 +1056,7 @@ public class GameSaveLoadManager {
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
                 fogOfWarSystems.append(",");
-                fogOfWarSystems.append(label == null || "".equals(label) ? "." : label);
+                fogOfWarSystems.append(label == null || label.isEmpty() ? "." : label);
                 fogOfWarSystems.append(";");
             }
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
