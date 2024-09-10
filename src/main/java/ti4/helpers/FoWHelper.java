@@ -136,7 +136,7 @@ public class FoWHelper {
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
 		for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-			if (playerIsInSystem(game, tileEntry.getValue(), player)) {
+			if (playerIsInSystem(game, tileEntry.getValue(), player, false)) {
 				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
 			}
 		}
@@ -164,7 +164,7 @@ public class FoWHelper {
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
 		for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-			if (playerIsInSystem(game, tileEntry.getValue(), player)) {
+			if (playerIsInSystem(game, tileEntry.getValue(), player, false)) {
 				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
 			}
 		}
@@ -614,7 +614,7 @@ public class FoWHelper {
 			for (String position_ : tiles) {
 				Tile tile = game.getTileByPosition(position_);
 				if (tile != null) {
-					if (playerIsInSystem(game, tile, player_)) {
+					if (playerIsInSystem(game, tile, player_, true)) {
 						players.add(player_);
 						break;
 					}
@@ -627,9 +627,12 @@ public class FoWHelper {
 	}
 
 	/** Check if the specified player should have vision on the system */
-	public static boolean playerIsInSystem(Game game, Tile tile, Player player) {
+	public static boolean playerIsInSystem(Game game, Tile tile, Player player, boolean forNeighbors) {
 		Set<String> unitHolderNames = tile.getUnitHolders().keySet();
 		List<String> playerPlanets = player.getPlanetsAllianceMode();
+		if (forNeighbors) {
+			playerPlanets = player.getPlanets();
+		}
 		if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
 			return true;
 		} else if (tile.isMecatol() && player.hasTech("iihq")) {

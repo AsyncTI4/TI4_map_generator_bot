@@ -2790,7 +2790,7 @@ public class Player {
 
         Set<Tile> playersTiles = new HashSet<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerIsInSystem(game, tile, this)) {
+            if (FoWHelper.playerIsInSystem(game, tile, this, true)) {
                 playersTiles.add(tile);
             }
         }

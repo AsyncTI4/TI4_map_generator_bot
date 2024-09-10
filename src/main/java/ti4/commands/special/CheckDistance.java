@@ -62,8 +62,8 @@ public class CheckDistance extends SpecialSubcommandData {
             .reduce("Distances: \n", (a, b) -> a + "\n" + b));
     }
 
-    public static int getDistanceBetweenTwoTiles(Game game, Player player, String tilePosition1, String tilePosition2) {
-        Map<String, Integer> distances = getTileDistances(game, player, tilePosition1, 8, false);
+    public static int getDistanceBetweenTwoTiles(Game game, Player player, String tilePosition1, String tilePosition2, boolean countsRiftsAsNormal) {
+        Map<String, Integer> distances = getTileDistances(game, player, tilePosition1, 8, countsRiftsAsNormal);
         if (distances.get(tilePosition2) != null) {
             return distances.get(tilePosition2);
         }
@@ -80,7 +80,7 @@ public class CheckDistance extends SpecialSubcommandData {
             }
         }
         for (Tile tile : originTiles) {
-            Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 8, false);
+            Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 8, true);
             for (String tilePos : someDistances.keySet()) {
                 if (AddCC.hasCC(player, game.getTileByPosition(tilePos))) {
                     continue;
