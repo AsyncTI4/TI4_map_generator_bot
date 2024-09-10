@@ -62,6 +62,9 @@ public class GameManager {
 
     public Game getUserActiveGame(String userID) {
         String mapName = userNameToGameName.get(userID);
+        if (mapName == null) {
+            return null;
+        }
         return gameNameToGame.get(mapName);
     }
 
