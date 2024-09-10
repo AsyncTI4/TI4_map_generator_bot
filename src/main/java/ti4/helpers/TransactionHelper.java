@@ -30,7 +30,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
 public class TransactionHelper {
-    
+
     public static void acceptTransactionOffer(Player p1, Player p2, Game game, ButtonInteractionEvent event) {
         List<String> transactionItems = p1.getTransactionItems();
         List<Player> players = new ArrayList<>();
@@ -43,7 +43,7 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
         }
 
-        String messageText = "A transaction has been ratified between:\n-# - " + p1.getRepresentation() + "\n-# - " + p2.getRepresentation();
+        String messageText = "A transaction has been ratified between:\n- " + p1.getRepresentation() + "\n- " + p2.getRepresentation();
         MessageEmbed embed = getTransactionEmbed(p1, p2, game, true);
         MessageHelper.sendMessageToChannelWithEmbed(channel, messageText, embed);
         MessageHelper.sendMessageToChannel(channel, p1.getFactionEmoji() + p2.getFactionEmoji() + " transaction details below: ");
@@ -149,14 +149,14 @@ public class TransactionHelper {
 
         // Player 1
         String trans1 = StringUtils.substringBefore(trans, transactionSeparator);
-        String title1 = "> " + StringUtils.substringBefore(trans1, ">") + "> gives:";
+        String title1 = StringUtils.substringBefore(trans1, ">") + "> gives:";
         String items1 = StringUtils.substringAfter(trans1, itemSeparator);
         String text1 = items1.isEmpty() ? "> - " + getNothingMessage() : "> - " + items1.replace(target, replacement);
         eb.addField(title1, text1, true);
 
         // Player 2
         String trans2 = StringUtils.substringAfter(trans, transactionSeparator);
-        String title2 = "> " + StringUtils.substringBefore(trans2, ">") + "> gives:";
+        String title2 = StringUtils.substringBefore(trans2, ">") + "> gives:";
         String items2 = StringUtils.substringAfter(trans2, itemSeparator);
         String text2 = items2.isEmpty() ? "> - " + getNothingMessage() : "> - " + items2.replace(target, replacement);
         eb.addField(title2, text2, true);

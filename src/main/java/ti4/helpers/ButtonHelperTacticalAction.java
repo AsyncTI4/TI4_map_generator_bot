@@ -487,7 +487,7 @@ public class ButtonHelperTacticalAction {
         String buttonID) {
         String pos = buttonID.replace("doneWithOneSystem_", "");
         Tile tile = game.getTileByPosition(pos);
-        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem());
+        int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem(), true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "
             + tile.getRepresentationForButtons(game, player) + " (**" + distance + " tile" + (distance == 1 ? "" : "s") + " away**)\n"
             + event.getMessage().getContentRaw());
@@ -582,6 +582,7 @@ public class ButtonHelperTacticalAction {
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("ringTile_", "");
         game.setActiveSystem(pos);
+        game.setStoredValue("possiblyUsedRift", "");
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true) + " activated "

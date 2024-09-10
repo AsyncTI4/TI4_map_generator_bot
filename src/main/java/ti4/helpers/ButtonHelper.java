@@ -4,7 +4,19 @@ import java.io.File;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -965,6 +977,9 @@ public class ButtonHelper {
             }
             String text = "" + player.getRepresentation(true, true) + " UP NEXT";
             String buttonText = "Use buttons to do your turn. ";
+            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+                buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
+            }
             List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), text);
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), buttonText, buttons);
@@ -4389,6 +4404,9 @@ public class ButtonHelper {
                 break;
             }
         }
+        if (buttonID.split("_").length > 2) {
+            tradeHolder = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
+        }
         if (tradeHolder == null) {
             BotLogger.log(event, "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
             return;
@@ -5045,9 +5063,11 @@ public class ButtonHelper {
         if (player.getPromissoryNotes().containsKey("ragh")) {
             buttons.addAll(ButtonHelperFactionSpecific.getRaghsCallButtons(player, game, tile));
         }
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Units traveled through rift")
-            .withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
-        buttons.add(rift);
+        if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
+            Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Units traveled through rift")
+                .withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
+            buttons.add(rift);
+        }
         if (player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)) {
             Button combatDrones = Button.primary(finChecker + "combatDrones", "Use Combat Drones Ability")
                 .withEmoji(Emoji.fromFormatted(Emojis.mirveda));
@@ -5193,12 +5213,16 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
 
         game.resetCurrentMovedUnitsFrom1System();
-        Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + game.getActiveSystem(),
-            "Build in this system (" + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value)");
-        buttons.add(buildButton);
-        Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Units traveled through rift")
-            .withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
-        buttons.add(rift);
+        if (Helper.getProductionValue(player, game, tile, false) > 0) {
+            Button buildButton = Button.success(finChecker + "tacticalActionBuild_" + game.getActiveSystem(),
+                "Build in this system (" + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value)");
+            buttons.add(buildButton);
+        }
+        if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
+            Button rift = Button.success(finChecker + "getRiftButtons_" + tile.getPosition(), "Units traveled through rift")
+                .withEmoji(Emoji.fromFormatted(Emojis.GravityRift));
+            buttons.add(rift);
+        }
         if (player.hasUnexhaustedLeader("sardakkagent")) {
             buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game, player));
         }
@@ -5395,7 +5419,9 @@ public class ButtonHelper {
                     if (activeSystem != null && uni != null && uni.getIsShip()
                         && !uni.getBaseType().equalsIgnoreCase("fighter")) {
                         int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
-                            game.getActiveSystem());
+                            game.getActiveSystem(), true);
+                        int riftDistance = CheckDistance.getDistanceBetweenTwoTiles(game, player, tile.getPosition(),
+                            game.getActiveSystem(), false);
                         int moveValue = uni.getMoveValue();
                         if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
                             moveValue = 1;
@@ -5409,11 +5435,8 @@ public class ButtonHelper {
                                 || tile == player.getHomeSystemTile())) {
                             moveValue++;
                         }
-                        if (tile.isGravityRift(game)) {
-                            moveValue++;
-                        }
                         if (!game.getStoredValue("crucibleBoost").isEmpty()) {
-                            moveValue = moveValue + 2;
+                            moveValue = moveValue + 1;
                         }
                         if (!game.getStoredValue("flankspeedBoost").isEmpty()) {
                             moveValue = moveValue + 1;
@@ -5431,8 +5454,13 @@ public class ButtonHelper {
                                     + "), **did not have gravity drive**)");
                             }
                             if (player.getTechs().contains("dsgledb")) {
-                                messageBuilder.append("(did have lightning drives for +1 if not transporting)");
+                                messageBuilder.append(" (did have lightning drives for +1 if not transporting)");
                             }
+                            if (riftDistance < distance) {
+                                messageBuilder.append(" (gravity rifts along a path could add +" + (distance - riftDistance) + " movement if used)");
+                                game.setStoredValue("possiblyUsedRift", "yes");
+                            }
+
                         }
                     }
                     messageBuilder.append("\n");
@@ -7883,13 +7911,13 @@ public class ButtonHelper {
         for (Player player : game.getRealPlayers()) {
             if (player.getActionCards().containsKey("deflection")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true)
-                                + "Reminder this is the window to play Deflection.");
+                    player.getRepresentation(true, true)
+                        + "Reminder this is the window to play Deflection.");
             }
             if (player.getActionCards().containsKey("revolution")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true)
-                                + "Reminder this is the window to play Revolution.");
+                    player.getRepresentation(true, true)
+                        + "Reminder this is the window to play Revolution.");
             }
         }
     }
@@ -9708,6 +9736,7 @@ public class ButtonHelper {
         // And refresh cards info
         PNInfo.sendPromissoryNoteInfo(game, player, false);
         PNInfo.sendPromissoryNoteInfo(game, owner, false);
+        MessageHelper.sendMessageToChannel(owner.getCardsInfoThread(), owner.getRepresentation(true, true) + " someone played one of your PNs (" + pnName + ")");
 
         if (id.contains("dspnveld")) {
             ButtonHelperFactionSpecific.offerVeldyrButtons(player, game, id);

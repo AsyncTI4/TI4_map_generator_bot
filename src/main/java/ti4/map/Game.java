@@ -1748,6 +1748,13 @@ public class Game extends GameProperties {
             if (optionalText != null) {
                 lawsInfo.put(id, optionalText);
             }
+            if (getLaws().size() > 2) {
+                for (Player p : getRealPlayers()) {
+                    if (p.getSecretsUnscored().keySet().contains("dp")) {
+                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentation(true, true) + " reminder that you have dictate policy and a 3rd law just got put into play");
+                    }
+                }
+            }
             return true;
         }
         return false;
