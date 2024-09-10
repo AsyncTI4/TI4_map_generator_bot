@@ -34,7 +34,7 @@
     {
         "alias": "grn",
         "name": "green",
-        "aliases": ["green", "green", "grn"],
+        "aliases": ["green", "grn"],
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 175, "blue": 50 },
         "hue": "GREEN"
@@ -42,7 +42,7 @@
     {
         "alias": "blu",
         "name": "blue",
-        "aliases": ["blue", "blue", "blu"],
+        "aliases": ["blue", "blu"],
         "textColor": "white",
         "primaryColor": { "red": 6, "green": 75, "blue": 203 },
         "hue": "BLUE"
