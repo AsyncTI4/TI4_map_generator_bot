@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TransactionHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -70,7 +71,6 @@ public class SendTG extends PlayerSubcommandData {
             // Add extra message for transaction visibility
             FoWHelper.pingPlayersTransaction(game, event, player, player_, tgString, null);
         }
-        ButtonHelper.checkTransactionLegality(game, player, player_);
-
+        TransactionHelper.checkTransactionLegality(game, player, player_);
     }
 }

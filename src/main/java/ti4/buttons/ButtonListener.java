@@ -1193,7 +1193,7 @@ public class ButtonListener extends ListenerAdapter {
             String player2Color = buttonID.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(player2Color);
             if (p2 != null) {
-                List<Button> buttons = ButtonHelper.getStuffToTransButtonsOld(game, p2, player);
+                List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, p2, player);
                 String message = p2.getRepresentation()
                     + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to "
                     + ButtonHelper.getIdentOrColor(player, game);
@@ -2391,16 +2391,16 @@ public class ButtonListener extends ListenerAdapter {
             String faction = buttonID.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 != null) {
-                player.clearTransactionItemsWith(p2);
-                List<Button> buttons = ButtonHelper.getStuffToTransButtonsOld(game, player, p2);
+                player.clearTransactionItemsWithPlayer(p2);
+                List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, player, p2);
                 if (!game.isFowMode() && game.isNewTransactionMethod()) {
-                    buttons = ButtonHelper.getStuffToTransButtonsNew(game, player, player, p2);
+                    buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
                 }
                 String message = player.getRepresentation()
                     + " Use the buttons to select what you want to transact with "
                     + p2.getRepresentation(false, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-                ButtonHelper.checkTransactionLegality(game, player, p2);
+                TransactionHelper.checkTransactionLegality(game, player, p2);
                 ButtonHelper.deleteMessage(event);
             }
         } else if (buttonID.startsWith("rejectOffer_")) {
@@ -2419,7 +2419,7 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentation() + "you rescinded the latest offer to "
                         + p2.getRepresentation(false, false));
-                player.clearTransactionItemsWith(p2);
+                player.clearTransactionItemsWithPlayer(p2);
                 ButtonHelper.deleteMessage(event);
             }
         } else if (buttonID.startsWith("acceptOffer_")) {
@@ -2844,7 +2844,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "getKeleresTechOptions" -> ButtonHelperFactionSpecific.offerKeleresStartingTech(player, game, event);
                 case "transaction" -> {
                     List<Button> buttons;
-                    buttons = ButtonHelper.getPlayersToTransact(game, player);
+                    buttons = TransactionHelper.getPlayersToTransact(game, player);
                     String message = player.getRepresentation()
                         + " Use the buttons to select which player you wish to transact with";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
