@@ -1,7 +1,6 @@
 package ti4.map;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,10 +8,10 @@ import java.util.concurrent.ConcurrentMap;
 
 public class GameManager {
 
-    private long loadTime;
+    private final long loadTime;
     private static GameManager gameManager;
     private static final ConcurrentMap<String, String> userNameToGameName = new ConcurrentHashMap<>();
-    private ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
 
     private GameManager() {
         loadTime = new Date().getTime();
@@ -27,10 +26,6 @@ public class GameManager {
 
     public Map<String, Game> getGameNameToGame() {
         return gameNameToGame;
-    }
-
-    public void setGameNameToGame(ConcurrentMap<String, Game> gameNameToGame) {
-        this.gameNameToGame = gameNameToGame;
     }
 
     public void addGame(Game game) {

@@ -20,11 +20,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -62,8 +59,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
-
-import static java.util.stream.Collectors.toConcurrentMap;
 
 public class GameSaveLoadManager {
 
@@ -1212,24 +1207,21 @@ public class GameSaveLoadManager {
 
     public static void loadMaps() {
         long loadStart = System.nanoTime();
-        ConcurrentMap<String, Game> games = Arrays.stream(readAllTxtMapFiles()).parallel()
-                .map(file -> {
+        Arrays.stream(readAllTxtMapFiles()).parallel()
+                .forEach(file -> {
                     try {
                         Game game = loadMap(file);
                         if (game != null && game.getName() != null) {
-                            return game;
+                            GameManager.getInstance().addGame(game);
                         }
                         BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                     } catch (Exception e) {
                         BotLogger.log("Could not load game: " + file.getName(), e);
                     }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(toConcurrentMap(Game::getName, Function.identity()));
-        GameManager.getInstance().setGameNameToGame(games);
+                });
         long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + games.size() + "` games: ", loadTime, loadTime));
+        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size()
+                + "` games: ", loadTime, loadTime));
     }
 
     @Nullable
