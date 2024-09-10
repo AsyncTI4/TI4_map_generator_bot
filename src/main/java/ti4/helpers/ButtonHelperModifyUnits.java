@@ -826,8 +826,8 @@ public class ButtonHelperModifyUnits {
             Tile tile2 = game.getTileByPosition(pos2);
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile2, game)) {
                 if (!FoWHelper.otherPlayersHaveUnitsInSystem(player, tile2, game) || skilled
-                    || FoWHelper.playerIsInSystem(game, tile2, player)) {
-                    if (FoWHelper.playerIsInSystem(game, tile2, player) || player.hasTech("det")
+                    || FoWHelper.playerIsInSystem(game, tile2, player, false)) {
+                    if (FoWHelper.playerIsInSystem(game, tile2, player, false) || player.hasTech("det")
                         || player.hasTech("absol_det") || skilled) {
                         buttons.add(Button.secondary(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS,
                             "Retreat to " + tile2.getRepresentationForButtons(game, player)));

@@ -91,6 +91,9 @@ public class TurnStart extends PlayerSubcommandData {
         }
         String text = "" + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
+        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+            buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
+        }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
             : game.getMainGameChannel();

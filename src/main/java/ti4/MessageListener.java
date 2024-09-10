@@ -629,7 +629,7 @@ public class MessageListener extends ListenerAdapter {
                                             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                                                 "Active player has been pinged. This is ping #" + pingNumber);
                                         } else {
-                                            MessageChannel gameChannel = game.getMainGameChannel();
+                                            MessageChannel gameChannel = player.getCorrectChannel();
                                             if (gameChannel != null) {
                                                 MessageHelper.sendMessageToChannel(gameChannel, ping);
                                                 if (ping != null && ping.contains("courtesy notice")) {

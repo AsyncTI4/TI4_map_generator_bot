@@ -132,7 +132,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         String gamePing = game.getPing();
         List<Player> playersToFollow = game.getRealPlayers();
-        if (game.getName().equalsIgnoreCase("pbd1000")) {
+        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
             num = num.substring(num.length() - 1, num.length());
@@ -201,7 +201,7 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay, event);
             }
-            if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1) {
+            if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1 && !game.getName().equalsIgnoreCase("pbd100two")) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
                         continue;
@@ -248,8 +248,8 @@ public class SCPlay extends PlayerSubcommandData {
                     if (scModel.usesAutomationForSCID("pok5trade")) {
                         Button transaction = Button.primary("transaction", "Transaction");
                         scButtons.add(transaction);
-                        scButtons.add(Button.success("sendTradeHolder_tg", "Send 1TG"));
-                        scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
+                        scButtons.add(Button.success("sendTradeHolder_tg_" + player.getFaction(), "Send 1TG"));
+                        scButtons.add(Button.secondary("sendTradeHolder_debt_" + player.getFaction(), "Send 1 debt"));
                     }
                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
                         "These buttons will work inside the thread", scButtons);
