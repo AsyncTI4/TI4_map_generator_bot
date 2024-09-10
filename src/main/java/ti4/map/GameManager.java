@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.jetbrains.annotations.Nullable;
+
 public class GameManager {
 
     private final long loadTime;
@@ -60,6 +62,7 @@ public class GameManager {
         return userNameToGameName.containsKey(userID);
     }
 
+    @Nullable
     public Game getUserActiveGame(String userID) {
         String mapName = userNameToGameName.get(userID);
         if (mapName == null) {

@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +38,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.uncategorized.CardsInfo;
@@ -1186,16 +1187,6 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    @NotNull
-    private static File[] readAllTxtMapFiles() {
-        File folder = Storage.getMapImageDirectory();
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-        File[] files = folder.listFiles((directory, fileName) -> fileName.endsWith(".txt"));
-        return files == null ? new File[0] : files;
-    }
-
     public static boolean deleteMap(String mapName) {
         File mapStorage = Storage.getMapStorage(mapName + TXT);
         if (!mapStorage.exists()) {
@@ -1207,18 +1198,25 @@ public class GameSaveLoadManager {
 
     public static void loadMaps() {
         long loadStart = System.nanoTime();
-        Arrays.stream(readAllTxtMapFiles()).parallel()
-                .forEach(file -> {
-                    try {
-                        Game game = loadMap(file);
-                        if (game != null && game.getName() != null) {
+        try (Stream<Path> pathStream = Files.list(Storage.getMapImageDirectory().toPath())) {
+            pathStream.parallel()
+                    .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
+                    .forEach(path -> {
+                        File file = path.toFile();
+                        try {
+                            Game game = loadMap(file);
+                            if (game == null || game.getName() == null) {
+                                BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
+                                return;
+                            }
                             GameManager.getInstance().addGame(game);
+                        } catch (Exception e) {
+                            BotLogger.log("Could not load game: " + file.getName(), e);
                         }
-                        BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
-                    } catch (Exception e) {
-                        BotLogger.log("Could not load game: " + file.getName(), e);
-                    }
-                });
+                    });
+        } catch (IOException e) {
+            BotLogger.log("Exception occurred while streaming map directory.", e);
+        }
         long loadTime = System.nanoTime() - loadStart;
         BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size()
                 + "` games: ", loadTime, loadTime));
