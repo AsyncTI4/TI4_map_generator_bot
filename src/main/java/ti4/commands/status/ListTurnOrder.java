@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -102,8 +104,11 @@ public class ListTurnOrder extends StatusSubcommandData {
             }
         }
         msg.append("_ _"); // forced extra line
-
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg.toString());
+        TextChannel channel = game.getMainGameChannel();
+        if (event instanceof SlashCommandInteractionEvent slash && slash.getChannel() instanceof TextChannel chan) {
+            channel = chan;
+        }
+        MessageHelper.sendMessageToChannel(channel, msg.toString());
 
     }
 

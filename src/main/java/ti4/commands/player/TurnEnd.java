@@ -125,6 +125,7 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         game.setStoredValue("mahactHeroTarget", "");
         game.setActiveSystem("");
+        game.setStoredValue("possiblyUsedRift", "");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
                 + "**End of Turn " + mainPlayer.getTurnCount() + " for** " + mainPlayer.getRepresentation());
