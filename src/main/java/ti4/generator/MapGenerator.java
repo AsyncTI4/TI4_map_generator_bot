@@ -205,8 +205,10 @@ public class MapGenerator {
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
-            } else if (player.getSecretsScored().size() > 3) {
-                playerY += (player.getSecretsScored().size() - 3) * 43;
+            } else if (player.getSecretsScored().size() == 4) {
+                playerY += 23;
+            } else if (player.getSecretsScored().size() > 4) {
+                playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
             }
         }
 
@@ -1079,7 +1081,7 @@ public class MapGenerator {
                 y += 200;
 
                 // Secret Objectives
-                int soCount = objectivesSO(yPlayArea + 165, player);
+                int soCount = objectivesSO(yPlayArea + 170, player);
 
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
@@ -1133,8 +1135,11 @@ public class MapGenerator {
                 }
 
                 g2.setColor(color);
-                if (soCount > 3) {
-                    y += (soCount - 3) * 43;
+                if (soCount >= 4) {
+                    y += 23;
+                }
+                if (soCount > 4) {
+                    y += (soCount - 4) * 43;
                 }
                 g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
                 y += 15;
