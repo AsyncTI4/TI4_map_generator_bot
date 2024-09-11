@@ -453,9 +453,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
-                message = "Resolve using the buttons";
-                Button getMechButton = Buttons.green("resolveLocalFab_" + planetID, "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
-                Button getCommButton3 = Buttons.blue("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
+                message = "Resolve Local Fabricators:\n-# You currently have " + player.getTg() + Emojis.tg + " and " + player.getCommodities() + "/" + player.getCommoditiesTotal() + Emojis.comm;
+                Button getMechButton = Buttons.green("resolveLocalFab_" + planetID, "Spend 1 Commodity or TG for a Mech on " + planetName, Emojis.mech);
+                Button getCommButton3 = Buttons.blue("gain_1_comms", "Gain 1 Commodity", Emojis.comm);
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
