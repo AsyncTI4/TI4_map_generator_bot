@@ -1441,6 +1441,22 @@ public class ButtonHelperActionCards {
             buttons.add(Button.danger("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+        if (player.getActionCards().containsKey("revolution")) {
+            String msg = player.getRepresentation()
+                + " you have the option to pre-play revolution. Start of strat phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("resolvePreassignment_PreRevolution", "Pre-play Revolution"));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
+        if (player.getActionCards().containsKey("deflection")) {
+            String msg = player.getRepresentation()
+                + " you have the option to pre-play deflection. Start of strat phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.success("resolvePreassignment_Deflection", "Pre-play Deflection"));
+            buttons.add(Button.danger("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
     }
 
     public static void checkForAssigningPublicDisgrace(Game game, Player player) {
@@ -1693,7 +1709,7 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event,
-                                                       String buttonID) {
+        String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tilePos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(tilePos);

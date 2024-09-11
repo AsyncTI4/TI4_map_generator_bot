@@ -17,8 +17,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.ResourceHelper;
+import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.message.BotLogger;
+import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 
@@ -207,9 +209,7 @@ public class AliasHandler {
     }
 
     public static String resolveColor(String name) {
-        String aliasID = colorAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Color: " + name);
-        return Objects.requireNonNullElse(aliasID, name);
+        return Optional.ofNullable(Mapper.getColor(name)).map(ColorModel::getName).orElse(name);
     }
 
     public static String resolveUnit(String name) {

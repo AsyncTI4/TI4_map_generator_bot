@@ -132,7 +132,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         String gamePing = game.getPing();
         List<Player> playersToFollow = game.getRealPlayers();
-        if (game.getName().equalsIgnoreCase("pbd1000")) {
+        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
             num = num.substring(num.length() - 1, num.length());
@@ -201,12 +201,12 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
                 player.addFollowedSC(scToPlay, event);
             }
-            if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1) {
+            if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1 && !game.getName().equalsIgnoreCase("pbd100two")) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
                         continue;
                     }
-                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8)) && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
                         Emoji reactionEmoji2 = Helper.getPlayerEmoji(game, p2, message_);
                         if (reactionEmoji2 != null) {
                             message_.addReaction(reactionEmoji2).queue();
@@ -248,12 +248,12 @@ public class SCPlay extends PlayerSubcommandData {
                     if (scModel.usesAutomationForSCID("pok5trade")) {
                         Button transaction = Button.primary("transaction", "Transaction");
                         scButtons.add(transaction);
-                        scButtons.add(Button.success("sendTradeHolder_tg", "Send 1TG"));
-                        scButtons.add(Button.secondary("sendTradeHolder_debt", "Send 1 debt"));
+                        scButtons.add(Button.success("sendTradeHolder_tg_" + player.getFaction(), "Send 1TG"));
+                        scButtons.add(Button.secondary("sendTradeHolder_debt_" + player.getFaction(), "Send 1 debt"));
                     }
                     MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
                         "These buttons will work inside the thread", scButtons);
-                    if (scToPlay == 5) {
+                    if (scModel.usesAutomationForSCID("pok5trade")) {
                         String neighborsMsg = "NOT neighbors with the trade holder:";
                         for (Player p2 : game.getRealPlayers()) {
                             if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
@@ -282,11 +282,12 @@ public class SCPlay extends PlayerSubcommandData {
         }
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (scModel.usesAutomationForSCID("pok3politics")) {
+            game.setStoredValue("hasntSetSpeaker", "waiting");
             String assignSpeakerMessage = player.getRepresentation()
                 + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
                 + Emojis.SpeakerToken;
 
-            List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game);
+            List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage, assignSpeakerActionRow);
         }
@@ -493,19 +494,19 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
-    private static List<Button> getPoliticsAssignSpeakerButtons(Game game) {
+    private static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politics) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
                     if (!game.isFowMode()) {
-                        Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
+                        Button button = Button.secondary(politics.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                         assignSpeakerButtons.add(button);
                     } else {
-                        Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
+                        Button button = Button.secondary(politics.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
                             player.getColor());
                         assignSpeakerButtons.add(button);
                     }

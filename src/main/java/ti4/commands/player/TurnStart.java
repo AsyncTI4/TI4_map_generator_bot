@@ -91,6 +91,9 @@ public class TurnStart extends PlayerSubcommandData {
         }
         String text = "" + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
+        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+            buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
+        }
         List<Button> buttons = getStartOfTurnButtons(player, game, false, event);
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel()
             : game.getMainGameChannel();
@@ -231,7 +234,7 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(player.getRepresentation(true, true));
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
-            if (game.getName().equalsIgnoreCase("pbd1000")) {
+            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1, num.length());
                 for (Integer sc2 : player.getSCs()) {
