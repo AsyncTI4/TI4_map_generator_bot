@@ -3072,6 +3072,9 @@ public class Helper {
                 count = 1;
                 alias = split[0];
             }
+            if (alias.isEmpty()) {
+                continue;
+            }
             sb.append(StringUtils.repeat(Emojis.getEmojiFromDiscord(Mapper.getUnitBaseTypeFromAsyncID(AliasHandler.resolveUnit(alias))), count));
         }
         return sb.toString();

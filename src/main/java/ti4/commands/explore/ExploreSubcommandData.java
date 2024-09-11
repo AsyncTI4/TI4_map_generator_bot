@@ -453,9 +453,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
-                message = "Resolve using the buttons";
-                Button getMechButton = Buttons.green("resolveLocalFab_" + planetID, "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
-                Button getCommButton3 = Buttons.blue("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
+                message = "Resolve Local Fabricators:\n-# You currently have " + player.getTg() + Emojis.tg + " and " + player.getCommodities() + "/" + player.getCommoditiesTotal() + Emojis.comm;
+                Button getMechButton = Buttons.green("resolveLocalFab_" + planetID, "Spend 1 Commodity or TG for a Mech on " + planetName, Emojis.mech);
+                Button getCommButton3 = Buttons.blue("gain_1_comms", "Gain 1 Commodity", Emojis.comm);
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
@@ -516,8 +516,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
-                message = "Resolve explore using the buttons.";
-                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Gain 1CC by removing 1 infantry or having mech on " + planetName);
+                message = player.getRepresentation() + " please resolve Volatile Fuel Source:\n-# Your current CCs are " + player.getCCRepresentation();
+                Planet planet = game.getUnitHolderFromPlanet(planetID);
+                if (planet != null) {
+                    String unitList = planet.getPlayersUnitListEmojisOnHolder(player);
+                    if (unitList.isEmpty()) {
+                        message += " and you have no units on " + planetName;
+                    } else {
+                        message += " and you have " + unitList + " on " + planetName;
+                    }
+                }
+                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Gain a CC by removing 1 Infantry or by having a Mech on " + planetName);
                 Button Decline3 = Buttons.red("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
