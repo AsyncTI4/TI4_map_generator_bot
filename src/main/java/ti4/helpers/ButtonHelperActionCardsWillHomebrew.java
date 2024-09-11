@@ -38,7 +38,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
-            buttons.add(Button.success("defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Buttons.green("defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -84,7 +84,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                 String buttonID = "produceOneUnitInTile_" + tile.getPosition() + "_sling";
-                Button tileButton = Button.success(buttonID,
+                Button tileButton = Buttons.green(buttonID,
                     tile.getRepresentationForButtons(game, player));
                 buttons.add(tileButton);
 
@@ -108,7 +108,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         msg.append(die.getResult());
         List<Button> buttons = new ArrayList<>();
         if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
-            buttons.add(Button.danger("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
+            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + "\n " + player.getRepresentation() + " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
@@ -117,32 +117,32 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> scButtons = new ArrayList<>();
         event.getMessage().delete().queue();
         if (player.getSCs().contains(2)) {
-            scButtons.add(Button.success("diploRefresh2", "Ready 2 Planets"));
+            scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
         if (player.getSCs().contains(3)) {
-            scButtons.add(Button.secondary("draw2 AC", "Draw 2 Action Cards")
+            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards")
                 .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
         }
         if (player.getSCs().contains(4)) {
             scButtons.add(
-                Button.success("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Button.success("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+                Buttons.green("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
         }
         if (player.getSCs().contains(5)) {
-            scButtons.add(Button.secondary("sc_refresh", "Replenish Commodities")
+            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities")
                 .withEmoji(Emoji.fromFormatted(Emojis.comm)));
         }
         if (player.getSCs().contains(6)) {
-            scButtons.add(Button.success("warfareBuild", "Build At Home"));
+            scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
         }
         if (player.getSCs().contains(7)) {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (player.getSCs().contains(8)) {
-            scButtons.add(Button.secondary("non_sc_draw_so", "Draw Secret Objective")
+            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective")
                 .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
         }
-        scButtons.add(Button.danger("deleteButtons", "Done resolving"));
+        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " use buttons to resolve", scButtons);
 
     }
@@ -163,15 +163,15 @@ public class ButtonHelperActionCardsWillHomebrew {
                 continue;
             }
             if (game.isFowMode()) {
-                buttons.add(Button.secondary("ancientTradeRoutesStep2_" + p2.getFaction(), p2.getColor()));
+                buttons.add(Buttons.gray("ancientTradeRoutesStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Button.secondary("ancientTradeRoutesStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray("ancientTradeRoutesStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
             }
         }
-        buttons.add(Button.danger("deleteButtons", "Don't give comms"));
+        buttons.add(Buttons.red("deleteButtons", "Don't give comms"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " tell the bot who you want to give 2 comms to",
@@ -189,9 +189,9 @@ public class ButtonHelperActionCardsWillHomebrew {
                 continue;
             }
             if (game.isFowMode()) {
-                buttons.add(Button.secondary("armsDealStep2_" + p2.getFaction(), p2.getColor()));
+                buttons.add(Buttons.gray("armsDealStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Button.secondary("armsDealStep2_" + p2.getFaction(), " ");
+                Button button = Buttons.gray("armsDealStep2_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
@@ -208,10 +208,10 @@ public class ButtonHelperActionCardsWillHomebrew {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
-        buttons.add(Button.danger("deleteButtons", "Don't place"));
+        buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 cruiser with your ships due to the arms deal", buttons);
         buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
-        buttons.add(Button.danger("deleteButtons", "Don't place"));
+        buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + "Use buttons to put 1 destroyer with your ships due to the arms deal", buttons);
         event.getMessage().delete().queue();
     }
@@ -303,7 +303,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                buttons.add(Button.secondary("spatialCollapseStep2_" + tile.getPosition(),
+                buttons.add(Buttons.gray("spatialCollapseStep2_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
             }
 
@@ -322,7 +322,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 continue;
             }
 
-            buttons.add(Button.secondary("spatialCollapseStep3_" + pos1 + "_" + tile.getPosition(),
+            buttons.add(Buttons.gray("spatialCollapseStep3_" + pos1 + "_" + tile.getPosition(),
                 tile.getRepresentationForButtons(game, player)));
 
         }
@@ -355,7 +355,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPlanetUnitHolders().isEmpty() && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
-                buttons.add(Button.success("strandedShipStep2_" + tile.getPosition(),
+                buttons.add(Buttons.green("strandedShipStep2_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
             }
         }
@@ -381,7 +381,7 @@ public class ButtonHelperActionCardsWillHomebrew {
     public static void resolveBrutalOccupationStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
-            buttons.add(Button.success("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Buttons.green("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation", buttons);

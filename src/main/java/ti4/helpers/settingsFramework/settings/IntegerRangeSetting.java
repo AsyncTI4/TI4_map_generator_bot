@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 
 @Getter
 @Setter
@@ -70,10 +71,10 @@ public class IntegerRangeSetting extends SettingInterface {
     }
 
     protected List<Button> buttons(String idPrefix) {
-        Button incLow = Button.success(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
-        Button decLow = Button.danger(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
-        Button incHigh = Button.success(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
-        Button decHigh = Button.danger(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
+        Button incLow = Buttons.green(idPrefix + "incLow" + id, "Increase Min " + name).withEmoji(emojiUp);
+        Button decLow = Buttons.red(idPrefix + "decLow" + id, "Decrease Min " + name).withEmoji(emojiDown);
+        Button incHigh = Buttons.green(idPrefix + "incHigh" + id, "Increase Max " + name).withEmoji(emojiUp);
+        Button decHigh = Buttons.red(idPrefix + "decHigh" + id, "Decrease Max " + name).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
         if (valLow < maxLow && valLow < valHigh)
             ls.add(incLow);

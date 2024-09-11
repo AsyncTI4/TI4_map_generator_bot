@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import ti4.buttons.Buttons;
 import ti4.message.BotLogger;
 
 @Getter
@@ -71,7 +72,7 @@ public class ChoiceSetting<T> extends SettingInterface {
 
     protected List<Button> buttons(String idPrefix) {
         List<Button> ls = new ArrayList<>();
-        Button choose = Button.secondary(idPrefix + "change" + id, lang + " " + this.name);
+        Button choose = Buttons.gray(idPrefix + "change" + id, lang + " " + this.name);
         if (this.emoji != null) choose = choose.withEmoji(Emoji.fromFormatted(this.emoji));
         ls.add(choose);
         return ls;

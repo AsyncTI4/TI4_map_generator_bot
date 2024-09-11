@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import ti4.buttons.Buttons;
 import ti4.message.BotLogger;
 
 @Getter
@@ -91,8 +92,8 @@ public class ListSetting<T> extends SettingInterface {
     }
 
     protected List<Button> buttons(String idPrefix) {
-        Button include = Button.success(idPrefix + "include" + id, includeLang).withEmoji(emojiUp);
-        Button remove = Button.danger(idPrefix + "remove" + id, removeLang).withEmoji(emojiDown);
+        Button include = Buttons.green(idPrefix + "include" + id, includeLang).withEmoji(emojiUp);
+        Button remove = Buttons.red(idPrefix + "remove" + id, removeLang).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
         if (!keys.isEmpty()) ls.add(remove);
         if (!(keys.size() == allValues.size())) ls.add(include);

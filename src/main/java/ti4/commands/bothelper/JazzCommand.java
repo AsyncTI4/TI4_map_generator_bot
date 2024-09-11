@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -36,7 +37,7 @@ public class JazzCommand extends BothelperSubcommandData {
 
     public static void sendJazzButton(GenericInteractionCreateEvent event) {
         Emoji spinner = Emoji.fromFormatted(Emojis.scoutSpinner);
-        Button jazz = Button.success("jazzButton", spinner);
+        Button jazz = Buttons.green("jazzButton", spinner.toString());
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), Constants.jazzPing() + " button", jazz);
     }
 
