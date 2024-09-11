@@ -163,7 +163,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         if (actionCards != null && !actionCards.isEmpty()
             && !ButtonHelper.isPlayerElected(game, player, "censure")
             && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")
-                || actionCards.containsKey("investments") || actionCards.containsKey("summit"))) {
+                || actionCards.containsKey("investments") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
             acButtons.add(Button.secondary("checkForAllACAssignments", "Pre assign ACs"));
         }
 

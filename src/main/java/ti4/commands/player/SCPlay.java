@@ -206,7 +206,7 @@ public class SCPlay extends PlayerSubcommandData {
                     if (p2 == player) {
                         continue;
                     }
-                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1) && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8)) && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar") && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
                         Emoji reactionEmoji2 = Helper.getPlayerEmoji(game, p2, message_);
                         if (reactionEmoji2 != null) {
                             message_.addReaction(reactionEmoji2).queue();
@@ -282,11 +282,12 @@ public class SCPlay extends PlayerSubcommandData {
         }
         // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (scModel.usesAutomationForSCID("pok3politics")) {
+            game.setStoredValue("hasntSetSpeaker", "waiting");
             String assignSpeakerMessage = player.getRepresentation()
                 + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
                 + Emojis.SpeakerToken;
 
-            List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game);
+            List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 assignSpeakerMessage, assignSpeakerActionRow);
         }
@@ -493,19 +494,19 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
-    private static List<Button> getPoliticsAssignSpeakerButtons(Game game) {
+    private static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politics) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
                     if (!game.isFowMode()) {
-                        Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
+                        Button button = Button.secondary(politics.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
                         String factionEmojiString = player.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                         assignSpeakerButtons.add(button);
                     } else {
-                        Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
+                        Button button = Button.secondary(politics.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
                             player.getColor());
                         assignSpeakerButtons.add(button);
                     }

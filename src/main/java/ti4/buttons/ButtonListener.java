@@ -643,11 +643,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)) {
             String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
-            if (!player.getSCs().contains(3)) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Only the player who played Politics may assign Speaker.");
-                return;
-            }
+            game.setStoredValue("hasntSetSpeaker", "");
             if (game != null) {
                 for (Player player_ : game.getPlayers().values()) {
                     if (player_.getFaction().equals(faction)) {
@@ -667,6 +663,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("assignSpeaker_")) {
             String faction = StringUtils.substringAfter(buttonID, "assignSpeaker_");
+            game.setStoredValue("hasntSetSpeaker", "");
             if (game != null && !game.isFowMode()) {
                 for (Player player_ : game.getPlayers().values()) {
                     if (player_.getFaction().equals(faction)) {
@@ -2943,7 +2940,12 @@ public class ButtonListener extends ListenerAdapter {
                     AgendaHelper.proceedToFinalizingVote(game, player, event);
                 }
                 case "drawAgenda_2" -> {
+                    if (!game.getStoredValue("hasntSetSpeaker").isEmpty() && !game.isHomebrewSCMode()) {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true) + " you need to assign speaker first before drawing agendas. You can override this restriction with /agenda draw");
+                        return;
+                    }
                     DrawAgenda.drawAgenda(event, 2, game, player);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false) + " drew 2 agendas");
                     ButtonHelper.deleteMessage(event);
                 }
                 case "nekroFollowTech" -> ButtonHelperSCs.nekroFollowTech(game, player, event, buttonID, trueIdentity, messageID);
@@ -3709,6 +3711,10 @@ public class ButtonListener extends ListenerAdapter {
                 case "pass_on_abilities" -> ButtonHelper.addReaction(event, false, false, " Is " + event.getButton().getLabel(), "");
                 case "tacticalAction" -> {
                     ButtonHelperTacticalAction.selectRingThatActiveSystemIsIn(player, game, event);
+                }
+                case "willRevolution" -> {
+                    game.setStoredValue("willRevolution", "active");
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Reversed SC Picking order");
                 }
                 case "ChooseDifferentDestination" -> {
                     String message = "Choosing a different system to activate. Please select the ring of the map that the system you want to activate is located in."

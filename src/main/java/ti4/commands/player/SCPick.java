@@ -201,10 +201,15 @@ public class SCPick extends PlayerSubcommandData {
                 game.setScTradeGood(sc, 0);
             }
             ButtonHelper.startActionPhase(event, game);
+            game.setStoredValue("willRevolution", "");
         } else {
             boolean foundPlayer = false;
             Player privatePlayer = null;
-            for (Player p3 : game.getRealPlayers()) {
+            List<Player> players = game.getRealPlayers();
+            if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
+                Collections.reverse(players);
+            }
+            for (Player p3 : players) {
                 if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
                     continue;
                 }
@@ -235,7 +240,7 @@ public class SCPick extends PlayerSubcommandData {
         List<Player> activePlayers = game.getPlayers().values().stream()
             .filter(Player::isRealPlayer)
             .collect(Collectors.toList());
-        if (game.isReverseSpeakerOrder()) {
+        if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
             Collections.reverse(activePlayers);
         }
         int maxSCsPerPlayer = game.getStrategyCardsPerPlayer();
@@ -319,7 +324,7 @@ public class SCPick extends PlayerSubcommandData {
                 if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
                 }
-
+                game.setStoredValue("willRevolution", "");
                 game.setPhaseOfGame("action");
                 if (!game.isFowMode()) {
                     ButtonHelper.updateMap(game, event,
