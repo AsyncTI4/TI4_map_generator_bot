@@ -193,11 +193,6 @@ public class GameSaveLoadManager {
         }
 
         File mapFile = Storage.getMapImageStorage(game.getName() + TXT);
-        if (!mapFile.exists()) {
-            BotLogger.log("Could not save game " + game.getName() + ": game file does not exist. Save reason: " + saveReason +
-                    ", trivial save: " + thisSaveTrivial);
-            return;
-        }
 
         long txtStart = System.nanoTime();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {
