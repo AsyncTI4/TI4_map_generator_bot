@@ -37,7 +37,7 @@ public class JazzCommand extends BothelperSubcommandData {
 
     public static void sendJazzButton(GenericInteractionCreateEvent event) {
         Emoji spinner = Emoji.fromFormatted(Emojis.scoutSpinner);
-        Button jazz = Buttons.green("jazzButton", spinner.toString());
+        Button jazz = Buttons.green("jazzButton", spinner.getFormatted());
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), Constants.jazzPing() + " button", jazz);
     }
 
