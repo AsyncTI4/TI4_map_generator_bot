@@ -1,13 +1,13 @@
 package ti4.helpers;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ti4.message.BotLogger;
+
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import ti4.message.BotLogger;
 
 public class Storage {
 
@@ -279,11 +279,7 @@ public class Storage {
 
     @NotNull
     public static File getMapImageDirectory() {
-        var file = new File(getStoragePath() + MAPS);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
-        return file;
+        return new File(getStoragePath() + MAPS);
     }
 
     @NotNull

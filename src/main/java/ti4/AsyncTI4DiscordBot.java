@@ -150,8 +150,8 @@ public class AsyncTI4DiscordBot {
 
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
-        userID = args[1];
         guildPrimaryID = args[2];
+        userID = args[1];
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 

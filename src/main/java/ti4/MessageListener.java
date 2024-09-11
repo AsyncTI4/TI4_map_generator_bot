@@ -12,6 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,8 +30,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.bothelper.CreateGameChannels;
@@ -159,10 +160,11 @@ public class MessageListener extends ListenerAdapter {
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
-                String sb = event.getUser().getEffectiveName() + " " +
-                        "`" + event.getCommandString() + "` " +
-                        commandResponseMessage.getJumpUrl();
-                MessageHelper.sendMessageToChannel(threadChannel_, sb);
+                StringBuilder sb = new StringBuilder();
+                sb.append(event.getUser().getEffectiveName()).append(" ");
+                sb.append("`").append(event.getCommandString()).append("` ");
+                sb.append(commandResponseMessage.getJumpUrl());
+                MessageHelper.sendMessageToChannel(threadChannel_, sb.toString());
                 break;
             }
         }
@@ -191,6 +193,10 @@ public class MessageListener extends ListenerAdapter {
             || !gameManager.getUserActiveGame(userID).getName().equals(gameID)
                 && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isCommunityMode()
                     || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
+            if (gameManager.getUserActiveGame(userID) != null
+                && !gameManager.getUserActiveGame(userID).getName().equals(gameID)) {
+                // MessageHelper.sendMessageToChannel(channel, "Active game set to: " + gameID);
+            }
             gameManager.setGameForUser(userID, gameID);
         } else if (gameManager.isUserWithActiveGame(userID)) {
             if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
@@ -301,8 +307,8 @@ public class MessageListener extends ListenerAdapter {
                                     twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollow"));
                                     half = twenty4 / 2;
                                 }
-                                long twelveHrs = (long) half * 60 * 60 * multiplier;
-                                long twentyFourhrs = (long) twenty4 * 60 * 60 * multiplier;
+                                long twelveHrs = half * 60 * 60 * multiplier;
+                                long twentyFourhrs = twenty4 * 60 * 60 * multiplier;
                                 String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
@@ -331,12 +337,13 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (timeDifference > twentyFourhrs) {
                                         if (!timesPinged.equalsIgnoreCase("2")) {
+                                            StringBuilder sb = new StringBuilder();
                                             Player p2 = player;
-                                            String sb = p2.getRepresentation(true, true) +
-                                                    Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
+                                            sb.append(p2.getRepresentation(true, true));
+                                            sb.append(Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n");
 
                                             //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
-                                            ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
+                                            ButtonHelper.sendMessageToRightStratThread(player, game, sb.toString(), ButtonHelper.getStratName(sc));
                                             player.addFollowedSC(sc);
                                             game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),
                                                 "2");
