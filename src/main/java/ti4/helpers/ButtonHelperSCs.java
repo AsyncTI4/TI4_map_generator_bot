@@ -310,7 +310,7 @@ public class ButtonHelperSCs {
                 }
             }
             if (p2.getSCs().contains(5)) {
-                ButtonHelper.checkTransactionLegality(game, player, p2);
+                TransactionHelper.checkTransactionLegality(game, player, p2);
             }
         }
         if (!player.getFollowedSCs().contains(5)) {

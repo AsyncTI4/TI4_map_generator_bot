@@ -311,13 +311,33 @@ public class Player {
     }
 
     public List<String> getTransactionItems() {
+        System.out.println(transactionItems); //TODO: delete
         return transactionItems;
     }
 
-    public void clearTransactionItemsWith(Player p2) {
+    public List<String> getTransactionItemsWithPlayer(Player player) {
+        List<String> transactionItemsWithPlayer = new ArrayList<>();
+        List<Player> players = new ArrayList<>();
+        players.add(this);
+        players.add(player);
+        for (Player sender : players) {
+            Player receiver = player;
+            if (sender == player) {
+                receiver = this;
+            }
+            for (String item : getTransactionItems()) {
+                if (item.contains("sending" + sender.getFaction()) && item.contains("receiving" + receiver.getFaction())) {
+                    transactionItemsWithPlayer.add(item);
+                }
+            }
+        }
+        return transactionItemsWithPlayer;
+    }
+
+    public void clearTransactionItemsWithPlayer(Player player) {
         List<String> newTransactionItems = new ArrayList<>();
         for (String item : transactionItems) {
-            if (!item.contains("ing" + p2.getFaction())) {
+            if (!item.contains("ing" + player.getFaction())) {
                 newTransactionItems.add(item);
             }
         }

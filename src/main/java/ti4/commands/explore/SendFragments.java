@@ -16,6 +16,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TransactionHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -105,7 +106,7 @@ public class SendFragments extends ExploreSubcommandData {
 			// Add extra message for transaction visibility
 			FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
 		}
-		ButtonHelper.checkTransactionLegality(game, sender, receiver);
+		TransactionHelper.checkTransactionLegality(game, sender, receiver);
 		Player player = receiver;
 		if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
 			ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
