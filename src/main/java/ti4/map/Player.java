@@ -311,7 +311,6 @@ public class Player {
     }
 
     public List<String> getTransactionItems() {
-        System.out.println(transactionItems); //TODO: delete
         return transactionItems;
     }
 
