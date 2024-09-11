@@ -5459,6 +5459,12 @@ public class ButtonHelper {
                             }
 
                         }
+                        if (riftDistance < distance) {
+                            game.setStoredValue("possiblyUsedRift", "yes");
+                        }
+                        if (player.hasAbility("celestial_guides")) {
+                            game.setStoredValue("possiblyUsedRift", "");
+                        }
                     }
                     messageBuilder.append("\n");
                 } else {
@@ -7413,6 +7419,7 @@ public class ButtonHelper {
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
         String msg;
+        game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
         String msgExtra = "";
         boolean allPicked = true;
@@ -7607,7 +7614,7 @@ public class ButtonHelper {
             if (player.getRelics() != null && player.hasRelic("mawofworlds") && game.isCustodiansScored()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentation()
-                        + " Reminder this is the window to do Maw of Worlds");
+                        + " Reminder this is the window to do Maw of Worlds, after you do your status homework things. Maw of worlds is technically start of agenda, but can be done now for efficiency");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentation()
                         + " You may use these buttons to resolve Maw Of Worlds.",
@@ -7728,6 +7735,16 @@ public class ButtonHelper {
                 && game.getStoredValue("Investments").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("investments")) {
                 PlayAC.playAC(event, game, p2, "investments", game.getMainGameChannel());
+            }
+            if (game.getStoredValue("PreRevolution") != null
+                && game.getStoredValue("PreRevolution").contains(p2.getFaction())
+                && p2.getActionCards().containsKey("PreRevolution")) {
+                PlayAC.playAC(event, game, p2, "revolution", game.getMainGameChannel());
+            }
+            if (game.getStoredValue("Deflection") != null
+                && game.getStoredValue("Deflection").contains(p2.getFaction())
+                && p2.getActionCards().containsKey("Deflection")) {
+                PlayAC.playAC(event, game, p2, "deflection", game.getMainGameChannel());
             }
             if (p2.hasLeader("zealotshero") && p2.getLeader("zealotshero").get().isActive()) {
                 if (!game.getStoredValue("zealotsHeroTechs").isEmpty()) {
@@ -8243,7 +8260,6 @@ public class ButtonHelper {
 
     public static void offerPersonalPingOptions(Game game, Player player) {
         List<Button> buttons = getPersonalAutoPingButtons(game);
-        player.setHoursThatPlayerIsAFK("");
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
             + " select the number of hours you would like the bot to wait before it pings you that it is your turn. This will apply to all your games. 0 is off. Your current interval is "
             + player.getPersonalPingInterval(),
