@@ -1,5 +1,9 @@
 package ti4.commands.tokens;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -7,17 +11,17 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-
+import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class AddFrontierTokens implements Command {
 
@@ -47,7 +51,7 @@ public class AddFrontierTokens implements Command {
         }
         if (game.getRound() == 1) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("deal2SOToAll", "Deal 2 SO To All"));
+            buttons.add(Buttons.green("deal2SOToAll", "Deal 2 SO To All"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after every player is setup", buttons);
         }
     }

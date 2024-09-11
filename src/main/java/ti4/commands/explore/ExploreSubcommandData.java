@@ -214,9 +214,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     if ("ionalpha".equalsIgnoreCase(token)) {
                         message = "Use buttons to decide to place either an alpha or a beta Ion Storm";
                         List<Button> buttonIon = new ArrayList<>();
-                        buttonIon.add(Button.success("addIonStorm_beta_" + tile.getPosition(), "Place a beta")
+                        buttonIon.add(Buttons.green("addIonStorm_beta_" + tile.getPosition(), "Place a beta")
                             .withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
-                        buttonIon.add(Button.secondary("addIonStorm_alpha_" + tile.getPosition(), "Place an alpha")
+                        buttonIon.add(Buttons.gray("addIonStorm_alpha_" + tile.getPosition(), "Place an alpha")
                             .withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttonIon);
                     } else {
@@ -344,9 +344,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")
                     && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
                     List<Button> saarButton = new ArrayList<>();
-                    saarButton.add(Button.success("saarMechRes_" + "mirage",
+                    saarButton.add(Buttons.green("saarMechRes_" + "mirage",
                         "Pay 1TG for mech on " + Helper.getPlanetRepresentation("mirage", game)));
-                    saarButton.add(Button.danger("deleteButtons", "Decline"));
+                    saarButton.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation(true, true)
                             + " you may pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
@@ -371,9 +371,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
-                Button getACButton = Button.success("comm_for_AC", "Spend 1TG or 1 Commodity For 1 AC")
+                Button getACButton = Buttons.green("comm_for_AC", "Spend 1TG or 1 Commodity For 1 AC")
                     .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
-                Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
+                Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity")
                     .withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getACButton, getCommButton);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
@@ -413,20 +413,20 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 String type = "industrial";
                 ButtonHelperFactionSpecific.resolveExpLook(player, game, event, type);
                 discardButtons.add(
-                    Button.success("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                    Buttons.green("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
                 type = "hazardous";
                 ButtonHelperFactionSpecific.resolveExpLook(player, game, event, type);
                 discardButtons
-                    .add(Button.danger("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                    .add(Buttons.red("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
                 type = "cultural";
                 ButtonHelperFactionSpecific.resolveExpLook(player, game, event, type);
                 discardButtons.add(
-                    Button.primary("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                    Buttons.blue("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
                 type = "frontier";
                 ButtonHelperFactionSpecific.resolveExpLook(player, game, event, type);
                 discardButtons.add(
-                    Button.secondary("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
-                discardButtons.add(Button.danger("deleteButtons", "Done Resolving"));
+                    Buttons.gray("discardExploreTop_" + type, "Discard Top " + StringUtils.capitalize(type)));
+                discardButtons.add(Buttons.red("deleteButtons", "Done Resolving"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation()
                         + " you may use the buttons to discard the top of the explore decks if you choose.",
@@ -449,13 +449,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
                     "Use this button to shuffle explore decks once you're done with the rest",
-                    Button.danger("shuffleExplores", "Shuffle Explore Decks"));
+                    Buttons.red("shuffleExplores", "Shuffle Explore Decks"));
 
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
-                Button getMechButton = Button.success("resolveLocalFab_" + planetID, "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
-                Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
+                Button getMechButton = Buttons.green("resolveLocalFab_" + planetID, "Spend 1TG or commodity for 1 mech on " + planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                Button getCommButton3 = Buttons.blue("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
@@ -495,40 +495,40 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";
-                Button ReadyPlanet = Button.success("resolveExpedition_" + planetID, "Ready " + planetName + " by removing 1 infantry from or having mech on planet.");
-                Button Decline = Button.danger("decline_explore", "Decline Explore");
+                Button ReadyPlanet = Buttons.green("resolveExpedition_" + planetID, "Ready " + planetName + " by removing 1 infantry from or having mech on planet.");
+                Button Decline = Buttons.red("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ReadyPlanet, Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "frln1", "frln2", "frln3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainTG = Button.success("freelancersBuild_" + planetID, "Build 1 Unit");
-                Button Decline2 = Button.danger("decline_explore", "Decline Explore");
+                Button gainTG = Buttons.green("freelancersBuild_" + planetID, "Build 1 Unit");
+                Button Decline2 = Buttons.red("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG, Decline2);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainTG = Button.success("resolveCoreMine_" + planetID, "Gain 1TG by removing infantry or having mech on " + planetName)
+                Button gainTG = Buttons.green("resolveCoreMine_" + planetID, "Gain 1TG by removing infantry or having mech on " + planetName)
                     .withEmoji(Emoji.fromFormatted(Emojis.tg));
-                Button Decline2 = Button.danger("decline_explore", "Decline Explore");
+                Button Decline2 = Buttons.red("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG, Decline2);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = "Resolve explore using the buttons.";
-                Button gainCC = Button.success("resolveVolatile_" + planetID, "Gain 1CC by removing 1 infantry or having mech on " + planetName);
-                Button Decline3 = Button.danger("decline_explore", "Decline Explore");
+                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Gain 1CC by removing 1 infantry or having mech on " + planetName);
+                Button Decline3 = Buttons.red("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "warforgeruins" -> {
                 message = "Resolve explore using the buttons.";
-                Button ruinsInf = Button.success("ruins_" + planetID + "_2inf",
+                Button ruinsInf = Buttons.green("ruins_" + planetID + "_2inf",
                     "Remove 1 infantry or have mech on planet to place 2 infantry on " + planetName);
-                Button ruinsMech = Button.success("ruins_" + planetID + "_mech",
+                Button ruinsMech = Buttons.green("ruins_" + planetID + "_mech",
                     "Remove 1 infantry or have mech on planet to place mech on " + planetName);
-                Button Decline = Button.danger("decline_explore", "Decline Explore");
+                Button Decline = Buttons.red("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ruinsInf, ruinsMech, Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
@@ -537,12 +537,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Resolve explore using the buttons.";
                 for (Leader leader : player.getLeaders()) {
                     if (leader.isExhausted() && leader.getId().contains("agent")) {
-                        buttons.add(Button.success("seedySpace_" + leader.getId() + "_" + planetID,
+                        buttons.add(Buttons.green("seedySpace_" + leader.getId() + "_" + planetID,
                             "Remove 1 infantry or have mech on planet to refresh " + Mapper.getLeader(leader.getId()).getName()));
                     }
                 }
-                buttons.add(Button.primary("seedySpace_AC_" + planetID, "Draw AC by removing 1 infantry or have mech on" + planetName));
-                buttons.add(Button.danger("decline_explore", "Decline Explore"));
+                buttons.add(Buttons.blue("seedySpace_AC_" + planetID, "Draw AC by removing 1 infantry or have mech on" + planetName));
+                buttons.add(Buttons.red("decline_explore", "Decline Explore"));
 
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
@@ -582,8 +582,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
-            gainComm.add(Button.success("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
-            gainComm.add(Button.danger("deleteButtons", "Decline"));
+            gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
+            gainComm.add(Buttons.red("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
             sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability\n");
             sb.append(player.getRepresentation(true, true)).append(
@@ -604,9 +604,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
         if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
             && player.getPlanetsAllianceMode().contains(planetID)) {
-            Button placeSleeper = Button.success("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID)
+            Button placeSleeper = Buttons.green("putSleeperOnPlanet_" + planetID, "Put Sleeper on " + planetID)
                 .withEmoji(Emoji.fromFormatted(Emojis.Sleeper));
-            Button decline = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
+            Button decline = Buttons.red("deleteButtons", "Decline To Put a Sleeper Down");
             List<Button> buttons = List.of(placeSleeper, decline);
             MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
         }

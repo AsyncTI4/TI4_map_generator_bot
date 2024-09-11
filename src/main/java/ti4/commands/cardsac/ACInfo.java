@@ -150,21 +150,21 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
                         .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
         if (ButtonHelper.isPlayerElected(game, player, "censure") || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
-            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC (You are politically censured)"));
+            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an AC (You are politically censured)"));
         } else {
-            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+            acButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard an AC"));
         }
         if (actionCards != null && !actionCards.isEmpty()
             && !ButtonHelper.isPlayerElected(game, player, "censure")
             && (actionCards.containsKey("coup") || actionCards.containsKey("disgrace")
                 || actionCards.containsKey("investments") || actionCards.containsKey("revolution") || actionCards.containsKey("deflection") || actionCards.containsKey("summit"))) {
-            acButtons.add(Button.secondary("checkForAllACAssignments", "Pre assign ACs"));
+            acButtons.add(Buttons.gray("checkForAllACAssignments", "Pre assign ACs"));
         }
 
         return acButtons;
@@ -181,7 +181,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
-                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
                         .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
@@ -249,7 +249,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Button.danger("takeAC_" + value + "_" + player.getFaction(), ac_name)
+                    acButtons.add(Buttons.red("takeAC_" + value + "_" + player.getFaction(), ac_name)
                         .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }

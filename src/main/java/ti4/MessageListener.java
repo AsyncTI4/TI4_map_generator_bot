@@ -12,6 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -27,8 +30,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.bothelper.CreateGameChannels;
@@ -627,9 +629,9 @@ public class MessageListener extends ListenerAdapter {
                                                 MessageHelper.sendMessageToChannel(gameChannel, ping);
                                                 if (ping != null && ping.contains("courtesy notice")) {
                                                     List<Button> buttons = new ArrayList<>();
-                                                    buttons.add(Button.danger("temporaryPingDisable",
+                                                    buttons.add(Buttons.red("temporaryPingDisable",
                                                         "Disable Pings For Turn"));
-                                                    buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
+                                                    buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
                                                     MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
                                                         + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                                                         buttons);
