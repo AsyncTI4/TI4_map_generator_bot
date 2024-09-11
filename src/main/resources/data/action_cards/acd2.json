@@ -90,6 +90,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "blackmail",
+    "name": "Blackmail",
+    "phase": "Agenda",
+    "window": "After an agenda is revealed",
+    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome must give you 1 promissory note from their hand.",
+    "flavorText": "Dirzuga Ohao stood next to the leader of the revolutionaries, his pale eyes full of accusation. \"Not every secret is lost in death, Brother Milor,\" they said in unison.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "boarding_party",
     "name": "Boarding Party",
     "phase": "Action",
@@ -183,7 +192,7 @@
     "alias": "data_archive",
     "name": "Data Archive",
     "phase": "Agenda",
-    "window": "Before the \"Ready Planets\" step of the agenda phase",
+    "window": "After an agenda is revealed",
     "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
     "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had paid off—the vault was exactly where they had expected it to be.",
     "source": "action_deck_2"
@@ -513,15 +522,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "last_minute_deliberation",
-    "name": "Last Minute Deliberation",
-    "phase": "Agenda",
-    "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Ready up to 2 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
-    "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "lazax_cache",
     "name": "Lazax Cache",
     "phase": "Action",
@@ -675,12 +675,12 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "promissory_rider",
-    "name": "Promissory Rider",
+    "alias": "project_rider",
+    "name": "Project Rider",
     "phase": "Agenda",
     "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
-    "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of bureaucracies and favors owed in many more.",
+    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, choose and take up to 2 action cards that have a component action from the action card discard pile. ",
+    "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of governments and favors owed in many more.",
     "source": "action_deck_2"
   },
   {
