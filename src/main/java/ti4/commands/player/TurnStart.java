@@ -234,7 +234,7 @@ public class TurnStart extends PlayerSubcommandData {
         sb.append(player.getRepresentation(true, true));
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
-            if (game.getName().equalsIgnoreCase("pbd1000")) {
+            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 String num = sc + "";
                 num = num.substring(num.length() - 1, num.length());
                 for (Integer sc2 : player.getSCs()) {
