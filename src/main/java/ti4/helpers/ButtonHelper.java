@@ -1194,28 +1194,22 @@ public class ButtonHelper {
 
     public static void offerDeckButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("showDeck_frontier", "Frontier").withEmoji(Emoji.fromFormatted(Emojis.Frontier)));
-        buttons.add(Buttons.blue("showDeck_cultural", "Cultural").withEmoji(Emoji.fromFormatted(Emojis.Cultural)));
-        buttons.add(Buttons.red("showDeck_hazardous", "Hazardous").withEmoji(Emoji.fromFormatted(Emojis.Hazardous)));
-        buttons.add(
-            Buttons.green("showDeck_industrial", "Industrial").withEmoji(Emoji.fromFormatted(Emojis.Industrial)));
+        buttons.add(Buttons.gray("showDeck_frontier", "Frontier", Emojis.Frontier));
+        buttons.add(Buttons.blue("showDeck_cultural", "Cultural", Emojis.Cultural));
+        buttons.add(Buttons.red("showDeck_hazardous", "Hazardous", Emojis.Hazardous));
+        buttons.add(Buttons.green("showDeck_industrial", "Industrial", Emojis.Industrial));
         buttons.add(Buttons.gray("showDeck_all", "All Explores"));
-        buttons.add(Buttons.blue("showDeck_propulsion", "Propulsion Techs")
-            .withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech)));
-        buttons.add(
-            Buttons.red("showDeck_warfare", "Warfare Techs").withEmoji(Emoji.fromFormatted(Emojis.WarfareTech)));
-        buttons.add(Buttons.gray("showDeck_cybernetic", "Cybernetic Techs")
-            .withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech)));
-        buttons.add(Buttons.green("showDeck_biotic", "Biotic Techs").withEmoji(Emoji.fromFormatted(Emojis.BioticTech)));
-        buttons.add(Buttons.gray("showDeck_ac", "AC Discards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
-        buttons.add(
-            Buttons.gray("showDeck_unplayedAC", "Unplayed ACs").withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
-        buttons.add(Buttons.gray("showDeck_agenda", "Agenda Discards").withEmoji(Emoji.fromFormatted(Emojis.Agenda)));
-        buttons.add(Buttons.gray("showDeck_relic", "Relics").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
-        buttons.add(Buttons.gray("showDeck_unscoredSO", "Unscored SOs")
-            .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
-        buttons.add(Buttons.gray("showObjInfo_both", "All Revealed Objectives in Game")
-            .withEmoji(Emoji.fromFormatted(Emojis.Public1)));
+        buttons.add(Buttons.blue("showDeck_propulsion", "Propulsion Techs", Emojis.PropulsionTech));
+        buttons.add(Buttons.red("showDeck_warfare", "Warfare Techs", Emojis.WarfareTech));
+        buttons.add(Buttons.gray("showDeck_cybernetic", "Cybernetic Techs", Emojis.CyberneticTech));
+        buttons.add(Buttons.green("showDeck_biotic", "Biotic Techs", Emojis.BioticTech));
+        buttons.add(Buttons.green("showDeck_unitupgrade", "Unit Upgrade Techs", Emojis.UnitUpgradeTech));
+        buttons.add(Buttons.gray("showDeck_ac", "AC Discards", Emojis.ActionCard));
+        buttons.add(Buttons.gray("showDeck_unplayedAC", "Unplayed ACs", Emojis.ActionCard));
+        buttons.add(Buttons.gray("showDeck_agenda", "Agenda Discards", Emojis.Agenda));
+        buttons.add(Buttons.gray("showDeck_relic", "Relics", Emojis.Relic));
+        buttons.add(Buttons.gray("showDeck_unscoredSO", "Unscored SOs", Emojis.SecretObjective));
+        buttons.add(Buttons.gray("showObjInfo_both", "All Revealed Objectives in Game", Emojis.Public1));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
     }
 
