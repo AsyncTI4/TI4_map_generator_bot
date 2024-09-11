@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
+import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.map.Game;
@@ -82,7 +82,7 @@ public abstract class BagDraft {
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
             player.getRepresentation(true, true) + " you have been passed a new draft bag!",
-            Button.secondary(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
+            Buttons.gray(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
     }
 
     public boolean allPlayersReadyToPass() {

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.player.TurnStart;
 import ti4.commands.special.CheckDistance;
@@ -279,11 +280,11 @@ public class ButtonHelperTacticalAction {
                     .values()) {
                     if (uH instanceof Planet) {
                         String planet = uH.getName();
-                        trapButtons.add(Button.secondary("setTrapStep3_" + planet,
+                        trapButtons.add(Buttons.gray("setTrapStep3_" + planet,
                             Helper.getPlanetRepresentation(planet, game)));
                     }
                 }
-                trapButtons.add(Button.danger("deleteButtons", "Decline"));
+                trapButtons.add(Buttons.red("deleteButtons", "Decline"));
                 String msg = player.getRepresentation(true, true)
                     + " you can use the buttons to place a trap on a planet";
                 if (trapButtons.size() > 1) {
@@ -298,7 +299,7 @@ public class ButtonHelperTacticalAction {
                         "Use Celdauri Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.celdauri));
                 buttons.add(hacanButton);
-                buttons.add(Button.danger("deleteButtons", "Decline"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
                         + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -311,7 +312,7 @@ public class ButtonHelperTacticalAction {
             && !player.getExhaustedRelics().contains("emphidia")) {
             String message = player.getRepresentation() + " You can use the button to explore a planet using the " + Emojis.Relic + "Crown of Emphidia";
             List<Button> systemButtons2 = new ArrayList<>();
-            systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
+            systemButtons2.add(Buttons.green("crownofemphidiaexplore", "Use Crown of Emphidia To Explore"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons2);
         }
         if (game.isNaaluAgent()) {
@@ -407,11 +408,11 @@ public class ButtonHelperTacticalAction {
             List<Button> empyButtons = new ArrayList<>();
             if (!game.getMovedUnitsFromCurrentActivation().isEmpty()
                 && (tile.getUnitHolders().values().size() == 1) && player.hasUnexhaustedLeader("empyreanagent")) {
-                Button empyButton = Button.secondary("exhaustAgent_empyreanagent",
+                Button empyButton = Buttons.gray("exhaustAgent_empyreanagent",
                     "Use Empyrean Agent")
                     .withEmoji(Emoji.fromFormatted(Emojis.Empyrean));
                 empyButtons.add(empyButton);
-                empyButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+                empyButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, true) + " use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "Acamar, the Empyrean" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent",
@@ -430,7 +431,7 @@ public class ButtonHelperTacticalAction {
                     || game.getMovedUnitsFromCurrentActivation().containsKey("flagshipdamaged"))
                 && player.hasUnit("dihmohn_flagship")) {
                 List<Button> produce = new ArrayList<>();
-                produce.add(Button.primary("dihmohnfs_" + game.getActiveSystem(), "Produce (2) Units"));
+                produce.add(Buttons.blue("dihmohnfs_" + game.getActiveSystem(), "Produce (2) Units"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation()
                         + " Your Dih-Mohn Flagship moved into the active system and you can produce 2 units with a combined cost of 4.",
@@ -554,9 +555,9 @@ public class ButtonHelperTacticalAction {
             message = message + "0 tiles away";
         }
         for (String pos : initialOffering) {
-            buttons.add(Button.success("ringTile_" + pos, game.getTileByPosition(pos).getRepresentationForButtons(game, player)));
+            buttons.add(Buttons.green("ringTile_" + pos, game.getTileByPosition(pos).getRepresentationForButtons(game, player)));
         }
-        buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
+        buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
         if (Constants.prisonerOneID.equals(player.getUserID())) buttons.addAll(ButtonHelper.getPossibleRings(player, game)); //TODO: Add option for this
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
@@ -567,16 +568,16 @@ public class ButtonHelperTacticalAction {
         int maxDistance = desiredDistance;
         List<Button> buttons = new ArrayList<>();
         if (desiredDistance > 0) {
-            buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance - 1), "Get Tiles " + (maxDistance - 1) + " Spaces Away"));
+            buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance - 1), "Get Tiles " + (maxDistance - 1) + " Spaces Away"));
         }
         for (String pos : CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
             Tile tile = game.getTileByPosition(pos);
             String tileRepresentation = tile.getRepresentationForButtons(game, player);
             if (!tileRepresentation.contains("Hyperlane")) {
-                buttons.add(Button.success("ringTile_" + pos, tileRepresentation));
+                buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation));
             }
         }
-        buttons.add(Button.secondary("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
+        buttons.add(Buttons.gray("getTilesThisFarAway_" + (maxDistance + 1), "Get Tiles " + (maxDistance + 1) + " Spaces Away"));
 
         String message = "Doing a tactical action. Please select the tile you want to activate";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -616,7 +617,7 @@ public class ButtonHelperTacticalAction {
             && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)
                 .contains(game.getTileByPosition(pos))) {
             List<Button> buttons = new ArrayList<>();
-            Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity")
+            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity")
                 .withEmoji(Emoji.fromFormatted(Emojis.comm));
             buttons.add(getCommButton);
             String msg = player.getRepresentation()
@@ -693,8 +694,8 @@ public class ButtonHelperTacticalAction {
             }
             // if (abilities > 0 ) {
             // List<Button> buttons = new ArrayList<>();
-            // buttons.add(Button.success("doActivation_" + pos, "Confirm"));
-            // buttons.add(Button.danger("deleteButtons", "This activation was a mistake"));
+            // buttons.add(Buttons.green("doActivation_" + pos, "Confirm"));
+            // buttons.add(Buttons.red("deleteButtons", "This activation was a mistake"));
             // String msg = "# " + player.getFactionEmoji() + " You are about to
             // automatically trigger some abilities by activating this system. Please hit
             // confirm before continuing";

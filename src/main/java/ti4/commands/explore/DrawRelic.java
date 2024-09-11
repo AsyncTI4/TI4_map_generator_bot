@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -38,7 +39,7 @@ public class DrawRelic extends GenericRelicAction {
         StringBuilder info = new StringBuilder();
         for (int x = 0; x < advantage && x < relics.size(); x++) {
             RelicModel relicData = Mapper.getRelic(relics.get(x));
-            buttons.add(Button.success("drawRelicAtPosition_" + x, relicData.getName()));
+            buttons.add(Buttons.green("drawRelicAtPosition_" + x, relicData.getName()));
             info.append(relicData.getName()).append(": ").append(relicData.getText()).append("\n");
         }
         String msg = player.getRepresentation(true, true) + " choose the relic that you want. The relic text is reproduced for your conveinenance";

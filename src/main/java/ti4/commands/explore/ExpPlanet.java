@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
@@ -27,7 +28,10 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
@@ -117,9 +121,9 @@ public class ExpPlanet extends ExploreSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
             }
 
-            Button resolveExploreC = Button.success("resolve_explore_" + cardIDC + "_" + planetName + "_distantSuns", exploreModelC.getName());
-            Button resolveExploreH = Button.success("resolve_explore_" + cardIDH + "_" + planetName + "_distantSuns", exploreModelH.getName());
-            Button resolveExploreI = Button.success("resolve_explore_" + cardIDI + "_" + planetName + "_distantSuns", exploreModelI.getName());
+            Button resolveExploreC = Buttons.green("resolve_explore_" + cardIDC + "_" + planetName + "_distantSuns", exploreModelC.getName());
+            Button resolveExploreH = Buttons.green("resolve_explore_" + cardIDH + "_" + planetName + "_distantSuns", exploreModelH.getName());
+            Button resolveExploreI = Buttons.green("resolve_explore_" + cardIDI + "_" + planetName + "_distantSuns", exploreModelI.getName());
             List<Button> buttons = List.of(resolveExploreC, resolveExploreH, resolveExploreI);
             List<MessageEmbed> embeds = List.of(exploreModelC.getRepresentationEmbed(), exploreModelH.getRepresentationEmbed(), exploreModelI.getRepresentationEmbed());
             String message = player.getRepresentation() + " please choose 1 Explore card to resolve.";
@@ -136,8 +140,8 @@ public class ExpPlanet extends ExploreSubcommandData {
                         MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
                     }
                     String message = "Please decide whether or not to use your " + Emojis.Naaz + "**Distant Suns** (explore twice) ability.";
-                    Button resolveExplore1 = Button.success("distant_suns_accept_" + planetName + "_" + drawColor, "Choose to Explore Twice");
-                    Button resolveExplore2 = Button.danger("distant_suns_decline_" + planetName + "_" + drawColor, "Decline Distant Suns");
+                    Button resolveExplore1 = Buttons.green("distant_suns_accept_" + planetName + "_" + drawColor, "Choose to Explore Twice");
+                    Button resolveExplore2 = Buttons.red("distant_suns_decline_" + planetName + "_" + drawColor, "Decline Distant Suns");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     return;
@@ -159,8 +163,8 @@ public class ExpPlanet extends ExploreSubcommandData {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), reportMessage);
                     }
 
-                    Button resolveExplore1 = Button.success("resolve_explore_" + cardID1 + "_" + planetName + "_distantSuns", exploreModel1.getName());
-                    Button resolveExplore2 = Button.success("resolve_explore_" + cardID2 + "_" + planetName + "_distantSuns", exploreModel2.getName());
+                    Button resolveExplore1 = Buttons.green("resolve_explore_" + cardID1 + "_" + planetName + "_distantSuns", exploreModel1.getName());
+                    Button resolveExplore2 = Buttons.green("resolve_explore_" + cardID2 + "_" + planetName + "_distantSuns", exploreModel2.getName());
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     List<MessageEmbed> embeds = List.of(exploreModel1.getRepresentationEmbed(), exploreModel2.getRepresentationEmbed());
                     String message = player.getRepresentation() + " please choose 1 Explore card to resolve.";
@@ -174,8 +178,8 @@ public class ExpPlanet extends ExploreSubcommandData {
             if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) > 0 || unitHolder.getUnitCount(UnitType.Pds, player.getColor()) > 0) {
                 if (!NRACheck) {
                     String message = "Please decide whether or not to use your " + Emojis.gledge + "**Deep Mining** (gain 1TG instead of explore) ability.";
-                    Button resolveExplore1 = Button.success("deep_mining_accept", "Choose to Gain 1TG instead of exploring");
-                    Button resolveExplore2 = Button.danger("deep_mining_decline_" + planetName + "_" + drawColor, "Choose to Explore");
+                    Button resolveExplore1 = Buttons.green("deep_mining_accept", "Choose to Gain 1TG instead of exploring");
+                    Button resolveExplore2 = Buttons.red("deep_mining_decline_" + planetName + "_" + drawColor, "Choose to Explore");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     return;
@@ -194,8 +198,8 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (player.hasUnexhaustedLeader("lanefiragent")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
-            Button resolveExplore1 = Button.success("lanefirAgentRes_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Choose " + name1);
-            Button resolveExplore2 = Button.success("lanefirAgentRes_Accept_" + drawColor + "_" + planetName,
+            Button resolveExplore1 = Buttons.green("lanefirAgentRes_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Choose " + name1);
+            Button resolveExplore2 = Buttons.green("lanefirAgentRes_Accept_" + drawColor + "_" + planetName,
                 "Use Lanefir Agent");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentation(true, true) + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -214,8 +218,8 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (player.hasTech("absol_sdn")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
-            Button resolveExplore1 = Button.success("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
-            Button resolveExplore2 = Button.success("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1TG");
+            Button resolveExplore1 = Buttons.green("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
+            Button resolveExplore2 = Buttons.green("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1TG");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentation(true, true) + " You have Scanlink Drone Network, and thus may decline this explore to get 1TG.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
@@ -261,9 +265,9 @@ public class ExpPlanet extends ExploreSubcommandData {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Button.success("exhaustAgent_augersagent_" + player.getFaction(),
+                    buttons.add(Buttons.green("exhaustAgent_augersagent_" + player.getFaction(),
                         "Use Augers Agent on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
-                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
                     String msg2 = p2.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2TGs.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);

@@ -218,13 +218,13 @@ public class TurnEnd extends PlayerSubcommandData {
                 Integer value = objective.getValue();
                 Button objectiveButton;
                 if (poStatus == 0) { //Stage 1 Objectives
-                    objectiveButton = Button.success(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
+                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
                     poButtons1.add(objectiveButton);
                 } else if (poStatus == 1) { //Stage 2 Objectives
-                    objectiveButton = Button.primary(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
+                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
                     poButtons2.add(objectiveButton);
                 } else { //Other Objectives
-                    objectiveButton = Button.secondary(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                    objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
                     poButtonsCustom.add(objectiveButton);
                 }
             }
@@ -235,7 +235,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
-                poButtons.add(Button.secondary("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
+                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
                 break;
             }
         }
@@ -267,20 +267,20 @@ public class TurnEnd extends PlayerSubcommandData {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
                     String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Button.success("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
-                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
         }
         List<Button> poButtons = getScoreObjectiveButtons(event, game);
-        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
-        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
+        Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No PO Scored");
+        Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No SO Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
             && ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).size() > 0) {
-            poButtons.add(Button.secondary("getSwapButtons_", "Swap"));
+            poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
         }
         poButtons.removeIf(Objects::isNull);
         List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
@@ -318,8 +318,8 @@ public class TurnEnd extends PlayerSubcommandData {
         // if(maxVP+4 > game.getVp()){
         //     String msg = "You may use these buttons to force scoring to go in iniative order";
         //     List<Button> buttons = new ArrayList<>();
-        //     buttons.add(Button.primary("forceACertainScoringOrder", "Force Scoring in Order"));
-        //     buttons.add(Button.danger("deleteButtons", "Decline to force order"));
+        //     buttons.add(Buttons.blue("forceACertainScoringOrder", "Force Scoring in Order"));
+        //     buttons.add(Buttons.red("deleteButtons", "Decline to force order"));
         //     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg, buttons);
         // }
         // return beginning of status phase PNs
@@ -348,8 +348,8 @@ public class TurnEnd extends PlayerSubcommandData {
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
                 && playerLeader != null && !playerLeader.isLocked()) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("kyroHeroInitiation", "Play Kyro Hero"));
-                buttons.add(Button.danger("deleteButtons", "Decline"));
+                buttons.add(Buttons.green("kyroHeroInitiation", "Play Kyro Hero"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentation()
                         + " Reminder this is the window to play Speygh, the Kyro hero. You may use the buttons to start the process.",
@@ -434,7 +434,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (game.getHighestScore() + 4 > game.getVp()) {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.danger("turnOffForcedScoring", "Turn off forced scoring order"));
+            buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
             for (Player player : Helper.getInitativeOrder(game)) {

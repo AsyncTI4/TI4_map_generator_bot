@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 
 @Getter
 @Setter
@@ -56,8 +57,8 @@ public class IntegerSetting extends SettingInterface {
     }
 
     protected List<Button> buttons(String idPrefix) {
-        Button inc = Button.success(idPrefix + "inc" + id, "Increase " + name).withEmoji(emojiUp);
-        Button dec = Button.danger(idPrefix + "dec" + id, "Decrease " + name).withEmoji(emojiDown);
+        Button inc = Buttons.green(idPrefix + "inc" + id, "Increase " + name).withEmoji(emojiUp);
+        Button dec = Buttons.red(idPrefix + "dec" + id, "Decrease " + name).withEmoji(emojiDown);
         List<Button> ls = new ArrayList<>();
         if (val + delta <= max) ls.add(inc);
         if (val - delta >= min) ls.add(dec);

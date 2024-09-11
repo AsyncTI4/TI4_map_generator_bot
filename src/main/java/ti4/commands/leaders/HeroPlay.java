@@ -215,8 +215,8 @@ public class HeroPlay extends LeaderAction {
             case "cymiaehero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
-                    Button.success("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve Cymiae Hero"));
-                buttons.add(Button.primary("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
+                    Buttons.green("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve Cymiae Hero"));
+                buttons.add(Buttons.blue("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
 
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation() + " choose whether to resolve Autonetic Memory or not.", buttons);
@@ -225,7 +225,7 @@ public class HeroPlay extends LeaderAction {
             case "lizhohero" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                     "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
-                    Button.success("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
+                    Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -300,7 +300,7 @@ public class HeroPlay extends LeaderAction {
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
                     + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
                 DrawAgenda.drawAgenda(event, size, game, player);
-                Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
+                Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
             }
@@ -393,9 +393,9 @@ public class HeroPlay extends LeaderAction {
             }
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
                     "Invade A Planet With Yin Hero"));
-                buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
                     + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.",
@@ -425,11 +425,11 @@ public class HeroPlay extends LeaderAction {
             }
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
                     "Resolve Ilyxum Hero on Stage 1 Deck"));
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
                     "ResolveIlyxum Hero on Stage 2 Deck"));
-                buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
                         + " use the button to choose on which objective type you wanna resolve Atropha, the Ilyxum hero.",

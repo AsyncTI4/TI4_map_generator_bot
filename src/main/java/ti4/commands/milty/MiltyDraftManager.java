@@ -438,7 +438,7 @@ public class MiltyDraftManager {
                         String keleres = "keleres" + flavor.charAt(0);
                         String id = String.format("setupStep5_%s_%s_%s_%s_%s", player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
                         String msg = "Keleres (" + flavor + ")";
-                        Button butt = Button.success(id, msg).withEmoji(Emoji.fromFormatted(emoji));
+                        Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
                         buttons.add(butt);
                     }
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
@@ -551,7 +551,7 @@ public class MiltyDraftManager {
         for (MiltyDraftSlice slice : getSlices()) {
             if (isSliceTaken(slice.getName())) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getMiltyDraftEmoji(slice.getName()));
-            Button button = Button.success("milty_slice_" + slice.getName(), emoji);
+            Button button = Buttons.green("milty_slice_" + slice.getName(), emoji.getFormatted());
             sliceButtons.add(button);
         }
         return sliceButtons;
@@ -567,7 +567,7 @@ public class MiltyDraftManager {
             String name = model.getFactionName();
             if (faction.startsWith("keleres"))
                 name = "The Council Keleres";
-            Button button = Button.secondary("milty_faction_" + faction, name).withEmoji(emoji);
+            Button button = Buttons.gray("milty_faction_" + faction, name).withEmoji(emoji);
             factionButtons.add(button);
         }
         return factionButtons;
@@ -578,7 +578,7 @@ public class MiltyDraftManager {
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getSpeakerPickEmoji(speakerOrder));
-            Button button = Button.success("milty_order_" + speakerOrder, emoji);
+            Button button = Buttons.green("milty_order_" + speakerOrder, emoji.getFormatted());
             orderButtons.add(button);
         }
         return orderButtons;
