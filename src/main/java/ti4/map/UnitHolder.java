@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import ti4.generator.Mapper;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 
@@ -228,6 +229,16 @@ abstract public class UnitHolder {
         return new HashMap<>(units.entrySet().stream()
             .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(color))
             .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
+    }
+
+    public String getPlayersUnitListOnHolder(Player player) {
+        return getUnitAsyncIdsOnHolder(player.getColorID()).entrySet().stream()
+            .map(e -> e.getValue() + " " + e.getKey())
+            .collect(Collectors.joining(","));
+    }
+
+    public String getPlayersUnitListEmojisOnHolder(Player player) {
+        return Helper.getUnitListEmojis(getPlayersUnitListOnHolder(player));
     }
 
     @JsonIgnore
