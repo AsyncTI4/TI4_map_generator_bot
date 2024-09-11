@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.buttons.Buttons;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -71,7 +72,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         String agendaID = game.revealAgenda(revealFromBottom);
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
-        // Button manualResolve = Button.danger("autoresolve_manual", "Resolve it
+        // Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it
         // Manually");
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -198,15 +199,15 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         if (action) {
             msg = "It seems likely you are resolving Midir, the Edyn hero, you may use this button to skip straight to the resolution.";
-            proceedButtons.add(Button.danger("autoresolve_manual", "Skip Straight To Resolution"));
+            proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             ListVoteCount.turnOrder(event, game, channel);
             msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
-            proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
-            proceedButtons.add(Button.primary("transaction", "Transaction"));
-            proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
-            proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
-            proceedButtons.add(Button.secondary("refreshAgenda", "Refresh Agenda"));
+            proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
+            proceedButtons.add(Buttons.blue("transaction", "Transaction"));
+            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+            proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
+            proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         if (cov) {

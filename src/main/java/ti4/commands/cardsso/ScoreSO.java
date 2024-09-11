@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -76,8 +77,8 @@ public class ScoreSO extends SOCardsSubcommandData {
                 if (p2.hasLeaderUnlocked("tnelishero")) {
                     List<Button> buttons = new ArrayList<>();
                     String soStringID = entry.getKey();
-                    buttons.add(Button.success("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
-                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    buttons.add(Buttons.green("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
                     String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
@@ -105,24 +106,24 @@ public class ScoreSO extends SOCardsSubcommandData {
                     String finChecker = p1.getFinsFactionCheckerPrefix();
                     List<Button> purgeFragButtons = new ArrayList<>();
                     if (p1.getCrf() > 0) {
-                        Button transact = Button.primary(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
+                        Button transact = Buttons.blue(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (p1.getIrf() > 0) {
-                        Button transact = Button.success(finChecker + "purge_Frags_IRF_1",
+                        Button transact = Buttons.green(finChecker + "purge_Frags_IRF_1",
                             "Purge 1 Industrial Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (p1.getHrf() > 0) {
-                        Button transact = Button.danger(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
+                        Button transact = Buttons.red(finChecker + "purge_Frags_HRF_1", "Purge 1 Hazardous Fragment");
                         purgeFragButtons.add(transact);
                     }
                     if (p1.getUrf() > 0) {
-                        Button transact = Button.secondary(finChecker + "purge_Frags_URF_1",
+                        Button transact = Buttons.gray(finChecker + "purge_Frags_URF_1",
                             "Purge 1 Frontier Fragment");
                         purgeFragButtons.add(transact);
                     }
-                    Button transact2 = Button.success(finChecker + "deleteButtons", "Done purging");
+                    Button transact2 = Buttons.green(finChecker + "deleteButtons", "Done purging");
                     purgeFragButtons.add(transact2);
 
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Purge 2 fragments please", purgeFragButtons);

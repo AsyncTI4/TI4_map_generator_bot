@@ -34,6 +34,7 @@ import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
+import ti4.buttons.Buttons;
 import ti4.commands.game.GameCreate;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
@@ -321,28 +322,28 @@ public class CreateGameChannels extends BothelperSubcommandData {
             + "\n- No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2."
             + "\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("anonDeclare_Friendly", "Friendly"));
-        buttons.add(Button.primary("anonDeclare_No Strong Preference", "No Strong Preference"));
-        buttons.add(Button.danger("anonDeclare_Aggressive", "Aggressive"));
+        buttons.add(Buttons.green("anonDeclare_Friendly", "Friendly"));
+        buttons.add(Buttons.blue("anonDeclare_No Strong Preference", "No Strong Preference"));
+        buttons.add(Buttons.red("anonDeclare_Aggressive", "Aggressive"));
         newGame.setUndoButtonOffered(false);
         MessageHelper.sendMessageToChannel(actionsChannel, agressionMsg, buttons);
         newGame.setUndoButtonOffered(true);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         List<Button> buttons2 = new ArrayList<>();
-        buttons2.add(Button.success("getHomebrewButtons", "Yes, have homebrew"));
-        buttons2.add(Button.danger("deleteButtons", "No Homebrew"));
+        buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
+        buttons2.add(Buttons.red("deleteButtons", "No Homebrew"));
         MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", buttons2);
 
         List<Button> buttons3 = new ArrayList<>();
-        buttons3.add(Button.success("enableAidReacts", "Yes, Enable Aid Reacts"));
-        buttons3.add(Button.danger("deleteButtons", "No Aid Reacts"));
+        buttons3.add(Buttons.green("enableAidReacts", "Yes, Enable Aid Reacts"));
+        buttons3.add(Buttons.red("deleteButtons", "No Aid Reacts"));
         MessageHelper.sendMessageToChannel(actionsChannel, "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember your faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under `/custom customization`", buttons3);
 
         List<Button> hexBorderButtons = new ArrayList<>();
-        hexBorderButtons.add(Button.success("showHexBorders_dash", "Dashed line"));
-        hexBorderButtons.add(Button.primary("showHexBorders_solid", "Solid line"));
-        hexBorderButtons.add(Button.danger("showHexBorders_off", "Off (default)"));
+        hexBorderButtons.add(Buttons.green("showHexBorders_dash", "Dashed line"));
+        hexBorderButtons.add(Buttons.blue("showHexBorders_solid", "Solid line"));
+        hexBorderButtons.add(Buttons.red("showHexBorders_off", "Off (default)"));
         MessageHelper.sendMessageToChannel(actionsChannel, "Show borders around systems with player's ships, either a dashed line or a solid line. You can also control this setting with `/custom customization`", hexBorderButtons);
 
         // INTRODUCTION TO BOT-MAP THREAD
