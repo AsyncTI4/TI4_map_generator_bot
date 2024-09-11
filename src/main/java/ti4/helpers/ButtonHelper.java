@@ -8515,57 +8515,6 @@ public class ButtonHelper {
 
     }
 
-    public static void resolveLocalFab(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
-        String planetName = buttonID.split("_")[1];
-        String commOrTg;
-        if (player.getCommodities() > 0) {
-            player.setCommodities(player.getCommodities() - 1);
-            commOrTg = "commodity";
-        } else if (player.getTg() > 0) {
-            player.setTg(player.getTg() - 1);
-            commOrTg = "tg";
-        } else {
-            ButtonHelper.addReaction(event, false, false, "Didn't have any comms/TGs to spend, no mech placed", "");
-            return;
-        }
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName, game);
-        planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
-        ButtonHelper.addReaction(event, false, false, "Spent 1 " + commOrTg + " for 1 mech on " + planetName, "");
-        ButtonHelper.deleteMessage(event);
-        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-            String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                pF + " Spent 1 " + commOrTg + " for 1 mech on " + planetName);
-        }
-    }
-
-    public static void resolveVolatile(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
-        String message = "";
-        String planetName = buttonID.split("_")[1];
-        boolean failed = false;
-        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
-        failed = message.contains("Please try again.");
-
-        if (!failed) {
-            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                + ". Use buttons to gain CCs";
-            game.setStoredValue("originalCCsFor" + player.getFaction(),
-                player.getCCRepresentation());
-            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-        }
-
-        ButtonHelper.addReaction(event, false, false, message, "");
-        if (!failed && !event.getMessage().getContentRaw().contains("fragment")) {
-            ButtonHelper.deleteMessage(event);
-            if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " " + message);
-            }
-        }
-
-    }
-
     public static String mechOrInfCheck(String planetName, Game game, Player player) {
         String message;
         Tile tile = game.getTile(AliasHandler.resolveTile(planetName));

@@ -516,8 +516,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
-                message = "Resolve explore using the buttons.";
-                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Gain 1CC by removing 1 infantry or having mech on " + planetName);
+                message = player.getRepresentation() + " please resolve Volatile Fuel Source:\n-# Your current CCs are " + player.getCCRepresentation();
+                Planet planet = game.getUnitHolderFromPlanet(planetID);
+                if (planet != null) {
+                    String unitList = planet.getPlayersUnitListEmojisOnHolder(player);
+                    if (unitList.isEmpty()) {
+                        message += " and you have no units on " + planetName;
+                    } else {
+                        message += " and you have " + unitList + " on " + planetName;
+                    }
+                }
+                Button gainCC = Buttons.green("resolveVolatile_" + planetID, "Gain a CC by removing 1 Infantry or by having a Mech on " + planetName);
                 Button Decline3 = Buttons.red("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel) event.getChannel(), message, buttons);

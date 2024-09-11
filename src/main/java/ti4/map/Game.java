@@ -3763,6 +3763,15 @@ public class Game extends GameProperties {
     }
 
     @Nullable
+    public Planet getUnitHolderFromPlanet(String planetName) {
+        Tile tile_ = getTileFromPlanet(planetName);
+        if (tile_ == null) {
+            return null;
+        }
+        return tile_.getUnitHolderFromPlanet(planetName);
+    }
+
+    @Nullable
     public Player getPlayerFromColorOrFaction(String factionOrColor) {
         Player player = null;
         if (factionOrColor != null) {

@@ -2583,10 +2583,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, game, player);
         } else if (buttonID.startsWith("resolveExpedition_")) {
             ButtonHelper.resolveExpedition(buttonID, game, player, event);
-        } else if (buttonID.startsWith("resolveLocalFab_")) {
-            ButtonHelper.resolveLocalFab(buttonID, game, player, event);
-        } else if (buttonID.startsWith("resolveVolatile_")) {
-            ButtonHelper.resolveVolatile(buttonID, game, player, event);
         } else if (buttonID.startsWith("resolveCoreMine_")) {
             ButtonHelper.resolveCoreMine(buttonID, game, player, event);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
