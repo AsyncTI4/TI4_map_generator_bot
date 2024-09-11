@@ -817,5 +817,14 @@
         "text": "That player rerolls all of their dice.",
         "flavorText": "Unlenn sat on the edge of a knife, his ship groaning against the rift's horizon. His crew clung to their stations, eyes wide, as the enemy's munitions vanished into the void like pebbles dropped into a well.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "last_minute_deliberation",
+        "name": "Last Minute Deliberation",
+        "phase": "Agenda",
+        "window": "Before the \"Ready Planets\" step of the agenda phase",
+        "text": "Ready up to 2 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
+        "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
+        "source": "action_deck_2_old"
     }
 ]
