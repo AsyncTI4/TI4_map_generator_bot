@@ -610,7 +610,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                         message = "Wants to score a PO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their PO when everyone ahead of them is clear. ";
                         if (!game.isFowMode()) {
-                            message = message + player2.getRepresentation(true, true)
+                            message += player2.getRepresentation(true, true)
                                 + " is the one the game is currently waiting on";
                         }
                         String poID = buttonID.replace(Constants.PO_SCORING, "");
@@ -1213,14 +1213,13 @@ public class ButtonListener extends ListenerAdapter {
             }
             boolean sendReact = true;
             if ("empy".equalsIgnoreCase(type)) {
-                message = message + "a Watcher mech! The Watcher should be removed now by the owner.";
+                message += "a Watcher mech! The Watcher should be removed now by the owner.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     "Remove the watcher",
                     ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "mech"));
                 ButtonHelper.deleteMessage(event);
             } else if ("xxcha".equalsIgnoreCase(type)) {
-                message = message
-                    + "the \"Instinct Training\" tech! The tech has been exhausted and a strategy CC removed.";
+                message += "the \"Instinct Training\" tech! The tech has been exhausted and a strategy CC removed.";
                 if (player.hasTech(AliasHandler.resolveTech("Instinct Training"))) {
                     player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
                     if (player.getStrategicCC() > 0) {
@@ -1234,7 +1233,7 @@ public class ButtonListener extends ListenerAdapter {
                         "Someone clicked the Instinct Training button but did not have the tech.");
                 }
             } else if ("ac".equalsIgnoreCase(type)) {
-                message = message + "A Sabotage!";
+                message += "A Sabotage!";
                 boolean hasSabo = false;
                 String saboID = "3";
                 for (String AC : player.getActionCards().keySet()) {
@@ -3118,7 +3117,7 @@ public class ButtonListener extends ListenerAdapter {
                     game.drawSecretObjective(player.getUserID());
                     if (player.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player.getUserID());
-                        message = message + ". Drew a second SO due to Plausible Deniability";
+                        message += ". Drew a second SO due to Plausible Deniability";
                     }
                     SOInfo.sendSecretObjectiveInfo(game, player, event);
                     ButtonHelper.addReaction(event, false, false, message, "");
@@ -3132,7 +3131,7 @@ public class ButtonListener extends ListenerAdapter {
                     game.drawSecretObjective(player.getUserID());
                     if (player.hasAbility("plausible_deniability")) {
                         game.drawSecretObjective(player.getUserID());
-                        message = message + ". Drew a second SO due to Plausible Deniability";
+                        message += ". Drew a second SO due to Plausible Deniability";
                     }
                     SOInfo.sendSecretObjectiveInfo(game, player, event);
                     ButtonHelper.addReaction(event, false, false, message, "");
@@ -3474,12 +3473,11 @@ public class ButtonListener extends ListenerAdapter {
                     String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1);
                     boolean failed = false;
                     if (labelP.contains("inf") && labelP.contains("mech")) {
-                        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
+                        message += ButtonHelper.mechOrInfCheck(planetName, game, player);
                         failed = message.contains("Please try again.");
                     }
                     if (!failed) {
-                        message = message + "Gained 1TG (" + player.getTg() + "->" + (player.getTg() + 1) + ").";
-                        player.setTg(player.getTg() + 1);
+                        message += "Gained 1TG " + player.gainTG(1) + ".";
                         ButtonHelperAbilities.pillageCheck(player, game);
                         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     }
@@ -3493,27 +3491,21 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "gain1tgFromLetnevCommander" -> {
-                    String message = player.getRepresentation() + " Gained 1TG (" + player.getTg() + "->"
-                        + (player.getTg() + 1) + ") from Rear Admiral Farran, the Letnev commander.";
-                    player.setTg(player.getTg() + 1);
+                    String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from Rear Admiral Farran, the Letnev commander.";
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     MessageHelper.sendMessageToChannel(mainGameChannel, message);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "gain1tgFromMuaatCommander" -> {
-                    String message = player.getRepresentation() + " Gained 1TG (" + player.getTg() + "->"
-                        + (player.getTg() + 1) + ") from Magmus, the Muaat commander.";
-                    player.setTg(player.getTg() + 1);
+                    String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from Magmus, the Muaat commander.";
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     MessageHelper.sendMessageToChannel(mainGameChannel, message);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "gain1tgFromCommander" -> { // should be deprecated
-                    String message = player.getRepresentation() + " Gained 1TG (" + player.getTg() + "->"
-                        + (player.getTg() + 1) + ") from their commander";
-                    player.setTg(player.getTg() + 1);
+                    String message = player.getRepresentation() + " Gained 1TG " + player.gainTG(1) + " from their commander";
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     MessageHelper.sendMessageToChannel(mainGameChannel, message);
@@ -3521,9 +3513,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "mallice_2_tg" -> {
                     String playerRep = player.getFactionEmoji();
-                    String message = playerRep + " exhausted Mallice ability and gained 2TGs (" + player.getTg() + "->"
-                        + (player.getTg() + 2) + ").";
-                    player.setTg(player.getTg() + 2);
+                    String message = playerRep + " exhausted Mallice ability and gained 2TGs " + player.gainTG(2) + ".";
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
                     ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
@@ -4324,7 +4314,7 @@ public class ButtonListener extends ListenerAdapter {
                         message = player.getRepresentation()
                             + " Wants to score an SO but has people ahead of them in initiative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
                         if (!game.isFowMode()) {
-                            message = message + player2.getRepresentation(true, true)
+                            message += player2.getRepresentation(true, true)
                                 + " is the one the game is currently waiting on";
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
