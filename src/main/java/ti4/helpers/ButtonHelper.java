@@ -1226,8 +1226,7 @@ public class ButtonHelper {
             case "agenda" -> ShowDiscardedAgendas.showDiscards(game, event);
             case "relic" -> ShowRemainingRelics.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
-            case "unplayedAC" -> showUnplayedACs(game, event);
-            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC -> TechShowDeck.displayTechDeck(game, event, deck);
+            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);
             case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
                 List<String> types = new ArrayList<>();
                 String msg = "You may click this button to get the full text.";
@@ -9799,39 +9798,6 @@ public class ButtonHelper {
             }
         }
         return assignSpeakerButtons;
-    }
-
-    public static void showUnplayedACs(Game game, GenericInteractionCreateEvent event) {
-        List<String> unplayedACs = new ArrayList<>(game.getActionCards());
-        for (Player player : game.getRealPlayers()) {
-            unplayedACs.addAll(player.getActionCards().keySet());
-        }
-        List<String> unplayedACNames = new ArrayList<>();
-        for (String acID : unplayedACs) {
-            unplayedACNames.add(Mapper.getActionCard(acID).getName());
-        }
-        Collections.sort(unplayedACNames);
-        Map<String, Integer> namesNValues = new HashMap<String, Integer>();
-        for (String acName : unplayedACNames) {
-            if (namesNValues.containsKey(acName)) {
-                namesNValues.put(acName, namesNValues.get(acName) + 1);
-            } else {
-                namesNValues.put(acName, 1);
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(game.getName()).append("\n");
-        sb.append("Unplayed Action Cards: ").append("\n");
-        int x = 1;
-        List<String> sortedNamed = new ArrayList<>();
-        sortedNamed.addAll(namesNValues.keySet());
-        Collections.sort(sortedNamed);
-        for (String id : sortedNamed) {
-            sb.append(x).append(". " + id + " x" + namesNValues.get(id) + "\n");
-            x++;
-        }
-
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     public static void serveNextComponentActionButtons(GenericInteractionCreateEvent event, Game game,
