@@ -40,8 +40,8 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
         }
 
-        String publicSummary = "A transaction has been ratified:\n" + buildTransactionOffer(p1, p2, game, true) + p1.getFactionEmoji() + p2.getFactionEmoji() + " transaction details below: ";
-        String privateSummary = "The following transaction has been accepted:\n" + buildTransactionOffer(p1, p2, game, false);
+        String publicSummary = "A transaction has been ratified:\n" + buildTransactionOffer(p1, p2, game, true, true) + p1.getFactionEmoji() + p2.getFactionEmoji() + " transaction details below: ";
+        String privateSummary = "The following transaction has been accepted:\n" + buildTransactionOffer(p1, p2, game, false, false);
         MessageHelper.sendMessageToChannel(channel, publicSummary);
         for (Player sender : players) {
             Player receiver = p2;
@@ -114,14 +114,14 @@ public class TransactionHelper {
         }
     }
 
-    private static String buildTransactionOffer(Player p1, Player p2, Game game, boolean publiclyShared) {
+    private static String buildTransactionOffer(Player p1, Player p2, Game game, boolean hidePrivateCardText, boolean pingPlayers) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         StringBuilder trans = new StringBuilder();
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
         for (Player player : players) {
-            trans.append("> ").append(player.getRepresentation(false, publiclyShared)).append(" gives:\n");
+            trans.append("> ").append(player.getRepresentation(false, pingPlayers)).append(" gives:\n");
             boolean sendingNothing = true;
             for (String item : transactionItems) {
                 if (!item.contains("sending" + player.getFaction())) {
@@ -180,7 +180,7 @@ public class TransactionHelper {
                                     }
                                 }
                                 trans.append(Emojis.ActionCard);
-                                if (!publiclyShared) {
+                                if (!hidePrivateCardText) {
                                     trans.append(Emojis.ActionCard).append(" ").append(Mapper.getActionCard(acID).getName());
                                 }
                             }
@@ -190,7 +190,7 @@ public class TransactionHelper {
                     case "PNs" -> {
                         switch (furtherDetail) {
                             case "generic" -> {
-                                if (!publiclyShared) {
+                                if (!hidePrivateCardText) {
                                     trans.append(amountToTransact).append(" ").append(Emojis.PN).append(" to be specified verbally");
                                 }
                             }
@@ -211,7 +211,7 @@ public class TransactionHelper {
                                     // continue;
                                 }
                                 trans.append(Emojis.PN);
-                                if (!publiclyShared) {
+                                if (!hidePrivateCardText) {
                                     trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse(""))).append(" ").append(Mapper.getPromissoryNote(id).getName());
                                 }
                             }
@@ -276,7 +276,7 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false) + "\n";
+        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false) + "\n";
         String requestOrOffer = "offer";
         if (requesting) {
             requestOrOffer = "request";
@@ -488,10 +488,10 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
             + "\n## Click something else that you want to request from " + p1.getRepresentation(false, false);
         if (p1 == player) {
-            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
                 + "\n## Click something else that YOU want to offer";
         }
         event.getMessage().delete().queue();
@@ -508,10 +508,10 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
             + "\n## Click something that you want to request from " + p1.getRepresentation(false, false);
         if (p1 == player) {
-            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
                 + "\n## Click something that YOU want to offer";
         }
         event.getMessage().delete().queue();
@@ -523,13 +523,13 @@ public class TransactionHelper {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " sent a transaction offer to " + p2.getFactionEmoji());
         if (game.getTableTalkChannel() != null) {
-            String offerMessage = "An offer has been sent by " + player.getFactionEmoji() + " to " + p2.getFactionEmoji() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true);
+            String offerMessage = "An offer has been sent by " + player.getFactionEmoji() + " to " + p2.getFactionEmoji() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true, false);
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
         }
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.danger("rescindOffer_" + p2.getFaction(), "Rescind Offer"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false), buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false, false), buttons);
 
         event.getMessage().delete().queue();
 
@@ -544,7 +544,7 @@ public class TransactionHelper {
         buttons.add(Button.success("acceptOffer_" + player.getFaction() + "_" + offerNumber, "Accept"));
         buttons.add(Button.danger("rejectOffer_" + player.getFaction(), "Reject"));
         buttons.add(Button.danger("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));
-        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer from " + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false), buttons);
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer from " + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false, false), buttons);
     }
 
     @ButtonHandler("transact_")
