@@ -551,7 +551,7 @@ public class MiltyDraftManager {
         for (MiltyDraftSlice slice : getSlices()) {
             if (isSliceTaken(slice.getName())) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getMiltyDraftEmoji(slice.getName()));
-            Button button = Buttons.green("milty_slice_" + slice.getName(), "",  emoji.getFormatted());
+            Button button = Buttons.green("milty_slice_" + slice.getName(), " ",  emoji.getFormatted());
             sliceButtons.add(button);
         }
         return sliceButtons;
@@ -578,7 +578,7 @@ public class MiltyDraftManager {
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getSpeakerPickEmoji(speakerOrder));
-            Button button = Buttons.green("milty_order_" + speakerOrder, "",  emoji.getFormatted());
+            Button button = Buttons.green("milty_order_" + speakerOrder, " ",  emoji.getFormatted());
             orderButtons.add(button);
         }
         return orderButtons;
