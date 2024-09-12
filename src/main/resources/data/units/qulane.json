@@ -57,7 +57,7 @@
         "capacityValue": 3,
         "cost": 8,
         "combatHitsOn": 7,
-        "combatDieCount": 1,
+        "combatDieCount": 2,
         "afbHitsOn": 5,
         "afbDieCount": 1,
         "bombardHitsOn": 5,
