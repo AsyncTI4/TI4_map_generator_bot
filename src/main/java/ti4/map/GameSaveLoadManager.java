@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -86,17 +87,12 @@ public class GameSaveLoadManager {
     public static final String PLAYER = "-player-";
     public static final String ENDPLAYER = "-endplayer-";
 
-    // TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100% WORKING
-    public static final boolean loadFromJSON = false;
-
     // Log the save times for each map for benchmarking
     private static final List<Long> saveTimes = new ArrayList<>();
-    private static long jsonTime = 0L;
     private static long txtTime = 0L;
     private static long undoTime = 0L;
 
     public static void saveMaps() {
-        jsonTime = txtTime = undoTime = 0L;
         // TODO: Make sure all commands and buttons and such actually save the game
         AtomicInteger savedGamesCount = new AtomicInteger();
         AtomicInteger skippedGamesCount = new AtomicInteger();
@@ -126,9 +122,8 @@ public class GameSaveLoadManager {
 
             String sb = "Map save time stats:\n```fix" + "\n" + debugString("        total:", tot, tot) +
                 "\n" + debugString("          txt:", txtTime, tot) +
-                "\n" + debugString("         json:", jsonTime, tot) +
                 "\n" + debugString("    undo file:", undoTime, tot) +
-                "\n" + debugString("  other stuff:", tot - txtTime - jsonTime - undoTime, tot) +
+                "\n" + debugString("  other stuff:", tot - txtTime - undoTime, tot) +
                 "\n```";
             BotLogger.logWithTimestamp(sb);
         }
@@ -180,17 +175,13 @@ public class GameSaveLoadManager {
             "Last Command Unknown - No Event Provided",
             "Bot Reload",
             "Auto Ping"));
-        boolean lastSaveTrivial = trivialSaveReasons.contains(game.getLatestCommand());
+        //boolean lastSaveTrivial = trivialSaveReasons.contains(game.getLatestCommand());
         boolean thisSaveTrivial = saveReason == null || trivialSaveReasons.contains(saveReason);
-        if (keepModifiedDate && game.isHasEnded() && lastSaveTrivial && thisSaveTrivial) {
+        //if (keepModifiedDate && game.isHasEnded() && lastSaveTrivial && thisSaveTrivial) {
             // return;
-        }
+        //}
 
-        if (saveReason != null) {
-            game.setLatestCommand(saveReason);
-        } else {
-            game.setLatestCommand("Last Command Unknown - No Event Provided");
-        }
+        game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
 
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
@@ -201,18 +192,7 @@ public class GameSaveLoadManager {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
 
-        long jsonStart = System.nanoTime();
-        if (loadFromJSON || System.getenv("TESTING") != null) {
-            saveMapJson(game);
-            if (loadFromJSON) return; // DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
-        }
-        jsonTime += System.nanoTime() - jsonStart;
-
         File mapFile = Storage.getMapImageStorage(game.getName() + TXT);
-        if (!mapFile.exists()) {
-            BotLogger.log("Could not save map, error creating save file");
-            return;
-        }
 
         long txtStart = System.nanoTime();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {

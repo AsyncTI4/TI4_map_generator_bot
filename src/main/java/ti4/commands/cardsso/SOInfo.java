@@ -72,8 +72,8 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         // SCORE/DISCARD BUTTONS
         String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
         List<Button> buttons = new ArrayList<>();
-        Button scoreB = Button.primary("get_so_score_buttons", "Score an SO");
-        Button discardB = Button.danger("get_so_discard_buttons", "Discard an SO");
+        Button scoreB = Buttons.blue("get_so_score_buttons", "Score an SO");
+        Button discardB = Buttons.red("get_so_discard_buttons", "Discard an SO");
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
         buttons.add(scoreB);
         buttons.add(discardB);
@@ -168,7 +168,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
                 }
             }
         }

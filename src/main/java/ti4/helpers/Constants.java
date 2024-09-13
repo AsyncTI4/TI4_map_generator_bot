@@ -1161,4 +1161,5 @@ public class Constants {
     public static final String GAME_LAUNCH_THREAD_ID = "game_launch_thread_id";
     public static final String INCLUDE_HUB = "include_hub";
     public static final String GAME_TAGS = "game_tags";
+    public static final String SHOW_UNPLAYED_AC = "show_unplayed_ac";
 }

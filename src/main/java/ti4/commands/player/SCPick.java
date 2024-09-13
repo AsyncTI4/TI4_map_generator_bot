@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
@@ -124,14 +125,14 @@ public class SCPick extends PlayerSubcommandData {
             }
             if (p2.getSCs().size() < maxSCsPerPlayer) {
                 if (game.isFowMode()) {
-                    buttons.add(Button.secondary("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
+                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
                 } else {
-                    buttons.add(Button.secondary("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
+                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                 }
             }
         }
         if (buttons.size() == 0) {
-            buttons.add(Button.secondary("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+            buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
         }
 
         return buttons;
@@ -405,14 +406,14 @@ public class SCPick extends PlayerSubcommandData {
             for (Player p2 : game.getRealPlayers()) {
                 List<Button> buttons = new ArrayList<>();
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
-                    buttons.add(Button.success("startQDN", "Use Quantum Datahub Node"));
-                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node"));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you have the opportunity to use QDN", buttons);
                 }
                 buttons = new ArrayList<>();
                 if (game.getLaws().containsKey("arbiter") && game.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())) {
-                    buttons.add(Button.success("startArbiter", "Use Imperial Arbiter"));
-                    buttons.add(Button.danger("deleteButtons", "Decline"));
+                    buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter"));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
                         p2.getRepresentation(true, true) + " you have the opportunity to use Imperial Arbiter", buttons);
                 }

@@ -240,7 +240,7 @@ public class Setup extends PlayerSubcommandData {
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
-                Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
+                Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Tech Options");
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(getTech);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),

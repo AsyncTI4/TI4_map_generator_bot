@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
+import ti4.buttons.Buttons;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.user.UserSettings;
@@ -311,7 +312,6 @@ public class Player {
     }
 
     public List<String> getTransactionItems() {
-        System.out.println(transactionItems); //TODO: delete
         return transactionItems;
     }
 
@@ -2451,8 +2451,8 @@ public class Player {
                 .contains("attachment_nanoforge.png")
             && !getExhaustedPlanetsAbilities().contains(planet)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
-            buttons.add(Button.danger("deleteButtons", "Decline"));
+            buttons.add(Buttons.green("planetAbilityExhaust_" + planet, "Use Nanoforge Ability"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(),
                 getRepresentation() + " You may choose to Exhaust Nanoforge Ability to ready the planet.", buttons);
         }

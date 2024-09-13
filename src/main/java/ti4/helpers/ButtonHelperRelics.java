@@ -3,11 +3,11 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -19,11 +19,9 @@ public class ButtonHelperRelics {
         String faction2 = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction2);
         if (p2 != null) {
-            Button sdButton = Button.success("jrStructure_sd", "Place 1 space dock");
-            sdButton = sdButton.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-            Button pdsButton = Button.success("jrStructure_pds", "Place 1 PDS");
-            pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Emojis.pds));
-            Button tgButton = Button.success("jrStructure_tg", "Gain 1TG");
+            Button sdButton = Buttons.green("jrStructure_sd", "Place 1 space dock", Emojis.spacedock);
+            Button pdsButton = Buttons.green("jrStructure_pds", "Place 1 PDS", Emojis.pds);
+            Button tgButton = Buttons.green("jrStructure_tg", "Gain 1TG");
             List<Button> buttons = new ArrayList<>();
             buttons.add(sdButton);
             buttons.add(pdsButton);

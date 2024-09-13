@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.status.ScorePublic;
@@ -57,7 +58,7 @@ public class ButtonHelperSCs {
         String message = trueIdentity + " Click the names of the planets you wish to ready";
 
         List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
-        Button doneRefreshing = Button.danger("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
+        Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(
@@ -103,15 +104,15 @@ public class ButtonHelperSCs {
             String message = deductCC(player, event);
             ButtonHelper.addReaction(event, false, false, message, "");
         }
-        Button getTactic = Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
-        Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
-        Button getStrat = Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-        Button exhaust = Button.danger("nekroTechExhaust", "Exhaust Planets");
-        Button doneGainingCC = Button.danger("deleteButtons_technology", "Done Gaining CCs");
+        Button getTactic = Buttons.green("increase_tactic_cc", "Gain 1 Tactic CC");
+        Button getFleet = Buttons.green("increase_fleet_cc", "Gain 1 Fleet CC");
+        Button getStrat = Buttons.green("increase_strategy_cc", "Gain 1 Strategy CC");
+        Button exhaust = Buttons.red("nekroTechExhaust", "Exhaust Planets");
+        Button doneGainingCC = Buttons.red("deleteButtons_technology", "Done Gaining CCs");
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         String message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
             + ". Use buttons to gain CCs";
-        Button resetCC = Button.secondary(player.getFinsFactionCheckerPrefix() + "resetCCs",
+        Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs",
             "Reset CCs");
         List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
         List<Button> buttons2 = Collections.singletonList(exhaust);
@@ -468,7 +469,7 @@ public class ButtonHelperSCs {
         player.addFollowedSC(leadershipInitiative, event);
         String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        Button doneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
+        Button doneExhausting = Buttons.red("deleteButtons_leadership", "Done Exhausting Planets");
         buttons.add(doneExhausting);
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
@@ -479,16 +480,16 @@ public class ButtonHelperSCs {
         message = trueIdentity + "! Your current CCs are " + player.getCCRepresentation()
             + ". Use buttons to gain CCs";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
-        Button getTactic = Button.success(player.getFinsFactionCheckerPrefix() + "increase_tactic_cc",
+        Button getTactic = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_tactic_cc",
             "Gain 1 Tactic CC");
-        Button getFleet = Button.success(player.getFinsFactionCheckerPrefix() + "increase_fleet_cc", "Gain 1 Fleet CC");
-        Button getStrat = Button.success(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc",
+        Button getFleet = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_fleet_cc", "Gain 1 Fleet CC");
+        Button getStrat = Buttons.green(player.getFinsFactionCheckerPrefix() + "increase_strategy_cc",
             "Gain 1 Strategy CC");
-        // Button exhaust = Button.danger(finsFactionCheckerPrefix +
+        // Button exhaust = Buttons.red(finsFactionCheckerPrefix +
         // "leadershipExhaust", "Exhaust Planets");
-        Button doneGainingCC = Button.danger(player.getFinsFactionCheckerPrefix() + "deleteButtons_leadership",
+        Button doneGainingCC = Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons_leadership",
             "Done Gaining CCs");
-        Button resetCC = Button.secondary(player.getFinsFactionCheckerPrefix() + "resetCCs",
+        Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs",
             "Reset CCs");
         List<Button> buttons2 = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
         if (!game.isFowMode()) {
@@ -540,7 +541,7 @@ public class ButtonHelperSCs {
                             List<Button> buttonsToRemoveCC = new ArrayList<>();
                             String finChecker = "FFCC_" + player.getFaction() + "_";
                             for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, game, event)) {
-                                buttonsToRemoveCC.add(Button.success(
+                                buttonsToRemoveCC.add(Buttons.green(
                                     finChecker + "removeCCFromBoard_mahactAgent" + p2.getFaction() + "_"
                                         + tile.getPosition(),
                                     tile.getRepresentationForButtons(game, player)));

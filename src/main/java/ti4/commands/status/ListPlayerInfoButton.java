@@ -43,19 +43,19 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
     public static void offerInfoButtons(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
-        buttons.add(Button.success("offerInfoButtonStep2_objective", "Objective Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_abilities", "Ability Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_stats", "Player Stats Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_agent", "Agent Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_commander", "Commander Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_hero", "Hero Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_relic", "Relic Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_planet", "Planet Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_units", "Special Units"));
-        buttons.add(Button.success("offerInfoButtonStep2_pn", "Faction PN"));
-        buttons.add(Button.success("offerInfoButtonStep2_tech", "Researched Tech"));
-        buttons.add(Button.success("offerInfoButtonStep2_ftech", "Faction Tech"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_objective", "Objective Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_abilities", "Ability Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_stats", "Player Stats Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_agent", "Agent Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_commander", "Commander Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_hero", "Hero Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_relic", "Relic Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_planet", "Planet Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_units", "Special Units"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_pn", "Faction PN"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Tech"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Tech"));
         buttons.add(Buttons.REFRESH_INFO);
         String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every factions";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -67,17 +67,17 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         List<Button> buttons = new ArrayList<>();
         String msg = "";
         if (category.equalsIgnoreCase("objective")) {
-            buttons.add(Button.success("showObjInfo_both", "All Objectives in Game"));
-            buttons.add(Button.primary("showObjInfo_1", "All Stage 1s Possible"));
-            buttons.add(Button.primary("showObjInfo_2", "All Stage 2s Possible"));
+            buttons.add(Buttons.green("showObjInfo_both", "All Objectives in Game"));
+            buttons.add(Buttons.blue("showObjInfo_1", "All Stage 1s Possible"));
+            buttons.add(Buttons.blue("showObjInfo_2", "All Stage 2s Possible"));
         } else {
             for (Player p2 : game.getRealPlayers()) {
-                Button button = Button.secondary("offerInfoButtonStep3_" + category + "_" + p2.getFaction(), " ");
+                Button button = Buttons.gray("offerInfoButtonStep3_" + category + "_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
             }
-            buttons.add(Button.success("offerInfoButtonStep3_" + category + "_all", "All Factions"));
+            buttons.add(Buttons.green("offerInfoButtonStep3_" + category + "_all", "All Factions"));
 
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);

@@ -41,6 +41,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
 import ti4.AsyncTI4DiscordBot;
+import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
@@ -122,7 +123,7 @@ public class MessageHelper {
 						.map(fileName -> fileName.replace(Constants.TXT, ""))
 						.map(Integer::parseInt).toList();
 					int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-					newButtons.add(Button.secondary("ultimateUndo_" + maxNumber, "UNDO"));
+					newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
 				} catch (Exception e) {
 					BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
 				}
