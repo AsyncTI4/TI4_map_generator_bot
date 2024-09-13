@@ -1,14 +1,15 @@
 package ti4.generator;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.List;
+
 import ti4.helpers.ImageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.List;
 
 public class ObjectiveBox {
 	public static final int objectiveBoxHeight = 38;
@@ -55,9 +56,8 @@ public class ObjectiveBox {
 		return maxTextWidth;
 	}
 
-
 	public static Integer GetMinimumBoxWidth(Game game) {
-		return game.isRedTapeMode() ? 800: 400;
+		return game.isRedTapeMode() ? 800 : 400;
 	}
 
 	public static Integer GetBoxWidth(Game game, Integer maxTextWidth, Integer scoreTokenWidth) {
@@ -82,7 +82,7 @@ public class ObjectiveBox {
 			return;
 		}
 		try {
-			for (String playerID: playerIDs) {
+			for (String playerID : playerIDs) {
 				Player player = game.getPlayer(playerID);
 				boolean convertToGeneric = generator.shouldConvertToGeneric(player);
 				String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
@@ -93,17 +93,15 @@ public class ObjectiveBox {
 
 				BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
 
-				if (objective.isMultiScoring(game)) {
+				if (objective.isMultiScoring(game) || game.isFowMode()) {
 					int frequency = Collections.frequency(playerIDs, playerID);
 					for (int i = 0; i < frequency; i++) {
 						MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
 						x += scoreTokenWidth;
 					}
 				} else {
-					MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
-				}
-				if (!objective.isMultiScoring(game)) {
-					x += scoreTokenWidth;
+					int xPosition = x + scoreTokenWidth * (game.getRealPlayers().indexOf(player));
+					MapGenerator.drawControlToken(graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
 				}
 			}
 		} catch (Exception e) {

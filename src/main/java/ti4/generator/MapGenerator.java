@@ -184,9 +184,9 @@ public class MapGenerator {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         if (bufferedImage != null)
-            scoreTokenWidth = bufferedImage.getWidth();
+            scoreTokenWidth = bufferedImage.getWidth() + 8;
         else
-            scoreTokenWidth = 14;
+            scoreTokenWidth = 30;
 
         int stage1 = game.getRevealedPublicObjectives().keySet().stream()
             .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
