@@ -2682,6 +2682,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("resolveCounterStroke_")) {
             ButtonHelperActionCards.resolveCounterStroke(game, player, event, buttonID);
+        } else if (buttonID.startsWith("sendTGTo_")) {
+            AgendaHelper.erase1DebtTo(game, buttonID, event, player);
         } else if (buttonID.startsWith("primaryOfWarfare")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
             MessageChannel channel = player.getCorrectChannel();

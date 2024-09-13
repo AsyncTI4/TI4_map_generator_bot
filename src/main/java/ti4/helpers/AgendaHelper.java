@@ -1,7 +1,18 @@
 package ti4.helpers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -9,7 +20,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -35,6 +45,7 @@ import ti4.commands.cardsac.DrawAC;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetExhaust;
+import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
@@ -1293,8 +1304,32 @@ public class AgendaHelper {
                     continue;
                 }
                 String msg = player.getRepresentation() + " This is a reminder that you owe debt to " + ButtonHelper.getIdentOrColor(p2, game) + " and now could be a good time to pay it (or get it cleared if it was paid already)";
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                List<Button> buttons = new ArrayList<>();
+                if (player.getTg() > 0) {
+                    buttons.add(Button.success("sendTGTo_" + p2.getFaction() + "_tg", "Send 1 TG"));
+                }
+                buttons.add(Button.primary("sendTGTo_" + p2.getFaction() + "_debt", "Erase 1 debt"));
+                buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
             }
+        }
+    }
+
+    public static void erase1DebtTo(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String tgOrDebt = buttonID.split("_")[2];
+        ClearDebt.clearDebt(p2, player, 1);
+        String msg = "1 debt owed by " + player.getRepresentation() + " to " + p2.getRepresentation() + " was cleared. " + p2.getDebtTokenCount(player.getColor()) + " debt remains.";
+        if (tgOrDebt.equalsIgnoreCase("tg")) {
+            player.setTg(player.getTg() - 1);
+            p2.setTg(p2.getTg() + 1);
+            msg = player.getRepresentation(false, false) + " sent 1 tg to " + p2.getRepresentation(false, false) + ".\n" + msg;
+            ButtonHelperAbilities.pillageCheck(p2, game);
+            ButtonHelperAbilities.pillageCheck(player, game);
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        if (p2.getDebtTokenCount(player.getColor()) < 1) {
+            event.getMessage().delete().queue();
         }
     }
 
