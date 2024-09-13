@@ -1,6 +1,6 @@
 package ti4.commands.game;
 
-import static ti4.helpers.StringHelper.ordinal;
+import static ti4.helpers.StringHelper.*;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -224,10 +224,10 @@ public class GameEnd extends GameSubcommandData {
                     summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
                         m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
                         m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
-                          t -> {
-                            sendFeedbackMessage(t, game);
-                            sendRoundSummariesToThread(t, game);
-                          });
+                            t -> {
+                                sendFeedbackMessage(t, game);
+                                sendRoundSummariesToThread(t, game);
+                            });
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
                     });
@@ -247,12 +247,12 @@ public class GameEnd extends GameSubcommandData {
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
-            summaryChannel.createThreadChannel(gameName, true).queue( 
-                t -> { 
+            summaryChannel.createThreadChannel(gameName, true).queue(
+                t -> {
                     MessageHelper.sendMessageToChannel(t, gameEndText);
                     sendFeedbackMessage(t, game);
                     sendRoundSummariesToThread(t, game);
-            });
+                });
         }
     }
 
@@ -286,7 +286,7 @@ public class GameEnd extends GameSubcommandData {
         }
         message.append(
             "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
-        
+
         MessageHelper.sendMessageToChannel(t, message.toString());
     }
 
@@ -375,7 +375,7 @@ public class GameEnd extends GameSubcommandData {
                     .append(playerCount).append("P)")
                     .append(", this path has been seen ")
                     .append(winningPathCount - 1)
-                    .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
+                    .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of " + winningPathCounts.size() + " paths) at ")
                     .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
                 if (winningPathCount == 1) {
                     sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");

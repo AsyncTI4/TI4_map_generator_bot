@@ -3,7 +3,6 @@ package ti4.generator;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.List;
 
 import ti4.helpers.ImageHelper;
@@ -94,11 +93,9 @@ public class ObjectiveBox {
 				BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
 
 				if (objective.isMultiScoring(game) || game.isFowMode()) {
-					int frequency = Collections.frequency(playerIDs, playerID);
-					for (int i = 0; i < frequency; i++) {
-						MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
-						x += scoreTokenWidth;
-					}
+					MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
+					x += scoreTokenWidth;
+
 				} else {
 					int xPosition = x + scoreTokenWidth * (game.getRealPlayers().indexOf(player));
 					MapGenerator.drawControlToken(graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
