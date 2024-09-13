@@ -1462,6 +1462,11 @@ public class Player {
 
     @JsonIgnore
     public String getRepresentation(boolean overrideFow, boolean ping) {
+        return getRepresentation(overrideFow, ping, false);
+    }
+
+    @JsonIgnore
+    public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor) {
         Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
         if (privateGame && !overrideFow) {
@@ -1480,10 +1485,10 @@ public class Player {
                     if (ping) {
                         sb.append(" ").append(userById.getAsMention());
                     } else {
-                        sb.append(" ").append(userById.getEffectiveName());
+                        //sb.append(" ").append(userById.getEffectiveName());
                     }
                 }
-                if (getColor() != null && !"null".equals(getColor())) {
+                if (getColor() != null && !"null".equals(getColor()) && !noColor) {
                     sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
                 }
                 return sb.toString();
@@ -1508,7 +1513,7 @@ public class Player {
             sb.append(getUserName());
         }
         sb.append(getGlobalUserSetting("emojiAfterName").orElse(""));
-        if (getColor() != null && !"null".equals(getColor())) {
+        if (getColor() != null && !"null".equals(getColor()) && !noColor) {
             sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
         }
         return sb.toString();

@@ -3818,7 +3818,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "mitosisMech" -> ButtonHelperAbilities.resolveMitosisMech(buttonID, event, game, player,
                     ident, finsFactionCheckerPrefix);
-                case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, false, true, false);
+                case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, false, true, false, false);
                 case "cardsInfo" -> CardsInfo.sendCardsInfo(game, player, event);
                 case "showMap" -> ShowGame.showMap(game, event);
                 case "showGameAgain" -> ShowGame.simpleShowGame(game, event);

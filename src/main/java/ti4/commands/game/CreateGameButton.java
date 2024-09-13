@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.bothelper.CreateGameChannels;
+import ti4.commands.search.SearchMyGames;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -69,6 +70,13 @@ public class CreateGameButton extends GameSubcommandData {
                 Member member = event.getOption("player" + i).getAsMember();
                 if (member != null)
                     members.add(member);
+                if (member.getId().equalsIgnoreCase("400038967744921612")) {
+                    int amount = SearchMyGames.searchGames(member.getUser(), event, false, false, false, true, false, true, false, true);
+                    if (amount > 4) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
+                        return;
+                    }
+                }
                 if (gameOwner == null)
                     gameOwner = member;
             } else {
