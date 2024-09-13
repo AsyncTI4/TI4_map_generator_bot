@@ -106,6 +106,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Game could not be found");
             return;
         }
+        String ogID = cardID;
 
         cardID = cardID.replace("extra1", "");
         cardID = cardID.replace("extra2", "");
@@ -140,7 +141,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         switch (exploreModel.getResolution().toLowerCase()) {
             case Constants.FRAGMENT -> {
                 player.addFragment(cardID);
-                game.purgeExplore(cardID);
+                game.purgeExplore(ogID);
             }
             case Constants.ATTACH -> {
                 String attachment = exploreModel.getAttachmentId().orElse("");
@@ -194,7 +195,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         }
                     }
                     tile.addToken(attachmentFilename, planetID);
-                    game.purgeExplore(cardID);
+                    game.purgeExplore(ogID);
                     message = "Attachment `" + attachment + "` added to planet";
                     if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
                         ButtonHelper.commanderUnlockCheck(player, game, "sol", event);
@@ -229,7 +230,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your stats, readied, and explored!";
                     }
-                    game.purgeExplore(cardID);
+                    game.purgeExplore(ogID);
                 }
             }
         }
@@ -258,7 +259,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "ed1", "ed2" -> {
                 message = "Card has been added to play area.";
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
-                game.purgeExplore(cardID);
+                game.purgeExplore(ogID);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             }
             case "lc1", "lc2" -> {
@@ -580,7 +581,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
             }
             case "starchartcultural", "starchartindustrial", "starcharthazardous", "starchartfrontier" -> {
-                game.purgeExplore(cardID);
+                game.purgeExplore(ogID);
                 player.addRelic(cardID);
                 message = "Card has been added to play area.\nAdded as a relic (not actually a relic)";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);

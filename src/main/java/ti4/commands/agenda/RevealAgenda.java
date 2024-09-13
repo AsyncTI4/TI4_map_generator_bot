@@ -152,12 +152,6 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         game.setStoredValue("Pass On Shenanigans", "");
         game.setStoredValue("Abstain On Agenda", "");
-        if (!action) {
-            AgendaHelper.offerEveryonePrepassOnShenanigans(game);
-            AgendaHelper.offerEveryonePreAbstain(game);
-            AgendaHelper.checkForAssigningGeneticRecombination(game);
-            AgendaHelper.checkForPoliticalSecret(game);
-        }
         game.resetCurrentAgendaVotes();
         game.setHasHackElectionBeenPlayed(false);
         game.setPlayersWhoHitPersistentNoAfter("");
@@ -169,6 +163,13 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
+        if (!action) {
+            AgendaHelper.offerEveryonePrepassOnShenanigans(game);
+            AgendaHelper.offerEveryonePreAbstain(game);
+            AgendaHelper.checkForAssigningGeneticRecombination(game);
+            AgendaHelper.checkForPoliticalSecret(game);
+        }
+
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + "\nAn agenda has been revealed";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
