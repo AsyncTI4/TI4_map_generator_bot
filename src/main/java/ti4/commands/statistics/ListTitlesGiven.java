@@ -55,6 +55,9 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
         longMsg.append("\nThe number of titles each person has: \n");
         Map<String, Integer> sortedMapAscPlayers = sortByValue(titlesAPersonHas, false);
         for (String person : sortedMapAscPlayers.keySet()) {
+            if (event.getGuild().getMemberById(person) == null) {
+                continue;
+            }
             longMsg.append(event.getGuild().getMemberById(person).getEffectiveName()).append(": ").append(sortedMapAscPlayers.get(person)).append(" \n");
         }
         if (titleOnly) {
@@ -65,6 +68,9 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
                     continue;
                 }
                 String person = personNTitle.split("_")[0];
+                if (event.getGuild().getMemberById(person) == null) {
+                    continue;
+                }
                 longMsg.append(event.getGuild().getMemberById(person).getEffectiveName()).append(": ").append(sortedMapAscPlayersNTitles.get(personNTitle)).append(" \n");
             }
         }
