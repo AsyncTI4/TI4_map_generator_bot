@@ -6116,7 +6116,7 @@ public class ButtonHelper {
         } else {
             if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != null
                 && opponent != player) {
-                String msg = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h
+                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " you suffered " + h
                     + " hit" + (h == 1 ? "" : "s");
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();

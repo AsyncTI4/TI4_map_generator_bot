@@ -118,17 +118,19 @@ public class CheckDistance extends SpecialSubcommandData {
                 Tile tile = game.getTileByPosition(existingPosition);
                 int num = 0;
                 int distance = i;
+
+                if (tile == null || (tile.isNebula() && player != null && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research")) || (tile.isSupernova() && player != null && !player.getAbilities().contains("gashlai_physiology")) || (tile.isAsteroidField() && player != null && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd"))) {
+                    continue;
+                }
                 if (!forMap) {
-                    if (tile == null || (tile.isNebula() && player != null && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research")) || (tile.isSupernova() && player != null && !player.getAbilities().contains("gashlai_physiology")) || (tile.isAsteroidField() && player != null && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd"))) {
-                        continue;
-                    }
                     if (tile != null && tile.isGravityRift(game)) {
                         num = -1;
                     }
-                    if (distances.get(existingPosition) != null) {
-                        distance = distances.get(existingPosition) + 1;
-                    }
                 }
+                if (distances.get(existingPosition) != null) {
+                    distance = distances.get(existingPosition) + 1;
+                }
+
                 addAdjacentPositionsIfNotThereYet(game, existingPosition, distances, player, distance + num);
             }
         }
