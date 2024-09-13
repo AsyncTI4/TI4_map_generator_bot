@@ -184,7 +184,7 @@ public class MapGenerator {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         if (bufferedImage != null)
-            scoreTokenWidth = bufferedImage.getWidth() + 8;
+            scoreTokenWidth = bufferedImage.getWidth() + 6;
         else
             scoreTokenWidth = 30;
 
