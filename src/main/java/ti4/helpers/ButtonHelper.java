@@ -149,6 +149,7 @@ public class ButtonHelper {
             buttons.add(Button.primary("bestowTitleStep1_A Brilliant Tactician", "A Brilliant Tactician"));
             buttons.add(Button.primary("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
             buttons.add(Button.primary("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
+            buttons.add(Button.primary("bestowTitleStep1_Shard Fumbler", "Shard Fumbler"));
             buttons.add(Button.secondary("bestowTitleStep1_Observer", "Observer"));
 
             buttons.add(Button.danger("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
@@ -9283,6 +9284,11 @@ public class ButtonHelper {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName;
         for (ThreadChannel threadChannel_ : threadChannels) {
+            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+                if (!threadChannel_.getMembers().contains(game.getGuild().getMemberById(player.getUserID()))) {
+                    continue;
+                }
+            }
             if ((threadChannel_.getName().startsWith(threadName)
                 || threadChannel_.getName().equals(threadName + "WinnuHero"))
                 && (!"technology".equalsIgnoreCase(stratName) || !game.isComponentAction())) {
