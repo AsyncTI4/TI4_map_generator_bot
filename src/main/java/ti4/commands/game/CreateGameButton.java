@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.AsyncTI4DiscordBot;
+import ti4.buttons.Buttons;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.search.SearchMyGames;
 import ti4.helpers.Constants;
@@ -88,7 +89,7 @@ public class CreateGameButton extends GameSubcommandData {
 
         String buttonMsg = "";
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("createGameChannels", "Create Game"));
+        buttons.add(Buttons.green("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
         if (members.size() > 0) {
             buttonMsg = "Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n";

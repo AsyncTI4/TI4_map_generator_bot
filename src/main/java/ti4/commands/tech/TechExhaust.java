@@ -139,24 +139,24 @@ public class TechExhaust extends TechAddRemove {
                 ButtonHelper.resolveTransitDiodesStep1(game, player);
             }
             case "miltymod_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
-                Button gainCC = Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
+                Button gainCC = Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC");
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getFactionEmojiOrColor() + " use button to gain 1 CC:", List.of(gainCC));
             }
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC"));
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CC", "Gain CC"));
                 if (player.getStrategicCC() > 0) {
                     for (Leader leader : player.getLeaders()) {
                         if (leader.isExhausted() && leader.getId().contains("agent")) {
-                            buttons.add(Button.primary(
+                            buttons.add(Buttons.blue(
                                 player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + leader.getId(),
                                 "Ready " + leader.getId()));
                         }
                     }
                     for (String relic : player.getExhaustedRelics()) {
                         if ("titanprototype".equalsIgnoreCase("relic") || "absol_jr".equalsIgnoreCase(relic)) {
-                            buttons.add(Button.primary(
+                            buttons.add(Buttons.blue(
                                 player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + relic,
                                 "Ready JR"));
                         }
@@ -181,7 +181,7 @@ public class TechExhaust extends TechAddRemove {
             }
             case "pi", "absol_pi" -> { // Predictive Intelligence
                 deleteTheOneButtonIfButtonEvent(event);
-                Button deleteButton = Button.danger("FFCC_" + player.getFaction() + "_deleteButtons",
+                Button deleteButton = Buttons.red("FFCC_" + player.getFaction() + "_deleteButtons",
                     "Delete These Buttons");
                 String message = player.getRepresentation(false, true) + " use buttons to redistribute";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
@@ -198,9 +198,9 @@ public class TechExhaust extends TechAddRemove {
                         continue;
                     }
                     if (game.isFowMode()) {
-                        buttons.add(Button.secondary(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
+                        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), p2.getColor()));
                     } else {
-                        Button button = Button.secondary(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
+                        Button button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "getACFrom_" + p2.getFaction(), " ");
                         String factionEmojiString = p2.getFactionEmoji();
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                         buttons.add(button);
@@ -302,7 +302,7 @@ public class TechExhaust extends TechAddRemove {
                 for (Tile tile : tiles) {
                     if (!pos2.contains(tile.getPosition())) {
                         String buttonID = "produceOneUnitInTile_" + tile.getPosition() + "_sling";
-                        Button tileButton = Button.success(buttonID,
+                        Button tileButton = Buttons.green(buttonID,
                             tile.getRepresentationForButtons(game, player));
                         buttons.add(tileButton);
                         pos2.add(tile.getPosition());

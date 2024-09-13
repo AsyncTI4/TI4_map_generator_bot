@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -60,8 +61,8 @@ public class DiscardSO extends SOCardsSubcommandData {
         if (!soIDString.isEmpty()) {
             String msg = "You discarded the SO " + Mapper.getSecretObjective(soIDString).getName() + ". If this was an accident, you can get it back with the below button. This will tell everyone that you made a mistake discarding and are picking back up the secret.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.secondary("drawSpecificSO_" + soIDString, "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
-            buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+            buttons.add(Buttons.gray("drawSpecificSO_" + soIDString, "Retrieve " + Mapper.getSecretObjective(soIDString).getName()));
+            buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
         }
 

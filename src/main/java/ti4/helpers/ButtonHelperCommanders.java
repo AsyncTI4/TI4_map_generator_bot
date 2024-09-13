@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.ShowAllPN;
@@ -75,10 +76,10 @@ public class ButtonHelperCommanders {
             if (Constants.MECATOLS.contains(planet) || tile == null || tile.isHomeSystem()) {
                 continue;
             }
-            buttons.add(Button.success("olradinCommanderStep2_" + planet,
+            buttons.add(Buttons.green("olradinCommanderStep2_" + planet,
                 Helper.getPlanetRepresentation(planet, game)));
         }
-        buttons.add(Button.danger("deleteButtons", "Decline"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
         String msg = player.getRepresentation(true, true)
             + " you may exhaust 1 planet to gain TGs equal to its influence or resources.";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
@@ -179,7 +180,7 @@ public class ButtonHelperCommanders {
                 if (unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
                     buttons
                         .add(
-                            Button.success(
+                            Buttons.green(
                                 "yinCommanderRemoval_" + tile.getPosition() + "_" + unitHolder.getName(),
                                 "Remove 1 infantry from "
                                     + ButtonHelper.getUnitHolderRep(unitHolder, tile, game)));
@@ -254,7 +255,7 @@ public class ButtonHelperCommanders {
                     .collect(Collectors.toSet());
                 String prefix = player.getFinsFactionCheckerPrefix() + "ravenMigration_" + from.getPosition() + "_" + uh.getName() + "_";
                 keys.stream().filter(uk -> !player.getUnitFromUnitKey(uk).getIsStructure())
-                    .map(uk -> Button.secondary(prefix + uk.asyncID(), uk.getUnitType().humanReadableName() + " " + planetName).withEmoji(Emoji.fromFormatted(uk.unitEmoji())))
+                    .map(uk -> Buttons.gray(prefix + uk.asyncID(), uk.getUnitType().humanReadableName() + " " + planetName).withEmoji(Emoji.fromFormatted(uk.unitEmoji())))
                     .forEach(newButtons::add);
             }
 
@@ -274,7 +275,7 @@ public class ButtonHelperCommanders {
             for (Tile t : game.getTileMap().values()) {
                 boolean hasplanet = t.getPlanetUnitHolders().stream().anyMatch(uh -> player.hasPlanet(uh.getName()));
                 if (t.containsPlayersUnits(player) || hasplanet) {
-                    newButtons.add(Button.success(prefix + t.getPosition() + suffix, t.getRepresentationForButtons(game, player)));
+                    newButtons.add(Buttons.green(prefix + t.getPosition() + suffix, t.getRepresentationForButtons(game, player)));
                 }
             }
 
@@ -294,7 +295,7 @@ public class ButtonHelperCommanders {
             for (UnitHolder uh : to.getUnitHolders().values()) {
                 PlanetModel planetTo = Mapper.getPlanet(uh.getName());
                 String planetNameTo = planetTo == null ? uh.getName() : planetTo.getName();
-                newButtons.add(Button.success(prefix + uh.getName(), planetNameTo));
+                newButtons.add(Buttons.green(prefix + uh.getName(), planetNameTo));
             }
 
         } else if ((matcher = Pattern.compile(part5).matcher(buttonID)).matches()) {
@@ -362,8 +363,8 @@ public class ButtonHelperCommanders {
                 String mMessage = player.getRepresentation(true, true)
                     + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("gain1tgFromLetnevCommander", "Gain 1TG"));
-                buttons.add(Button.danger("deleteButtons", "Decline"));
+                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
         }
@@ -420,8 +421,8 @@ public class ButtonHelperCommanders {
                 String mMessage = player.getRepresentation(true, true)
                     + " you have Magmus, the Muaat Commander, unlocked, you may gain 1TG, but you are in Pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.success("gain1tgFromMuaatCommander", "Gain 1TG").withEmoji(Emoji.fromFormatted(Emojis.tg)));
-                buttons.add(Button.danger("deleteButtons", "Decline"));
+                buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1TG").withEmoji(Emoji.fromFormatted(Emojis.tg)));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
         }
@@ -453,11 +454,11 @@ public class ButtonHelperCommanders {
                 || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
-                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
+                    buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
                 } else {
-                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                    buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 AC"));
                 }
-                buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
                         + " You gained tech while having Nekro Acidos, the Nekro commander, use buttons to resolve. ",

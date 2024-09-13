@@ -2268,6 +2268,15 @@ public class Game extends GameProperties {
             .toList();
     }
 
+    @JsonIgnore
+    public List<TechnologyModel> getUnitUpgradeTechDeck() {
+        return getTechnologyDeck().stream()
+            .map(Mapper::getTech)
+            .filter(TechnologyModel::isUnitUpgrade)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList();
+    }
+
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
         String result = null;
@@ -3751,6 +3760,15 @@ public class Game extends GameProperties {
             }
         }
         return null;
+    }
+
+    @Nullable
+    public Planet getUnitHolderFromPlanet(String planetName) {
+        Tile tile_ = getTileFromPlanet(planetName);
+        if (tile_ == null) {
+            return null;
+        }
+        return tile_.getUnitHolderFromPlanet(planetName);
     }
 
     @Nullable

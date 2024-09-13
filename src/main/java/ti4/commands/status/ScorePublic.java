@@ -2,6 +2,7 @@ package ti4.commands.status;
 
 import java.util.List;
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -146,7 +148,7 @@ public class ScorePublic extends StatusSubcommandData {
             String message2 = player.getRepresentation(true, true)
                 + " Click the names of the planets you wish to exhaust to score the objective.";
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
-            Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+            Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2,
                 buttons);
