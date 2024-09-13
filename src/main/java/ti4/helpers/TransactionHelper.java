@@ -193,6 +193,8 @@ public class TransactionHelper {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
                                     trans.append(amountToTransact).append(" ").append(Emojis.PN).append(" to be specified verbally");
+                                } else {
+                                    trans.append(Emojis.PN);
                                 }
                             }
                             default -> {

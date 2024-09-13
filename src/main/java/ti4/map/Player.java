@@ -1467,6 +1467,11 @@ public class Player {
 
     @JsonIgnore
     public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor) {
+        return getRepresentation(overrideFow, ping, noColor, false);
+    }
+
+    @JsonIgnore
+    public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor, boolean noFactionIcon) {
         Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
         if (privateGame && !overrideFow) {
@@ -1507,6 +1512,9 @@ public class Player {
 
         // DEFAULT REPRESENTATION
         StringBuilder sb = new StringBuilder(getFactionEmoji());
+        if (noFactionIcon) {
+            sb = new StringBuilder();
+        }
         if (ping) {
             sb.append(getPing());
         } else {

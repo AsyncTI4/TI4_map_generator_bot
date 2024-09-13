@@ -295,7 +295,7 @@
         "name": "Brother Milor",
         "title": "Purifed by Fire",
         "abilityWindow": "After a player's unit is destroyed:",
-        "abilityText": "You may exhaust this card to allow that player to place 2 fighters in the destroyed unit's system if it was a ship, or 2 infantry if it was a ground force.",
+        "abilityText": "You may exhaust this card to allow that player to place 2 fighters in the destroyed unit's system if it was a ship, or 2 infantry on its planet if it was a ground force.",
         "unlockCondition": "Always Unlocked",
         "source": "pok"
     },
