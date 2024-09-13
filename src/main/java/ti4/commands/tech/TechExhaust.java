@@ -74,7 +74,7 @@ public class TechExhaust extends TechAddRemove {
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "gls" -> { // Graviton
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " exhausted Graviton Laser System. The auto assign hit buttons for PDS fire will now kill fighters last");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " exhausted Graviton Laser System. The auto assign hit buttons for PDS fire will now kill fighters last");
                 game.setStoredValue(player.getFaction() + "graviton", "true");
                 deleteTheOneButtonIfButtonEvent(event);
             }

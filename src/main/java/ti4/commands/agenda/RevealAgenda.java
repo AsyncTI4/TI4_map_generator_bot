@@ -105,6 +105,16 @@ public class RevealAgenda extends AgendaSubcommandData {
             revealAgenda(event, revealFromBottom, game, channel);
             return;
         }
+        if ((agendaTarget.toLowerCase().contains("secret objective"))
+            && game.getScoredSecrets() < 1) {
+            MessageHelper.sendMessageToChannel(channel,
+                game.getPing() + "An Elect Secret Agenda (" + agendaName
+                    + ") was revealed when no scored secrets were in play, flipping next agenda");
+            aCount -= 1;
+            game.setStoredValue("agendaCount", aCount + "");
+            revealAgenda(event, revealFromBottom, game, channel);
+            return;
+        }
         if (agendaName != null && !"Covert Legislation".equalsIgnoreCase(agendaName)) {
             game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_" + uniqueID + "_" + agendaID);
         } else {
@@ -116,7 +126,13 @@ public class RevealAgenda extends AgendaSubcommandData {
                         + " Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
                 notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
-                if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution"))
+                String id2 = game.getNextAgenda(revealFromBottom);
+                AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
+                agendaTarget = agendaDetails2.getTarget();
+                agendaType = agendaDetails2.getType();
+                agendaName = agendaModel.getName();
+                game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
+                if ((agendaTarget.toLowerCase().contains("elect law") || id2.equalsIgnoreCase("constitution"))
                     && game.getLaws().size() < 1) {
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
@@ -124,12 +140,14 @@ public class RevealAgenda extends AgendaSubcommandData {
                         game.getPing()
                             + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
                 }
-                String id2 = game.getNextAgenda(revealFromBottom);
-                AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
-                agendaTarget = agendaDetails2.getTarget();
-                agendaType = agendaDetails2.getType();
-                agendaName = agendaModel.getName();
-                game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
+                if ((agendaTarget.toLowerCase().contains("secret objective"))
+                    && game.getScoredSecrets() < 1) {
+                    MessageHelper.sendMessageToChannel(channel,
+                        game.getPing() + "An Elect Secret Agenda (" + agendaName
+                            + ") was revealed under COvert when no scored secrets were in play, flipping next agenda");
+                    notEmergency = false;
+                    game.revealAgenda(revealFromBottom);
+                }
 
                 if (notEmergency) {
                     cov = true;

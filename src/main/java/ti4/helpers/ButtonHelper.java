@@ -2842,8 +2842,8 @@ public class ButtonHelper {
 
         String finChecker = "FFCC_" + player.getFaction() + "_";
         if ("mahactCommander".equalsIgnoreCase(whatIsItFor)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + "reduced their tactic CCs from "
-                + player.getTacticalCC() + " to " + (player.getTacticalCC() - 1));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " used Mahact Commander and reduced their tactic CCs from "
+                + player.getTacticalCC() + " to " + (player.getTacticalCC() - 1) + ". This ends their turn, leaving a window open for end of turn abilities.");
             player.setTacticalCC(player.getTacticalCC() - 1);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> conclusionButtons = new ArrayList<>();
@@ -6116,7 +6116,7 @@ public class ButtonHelper {
         } else {
             if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != null
                 && opponent != player) {
-                String msg = "\n" + opponent.getRepresentation(true, true) + " you suffered " + h
+                String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " you suffered " + h
                     + " hit" + (h == 1 ? "" : "s");
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 List<Button> buttons = new ArrayList<>();

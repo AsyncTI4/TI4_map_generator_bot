@@ -1634,6 +1634,14 @@ public class Game extends GameProperties {
         return laws;
     }
 
+    public int getScoredSecrets() {
+        int count = 0;
+        for (Player player : getRealPlayers()) {
+            count += player.getSoScored();
+        }
+        return count;
+    }
+
     public Map<String, String> getLawsInfo() {
         return lawsInfo;
     }

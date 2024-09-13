@@ -1,13 +1,16 @@
 package ti4.generator;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.PublicObjectiveModel;
-
-import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public record Objective(
 	String key,
@@ -16,7 +19,9 @@ public record Objective(
 	List<String> scoredPlayerIDs,
 	List<String> peekPlayerIDs) {
 
-	public enum Type {Stage1, Stage2, Custom}
+	public enum Type {
+		Stage1, Stage2, Custom
+	}
 
 	public static List<Objective> retrieve(Game game) {
 		List<Objective> objectives = new ArrayList<>();
@@ -54,7 +59,7 @@ public record Objective(
 		String name = this.getName();
 		Integer worth = this.getWorth(game);
 		if (revealed) {
-			return String.format("(%d) %s - %d VP", index, name, worth);
+			return String.format("(%d) %s - %d VP", game.getRevealedPublicObjectives().get(key), name, worth);
 		} else if (game.isRedTapeMode()) {
 			return String.format("(%d) <Unrevealed> %s - %d VP", index, name, worth);
 		}
