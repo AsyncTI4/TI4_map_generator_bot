@@ -330,16 +330,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         "Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
-                if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
-                    || game.getPhaseOfGame().contains("agenda")) && player.hasAbility("scavenge")) {
-                    String fac = player.getFactionEmoji();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1TG from Scavenge ("
-                        + player.getTg() + "->" + (player.getTg() + 1)
-                        + "). Reminder you do not legally have this TG prior to exploring, and you could potentially deploy 1 mech before doing it to dodge pillage.");
-                    player.setTg(player.getTg() + 1);
-                    ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-                    ButtonHelperAbilities.pillageCheck(player, game);
-                }
 
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
                     || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")

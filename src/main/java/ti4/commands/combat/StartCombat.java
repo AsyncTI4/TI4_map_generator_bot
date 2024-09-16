@@ -745,6 +745,13 @@ public class StartCombat extends CombatSubcommandData {
                 "Use Letnev Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
         }
+        // Exo 2s
+        if ("space".equalsIgnoreCase(groundOrSpace) && !game.isFowMode()) {
+            if ((tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, p1.getColor()) > 0 && p1.hasTech("exo2")) || (tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, p2.getColor()) > 0 && p2.hasTech("exo2"))) {
+                buttons.add(Buttons.blue("assCannonNDihmohn_exo_" + tile.getPosition(), "Use Exotrireme 2 Ability")
+                    .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+            }
+        }
 
         Player nomad = Helper.getPlayerFromUnlockedLeader(game, "nomadagentthundarian");
         if ((!game.isFowMode() || nomad == p1) && nomad != null && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {

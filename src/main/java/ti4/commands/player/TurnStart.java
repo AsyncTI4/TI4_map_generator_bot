@@ -192,7 +192,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
                 ButtonHelperCommanders.olradinCommanderStep1(player, game);
             }
-            String text2 = player.getRepresentation() + " PASSED";
+            String text2 = player.getRepresentation(true, false) + " PASSED";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()

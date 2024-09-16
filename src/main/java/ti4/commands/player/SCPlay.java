@@ -213,6 +213,10 @@ public class SCPlay extends PlayerSubcommandData {
                             p2.addFollowedSC(scToPlay, event);
                             if (scToPlay == 8) {
                                 String key = "factionsThatAreNotDiscardingSOs";
+                                String key3 = "potentialBlockers";
+                                if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+                                    game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                                }
                                 game.setStoredValue(key,
                                     game.getStoredValue(key) + player.getFaction() + "*");
                             }
