@@ -997,7 +997,7 @@ public class ButtonHelperModifyUnits {
 
     public static void resolveDevote(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile);
+        List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
         String msg = player.getRepresentation() + " choose which opposing unit to hit";
         String unit = buttonID.split("_")[2];
         Player p2 = player;
@@ -1015,9 +1015,13 @@ public class ButtonHelperModifyUnits {
         }
     }
 
-    public static List<Button> getOpposingUnitsToHit(Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
+    public static List<Button> getOpposingUnitsToHit(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, boolean exoHit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
+        String exo = "";
+        if (exoHit) {
+            exo = "exo";
+        }
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
@@ -1051,7 +1055,7 @@ public class ButtonHelperModifyUnits {
                 EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName + "damaged"
-                        + "_" + unitKey.getColor();
+                        + "_" + unitKey.getColor() + "_" + exo;
                     Button validTile2 = Buttons.red(buttonID, "Damaged " + prettyName);
                     validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
@@ -1059,7 +1063,7 @@ public class ButtonHelperModifyUnits {
                 totalUnits = totalUnits - damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName
-                        + "_" + unitKey.getColor(), "Hit " + prettyName);
+                        + "_" + unitKey.getColor() + "_" + exo, prettyName);
                     validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
@@ -1073,6 +1077,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(pos);
         String unit = buttonID.split("_")[2];
         boolean damaged = false;
+        boolean exo = buttonID.contains("exo");
         if (unit.contains("damaged")) {
             damaged = true;
             unit = unit.replace("damaged", "");
@@ -1091,7 +1096,18 @@ public class ButtonHelperModifyUnits {
         UnitModel unitModel = player.getUnitFromUnitKey(key);
 
         String unitName = ButtonHelper.getUnitName(key.asyncID());
-
+        if (exo) {
+            String dmg = "";
+            if (damaged) {
+                dmg = "damaged ";
+            }
+            msg = player.getRepresentation() + " lost a " + dmg + unitModel.getBaseType() + " to your opponents exo 2 ability";
+            new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), damaged, game);
+            ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, unitName, event, tile, tile.getSpaceUnitHolder());
+            MessageHelper.sendMessageToChannel(channel, msg, buttons);
+            event.getMessage().delete().queue();
+            return;
+        }
         int x = 1;
         EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
         String finChecker = player.getFinsFactionCheckerPrefix();
@@ -1889,8 +1905,15 @@ public class ButtonHelperModifyUnits {
             msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
                 + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
-            buttons = getOpposingUnitsToHit(player, game, event, tile);
+            buttons = getOpposingUnitsToHit(player, game, event, tile, false);
             msg = player.getRepresentation() + " choose which opposing unit to hit";
+        } else if (cause.contains("exo")) {
+            new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 dread", game);
+            ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, "dread", event, tile, tile.getSpaceUnitHolder());
+            buttons = getOpposingUnitsToHit(player, game, event, tile, true);
+            msg = player.getRepresentation() + " choose which opposing unit to destroy";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to choose 2 opposing ships to destroy. This occurs after any retreats. The dread has been removed.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         } else {
             msg = opponent.getRepresentation(true, true) + " your opponent used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");

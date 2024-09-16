@@ -298,6 +298,19 @@ public class Player {
         bombardUnits.remove(thing);
     }
 
+    public int getInitiative() {
+        int x = 1000;
+        for (int sc : getSCs()) {
+            if (sc < x) {
+                x = sc;
+            }
+        }
+        if (getAbilities().contains("telepathic") || getPromissoryNotesInPlayArea().contains("gift")) {
+            x = 0;
+        }
+        return x;
+    }
+
     public int getSpentTgsThisWindow() {
         for (String thing : spentThingsThisWindow) {
             if (thing.contains("tg_")) {
