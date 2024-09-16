@@ -1338,6 +1338,11 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperAbilities.resolveDiplomatExhaust(buttonID, event, game, player);
         } else if (buttonID.startsWith("exhaustForVotes_")) {
             AgendaHelper.exhaustForVotes(event, player, game, buttonID);
+        } else if (buttonID.startsWith("deflectSC_")) {
+            String sc = buttonID.split("_")[1];
+            ButtonHelper.deleteMessage(event);
+            game.setStoredValue("deflectedSC", sc);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Put Deflection on " + sc);
         } else if (buttonID.startsWith("diplo_")) {
             ButtonHelper.resolveDiploPrimary(game, player, event, buttonID);
         } else if (buttonID.startsWith("doneLanding_")) {
@@ -1966,6 +1971,16 @@ public class ButtonListener extends ListenerAdapter {
                                 + " was chosen. If this is a mistake or the Public Disgrace is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
                         return;
                     }
+                }
+            }
+            if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
+                if (player.getStrategicCC() < 1) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " You cant pick this SC because it has the deflection ability on it and you have no strat CC to spend");
+                    return;
+                } else {
+                    player.setStrategicCC(player.getStrategicCC() - 1);
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " spent 1 strat CC due to deflection");
                 }
             }
 
@@ -3153,7 +3168,6 @@ public class ButtonListener extends ListenerAdapter {
                         aCount = Integer.parseInt(agendaCount) - 1;
                     }
                     game.setStoredValue("agendaCount", aCount + "");
-                    game.setStoredValue("agendaCount", aCount + "");
                     String agendaid = game.getCurrentAgendaInfo().split("_")[2];
                     if ("CL".equalsIgnoreCase(agendaid)) {
                         String id2 = game.revealAgenda(false);
@@ -3700,7 +3714,19 @@ public class ButtonListener extends ListenerAdapter {
                 case "tacticalAction" -> {
                     ButtonHelperTacticalAction.selectRingThatActiveSystemIsIn(player, game, event);
                 }
+                case "lastMinuteDeliberation" -> {
+                    ButtonHelper.deleteMessage(event);
+                    String message = player.getRepresentation()
+                        + " Click the names of up to 2 planets you wish to ready ";
+
+                    List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
+                    buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message, buttons);
+                    RevealAgenda.revealAgenda(event, false, game, actionsChannel);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to ready 2 planets to the person who pressed the button");
+                }
                 case "willRevolution" -> {
+                    ButtonHelper.deleteMessage(event);
                     game.setStoredValue("willRevolution", "active");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Reversed SC Picking order");
                 }
@@ -4593,6 +4619,7 @@ public class ButtonListener extends ListenerAdapter {
                 player.setTotalExpenses(
                     player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, game, true));
                 String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
+                boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
                 if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
@@ -4690,6 +4717,9 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
                 }
+                if (warM) {
+                    player.addSpentThing("warmachine");
+                }
                 ButtonHelper.updateMap(game, event,
                     "Result of build on turn " + player.getTurnCount() + " for " + player.getFactionEmoji());
                 buttons.add(doneExhausting);
@@ -4712,6 +4742,7 @@ public class ButtonListener extends ListenerAdapter {
             if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
+            player.resetSpentThings();
             if (buttonID.contains("tacticalAction")) {
                 ButtonHelper.exploreDET(player, game, event);
                 ButtonHelperFactionSpecific.cleanCavUp(game, event);
