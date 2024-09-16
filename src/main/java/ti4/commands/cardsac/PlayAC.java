@@ -195,14 +195,14 @@ public class PlayAC extends ACCardsSubcommandData {
             MessageChannel channel2 = player.getCorrectChannel();
             if (actionCardTitle.contains("Manipulate Investments")) {
                 List<Button> scButtons = new ArrayList<>();
-                for (int sc = 1; sc < 9; sc++) {
+                for (int sc : game.getSCList()) {
                     Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                     Button button;
-                    if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
-                        button = Buttons.gray("FFCC_" + player.getFaction() + "_increaseTGonSC_" + sc, " ")
+                    if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "increaseTGonSC_" + sc, " ")
                             .withEmoji(scEmoji);
                     } else {
-                        button = Buttons.gray("FFCC_" + player.getFaction() + "_increaseTGonSC_" + sc,
+                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "increaseTGonSC_" + sc,
                             sc + " " + Helper.getSCName(sc, game));
                     }
                     scButtons.add(button);
@@ -210,6 +210,24 @@ public class PlayAC extends ACCardsSubcommandData {
                 scButtons.add(Buttons.red("deleteButtons", "Done adding TG"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
                     player.getRepresentation() + " Use buttons to increase TGs on SCs. Each press adds 1TG.",
+                    scButtons);
+            }
+            if (actionCardTitle.contains("Deflection")) {
+                List<Button> scButtons = new ArrayList<>();
+                for (int sc : game.getSCList()) {
+                    Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
+                    Button button;
+                    if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "deflectSC_" + sc, " ")
+                            .withEmoji(scEmoji);
+                    } else {
+                        button = Buttons.gray(player.getFinsFactionCheckerPrefix() + "deflectSC_" + sc,
+                            sc + " " + Helper.getSCName(sc, game));
+                    }
+                    scButtons.add(button);
+                }
+                MessageHelper.sendMessageToChannelWithButtons(channel2,
+                    player.getRepresentation() + " Use buttons to choose which SC will be deflected.",
                     scButtons);
             }
             if (actionCardTitle.contains("Archaeological Expedition")) {
@@ -252,6 +270,20 @@ public class PlayAC extends ACCardsSubcommandData {
                     "Resolve " + codedName));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
             }
+
+            codedName = "Last Minute Deliberation";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "lastMinuteDeliberation",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+            codedName = "Special Session";
+            if (actionCardTitle.contains(codedName)) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveVeto",
+                    "Resolve " + codedName));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, codedMessage + codedName, codedButtons);
+            }
+
             codedName = "War Machine";
             if (actionCardTitle.contains(codedName)) {
                 player.addSpentThing("warmachine");
