@@ -1441,6 +1441,22 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+        if (player.getActionCards().containsKey("last_minute_deliberation")) {
+            String msg = player.getRepresentation()
+                + " you have the option to pre-play Last Minute Deliberation. End of Agenda phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_LastMinuteDeliberation", "Pre-play Last Minute Deliberation"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
+        if (player.getActionCards().containsKey("special_session")) {
+            String msg = player.getRepresentation()
+                + " you have the option to pre-play Special Session. End of Agenda phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("resolvePreassignment_SpecialSession", "Pre-play Special Session"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        }
         if (player.getActionCards().containsKey("revolution")) {
             String msg = player.getRepresentation()
                 + " you have the option to pre-play revolution. Start of strat phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";

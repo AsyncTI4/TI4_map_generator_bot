@@ -262,10 +262,35 @@ public class CombatModHelper {
             case Constants.MOD_OPPONENT_NO_CC_FLEET -> meetsCondition = !player.getMahactCC().contains(opponent.getColor());
             case "next_to_structure" -> meetsCondition = (ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile).size() > 0 || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
+                meetsCondition = false;
                 if (unitsByQuantity.entrySet().size() == 1) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
                     meetsCondition = unitByQuantity.getValue() == 2
                         && !"ff".equals(unitByQuantity.getKey().getAsyncId());
+                }
+                if (unitsByQuantity.entrySet().size() == 2) {
+                    Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
+                    Entry<UnitModel, Integer> unitByQuantity2 = new ArrayList<>(unitsByQuantity.entrySet()).get(1);
+                    String baseType1 = unitByQuantity.getKey().getBaseType();
+                    String baseType2 = unitByQuantity2.getKey().getBaseType();
+                    if (baseType1.equalsIgnoreCase("fighter") || baseType2.equalsIgnoreCase("fighter")) {
+                        if (baseType1.equalsIgnoreCase("fighter")) {
+                            meetsCondition = unitByQuantity.getValue() == 2;
+                        } else {
+                            meetsCondition = unitByQuantity2.getValue() == 2;
+                        }
+                    } else if (baseType1.equalsIgnoreCase("flagship") && baseType2.equalsIgnoreCase("flagship")) {
+                        meetsCondition = true;
+                    }
+                }
+                if (unitsByQuantity.entrySet().size() == 3) {
+                    List<Entry<UnitModel, Integer>> entries = new ArrayList<>(unitsByQuantity.entrySet());
+                    meetsCondition = entries.stream()
+                        .limit(3)
+                        .allMatch(entry -> {
+                            String baseType = entry.getKey().getBaseType();
+                            return baseType.equalsIgnoreCase("fighter") || baseType.equalsIgnoreCase("flagship");
+                        });
                 }
             }
             case Constants.MOD_NEBULA_DEFENDER -> {

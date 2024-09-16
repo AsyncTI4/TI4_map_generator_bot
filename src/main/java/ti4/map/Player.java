@@ -354,6 +354,8 @@ public class Player {
                 newTransactionItems.add(item);
             }
         }
+        getGame().setStoredValue(player.getFaction() + "NothingMessage", "");
+        getGame().setStoredValue(getFaction() + "NothingMessage", "");
         transactionItems = newTransactionItems;
     }
 

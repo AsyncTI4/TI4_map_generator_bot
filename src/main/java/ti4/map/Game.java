@@ -617,6 +617,16 @@ public class Game extends GameProperties {
         }
     }
 
+    public void clearAllEmptyStoredValues() {
+        java.util.Iterator<Map.Entry<String, String>> iterator = checkingForAllReacts.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                iterator.remove(); // Remove the entry if the value is empty  
+            }
+        }
+    }
+
     public void setStoredValue(String key, String value) {
         value = StringHelper.escape(value);
         checkingForAllReacts.put(key, value);

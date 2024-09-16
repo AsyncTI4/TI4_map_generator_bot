@@ -228,7 +228,12 @@ public class TransactionHelper {
                 trans.append("\n");
             }
             if (sendingNothing) {
-                trans.append("> ").append(getNothingMessage()).append("\n");
+                String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
+                if (nothing.isEmpty()) {
+                    nothing = getNothingMessage();
+                    game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
+                }
+                trans.append("> ").append(nothing).append("\n");
             }
         }
 
@@ -246,7 +251,7 @@ public class TransactionHelper {
             case 6 -> "A Well Written Thank-You Note";
             case 7 -> "Heartfelt Thanks";
             case 8 -> "The Best Vibes";
-            case 9 -> "A Bot's Blessing For Your Trouble";
+            case 9 -> "A Blessing";
             case 10 -> "Good Karma";
             case 11 -> "A Mewling Kitten";
             case 12 -> "A Lost Virtual Puppy";
@@ -1075,7 +1080,7 @@ public class TransactionHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
         }
-        if (game.getPhaseOfGame().toLowerCase().contains("agenda")
+        if ((game.getPhaseOfGame().toLowerCase().contains("agenda") || game.getPhaseOfGame().toLowerCase().contains("strategy"))
             && !"no".equalsIgnoreCase(ButtonHelper.playerHasDMZPlanet(p1, game))) {
             Button transact = Buttons.gray(
                 "offerToTransact_dmz_" + p1.getFaction() + "_" + p2.getFaction() + "_"

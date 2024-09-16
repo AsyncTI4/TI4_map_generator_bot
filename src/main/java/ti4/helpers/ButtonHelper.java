@@ -5180,7 +5180,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
 
         game.resetCurrentMovedUnitsFrom1System();
-        if (Helper.getProductionValue(player, game, tile, false) > 0) {
+        if (Helper.getProductionValue(player, game, tile, false) > 0 || (player.hasTech("iihq") && tile.getTileID().equalsIgnoreCase("18"))) {
             Button buildButton = Buttons.green(finChecker + "tacticalActionBuild_" + game.getActiveSystem(),
                 "Build in this system (" + Helper.getProductionValue(player, game, tile, false) + " PRODUCTION Value)");
             buttons.add(buildButton);
@@ -7680,6 +7680,21 @@ public class ButtonHelper {
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
+        for (Player p2 : game.getRealPlayers()) {
+            if (game.getStoredValue("LastMinuteDeliberation") != null
+                && game.getStoredValue("LastMinuteDeliberation").contains(p2.getFaction())
+                && p2.getActionCards().containsKey("last_minute_deliberation")) {
+                PlayAC.playAC(event, game, p2, "last_minute_deliberation", game.getMainGameChannel());
+                return;
+            }
+            if (game.getStoredValue("SpecialSession") != null
+                && game.getStoredValue("SpecialSession").contains(p2.getFaction())
+                && p2.getActionCards().containsKey("special_session")) {
+                PlayAC.playAC(event, game, p2, "special_session", game.getMainGameChannel());
+                return;
+            }
+
+        }
         int round = game.getRound();
         if (game.isHasHadAStatusPhase()) {
             round++;
@@ -7699,19 +7714,21 @@ public class ButtonHelper {
                 && p2.getActionCards().containsKey("summit")) {
                 PlayAC.playAC(event, game, p2, "summit", game.getMainGameChannel());
             }
+
             if (game.getStoredValue("Investments") != null
                 && game.getStoredValue("Investments").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("investments")) {
                 PlayAC.playAC(event, game, p2, "investments", game.getMainGameChannel());
             }
+
             if (game.getStoredValue("PreRevolution") != null
                 && game.getStoredValue("PreRevolution").contains(p2.getFaction())
-                && p2.getActionCards().containsKey("PreRevolution")) {
+                && p2.getActionCards().containsKey("revolution")) {
                 PlayAC.playAC(event, game, p2, "revolution", game.getMainGameChannel());
             }
             if (game.getStoredValue("Deflection") != null
                 && game.getStoredValue("Deflection").contains(p2.getFaction())
-                && p2.getActionCards().containsKey("Deflection")) {
+                && p2.getActionCards().containsKey("deflection")) {
                 PlayAC.playAC(event, game, p2, "deflection", game.getMainGameChannel());
             }
             if (p2.hasLeader("zealotshero") && p2.getLeader("zealotshero").get().isActive()) {
