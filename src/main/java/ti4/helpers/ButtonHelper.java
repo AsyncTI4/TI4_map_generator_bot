@@ -3797,6 +3797,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("absol_hm") && !player.getExhaustedTechs().contains("absol_hm")) {
             endButtons.add(Buttons.green(finChecker + "exhaustTech_absol_hm", "Exhaust Hyper Metabolism"));
         }
+        if (player.getTechs().contains("absol_nm") && !player.getExhaustedTechs().contains("absol_nm")) {
+            endButtons.add(Buttons.green(finChecker + "exhaustTech_absol_nm", "Exhaust Neural Motivator"));
+        }
         if (player.getTechs().contains("absol_pa") && !player.getReadiedPlanets().isEmpty()
             && !player.getActionCards().isEmpty()) {
             endButtons.add(Buttons.green(finChecker + "useTech_absol_pa", "Use Psychoarchaeology"));
@@ -5856,9 +5859,6 @@ public class ButtonHelper {
                         damagedUnits = unitHolder.getUnitDamage().get(unitKey);
                     }
                     int totalUnits = unitEntry.getValue() - damagedUnits;
-                    if (type.equalsIgnoreCase("assaultcannoncombat") && unitKey.getUnitType() == UnitType.Fighter) {
-                        continue;
-                    }
                     EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
                     for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
                         String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_"
@@ -5899,12 +5899,13 @@ public class ButtonHelper {
                     UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
                     if (unitModel == null)
                         continue;
-
                     UnitKey key = unitEntry.getKey();
                     String unitName = getUnitName(key.asyncID());
                     int totalUnits = unitEntry.getValue();
                     int damagedUnits = 0;
-
+                    if (type.equalsIgnoreCase("assaultcannoncombat") && key.getUnitType() == UnitType.Fighter) {
+                        continue;
+                    }
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
@@ -5918,6 +5919,7 @@ public class ButtonHelper {
                         validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
+
                     for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
                         Button validTile2 = Buttons.red(
                             finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName,
@@ -5925,27 +5927,26 @@ public class ButtonHelper {
                         validTile2 = validTile2.withEmoji(emoji);
                         buttons.add(validTile2);
                     }
-
-                    if ((("mech".equalsIgnoreCase(unitName) && !game.getLaws().containsKey("articles_war")
-                        && player.getUnitsOwned().contains("nomad_mech"))
-                        || "dreadnought".equalsIgnoreCase(unitName)
-                        || (player != game.getActivePlayer() && !"fighter".equalsIgnoreCase(unitName)
-                            && !"mech".equalsIgnoreCase(unitName) && !"infantry".equalsIgnoreCase(unitName)
-                            && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander"))
-                        || ("warsun".equalsIgnoreCase(unitName) && !ButtonHelper.isLawInPlay(game, "schematics"))
-                        || "lady".equalsIgnoreCase(unitName) || "cavalry".equalsIgnoreCase(unitName)
-                        || "flagship".equalsIgnoreCase(unitName)
-                        || ("mech".equalsIgnoreCase(unitName)
-                            && doesPlayerHaveFSHere("nekro_flagship", player, tile))
-                        || ("cruiser".equalsIgnoreCase(unitName) && player.hasTech("se2"))
-                        || ("mech".equalsIgnoreCase(unitName)
-                            && ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile))
-                        || ("carrier".equalsIgnoreCase(unitName) && player.hasTech("ac2"))) && totalUnits > 0) {
-                        Button validTile2 = Button
-                            .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName,
-                                "Sustain " + 1 + " " + unitModel.getBaseType());
-                        validTile2 = validTile2.withEmoji(emoji);
-                        buttons.add(validTile2);
+                    if (!type.equalsIgnoreCase("assaultcannoncombat")) {
+                        if ((("mech".equalsIgnoreCase(unitName) && !game.getLaws().containsKey("articles_war")
+                            && player.getUnitsOwned().contains("nomad_mech"))
+                            || "dreadnought".equalsIgnoreCase(unitName)
+                            || (player != game.getActivePlayer() && !"fighter".equalsIgnoreCase(unitName)
+                                && !"mech".equalsIgnoreCase(unitName) && !"infantry".equalsIgnoreCase(unitName)
+                                && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander"))
+                            || ("warsun".equalsIgnoreCase(unitName) && !ButtonHelper.isLawInPlay(game, "schematics"))
+                            || "lady".equalsIgnoreCase(unitName) || "cavalry".equalsIgnoreCase(unitName)
+                            || "flagship".equalsIgnoreCase(unitName)
+                            || ("mech".equalsIgnoreCase(unitName)
+                                && doesPlayerHaveFSHere("nekro_flagship", player, tile))
+                            || ("cruiser".equalsIgnoreCase(unitName) && player.hasTech("se2"))
+                            || ("carrier".equalsIgnoreCase(unitName) && player.hasTech("ac2"))) && totalUnits > 0) {
+                            Button validTile2 = Button
+                                .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName,
+                                    "Sustain " + 1 + " " + unitModel.getBaseType());
+                            validTile2 = validTile2.withEmoji(emoji);
+                            buttons.add(validTile2);
+                        }
                     }
                 }
             }

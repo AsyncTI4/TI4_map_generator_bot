@@ -1239,7 +1239,7 @@ public class ButtonHelperFactionSpecific {
         Player player,
         String ident) {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation()
-            + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4.");
+            + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4. They cannot produce ships if enemy ships are in the system. ");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff
@@ -1621,6 +1621,24 @@ public class ButtonHelperFactionSpecific {
     public static void cabalEatsUnit(Player player, Game game, Player cabal, int amount, String unit,
         GenericInteractionCreateEvent event) {
         cabalEatsUnit(player, game, cabal, amount, unit, event, false);
+    }
+
+    public static void cabalEatsUnitIfItShould(Player player, Game game, Player owner, int amount, String unit,
+        GenericInteractionCreateEvent event, Tile tile, UnitHolder uH) {
+        Player cabal = Helper.getPlayerFromAbility(game, "devour");
+        if (cabal == owner) {
+            cabal = null;
+        }
+        if (cabal == null) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)) {
+                    cabal = p2;
+                }
+            }
+        }
+        if (cabal != null && (!uH.getPlayersUnitListOnHolder(cabal).isEmpty() || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))) {
+            cabalEatsUnit(player, game, cabal, amount, unit, event, false);
+        }
     }
 
     public static void mentakHeroProducesUnit(Player player, Game game, Player mentak, int amount, String unit,

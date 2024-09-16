@@ -204,7 +204,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 game.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
 
-        if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
+        if ((game.getPhaseOfGame().contains("agenda") || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
             && player.hasAbility("scavenge") && !doubleCheck && !setUP) {
             String fac = player.getFactionEmoji();
 
