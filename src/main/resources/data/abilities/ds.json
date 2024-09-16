@@ -237,7 +237,7 @@
         "id": "the_lady_and_the_lord",
         "name": "The Lady & The Lord",
         "faction": "ghemina",
-        "permanentEffect": "During setup, place the Lord flagship token in your reinforcements and place the additional Ghemina Hero next to your faction sheet. The Lord flagship token is a second flagship unit with the abilities and attributes listed on the Lord flagship card. You have 2 Heroes.",
+        "permanentEffect": "During setup, place the Lord flagship token in your reinforcements and place the additional Ghemina Hero next to your faction sheet. The Lord flagship token is a second flagship unit with the abilities and attributes listed on the Lord flagship card. You have 2 Heroes.[Note: In async, this ability has been changed to bestowing the Lady, with the Lord being the default flagship. This only affects franken]",
         "source": "ds"
     },
     {

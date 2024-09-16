@@ -614,6 +614,11 @@ public class MapGenerator {
             name = player.getDisplayName().toUpperCase();
         }
         superDrawString(bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
+        int mod = 0;
+        if (player.getInitiative() > 9) {
+            mod = 13;
+        }
+        superDrawString(bannerG, "#" + player.getInitiative(), 300 - mod, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
         String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
