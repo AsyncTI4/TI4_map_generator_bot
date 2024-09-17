@@ -14,9 +14,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
-public class DrawSpecificRelic extends RelicSubcommandData {
+public class RelicDrawSpecific extends RelicSubcommandData {
 
-    public DrawSpecificRelic() {
+    public RelicDrawSpecific() {
         super(Constants.RELIC_DRAW_SPECIFIC, "Draw a specific relic");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit"));
@@ -52,6 +52,6 @@ public class DrawSpecificRelic extends RelicSubcommandData {
             message += " (FORCE DRAW: This relic was not in the deck but was forcefully drawn from the ether)";
         }
         MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
-        DrawRelic.resolveRelicEffects(event, game, player, relicID);
+        RelicDraw.resolveRelicEffects(event, game, player, relicID);
     }
 }

@@ -12,15 +12,19 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class RefreshRelic extends RelicSubcommandData {
+public class RelicExhaust extends RelicSubcommandData {
 
-    public RefreshRelic() {
-        super(Constants.RELIC_REFRESH, "Ready a Relic");
+    public RelicExhaust() {
+        super(Constants.RELIC_EXHAUST, "Exhaust a Relic");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit\"").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
-    @Override
+	public RelicExhaust(String relicRefresh, String refresh_a_relic) {
+		super(relicRefresh, refresh_a_relic);
+	}
+
+	@Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
@@ -39,11 +43,11 @@ public class RefreshRelic extends RelicSubcommandData {
 
         String relicId = option.getAsString();
         if (player.hasRelic(relicId)) {
-            player.removeExhaustedRelic(relicId);
+            player.addExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).getName();
-            MessageHelper.sendMessageToEventChannel(event, "Refreshed " + Emojis.Relic + "Relic: " + relicName);
+            MessageHelper.sendMessageToEventChannel(event, "Exhausted " + Emojis.Relic + " relic: " + relicName);
 		} else {
-            MessageHelper.sendMessageToEventChannel(event, "Invalid Relic or player does not have specified Relic");
+            MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic");
         }
     }
 }

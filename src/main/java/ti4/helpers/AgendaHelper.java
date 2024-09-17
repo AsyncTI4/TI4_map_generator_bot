@@ -47,7 +47,7 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
-import ti4.commands.relic.DrawRelic;
+import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.commands.special.WormholeResearchFor;
@@ -401,7 +401,7 @@ public class AgendaHelper {
                     ButtonHelper.checkFleetInEveryTile(player2, game, event);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
-                    DrawRelic.drawRelicAndNotify(player2, event, game);
+                    RelicDraw.drawRelicAndNotify(player2, event, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Drew relic for " + ButtonHelper.getIdentOrColor(player2, game));
                 }
@@ -2465,7 +2465,7 @@ public class AgendaHelper {
                         if (specificVote.contains("Relic Rider")) {
                             MessageHelper.sendMessageToChannel(channel,
                                 identity + " due to having a winning Relic Rider, you have gained a relic");
-                            DrawRelic.drawRelicAndNotify(winningR, event, game);
+                            RelicDraw.drawRelicAndNotify(winningR, event, game);
                         }
                         if (specificVote.contains("Radiance")) {
                             List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR,

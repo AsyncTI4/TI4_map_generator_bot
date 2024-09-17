@@ -631,17 +631,17 @@ public class Constants {
     public static final String AGENDAS = "agendas";
     public static final String AGENDA_DECK = "agenda_deck";
     public static final String AGENDA = "agenda";
-    public static final String RELIC_SHOW_REMAINING = "relic_show_remaining";
-    public static final String RELIC_DRAW_SPECIFIC = "relic_draw_specific";
+    public static final String RELIC_SHOW_REMAINING = "show_remaining";
+    public static final String RELIC_DRAW_SPECIFIC = "draw_specific";
     public static final String DRAW = "draw";
-    public static final String RELIC_DRAW = "relic_draw";
+    public static final String RELIC_DRAW = "draw";
     public static final String ALSO_DRAW_RELIC = "also_draw_relic";
-    public static final String RELIC_EXHAUST = "relic_exhaust";
-    public static final String RELIC_REFRESH = "relic_ready";
-    public static final String RELIC_PURGE = "relic_purge";
-    public static final String SHUFFLE_BACK = "relic_shuffle_back";
-    public static final String ADD_BACK_INTO_DECK = "relic_add_back_into_deck";
-    public static final String RELIC_INFO = "relic_info";
+    public static final String RELIC_EXHAUST = "exhaust";
+    public static final String RELIC_REFRESH = "ready";
+    public static final String RELIC_PURGE = "purge";
+    public static final String SHUFFLE_BACK = "shuffle_back";
+    public static final String ADD_BACK_INTO_DECK = "add_back_into_deck";
+    public static final String RELIC_INFO = "info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
@@ -912,7 +912,7 @@ public class Constants {
     public static final String ABILITY_INFO = "ability_info";
     public static final String ABILITY_ADD = "ability_add";
     public static final String ABILITY_REMOVE = "ability_remove";
-    public static final String RELIC_LOOK_AT_TOP = "relic_look_at_top";
+    public static final String RELIC_LOOK_AT_TOP = "look_at_top";
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
     public static final String DRAFT_BAG_INFO_THREAD_CHANNEL_ID = "draft_bag_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
@@ -932,7 +932,7 @@ public class Constants {
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
     public static final String HAS_HAD_A_STATUS_PHASE = "has_had_a_status_phase";
     public static final String BOT_SHUSHING = "bot_shushing";
-    public static final String RELIC_SEND = "relic_send";
+    public static final String RELIC_SEND = "send";
     public static final String FOLLOWED_SC = "followed_sc";
 
     // Installation constants

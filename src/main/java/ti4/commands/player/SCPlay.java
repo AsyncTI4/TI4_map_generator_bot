@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.event.RevealEvent;
-import ti4.commands.relic.DrawRelic;
+import ti4.commands.relic.RelicDraw;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -583,7 +583,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
         event.editButton(event.getButton().asDisabled()).queue();
-        DrawRelic.drawRelicAndNotify(player, event, game);
+        RelicDraw.drawRelicAndNotify(player, event, game);
         RevealEvent.revealEvent(event, game, game.getMainGameChannel());
     }
 

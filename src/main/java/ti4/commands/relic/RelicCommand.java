@@ -49,18 +49,18 @@ public class RelicCommand implements Command {
     private Collection<RelicSubcommandData> getSubcommands() {
         Collection<RelicSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new RelicInfo());
-        subcommands.add(new DrawRelic());
-        subcommands.add(new PurgeRelic());
-        subcommands.add(new ExhaustRelic());
-        subcommands.add(new RefreshRelic());
-        subcommands.add(new DrawSpecificRelic());
+        subcommands.add(new RelicDraw());
+        subcommands.add(new RelicPurge());
+        subcommands.add(new RelicExhaust());
+        subcommands.add(new RelicReady());
+        subcommands.add(new RelicDrawSpecific());
         subcommands.add(new RelicLookAtTop());
         subcommands.add(new RelicSend());
-        subcommands.add(new ShuffleRelicBack());
-        subcommands.add(new ShowRemainingRelics());
-        subcommands.add(new AddRelicBackIntoDeck());
-        subcommands.add(new SendFragments());
-        subcommands.add(new PurgeFragments());
+        subcommands.add(new RelicShuffleBack());
+        subcommands.add(new RelicShowRemaining());
+        subcommands.add(new RelicAddBackIntoDeck());
+        subcommands.add(new RelicSendFragments());
+        subcommands.add(new RelicPurgeFragments());
         return subcommands;
     }
 

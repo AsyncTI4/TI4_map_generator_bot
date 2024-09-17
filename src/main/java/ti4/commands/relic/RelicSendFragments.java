@@ -22,9 +22,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class SendFragments extends RelicSubcommandData {
+public class RelicSendFragments extends RelicSubcommandData {
 
-	public SendFragments() {
+	public RelicSendFragments() {
 		super(Constants.SEND_FRAGMENT, "Send a number of relic fragments (default 1) to another player");
 		addOptions(
 			typeOption.setRequired(true),

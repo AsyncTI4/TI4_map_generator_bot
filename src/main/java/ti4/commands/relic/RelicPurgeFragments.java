@@ -16,9 +16,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class PurgeFragments extends RelicSubcommandData {
+public class RelicPurgeFragments extends RelicSubcommandData {
 
-	public PurgeFragments() {
+	public RelicPurgeFragments() {
 		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).");
 		addOptions(typeOption.setRequired(true));
 		addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."));
@@ -80,7 +80,7 @@ public class PurgeFragments extends RelicSubcommandData {
 
 		boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, false, OptionMapping::getAsBoolean);
 		if (drawRelic) {
-			DrawRelic.drawRelicAndNotify(activePlayer, event, game);
+			RelicDraw.drawRelicAndNotify(activePlayer, event, game);
 		}
 	}
 

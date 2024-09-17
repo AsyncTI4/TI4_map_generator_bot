@@ -14,7 +14,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.relic.DrawRelic;
+import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.ListTurnOrder;
@@ -154,7 +154,7 @@ public class HeroPlay extends LeaderAction {
         }
 
         switch (playerLeader.getId()) {
-            case "kollecchero" -> DrawRelic.drawWithAdvantage(player, event, game, game.getRealPlayers().size());
+            case "kollecchero" -> RelicDraw.drawWithAdvantage(player, event, game, game.getRealPlayers().size());
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
@@ -402,7 +402,7 @@ public class HeroPlay extends LeaderAction {
                     buttons);
             }
             case "naazhero" -> {
-                DrawRelic.drawRelicAndNotify(player, event, game);
+                RelicDraw.drawRelicAndNotify(player, event, game);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
