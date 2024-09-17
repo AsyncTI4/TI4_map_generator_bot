@@ -43,6 +43,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardsac.DrawAC;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
@@ -378,7 +379,7 @@ public class AgendaHelper {
             if (game.getLaws().size() > 0) {
                 for (Player player : game.getRealPlayers()) {
                     if (player.getLeaderIDs().contains("edyncommander") && !player.hasLeaderUnlocked("edyncommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "edyn", event);
+                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "edyn", event);
                     }
                 }
             }
@@ -882,7 +883,7 @@ public class AgendaHelper {
 
                         if (playerWL.getLeaderIDs().contains("yssarilcommander")
                             && !playerWL.hasLeaderUnlocked("yssarilcommander")) {
-                            ButtonHelper.commanderUnlockCheck(playerWL, game, "yssaril", event);
+                            CommanderUnlockCheck.commanderUnlockCheck(playerWL, game, "yssaril", event);
                         }
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
@@ -911,10 +912,8 @@ public class AgendaHelper {
                             }
                         }
 
-                        if (playerWL.getLeaderIDs().contains("yssarilcommander")
-                            && !playerWL.hasLeaderUnlocked("yssarilcommander")) {
-                            ButtonHelper.commanderUnlockCheck(playerWL, game, "yssaril", event);
-                        }
+                        CommanderUnlockCheck.commanderUnlockCheck(playerWL, game, "yssaril", event);
+                        
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     for (Player p2 : getLosingVoters(winner, game)) {
@@ -1014,7 +1013,7 @@ public class AgendaHelper {
         voters.addAll(riders);
         for (Player player : voters) {
             if (player.getLeaderIDs().contains("florzencommander") && !player.hasLeaderUnlocked("florzencommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "florzen", event);
+                CommanderUnlockCheck.commanderUnlockCheck(player, game, "florzen", event);
             }
         }
         String ridSum = "People had Riders to resolve.";

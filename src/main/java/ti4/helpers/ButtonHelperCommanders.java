@@ -18,6 +18,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.ShowAllSO;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
@@ -533,7 +534,7 @@ public class ButtonHelperCommanders {
         if (player.getTg() > 0) {
             player.setTg(oldTg - 1);
         }
-        ButtonHelper.commanderUnlockCheck(player, game, "keleres", event);
+        CommanderUnlockCheck.commanderUnlockCheck(player, game, "keleres", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdentOrColor(player, game) + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + "(" + oldTg + "->"
                 + player.getTg() + ")");
@@ -562,7 +563,7 @@ public class ButtonHelperCommanders {
             game);
 
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message);
-        ButtonHelper.fullCommanderUnlockCheck(p1, game, "naaz", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(p1, game, "naaz", event);
         ButtonHelper.deleteTheOneButton(event);
     }
 

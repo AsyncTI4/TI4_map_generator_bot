@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
@@ -245,7 +246,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
             }
         }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "kollecc", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "kollecc", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         event.getMessage().delete().queue();
     }
@@ -283,7 +284,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         if (p2 != null) {
             if (!p2.hasLeaderUnlocked("empyreancommander")) {
-                ButtonHelper.commanderUnlockCheck(p2, game, "empyrean", event);
+                CommanderUnlockCheck.commanderUnlockCheck(p2, game, "empyrean", event);
             }
         }
     }

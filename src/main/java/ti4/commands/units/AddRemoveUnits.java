@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.combat.StartCombat;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
@@ -305,12 +306,8 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
             ButtonHelper.checkFleetAndCapacity(player, game, tile, event);
-            if (player.getLeaderIDs().contains("naalucommander") && !player.hasLeaderUnlocked("naalucommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "naalu", event);
-            }
-            if (player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "cabal", event);
-            }
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "naalu", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "cabal", event);
         }
     }
 

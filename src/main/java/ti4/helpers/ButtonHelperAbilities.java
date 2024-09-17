@@ -19,6 +19,7 @@ import ti4.commands.combat.StartCombat;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.TurnStart;
@@ -971,9 +972,7 @@ public class ButtonHelperAbilities {
             player.getRepresentation(true, true) + " acquired " + Mapper.getRelic(relicName).getName()
                 + " and paid " + lostComms + " commodities (" + oldComms + "->" + player.getCommodities()
                 + ")");
-        if (player.getLeaderIDs().contains("axiscommander") && !player.hasLeaderUnlocked("axiscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "axis", event);
-        }
+        CommanderUnlockCheck.commanderUnlockCheck(player, game, "axis", event);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1022,7 +1021,7 @@ public class ButtonHelperAbilities {
         }
 
         if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "kollecc", event);
         }
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
@@ -1186,9 +1185,7 @@ public class ButtonHelperAbilities {
                 game.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName, game);
             message = ident + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game)
                 + " with a " + Emojis.pds;
-            if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "titans", event);
-            }
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "titans", event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         event.getMessage().delete().queue();
@@ -1440,7 +1437,7 @@ public class ButtonHelperAbilities {
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "yin", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yin", event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "

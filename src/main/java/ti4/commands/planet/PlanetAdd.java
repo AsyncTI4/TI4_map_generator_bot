@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -325,26 +326,26 @@ public class PlanetAdd extends PlanetAddRemove {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }
         if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "sol", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "sol", event);
         }
         if (player.getLeaderIDs().contains("vayleriancommander") && !player.hasLeaderUnlocked("vayleriancommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "vaylerian", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "vaylerian", event);
         }
         if (player.getLeaderIDs().contains("olradincommander") && !player.hasLeaderUnlocked("olradincommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "olradin", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "olradin", event);
         }
         if (player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "xxcha", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "xxcha", event);
         }
         if (player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "sardakk", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "sardakk", event);
         }
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelper.fullCommanderUnlockCheck(p2, game, "freesystems", event);
+            CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "freesystems", event);
         }
         if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.getLeaderIDs().contains("winnucommander")
             && !player.hasLeaderUnlocked("winnucommander") && player.controlsMecatol(true)) {
-            ButtonHelper.commanderUnlockCheck(player, game, "winnu", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "winnu", event);
         }
     }
 }

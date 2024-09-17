@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.ButtonHelper;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -53,7 +53,7 @@ public class SendTG extends PlayerSubcommandData {
 
         String p1 = player.getRepresentation();
         String p2 = player_.getRepresentation();
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
         String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(game) + " trade goods";
         String message = p1 + " sent " + tgString + " to " + p2;
         MessageHelper.sendMessageToEventChannel(event, message);

@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -68,14 +68,8 @@ public class PurgeFragments extends RelicSubcommandData {
 			game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
 		}
 
-		Player lanefirPlayer = game.getPlayers().values().stream()
-			.filter(p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander"))
-			.findFirst()
-			.orElse(null);
+		CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
 
-		if (lanefirPlayer != null) {
-			ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
-		}
 		String message = activePlayer.getRepresentation() + " purged fragments: " + fragmentsToPurge;
 		MessageHelper.sendMessageToEventChannel(event, message);
 
@@ -84,11 +78,9 @@ public class PurgeFragments extends RelicSubcommandData {
 			MessageHelper.sendMessageToEventChannel(event, activePlayer.getRepresentation() + " Put 1 commodity on ATS Armaments");
 		}
 
-		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
-		if (drawRelicOption != null) {
-			if (drawRelicOption.getAsBoolean()) {
-				DrawRelic.drawRelicAndNotify(activePlayer, event, game);
-			}
+		boolean drawRelic = event.getOption(Constants.ALSO_DRAW_RELIC, false, OptionMapping::getAsBoolean);
+		if (drawRelic) {
+			DrawRelic.drawRelicAndNotify(activePlayer, event, game);
 		}
 	}
 

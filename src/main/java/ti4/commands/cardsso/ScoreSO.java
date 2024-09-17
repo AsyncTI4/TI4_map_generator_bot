@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -92,14 +92,10 @@ public class ScoreSO extends SOCardsSubcommandData {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                     }
-                    Player lanefirPlayer = game.getPlayers().values().stream().filter(
-                        p -> p.getLeaderIDs().contains("lanefircommander") && !p.hasLeaderUnlocked("lanefircommander")).findFirst().orElse(null);
 
-                    if (lanefirPlayer != null) {
-                        ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
-                    }
-                    String message2 = player.getRepresentation() + " purged fragments: "
-                        + fragmentsToPurge;
+                    CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
+
+                    String message2 = player.getRepresentation() + " purged fragments: " + fragmentsToPurge;
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 } else {
                     Player p1 = player;
@@ -146,7 +142,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         SOInfo.sendSecretObjectiveInfo(game, player);
         Helper.checkIfHeroUnlocked(game, player);
         if (player.getLeaderIDs().contains("nomadcommander") && !player.hasLeaderUnlocked("nomadcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "nomad", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "nomad", event);
         }
         Helper.checkEndGame(game, player);
     }

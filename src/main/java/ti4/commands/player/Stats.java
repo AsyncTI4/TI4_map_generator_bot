@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -157,7 +158,7 @@ public class Stats extends PlayerSubcommandData {
             }
             if (player.getLeaderIDs().contains("mykomentoricommander")
                 && !player.hasLeaderUnlocked("mykomentoricommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
+                CommanderUnlockCheck.commanderUnlockCheck(player, game, "mykomentori", event);
             }
         }
 
@@ -407,7 +408,7 @@ public class Stats extends PlayerSubcommandData {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+            CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
             ButtonHelperAbilities.pillageCheck(player, game);
             if (scNumber == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {

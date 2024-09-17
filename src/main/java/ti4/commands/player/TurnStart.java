@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
@@ -60,7 +61,7 @@ public class TurnStart extends PlayerSubcommandData {
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
         Map<String, String> maps = new HashMap<>();
         maps.putAll(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
