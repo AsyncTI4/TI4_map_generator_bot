@@ -68,7 +68,6 @@ import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpInfo;
 import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.explore.ShowRemainingRelics;
 import ti4.commands.game.GameCreate;
 import ti4.commands.game.GameEnd;
 import ti4.commands.leaders.ExhaustLeader;
@@ -80,6 +79,7 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
+import ti4.commands.relic.ShowRemainingRelics;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.special.DiploSystem;
 import ti4.commands.special.StellarConverter;
@@ -2358,16 +2358,14 @@ public class ButtonHelper {
         return count;
     }
 
-    public static void fullCommanderUnlockCheck(Player player, Game game, String faction,
-        GenericInteractionCreateEvent event) {
+    public static void fullCommanderUnlockCheck(Player player, Game game, String faction, GenericInteractionCreateEvent event) {
         if (player != null && player.isRealPlayer() && player.getLeaderIDs().contains(faction + "commander")
             && !player.hasLeaderUnlocked(faction + "commander")) {
             commanderUnlockCheck(player, game, faction, event);
         }
     }
 
-    public static void commanderUnlockCheck(Player player, Game game, String faction,
-        GenericInteractionCreateEvent event) {
+    public static void commanderUnlockCheck(Player player, Game game, String faction, GenericInteractionCreateEvent event) {
         boolean shouldBeUnlocked = false;
         switch (faction) {
             case "axis" -> {

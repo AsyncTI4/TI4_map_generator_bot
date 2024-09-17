@@ -25,6 +25,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.relic.DrawRelic;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;

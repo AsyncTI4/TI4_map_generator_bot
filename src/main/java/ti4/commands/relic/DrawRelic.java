@@ -1,4 +1,4 @@
-package ti4.commands.explore;
+package ti4.commands.relic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +21,22 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
-public class DrawRelic extends GenericRelicAction {
+public class DrawRelic extends RelicSubcommandData {
 
     public DrawRelic() {
         super(Constants.RELIC_DRAW, "Draw a relic");
     }
 
     @Override
-    public void doAction(Player player, SlashCommandInteractionEvent event) {
+    public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            return;
+        }
         drawRelicAndNotify(player, event, game);
     }
 
