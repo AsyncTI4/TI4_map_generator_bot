@@ -956,10 +956,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), text);
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), buttonText, buttons);
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "jolnar");
-        CommanderUnlockCheck.checkPlayer(player, game, "nekro");
-        CommanderUnlockCheck.checkPlayer(player, game, "mirveda");
-        CommanderUnlockCheck.checkPlayer(player, game, "dihmohn");
+        CommanderUnlockCheck.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
 
         if (game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), message.toString());
@@ -1866,7 +1863,7 @@ public class ButtonHelper {
         int tg = player.getTg();
         player.setTg(tg + 3);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
-        CommanderUnlockCheck.checkPlayer(player, game, "hacan");
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
 
         boolean reacted = false;
         ButtonHelperAbilities.pillageCheck(player, game);

@@ -51,6 +51,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -4068,5 +4069,9 @@ public class Game extends GameProperties {
 
     public boolean removeTag(String tag) {
         return getTags().remove(tag);
+    }
+
+    public void checkCommanderUnlocks(String factionToCheck) {
+        CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
     }
 }

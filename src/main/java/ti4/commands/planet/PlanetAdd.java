@@ -325,14 +325,10 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "sol", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "vaylerian", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "olradin", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "xxcha", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "sardakk", event);
+        CommanderUnlockCheck.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
         CommanderUnlockCheck.checkAllPlayersInGame(game, "freesystems");
         if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.controlsMecatol(true)) {
-            CommanderUnlockCheck.checkPlayer(player, game, "winnu", event);
+            CommanderUnlockCheck.checkPlayer(player, "winnu");
         }
     }
 }

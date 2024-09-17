@@ -41,6 +41,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.user.UserSettings;
@@ -3129,5 +3130,9 @@ public class Player {
             }
         }
         return unfollowedSCs;
+    }
+
+    public void checkCommanderUnlock(String factionToCheck) {
+        CommanderUnlockCheck.checkPlayer(this, factionToCheck);
     }
 }
