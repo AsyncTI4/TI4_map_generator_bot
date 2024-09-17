@@ -65,21 +65,21 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.ds.DrawBlueBackTile;
-import ti4.commands.explore.ExpFrontier;
-import ti4.commands.explore.ExpInfo;
+import ti4.commands.explore.ExploreFrontier;
+import ti4.commands.explore.ExploreInfo;
 import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.explore.ShowRemainingRelics;
 import ti4.commands.game.GameCreate;
 import ti4.commands.game.GameEnd;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.ExhaustLeader;
 import ti4.commands.leaders.HeroPlay;
 import ti4.commands.leaders.RefreshLeader;
-import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
+import ti4.commands.relic.RelicShowRemaining;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.special.DiploSystem;
 import ti4.commands.special.StellarConverter;
@@ -862,9 +862,7 @@ public class ButtonHelper {
             .append(techM.getRepresentation(false));
 
         if (techM.getRequirements().isPresent() && techM.getRequirements().get().length() > 1) {
-            if (player.getLeaderIDs().contains("zealotscommander") && !player.hasLeaderUnlocked("zealotscommander")) {
-                commanderUnlockCheck(player, game, "zealots", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "zealots", event);
         }
         player.addTech(techID);
         if (techM.isUnitUpgrade()) {
@@ -958,18 +956,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), text);
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), buttonText, buttons);
         }
-        if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
-            commanderUnlockCheck(player, game, "jolnar", event);
-        }
-        if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
-            commanderUnlockCheck(player, game, "nekro", event);
-        }
-        if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
-            commanderUnlockCheck(player, game, "mirveda", event);
-        }
-        if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
-            commanderUnlockCheck(player, game, "dihmohn", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
 
         if (game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), message.toString());
@@ -1219,7 +1206,7 @@ public class ButtonHelper {
         switch (deck) {
             case "ac" -> ShowDiscardActionCards.showDiscard(game, event);
             case "agenda" -> ShowDiscardedAgendas.showDiscards(game, event);
-            case "relic" -> ShowRemainingRelics.showRemaining(event, false, game, player);
+            case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
             case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);
             case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
@@ -1236,7 +1223,7 @@ public class ButtonHelper {
                 } else {
                     types.add(deck);
                 }
-                ExpInfo.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
@@ -1253,10 +1240,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExpInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
         } else {
             types.add(type);
-            ExpInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
         }
         deleteMessage(event);
     }
@@ -1328,9 +1315,7 @@ public class ButtonHelper {
         }
 
         ACInfo.sendActionCardInfo(game, player, event);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            commanderUnlockCheck(player, game, "yssaril", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentation(true, true) + " use buttons to discard",
@@ -1813,9 +1798,7 @@ public class ButtonHelper {
             player.refreshTech(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
-            if (player.getLeaderIDs().contains("kolumecommander") && !player.hasLeaderUnlocked("kolumecommander")) {
-                commanderUnlockCheck(player, game, "kolume", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "kolume", event);
         } else {
             player.refreshPlanet(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
@@ -1880,7 +1863,7 @@ public class ButtonHelper {
         int tg = player.getTg();
         player.setTg(tg + 3);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
 
         boolean reacted = false;
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -2356,313 +2339,6 @@ public class ButtonHelper {
             }
         }
         return count;
-    }
-
-    public static void fullCommanderUnlockCheck(Player player, Game game, String faction,
-        GenericInteractionCreateEvent event) {
-        if (player != null && player.isRealPlayer() && player.getLeaderIDs().contains(faction + "commander")
-            && !player.hasLeaderUnlocked(faction + "commander")) {
-            commanderUnlockCheck(player, game, faction, event);
-        }
-    }
-
-    public static void commanderUnlockCheck(Player player, Game game, String faction,
-        GenericInteractionCreateEvent event) {
-        boolean shouldBeUnlocked = false;
-        switch (faction) {
-            case "axis" -> {
-                if (ButtonHelperAbilities.getNumberOfDifferentAxisOrdersBought(player, game) > 3) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "rohdhna" -> {
-                if (checkHighestProductionSystem(player, game) > 6) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "freesystems" -> {
-                if (getNumberOfUncontrolledNonLegendaryPlanets(game) < 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "mortheus" -> {
-                if (getNumberOfSystemsWithShipsNotAdjacentToHS(player, game) > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "celdauri" -> {
-                if (getNumberOfSpacedocksNotInOrAdjacentHS(player, game) > 0) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "cheiran" -> {
-                if (getNumberOfPlanetsWithStructuresNotInHS(player, game) > 3) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "vaden" -> {
-                if (howManyDifferentDebtPlayerHas(player) > (game.getRealPlayers().size() / 2) - 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "gledge" -> {
-                if (checkHighestCostSystem(player, game) > 9) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "olradin" -> {
-                if (getNumberOfXTypePlanets(player, game, "industrial", true) > 0
-                    && getNumberOfXTypePlanets(player, game, "cultural", true) > 0
-                    && getNumberOfXTypePlanets(player, game, "hazardous", true) > 0) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "vaylerian" -> {
-                if (getNumberOfXTypePlanets(player, game, "industrial", true) > 2
-                    || getNumberOfXTypePlanets(player, game, "cultural", true) > 2
-                    || getNumberOfXTypePlanets(player, game, "hazardous", true) > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "ghoti" -> {
-                if (getNumberOfTilesPlayerIsInWithNoPlanets(game, player) > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "nivyn" -> {
-                if (getNumberOfNonHomeAnomaliesPlayerIsIn(game, player) > 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "zelian" -> {
-                if (getNumberOfAsteroidsPlayerIsIn(game, player) > 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "yssaril" -> {
-                if (player.getActionCards().size() > 7
-                    || (player.getExhaustedTechs().contains("mi") && player.getActionCards().size() > 6)) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "kjalengard" -> {
-                if (ButtonHelperAgents.getGloryTokenTiles(game).size() > 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "kolume" -> {
-                shouldBeUnlocked = true;
-
-            }
-            case "veldyr" -> {
-                if (ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player).size() > 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "mirveda" -> {
-                if (getNumberOfUnitUpgrades(player) > 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "dihmohn" -> {
-                if (getNumberOfUnitUpgrades(player) > 0) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "kollecc" -> {
-                if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() > 3) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "bentor" -> {
-                if (player.getNumberOfBluePrints() > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "edyn" -> {
-                if (game.getLaws().size() > 0) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "lizho" -> {
-                if (player.getTrapCardsPlanets().size() > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "zealots" -> shouldBeUnlocked = true;
-            case "yin" -> shouldBeUnlocked = true;
-            case "florzen" -> shouldBeUnlocked = true;
-            case "letnev" -> shouldBeUnlocked = true;
-            case "kortali" -> shouldBeUnlocked = true;
-            case "augers" -> shouldBeUnlocked = true;
-            case "hacan" -> {
-                if (player.getTg() > 9) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "mykomentori" -> {
-                if (player.getCommodities() > 3) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "sardakk" -> {
-                if (player.getPlanets().size() > 6) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "ghost" -> {
-                if (getAllTilesWithAlphaNBetaNUnits(player, game) > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "sol" -> {
-                int resources = 0;
-                for (String planet : player.getPlanets()) {
-                    resources = resources + Helper.getPlanetResources(planet, game);
-                }
-                if (resources > 11) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "xxcha" -> {
-                int resources = 0;
-                for (String planet : player.getPlanets()) {
-                    resources = resources + Helper.getPlanetInfluence(planet, game);
-                }
-                if (resources > 11) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "mentak" -> {
-                if (getNumberOfUnitsOnTheBoard(game, player, "cruiser", false) > 3) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "ghemina" -> {
-                if ((getNumberOfUnitsOnTheBoard(game, player, "flagship", false)
-                    + getNumberOfUnitsOnTheBoard(game, player, "lady", false)) > 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "tnelis" -> {
-                if (getNumberOfUnitsOnTheBoard(game, player, "destroyer", false) > 5) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "cymiae" -> {
-                if (getNumberOfUnitsOnTheBoard(game, player, "infantry", false) > 9) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "kyro" -> {
-                if (getNumberOfUnitsOnTheBoard(game, player, "infantry", false) > 5
-                    && getNumberOfUnitsOnTheBoard(game, player, "fighter", false) > 5) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "l1z1x" -> {
-                if (getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false) > 3) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "argent" -> {
-                int num = getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                    + getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false)
-                    + getNumberOfUnitsOnTheBoard(game, player, "destroyer", false)
-                    + getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
-                if (num > 5) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "titans" -> {
-                int num = getNumberOfUnitsOnTheBoard(game, player, "pds")
-                    + getNumberOfUnitsOnTheBoard(game, player, "spacedock");
-                if (num > 4) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "cabal" -> {
-                int num = getNumberOfGravRiftsPlayerIsIn(player, game);
-                if (num > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "nekro" -> {
-                int count = 2;
-                if (player.hasTech("vax")) {
-                    count++;
-                }
-                if (player.hasTech("vay")) {
-                    count++;
-                }
-                if (player.getTechs().size() > count) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "jolnar" -> {
-                if (player.getTechs().size() > 7) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "saar" -> {
-                if (getNumberOfUnitsOnTheBoard(game, player, "spacedock") > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "naaz" -> {
-                if (getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size() > 2) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "nomad" -> {
-                if (player.getSoScored() > 0) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "mahact" -> {
-                if (player.getMahactCC().size() > 1) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "empyrean" -> {
-                if (player.getNeighbourCount() > (game.getRealPlayers().size() - 2)) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "muaat" -> shouldBeUnlocked = true;
-            case "winnu" -> shouldBeUnlocked = true;
-            case "naalu" -> {
-                Tile rex = game.getMecatolTile();
-                if (rex != null) {
-                    for (String tilePos : FoWHelper.getAdjacentTiles(game, rex.getPosition(), player, false)) {
-                        Tile tile = game.getTileByPosition(tilePos);
-                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                            if (unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
-                                || unitHolder.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
-                                shouldBeUnlocked = true;
-                            }
-                        }
-                    }
-                }
-            }
-            case "keleres" -> shouldBeUnlocked = true;
-            case "arborec" -> {
-                int num = getAmountOfSpecificUnitsOnPlanets(player, game, "infantry")
-                    + getAmountOfSpecificUnitsOnPlanets(player, game, "mech");
-                if (num > 11) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            case "lanefir" -> {
-                if (game.getNumberOfPurgedFragments() > 6) {
-                    shouldBeUnlocked = true;
-                }
-            }
-            // missing: yin, ghost, naalu, letnev
-        }
-        if (shouldBeUnlocked) {
-            UnlockLeader.unlockLeader(faction + "commander", game, player);
-        }
     }
 
     public static int getAmountOfSpecificUnitsOnPlanets(Player player, Game game, String unit) {
@@ -3330,10 +3006,7 @@ public class ButtonHelper {
                     message = getIdent(player) + " Drew 1 AC";
                     ACInfo.sendActionCardInfo(game, player, event);
                 }
-                if (player.getLeaderIDs().contains("yssarilcommander")
-                    && !player.hasLeaderUnlocked("yssarilcommander")) {
-                    commanderUnlockCheck(player, game, "yssaril", event);
-                }
+                CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
             } else {
                 Leader playerLeader = player.getLeader(acOrAgent).orElse(null);
                 if (playerLeader == null) {
@@ -3585,9 +3258,7 @@ public class ButtonHelper {
             }
         }
         if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
-            if (player.getLeaderIDs().contains("letnevcommander") && !player.hasLeaderUnlocked("letnevcommander")) {
-                commanderUnlockCheck(player, game, "letnev", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "letnev", event);
         }
         if (player.hasAbility("flotilla")) {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
@@ -4333,7 +4004,7 @@ public class ButtonHelper {
                 msg2 = msg2 + name1 + ": " + card.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
-                new ExpFrontier().expFront(event, tile, game, player);
+                new ExploreFrontier().expFront(event, tile, game, player);
             }
 
             if (player.hasAbility("migrant_fleet")) {
@@ -5126,15 +4797,9 @@ public class ButtonHelper {
         }
         Button concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done landing troops");
         buttons.add(concludeMove);
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")) {
-            commanderUnlockCheck(player, game, "empyrean", event);
-        }
-        if (player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")) {
-            commanderUnlockCheck(player, game, "ghost", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "empyrean", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "ghost", event);
 
         return buttons;
     }
@@ -8890,7 +8555,7 @@ public class ButtonHelper {
                             + " Use buttons to select the user of the agent";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null), null);
+                        ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null));
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
                             ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1, p1.getFactionEmoji());
                         }
@@ -9588,9 +9253,7 @@ public class ButtonHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
-            if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
-                commanderUnlockCheck(player, game, "mirveda", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "mirveda", event);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(true, true) + " acquired War Sun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);

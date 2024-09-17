@@ -15,8 +15,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.explore.SendFragments;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ClearDebt;
+import ti4.commands.relic.RelicSendFragments;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
@@ -748,7 +749,7 @@ public class TransactionHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
@@ -772,7 +773,7 @@ public class TransactionHelper {
                     p2.setCommodities(targetTG);
                 }
 
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
@@ -802,8 +803,8 @@ public class TransactionHelper {
                 p2.setCommodities(newP2Comms);
                 p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
                 p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
-                ButtonHelper.fullCommanderUnlockCheck(p1, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p1, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 // ButtonHelperAbilities.pillageCheck(p1, game);
@@ -823,7 +824,7 @@ public class TransactionHelper {
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt tokens to " + ident2;
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "vaden", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "vaden", event);
             }
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
@@ -927,7 +928,7 @@ public class TransactionHelper {
                     case "URF" -> "frontier";
                     default -> "";
                 };
-                new SendFragments().sendFrags(event, p1, p2, trait, fragNum, game);
+                new RelicSendFragments().sendFrags(event, p1, p2, trait, fragNum, game);
                 message2 = "";
             }
         }

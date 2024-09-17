@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -155,10 +156,7 @@ public class Stats extends PlayerSubcommandData {
                     player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
                     ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            if (player.getLeaderIDs().contains("mykomentoricommander")
-                && !player.hasLeaderUnlocked("mykomentoricommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "mykomentori", event);
         }
 
         OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);
@@ -407,7 +405,7 @@ public class Stats extends PlayerSubcommandData {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
             ButtonHelperAbilities.pillageCheck(player, game);
             if (scNumber == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {

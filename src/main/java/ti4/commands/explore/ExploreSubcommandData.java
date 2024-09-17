@@ -23,8 +23,10 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.relic.RelicDraw;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
@@ -197,13 +199,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     tile.addToken(attachmentFilename, planetID);
                     game.purgeExplore(ogID);
                     message = "Attachment `" + attachment + "` added to planet";
-                    if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "sol", event);
-                    }
-                    if (player.getLeaderIDs().contains("xxchacommander")
-                        && !player.hasLeaderUnlocked("xxchacommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "xxcha", event);
-                    }
+                    CommanderUnlockCheck.checkPlayer(player, game, "sol", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "xxcha", event);
                 }
             }
             case Constants.TOKEN -> {
@@ -289,7 +286,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 ButtonHelper.checkACLimit(game, event, player);
-                ButtonHelper.fullCommanderUnlockCheck(player, game, "yssaril", event);
+                CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
             }
             case "dv1", "dv2" -> {
                 message = "Drew A Secret Objective.";
@@ -307,7 +304,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dw" -> {
                 message = "Drew Relic";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-                DrawRelic.drawRelicAndNotify(player, event, game);
+                RelicDraw.drawRelicAndNotify(player, event, game);
             }
             case "ms1", "ms2" -> {
                 message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()
@@ -475,7 +472,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
-                ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
 
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
@@ -550,7 +547,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
                     "# Exploring frontier in this system due to finding the hidden laboratory industrial explore.");
                 AddToken.addToken(event, tile, Constants.FRONTIER, game);
-                new ExpFrontier().expFront(event, tile, game, player);
+                new ExploreFrontier().expFront(event, tile, game, player);
             }
             case "ancientshipyard" -> {
                 List<String> colors = tile == null ? List.of() : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
@@ -578,7 +575,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
 
         }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
@@ -592,15 +589,11 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             game.setStoredValue("fortuneSeekers", "Used");
         }
 
-        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }
-        if (player.getLeaderIDs().contains("bentorcommander") && !player.hasLeaderUnlocked("bentorcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "bentor", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "bentor", event);
 
         if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
             && player.getPlanetsAllianceMode().contains(planetID)) {

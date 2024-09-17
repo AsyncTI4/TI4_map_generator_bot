@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -55,10 +56,7 @@ public class DrawAC extends ACCardsSubcommandData {
         ACInfo.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, null, player);
         if (addScheming && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(game, player, false);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", null);
-        }
-
+        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", null);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 }
