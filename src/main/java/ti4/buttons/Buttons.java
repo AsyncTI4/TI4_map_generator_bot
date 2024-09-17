@@ -49,6 +49,9 @@ public class Buttons {
      * A blue button (primary style)
      */
     public static Button blue(String buttonID, String buttonLabel) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.primary(buttonID, buttonLabel);
     }
 
@@ -56,6 +59,9 @@ public class Buttons {
      * A blue button (primary style) with an emoji
      */
     public static Button blue(String buttonID, String buttonLabel, String emoji) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.primary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
@@ -63,6 +69,9 @@ public class Buttons {
      * A gray button (secondary style)
      */
     public static Button gray(String buttonID, String buttonLabel) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.secondary(buttonID, buttonLabel);
     }
 
@@ -70,6 +79,9 @@ public class Buttons {
      * A gray button (secondary style) with an emoji
      */
     public static Button gray(String buttonID, String buttonLabel, String emoji) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.secondary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
@@ -77,6 +89,9 @@ public class Buttons {
      * A green button (success style)
      */
     public static Button green(String buttonID, String buttonLabel) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.success(buttonID, buttonLabel);
     }
 
@@ -84,6 +99,9 @@ public class Buttons {
      * A green button (success style) with an emoji
      */
     public static Button green(String buttonID, String buttonLabel, String emoji) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.success(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
@@ -91,6 +109,9 @@ public class Buttons {
      * A red button (danger style) with an emoji
      */
     public static Button red(String buttonID, String buttonLabel) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.danger(buttonID, buttonLabel);
     }
 
@@ -98,6 +119,9 @@ public class Buttons {
      * A red button (danger style) with an emoji
      */
     public static Button red(String buttonID, String buttonLabel, String emoji) {
+        if (StringUtils.isEmpty(buttonLabel)) {
+            buttonLabel = " ";
+        }
         return Button.danger(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
     }
 
