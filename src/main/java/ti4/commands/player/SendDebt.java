@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -62,7 +62,7 @@ public class SendDebt extends PlayerSubcommandData {
 
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
 
-        ButtonHelper.fullCommanderUnlockCheck(receivingPlayer, game, "vaden", event);
+        CommanderUnlockCheck.checkPlayer(receivingPlayer, game, "vaden", event);
 
         MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
 

@@ -53,16 +53,15 @@ import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.ZelianHero;
-import ti4.commands.explore.DrawRelic;
-import ti4.commands.explore.ExpFrontier;
-import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExploreFrontier;
+import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.explore.RelicInfo;
 import ti4.commands.franken.FrankenApplicator;
 import ti4.commands.game.CreateGameButton;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
@@ -76,6 +75,8 @@ import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.player.UnitInfo;
+import ti4.commands.relic.RelicDraw;
+import ti4.commands.relic.RelicInfo;
 import ti4.commands.search.SearchMyGames;
 import ti4.commands.special.FighterConscription;
 import ti4.commands.special.NaaluCommander;
@@ -253,8 +254,6 @@ public class ButtonListener extends ListenerAdapter {
             soDiscard(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel, ident);
         } else if (buttonID.startsWith("mantleCrack_")) {
             ButtonHelperAbilities.mantleCracking(player, game, event, buttonID);
-        } else if (buttonID.startsWith("umbatTile_")) {
-            ButtonHelperAgents.umbatTile(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("dihmohnfs_")) {
             ButtonHelperFactionSpecific.resolveDihmohnFlagship(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("dsdihmy_")) {
@@ -745,7 +744,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             String[] info = bID.split("_");
             Tile tile = game.getTileFromPlanet(info[1]);
-            new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game,
+            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game,
                 1, false);
             if (dsdihmy) {
                 player.exhaustPlanet(info[1]);
@@ -1319,7 +1318,7 @@ public class ButtonListener extends ListenerAdapter {
             String pos = stuff[1];
             String cardRefused = stuff[2];
             game.addExplore(cardRefused);
-            new ExpFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
+            new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
                 cardChosen);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("finishComponentAction_")) {
@@ -1936,7 +1935,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("garboziaAbilityExhaust_")) {
             String planet = "garbozia";
             player.exhaustPlanetAbility(planet);
-            new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player,
+            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player,
                 true, game, 1, false);
         } else if (buttonID.startsWith("checksNBalancesPt2_")) {// "freeSystemsHeroPlanet_"
             SCPick.resolvePt2ChecksNBalances(event, player, game, buttonID);
@@ -2153,7 +2152,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("khraskHeroStep4Ready_")) {
             ButtonHelperHeroes.resolveKhraskHeroStep4Ready(player, game, event, buttonID);
         } else if (buttonID.startsWith("drawRelicAtPosition_")) {
-            DrawRelic.resolveDrawRelicAtPosition(player, event, game, buttonID);
+            RelicDraw.resolveDrawRelicAtPosition(player, event, game, buttonID);
         } else if (buttonID.startsWith("setTrapStep2_")) {
             ButtonHelperAbilities.setTrapStep2(game, player, event, buttonID);
         } else if (buttonID.startsWith("removeTrapStep2_")) {
@@ -2182,7 +2181,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveDeckChoice(game, event, buttonID, player);
         } else if (buttonID.startsWith("unlockCommander_")) {
             ButtonHelper.deleteTheOneButton(event);
-            ButtonHelper.commanderUnlockCheck(player, game, buttonID.split("_")[1], event);
+            CommanderUnlockCheck.checkPlayer(player, game, buttonID.split("_")[1], event);
         } else if (buttonID.startsWith("setForThalnos_")) {
             ButtonHelper.resolveSetForThalnos(player, game, buttonID, event);
         } else if (buttonID.startsWith("rollThalnos_")) {
@@ -2624,18 +2623,18 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, game, "jolnar", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "jolnar", event);
                 }
                 if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, game, "nekro", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "nekro", event);
                 }
                 if (player.getLeaderIDs().contains("mirvedacommander")
                     && !player.hasLeaderUnlocked("mirvedacommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, game, "mirveda", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "mirveda", event);
                 }
                 if (player.getLeaderIDs().contains("dihmohncommander")
                     && !player.hasLeaderUnlocked("dihmohncommander")) {
-                    ButtonHelper.commanderUnlockCheck(player, game, "dihmohn", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "dihmohn", event);
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
@@ -3118,7 +3117,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
                     ButtonHelper.deleteTheOneButton(event);
 
@@ -3334,7 +3333,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
 
                     if (hasSchemingAbility) {
@@ -3382,7 +3381,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
 
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -3417,7 +3416,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
 
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -3532,7 +3531,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = playerRep + " exhausted Mallice ability and gained 2TGs " + player.gainTG(2) + ".";
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
-                    ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
                     if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
                     }
@@ -3660,7 +3659,7 @@ public class ButtonListener extends ListenerAdapter {
                         game.drawActionCard(player.getUserID());
                         if (player.getLeaderIDs().contains("yssarilcommander")
                             && !player.hasLeaderUnlocked("yssarilcommander")) {
-                            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                         }
                         ACInfo.sendActionCardInfo(game, player, event);
                         message = "Drew 1 AC";
@@ -3678,7 +3677,7 @@ public class ButtonListener extends ListenerAdapter {
                         game.drawActionCard(player.getUserID());
                         if (player.getLeaderIDs().contains("yssarilcommander")
                             && !player.hasLeaderUnlocked("yssarilcommander")) {
-                            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                         }
                         ACInfo.sendActionCardInfo(game, player, event);
                         message = "Drew 1 AC";
@@ -3697,7 +3696,7 @@ public class ButtonListener extends ListenerAdapter {
                         game.drawActionCard(player.getUserID());
                         if (player.getLeaderIDs().contains("yssarilcommander")
                             && !player.hasLeaderUnlocked("yssarilcommander")) {
-                            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                         }
                         ACInfo.sendActionCardInfo(game, player, event);
                         message = "Drew 2 ACs With Scheming. Please Discard 1 AC.";
@@ -3749,7 +3748,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "drawRelicFromFrag" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
-                    DrawRelic.drawRelicAndNotify(player, event, game);
+                    RelicDraw.drawRelicAndNotify(player, event, game);
                     String message = "Use buttons to end turn or do another action.";
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -3757,7 +3756,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "drawRelic" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
-                    DrawRelic.drawRelicAndNotify(player, event, game);
+                    RelicDraw.drawRelicAndNotify(player, event, game);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "thronePoint" -> {
@@ -3874,7 +3873,7 @@ public class ButtonListener extends ListenerAdapter {
                             "You are not the active player. Force End Turn with /player turn_end.");
                         return;
                     }
-                    ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
                     TurnEnd.pingNextPlayer(event, game, player);
                     event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
 

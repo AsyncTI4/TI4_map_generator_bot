@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.combat.StartCombat;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -888,12 +889,8 @@ public class ButtonHelperModifyUnits {
         }
         Button concludeMove = Buttons.gray(finChecker + "deleteButtons", "Done Retreating troops");
         buttons.add(concludeMove);
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "empyrean", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "empyrean", event);
         return buttons;
     }
 
@@ -947,7 +944,7 @@ public class ButtonHelperModifyUnits {
         }
         List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cheiran", event);
         event.getMessage().delete().queue();
     }
 
@@ -1009,9 +1006,7 @@ public class ButtonHelperModifyUnits {
         String devoteOrNo = buttonID.split("_")[3];
         if (devoteOrNo.equalsIgnoreCase("devote")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
-            if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "yin", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "yin", event);
         }
     }
 
@@ -1288,9 +1283,7 @@ public class ButtonHelperModifyUnits {
                 successMessage = "Placed 1 " + Emojis.spacedock + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
-            if (player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "cabal", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "cabal", event);
             if (player.hasAbility("industrious") && !FoWHelper.otherPlayersHaveShipsInSystem(player,
                 game.getTile(AliasHandler.resolveTile(planetName)), game)) {
                 Button replace = Buttons.green("FFCC_" + player.getFaction() + "_rohdhnaIndustrious_"
@@ -1522,52 +1515,29 @@ public class ButtonHelperModifyUnits {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "titans", event);
-        }
-        if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "saar", event);
-        }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "rohdhna", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "celdauri", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "gledge", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "titans", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "saar", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "rohdhna", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cheiran", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "celdauri", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "gledge", event);
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        if (player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mentak", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "mentak", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "l1z1x", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "tnelis", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cymiae", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "kyro", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "ghemina", event);
+        if ("warsun".equalsIgnoreCase(unitLong)) {
+            CommanderUnlockCheck.checkPlayer(player, game, "muaat", event);
         }
-        if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "l1z1x", event);
-        }
-        if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "tnelis", event);
-        }
-        if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "cymiae", event);
-        }
-        if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kyro", event);
-        }
-        if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "ghemina", event);
-        }
-        if (player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander")
-            && "warsun".equalsIgnoreCase(unitLong)) {
-            ButtonHelper.commanderUnlockCheck(player, game, "muaat", event);
-        }
-        if (player.getLeaderIDs().contains("argentcommander") && !player.hasLeaderUnlocked("argentcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "argent", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "argent", event);
 
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("arboreccommander") && !player.hasLeaderUnlocked("arboreccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "arborec", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "arborec", event);
     }
 
     public static void resolveCloakedFleets(String buttonID, ButtonInteractionEvent event, Game game,
@@ -1727,21 +1697,11 @@ public class ButtonHelperModifyUnits {
                 }
 
             }
-            if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "l1z1x", event);
-            }
-            if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "cymiae", event);
-            }
-            if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "kyro", event);
-            }
-            if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "ghemina", event);
-            }
-            if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "tnelis", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "l1z1x", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "cymiae", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "kyro", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "ghemina", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "tnelis", event);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             playerRep + " " + successMessage);
@@ -1790,56 +1750,32 @@ public class ButtonHelperModifyUnits {
             }
         }
 
-        if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "titans", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "titans", event);
         if ("sd".equalsIgnoreCase(unit)) {
             Tile tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "saar", event);
-        }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "rohdhna", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "celdauri", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "saar", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "rohdhna", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cheiran", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "celdauri", event);
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
-            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
-                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        if (player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mentak", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "mentak", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "l1z1x", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "tnelis", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cymiae", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "kyro", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "ghemina", event);
+        if ("warsun".equalsIgnoreCase(unitLong)) {
+            CommanderUnlockCheck.checkPlayer(player, game, "muaat", event);
         }
-        if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "l1z1x", event);
-        }
-        if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "tnelis", event);
-        }
-        if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "cymiae", event);
-        }
-        if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kyro", event);
-        }
-        if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "ghemina", event);
-        }
-        if (player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander")
-            && "warsun".equalsIgnoreCase(unitLong)) {
-            ButtonHelper.commanderUnlockCheck(player, game, "muaat", event);
-        }
-        if (player.getLeaderIDs().contains("argentcommander") && !player.hasLeaderUnlocked("argentcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "argent", event);
-        }
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("arboreccommander") && !player.hasLeaderUnlocked("arboreccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "arborec", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "argent", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "arborec", event);
 
         event.getMessage().delete().queue();
     }

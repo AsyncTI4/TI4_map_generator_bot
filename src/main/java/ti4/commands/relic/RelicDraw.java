@@ -1,4 +1,4 @@
-package ti4.commands.explore;
+package ti4.commands.relic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsso.SOInfo;
@@ -21,15 +23,23 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 
-public class DrawRelic extends GenericRelicAction {
+public class RelicDraw extends RelicSubcommandData {
 
-    public DrawRelic() {
+    public RelicDraw() {
         super(Constants.RELIC_DRAW, "Draw a relic");
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
-    public void doAction(Player player, SlashCommandInteractionEvent event) {
+    public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
+        Player player = game.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
+            return;
+        }
         drawRelicAndNotify(player, event, game);
     }
 
