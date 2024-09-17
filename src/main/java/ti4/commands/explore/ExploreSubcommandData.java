@@ -547,7 +547,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
                     "# Exploring frontier in this system due to finding the hidden laboratory industrial explore.");
                 AddToken.addToken(event, tile, Constants.FRONTIER, game);
-                new ExpFrontier().expFront(event, tile, game, player);
+                new ExploreFrontier().expFront(event, tile, game, player);
             }
             case "ancientshipyard" -> {
                 List<String> colors = tile == null ? List.of() : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
