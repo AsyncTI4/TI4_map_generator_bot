@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
@@ -158,7 +159,7 @@ public class SCPick extends PlayerSubcommandData {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+            CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
             ButtonHelperAbilities.pillageCheck(player, game);
             game.setScTradeGood(scPicked, 0);
             if (scPicked == 2 && game.isRedTapeMode()) {

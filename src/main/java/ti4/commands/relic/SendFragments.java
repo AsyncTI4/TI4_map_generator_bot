@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -89,10 +89,10 @@ public class SendFragments extends RelicSubcommandData {
 			MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
 		}
 		if (receiver.getLeaderIDs().contains("kollecccommander") && !receiver.hasLeaderUnlocked("kollecccommander")) {
-			ButtonHelper.commanderUnlockCheck(receiver, game, "kollecc", event);
+			CommanderUnlockCheck.commanderUnlockCheck(receiver, game, "kollecc", event);
 		}
 		if (receiver.getLeaderIDs().contains("bentorcommander") && !receiver.hasLeaderUnlocked("bentorcommander")) {
-			ButtonHelper.commanderUnlockCheck(receiver, game, "bentor", event);
+			CommanderUnlockCheck.commanderUnlockCheck(receiver, game, "bentor", event);
 		}
 		if (game.isFowMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
@@ -105,7 +105,7 @@ public class SendFragments extends RelicSubcommandData {
 		TransactionHelper.checkTransactionLegality(game, sender, receiver);
 		Player player = receiver;
 		if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-			ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
+			CommanderUnlockCheck.commanderUnlockCheck(player, game, "kollecc", event);
 		}
 	}
 }

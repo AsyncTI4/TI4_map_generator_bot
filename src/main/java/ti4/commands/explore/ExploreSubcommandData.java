@@ -23,6 +23,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.relic.DrawRelic;
@@ -199,11 +200,11 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     game.purgeExplore(ogID);
                     message = "Attachment `" + attachment + "` added to planet";
                     if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "sol", event);
+                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "sol", event);
                     }
                     if (player.getLeaderIDs().contains("xxchacommander")
                         && !player.hasLeaderUnlocked("xxchacommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "xxcha", event);
+                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "xxcha", event);
                     }
                 }
             }
@@ -290,7 +291,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 ButtonHelper.checkACLimit(game, event, player);
-                ButtonHelper.fullCommanderUnlockCheck(player, game, "yssaril", event);
+                CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "yssaril", event);
             }
             case "dv1", "dv2" -> {
                 message = "Drew A Secret Objective.";
@@ -476,7 +477,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
-                ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+                CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
 
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
@@ -579,7 +580,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
 
         }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
@@ -594,13 +595,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
 
         if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "kollecc", event);
         }
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }
         if (player.getLeaderIDs().contains("bentorcommander") && !player.hasLeaderUnlocked("bentorcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "bentor", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player, game, "bentor", event);
         }
 
         if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)

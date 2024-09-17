@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -57,7 +58,7 @@ public class ButtonHelperRelics {
             }
             if (player.getLeaderIDs().contains("yssarilcommander")
                 && !player.hasLeaderUnlocked("yssarilcommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+                CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
             }
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

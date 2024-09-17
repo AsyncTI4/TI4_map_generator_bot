@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.GenerateTile;
 import ti4.helpers.AliasHandler;
@@ -236,18 +237,13 @@ public class StartCombat extends CombatSubcommandData {
                 return;
             }
         }
-        if (tile.isMecatol() && player1.getLeaderIDs().contains("winnucommander")
-            && !player1.hasLeaderUnlocked("winnucommander")) {
-            ButtonHelper.commanderUnlockCheck(player1, game, "winnu", event);
-        }
-        if (tile.isMecatol() && player2.getLeaderIDs().contains("winnucommander")
-            && !player2.hasLeaderUnlocked("winnucommander")) {
-            ButtonHelper.commanderUnlockCheck(player2, game, "winnu", event);
+        if (tile.isMecatol()) {
+            CommanderUnlockCheck.commanderUnlockCheck(player1, game, "winnu", event);
+            CommanderUnlockCheck.commanderUnlockCheck(player2, game, "winnu", event);
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(),
-            event, player1);
+        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event, player1);
 
         // Create the thread
         final String finalThreadName = threadName;

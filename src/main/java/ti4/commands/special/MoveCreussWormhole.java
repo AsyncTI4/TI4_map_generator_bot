@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -68,9 +68,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
-        if (player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "ghost", event);
-        }
+        CommanderUnlockCheck.commanderUnlockCheck(player, game, "ghost", event);
     }
 
     private boolean isValidCreussWormhole(String tokenName) {

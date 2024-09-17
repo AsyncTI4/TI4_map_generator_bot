@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.explore.ExpFrontier;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -87,7 +88,7 @@ public class ButtonHelperExplore {
             .findFirst().orElse(null);
 
         if (lanefirPlayer != null) {
-            ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
+            CommanderUnlockCheck.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
         }
 
         String message = player.getRepresentation() + " purged fragments: "

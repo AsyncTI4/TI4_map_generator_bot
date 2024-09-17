@@ -19,6 +19,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.SentACRandom;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.ExpFrontier;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
@@ -428,9 +429,8 @@ public class ButtonHelperActionCards {
         }
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
-        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
-        }
+        CommanderUnlockCheck.commanderUnlockCheck(player, game, "kollecc", event);
+        
         ButtonHelper.deleteMessage(event);
     }
 
@@ -797,7 +797,7 @@ public class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromLeader("empyreancommander");
         if (p2 != null) {
             if (!p2.hasLeaderUnlocked("empyreancommander")) {
-                ButtonHelper.commanderUnlockCheck(p2, game, "empyrean", event);
+                CommanderUnlockCheck.commanderUnlockCheck(p2, game, "empyrean", event);
             }
         }
     }

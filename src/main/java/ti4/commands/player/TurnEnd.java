@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
@@ -110,8 +111,8 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setStoredValue("endTurnWhenSCFinished", "");
         game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "sol", event);
-        ButtonHelper.fullCommanderUnlockCheck(mainPlayer, game, "hacan", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(mainPlayer, game, "sol", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(mainPlayer, game, "hacan", event);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -171,7 +172,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
-        ButtonHelper.fullCommanderUnlockCheck(nextPlayer, game, "sol", event);
+        CommanderUnlockCheck.fullCommanderUnlockCheck(nextPlayer, game, "sol", event);
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);
