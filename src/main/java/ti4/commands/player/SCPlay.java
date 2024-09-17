@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.event.RevealEvent;
-import ti4.commands.explore.DrawRelic;
+import ti4.commands.relic.DrawRelic;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
