@@ -8555,7 +8555,7 @@ public class ButtonHelper {
                             + " Use buttons to select the user of the agent";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null), null);
+                        ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null));
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
                             ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1, p1.getFactionEmoji());
                         }
