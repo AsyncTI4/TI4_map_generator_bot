@@ -53,7 +53,7 @@ public class SendTG extends PlayerSubcommandData {
 
         String p1 = player.getRepresentation();
         String p2 = player_.getRepresentation();
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
         String tgString = sendTG + " " + Emojis.getTGorNomadCoinEmoji(game) + " trade goods";
         String message = p1 + " sent " + tgString + " to " + p2;
         MessageHelper.sendMessageToEventChannel(event, message);

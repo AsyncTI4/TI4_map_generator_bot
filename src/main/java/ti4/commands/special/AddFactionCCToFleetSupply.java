@@ -21,7 +21,7 @@ public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
             player.addMahactCC(color);
             Helper.isCCCountCorrect(event, game, color);
         }
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "mahact", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "mahact", event);
         GameSaveLoadManager.saveMap(game, event);
 
     }

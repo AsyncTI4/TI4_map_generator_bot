@@ -61,7 +61,7 @@ public class TurnStart extends PlayerSubcommandData {
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
         Map<String, String> maps = new HashMap<>();
         maps.putAll(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {

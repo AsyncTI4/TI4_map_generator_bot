@@ -862,9 +862,7 @@ public class ButtonHelper {
             .append(techM.getRepresentation(false));
 
         if (techM.getRequirements().isPresent() && techM.getRequirements().get().length() > 1) {
-            if (player.getLeaderIDs().contains("zealotscommander") && !player.hasLeaderUnlocked("zealotscommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(player, game, "zealots", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "zealots", event);
         }
         player.addTech(techID);
         if (techM.isUnitUpgrade()) {
@@ -958,10 +956,10 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), text);
             MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(player, game), buttonText, buttons);
         }
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "jolnar");
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "nekro");
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "mirveda");
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "dihmohn");
+        CommanderUnlockCheck.checkPlayer(player, game, "jolnar");
+        CommanderUnlockCheck.checkPlayer(player, game, "nekro");
+        CommanderUnlockCheck.checkPlayer(player, game, "mirveda");
+        CommanderUnlockCheck.checkPlayer(player, game, "dihmohn");
 
         if (game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), message.toString());
@@ -1320,9 +1318,7 @@ public class ButtonHelper {
         }
 
         ACInfo.sendActionCardInfo(game, player, event);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentation(true, true) + " use buttons to discard",
@@ -1805,9 +1801,7 @@ public class ButtonHelper {
             player.refreshTech(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
-            if (player.getLeaderIDs().contains("kolumecommander") && !player.hasLeaderUnlocked("kolumecommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(player, game, "kolume", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "kolume", event);
         } else {
             player.refreshPlanet(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
@@ -1872,7 +1866,7 @@ public class ButtonHelper {
         int tg = player.getTg();
         player.setTg(tg + 3);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan");
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan");
 
         boolean reacted = false;
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -3015,10 +3009,7 @@ public class ButtonHelper {
                     message = getIdent(player) + " Drew 1 AC";
                     ACInfo.sendActionCardInfo(game, player, event);
                 }
-                if (player.getLeaderIDs().contains("yssarilcommander")
-                    && !player.hasLeaderUnlocked("yssarilcommander")) {
-                    CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
-                }
+                CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
             } else {
                 Leader playerLeader = player.getLeader(acOrAgent).orElse(null);
                 if (playerLeader == null) {
@@ -3270,9 +3261,7 @@ public class ButtonHelper {
             }
         }
         if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
-            if (player.getLeaderIDs().contains("letnevcommander") && !player.hasLeaderUnlocked("letnevcommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(player, game, "letnev", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "letnev", event);
         }
         if (player.hasAbility("flotilla")) {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
@@ -4811,15 +4800,9 @@ public class ButtonHelper {
         }
         Button concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done landing troops");
         buttons.add(concludeMove);
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "empyrean", event);
-        }
-        if (player.getLeaderIDs().contains("ghostcommander") && !player.hasLeaderUnlocked("ghostcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "ghost", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "empyrean", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "ghost", event);
 
         return buttons;
     }
@@ -9273,9 +9256,7 @@ public class ButtonHelper {
         }
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
-            if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(player, game, "mirveda", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "mirveda", event);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(true, true) + " acquired War Sun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);

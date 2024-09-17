@@ -111,8 +111,8 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setStoredValue("endTurnWhenSCFinished", "");
         game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(mainPlayer, game, "sol", event);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(mainPlayer, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "hacan", event);
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -172,7 +172,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
-        CommanderUnlockCheck.fullCommanderUnlockCheck(nextPlayer, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(nextPlayer, game, "sol", event);
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);

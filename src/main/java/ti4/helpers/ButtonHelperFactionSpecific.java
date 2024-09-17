@@ -359,7 +359,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ident + " already had a " + color + " CC in their fleet pool");
         }
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "mahact", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "mahact", event);
 
         if (ButtonHelper.isLawInPlay(game, "regulations")
             && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
@@ -1268,7 +1268,7 @@ public class ButtonHelperFactionSpecific {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
                 SendDebt.sendDebt(player, p2, 1);
-                CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "vaden", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "vaden", event);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you sent 1 debt token to "
                         + ButtonHelper.getIdentOrColor(p2, game) + " due to their fine print ability");
@@ -1974,7 +1974,7 @@ public class ButtonHelperFactionSpecific {
         ACInfo.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, event, player);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
         }
         event.getMessage().delete().queue();
     }
@@ -1987,7 +1987,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, game));
         game.setStoredValue("terraformedPlanet", planet);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "sol", event);
         event.getMessage().delete().queue();
     }
 
@@ -2037,7 +2037,7 @@ public class ButtonHelperFactionSpecific {
             "Attached branch office to " + Helper.getPlanetRepresentation(planet, game));
         if (game.getPNOwner(pnID).getLeaderIDs().contains("veldyrcommander")
             && !game.getPNOwner(pnID).hasLeaderUnlocked("veldyrcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(game.getPNOwner(pnID), game, "veldyr", event);
+            CommanderUnlockCheck.checkPlayer(game.getPNOwner(pnID), game, "veldyr", event);
         }
         event.getMessage().delete().queue();
     }
@@ -2141,7 +2141,7 @@ public class ButtonHelperFactionSpecific {
         }
         String msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "nivyn", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "nivyn", event);
         event.getMessage().delete().queue();
     }
 
@@ -2270,7 +2270,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
         for (Player p2 : game.getRealPlayers()) {
-            CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "ghost", event);
+            CommanderUnlockCheck.checkPlayer(p2, game, "ghost", event);
         }
         event.getMessage().delete().queue();
     }

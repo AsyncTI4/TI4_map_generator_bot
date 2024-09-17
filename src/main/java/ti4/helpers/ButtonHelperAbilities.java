@@ -972,7 +972,7 @@ public class ButtonHelperAbilities {
             player.getRepresentation(true, true) + " acquired " + Mapper.getRelic(relicName).getName()
                 + " and paid " + lostComms + " commodities (" + oldComms + "->" + player.getCommodities()
                 + ")");
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "axis", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "axis", event);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1020,9 +1020,7 @@ public class ButtonHelperAbilities {
             game.purgeExplore(cardID);
         }
 
-        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "kollecc", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         event.getMessage().delete().queue();
@@ -1185,7 +1183,7 @@ public class ButtonHelperAbilities {
                 game.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName, game);
             message = ident + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game)
                 + " with a " + Emojis.pds;
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "titans", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "titans", event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         event.getMessage().delete().queue();
@@ -1436,9 +1434,7 @@ public class ButtonHelperAbilities {
             }
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yin", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "yin", event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, game) + " using indoctrination");

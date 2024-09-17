@@ -88,12 +88,9 @@ public class SendFragments extends RelicSubcommandData {
 		if (!game.isFowMode()) {
 			MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
 		}
-		if (receiver.getLeaderIDs().contains("kollecccommander") && !receiver.hasLeaderUnlocked("kollecccommander")) {
-			CommanderUnlockCheck.commanderUnlockCheck(receiver, game, "kollecc", event);
-		}
-		if (receiver.getLeaderIDs().contains("bentorcommander") && !receiver.hasLeaderUnlocked("bentorcommander")) {
-			CommanderUnlockCheck.commanderUnlockCheck(receiver, game, "bentor", event);
-		}
+		CommanderUnlockCheck.checkPlayer(receiver, game, "kollecc", event);
+		CommanderUnlockCheck.checkPlayer(receiver, game, "bentor", event);
+
 		if (game.isFowMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = "The other player has been notified";
@@ -104,8 +101,6 @@ public class SendFragments extends RelicSubcommandData {
 		}
 		TransactionHelper.checkTransactionLegality(game, sender, receiver);
 		Player player = receiver;
-		if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-			CommanderUnlockCheck.commanderUnlockCheck(player, game, "kollecc", event);
-		}
+		CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
 	}
 }

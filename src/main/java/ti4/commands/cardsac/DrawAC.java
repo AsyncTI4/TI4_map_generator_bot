@@ -56,10 +56,7 @@ public class DrawAC extends ACCardsSubcommandData {
         ACInfo.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, null, player);
         if (addScheming && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(game, player, false);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", null);
-        }
-
+        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", null);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 }

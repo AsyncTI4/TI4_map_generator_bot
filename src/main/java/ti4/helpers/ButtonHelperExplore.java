@@ -82,14 +82,7 @@ public class ButtonHelperExplore {
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
         }
 
-        Player lanefirPlayer = game.getPlayers().values().stream()
-            .filter(p -> p.getLeaderIDs().contains("lanefircommander")
-                && !p.hasLeaderUnlocked("lanefircommander"))
-            .findFirst().orElse(null);
-
-        if (lanefirPlayer != null) {
-            CommanderUnlockCheck.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
-        }
+        CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
 
         String message = player.getRepresentation() + " purged fragments: "
             + fragmentsToPurge;

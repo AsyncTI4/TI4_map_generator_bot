@@ -370,7 +370,7 @@ public class ButtonHelperAgents {
                 game.purgeExplore(cardID);
             }
         }
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "kollecc", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         ButtonHelper.deleteMessage(event);
@@ -1813,15 +1813,11 @@ public class ButtonHelperAgents {
             msg = msg + "\n" + player.getFactionEmoji() + "Paid 2TGs";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "titans", event);
-        }
-        if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "saar", event);
-        }
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "rohdhna", event);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "cheiran", event);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "celdauri", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "titans", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "saar", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "rohdhna", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cheiran", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "celdauri", event);
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
@@ -1953,12 +1949,8 @@ public class ButtonHelperAgents {
         space.addToken(gloryTokens.get(0));
 
         String msg = player.getFactionEmoji() + " added glory token to " + tile.getRepresentation();
-        if (player.getLeaderIDs().contains("kjalengardcommander") && !player.hasLeaderUnlocked("kjalengardcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "kjalengard", event);
-        }
-
+        CommanderUnlockCheck.checkPlayer(player, game, "kjalengard", event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-
         ButtonHelper.deleteMessage(event);
     }
 

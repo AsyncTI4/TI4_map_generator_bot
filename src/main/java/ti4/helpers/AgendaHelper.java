@@ -377,11 +377,7 @@ public class AgendaHelper {
                 }
             }
             if (game.getLaws().size() > 0) {
-                for (Player player : game.getRealPlayers()) {
-                    if (player.getLeaderIDs().contains("edyncommander") && !player.hasLeaderUnlocked("edyncommander")) {
-                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "edyn", event);
-                    }
-                }
+                CommanderUnlockCheck.checkAllPlayersInGame(game, "edyn");
             }
         } else {
             if (game.getCurrentAgendaInfo().contains("Player")) {
@@ -880,11 +876,7 @@ public class AgendaHelper {
                                 ACInfo.sendActionCardInfo(game, playerWL, event);
                             }
                         }
-
-                        if (playerWL.getLeaderIDs().contains("yssarilcommander")
-                            && !playerWL.hasLeaderUnlocked("yssarilcommander")) {
-                            CommanderUnlockCheck.commanderUnlockCheck(playerWL, game, "yssaril", event);
-                        }
+                        CommanderUnlockCheck.checkPlayer(playerWL, game, "yssaril", event);
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -912,8 +904,7 @@ public class AgendaHelper {
                             }
                         }
 
-                        CommanderUnlockCheck.commanderUnlockCheck(playerWL, game, "yssaril", event);
-                        
+                        CommanderUnlockCheck.checkPlayer(playerWL, game, "yssaril", event);
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     for (Player p2 : getLosingVoters(winner, game)) {
@@ -1012,9 +1003,7 @@ public class AgendaHelper {
         }
         voters.addAll(riders);
         for (Player player : voters) {
-            if (player.getLeaderIDs().contains("florzencommander") && !player.hasLeaderUnlocked("florzencommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(player, game, "florzen", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "florzen", event);
         }
         String ridSum = "People had Riders to resolve.";
         for (Player rid : riders) {
