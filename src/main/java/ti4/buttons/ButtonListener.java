@@ -254,8 +254,6 @@ public class ButtonListener extends ListenerAdapter {
             soDiscard(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel, ident);
         } else if (buttonID.startsWith("mantleCrack_")) {
             ButtonHelperAbilities.mantleCracking(player, game, event, buttonID);
-        } else if (buttonID.startsWith("umbatTile_")) {
-            ButtonHelperAgents.umbatTile(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("dihmohnfs_")) {
             ButtonHelperFactionSpecific.resolveDihmohnFlagship(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("dsdihmy_")) {
