@@ -14,24 +14,43 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
 public class CommanderUnlockCheck {
+
+    /**
+     * Will run {@link CommanderUnlockCheck#checkPlayer()} on all players within the game
+     * @param game - the {@link Game} to check
+     * @param factionToCheck - the factions of the leader to check the unlock conditions of
+     */
     public static void checkAllPlayersInGame(Game game, String factionToCheck) {
         for (Player player : game.getRealPlayers()) {
-            checkPlayer(player, game, factionToCheck);
+            checkPlayer(player, factionToCheck);
         }
     }
 
+    /**
+     * @deprecated event and game aren't required but I'm too lazy to figure out the regex replace for it right now
+     */
     @Deprecated
     public static void checkPlayer(Player player, Game game, String factionToCheck, GenericInteractionCreateEvent event) {
-        checkPlayer(player, game, factionToCheck);
+        checkPlayer(player, factionToCheck);
     }
 
-    public static void checkPlayer(Player player, Game game, String factionToCheck) {
-        if (player != null && player.isRealPlayer() && player.hasLeader(factionToCheck + "commander") && !player.hasLeaderUnlocked(factionToCheck + "commander")) {
-            checkConditionsAndUnlock(player, game, factionToCheck);
+    /**
+     * @param player - the {@link Player} to check
+     * @param factionsToCheck - the faction IDs of the leader to check the unlock conditions of e.g. "sol" will check for "solcommander"
+     */
+    public static void checkPlayer(Player player, String... factionsToCheck) {
+        for (String factionToCheck : factionsToCheck) {
+            if (player != null &&
+                player.isRealPlayer() &&
+                player.hasLeader(factionToCheck + "commander") &&
+                !player.hasLeaderUnlocked(factionToCheck + "commander")) {
+                checkConditionsAndUnlock(player, factionToCheck);
+            }
         }
     }
 
-    private static void checkConditionsAndUnlock(Player player, Game game, String faction) {
+    private static void checkConditionsAndUnlock(Player player, String faction) {
+        Game game = player.getGame();
         boolean shouldBeUnlocked = false;
         switch (faction) {
             case "axis" -> {
@@ -311,8 +330,8 @@ public class CommanderUnlockCheck {
             }
             case "keleres" -> shouldBeUnlocked = true;
             case "arborec" -> {
-                int num = ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, game, "infantry")
-                    + ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, game, "mech");
+                int num = ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, game, "infantry");
+                num += ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, game, "mech");
                 if (num > 11) {
                     shouldBeUnlocked = true;
                 }
