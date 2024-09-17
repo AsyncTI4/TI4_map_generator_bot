@@ -17,9 +17,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowRemainingRelics extends RelicSubcommandData {
+public class RelicShowRemaining extends RelicSubcommandData {
 
-    public ShowRemainingRelics() {
+    public RelicShowRemaining() {
         super(Constants.RELIC_SHOW_REMAINING, "Show remaining relics in deck");
         addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE if override fog"));
     }

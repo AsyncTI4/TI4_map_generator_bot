@@ -75,7 +75,7 @@ import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.player.UnitInfo;
-import ti4.commands.relic.DrawRelic;
+import ti4.commands.relic.RelicDraw;
 import ti4.commands.relic.RelicInfo;
 import ti4.commands.search.SearchMyGames;
 import ti4.commands.special.FighterConscription;
@@ -2154,7 +2154,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("khraskHeroStep4Ready_")) {
             ButtonHelperHeroes.resolveKhraskHeroStep4Ready(player, game, event, buttonID);
         } else if (buttonID.startsWith("drawRelicAtPosition_")) {
-            DrawRelic.resolveDrawRelicAtPosition(player, event, game, buttonID);
+            RelicDraw.resolveDrawRelicAtPosition(player, event, game, buttonID);
         } else if (buttonID.startsWith("setTrapStep2_")) {
             ButtonHelperAbilities.setTrapStep2(game, player, event, buttonID);
         } else if (buttonID.startsWith("removeTrapStep2_")) {
@@ -3750,7 +3750,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "drawRelicFromFrag" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
-                    DrawRelic.drawRelicAndNotify(player, event, game);
+                    RelicDraw.drawRelicAndNotify(player, event, game);
                     String message = "Use buttons to end turn or do another action.";
                     List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
@@ -3758,7 +3758,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "drawRelic" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
-                    DrawRelic.drawRelicAndNotify(player, event, game);
+                    RelicDraw.drawRelicAndNotify(player, event, game);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "thronePoint" -> {

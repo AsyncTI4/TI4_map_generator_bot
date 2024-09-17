@@ -17,7 +17,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ClearDebt;
-import ti4.commands.relic.SendFragments;
+import ti4.commands.relic.RelicSendFragments;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
@@ -928,7 +928,7 @@ public class TransactionHelper {
                     case "URF" -> "frontier";
                     default -> "";
                 };
-                new SendFragments().sendFrags(event, p1, p2, trait, fragNum, game);
+                new RelicSendFragments().sendFrags(event, p1, p2, trait, fragNum, game);
                 message2 = "";
             }
         }

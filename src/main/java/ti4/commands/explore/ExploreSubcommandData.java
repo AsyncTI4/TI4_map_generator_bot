@@ -26,7 +26,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
-import ti4.commands.relic.DrawRelic;
+import ti4.commands.relic.RelicDraw;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
@@ -304,7 +304,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dw" -> {
                 message = "Drew Relic";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-                DrawRelic.drawRelicAndNotify(player, event, game);
+                RelicDraw.drawRelicAndNotify(player, event, game);
             }
             case "ms1", "ms2" -> {
                 message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()

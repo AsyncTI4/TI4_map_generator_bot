@@ -1,5 +1,7 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +14,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -23,10 +30,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import ti4.autocomplete.AutoCompleteListener;
 import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
@@ -54,6 +57,7 @@ import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
+import ti4.commands.relic.RelicCommand;
 import ti4.commands.search.SearchCommand;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
@@ -94,8 +98,6 @@ import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
-
-import static org.reflections.scanners.Scanners.SubTypes;
 
 public class AsyncTI4DiscordBot {
 
@@ -179,6 +181,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new HelpCommand());
         commandManager.addCommand(new SearchCommand());
         commandManager.addCommand(new ExploreCommand());
+        commandManager.addCommand(new RelicCommand());
         commandManager.addCommand(new AdminCommand());
 
         commandManager.addCommand(new DeveloperCommand());

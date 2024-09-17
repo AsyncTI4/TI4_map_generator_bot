@@ -12,9 +12,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AddRelicBackIntoDeck extends RelicSubcommandData {
+public class RelicAddBackIntoDeck extends RelicSubcommandData {
 
-    public AddRelicBackIntoDeck() {
+    public RelicAddBackIntoDeck() {
         super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck if already purged");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck").setAutoComplete(true).setRequired(true));
     }

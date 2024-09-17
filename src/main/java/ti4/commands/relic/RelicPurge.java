@@ -11,20 +11,17 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.RelicModel;
 
-public class ExhaustRelic extends RelicSubcommandData {
+public class RelicPurge extends RelicSubcommandData {
 
-    public ExhaustRelic() {
-        super(Constants.RELIC_EXHAUST, "Exhaust a Relic");
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
+    public RelicPurge() {
+        super(Constants.RELIC_PURGE, "Purge a relic");
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to purge").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
-	public ExhaustRelic(String relicRefresh, String refresh_a_relic) {
-		super(relicRefresh, refresh_a_relic);
-	}
-
-	@Override
+    @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
@@ -34,20 +31,15 @@ public class ExhaustRelic extends RelicSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-
-        OptionMapping option = event.getOption(Constants.RELIC);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Specify relic");
+        String relicId = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
+        if (relicId == null || !player.hasRelic(relicId)) {
+            MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic: " + relicId);
             return;
         }
-
-        String relicId = option.getAsString();
-        if (player.hasRelic(relicId)) {
-            player.addExhaustedRelic(relicId);
-            String relicName = Mapper.getRelic(relicId).getName();
-            MessageHelper.sendMessageToEventChannel(event, "Exhausted " + Emojis.Relic + " relic: " + relicName);
-		} else {
-            MessageHelper.sendMessageToEventChannel(event, "Invalid relic or player does not have specified relic");
-        }
+        player.removeRelic(relicId);
+        player.removeExhaustedRelic(relicId);
+        RelicModel relicData = Mapper.getRelic(relicId);
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged relic Relic:\n" + Emojis.Relic + " __**" + relicData.getName() + "**__\n> " + relicData.getText() + "\n");
+        RelicInfo.sendRelicInfo(getActiveGame(), player, event);
     }
 }
