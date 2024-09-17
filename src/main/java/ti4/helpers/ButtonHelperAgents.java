@@ -22,7 +22,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
@@ -1248,7 +1248,7 @@ public class ButtonHelperAgents {
             if (buttonID.contains("frontier")) {
                 String cardChosen = buttonID.split("_")[3];
                 String pos = buttonID.split("_")[4];
-                new ExpFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
+                new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
                     cardChosen);
             } else {
                 String drawColor = buttonID.split("_")[2];
@@ -1288,7 +1288,7 @@ public class ButtonHelperAgents {
                 String name = card.getName();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Found a " + name + " in " + game.getTileByPosition(pos).getRepresentation());
-                new ExpFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
+                new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
                     cardChosen);
             } else {
                 String drawColor = buttonID.split("_")[2];

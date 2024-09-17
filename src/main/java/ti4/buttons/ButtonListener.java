@@ -53,8 +53,8 @@ import ti4.commands.custom.PeakAtStage1;
 import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.ZelianHero;
-import ti4.commands.explore.ExpFrontier;
-import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExploreFrontier;
+import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.franken.FrankenApplicator;
 import ti4.commands.game.CreateGameButton;
@@ -746,7 +746,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             String[] info = bID.split("_");
             Tile tile = game.getTileFromPlanet(info[1]);
-            new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game,
+            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game,
                 1, false);
             if (dsdihmy) {
                 player.exhaustPlanet(info[1]);
@@ -1320,7 +1320,7 @@ public class ButtonListener extends ListenerAdapter {
             String pos = stuff[1];
             String cardRefused = stuff[2];
             game.addExplore(cardRefused);
-            new ExpFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
+            new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player,
                 cardChosen);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("finishComponentAction_")) {
@@ -1937,7 +1937,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("garboziaAbilityExhaust_")) {
             String planet = "garbozia";
             player.exhaustPlanetAbility(planet);
-            new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player,
+            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player,
                 true, game, 1, false);
         } else if (buttonID.startsWith("checksNBalancesPt2_")) {// "freeSystemsHeroPlanet_"
             SCPick.resolvePt2ChecksNBalances(event, player, game, buttonID);

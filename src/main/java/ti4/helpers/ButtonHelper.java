@@ -65,8 +65,8 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.ds.DrawBlueBackTile;
-import ti4.commands.explore.ExpFrontier;
-import ti4.commands.explore.ExpInfo;
+import ti4.commands.explore.ExploreFrontier;
+import ti4.commands.explore.ExploreInfo;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.game.GameCreate;
 import ti4.commands.game.GameEnd;
@@ -1223,7 +1223,7 @@ public class ButtonHelper {
                 } else {
                     types.add(deck);
                 }
-                ExpInfo.secondHalfOfExpInfo(types, event, player, game, false);
+                ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
@@ -1240,10 +1240,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExpInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
         } else {
             types.add(type);
-            ExpInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false, true);
         }
         deleteMessage(event);
     }
@@ -4004,7 +4004,7 @@ public class ButtonHelper {
                 msg2 = msg2 + name1 + ": " + card.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
-                new ExpFrontier().expFront(event, tile, game, player);
+                new ExploreFrontier().expFront(event, tile, game, player);
             }
 
             if (player.hasAbility("migrant_fleet")) {

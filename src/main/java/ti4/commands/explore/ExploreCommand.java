@@ -50,16 +50,16 @@ public class ExploreCommand implements Command {
 
     private Collection<ExploreSubcommandData> getSubcommands() {
         Collection<ExploreSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new DiscardFromDeckExp());
-        subcommands.add(new ShuffleIntoDeckFromHandExp());
-        subcommands.add(new ExploreAndDiscard());
-        subcommands.add(new RemoveExplore());
-        subcommands.add(new ShuffleExpBackIntoDeck());
-        subcommands.add(new ExpInfo());
-        subcommands.add(new ExpPlanet());
-        subcommands.add(new ExpReset());
-        subcommands.add(new ExpFrontier());
-        subcommands.add(new UseExplore());
+        subcommands.add(new ExploreDiscardFromDeck());
+        subcommands.add(new ExploreShuffleIntoDeckFromHand());
+        subcommands.add(new ExploreDrawAndDiscard());
+        subcommands.add(new ExploreRemoveFromGame());
+        subcommands.add(new ExploreShuffleBackIntoDeck());
+        subcommands.add(new ExploreInfo());
+        subcommands.add(new ExplorePlanet());
+        subcommands.add(new ExploreReset());
+        subcommands.add(new ExploreFrontier());
+        subcommands.add(new ExploreUse());
         subcommands.add(new ExploreLookAtTop());
 
         return subcommands;

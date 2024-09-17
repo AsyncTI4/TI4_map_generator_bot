@@ -18,7 +18,7 @@ import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.SentACRandom;
 import ti4.commands.cardsso.SOInfo;
-import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.special.NaaluCommander;
 import ti4.commands.tokens.AddCC;
@@ -799,7 +799,7 @@ public class ButtonHelperActionCards {
 
     public static void resolveProbeStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        new ExpFrontier().expFront(event, tile, game, player);
+        new ExploreFrontier().expFront(event, tile, game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " explored the frontier token in " + tile.getRepresentation());
