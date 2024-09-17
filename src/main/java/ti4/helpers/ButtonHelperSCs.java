@@ -717,7 +717,7 @@ public class ButtonHelperSCs {
                 player.getRepresentation(true, true) + " use buttons to discard",
                 ACInfo.getDiscardActionCardButtons(game, player, false));
         }
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
         if (player.hasAbility("contagion")) {
             List<Button> buttons2 = ButtonHelperAbilities.getKyroContagionButtons(game, player,
                 event, player.getFinsFactionCheckerPrefix());

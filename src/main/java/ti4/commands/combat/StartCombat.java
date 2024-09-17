@@ -238,8 +238,8 @@ public class StartCombat extends CombatSubcommandData {
             }
         }
         if (tile.isMecatol()) {
-            CommanderUnlockCheck.commanderUnlockCheck(player1, game, "winnu", event);
-            CommanderUnlockCheck.commanderUnlockCheck(player2, game, "winnu", event);
+            CommanderUnlockCheck.checkPlayer(player1, game, "winnu", event);
+            CommanderUnlockCheck.checkPlayer(player2, game, "winnu", event);
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);

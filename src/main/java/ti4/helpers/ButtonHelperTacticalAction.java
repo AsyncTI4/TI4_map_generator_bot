@@ -467,20 +467,12 @@ public class ButtonHelperTacticalAction {
         if (systemButtons.size() == landingButtons || game.isL1Hero()) {
             systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         }
-        if (player.getLeaderIDs().contains("nivyncommander") && !player.hasLeaderUnlocked("nivyncommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "nivyn", event);
-        }
-        if (player.getLeaderIDs().contains("ghoticommander") && !player.hasLeaderUnlocked("ghoticommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "ghoti", event);
-        }
-        if (player.getLeaderIDs().contains("zeliancommander") && !player.hasLeaderUnlocked("zeliancommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "zelian", event);
-        }
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "gledge", event);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "mortheus", event);
-        for (Player p2 : game.getRealPlayers()) {
-            CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "empyrean", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "nivyn", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "ghoti", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "zelian", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "gledge", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "mortheus", event);
+        CommanderUnlockCheck.checkAllPlayersInGame(game, "empyrean");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         if (needPDSCheck && !game.isL1Hero() && playersWithPds2.size() > 0) {
             StartCombat.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game,

@@ -16,29 +16,22 @@ import ti4.map.UnitHolder;
 public class CommanderUnlockCheck {
     public static void checkAllPlayersInGame(Game game, String factionToCheck) {
         for (Player player : game.getRealPlayers()) {
-            fullCommanderUnlockCheck(player, game, factionToCheck);
+            checkPlayer(player, game, factionToCheck);
         }
     }
 
-    public static void fullCommanderUnlockCheck(Player player, Game game, String faction, GenericInteractionCreateEvent event) {
-        fullCommanderUnlockCheck(player, game, faction);
+    @Deprecated
+    public static void checkPlayer(Player player, Game game, String factionToCheck, GenericInteractionCreateEvent event) {
+        checkPlayer(player, game, factionToCheck);
     }
 
-    public static void fullCommanderUnlockCheck(Player player, Game game, String faction) {
-        if (player != null && player.isRealPlayer() && player.hasLeader(faction + "commander") && !player.hasLeaderUnlocked(faction + "commander")) {
-            commanderUnlockCheck(player, game, faction);
+    public static void checkPlayer(Player player, Game game, String factionToCheck) {
+        if (player != null && player.isRealPlayer() && player.hasLeader(factionToCheck + "commander") && !player.hasLeaderUnlocked(factionToCheck + "commander")) {
+            checkConditionsAndUnlock(player, game, factionToCheck);
         }
     }
 
-    public static void commanderUnlockCheck(Player player, Game game, String faction, GenericInteractionCreateEvent event) {
-        commanderUnlockCheck(player, game, faction);
-    }
-
-    public static void commanderUnlockCheck(Player player, Game game, String faction) {
-        unlock(player, game, faction);
-    }
-
-    private static void unlock(Player player, Game game, String faction) {
+    private static void checkConditionsAndUnlock(Player player, Game game, String faction) {
         boolean shouldBeUnlocked = false;
         switch (faction) {
             case "axis" -> {

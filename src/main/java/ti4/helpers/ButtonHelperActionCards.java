@@ -429,8 +429,8 @@ public class ButtonHelperActionCards {
         }
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "kollecc", event);
-        
+        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+
         ButtonHelper.deleteMessage(event);
     }
 
@@ -784,8 +784,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true) + " tell the bot which tile you wish to Exploration Probe", buttons);
     }
 
-    public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = MoveUnits.flipMallice(event, tile, game);
         new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", game);
@@ -795,15 +794,10 @@ public class ButtonHelperActionCards {
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
-        if (p2 != null) {
-            if (!p2.hasLeaderUnlocked("empyreancommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(p2, game, "empyrean", event);
-            }
-        }
+        CommanderUnlockCheck.checkPlayer(p2, game, "empyrean", event);
     }
 
-    public static void resolveProbeStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveProbeStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         new ExpFrontier().expFront(event, tile, game, player);
         ButtonHelper.deleteMessage(event);
@@ -811,8 +805,7 @@ public class ButtonHelperActionCards {
             player.getFactionEmoji() + " explored the frontier token in " + tile.getRepresentation());
     }
 
-    public static void resolveCrippleDefensesStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveCrippleDefensesStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {

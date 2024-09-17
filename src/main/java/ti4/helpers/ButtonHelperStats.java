@@ -38,7 +38,7 @@ public class ButtonHelperStats {
             message += " using their space station";
         }
 
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
@@ -108,7 +108,7 @@ public class ButtonHelperStats {
             String axis = player.getRepresentation(true, true) + " you have the opportunity to buy axis orders";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "mykomentori", null);
+        CommanderUnlockCheck.checkPlayer(player, game, "mykomentori", null);
     }
 
     public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {

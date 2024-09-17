@@ -325,27 +325,14 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }
-        if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "sol", event);
-        }
-        if (player.getLeaderIDs().contains("vayleriancommander") && !player.hasLeaderUnlocked("vayleriancommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "vaylerian", event);
-        }
-        if (player.getLeaderIDs().contains("olradincommander") && !player.hasLeaderUnlocked("olradincommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "olradin", event);
-        }
-        if (player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "xxcha", event);
-        }
-        if (player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "sardakk", event);
-        }
-        for (Player p2 : game.getRealPlayers()) {
-            CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "freesystems", event);
-        }
-        if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.getLeaderIDs().contains("winnucommander")
-            && !player.hasLeaderUnlocked("winnucommander") && player.controlsMecatol(true)) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "winnu", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "vaylerian", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "olradin", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "xxcha", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "sardakk", event);
+        CommanderUnlockCheck.checkAllPlayersInGame(game, "freesystems");
+        if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.controlsMecatol(true)) {
+            CommanderUnlockCheck.checkPlayer(player, game, "winnu", event);
         }
     }
 }

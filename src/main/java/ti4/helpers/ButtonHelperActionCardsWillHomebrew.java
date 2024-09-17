@@ -246,7 +246,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
             }
         }
-        CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "kollecc", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         event.getMessage().delete().queue();
     }
@@ -282,11 +282,7 @@ public class ButtonHelperActionCardsWillHomebrew {
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
-        if (p2 != null) {
-            if (!p2.hasLeaderUnlocked("empyreancommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(p2, game, "empyrean", event);
-            }
-        }
+        CommanderUnlockCheck.checkPlayer(p2, game, "empyrean", event);
     }
 
     public static void resolveSpatialCollapseStep1(Player player, Game game, ButtonInteractionEvent event) {

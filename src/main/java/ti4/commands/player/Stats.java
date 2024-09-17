@@ -156,10 +156,7 @@ public class Stats extends PlayerSubcommandData {
                     player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
                     ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            if (player.getLeaderIDs().contains("mykomentoricommander")
-                && !player.hasLeaderUnlocked("mykomentoricommander")) {
-                CommanderUnlockCheck.commanderUnlockCheck(player, game, "mykomentori", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "mykomentori", event);
         }
 
         OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);
@@ -408,7 +405,7 @@ public class Stats extends PlayerSubcommandData {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
             ButtonHelperAbilities.pillageCheck(player, game);
             if (scNumber == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {

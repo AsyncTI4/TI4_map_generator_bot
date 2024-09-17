@@ -534,7 +534,7 @@ public class ButtonHelperCommanders {
         if (player.getTg() > 0) {
             player.setTg(oldTg - 1);
         }
-        CommanderUnlockCheck.commanderUnlockCheck(player, game, "keleres", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "keleres", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             ButtonHelper.getIdentOrColor(player, game) + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + "(" + oldTg + "->"
                 + player.getTg() + ")");
@@ -563,7 +563,7 @@ public class ButtonHelperCommanders {
             game);
 
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message);
-        CommanderUnlockCheck.fullCommanderUnlockCheck(p1, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(p1, game, "naaz", event);
         ButtonHelper.deleteTheOneButton(event);
     }
 

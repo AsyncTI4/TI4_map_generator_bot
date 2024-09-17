@@ -28,18 +28,10 @@ public class TechAdd extends TechAddRemove {
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message = message + "\n Automatically added the Custodia Vigilia planet";
         }
-        if (player.getLeaderIDs().contains("mirvedacommander") && !player.hasLeaderUnlocked("mirvedacommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "mirveda", event);
-        }
-        if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "jolnar", event);
-        }
-        if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "nekro", event);
-        }
-        if (player.getLeaderIDs().contains("dihmohncommander") && !player.hasLeaderUnlocked("dihmohncommander")) {
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, "dihmohn", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "mirveda", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "jolnar", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "nekro", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "dihmohn", event);
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

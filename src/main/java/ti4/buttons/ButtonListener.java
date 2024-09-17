@@ -2183,7 +2183,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveDeckChoice(game, event, buttonID, player);
         } else if (buttonID.startsWith("unlockCommander_")) {
             ButtonHelper.deleteTheOneButton(event);
-            CommanderUnlockCheck.commanderUnlockCheck(player, game, buttonID.split("_")[1], event);
+            CommanderUnlockCheck.checkPlayer(player, game, buttonID.split("_")[1], event);
         } else if (buttonID.startsWith("setForThalnos_")) {
             ButtonHelper.resolveSetForThalnos(player, game, buttonID, event);
         } else if (buttonID.startsWith("rollThalnos_")) {
@@ -2625,18 +2625,18 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
                 if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
-                    CommanderUnlockCheck.commanderUnlockCheck(player, game, "jolnar", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "jolnar", event);
                 }
                 if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
-                    CommanderUnlockCheck.commanderUnlockCheck(player, game, "nekro", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "nekro", event);
                 }
                 if (player.getLeaderIDs().contains("mirvedacommander")
                     && !player.hasLeaderUnlocked("mirvedacommander")) {
-                    CommanderUnlockCheck.commanderUnlockCheck(player, game, "mirveda", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "mirveda", event);
                 }
                 if (player.getLeaderIDs().contains("dihmohncommander")
                     && !player.hasLeaderUnlocked("dihmohncommander")) {
-                    CommanderUnlockCheck.commanderUnlockCheck(player, game, "dihmohn", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "dihmohn", event);
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
@@ -3119,7 +3119,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
                     ButtonHelper.deleteTheOneButton(event);
 
@@ -3335,7 +3335,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
 
                     if (hasSchemingAbility) {
@@ -3383,7 +3383,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
 
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -3418,7 +3418,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (player.getLeaderIDs().contains("yssarilcommander")
                         && !player.hasLeaderUnlocked("yssarilcommander")) {
-                        CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                     }
 
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -3533,7 +3533,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = playerRep + " exhausted Mallice ability and gained 2TGs " + player.gainTG(2) + ".";
                     ButtonHelperAbilities.pillageCheck(player, game);
                     ButtonHelperAgents.resolveArtunoCheck(player, game, 2);
-                    CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
                     if (!game.isFowMode() && event.getMessageChannel() != game.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
                     }
@@ -3661,7 +3661,7 @@ public class ButtonListener extends ListenerAdapter {
                         game.drawActionCard(player.getUserID());
                         if (player.getLeaderIDs().contains("yssarilcommander")
                             && !player.hasLeaderUnlocked("yssarilcommander")) {
-                            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+                            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                         }
                         ACInfo.sendActionCardInfo(game, player, event);
                         message = "Drew 1 AC";
@@ -3679,7 +3679,7 @@ public class ButtonListener extends ListenerAdapter {
                         game.drawActionCard(player.getUserID());
                         if (player.getLeaderIDs().contains("yssarilcommander")
                             && !player.hasLeaderUnlocked("yssarilcommander")) {
-                            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+                            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                         }
                         ACInfo.sendActionCardInfo(game, player, event);
                         message = "Drew 1 AC";
@@ -3698,7 +3698,7 @@ public class ButtonListener extends ListenerAdapter {
                         game.drawActionCard(player.getUserID());
                         if (player.getLeaderIDs().contains("yssarilcommander")
                             && !player.hasLeaderUnlocked("yssarilcommander")) {
-                            CommanderUnlockCheck.commanderUnlockCheck(player, game, "yssaril", event);
+                            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
                         }
                         ACInfo.sendActionCardInfo(game, player, event);
                         message = "Drew 2 ACs With Scheming. Please Discard 1 AC.";
@@ -3875,7 +3875,7 @@ public class ButtonListener extends ListenerAdapter {
                             "You are not the active player. Force End Turn with /player turn_end.");
                         return;
                     }
-                    CommanderUnlockCheck.fullCommanderUnlockCheck(player, game, "hacan", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
                     TurnEnd.pingNextPlayer(event, game, player);
                     event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
 

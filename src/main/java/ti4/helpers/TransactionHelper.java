@@ -749,7 +749,7 @@ public class TransactionHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
@@ -773,7 +773,7 @@ public class TransactionHelper {
                     p2.setCommodities(targetTG);
                 }
 
-                CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
@@ -803,8 +803,8 @@ public class TransactionHelper {
                 p2.setCommodities(newP2Comms);
                 p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
                 p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
-                CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "hacan", event);
-                CommanderUnlockCheck.fullCommanderUnlockCheck(p1, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p1, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 // ButtonHelperAbilities.pillageCheck(p1, game);
@@ -824,7 +824,7 @@ public class TransactionHelper {
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt tokens to " + ident2;
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
-                CommanderUnlockCheck.fullCommanderUnlockCheck(p2, game, "vaden", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "vaden", event);
             }
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
