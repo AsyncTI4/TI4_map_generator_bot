@@ -128,7 +128,6 @@ import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -1111,17 +1110,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("getTech_")) {
             ButtonHelper.getTech(game, player, event, buttonID);
-        } else if (buttonID.startsWith("riftUnit_")) {
-            ButtonHelper.riftUnitButton(buttonID, event, game, player, ident);
-        } else if (buttonID.startsWith("getRiftButtons_")) {
-            Tile tile = game.getTileByPosition(buttonID.replace("getRiftButtons_", ""));
-            MessageChannel channel = player.getCorrectChannel();
-            String msg = ident + " use buttons to rift units";
-            MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + " is rifting some units");
-            MessageHelper.sendMessageToChannelWithButtons(channel, msg,
-                ButtonHelper.getButtonsForRiftingUnitsInSystem(player, game, tile));
-        } else if (buttonID.startsWith("riftAllUnits_")) {
-            ButtonHelper.riftAllUnitsButton(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("cabalVortextCapture_")) {
             ButtonHelperFactionSpecific.resolveVortexCapture(buttonID, player, game, event);
         } else if (buttonID.startsWith("takeAC_")) {
