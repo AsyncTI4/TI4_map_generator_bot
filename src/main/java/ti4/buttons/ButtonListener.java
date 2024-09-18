@@ -95,8 +95,6 @@ import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.user.SetPersonalPingInterval;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -116,6 +114,7 @@ import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperStats;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -3663,12 +3662,11 @@ public class ButtonListener extends ListenerAdapter {
                 case "componentAction" -> {
                     player.setWhetherPlayerShouldBeTenMinReminded(false);
                     String message = "Use Buttons to decide what kind of component action you want to do";
-                    List<Button> systemButtons = ButtonHelper.getAllPossibleCompButtons(game, player, event);
+                    List<Button> systemButtons = ComponentActionHelper.getAllPossibleCompButtons(game, player, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     if (!game.isFowMode()) {
                         ButtonHelper.deleteMessage(event);
                     }
-
                 }
                 case "drawRelicFromFrag" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Drew Relic");
