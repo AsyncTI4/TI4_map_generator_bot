@@ -43,6 +43,7 @@ import ti4.commands.cardsac.DrawAC;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.DrawSO;
@@ -2442,7 +2443,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Keleres Rider");
                         return;
                     }
-                    ButtonHelper.resolvePNPlay(pnKey, player, game, event);
+                    PlayPN.resolvePNPlay(pnKey, player, game, event);
                 }
                 if ("Edyn Rider".equalsIgnoreCase(riderName)) {
                     String pnKey = "fin";
@@ -2455,7 +2456,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
                         return;
                     }
-                    ButtonHelper.resolvePNPlay(pnKey, player, game, event);
+                    PlayPN.resolvePNPlay(pnKey, player, game, event);
                 }
                 if ("Kyro Rider".equalsIgnoreCase(riderName)) {
                     String pnKey = "fin";
@@ -2468,7 +2469,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Kyro Rider");
                         return;
                     }
-                    ButtonHelper.resolvePNPlay(pnKey, player, game, event);
+                    PlayPN.resolvePNPlay(pnKey, player, game, event);
                 }
             } else {
                 if (riderName.contains("Unity Algorithm")) {
@@ -2616,7 +2617,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             }
-            ButtonHelper.resolvePNPlay(pnID, player, game, event);
+            PlayPN.resolvePNPlay(pnID, player, game, event);
             if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
                 ButtonHelper.deleteMessage(event);
             }
@@ -2687,7 +2688,7 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("useTA_")) {
             String ta = buttonID.replace("useTA_", "") + "_ta";
-            ButtonHelper.resolvePNPlay(ta, player, game, event);
+            PlayPN.resolvePNPlay(ta, player, game, event);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("combatDroneConvert_")) {
             ButtonHelperModifyUnits.resolvingCombatDrones(event, game, player, ident, buttonID);
