@@ -121,6 +121,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TransactionHelper;
 import ti4.helpers.Units.UnitKey;
@@ -1748,15 +1749,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolveMaw(game, player, event);
         } else if (buttonID.startsWith("resolveTwilightMirror")) {
             ButtonHelper.resolveTwilightMirror(game, player, event);
-        } else if (buttonID.startsWith("playerPref_")) {
-            ButtonHelper.resolvePlayerPref(player, event, buttonID, game);
-        } else if (buttonID.startsWith("riskDirectHit_")) {
-            ButtonHelper.resolveRiskDirectHit(game, player, event, buttonID);
-        } else if (buttonID.startsWith("setPersonalAutoPingInterval_")) { // TODO: DEPRECATED
-            int interval = Integer.parseInt(buttonID.split("_")[1]);
-            SetPersonalPingInterval.set(event, interval);
-        } else if (buttonID.startsWith("playerPrefDecision_")) {
-            ButtonHelper.resolvePlayerPrefDecision(player, event, buttonID, game);
         } else if (buttonID.startsWith("resolveCrownOfE")) {
             ButtonHelper.resolveCrownOfE(game, player, event);
         } else if (buttonID.startsWith("yssarilAgentAsJr")) {
@@ -3157,7 +3149,6 @@ public class ButtonListener extends ListenerAdapter {
                     game.removePlayersWhoHitPersistentNoWhen(player.getFaction());
                     ButtonHelper.addReaction(event, false, false, message, "");
                 }
-                case "offerPlayerPref" -> ButtonHelper.offerPlayerPreferences(player, event);
                 case "no_after" -> {
                     String message = game.isFowMode() ? "No afters" : null;
                     game.removePlayersWhoHitPersistentNoAfter(player.getFaction());
@@ -3205,7 +3196,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     RevealStage1.revealTwoStage1(event, game.getMainGameChannel());
                     ButtonHelper.startStrategyPhase(event, game);
-                    ButtonHelper.offerSetAutoPassOnSaboButtons(game, null);
+                    PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "startYinSpinner" -> {
