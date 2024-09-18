@@ -364,48 +364,9 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("placeKhraskCommanderInf_")) {
             ButtonHelperCommanders.resolveKhraskCommanderPlacement(player, game, buttonID, event);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
-            String planet = buttonID.replace("yinHeroPlanet_", "");
-            if (planet.equalsIgnoreCase("lockedmallice")) {
-                Tile tile = game.getTileFromPlanet("lockedmallice");
-                planet = "mallice";
-                tile = MoveUnits.flipMallice(event, tile, game);
-            } else if (planet.equalsIgnoreCase("hexlockedmallice")) {
-                Tile tile = game.getTileFromPlanet("hexlockedmallice");
-                planet = "hexmallice";
-                tile = MoveUnits.flipMallice(event, tile, game);
-            }
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                trueIdentity + " Chose to invade " + Helper.getPlanetRepresentation(planet, game));
-            List<Button> buttons = new ArrayList<>();
-            for (int x = 1; x < 4; x++) {
-                buttons.add(Button
-                    .success(finsFactionCheckerPrefix + "yinHeroInfantry_" + planet + "_" + x,
-                        "Land " + x + " infantry")
-                    .withEmoji(Emoji.fromFormatted(Emojis.infantry)));
-            }
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                "Use buttons to select how many infantry you'd like to land on the planet", buttons);
-            ButtonHelper.deleteMessage(event);
+            ButtonHelperHeroes.yinHeroPlanet(event, buttonID, game, finsFactionCheckerPrefix, trueIdentity);
         } else if (buttonID.startsWith("yinHeroTarget_")) {
-            String faction = buttonID.replace("yinHeroTarget_", "");
-            List<Button> buttons = new ArrayList<>();
-            Player target = game.getPlayerFromColorOrFaction(faction);
-            if (target != null) {
-                for (String planet : target.getPlanets()) {
-                    buttons.add(Buttons.green(finsFactionCheckerPrefix + "yinHeroPlanet_" + planet,
-                        Helper.getPlanetRepresentation(planet, game)));
-                }
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                    "Use buttons to select which planet to invade", buttons);
-                ButtonHelper.deleteMessage(event);
-            }
-        } else if (buttonID.startsWith("yinHeroStart")) {
-            List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "yinHeroTarget", null);
-            if (game.getTileByPosition("tl").getTileID().equalsIgnoreCase("82a")) {
-                buttons.add(Buttons.green("yinHeroPlanet_lockedmallice", "Invade Mallice"));
-            }
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                "Use buttons to select which player owns the planet you want to land on", buttons);
+            ButtonHelperHeroes.yinHeroTarget(event, buttonID, game, finsFactionCheckerPrefix);
         } else if (buttonID.startsWith("psychoExhaust_")) {
             ButtonHelper.resolvePsychoExhaust(game, event, player, buttonID);
         } else if (buttonID.startsWith("productionBiomes_")) {
