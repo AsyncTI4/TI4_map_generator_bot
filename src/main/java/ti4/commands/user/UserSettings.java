@@ -22,6 +22,7 @@ import ti4.buttons.Buttons;
 public class UserSettings {
     private String userId;
     private List<String> preferredColourList = new ArrayList<>();
+    private Integer personalPingInterval = 0;
     private Map<String, String> storedValues = new HashMap<>();
 
     public UserSettings(String userId) {
@@ -43,6 +44,11 @@ public class UserSettings {
     }
 
     @JsonIgnore
+    public void save() {
+        UserSettingsManager.getInstance().saveUserSetting(this);
+    }
+
+    @JsonIgnore
     public MessageEmbed getSettingEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         String userName = AsyncTI4DiscordBot.jda.getUserById(getUserId()).getName();
@@ -53,8 +59,9 @@ public class UserSettings {
 
     @JsonIgnore
     public List<Button> getUserSettingsButtons() {
-        Button editSettings = Buttons.green("editUserSettings", "Edit User Settings");
-        return List.of(editSettings, Buttons.DONE_DELETE_BUTTONS);
+        return List.of(
+            SetPersonalPingInterval.OFFER_PING_OPTIONS_BUTTON,
+            Buttons.DONE_DELETE_BUTTONS);
     }
 
     public void putStoredValue(String settingKey, String settingValue) {

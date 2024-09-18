@@ -92,6 +92,7 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands.user.SetPersonalPingInterval;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -7724,14 +7725,6 @@ public class ButtonHelper {
             buttons);
     }
 
-    public static void offerPersonalPingOptions(Game game, Player player) {
-        List<Button> buttons = getPersonalAutoPingButtons(game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
-            + " select the number of hours you would like the bot to wait before it pings you that it is your turn. This will apply to all your games. 0 is off. Your current interval is "
-            + player.getPersonalPingInterval(),
-            buttons);
-    }
-
     public static void offerDirectHitManagementOptions(Game game, Player player) {
         List<Button> buttons = getDirectHitManagementButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
@@ -7755,16 +7748,6 @@ public class ButtonHelper {
             }
         }
         return false;
-    }
-
-    public static List<Button> getPersonalAutoPingButtons(Game game) {
-        List<Button> buttons = new ArrayList<>();
-        for (int x = 0; x < 13; x++) {
-            buttons.add(Buttons.gray("setPersonalAutoPingInterval_" + x, "" + x));
-        }
-        buttons.add(Buttons.gray("setPersonalAutoPingInterval_" + 24, "" + 24));
-        buttons.add(Buttons.gray("setPersonalAutoPingInterval_" + 48, "" + 48));
-        return buttons;
     }
 
     public static List<Button> getDirectHitManagementButtons(Game game, Player player) {
@@ -9026,18 +9009,13 @@ public class ButtonHelper {
 
     public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Change Auto No-Sabo React Time")
-            .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+        buttons.add(Buttons.gray("playerPref_autoSaboReact", "Change Auto No-Sabo React Time", Emojis.ActionCard));
         buttons.add(Buttons.gray("playerPref_afkTimes", "Change AFK Times"));
         buttons.add(Buttons.gray("playerPref_tacticalAction", "Change Distance-Based Tactical Action Preference"));
-        buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Change Auto No Whens/Afters React")
-            .withEmoji(Emoji.fromFormatted(Emojis.Agenda)));
-        buttons.add(Buttons.gray("playerPref_personalPingInterval", "Change Personal Ping Interval"));
-        buttons.add(Buttons.gray("playerPref_directHitManagement",
-            "Tell The Bot What Units Not To Risk Direct Hit On"));
-        // deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-            player.getRepresentation() + " Choose the thing you wish to change", buttons);
+        buttons.add(Buttons.gray("playerPref_autoNoWhensAfters", "Change Auto No Whens/Afters React", Emojis.Agenda));
+        buttons.add(SetPersonalPingInterval.OFFER_PING_OPTIONS_BUTTON);
+        buttons.add(Buttons.gray("playerPref_directHitManagement", "Tell The Bot What Units Not To Risk Direct Hit On"));
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
     }
 
     public static void resolvePlayerPref(Player player, ButtonInteractionEvent event, String buttonID, Game game) {
@@ -9064,9 +9042,6 @@ public class ButtonHelper {
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
-            }
-            case "personalPingInterval" -> {
-                offerPersonalPingOptions(game, player);
             }
             case "directHitManagement" -> {
                 offerDirectHitManagementOptions(game, player);

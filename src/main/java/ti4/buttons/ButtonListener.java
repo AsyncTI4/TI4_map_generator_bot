@@ -95,6 +95,7 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
+import ti4.commands.user.SetPersonalPingInterval;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -1801,20 +1802,9 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.resolvePlayerPref(player, event, buttonID, game);
         } else if (buttonID.startsWith("riskDirectHit_")) {
             ButtonHelper.resolveRiskDirectHit(game, player, event, buttonID);
-        } else if (buttonID.startsWith("setPersonalAutoPingInterval_")) {
+        } else if (buttonID.startsWith("setPersonalAutoPingInterval_")) { // TODO: DEPRECATED
             int interval = Integer.parseInt(buttonID.split("_")[1]);
-            player.setPersonalPingInterval(interval);
-            Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-            for (Game game2 : mapList.values()) {
-                for (Player player2 : game2.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        player2.setPersonalPingInterval(interval);
-                        GameSaveLoadManager.saveMap(game2, event);
-                    }
-                }
-            }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set interval as " + interval + " hours");
-            ButtonHelper.deleteMessage(event);
+            SetPersonalPingInterval.set(event, interval);
         } else if (buttonID.startsWith("playerPrefDecision_")) {
             ButtonHelper.resolvePlayerPrefDecision(player, event, buttonID, game);
         } else if (buttonID.startsWith("resolveCrownOfE")) {
@@ -4239,12 +4229,6 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
 
                 }
-                // case "editUserSettings" ->
-                // UserButtonProvider.resolveEditUserSettingsButton(event);
-                // case "editUserSettingPreferredColours" ->
-                // UserButtonProvider.resolveEditPreferredColoursButton(event);
-                // case "editUserSettingFunEmoji" ->
-                // UserButtonProvider.resolveEditFunEmojiButton(event);
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
