@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -374,7 +375,7 @@ public class PlayPN extends PNCardsSubcommandData {
             }
         }
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
-            ButtonHelper.serveNextComponentActionButtons(event, game, player);
+            ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         }
         TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberTurns());
         if (posssibleCombatMod != null) {

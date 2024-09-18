@@ -2509,10 +2509,6 @@ public class ButtonListener extends ListenerAdapter {
             }
             // "dspnedyn"
             ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("componentActionRes_")) {
-            ButtonHelper.resolvePressedCompButton(game, player, event, buttonID);
-            ButtonHelper.deleteMessage(event);
-
         } else if (buttonID.startsWith("ultimateUndo_")) {
             if (game.getSavedButtons().size() > 0) {
                 String buttonString = game.getSavedButtons().get(0);
