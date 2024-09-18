@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -60,7 +61,7 @@ public class RelicDraw extends RelicSubcommandData {
     public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game game, String buttonID) {
         int position = Integer.parseInt(buttonID.split("_")[1]);
         if (player.getPromissoryNotes().containsKey("dspnflor") && game.getPNOwner("dspnflor") != player) {
-            ButtonHelper.resolvePNPlay("dspnflorChecked", player, game, event);
+            PlayPN.resolvePNPlay("dspnflorChecked", player, game, event);
         }
         drawRelicAndNotify(player, event, game, position, true);
         event.getMessage().delete().queue();

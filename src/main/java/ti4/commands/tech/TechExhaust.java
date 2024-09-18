@@ -20,6 +20,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Emojis;
@@ -344,7 +345,7 @@ public class TechExhaust extends TechAddRemove {
     private static void sendNextActionButtonsIfButtonEvent(GenericInteractionCreateEvent event, Game game,
         Player player) {
         if (event instanceof ButtonInteractionEvent) {
-            ButtonHelper.serveNextComponentActionButtons(event, game, player);
+            ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         }
     }
 

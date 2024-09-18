@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
@@ -441,7 +442,7 @@ public class ButtonHelperFactionSpecific {
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         event.getMessage().delete().queue();
-        ButtonHelper.resolvePNPlay("stymie", player, game, event);
+        PlayPN.resolvePNPlay("stymie", player, game, event);
     }
 
     public static void resolveStymiePlayerStep2(Game game, Player player, ButtonInteractionEvent event,
@@ -764,7 +765,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveRaghsCallStepOne(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String origPlanet = buttonID.split("_")[1];
-        ButtonHelper.resolvePNPlay("ragh", player, game, event);
+        PlayPN.resolvePNPlay("ragh", player, game, event);
         List<Button> buttons = new ArrayList<>();
         Player saar = game.getPNOwner("ragh");
         for (String planet : saar.getPlanetsAllianceMode()) {
@@ -2188,7 +2189,7 @@ public class ButtonHelperFactionSpecific {
         String scNum = buttonID.split("_")[1];
         int sc = Integer.parseInt(scNum);
         player.addFollowedSC(sc, event);
-        ButtonHelper.resolvePNPlay("acq", player, game, event);
+        PlayPN.resolvePNPlay("acq", player, game, event);
         String msg = player.getRepresentation(true, true) + " you will be marked as having followed " + sc
             + " without having needed to spend a CC. Please still use the strategy card buttons to resolve the strategy card effect";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

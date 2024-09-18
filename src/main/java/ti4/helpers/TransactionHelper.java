@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.relic.RelicSendFragments;
@@ -891,7 +892,7 @@ public class TransactionHelper {
                 p1.removePromissoryNote(id);
                 p2.setPromissoryNote(id);
                 if (id.contains("dspnveld")) {
-                    ButtonHelper.resolvePNPlay(id, p2, game, event);
+                    PlayPN.resolvePNPlay(id, p2, game, event);
                 }
                 boolean sendSftT = false;
                 boolean sendAlliance = false;

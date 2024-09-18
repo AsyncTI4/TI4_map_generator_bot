@@ -54,7 +54,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
             }
             if (speaker == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Speaker is not yet assigned. Secrets have been dealt, but please assign speaker soon (command is /player stats speaker:y)");
+                    "Speaker is not yet assigned. Secrets have been dealt, but please assign speaker soon (command is `/player speaker`)");
             }
             // List<Button> buttons2 = new ArrayList<>();
             // buttons2.add(Buttons.green("setOrder", "Set Speaker Order"));

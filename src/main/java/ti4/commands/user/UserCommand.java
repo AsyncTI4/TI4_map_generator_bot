@@ -45,6 +45,7 @@ public class UserCommand implements Command {
         Collection<UserSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new ShowUserSettings());
         subcommands.add(new SetPreferredColourList());
+        subcommands.add(new SetPersonalPingInterval());
         return subcommands;
     }
 

@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.MapGenerator;
@@ -283,7 +284,7 @@ public class SCPick extends PlayerSubcommandData {
                 ButtonHelperActionCards.checkForAssigningCoup(game, p2);
                 if (game.getStoredValue("Play Naalu PN") != null && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
                     if (!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().containsKey("gift")) {
-                        ButtonHelper.resolvePNPlay("gift", p2, game, event);
+                        PlayPN.resolvePNPlay("gift", p2, game, event);
                     }
                 }
             }

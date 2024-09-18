@@ -1750,32 +1750,32 @@ public class ButtonHelperModifyUnits {
             }
         }
 
-        CommanderUnlockCheck.checkPlayer(player, game, "titans", event);
+        CommanderUnlockCheck.checkPlayer(player, "titans");
         if ("sd".equalsIgnoreCase(unit)) {
             Tile tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "saar", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "rohdhna", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "cheiran", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "celdauri", event);
+        CommanderUnlockCheck.checkPlayer(player, "saar");
+        CommanderUnlockCheck.checkPlayer(player, "rohdhna");
+        CommanderUnlockCheck.checkPlayer(player, "cheiran");
+        CommanderUnlockCheck.checkPlayer(player, "celdauri");
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "mentak", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "l1z1x", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "tnelis", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "cymiae", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "kyro", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "ghemina", event);
+        CommanderUnlockCheck.checkPlayer(player, "mentak");
+        CommanderUnlockCheck.checkPlayer(player, "l1z1x");
+        CommanderUnlockCheck.checkPlayer(player, "tnelis");
+        CommanderUnlockCheck.checkPlayer(player, "cymiae");
+        CommanderUnlockCheck.checkPlayer(player, "kyro");
+        CommanderUnlockCheck.checkPlayer(player, "ghemina");
         if ("warsun".equalsIgnoreCase(unitLong)) {
-            CommanderUnlockCheck.checkPlayer(player, game, "muaat", event);
+            CommanderUnlockCheck.checkPlayer(player, "muaat");
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "argent", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "arborec", event);
+        CommanderUnlockCheck.checkPlayer(player, "argent");
+        CommanderUnlockCheck.checkPlayer(player, "naaz");
+        CommanderUnlockCheck.checkPlayer(player, "arborec");
 
         event.getMessage().delete().queue();
     }
