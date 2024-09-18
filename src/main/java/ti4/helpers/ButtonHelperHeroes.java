@@ -1146,15 +1146,12 @@ public class ButtonHelperHeroes {
             if (p2 == player) {
                 continue;
             }
-            if (FoWHelper.playerHasShipsInSystem(p2, tile)
-                && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
-                ButtonHelper.riftAllUnitsInASystem(pos, event, game, p2, p2.getFactionEmoji(), player);
+            if (FoWHelper.playerHasShipsInSystem(p2, tile) && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
+                RiftUnitsHelper.riftAllUnitsInASystem(pos, event, game, p2, p2.getFactionEmoji(), player);
             }
-            if (FoWHelper.playerHasShipsInSystem(p2, tile)
-                && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
+            if (FoWHelper.playerHasShipsInSystem(p2, tile) && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, game, player)) {
                 String msg = player.getRepresentation(true, true) + " has failed to eat units owned by "
-                    + p2.getRepresentation()
-                    + " because they were blockaded. Womp Womp.";
+                    + p2.getRepresentation() + " because they were blockaded. Womp Womp.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

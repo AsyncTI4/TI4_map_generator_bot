@@ -59,7 +59,7 @@ public class RiftUnitsHelper {
         riftAllUnitsInASystem(pos, event, game, player, ident, null);
     }
 
-    private static void riftAllUnitsInASystem(String pos, ButtonInteractionEvent event, Game game, Player player, String ident, Player cabal) {
+    public static void riftAllUnitsInASystem(String pos, ButtonInteractionEvent event, Game game, Player player, String ident, Player cabal) {
         Tile tile = game.getTileByPosition(pos);
 
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
