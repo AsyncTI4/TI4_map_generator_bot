@@ -164,21 +164,6 @@ public class Stats extends PlayerSubcommandData {
             player.setAutoSaboPassMedian(optionMedian.getAsInt());
         }
 
-        OptionMapping optionInterval = event.getOption(Constants.PERSONAL_PING_INTERVAL);
-        if (optionInterval != null) {
-            player.setPersonalPingInterval(optionInterval.getAsInt());
-            Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-            for (Game activeGame2 : mapList.values()) {
-                for (Player player2 : activeGame2.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        player2.setPersonalPingInterval(optionInterval.getAsInt());
-                        GameSaveLoadManager.saveMap(activeGame2, event);
-                    }
-                }
-
-            }
-        }
-
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
             player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());

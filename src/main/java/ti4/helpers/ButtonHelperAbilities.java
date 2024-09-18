@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
@@ -58,7 +59,7 @@ public class ButtonHelperAbilities {
         String msg = player.getRepresentation() + " choose the opponent ship you wish to build using influence";
         if (player.getPromissoryNotes().containsKey("dspnmort")
             && !player.getPromissoryNotesOwned().contains("dspnmort")) {
-            ButtonHelper.resolvePNPlay("dspnmort", player, game, event);
+            PlayPN.resolvePNPlay("dspnmort", player, game, event);
         }
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {

@@ -115,7 +115,6 @@ public class Player {
     private int turnCount;
     private int tg;
     private int commodities;
-    private int personalPingInterval;
     private int commoditiesTotal;
     private int stasisInfantry;
     private int autoSaboPassMedian;
@@ -1887,11 +1886,7 @@ public class Player {
     }
 
     public int getPersonalPingInterval() {
-        return personalPingInterval;
-    }
-
-    public void setPersonalPingInterval(int interval) {
-        personalPingInterval = interval;
+        return getGlobalUserSettings().getPersonalPingInterval();
     }
 
     public int getTurnCount() {
@@ -2968,7 +2963,12 @@ public class Player {
     }
 
     public Optional<String> getGlobalUserSetting(String setting) {
-        return UserSettingsManager.getInstance().getUserSettings(getUserID()).getStoredValue(setting);
+        return getGlobalUserSettings().getStoredValue(setting);
+    }
+
+    @JsonIgnore
+    public UserSettings getGlobalUserSettings() {
+        return UserSettingsManager.getInstance().getUserSettings(getUserID());
     }
 
     public void setGlobalUserSetting(String setting, String value) {

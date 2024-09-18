@@ -99,7 +99,7 @@ public class SendPN extends PNCardsSubcommandData {
 		targetPlayer.setPromissoryNote(id);
 
 		if (id.contains("dspnveld") && !targetPlayer.ownsPromissoryNote(id)) {
-			ButtonHelper.resolvePNPlay(id, targetPlayer, game, event);
+			PlayPN.resolvePNPlay(id, targetPlayer, game, event);
 		}
 
 		boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();

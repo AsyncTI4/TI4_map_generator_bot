@@ -24,6 +24,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -275,7 +276,7 @@ public class TurnStart extends PlayerSubcommandData {
         List<Button> startButtons = new ArrayList<>();
         Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
             "Tactical Action (" + player.getTacticalCC() + ")");
-        int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
+        int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
         Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
         startButtons.add(tacticalAction);
