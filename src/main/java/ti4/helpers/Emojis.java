@@ -1903,4 +1903,36 @@ public class Emojis {
     public static String comm(int count) {
         return StringUtils.repeat(Emojis.comm, count);
     }
+
+    public static String getRedDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10red_0;
+            case 1 -> Emojis.d10red_1;
+            case 2 -> Emojis.d10red_2;
+            case 3 -> Emojis.d10red_3;
+            case 4 -> Emojis.d10red_4;
+            case 5 -> Emojis.d10red_5;
+            case 6 -> Emojis.d10red_6;
+            case 7 -> Emojis.d10red_7;
+            case 8 -> Emojis.d10red_8;
+            case 9 -> Emojis.d10red_9;
+            default -> String.valueOf(value);
+        };
+    }
+
+    public static String getGreenDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10green_0;
+            case 1 -> Emojis.d10green_1;
+            case 2 -> Emojis.d10green_2;
+            case 3 -> Emojis.d10green_3;
+            case 4 -> Emojis.d10green_4;
+            case 5 -> Emojis.d10green_5;
+            case 6 -> Emojis.d10green_6;
+            case 7 -> Emojis.d10green_7;
+            case 8 -> Emojis.d10green_8;
+            case 9 -> Emojis.d10green_9;
+            default -> String.valueOf(value);
+        };
+    } 
 }

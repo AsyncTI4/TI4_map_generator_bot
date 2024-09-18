@@ -24,6 +24,14 @@ public class DiceHelper {
             return threshold;
         }
 
+        public String getEmojiRepresentation() {
+            if (isSuccess()) {
+                return Emojis.getGreenDieEmoji(result);
+            } else {
+                return Emojis.getRedDieEmoji(result);
+            }
+        }
+
         public String printResult() {
             if (isSuccess()) {
                 return String.format("**%d**", result);
