@@ -19,6 +19,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DiscardACRandom;
 import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.franken.LeaderAdd;
 import ti4.commands.leaders.HeroPlay;
@@ -1198,7 +1199,7 @@ public class ButtonHelperHeroes {
         p1.removePromissoryNote(id);
         p2.setPromissoryNote(id);
         if (id.contains("dspnveld")) {
-            ButtonHelper.resolvePNPlay(id, p2, game, event);
+            PlayPN.resolvePNPlay(id, p2, game, event);
         }
         boolean sendSftT = false;
         boolean sendAlliance = false;
