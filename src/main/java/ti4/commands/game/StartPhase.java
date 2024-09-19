@@ -34,6 +34,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerTitleHelper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
@@ -67,7 +68,7 @@ public class StartPhase extends GameSubcommandData {
             case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
             case "ixthian" -> AgendaHelper.rollIxthian(game, false);
-            case "gameTitles" -> ButtonHelper.offerEveryoneTitlePossibilities(game);
+            case "gameTitles" -> PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
             case "giveAgendaButtonsBack" -> Helper.giveMeBackMyAgendaButtons(game);
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);

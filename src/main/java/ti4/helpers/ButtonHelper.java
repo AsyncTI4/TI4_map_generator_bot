@@ -6,9 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +14,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -51,29 +48,22 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.ShowDiscardedAgendas;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardspn.PlayPN;
 import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
-import ti4.commands.ds.DrawBlueBackTile;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExploreInfo;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.game.GameCreate;
 import ti4.commands.game.GameEnd;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.leaders.ExhaustLeader;
-import ti4.commands.leaders.HeroPlay;
-import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
@@ -83,8 +73,6 @@ import ti4.commands.relic.RelicShowRemaining;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.special.DiploSystem;
 import ti4.commands.special.StellarConverter;
-import ti4.commands.status.Cleanup;
-import ti4.commands.status.ListTurnOrder;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
@@ -92,7 +80,6 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.commands.user.SetPersonalPingInterval;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -114,12 +101,10 @@ import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
-import ti4.model.LeaderModel;
 import ti4.model.NamedCombatModifierModel;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
-import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -128,76 +113,6 @@ import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
 
 public class ButtonHelper {
-
-    public static void offerEveryoneTitlePossibilities(Game game) {
-        for (Player player : game.getRealAndEliminatedPlayers()) {
-            String msg = player.getRepresentation()
-                + " you have the opportunity to anonymously bestow one title on someone else in this game. Titles are just for fun, and have no real significance, but could a nice way to take something away from this game. Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you want to bestow it upon.";
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("bestowTitleStep1_Life Of The Table", "Life Of The Table"));
-            buttons.add(Buttons.green("bestowTitleStep1_Fun To Be Around", "Fun To Be Around"));
-            buttons.add(Buttons.green("bestowTitleStep1_Trustworthy To A Fault", "Trustworthy To A Fault"));
-            buttons.add(Buttons.green("bestowTitleStep1_You Made The Game Better", "You Made The Game Better"));
-            buttons.add(Buttons.green("bestowTitleStep1_A Kind Soul", "A Kind Soul"));
-            buttons.add(Buttons.green("bestowTitleStep1_A Good Ally", "A Good Ally"));
-            buttons.add(Buttons.green("bestowTitleStep1_A Mahact Puppet Master", "A Mahact Puppet Master"));
-
-            buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
-            buttons.add(Buttons.blue("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
-            buttons.add(Buttons.blue("bestowTitleStep1_Possesses Cursed Dice", "Possesses Cursed Dice"));
-            buttons.add(Buttons.blue("bestowTitleStep1_A Worthy Opponent", "A Worthy Opponent"));
-            buttons.add(Buttons.blue("bestowTitleStep1_A Brilliant Tactician", "A Brilliant Tactician"));
-            buttons.add(Buttons.blue("bestowTitleStep1_A Master Diplomat", "A Master Diplomat"));
-            buttons.add(Buttons.blue("bestowTitleStep1_Hard To Kill", "Hard To Kill"));
-            buttons.add(Button.primary("bestowTitleStep1_Shard Fumbler", "Shard Fumbler"));
-            buttons.add(Buttons.gray("bestowTitleStep1_Observer", "Observer"));
-
-            buttons.add(Buttons.red("bestowTitleStep1_A Sneaky One", "A Sneaky One"));
-            buttons.add(Buttons.red("bestowTitleStep1_You Made Me Mad", "You Made Me Mad"));
-            buttons.add(
-                Buttons.red("bestowTitleStep1_A Vuil'Raith In Xxcha Clothing", "A Vuil'Raith In Xxcha Clothing"));
-            buttons.add(Buttons.red("bestowTitleStep1_Space Risker", "Space Risker"));
-            buttons.add(Buttons.red("bestowTitleStep1_A Warlord", "A Warlord"));
-            buttons.add(Buttons.red("bestowTitleStep1_Traitor", "Traitor"));
-            buttons.add(Buttons.red("bestowTitleStep1_Saltshaker", "Saltshaker"));
-
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tiles here", buttons);
-        }
-    }
-
-    public static void resolveBestowTitleStep1(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
-        String title = buttonID.split("_")[1];
-        String msg = player.getRepresentation() + " choose the player you wish to give the title of " + title;
-        List<Button> buttons = new ArrayList<>();
-        for (Player player2 : game.getRealPlayersNDummies()) {
-            if (player2 == player) {
-                continue;
-            }
-            buttons.add(Buttons.green("bestowTitleStep2_" + title + "_" + player2.getFaction(),
-                player2.getFactionModel().getFactionName() + " (" + player2.getUserName() + ")"));
-        }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
-        deleteMessage(event);
-    }
-
-    public static void resolveBestowTitleStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
-        String title = buttonID.split("_")[1];
-        String faction = buttonID.split("_")[2];
-        Player p2 = game.getPlayerFromColorOrFaction(faction);
-        String msg = p2.getRepresentation() + " someone has chosen to give you the title of '" + title + "'";
-        String titles = game.getStoredValue("TitlesFor" + p2.getUserID());
-        if (titles.isEmpty()) {
-            game.setStoredValue("TitlesFor" + p2.getUserID(), title);
-        } else {
-            game.setStoredValue("TitlesFor" + p2.getUserID(), titles + "_" + title);
-        }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Successfully bestowed title");
-        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg);
-        deleteMessage(event);
-    }
 
     public static void pickACardFromDiscardStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
@@ -2826,68 +2741,6 @@ public class ButtonHelper {
             }
         }
         return buttons;
-    }
-
-    public static void resolveWarForgeRuins(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
-        String planet = buttonID.split("_")[1];
-        String mech = buttonID.split("_")[2];
-        String message = "";
-        boolean failed;
-        message = message + mechOrInfCheck(planet, game, player);
-        failed = message.contains("Please try again.");
-        if (!failed) {
-            if ("mech".equalsIgnoreCase(mech)) {
-                new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
-                    "mech " + planet, game);
-                message = message + "Placed mech on" + Mapper.getPlanet(planet).getName();
-            } else {
-                new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
-                    "2 infantry " + planet, game);
-                message = message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
-            }
-            addReaction(event, false, false, message, "");
-            deleteMessage(event);
-        } else {
-            addReaction(event, false, false, message, "");
-        }
-    }
-
-    public static void resolveSeedySpace(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
-        String planet = buttonID.split("_")[2];
-        String acOrAgent = buttonID.split("_")[1];
-        String message = "";
-        boolean failed;
-        message = message + mechOrInfCheck(planet, game, player);
-        failed = message.contains("Please try again.");
-        if (!failed) {
-            if ("ac".equalsIgnoreCase(acOrAgent)) {
-                if (player.hasAbility("scheming")) {
-                    game.drawActionCard(player.getUserID());
-                    game.drawActionCard(player.getUserID());
-                    message = getIdent(player)
-                        + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons.";
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true) + " use buttons to discard",
-                        ACInfo.getDiscardActionCardButtons(game, player, false));
-                } else {
-                    game.drawActionCard(player.getUserID());
-                    message = getIdent(player) + " Drew 1 AC";
-                    ACInfo.sendActionCardInfo(game, player, event);
-                }
-                CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
-            } else {
-                Leader playerLeader = player.getLeader(acOrAgent).orElse(null);
-                if (playerLeader == null) {
-                    return;
-                }
-                RefreshLeader.refreshLeader(player, playerLeader, game);
-                message = message + " Refreshed " + Mapper.getLeader(acOrAgent).getName();
-            }
-            addReaction(event, false, false, message, "");
-            deleteMessage(event);
-        } else {
-            addReaction(event, false, false, message, "");
-        }
     }
 
     public static boolean doesPlayerOwnAPlanetInThisSystem(Tile tile, Player player, Game game) {
@@ -6807,75 +6660,6 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void resolveExpedition(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
-        String message = "";
-        String planetName = buttonID.split("_")[1];
-        boolean failed = false;
-        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
-        failed = message.contains("Please try again.");
-        if (!failed) {
-            PlanetRefresh.doAction(player, planetName, game);
-            planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
-            message = message + "Readied " + planetName;
-            ButtonHelper.addReaction(event, false, false, message, "");
-            ButtonHelper.deleteMessage(event);
-        } else {
-            ButtonHelper.addReaction(event, false, false, message, "");
-        }
-    }
-
-    public static void resolveCoreMine(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
-        String message = "";
-        String planetName = buttonID.split("_")[1];
-        boolean failed = false;
-        message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
-        failed = message.contains("Please try again.");
-        if (!failed) {
-            message = message + "Gained 1TG " + player.gainTG(1);
-            ButtonHelperAbilities.pillageCheck(player, game);
-            ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-        }
-        ButtonHelper.addReaction(event, false, false, message, "");
-        if (!failed) {
-            ButtonHelper.deleteMessage(event);
-            if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-                String pF = player.getFactionEmoji();
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " " + message);
-            }
-        }
-    }
-
-    public static String mechOrInfCheck(String planetName, Game game, Player player) {
-        String message;
-        Tile tile = game.getTile(AliasHandler.resolveTile(planetName));
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        int numMechs = 0;
-        int numInf = 0;
-        String colorID = Mapper.getColorID(player.getColor());
-        UnitKey mechKey = Mapper.getUnitKey("mf", colorID);
-        UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-        if (unitHolder.getUnits() != null) {
-
-            if (unitHolder.getUnits().get(mechKey) != null) {
-                numMechs = unitHolder.getUnits().get(mechKey);
-            }
-            if (unitHolder.getUnits().get(infKey) != null) {
-                numInf = unitHolder.getUnits().get(infKey);
-            }
-        }
-        if (numMechs > 0 || numInf > 0) {
-            if (numMechs > 0) {
-                message = "Planet had a mech. ";
-            } else {
-                message = "Planet did not have a mech. Removed 1 infantry (" + numInf + "->" + (numInf - 1) + "). ";
-                tile.removeUnit(planetName, infKey, 1);
-            }
-        } else {
-            message = "Planet did not have a mech or an infantry. Please try again.";
-        }
-        return message;
-    }
-
     public static void addReaction(ButtonInteractionEvent event, boolean skipReaction, boolean sendPublic,
         String message, String additionalMessage) {
         if (event == null)
@@ -6954,8 +6738,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
     }
 
-    public static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message,
-        String additionalMessage, String messageID, Game game) {
+    public static void addReaction(Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage, String messageID, Game game) {
         Guild guild = game.getGuild();
         if (guild == null)
             return;

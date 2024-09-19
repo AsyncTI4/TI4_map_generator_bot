@@ -118,9 +118,11 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
+import ti4.helpers.ExploreHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerPreferenceHelper;
+import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TransactionHelper;
 import ti4.helpers.Units.UnitKey;
@@ -1016,8 +1018,6 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("assignHits_")) {
             ButtonHelperModifyUnits.assignHits(buttonID, event, game, player, ident, buttonLabel);
-        } else if (buttonID.startsWith("seedySpace_")) {
-            ButtonHelper.resolveSeedySpace(game, buttonID, player, event);
         } else if (buttonID.startsWith("startDevotion_")) {
             ButtonHelperModifyUnits.startDevotion(player, game, event, buttonID);
         } else if (buttonID.startsWith("purgeTech_")) {
@@ -1782,8 +1782,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperRelics.jrResolution(player, buttonID, game, event);
         } else if (buttonID.startsWith("colonialRedTarget_")) {
             AgendaHelper.resolveColonialRedTarget(game, buttonID, event);
-        } else if (buttonID.startsWith("ruins_")) {
-            ButtonHelper.resolveWarForgeRuins(game, buttonID, player, event);
         } else if (buttonID.startsWith("createGameChannels")) {
             CreateGameButton.decodeButtonMsg(event);
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
@@ -2052,10 +2050,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveUprisingStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("addAbsolOrbital_")) {
             ButtonHelper.addAbsolOrbital(game, player, event, buttonID);
-        } else if (buttonID.startsWith("bestowTitleStep1_")) {
-            ButtonHelper.resolveBestowTitleStep1(game, player, event, buttonID);
-        } else if (buttonID.startsWith("bestowTitleStep2_")) {
-            ButtonHelper.resolveBestowTitleStep2(game, player, event, buttonID);
         } else if (buttonID.startsWith("argentHeroStep2_")) {
             ButtonHelperHeroes.argentHeroStep2(game, player, event, buttonID);
         } else if (buttonID.startsWith("fogAllianceAgentStep2_")) {
@@ -2516,10 +2510,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, game);
         } else if (buttonID.startsWith("veldyrAttach_")) {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, game, player);
-        } else if (buttonID.startsWith("resolveExpedition_")) {
-            ButtonHelper.resolveExpedition(buttonID, game, player, event);
-        } else if (buttonID.startsWith("resolveCoreMine_")) {
-            ButtonHelper.resolveCoreMine(buttonID, game, player, event);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
             String planet = buttonID.replace("nanoforgePlanet_", "");
             Planet planetReal = game.getPlanetsInfo().get(planet);
@@ -3409,12 +3399,11 @@ public class ButtonListener extends ListenerAdapter {
                     String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1);
                     boolean failed = false;
                     if (labelP.contains("inf") && labelP.contains("mech")) {
-                        message += ButtonHelper.mechOrInfCheck(planetName, game, player);
+                        message += ExploreHelper.checkForMechOrRemoveInf(planetName, game, player);
                         failed = message.contains("Please try again.");
                     }
                     if (!failed) {
-                        message += "Gained 1TG " + player.gainTG(1) + ".";
-                        ButtonHelperAbilities.pillageCheck(player, game);
+                        message += "Gained 1TG " + player.gainTG(1, true) + ".";
                         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
@@ -3807,7 +3796,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "rematch" -> ButtonHelper.rematch(game, event);
                 case "offerToGiveTitles" -> {
-                    ButtonHelper.offerEveryoneTitlePossibilities(game);
+                    PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "enableAidReacts" -> {
