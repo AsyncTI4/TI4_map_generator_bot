@@ -482,7 +482,7 @@ public class ButtonHelper {
         String exhausted = buttonID.split("_")[3];
         Player p2 = game.getPlayerFromColorOrFaction(receiverFaction);
         if (p2 == null) {
-            MessageHelper.sendMessageToChannel(getCorrectChannel(p1, game),
+            MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
                 "Could not resolve second player, please resolve manually.");
             return;
         }
@@ -519,7 +519,7 @@ public class ButtonHelper {
         String receiverFaction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(receiverFaction);
         if (p2 == null) {
-            MessageHelper.sendMessageToChannel(getCorrectChannel(p1, game),
+            MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
                 "Could not resolve second player, please resolve manually.");
             return;
         }
@@ -544,7 +544,7 @@ public class ButtonHelper {
             }
         }
         deleteMessage(event);
-        MessageHelper.sendMessageToChannel(getCorrectChannel(p2, game), p2.getRepresentation(true, true) + " you got traded the DMZ");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you got traded the DMZ");
     }
 
     public static boolean canIBuildGFInSpace(Game game, Player player, Tile tile, String kindOfBuild) {
@@ -588,7 +588,7 @@ public class ButtonHelper {
         String msg = player.getFactionEmoji() + " forced " + getIdentOrColor(p2, game) + " to refresh";
         String msg2 = p2.getRepresentation(true, true) + " the trade holder has forced you to refresh";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        MessageHelper.sendMessageToChannel(getCorrectChannel(p2, game), msg2);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
         deleteTheOneButton(event);
         if (!p2.getFollowedSCs().contains(5)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(p2, 5, game, event);
@@ -971,7 +971,7 @@ public class ButtonHelper {
                     .withEmoji(Emoji.fromFormatted(Emojis.nivyn));
                 Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Wound");
                 List<Button> buttons = List.of(nivynButton, decline);
-                MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, game),
+                MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(),
                     ident + " use buttons to resolve potential wound ", buttons);
             }
             if (game.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander")
@@ -987,7 +987,7 @@ public class ButtonHelper {
                         "Build 1 Unit With Arborec Commander");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(gainTG, decline);
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, game),
+                    MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(),
                         ident + " use buttons to resolve Dirzuga Rophal, the Arborec commander.", buttons);
                 }
             }
@@ -1006,7 +1006,7 @@ public class ButtonHelper {
                         "Use Celdauri Hero");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Hero");
                     List<Button> buttons = List.of(gainTG, decline);
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, game),
+                    MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(),
                         ident + " use buttons to decide if you want to use Titus Flavius, the Celdauri Hero.", buttons);
                 }
             }
@@ -1015,19 +1015,14 @@ public class ButtonHelper {
                 && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                 if (justChecking) {
                     if (!game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(channel,
-                            "Warning: you would trigger an opportunity for a mahact mech trigger");
+                        MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger an opportunity for a mahact mech trigger");
                     }
                     numberOfAbilities++;
                 } else {
-                    Button gainTG = Buttons.green(
-                        fincheckerForNonActive + "mahactMechHit_" + activeSystem.getPosition() + "_"
-                            + player.getColor(),
-                        "Return " + player.getColor() + " CC and end their turn");
+                    Button gainTG = Buttons.green(fincheckerForNonActive + "mahactMechHit_" + activeSystem.getPosition() + "_" + player.getColor(), "Return " + player.getColor() + " CC and end their turn");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline To Use Mech");
                     List<Button> buttons = List.of(gainTG, decline);
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, game),
-                        ident + " use buttons to resolve Mahact mech ability ", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(), ident + " use buttons to resolve Mahact mech ability ", buttons);
                 }
             }
             if (nonActivePlayer.hasTechReady("nf") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)
@@ -1069,7 +1064,7 @@ public class ButtonHelper {
                         "Look at SOs (" + (player.getSo()) + ")");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Yssaril commander");
                     List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs, decline);
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(nonActivePlayer, game),
+                    MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(),
                         ident + " use buttons to resolve So Ata, the Yssaril commander. ", buttons);
                 }
             }
@@ -2011,7 +2006,7 @@ public class ButtonHelper {
 
         }
 
-        MessageHelper.sendMessageToChannel(getCorrectChannel(mahact, game),
+        MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
             mahact.getRepresentation(true, true) + " the " + target.getColor()
                 + " CC has been removed from your fleet pool");
         ButtonHelper.checkFleetInEveryTile(mahact, game, event);
@@ -2027,8 +2022,8 @@ public class ButtonHelper {
         String message2 = trueIdentity + "! Your current CCs are " + target.getCCRepresentation()
             + ". Use buttons to gain CCs";
         game.setStoredValue("originalCCsFor" + target.getFaction(), target.getCCRepresentation());
-        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), message2, buttons);
-        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target.getRepresentation(true,
+        MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), message2, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), target.getRepresentation(true,
             true)
             + " You've been hit by"
             + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
@@ -2099,20 +2094,16 @@ public class ButtonHelper {
                 AddCC.addCC(event, target.getColor(), tile);
             }
         }
-        MessageHelper.sendMessageToChannel(getCorrectChannel(minister, game),
-            minister.getRepresentation(true, true) + " you have used the Minister of Peace agenda");
+        MessageHelper.sendMessageToChannel(minister.getCorrectChannel(), minister.getRepresentation(true, true) + " you have used the Minister of Peace agenda");
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Buttons.red(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
         if (getEndOfTurnAbilities(target, game).size() > 1) {
-            conclusionButtons.add(Buttons.blue("endOfTurnAbilities",
-                "Do End Of Turn Ability (" + (getEndOfTurnAbilities(target, game).size() - 1) + ")"));
+            conclusionButtons.add(Buttons.blue("endOfTurnAbilities", "Do End Of Turn Ability (" + (getEndOfTurnAbilities(target, game).size() - 1) + ")"));
         }
 
-        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(target, game), target
-            .getRepresentation(true, true)
-            + " You've been hit by"
-            + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
+        MessageHelper.sendMessageToChannelWithButtons(target.getCorrectChannel(), target.getRepresentation(true, true)
+            + " You've been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "")
             + " *Minister of Peace*. 1 CC has been placed from your tactic pool in the system and your turn has been ended. Use the buttons to resolve end of turn abilities and then end turn.",
             conclusionButtons);
         deleteTheOneButton(event);
@@ -3769,14 +3760,6 @@ public class ButtonHelper {
         }
     }
 
-    /**
-     * @deprecated use {@link Player#getCorrectChannel()} instead
-     */
-    @Deprecated
-    public static MessageChannel getCorrectChannel(Player player, Game game) {
-        return player.getCorrectChannel();
-    }
-
     public static List<Button> getTilesToMoveFrom(Player player, Game game, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -3785,33 +3768,29 @@ public class ButtonHelper {
                 && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue())
                     || nomadHeroAndDomOrbCheck(player, game, tileEntry.getValue()))) {
                 Tile tile = tileEntry.getValue();
-                Button validTile = Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(),
-                    tile.getRepresentationForButtons(game, player));
+                Button validTile = Buttons.green(finChecker + "tacticalMoveFrom_" + tileEntry.getKey(), tile.getRepresentationForButtons(game, player));
                 buttons.add(validTile);
             }
         }
 
         if (player.hasUnexhaustedLeader("saaragent")) {
-            Button saarButton = Buttons.gray("exhaustAgent_saaragent",
-                "Use Saar Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.Saar));
+            Button saarButton = Buttons.gray("exhaustAgent_saaragent", "Use Saar Agent", Emojis.Saar);
             buttons.add(saarButton);
         }
 
         if (player.hasRelic("dominusorb")) {
-            Button domButton = Buttons.gray("dominusOrb", "Purge Dominus Orb");
+            Button domButton = Buttons.gray("dominusOrb", "Purge Dominus Orb", Emojis.Relic);
             buttons.add(domButton);
         }
 
         if (player.hasRelicReady("absol_luxarchtreatise")) {
-            Button domButton = Buttons.gray("exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise");
+            Button domButton = Buttons.gray("exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise", Emojis.Relic);
             buttons.add(domButton);
         }
 
         if (player.hasUnexhaustedLeader("ghostagent")
             && FoWHelper.doesTileHaveWHs(game, game.getActiveSystem())) {
-            Button ghostButton = Buttons.gray("exhaustAgent_ghostagent", "Use Creuss Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.Ghost));
+            Button ghostButton = Buttons.gray("exhaustAgent_ghostagent", "Use Creuss Agent", Emojis.Ghost);
             buttons.add(ghostButton);
         }
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
@@ -6105,13 +6084,13 @@ public class ButtonHelper {
 
             if (privatePlayer.getStasisInfantry() > 0) {
                 if (getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
+                    MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                         "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
                             + " infantry left to revive.",
                         getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(getCorrectChannel(privatePlayer, game), privatePlayer
+                    MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer
                         .getRepresentation()
                         + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether");
 
@@ -6131,13 +6110,13 @@ public class ButtonHelper {
 
                 if (privatePlayer.getStasisInfantry() > 0) {
                     if (getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                        MessageHelper.sendMessageToChannelWithButtons(getCorrectChannel(privatePlayer, game),
+                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                             "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
                                 + " infantry left to revive.",
                             getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
                         privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(getCorrectChannel(privatePlayer, game), privatePlayer
+                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer
                             .getRepresentation()
                             + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
 
