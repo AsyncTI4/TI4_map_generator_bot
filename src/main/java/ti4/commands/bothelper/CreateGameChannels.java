@@ -36,6 +36,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.game.GameCreate;
+import ti4.commands.game.WeirdGameSetup;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -43,6 +44,7 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
+import ti4.helpers.TIGLHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -385,6 +387,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR);
+                if (thread.getName().toLowerCase().contains(" tigl ")) {
+                    TIGLHelper.sendTIGLSetupText(newGame);
+                }
                 if (missingMembers.isEmpty()) {
                     manager.setArchived(true);
                 }

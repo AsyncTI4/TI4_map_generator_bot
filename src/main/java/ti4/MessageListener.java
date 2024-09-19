@@ -35,6 +35,7 @@ import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.fow.Whisper;
+import ti4.commands.tech.GetTechButton;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -397,7 +398,7 @@ public class MessageListener extends ListenerAdapter {
                 if (!game.getStoredValue(key2).isEmpty() && !game.getStoredValue(key2).equalsIgnoreCase("0")) {
                     game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
                     if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-                        ButtonHelper.postTechSummary(game);
+                        GetTechButton.postTechSummary(game);
                     }
                 }
                 if (game.getAutoPingStatus() && spacer != 0 && !game.isTemporaryPingDisable()) {

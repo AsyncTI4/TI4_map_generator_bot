@@ -168,7 +168,7 @@ public class PlayerPreferenceHelper {
             buttons);
     }
 
-        public static List<Button> getDirectHitManagementButtons(Game game, Player player) {
+    public static List<Button> getDirectHitManagementButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String stuffNotToSustain = game
             .getStoredValue("stuffNotToSustainFor" + player.getFaction());
@@ -211,7 +211,7 @@ public class PlayerPreferenceHelper {
     public static void resolveRiskDirectHit(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String yesOrNo = buttonID.split("_")[2];
         String unit = buttonID.split("_")[1];
-        String stuffNotToSustain = game            .getStoredValue("stuffNotToSustainFor" + player.getFaction());
+        String stuffNotToSustain = game.getStoredValue("stuffNotToSustainFor" + player.getFaction());
         if ("yes".equalsIgnoreCase(yesOrNo)) {
             stuffNotToSustain = stuffNotToSustain.replace(unit, "");
         } else {
@@ -224,5 +224,25 @@ public class PlayerPreferenceHelper {
         List<Button> systemButtons = getDirectHitManagementButtons(game, player);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+
+    @ButtonHandler("setHourAsAFK_")
+    public static void resolveSetAFKTime(Game gameOG, Player player, String buttonID, ButtonInteractionEvent event) {
+        String time = buttonID.split("_")[1];
+        player.addHourThatIsAFK(time);
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        String afkTimes = "" + player.getHoursThatPlayerIsAFK();
+        for (Game game : mapList.values()) {
+            if (!game.isHasEnded()) {
+                for (Player player2 : game.getRealPlayers()) {
+                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                        player2.setHoursThatPlayerIsAFK(afkTimes);
+                        GameSaveLoadManager.saveMap(game, player2.getUserName() + " Updated Player Settings");
+                    }
+                }
+            }
+        }
     }
 }

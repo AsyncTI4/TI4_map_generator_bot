@@ -36,6 +36,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.WebHelper;
 import ti4.map.Game;
@@ -205,7 +206,7 @@ public class GameEnd extends GameSubcommandData {
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
         if (!game.isFowMode()) {
-            ButtonHelper.offerEveryoneTitlePossibilities(game);
+            PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
         }
 
         TextChannel summaryChannel = getGameSummaryChannel(game);

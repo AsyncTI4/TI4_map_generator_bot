@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PlayPN;
+import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.MapGenerator;
@@ -203,7 +204,7 @@ public class SCPick extends PlayerSubcommandData {
             for (int sc : scPickedList) {
                 game.setScTradeGood(sc, 0);
             }
-            ButtonHelper.startActionPhase(event, game);
+            StartPhase.startActionPhase(event, game);
             game.setStoredValue("willRevolution", "");
         } else {
             boolean foundPlayer = false;

@@ -23,6 +23,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
+import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
@@ -952,7 +953,7 @@ public class ButtonHelperFactionSpecific {
             + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
         event.getMessage().delete().queue();
-        ButtonHelper.startActionPhase(event, game);
+        StartPhase.startActionPhase(event, game);
     }
 
     public static void resolveRaghsCallStepTwo(Player player, Game game, ButtonInteractionEvent event,

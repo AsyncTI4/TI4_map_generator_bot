@@ -20,6 +20,7 @@ import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.PlayerFactionSettings;
@@ -133,7 +134,7 @@ public class StartMilty extends MiltySubcommandData {
         boolean success = game.loadGameSettingsFromSettings(event, settings);
         if (!success) return "Fix the game settings before continuing";
         if (game.isCompetitiveTIGLGame()) {
-            WeirdGameSetup.sendTIGLSetupText(game);
+            TIGLHelper.sendTIGLSetupText(game);
         }
 
         // Load Game Specifications
