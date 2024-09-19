@@ -52,6 +52,7 @@ import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -1970,6 +1971,15 @@ public class Player {
     public String gainTG(int count) {
         String message = "(" + getTg() + " -> " + (getTg() + count) + ")";
         this.tg += count;
+        return message;
+    }
+
+    @JsonIgnore
+    public String gainTG(int count, boolean checkForPillage) {
+        String message = gainTG(count);
+        if (checkForPillage) {
+            ButtonHelperAbilities.pillageCheck(this, getGame());
+        }
         return message;
     }
 

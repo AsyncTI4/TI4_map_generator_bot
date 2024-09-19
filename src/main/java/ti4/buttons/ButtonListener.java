@@ -40,6 +40,7 @@ import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DrawAC;
+import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.PNInfo;
@@ -118,9 +119,11 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
+import ti4.helpers.ExploreHelper;
 import ti4.helpers.FrankenDraftHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerPreferenceHelper;
+import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TransactionHelper;
 import ti4.helpers.Units.UnitKey;
@@ -514,8 +517,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.resolveDomnaStep3Buttons(event, game, player, buttonID);
         } else if (buttonID.startsWith("domnaStepTwo_")) {
             ButtonHelperModifyUnits.offerDomnaStep3Buttons(event, game, player, buttonID);
-        } else if (buttonID.startsWith("setHourAsAFK_")) {
-            ButtonHelper.resolveSetAFKTime(game, player, buttonID, event);
         } else if (buttonID.startsWith("domnaStepOne_")) {
             ButtonHelperModifyUnits.offerDomnaStep2Buttons(event, game, player, buttonID);
         } else if (buttonID.startsWith("selectBeforeSwapSCs_")) {
@@ -665,7 +666,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
 
-            ButtonHelper.startStatusHomework(event, game);
+            StartPhase.startStatusHomework(event, game);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("exhaustRelic_")) {
             String relic = buttonID.replace("exhaustRelic_", "");
@@ -981,10 +982,7 @@ public class ButtonListener extends ListenerAdapter {
                 trueIdentity + " Use buttons to resolve", buttons);
         } else if (buttonID.startsWith("codexCardPick_")) {
             ButtonHelper.deleteTheOneButton(event);
-            ButtonHelper.pickACardFromDiscardStep1(game, player);
-
-        } else if (buttonID.startsWith("pickFromDiscard_")) {
-            ButtonHelper.pickACardFromDiscardStep2(game, player, event, buttonID);
+            PickACFromDiscard.pickACardFromDiscardStep1(game, player);
         } else if (buttonID.startsWith("cymiaeHeroStep2_")) {
             ButtonHelperHeroes.resolveCymiaeHeroStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("cymiaeHeroStep3_")) {
@@ -1018,8 +1016,6 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("assignHits_")) {
             ButtonHelperModifyUnits.assignHits(buttonID, event, game, player, ident, buttonLabel);
-        } else if (buttonID.startsWith("seedySpace_")) {
-            ButtonHelper.resolveSeedySpace(game, buttonID, player, event);
         } else if (buttonID.startsWith("startDevotion_")) {
             ButtonHelperModifyUnits.startDevotion(player, game, event, buttonID);
         } else if (buttonID.startsWith("purgeTech_")) {
@@ -1070,8 +1066,6 @@ public class ButtonListener extends ListenerAdapter {
             String message = player.getRepresentation() + " Use the buttons to get the tech you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("getTech_")) {
-            ButtonHelper.getTech(game, player, event, buttonID);
         } else if (buttonID.startsWith("cabalVortextCapture_")) {
             ButtonHelperFactionSpecific.resolveVortexCapture(buttonID, player, game, event);
         } else if (buttonID.startsWith("takeAC_")) {
@@ -1784,8 +1778,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperRelics.jrResolution(player, buttonID, game, event);
         } else if (buttonID.startsWith("colonialRedTarget_")) {
             AgendaHelper.resolveColonialRedTarget(game, buttonID, event);
-        } else if (buttonID.startsWith("ruins_")) {
-            ButtonHelper.resolveWarForgeRuins(game, buttonID, player, event);
         } else if (buttonID.startsWith("createGameChannels")) {
             CreateGameButton.decodeButtonMsg(event);
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
@@ -2054,10 +2046,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperActionCards.resolveUprisingStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("addAbsolOrbital_")) {
             ButtonHelper.addAbsolOrbital(game, player, event, buttonID);
-        } else if (buttonID.startsWith("bestowTitleStep1_")) {
-            ButtonHelper.resolveBestowTitleStep1(game, player, event, buttonID);
-        } else if (buttonID.startsWith("bestowTitleStep2_")) {
-            ButtonHelper.resolveBestowTitleStep2(game, player, event, buttonID);
         } else if (buttonID.startsWith("argentHeroStep2_")) {
             ButtonHelperHeroes.argentHeroStep2(game, player, event, buttonID);
         } else if (buttonID.startsWith("fogAllianceAgentStep2_")) {
@@ -2518,10 +2506,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.gledgeBasePlanet(buttonID, event, game);
         } else if (buttonID.startsWith("veldyrAttach_")) {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, game, player);
-        } else if (buttonID.startsWith("resolveExpedition_")) {
-            ButtonHelper.resolveExpedition(buttonID, game, player, event);
-        } else if (buttonID.startsWith("resolveCoreMine_")) {
-            ButtonHelper.resolveCoreMine(buttonID, game, player, event);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
             String planet = buttonID.replace("nanoforgePlanet_", "");
             Planet planetReal = game.getPlanetsInfo().get(planet);
@@ -3122,7 +3106,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Did not refresh planets due to the Checks and Balances resolving against. Players have been sent buttons to refresh up to 3 planets.");
                     }
-                    ButtonHelper.startStrategyPhase(event, game);
+                    StartPhase.startStrategyPhase(event, game);
                     ButtonHelper.deleteMessage(event);
 
                 }
@@ -3194,7 +3178,7 @@ public class ButtonListener extends ListenerAdapter {
                         return;
                     }
                     RevealStage1.revealTwoStage1(event, game.getMainGameChannel());
-                    ButtonHelper.startStrategyPhase(event, game);
+                    StartPhase.startStrategyPhase(event, game);
                     PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
                     ButtonHelper.deleteMessage(event);
                 }
@@ -3411,12 +3395,11 @@ public class ButtonListener extends ListenerAdapter {
                     String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1);
                     boolean failed = false;
                     if (labelP.contains("inf") && labelP.contains("mech")) {
-                        message += ButtonHelper.mechOrInfCheck(planetName, game, player);
+                        message += ExploreHelper.checkForMechOrRemoveInf(planetName, game, player);
                         failed = message.contains("Please try again.");
                     }
                     if (!failed) {
-                        message += "Gained 1TG " + player.gainTG(1) + ".";
-                        ButtonHelperAbilities.pillageCheck(player, game);
+                        message += "Gained 1TG " + player.gainTG(1, true) + ".";
                         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
                     }
                     ButtonHelper.addReaction(event, false, false, message, "");
@@ -3809,7 +3792,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "rematch" -> ButtonHelper.rematch(game, event);
                 case "offerToGiveTitles" -> {
-                    ButtonHelper.offerEveryoneTitlePossibilities(game);
+                    PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
                     ButtonHelper.deleteMessage(event);
                 }
                 case "enableAidReacts" -> {
