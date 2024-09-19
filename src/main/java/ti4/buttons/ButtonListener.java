@@ -514,8 +514,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.resolveDomnaStep3Buttons(event, game, player, buttonID);
         } else if (buttonID.startsWith("domnaStepTwo_")) {
             ButtonHelperModifyUnits.offerDomnaStep3Buttons(event, game, player, buttonID);
-        } else if (buttonID.startsWith("setHourAsAFK_")) {
-            ButtonHelper.resolveSetAFKTime(game, player, buttonID, event);
         } else if (buttonID.startsWith("domnaStepOne_")) {
             ButtonHelperModifyUnits.offerDomnaStep2Buttons(event, game, player, buttonID);
         } else if (buttonID.startsWith("selectBeforeSwapSCs_")) {

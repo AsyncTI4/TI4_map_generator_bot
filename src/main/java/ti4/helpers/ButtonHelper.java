@@ -6731,28 +6731,7 @@ public class ButtonHelper {
         Helper.checkEndGame(game, player);
     }
 
-    public static void resolveSetAFKTime(Game gameOG, Player player, String buttonID, ButtonInteractionEvent event) {
-        String time = buttonID.split("_")[1];
-        player.addHourThatIsAFK(time);
-        deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            getIdent(player) + " Set hour " + time + " as a time that you are afk");
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        String afkTimes = "" + player.getHoursThatPlayerIsAFK();
-        for (Game game : mapList.values()) {
-            if (!game.isHasEnded()) {
-                for (Player player2 : game.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        player2.setHoursThatPlayerIsAFK(afkTimes);
-                        GameSaveLoadManager.saveMap(game, player2.getUserName() + " Updated Player Settings");
-                    }
-                }
-            }
-        }
-    }
-
     public static boolean isPlayerNew(Game gameOG, Player player) {
-
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         for (Game game : mapList.values()) {
             if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
@@ -6852,8 +6831,7 @@ public class ButtonHelper {
         message = message + ButtonHelper.mechOrInfCheck(planetName, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
-            message = message + "Gained 1TG (" + player.getTg() + "->" + (player.getTg() + 1) + ").";
-            player.setTg(player.getTg() + 1);
+            message = message + "Gained 1TG " + player.gainTG(1);
             ButtonHelperAbilities.pillageCheck(player, game);
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         }
@@ -6865,7 +6843,6 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " " + message);
             }
         }
-
     }
 
     public static String mechOrInfCheck(String planetName, Game game, Player player) {
