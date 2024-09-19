@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.RevealAgenda;
+import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
@@ -323,7 +324,7 @@ public class PlayPN extends PNCardsSubcommandData {
             ButtonHelperFactionSpecific.offerSpyNetOptions(player);
         }
         if ("gift".equalsIgnoreCase(id)) {
-            ButtonHelper.startActionPhase(event, game);
+            StartPhase.startActionPhase(event, game);
             //in case Naalu gets eliminated and the PN goes away
             game.setStoredValue("naaluPNUser", player.getFaction());
         }

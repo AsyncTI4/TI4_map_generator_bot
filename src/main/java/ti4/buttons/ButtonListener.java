@@ -665,7 +665,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
 
-            ButtonHelper.startStatusHomework(event, game);
+            StartPhase.startStatusHomework(event, game);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("exhaustRelic_")) {
             String relic = buttonID.replace("exhaustRelic_", "");
@@ -3122,7 +3122,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Did not refresh planets due to the Checks and Balances resolving against. Players have been sent buttons to refresh up to 3 planets.");
                     }
-                    ButtonHelper.startStrategyPhase(event, game);
+                    StartPhase.startStrategyPhase(event, game);
                     ButtonHelper.deleteMessage(event);
 
                 }
@@ -3194,7 +3194,7 @@ public class ButtonListener extends ListenerAdapter {
                         return;
                     }
                     RevealStage1.revealTwoStage1(event, game.getMainGameChannel());
-                    ButtonHelper.startStrategyPhase(event, game);
+                    StartPhase.startStrategyPhase(event, game);
                     PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
                     ButtonHelper.deleteMessage(event);
                 }
