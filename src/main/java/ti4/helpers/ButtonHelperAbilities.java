@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.ds.TrapReveal;
@@ -507,7 +508,7 @@ public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        ButtonHelper.pickACardFromDiscardStep1(game, player);
+        PickACFromDiscard.pickACardFromDiscardStep1(game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {

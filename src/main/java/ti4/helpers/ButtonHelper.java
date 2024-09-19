@@ -114,47 +114,6 @@ import ti4.selections.selectmenus.SelectFaction;
 
 public class ButtonHelper {
 
-    public static void pickACardFromDiscardStep1(Game game, Player player) {
-        List<Button> buttons = new ArrayList<>();
-        for (String acStringID : game.getDiscardActionCards().keySet()) {
-            buttons.add(Buttons.green("pickFromDiscard_" + acStringID, Mapper.getActionCard(acStringID).getName()));
-        }
-        buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
-        if (buttons.size() > 25) {
-            buttons.add(25, Buttons.red("deleteButtons_", "Delete These Buttons"));
-        }
-        if (buttons.size() > 50) {
-            buttons.add(50, Buttons.red("deleteButtons_2", "Delete These Buttons"));
-        }
-        if (buttons.size() > 75) {
-            buttons.add(75, Buttons.red("deleteButtons_3", "Delete These Buttons"));
-        }
-        String msg = player.getRepresentation(true, true) + " use buttons to grab an AC from the discard";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-    }
-
-    public static void pickACardFromDiscardStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
-        deleteMessage(event);
-        String acID = buttonID.replace("pickFromDiscard_", "");
-        boolean picked = game.pickActionCard(player.getUserID(), game.getDiscardActionCards().get(acID));
-        if (!picked) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
-            return;
-        }
-        String msg2 = player.getRepresentation(true, true) + " grabbed " + Mapper.getActionCard(acID).getName()
-            + " from the discard";
-        MessageHelper.sendMessageToChannel(getCorrectChannel(player, game), msg2);
-
-        ACInfo.sendActionCardInfo(game, player, event);
-        if (player.hasAbility("autonetic_memory")) {
-            String message = player.getRepresentation(true, true)
-                + " if you did not just use the Codex to get that AC, please discard 1 AC due to your Cybernetic Madness ability";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message,
-                ACInfo.getDiscardActionCardButtons(game, player, false));
-        }
-    }
-
     public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile) {
         if (!player.hasUnit(flagshipID) || tile == null) {
             return false;

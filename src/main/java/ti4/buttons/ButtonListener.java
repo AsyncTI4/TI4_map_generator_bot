@@ -40,6 +40,7 @@ import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DrawAC;
+import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.PNInfo;
@@ -981,10 +982,7 @@ public class ButtonListener extends ListenerAdapter {
                 trueIdentity + " Use buttons to resolve", buttons);
         } else if (buttonID.startsWith("codexCardPick_")) {
             ButtonHelper.deleteTheOneButton(event);
-            ButtonHelper.pickACardFromDiscardStep1(game, player);
-
-        } else if (buttonID.startsWith("pickFromDiscard_")) {
-            ButtonHelper.pickACardFromDiscardStep2(game, player, event, buttonID);
+            PickACFromDiscard.pickACardFromDiscardStep1(game, player);
         } else if (buttonID.startsWith("cymiaeHeroStep2_")) {
             ButtonHelperHeroes.resolveCymiaeHeroStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("cymiaeHeroStep3_")) {
