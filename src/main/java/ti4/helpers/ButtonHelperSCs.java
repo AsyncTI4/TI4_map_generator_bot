@@ -18,6 +18,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ScorePublic;
+import ti4.commands.tech.GetTechButton;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -585,7 +586,7 @@ public class ButtonHelperSCs {
         if (setStatus) {
             player.addFollowedSC(scNum, event);
             if (scNum == 7 || scNum / 10 == 7) {
-                ButtonHelper.postTechSummary(game);
+                GetTechButton.postTechSummary(game);
             }
         }
         ButtonHelper.addReaction(event, false, false, "Not Following", "");

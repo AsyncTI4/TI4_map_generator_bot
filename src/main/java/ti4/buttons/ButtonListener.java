@@ -1066,8 +1066,6 @@ public class ButtonListener extends ListenerAdapter {
             String message = player.getRepresentation() + " Use the buttons to get the tech you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             ButtonHelper.deleteMessage(event);
-        } else if (buttonID.startsWith("getTech_")) {
-            ButtonHelper.getTech(game, player, event, buttonID);
         } else if (buttonID.startsWith("cabalVortextCapture_")) {
             ButtonHelperFactionSpecific.resolveVortexCapture(buttonID, player, game, event);
         } else if (buttonID.startsWith("takeAC_")) {

@@ -73,12 +73,12 @@ public class ExploreHelper {
         String message = "";
         String planetName = buttonID.split("_")[1];
         boolean failed = false;
-        message = message + checkForMechOrRemoveInf(planetName, game, player);
+        message += checkForMechOrRemoveInf(planetName, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
             PlanetRefresh.doAction(player, planetName, game);
             planetName = Mapper.getPlanet(planetName) == null ? planetName : Mapper.getPlanet(planetName).getName();
-            message = message + "Readied " + planetName;
+            message += "Readied " + planetName;
             ButtonHelper.addReaction(event, false, false, message, "");
             ButtonHelper.deleteMessage(event);
         } else {
@@ -91,10 +91,10 @@ public class ExploreHelper {
         String message = "";
         String planetName = buttonID.split("_")[1];
         boolean failed = false;
-        message = message + checkForMechOrRemoveInf(planetName, game, player);
+        message += checkForMechOrRemoveInf(planetName, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
-            message = message + "Gained 1TG " + player.gainTG(1, true);
+            message += "Gained 1TG " + player.gainTG(1, true);
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         }
         ButtonHelper.addReaction(event, false, false, message, "");
@@ -144,17 +144,17 @@ public class ExploreHelper {
         String mech = buttonID.split("_")[2];
         String message = "";
         boolean failed;
-        message = message + checkForMechOrRemoveInf(planet, game, player);
+        message += checkForMechOrRemoveInf(planet, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
             if ("mech".equalsIgnoreCase(mech)) {
                 new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
                     "mech " + planet, game);
-                message = message + "Placed mech on" + Mapper.getPlanet(planet).getName();
+                message += "Placed mech on" + Mapper.getPlanet(planet).getName();
             } else {
                 new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
                     "2 infantry " + planet, game);
-                message = message + "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
+                message += "Placed 2 infantry on" + Mapper.getPlanet(planet).getName();
             }
             ButtonHelper.addReaction(event, false, false, message, "");
             ButtonHelper.deleteMessage(event);
@@ -169,7 +169,7 @@ public class ExploreHelper {
         String acOrAgent = buttonID.split("_")[1];
         String message = "";
         boolean failed;
-        message = message + checkForMechOrRemoveInf(planet, game, player);
+        message += checkForMechOrRemoveInf(planet, game, player);
         failed = message.contains("Please try again.");
         if (!failed) {
             if ("ac".equalsIgnoreCase(acOrAgent)) {
@@ -192,7 +192,7 @@ public class ExploreHelper {
                     return;
                 }
                 RefreshLeader.refreshLeader(player, playerLeader, game);
-                message = message + " Refreshed " + Mapper.getLeader(acOrAgent).getName();
+                message += " Refreshed " + Mapper.getLeader(acOrAgent).getName();
             }
             ButtonHelper.addReaction(event, false, false, message, "");
             ButtonHelper.deleteMessage(event);
