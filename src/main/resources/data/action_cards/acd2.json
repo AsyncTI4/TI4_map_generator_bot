@@ -128,7 +128,7 @@
   {
     "alias": "brutal_occupation",
     "name": "Brutal Occupation",
-    "phase": "Action",
+    "phase": "Any",
     "window": "After you gain control of a planet",
     "text": "Ready and explore that planet.",
     "flavorText": "The harvest of Ordinian was so complete that even the planet's core was depleted. The Nekro left nothing usable. Only its lifeless shell remained.",
@@ -204,15 +204,6 @@
     "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
     "text": "Remove your command token from the active system.",
     "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "defectors",
-    "name": "Defectors",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend influence equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
-    "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
     "source": "action_deck_2"
   },
   {
@@ -434,7 +425,7 @@
   {
     "alias": "foreign_aid",
     "name": "Foreign Aid",
-    "phase": "Agenda",
+    "phase": "Action",
     "window": "When you perform the primary ability of your strategy card",
     "text": "Choose up to 2 other players. Those players do not have to spend or place a command token to resolve the secondary ability of that strategy card.",
     "flavorText": "As he projected scenes of their reconstruction efforts, Odlynn was interrupted by the council's rapturous applause.",
@@ -528,6 +519,15 @@
     "window": "At the end of your turn",
     "text": "Exhaust 1 non-home planet you control other than Mecatol Rex to gain trade goods equal to the combined value of its resources and influence.",
     "flavorText": "The hoard of Lazax artifacts dated back to the dawn of the empire. The thought of selling these prized possessions cut him deeply, but Berekar knew they were the coin required to reclaim their home.",
+    "source": "action_deck_2"
+  },
+  {
+    "alias": "liberation",
+    "name": "Liberation",
+    "phase": "Any",
+    "window": "After you gain control of a planet",
+    "text": "Produce a number of ground forces on that planet up to that planet's resource or influence value; you may spend influence as if it were resources to produce these units.",
+    "flavorText": "Harsh penal colonies were all too common, always filled with hardy folk eager for a chance at revenge.",
     "source": "action_deck_2"
   },
   {
@@ -1021,7 +1021,7 @@
     "name": "Syndicate",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal 3 cards from the top of the action card deck. Give 1 of those cards to up to 3 different players and discard the rest.\nDuring this turn, you can exchange action cards as part of transactions with those players. [Note: When giving away the action cards, you may choose yourself as 1 of the recipients.]",
+    "text": "Reveal 3 cards from the top of the action card deck. Give 1 of those cards to up to 3 different players and discard the rest. During this turn, you can exchange action cards as part of transactions with those players. [Note: When giving away the action cards, you may choose yourself as 1 of the recipients.]",
     "flavorText": "\"What if I'm not ready, Harka?\" the operative asked, looking away. Harka squeezed her hand. \"The Keleres chose me to lead because my crews have never failed a job. Now, I've chosen you. Believe in me, who believes in you.\"",
     "source": "action_deck_2"
   },
