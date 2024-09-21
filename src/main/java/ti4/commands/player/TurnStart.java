@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
@@ -23,6 +24,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -60,7 +62,7 @@ public class TurnStart extends PlayerSubcommandData {
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
         Map<String, String> maps = new HashMap<>();
         maps.putAll(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
@@ -192,7 +194,7 @@ public class TurnStart extends PlayerSubcommandData {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
                 ButtonHelperCommanders.olradinCommanderStep1(player, game);
             }
-            String text2 = player.getRepresentation() + " PASSED";
+            String text2 = player.getRepresentation(true, false) + " PASSED";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text2);
             if (player.hasTech("absol_aida")) {
                 String msg = player.getRepresentation()
@@ -274,7 +276,7 @@ public class TurnStart extends PlayerSubcommandData {
         List<Button> startButtons = new ArrayList<>();
         Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
             "Tactical Action (" + player.getTacticalCC() + ")");
-        int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
+        int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
         Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
         startButtons.add(tacticalAction);

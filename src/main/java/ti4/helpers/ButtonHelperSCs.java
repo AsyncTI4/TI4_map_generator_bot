@@ -16,7 +16,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ScorePublic;
+import ti4.commands.tech.GetTechButton;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -29,7 +31,15 @@ public class ButtonHelperSCs {
     public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID, String trueIdentity, String messageID) {
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
-        StrategyCardModel scModel = game.getStrategyCardModelByName("diplomacy").orElse(null);
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok2diplomacy")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("diplomacy").orElse(null);
+        }
         if (!used && scModel != null && scModel.usesAutomationForSCID("pok2diplomacy")
             && !player.getFollowedSCs().contains(scModel.getInitiative())
             && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -73,10 +83,20 @@ public class ButtonHelperSCs {
     public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event,
         String buttonID, String trueIdentity, String messageID) {
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
-        StrategyCardModel scModel = game.getStrategyCardModelByName("technology").orElse(null);
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok7technology")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("technology").orElse(null);
+        }
+
         if (!used && scModel != null && scModel.usesAutomationForSCID("pok7technology")
             && !player.getFollowedSCs().contains(scModel.getInitiative())
             && game.getPlayedSCs().contains(scModel.getInitiative())) {
+
             int scNum = scModel.getInitiative();
             player.addFollowedSC(scNum, event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -136,28 +156,25 @@ public class ButtonHelperSCs {
         if (used) {
             return;
         }
-        int tradeInitiative = 5;
-        if (game.getStrategyCardSet().getStrategyCardModelByName("trade").isPresent()) {
-            tradeInitiative = game.getStrategyCardSet()
-                .getStrategyCardModelByName("trade")
-                .get().getInitiative();
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        int tradeInitiative = scModel.getInitiative();
 
         if (player.getStrategicCC() > 0) {
             ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed Trade");
         }
         String message = deductCC(player, event);
-        if (!player.getFollowedSCs().contains(5)) {
+        if (!player.getFollowedSCs().contains(tradeInitiative)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
         player.addFollowedSC(tradeInitiative, event);
-        if (game.getName().equalsIgnoreCase("pbd1000")) {
-            for (int sc : player.getUnfollowedSCs()) {
-                if (sc % 10 == 5) {
-                    player.addFollowedSC(sc, event);
-                }
-            }
-        }
         ButtonHelperStats.replenishComms(event, game, player, true);
 
         ButtonHelper.addReaction(event, false, false, message, "");
@@ -168,7 +185,15 @@ public class ButtonHelperSCs {
     public static void scDrawSO(Game game, Player player, ButtonInteractionEvent event,
         String buttonID, String trueIdentity, String messageID) {
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
-        StrategyCardModel scModel = game.getStrategyCardModelByName("imperial").orElse(null);
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok8imperial")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("imperial").orElse(null);
+        }
         if (!game.getPhaseOfGame().contains("agenda") && !used && scModel != null && scModel.usesAutomationForSCID("pok8imperial")
             && !player.getFollowedSCs().contains(scModel.getInitiative())
             && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -231,16 +256,19 @@ public class ButtonHelperSCs {
         }
         int initComm = player.getCommodities();
         player.setCommodities(player.getCommoditiesTotal());
-        if (!player.getFollowedSCs().contains(5)) {
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, game, event);
-        }
-        player.addFollowedSC(5, event);
-        if (game.getName().equalsIgnoreCase("pbd1000")) {
-            for (int sc : player.getUnfollowedSCs()) {
-                if (sc % 10 == 5) {
-                    player.addFollowedSC(sc, event);
-                }
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        int tradeInitiative = scModel.getInitiative();
+        player.addFollowedSC(tradeInitiative, event);
+        if (!player.getFollowedSCs().contains(tradeInitiative)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
         ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
@@ -277,8 +305,22 @@ public class ButtonHelperSCs {
         ButtonHelperAbilities.pillageCheck(player, game);
         player.setCommodities(0);
 
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("trade").orElse(null);
+        }
+        int tradeInitiative = scModel.getInitiative();
+        player.addFollowedSC(tradeInitiative, event);
+        if (!player.getFollowedSCs().contains(tradeInitiative)) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
+        }
         for (Player p2 : game.getRealPlayers()) {
-            if (p2.getSCs().contains(5) && p2.getCommodities() > 0) {
+            if (p2.getSCs().contains(tradeInitiative) && p2.getCommodities() > 0) {
                 if (p2.getCommodities() > washedCommsPower) {
                     p2.setTg(p2.getTg() + washedCommsPower);
                     p2.setCommodities(p2.getCommodities() - washedCommsPower);
@@ -305,26 +347,16 @@ public class ButtonHelperSCs {
                         p2.getCommoditiesTotal());
                 }
             } else {
-                if (p2.getSCs().contains(5)) {
+                if (p2.getSCs().contains(tradeInitiative)) {
                     ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
                         player.getCommoditiesTotal());
                 }
             }
-            if (p2.getSCs().contains(5)) {
+            if (p2.getSCs().contains(tradeInitiative)) {
                 TransactionHelper.checkTransactionLegality(game, player, p2);
             }
         }
-        if (!player.getFollowedSCs().contains(5)) {
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 5, game, event);
-        }
-        player.addFollowedSC(5, event);
-        if (game.getName().equalsIgnoreCase("pbd1000")) {
-            for (int sc : player.getUnfollowedSCs()) {
-                if (sc % 10 == 5) {
-                    player.addFollowedSC(sc, event);
-                }
-            }
-        }
+
         ButtonHelper.addReaction(event, false, false, "Replenishing and washing", "");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
@@ -335,7 +367,15 @@ public class ButtonHelperSCs {
         String buttonID, String trueIdentity, String messageID) {
         List<Button> buttons;
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
-        StrategyCardModel scModel = game.getStrategyCardModelByName("warfare").orElse(null);
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok6warfare")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("warfare").orElse(null);
+        }
         if (!used && scModel != null && scModel.usesAutomationForSCID("pok6warfare")
             && !player.getFollowedSCs().contains(scModel.getInitiative())
             && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -378,7 +418,15 @@ public class ButtonHelperSCs {
     public static void construction(Game game, Player player, ButtonInteractionEvent event,
         String buttonID, String trueIdentity, String messageID) {
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
-        StrategyCardModel scModel = game.getStrategyCardModelByName("construction").orElse(null);
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok4construction")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("construction").orElse(null);
+        }
         boolean automationExists = scModel != null && scModel.usesAutomationForSCID("pok4construction");
         if (!used && scModel != null && !player.getFollowedSCs().contains(scModel.getInitiative())
             && automationExists && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -406,23 +454,21 @@ public class ButtonHelperSCs {
     public static void leadershipGenerateCCButtons(Game game, Player player, ButtonInteractionEvent event,
         String buttonID, String trueIdentity) {
         int leadershipInitiative = 1;
-        if (game.getStrategyCardSet().getStrategyCardModelByName("leadership").isPresent()) {
-            leadershipInitiative = game.getStrategyCardSet()
-                .getStrategyCardModelByName("leadership")
-                .get().getInitiative();
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok1leadership")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
         }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("leadership").orElse(null);
+        }
+        leadershipInitiative = scModel.getInitiative();
 
         if (!player.getFollowedSCs().contains(leadershipInitiative)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, leadershipInitiative, game, event);
         }
         player.addFollowedSC(leadershipInitiative, event);
-        if (game.getName().equalsIgnoreCase("pbd1000")) {
-            for (int sc : player.getUnfollowedSCs()) {
-                if (sc % 10 == 1) {
-                    player.addFollowedSC(sc, event);
-                }
-            }
-        }
         String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_leadership", "Done Exhausting Planets");
@@ -539,8 +585,8 @@ public class ButtonHelperSCs {
         }
         if (setStatus) {
             player.addFollowedSC(scNum, event);
-            if (scNum == 7) {
-                ButtonHelper.postTechSummary(game);
+            if (scNum == 7 || scNum / 10 == 7) {
+                GetTechButton.postTechSummary(game);
             }
         }
         ButtonHelper.addReaction(event, false, false, "Not Following", "");
@@ -628,7 +674,15 @@ public class ButtonHelperSCs {
             return;
         }
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
-        StrategyCardModel scModel = game.getStrategyCardModelByName("politics").orElse(null);
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok3politics")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (scModel == null) {
+            scModel = game.getStrategyCardModelByName("politics").orElse(null);
+        }
         if (!used && scModel != null && scModel.usesAutomationForSCID("pok3politics")
             && !player.getFollowedSCs().contains(scModel.getInitiative())
             && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -664,10 +718,7 @@ public class ButtonHelperSCs {
                 player.getRepresentation(true, true) + " use buttons to discard",
                 ACInfo.getDiscardActionCardButtons(game, player, false));
         }
-        if (player.getLeaderIDs().contains("yssarilcommander")
-            && !player.hasLeaderUnlocked("yssarilcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
         if (player.hasAbility("contagion")) {
             List<Button> buttons2 = ButtonHelperAbilities.getKyroContagionButtons(game, player,
                 event, player.getFinsFactionCheckerPrefix());

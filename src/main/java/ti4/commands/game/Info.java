@@ -86,7 +86,15 @@ public class Info extends GameSubcommandData {
 
         sb.append("### Settings: ").append(NEW_LINE);
         sb.append("Beta Test Mode: ").append(game.isTestBetaFeaturesMode()).append(NEW_LINE);
-        sb.append("Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Game Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Player's Auto-Ping Time Interval (hrs):\n");
+        for (Player player : game.getRealPlayers()) {
+            String interval = String.valueOf(player.getPersonalPingInterval());
+            if ("0".equals(interval)) {
+                interval = "Off";
+            }
+            sb.append("> ").append(player.getFactionEmojiOrColor()).append(": `").append(interval).append("`\n");
+        }
         sb.append("Text Size: ").append(game.getTextSize()).append(NEW_LINE);
         sb.append("Full Text Output: ").append(game.isShowFullComponentTextEmbeds()).append(NEW_LINE);
         sb.append("Output Verbosity: ").append(game.getOutputVerbosity()).append(NEW_LINE);

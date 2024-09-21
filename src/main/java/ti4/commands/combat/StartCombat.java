@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.GenerateTile;
 import ti4.helpers.AliasHandler;
@@ -236,18 +237,13 @@ public class StartCombat extends CombatSubcommandData {
                 return;
             }
         }
-        if (tile.isMecatol() && player1.getLeaderIDs().contains("winnucommander")
-            && !player1.hasLeaderUnlocked("winnucommander")) {
-            ButtonHelper.commanderUnlockCheck(player1, game, "winnu", event);
-        }
-        if (tile.isMecatol() && player2.getLeaderIDs().contains("winnucommander")
-            && !player2.hasLeaderUnlocked("winnucommander")) {
-            ButtonHelper.commanderUnlockCheck(player2, game, "winnu", event);
+        if (tile.isMecatol()) {
+            CommanderUnlockCheck.checkPlayer(player1, game, "winnu", event);
+            CommanderUnlockCheck.checkPlayer(player2, game, "winnu", event);
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(),
-            event, player1);
+        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event, player1);
 
         // Create the thread
         final String finalThreadName = threadName;
@@ -744,6 +740,13 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Buttons.gray(finChecker + "getAgentSelection_letnevagent",
                 "Use Letnev Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.Letnev)));
+        }
+        // Exo 2s
+        if ("space".equalsIgnoreCase(groundOrSpace) && !game.isFowMode()) {
+            if ((tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, p1.getColor()) > 0 && p1.hasTech("exo2")) || (tile.getSpaceUnitHolder().getUnitCount(UnitType.Dreadnought, p2.getColor()) > 0 && p2.hasTech("exo2"))) {
+                buttons.add(Buttons.blue("assCannonNDihmohn_exo_" + tile.getPosition(), "Use Exotrireme 2 Ability")
+                    .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+            }
         }
 
         Player nomad = Helper.getPlayerFromUnlockedLeader(game, "nomadagentthundarian");

@@ -265,7 +265,7 @@
         "target": "Elect Player",
         "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses Production, they discard this card unless they produce 2 or more fighters.",
         "text2": "",
-        "mapText": "Apply +1 to the result of your fighter's combat rolls. When you use Production, discard this card unless you produce 2 or more fighters.",
+        "mapText": "Apply +1 to the result of your fighter's combat rolls. When you use PRODUCTION, discard this card unless you produce 2 or more fighters.",
         "source": "base"
     },
     {

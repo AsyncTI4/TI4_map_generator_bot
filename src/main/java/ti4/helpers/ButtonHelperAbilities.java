@@ -15,10 +15,13 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardsac.PickACFromDiscard;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
-import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExplorePlanet;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.TurnStart;
@@ -57,7 +60,7 @@ public class ButtonHelperAbilities {
         String msg = player.getRepresentation() + " choose the opponent ship you wish to build using influence";
         if (player.getPromissoryNotes().containsKey("dspnmort")
             && !player.getPromissoryNotesOwned().contains("dspnmort")) {
-            ButtonHelper.resolvePNPlay("dspnmort", player, game, event);
+            PlayPN.resolvePNPlay("dspnmort", player, game, event);
         }
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -505,7 +508,7 @@ public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        ButtonHelper.pickACardFromDiscardStep1(game, player);
+        PickACFromDiscard.pickACardFromDiscardStep1(game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {
@@ -971,9 +974,7 @@ public class ButtonHelperAbilities {
             player.getRepresentation(true, true) + " acquired " + Mapper.getRelic(relicName).getName()
                 + " and paid " + lostComms + " commodities (" + oldComms + "->" + player.getCommodities()
                 + ")");
-        if (player.getLeaderIDs().contains("axiscommander") && !player.hasLeaderUnlocked("axiscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "axis", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "axis", event);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1021,9 +1022,7 @@ public class ButtonHelperAbilities {
             game.purgeExplore(cardID);
         }
 
-        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         event.getMessage().delete().queue();
@@ -1186,9 +1185,7 @@ public class ButtonHelperAbilities {
                 game.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName, game);
             message = ident + " replaced a Sleeper on " + Helper.getPlanetRepresentation(planetName, game)
                 + " with a " + Emojis.pds;
-            if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "titans", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "titans", event);
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         event.getMessage().delete().queue();
@@ -1439,9 +1436,7 @@ public class ButtonHelperAbilities {
             }
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "yin", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "yin", event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, game) + " using indoctrination");
@@ -1458,10 +1453,10 @@ public class ButtonHelperAbilities {
         if ("decline".equalsIgnoreCase(info[0])) {
             message = player.getFactionEmoji() + " declined to use their Distant Suns ability";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
-            new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
+            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 1, false);
         } else {
-            new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
+            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 2, false);
         }
 
@@ -1475,7 +1470,7 @@ public class ButtonHelperAbilities {
         if ("decline".equalsIgnoreCase(info[0])) {
             message = player.getFactionEmoji() + " declined to use their Deep Mining ability";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
-            new ExpPlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
+            new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 1, false);
         } else {
             message = player.getFactionEmoji() + " used their Deep Mining ability to gain 1TG (TGs went from "
