@@ -91,11 +91,11 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public List<SettingInterface> settings() {
         List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        ls.add(numFactions);
         if (presetSlices != null) {
             return ls;
         }
         ls.add(numSlices);
-        ls.add(numFactions);
         ls.add(minimumRes);
         ls.add(minimumInf);
         ls.add(totalValue);
