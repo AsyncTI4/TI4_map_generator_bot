@@ -419,12 +419,12 @@
     },
     {
         "alias": "baldrick_astral_echoes",
-        "name": "Astral Echoes (Seers of Quilane)",
+        "name": "Astral Echoes (Seers of Qulane)",
         "category": "faction",
         "categoryDescription": "qulane",
         "type": "Directive",
         "target": "For/Against",
-        "text1": "For: The Quilane player may look at the top 4 cards of the relic deck, then return them to the top of the deck in any order",
+        "text1": "For: The Qulane player may look at the top 4 cards of the relic deck, then return them to the top of the deck in any order",
         "text2": "Against: Each player that voted For gains 1 unknown relic fragment.",
         "source": "ignis_aurora"
     },
