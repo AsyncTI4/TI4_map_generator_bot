@@ -441,7 +441,7 @@ public class ButtonHelperSCs {
         ButtonHelper.addReaction(event, false, false, "", "");
         String unit = buttonID.replace("construction_", "");
         String message = trueIdentity + " Click the name of the planet you wish to put your "
-            + Emojis.getEmojiFromDiscord(unit) + " on for construction";
+            + Emojis.getEmojiFromDiscord(unit) + " on for construction. If you are resolving the secondary, it will place a command counter in the system as well.";
         List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
@@ -473,6 +473,12 @@ public class ButtonHelperSCs {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_leadership", "Done Exhausting Planets");
         buttons.add(doneExhausting);
+        int ccCount = Helper.getCCCount(game, player.getColor());
+        int limit = 16;
+        if (!game.getStoredValue("ccLimit").isEmpty()) {
+            limit = Integer.parseInt(game.getStoredValue("ccLimit"));
+        }
+        message = message + "\nYou have " + (limit - ccCount) + " CCs remaining that you could gain";
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {

@@ -22,6 +22,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.SecretObjectiveModel;
 
 public class RevealSpecificAgenda extends AgendaSubcommandData {
     public RevealSpecificAgenda() {
@@ -179,6 +180,18 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                     player.getRepresentation(true, true) + " you have Florzen commander and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
+        }
+        if (game.getCurrentAgendaInfo().contains("Secret")) {
+            String summary = "The scored secrets so far are:\n";
+            for (Player p2 : game.getRealPlayers()) {
+                for (String soID : p2.getSecretsScored().keySet()) {
+                    SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+                    if (so != null) {
+                        summary = summary + so.getName() + ": " + so.getText() + "\n";
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(channel, summary);
         }
     }
 }

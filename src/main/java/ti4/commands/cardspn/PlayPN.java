@@ -273,7 +273,7 @@ public class PlayPN extends PNCardsSubcommandData {
                 }
                 RevealAgenda.revealAgenda(event, false, game, game.getMainGameChannel());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    "Political Facor (xxcha PN) was played");
+                    "Political Favor (xxcha PN) was played");
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "PN owner did not have a strategy CC, agenda not vetod");
