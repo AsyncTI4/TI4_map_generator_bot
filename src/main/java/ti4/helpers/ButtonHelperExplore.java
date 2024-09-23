@@ -8,7 +8,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExploreFrontier;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -18,7 +19,7 @@ public class ButtonHelperExplore {
 
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
-        new ExpFrontier().expFront(event, game.getTileByPosition(pos), game, player);
+        new ExploreFrontier().expFront(event, game.getTileByPosition(pos), game, player);
         List<ActionRow> actionRow2 = new ArrayList<>();
         String exhaustedMessage = event.getMessage().getContentRaw();
         for (ActionRow row : event.getMessage().getActionRows()) {
@@ -81,14 +82,7 @@ public class ButtonHelperExplore {
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
         }
 
-        Player lanefirPlayer = game.getPlayers().values().stream()
-            .filter(p -> p.getLeaderIDs().contains("lanefircommander")
-                && !p.hasLeaderUnlocked("lanefircommander"))
-            .findFirst().orElse(null);
-
-        if (lanefirPlayer != null) {
-            ButtonHelper.commanderUnlockCheck(lanefirPlayer, game, "lanefir", event);
-        }
+        CommanderUnlockCheck.checkAllPlayersInGame(game, "lanefir");
 
         String message = player.getRepresentation() + " purged fragments: "
             + fragmentsToPurge;

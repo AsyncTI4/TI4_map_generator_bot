@@ -41,6 +41,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.user.UserSettings;
@@ -51,6 +52,7 @@ import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -114,7 +116,6 @@ public class Player {
     private int turnCount;
     private int tg;
     private int commodities;
-    private int personalPingInterval;
     private int commoditiesTotal;
     private int stasisInfantry;
     private int autoSaboPassMedian;
@@ -298,6 +299,19 @@ public class Player {
         bombardUnits.remove(thing);
     }
 
+    public int getInitiative() {
+        int x = 1000;
+        for (int sc : getSCs()) {
+            if (sc < x) {
+                x = sc;
+            }
+        }
+        if (getAbilities().contains("telepathic") || getPromissoryNotesInPlayArea().contains("gift")) {
+            x = 0;
+        }
+        return x;
+    }
+
     public int getSpentTgsThisWindow() {
         for (String thing : spentThingsThisWindow) {
             if (thing.contains("tg_")) {
@@ -341,6 +355,8 @@ public class Player {
                 newTransactionItems.add(item);
             }
         }
+        getGame().setStoredValue(player.getFaction() + "NothingMessage", "");
+        getGame().setStoredValue(getFaction() + "NothingMessage", "");
         transactionItems = newTransactionItems;
     }
 
@@ -1462,6 +1478,16 @@ public class Player {
 
     @JsonIgnore
     public String getRepresentation(boolean overrideFow, boolean ping) {
+        return getRepresentation(overrideFow, ping, false);
+    }
+
+    @JsonIgnore
+    public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor) {
+        return getRepresentation(overrideFow, ping, noColor, false);
+    }
+
+    @JsonIgnore
+    public String getRepresentation(boolean overrideFow, boolean ping, boolean noColor, boolean noFactionIcon) {
         Game game = getGame();
         boolean privateGame = FoWHelper.isPrivateGame(game);
         if (privateGame && !overrideFow) {
@@ -1480,10 +1506,10 @@ public class Player {
                     if (ping) {
                         sb.append(" ").append(userById.getAsMention());
                     } else {
-                        sb.append(" ").append(userById.getEffectiveName());
+                        //sb.append(" ").append(userById.getEffectiveName());
                     }
                 }
-                if (getColor() != null && !"null".equals(getColor())) {
+                if (getColor() != null && !"null".equals(getColor()) && !noColor) {
                     sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
                 }
                 return sb.toString();
@@ -1502,13 +1528,16 @@ public class Player {
 
         // DEFAULT REPRESENTATION
         StringBuilder sb = new StringBuilder(getFactionEmoji());
+        if (noFactionIcon) {
+            sb = new StringBuilder();
+        }
         if (ping) {
             sb.append(getPing());
         } else {
             sb.append(getUserName());
         }
         sb.append(getGlobalUserSetting("emojiAfterName").orElse(""));
-        if (getColor() != null && !"null".equals(getColor())) {
+        if (getColor() != null && !"null".equals(getColor()) && !noColor) {
             sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
         }
         return sb.toString();
@@ -1858,11 +1887,7 @@ public class Player {
     }
 
     public int getPersonalPingInterval() {
-        return personalPingInterval;
-    }
-
-    public void setPersonalPingInterval(int interval) {
-        personalPingInterval = interval;
+        return getGlobalUserSettings().getPersonalPingInterval();
     }
 
     public int getTurnCount() {
@@ -1946,6 +1971,15 @@ public class Player {
     public String gainTG(int count) {
         String message = "(" + getTg() + " -> " + (getTg() + count) + ")";
         this.tg += count;
+        return message;
+    }
+
+    @JsonIgnore
+    public String gainTG(int count, boolean checkForPillage) {
+        String message = gainTG(count);
+        if (checkForPillage) {
+            ButtonHelperAbilities.pillageCheck(this, getGame());
+        }
         return message;
     }
 
@@ -2939,7 +2973,12 @@ public class Player {
     }
 
     public Optional<String> getGlobalUserSetting(String setting) {
-        return UserSettingsManager.getInstance().getUserSettings(getUserID()).getStoredValue(setting);
+        return getGlobalUserSettings().getStoredValue(setting);
+    }
+
+    @JsonIgnore
+    public UserSettings getGlobalUserSettings() {
+        return UserSettingsManager.getInstance().getUserSettings(getUserID());
     }
 
     public void setGlobalUserSetting(String setting, String value) {
@@ -3101,5 +3140,9 @@ public class Player {
             }
         }
         return unfollowedSCs;
+    }
+
+    public void checkCommanderUnlock(String factionToCheck) {
+        CommanderUnlockCheck.checkPlayer(this, factionToCheck);
     }
 }

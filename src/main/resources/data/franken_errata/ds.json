@@ -240,6 +240,7 @@
             "ABILITY:mobile_command",
             "HOMESYSTEM:ghoti"
         ],
+        "Undraftable": true,
         "source": "ds"
     },
     {

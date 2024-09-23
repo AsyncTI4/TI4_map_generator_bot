@@ -23,8 +23,10 @@ import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.relic.RelicDraw;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
@@ -106,6 +108,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Game could not be found");
             return;
         }
+        String ogID = cardID;
 
         cardID = cardID.replace("extra1", "");
         cardID = cardID.replace("extra2", "");
@@ -140,7 +143,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         switch (exploreModel.getResolution().toLowerCase()) {
             case Constants.FRAGMENT -> {
                 player.addFragment(cardID);
-                game.purgeExplore(cardID);
+                game.purgeExplore(ogID);
             }
             case Constants.ATTACH -> {
                 String attachment = exploreModel.getAttachmentId().orElse("");
@@ -194,15 +197,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         }
                     }
                     tile.addToken(attachmentFilename, planetID);
-                    game.purgeExplore(cardID);
+                    game.purgeExplore(ogID);
                     message = "Attachment `" + attachment + "` added to planet";
-                    if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "sol", event);
-                    }
-                    if (player.getLeaderIDs().contains("xxchacommander")
-                        && !player.hasLeaderUnlocked("xxchacommander")) {
-                        ButtonHelper.commanderUnlockCheck(player, game, "xxcha", event);
-                    }
+                    CommanderUnlockCheck.checkPlayer(player, game, "sol", event);
+                    CommanderUnlockCheck.checkPlayer(player, game, "xxcha", event);
                 }
             }
             case Constants.TOKEN -> {
@@ -229,7 +227,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your stats, readied, and explored!";
                     }
-                    game.purgeExplore(cardID);
+                    game.purgeExplore(ogID);
                 }
             }
         }
@@ -258,7 +256,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "ed1", "ed2" -> {
                 message = "Card has been added to play area.";
                 player.addRelic(Constants.ENIGMATIC_DEVICE);
-                game.purgeExplore(cardID);
+                game.purgeExplore(ogID);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             }
             case "lc1", "lc2" -> {
@@ -288,7 +286,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
                 ButtonHelper.checkACLimit(game, event, player);
-                ButtonHelper.fullCommanderUnlockCheck(player, game, "yssaril", event);
+                CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
             }
             case "dv1", "dv2" -> {
                 message = "Drew A Secret Objective.";
@@ -306,7 +304,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dw" -> {
                 message = "Drew Relic";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
-                DrawRelic.drawRelicAndNotify(player, event, game);
+                RelicDraw.drawRelicAndNotify(player, event, game);
             }
             case "ms1", "ms2" -> {
                 message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()
@@ -328,16 +326,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         "Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
-                }
-                if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
-                    || game.getPhaseOfGame().contains("agenda")) && player.hasAbility("scavenge")) {
-                    String fac = player.getFactionEmoji();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac + " gained 1TG from Scavenge ("
-                        + player.getTg() + "->" + (player.getTg() + 1)
-                        + "). Reminder you do not legally have this TG prior to exploring, and you could potentially deploy 1 mech before doing it to dodge pillage.");
-                    player.setTg(player.getTg() + 1);
-                    ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-                    ButtonHelperAbilities.pillageCheck(player, game);
                 }
 
                 if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
@@ -484,7 +472,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
-                ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
 
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String trueIdentity = player.getRepresentation(true, true);
@@ -559,7 +547,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
                     "# Exploring frontier in this system due to finding the hidden laboratory industrial explore.");
                 AddToken.addToken(event, tile, Constants.FRONTIER, game);
-                new ExpFrontier().expFront(event, tile, game, player);
+                new ExploreFrontier().expFront(event, tile, game, player);
             }
             case "ancientshipyard" -> {
                 List<String> colors = tile == null ? List.of() : tile.getUnitHolders().get("space").getUnitColorsOnHolder();
@@ -580,14 +568,14 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
             }
             case "starchartcultural", "starchartindustrial", "starcharthazardous", "starchartfrontier" -> {
-                game.purgeExplore(cardID);
+                game.purgeExplore(ogID);
                 player.addRelic(cardID);
                 message = "Card has been added to play area.\nAdded as a relic (not actually a relic)";
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), message);
             }
 
         }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
@@ -601,15 +589,11 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             game.setStoredValue("fortuneSeekers", "Used");
         }
 
-        if (player.getLeaderIDs().contains("kollecccommander") && !player.hasLeaderUnlocked("kollecccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kollecc", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }
-        if (player.getLeaderIDs().contains("bentorcommander") && !player.hasLeaderUnlocked("bentorcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "bentor", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "bentor", event);
 
         if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
             && player.getPlanetsAllianceMode().contains(planetID)) {

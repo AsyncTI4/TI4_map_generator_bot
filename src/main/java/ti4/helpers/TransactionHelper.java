@@ -13,11 +13,12 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.explore.SendFragments;
+import ti4.commands.cardspn.PlayPN;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ClearDebt;
+import ti4.commands.relic.RelicSendFragments;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
@@ -42,8 +43,8 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), p1.getRepresentation(false, false) + " and" + p2.getRepresentation(false, false) + " have transacted");
         }
 
-        String publicSummary = "A transaction has been ratified:\n" + buildTransactionOffer(p1, p2, game, true, true) + p1.getFactionEmoji() + p2.getFactionEmoji() + " transaction details below: ";
-        String privateSummary = "The following transaction has been accepted:\n" + buildTransactionOffer(p1, p2, game, false, false);
+        String publicSummary = "A transaction has been ratified:\n" + buildTransactionOffer(p1, p2, game, true);
+        String privateSummary = "The following transaction has been accepted:\n" + buildTransactionOffer(p1, p2, game, false);
         MessageHelper.sendMessageToChannel(channel, publicSummary);
         for (Player sender : players) {
             Player receiver = p2;
@@ -106,8 +107,8 @@ public class TransactionHelper {
         }
 
         // Send Summary to Player's CardsInfo threads
-        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), privateSummary);
-        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), privateSummary);
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation(true, true) + " " + privateSummary);
+        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + " " + privateSummary);
 
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
@@ -116,14 +117,14 @@ public class TransactionHelper {
         }
     }
 
-    private static String buildTransactionOffer(Player p1, Player p2, Game game, boolean hidePrivateCardText, boolean pingPlayers) {
+    private static String buildTransactionOffer(Player p1, Player p2, Game game, boolean hidePrivateCardText) {
         List<String> transactionItems = p1.getTransactionItemsWithPlayer(p2);
         StringBuilder trans = new StringBuilder();
         List<Player> players = new ArrayList<>();
         players.add(p1);
         players.add(p2);
         for (Player player : players) {
-            trans.append("> ").append(player.getRepresentation(false, pingPlayers)).append(" gives:\n");
+            trans.append("> ").append(player.getRepresentation(false, false, true)).append(" gives:\n");
             boolean sendingNothing = true;
             for (String item : transactionItems) {
                 if (!item.contains("sending" + player.getFaction())) {
@@ -194,6 +195,8 @@ public class TransactionHelper {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
                                     trans.append(amountToTransact).append(" ").append(Emojis.PN).append(" to be specified verbally");
+                                } else {
+                                    trans.append(Emojis.PN);
                                 }
                             }
                             default -> {
@@ -227,7 +230,12 @@ public class TransactionHelper {
                 trans.append("\n");
             }
             if (sendingNothing) {
-                trans.append("> - ").append(getNothingMessage()).append("\n");
+                String nothing = game.getStoredValue(player.getFaction() + "NothingMessage");
+                if (nothing.isEmpty()) {
+                    nothing = getNothingMessage();
+                    game.setStoredValue(player.getFaction() + "NothingMessage", nothing);
+                }
+                trans.append("> ").append(nothing).append("\n");
             }
         }
 
@@ -235,7 +243,7 @@ public class TransactionHelper {
     }
 
     public static String getNothingMessage() {
-        int result = ThreadLocalRandom.current().nextInt(1, 21);
+        int result = ThreadLocalRandom.current().nextInt(1, 41);
         return switch (result) {
             case 1 -> "Nothing But Respect And Good Will";
             case 2 -> "Some Pocket Lint";
@@ -245,7 +253,7 @@ public class TransactionHelper {
             case 6 -> "A Well Written Thank-You Note";
             case 7 -> "Heartfelt Thanks";
             case 8 -> "The Best Vibes";
-            case 9 -> "A Bot's Blessing For Your Trouble";
+            case 9 -> "A Blessing";
             case 10 -> "Good Karma";
             case 11 -> "A Mewling Kitten";
             case 12 -> "A Lost Virtual Puppy";
@@ -257,6 +265,26 @@ public class TransactionHelper {
             case 18 -> "$1000 In Monopoly Money";
             case 19 -> "Forgiveness For Past Mistakes";
             case 20 -> "A Lucky Rock";
+            case 21 -> "A Warm Cup of Tea";
+            case 22 -> "A Poorly Drawn But Deeply Meaningful Picture";
+            case 23 -> "An Unexpected Hug";
+            case 24 -> "A Magic Trick";
+            case 25 -> "A Pair of Comfy Socks";
+            case 26 -> "A Whiff of Fresh Cookies";
+            case 27 -> "A Charming Smile";
+            case 28 -> "A Promise to Call Later";
+            case 29 -> "A Supportive Cheer";
+            case 30 -> "A Playful Joke";
+            case 31 -> "A Chance to See A Beautiful Sunset";
+            case 32 -> "A Treasure Map";
+            case 33 -> "A Song";
+            case 34 -> "A Book Recommendation";
+            case 35 -> "A Cozy Blanket";
+            case 36 -> "A Cheery Greeting";
+            case 37 -> "A Bucket of Joy";
+            case 38 -> "A Gentle Reminder";
+            case 39 -> "A Heartwarming Story";
+            case 40 -> "A Whisper of Kindness";
             default -> "Nothing";
         };
     }
@@ -278,7 +306,7 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false) + "\n";
+        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false) + "\n";
         String requestOrOffer = "offer";
         if (requesting) {
             requestOrOffer = "request";
@@ -490,10 +518,10 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
+        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
             + "\n## Click something else that you want to request from " + p1.getRepresentation(false, false);
         if (p1 == player) {
-            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
+            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
                 + "\n## Click something else that YOU want to offer";
         }
         event.getMessage().delete().queue();
@@ -510,10 +538,10 @@ public class TransactionHelper {
         if (player == p2) {
             opposing = p1;
         }
-        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
+        String message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
             + "\n## Click something that you want to request from " + p1.getRepresentation(false, false);
         if (p1 == player) {
-            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false, false)
+            message = "Current Transaction Offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
                 + "\n## Click something that YOU want to offer";
         }
         event.getMessage().delete().queue();
@@ -525,13 +553,13 @@ public class TransactionHelper {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " sent a transaction offer to " + p2.getFactionEmoji());
         if (game.getTableTalkChannel() != null) {
-            String offerMessage = "An offer has been sent by " + player.getFactionEmoji() + " to " + p2.getFactionEmoji() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true, false);
+            String offerMessage = "Trade offer from " + player.getFactionEmoji() + " to " + p2.getFactionEmoji() + ":\n" + TransactionHelper.buildTransactionOffer(player, p2, game, true);
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), offerMessage);
         }
 
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("rescindOffer_" + p2.getFaction(), "Rescind Offer"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false, false), buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationNoPing() + " you sent a transaction offer to " + p2.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false), buttons);
 
         event.getMessage().delete().queue();
 
@@ -546,7 +574,7 @@ public class TransactionHelper {
         buttons.add(Buttons.green("acceptOffer_" + player.getFaction() + "_" + offerNumber, "Accept"));
         buttons.add(Buttons.red("rejectOffer_" + player.getFaction(), "Reject"));
         buttons.add(Buttons.red("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));
-        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer from " + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false, false), buttons);
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer from " + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false), buttons);
     }
 
     @ButtonHandler("transact_")
@@ -722,7 +750,7 @@ public class TransactionHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
@@ -746,7 +774,7 @@ public class TransactionHelper {
                     p2.setCommodities(targetTG);
                 }
 
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
@@ -776,8 +804,8 @@ public class TransactionHelper {
                 p2.setCommodities(newP2Comms);
                 p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
                 p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "hacan", event);
-                ButtonHelper.fullCommanderUnlockCheck(p1, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p1, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 // ButtonHelperAbilities.pillageCheck(p1, game);
@@ -797,7 +825,7 @@ public class TransactionHelper {
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt tokens to " + ident2;
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "vaden", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "vaden", event);
             }
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
@@ -843,13 +871,18 @@ public class TransactionHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
+                    if (p1.getPromissoryNotes().keySet().contains(amountToTrans)) {
+                        id = amountToTrans;
+                    }
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
                     return;
                 }
-                for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
-                    if (pn.getValue().equals(pnIndex)) {
-                        id = pn.getKey();
-                        break;
+                if (id == null) {
+                    for (Map.Entry<String, Integer> pn : p1.getPromissoryNotes().entrySet()) {
+                        if (pn.getValue().equals(pnIndex)) {
+                            id = pn.getKey();
+                            break;
+                        }
                     }
                 }
                 if (id == null) {
@@ -859,7 +892,7 @@ public class TransactionHelper {
                 p1.removePromissoryNote(id);
                 p2.setPromissoryNote(id);
                 if (id.contains("dspnveld")) {
-                    ButtonHelper.resolvePNPlay(id, p2, game, event);
+                    PlayPN.resolvePNPlay(id, p2, game, event);
                 }
                 boolean sendSftT = false;
                 boolean sendAlliance = false;
@@ -896,7 +929,7 @@ public class TransactionHelper {
                     case "URF" -> "frontier";
                     default -> "";
                 };
-                new SendFragments().sendFrags(event, p1, p2, trait, fragNum, game);
+                new RelicSendFragments().sendFrags(event, p1, p2, trait, fragNum, game);
                 message2 = "";
             }
         }
@@ -916,10 +949,12 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
-            if (game.getName().equalsIgnoreCase("pbd1000")) {
+            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd1000")) {
                 channel = game.getTableTalkChannel();
             }
-            MessageHelper.sendMessageToChannel(channel, message2);
+            if (oldWay || (message2.toLowerCase().contains("alliance") || message2.toLowerCase().contains("support"))) {
+                MessageHelper.sendMessageToChannel(channel, message2);
+            }
             if (oldWay) {
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                     ident + " Use Buttons To Complete Transaction", goAgainButtons);
@@ -1047,7 +1082,7 @@ public class TransactionHelper {
                 .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
         }
-        if (game.getPhaseOfGame().toLowerCase().contains("agenda")
+        if ((game.getPhaseOfGame().toLowerCase().contains("agenda") || game.getPhaseOfGame().toLowerCase().contains("strategy"))
             && !"no".equalsIgnoreCase(ButtonHelper.playerHasDMZPlanet(p1, game))) {
             Button transact = Buttons.gray(
                 "offerToTransact_dmz_" + p1.getFaction() + "_" + p2.getFaction() + "_"
