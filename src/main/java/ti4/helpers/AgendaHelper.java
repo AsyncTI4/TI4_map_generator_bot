@@ -364,7 +364,7 @@ public class AgendaHelper {
                         return;
                     }
                     game.addToSoToPoList(winner);
-                    Integer poIndex = game.addCustomPO(winner, 1);
+                    Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(winner), 1);
                     game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
                     String sb = "**Public Objective added from Secret:**" + "\n" +
