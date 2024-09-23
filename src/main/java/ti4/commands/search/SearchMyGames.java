@@ -46,10 +46,10 @@ public class SearchMyGames extends SearchSubcommandData {
         boolean ignoreAborted = event.getOption("ignore_aborted", true, OptionMapping::getAsBoolean);
 
         User user = event.getOption(Constants.PLAYER, event.getUser(), OptionMapping::getAsUser);
-        searchGames(user, event, onlyMyTurn, includeEndedGames, showAverageTurnTime, showSecondaries, showGameModes, ignoreSpectate, ignoreAborted);
+        searchGames(user, event, onlyMyTurn, includeEndedGames, showAverageTurnTime, showSecondaries, showGameModes, ignoreSpectate, ignoreAborted, false);
     }
 
-    public static void searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted) {
+    public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
         String userID = user.getId();
 
         Predicate<Game> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayerIDs().contains(userID) : game -> game.getPlayerIDs().contains(userID);
@@ -67,6 +67,9 @@ public class SearchMyGames extends SearchSubcommandData {
             .toList();
 
         int index = 1;
+        if (wantNum) {
+            return games.size();
+        }
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (Game playerGame : games) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
@@ -80,6 +83,7 @@ public class SearchMyGames extends SearchSubcommandData {
         if (event instanceof ButtonInteractionEvent butt) {
             MessageHelper.sendMessageToThread(butt.getChannel(), user.getName() + "'s Game List", sb.toString());
         }
+        return games.size();
 
     }
 

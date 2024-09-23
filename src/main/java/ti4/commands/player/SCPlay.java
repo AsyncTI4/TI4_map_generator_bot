@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.event.RevealEvent;
-import ti4.commands.explore.DrawRelic;
+import ti4.commands.relic.RelicDraw;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -132,7 +132,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         String gamePing = game.getPing();
         List<Player> playersToFollow = game.getRealPlayers();
-        if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
+        if (!"All".equals(scModel.getGroup().orElse("")) && (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two"))) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
             num = num.substring(num.length() - 1, num.length());
@@ -213,6 +213,10 @@ public class SCPlay extends PlayerSubcommandData {
                             p2.addFollowedSC(scToPlay, event);
                             if (scToPlay == 8) {
                                 String key = "factionsThatAreNotDiscardingSOs";
+                                String key3 = "potentialBlockers";
+                                if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+                                    game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                                }
                                 game.setStoredValue(key,
                                     game.getStoredValue(key) + player.getFaction() + "*");
                             }
@@ -579,7 +583,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
         event.editButton(event.getButton().asDisabled()).queue();
-        DrawRelic.drawRelicAndNotify(player, event, game);
+        RelicDraw.drawRelicAndNotify(player, event, game);
         RevealEvent.revealEvent(event, game, game.getMainGameChannel());
     }
 

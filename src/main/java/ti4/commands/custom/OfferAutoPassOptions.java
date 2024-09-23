@@ -3,6 +3,7 @@ package ti4.commands.custom;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.PlayerPreferenceHelper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
@@ -14,7 +15,7 @@ public class OfferAutoPassOptions extends CustomSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        ButtonHelper.offerSetAutoPassOnSaboButtons(game, null);
+        PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Offered options");
     }
 }

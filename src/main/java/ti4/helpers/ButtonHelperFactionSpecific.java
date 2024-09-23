@@ -21,7 +21,10 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
+import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
+import ti4.commands.game.StartPhase;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.player.ClearDebt;
@@ -358,9 +361,8 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ident + " already had a " + color + " CC in their fleet pool");
         }
-        if (player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mahact", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "mahact", event);
+
         if (ButtonHelper.isLawInPlay(game, "regulations")
             && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
@@ -441,7 +443,7 @@ public class ButtonHelperFactionSpecific {
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         event.getMessage().delete().queue();
-        ButtonHelper.resolvePNPlay("stymie", player, game, event);
+        PlayPN.resolvePNPlay("stymie", player, game, event);
     }
 
     public static void resolveStymiePlayerStep2(Game game, Player player, ButtonInteractionEvent event,
@@ -764,7 +766,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveRaghsCallStepOne(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String origPlanet = buttonID.split("_")[1];
-        ButtonHelper.resolvePNPlay("ragh", player, game, event);
+        PlayPN.resolvePNPlay("ragh", player, game, event);
         List<Button> buttons = new ArrayList<>();
         Player saar = game.getPNOwner("ragh");
         for (String planet : saar.getPlanetsAllianceMode()) {
@@ -951,7 +953,7 @@ public class ButtonHelperFactionSpecific {
             + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
         event.getMessage().delete().queue();
-        ButtonHelper.startActionPhase(event, game);
+        StartPhase.startActionPhase(event, game);
     }
 
     public static void resolveRaghsCallStepTwo(Player player, Game game, ButtonInteractionEvent event,
@@ -1239,7 +1241,7 @@ public class ButtonHelperFactionSpecific {
         Player player,
         String ident) {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation()
-            + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4.");
+            + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4. They cannot produce ships if enemy ships are in the system. ");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff
@@ -1268,7 +1270,7 @@ public class ButtonHelperFactionSpecific {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
                 SendDebt.sendDebt(player, p2, 1);
-                ButtonHelper.fullCommanderUnlockCheck(p2, game, "vaden", event);
+                CommanderUnlockCheck.checkPlayer(p2, game, "vaden", event);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you sent 1 debt token to "
                         + ButtonHelper.getIdentOrColor(p2, game) + " due to their fine print ability");
@@ -1623,6 +1625,24 @@ public class ButtonHelperFactionSpecific {
         cabalEatsUnit(player, game, cabal, amount, unit, event, false);
     }
 
+    public static void cabalEatsUnitIfItShould(Player player, Game game, Player owner, int amount, String unit,
+        GenericInteractionCreateEvent event, Tile tile, UnitHolder uH) {
+        Player cabal = Helper.getPlayerFromAbility(game, "devour");
+        if (cabal == owner) {
+            cabal = null;
+        }
+        if (cabal == null) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)) {
+                    cabal = p2;
+                }
+            }
+        }
+        if (cabal != null && (!uH.getPlayersUnitListOnHolder(cabal).isEmpty() || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile))) {
+            cabalEatsUnit(player, game, cabal, amount, unit, event, false);
+        }
+    }
+
     public static void mentakHeroProducesUnit(Player player, Game game, Player mentak, int amount, String unit,
         GenericInteractionCreateEvent event, Tile tile) {
         String unitP = AliasHandler.resolveUnit(unit);
@@ -1956,7 +1976,7 @@ public class ButtonHelperFactionSpecific {
         ACInfo.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, event, player);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "yssaril", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
         }
         event.getMessage().delete().queue();
     }
@@ -1969,7 +1989,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, game));
         game.setStoredValue("terraformedPlanet", planet);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "sol", event);
         event.getMessage().delete().queue();
     }
 
@@ -2019,7 +2039,7 @@ public class ButtonHelperFactionSpecific {
             "Attached branch office to " + Helper.getPlanetRepresentation(planet, game));
         if (game.getPNOwner(pnID).getLeaderIDs().contains("veldyrcommander")
             && !game.getPNOwner(pnID).hasLeaderUnlocked("veldyrcommander")) {
-            ButtonHelper.commanderUnlockCheck(game.getPNOwner(pnID), game, "veldyr", event);
+            CommanderUnlockCheck.checkPlayer(game.getPNOwner(pnID), game, "veldyr", event);
         }
         event.getMessage().delete().queue();
     }
@@ -2123,7 +2143,7 @@ public class ButtonHelperFactionSpecific {
         }
         String msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "nivyn", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "nivyn", event);
         event.getMessage().delete().queue();
     }
 
@@ -2170,7 +2190,7 @@ public class ButtonHelperFactionSpecific {
         String scNum = buttonID.split("_")[1];
         int sc = Integer.parseInt(scNum);
         player.addFollowedSC(sc, event);
-        ButtonHelper.resolvePNPlay("acq", player, game, event);
+        PlayPN.resolvePNPlay("acq", player, game, event);
         String msg = player.getRepresentation(true, true) + " you will be marked as having followed " + sc
             + " without having needed to spend a CC. Please still use the strategy card buttons to resolve the strategy card effect";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -2252,7 +2272,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelper.fullCommanderUnlockCheck(p2, game, "ghost", event);
+            CommanderUnlockCheck.checkPlayer(p2, game, "ghost", event);
         }
         event.getMessage().delete().queue();
     }

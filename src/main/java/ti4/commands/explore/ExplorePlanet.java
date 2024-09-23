@@ -36,9 +36,9 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 
-public class ExpPlanet extends ExploreSubcommandData {
+public class ExplorePlanet extends ExploreSubcommandData {
 
-    public ExpPlanet() {
+    public ExplorePlanet() {
         super(Constants.PLANET, "Explore a specific planet.");
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setRequired(false).setAutoComplete(true));

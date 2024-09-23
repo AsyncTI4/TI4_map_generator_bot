@@ -41,7 +41,7 @@ public class Cleanup extends StatusSubcommandData {
     }
 
     public void runStatusCleanup(Game game) {
-
+        game.setStoredValue("deflectedSC", "");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
@@ -114,6 +114,7 @@ public class Cleanup extends StatusSubcommandData {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
             ListPlayerInfoButton.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
         }
+        game.clearAllEmptyStoredValues();
     }
 
     public void returnEndStatusPNs(Game game) {

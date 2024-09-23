@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.combat.StartCombat;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
@@ -37,11 +39,11 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperModifyUnits {
 
-    public static int getNumberOfSustainableUnits(Player player, Game game, UnitHolder unitHolder) {
+    public static int getNumberOfSustainableUnits(Player player, Game game, UnitHolder unitHolder, boolean space, boolean spacecannonoffence) {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int sustains = 0;
         Player mentak = Helper.getPlayerFromUnit(game, "mentak_mech");
-        if (mentak != null && mentak != player && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0) {
+        if (mentak != null && mentak != player && !space && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0) {
             return 0;
         }
         Player mentakFS = Helper.getPlayerFromUnit(game, "mentak_flagship");
@@ -57,6 +59,9 @@ public class ButtonHelperModifyUnits {
                 continue;
 
             if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) {
+                continue;
+            }
+            if (unitModel.getBaseType().equalsIgnoreCase("mech") && spacecannonoffence) {
                 continue;
             }
             UnitKey unitKey = unitEntry.getKey();
@@ -78,7 +83,7 @@ public class ButtonHelperModifyUnits {
         UnitHolder unitHolder = tile.getUnitHolders().get("space");
         String msg = player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits") + " in the following way:\n";
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder);
+        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, false);
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
         Player mentakHero = game
             .getPlayerFromColorOrFaction(game.getStoredValue("mentakHero"));
@@ -231,7 +236,7 @@ public class ButtonHelperModifyUnits {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " assigned " + (hits == 1 ? "the hit" : "hits") + " in the following way:\n");
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder);
+        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, false, false);
         boolean cabalMech = isCabalMechActive(game, unitHolder);
         Tile tile = game.getTileFromPlanet(planet);
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
@@ -267,11 +272,10 @@ public class ButtonHelperModifyUnits {
                 }
             }
         }
-        Map<String, String> unitTypes = Map.of(
-            "fighter", Emojis.fighter,
-            "infantry", Emojis.infantry,
-            "pds", Emojis.pds);
-
+        Map<String, String> unitTypes = new LinkedHashMap<>();
+        unitTypes.put("fighter", Emojis.fighter);
+        unitTypes.put("infantry", Emojis.infantry);
+        unitTypes.put("pds", Emojis.pds);
         for (String unitType : unitTypes.keySet()) {
             if (shouldProcessUnit(player, unitType, unitHolder, hits)) {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -457,7 +461,7 @@ public class ButtonHelperModifyUnits {
             msg = player.getFactionEmoji() + " would assign " + (hits == 1 ? "the hit" : "hits") + " in the following way:\n";
         }
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder);
+        int numSustains = getNumberOfSustainableUnits(player, game, unitHolder, true, spaceCannonOffence);
         boolean noMechPowers = ButtonHelper.isLawInPlay(game, "articles_war");
         Player cabal = Helper.getPlayerFromAbility(game, "devour");
 
@@ -532,7 +536,7 @@ public class ButtonHelperModifyUnits {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                if (unitModel == null || !unitModel.getSustainDamage() || (!unitModel.getIsShip() && !isNomadMechApplicable(player, noMechPowers, unitKey))) continue;
+                if (unitModel == null || !unitModel.getSustainDamage() || ((!unitModel.getIsShip() && !ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)) && !isNomadMechApplicable(player, (noMechPowers || spaceCannonOffence), unitKey))) continue;
                 if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) continue;
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
 
@@ -697,7 +701,7 @@ public class ButtonHelperModifyUnits {
                 int damagedUnits = unitHolder.getUnitDamage() != null ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
                 String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
 
-                if (damagedUnits > 0 && duraniumMsgBuilder.toString().contains(unitName)) {
+                if (damagedUnits > 0 && duraniumMsgBuilder.toString().contains(unitName) && unitModel.getIsShip()) {
                     if (!justSummarizing) {
                         msg += "> Repaired 1 " + unitModel.getUnitEmoji() + " due to Duranium Armor\n";
                         tile.removeUnitDamage("space", unitKey, 1);
@@ -885,12 +889,8 @@ public class ButtonHelperModifyUnits {
         }
         Button concludeMove = Buttons.gray(finChecker + "deleteButtons", "Done Retreating troops");
         buttons.add(concludeMove);
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "empyrean", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "empyrean", event);
         return buttons;
     }
 
@@ -944,7 +944,7 @@ public class ButtonHelperModifyUnits {
         }
         List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, game, event, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cheiran", event);
         event.getMessage().delete().queue();
     }
 
@@ -994,7 +994,7 @@ public class ButtonHelperModifyUnits {
 
     public static void resolveDevote(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile);
+        List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
         String msg = player.getRepresentation() + " choose which opposing unit to hit";
         String unit = buttonID.split("_")[2];
         Player p2 = player;
@@ -1006,15 +1006,17 @@ public class ButtonHelperModifyUnits {
         String devoteOrNo = buttonID.split("_")[3];
         if (devoteOrNo.equalsIgnoreCase("devote")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
-            if (player.getLeaderIDs().contains("yincommander") && !player.hasLeaderUnlocked("yincommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "yin", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "yin", event);
         }
     }
 
-    public static List<Button> getOpposingUnitsToHit(Player player, Game game, GenericInteractionCreateEvent event, Tile tile) {
+    public static List<Button> getOpposingUnitsToHit(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, boolean exoHit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
+        String exo = "";
+        if (exoHit) {
+            exo = "exo";
+        }
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             UnitHolder unitHolder = entry.getValue();
@@ -1048,7 +1050,7 @@ public class ButtonHelperModifyUnits {
                 EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName + "damaged"
-                        + "_" + unitKey.getColor();
+                        + "_" + unitKey.getColor() + "_" + exo;
                     Button validTile2 = Buttons.red(buttonID, "Damaged " + prettyName);
                     validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
@@ -1056,7 +1058,7 @@ public class ButtonHelperModifyUnits {
                 totalUnits = totalUnits - damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(finChecker + "hitOpponent_" + tile.getPosition() + "_" + unitName
-                        + "_" + unitKey.getColor(), "Hit " + prettyName);
+                        + "_" + unitKey.getColor() + "_" + exo, prettyName);
                     validTile2 = validTile2.withEmoji(emoji);
                     buttons.add(validTile2);
                 }
@@ -1070,6 +1072,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(pos);
         String unit = buttonID.split("_")[2];
         boolean damaged = false;
+        boolean exo = buttonID.contains("exo");
         if (unit.contains("damaged")) {
             damaged = true;
             unit = unit.replace("damaged", "");
@@ -1088,7 +1091,18 @@ public class ButtonHelperModifyUnits {
         UnitModel unitModel = player.getUnitFromUnitKey(key);
 
         String unitName = ButtonHelper.getUnitName(key.asyncID());
-
+        if (exo) {
+            String dmg = "";
+            if (damaged) {
+                dmg = "damaged ";
+            }
+            msg = player.getRepresentation() + " lost a " + dmg + unitModel.getBaseType() + " to your opponents exo 2 ability";
+            new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), damaged, game);
+            ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, unitName, event, tile, tile.getSpaceUnitHolder());
+            MessageHelper.sendMessageToChannel(channel, msg, buttons);
+            event.getMessage().delete().queue();
+            return;
+        }
         int x = 1;
         EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
         String finChecker = player.getFinsFactionCheckerPrefix();
@@ -1269,9 +1283,7 @@ public class ButtonHelperModifyUnits {
                 successMessage = "Placed 1 " + Emojis.spacedock + " on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
-            if (player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "cabal", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "cabal", event);
             if (player.hasAbility("industrious") && !FoWHelper.otherPlayersHaveShipsInSystem(player,
                 game.getTile(AliasHandler.resolveTile(planetName)), game)) {
                 Button replace = Buttons.green("FFCC_" + player.getFaction() + "_rohdhnaIndustrious_"
@@ -1503,52 +1515,29 @@ public class ButtonHelperModifyUnits {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "titans", event);
-        }
-        if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "saar", event);
-        }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "rohdhna", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "celdauri", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "gledge", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "titans", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "saar", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "rohdhna", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cheiran", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "celdauri", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "gledge", event);
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        if (player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mentak", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "mentak", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "l1z1x", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "tnelis", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "cymiae", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "kyro", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "ghemina", event);
+        if ("warsun".equalsIgnoreCase(unitLong)) {
+            CommanderUnlockCheck.checkPlayer(player, game, "muaat", event);
         }
-        if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "l1z1x", event);
-        }
-        if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "tnelis", event);
-        }
-        if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "cymiae", event);
-        }
-        if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kyro", event);
-        }
-        if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "ghemina", event);
-        }
-        if (player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander")
-            && "warsun".equalsIgnoreCase(unitLong)) {
-            ButtonHelper.commanderUnlockCheck(player, game, "muaat", event);
-        }
-        if (player.getLeaderIDs().contains("argentcommander") && !player.hasLeaderUnlocked("argentcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "argent", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "argent", event);
 
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("arboreccommander") && !player.hasLeaderUnlocked("arboreccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "arborec", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "arborec", event);
     }
 
     public static void resolveCloakedFleets(String buttonID, ButtonInteractionEvent event, Game game,
@@ -1708,21 +1697,11 @@ public class ButtonHelperModifyUnits {
                 }
 
             }
-            if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "l1z1x", event);
-            }
-            if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "cymiae", event);
-            }
-            if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "kyro", event);
-            }
-            if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "ghemina", event);
-            }
-            if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
-                ButtonHelper.commanderUnlockCheck(player, game, "tnelis", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, game, "l1z1x", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "cymiae", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "kyro", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "ghemina", event);
+            CommanderUnlockCheck.checkPlayer(player, game, "tnelis", event);
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             playerRep + " " + successMessage);
@@ -1771,56 +1750,32 @@ public class ButtonHelperModifyUnits {
             }
         }
 
-        if (player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "titans", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, "titans");
         if ("sd".equalsIgnoreCase(unit)) {
             Tile tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
             }
         }
-        if (player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "saar", event);
-        }
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "rohdhna", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "cheiran", event);
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "celdauri", event);
+        CommanderUnlockCheck.checkPlayer(player, "saar");
+        CommanderUnlockCheck.checkPlayer(player, "rohdhna");
+        CommanderUnlockCheck.checkPlayer(player, "cheiran");
+        CommanderUnlockCheck.checkPlayer(player, "celdauri");
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
-            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
-                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        if (player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mentak", event);
+        CommanderUnlockCheck.checkPlayer(player, "mentak");
+        CommanderUnlockCheck.checkPlayer(player, "l1z1x");
+        CommanderUnlockCheck.checkPlayer(player, "tnelis");
+        CommanderUnlockCheck.checkPlayer(player, "cymiae");
+        CommanderUnlockCheck.checkPlayer(player, "kyro");
+        CommanderUnlockCheck.checkPlayer(player, "ghemina");
+        if ("warsun".equalsIgnoreCase(unitLong)) {
+            CommanderUnlockCheck.checkPlayer(player, "muaat");
         }
-        if (player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "l1z1x", event);
-        }
-        if (player.getLeaderIDs().contains("tneliscommander") && !player.hasLeaderUnlocked("tneliscommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "tnelis", event);
-        }
-        if (player.getLeaderIDs().contains("cymiaecommander") && !player.hasLeaderUnlocked("cymiaecommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "cymiae", event);
-        }
-        if (player.getLeaderIDs().contains("kyrocommander") && !player.hasLeaderUnlocked("kyrocommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "kyro", event);
-        }
-        if (player.getLeaderIDs().contains("gheminacommander") && !player.hasLeaderUnlocked("gheminacommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "ghemina", event);
-        }
-        if (player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander")
-            && "warsun".equalsIgnoreCase(unitLong)) {
-            ButtonHelper.commanderUnlockCheck(player, game, "muaat", event);
-        }
-        if (player.getLeaderIDs().contains("argentcommander") && !player.hasLeaderUnlocked("argentcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "argent", event);
-        }
-        if (player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "naaz", event);
-        }
-        if (player.getLeaderIDs().contains("arboreccommander") && !player.hasLeaderUnlocked("arboreccommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "arborec", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, "argent");
+        CommanderUnlockCheck.checkPlayer(player, "naaz");
+        CommanderUnlockCheck.checkPlayer(player, "arborec");
 
         event.getMessage().delete().queue();
     }
@@ -1886,8 +1841,15 @@ public class ButtonHelperModifyUnits {
             msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
                 + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
-            buttons = getOpposingUnitsToHit(player, game, event, tile);
+            buttons = getOpposingUnitsToHit(player, game, event, tile, false);
             msg = player.getRepresentation() + " choose which opposing unit to hit";
+        } else if (cause.contains("exo")) {
+            new RemoveUnits().unitParsing(event, player.getColor(), tile, "1 dread", game);
+            ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, "dread", event, tile, tile.getSpaceUnitHolder());
+            buttons = getOpposingUnitsToHit(player, game, event, tile, true);
+            msg = player.getRepresentation() + " choose which opposing unit to destroy";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to choose 2 opposing ships to destroy. This occurs after any retreats. The dread has been removed.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         } else {
             msg = opponent.getRepresentation(true, true) + " your opponent used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");

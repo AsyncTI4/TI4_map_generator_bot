@@ -51,6 +51,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -614,6 +615,16 @@ public class Game extends GameProperties {
             return checkingForAllReacts.get(messageID);
         } else {
             return "";
+        }
+    }
+
+    public void clearAllEmptyStoredValues() {
+        java.util.Iterator<Map.Entry<String, String>> iterator = checkingForAllReacts.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                iterator.remove(); // Remove the entry if the value is empty  
+            }
         }
     }
 
@@ -1632,6 +1643,14 @@ public class Game extends GameProperties {
 
     public Map<String, Integer> getLaws() {
         return laws;
+    }
+
+    public int getScoredSecrets() {
+        int count = 0;
+        for (Player player : getRealPlayers()) {
+            count += player.getSoScored();
+        }
+        return count;
     }
 
     public Map<String, String> getLawsInfo() {
@@ -4050,5 +4069,9 @@ public class Game extends GameProperties {
 
     public boolean removeTag(String tag) {
         return getTags().remove(tag);
+    }
+
+    public void checkCommanderUnlocks(String factionToCheck) {
+        CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
     }
 }

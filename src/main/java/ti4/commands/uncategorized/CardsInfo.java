@@ -294,13 +294,13 @@ public class CardsInfo implements Command, InfoThreadCommand {
                 .withEmoji(Emoji.fromFormatted(Emojis.mykomentori));
             buttons.add(augers);
         }
-        Button playerPref = Buttons.gray("offerPlayerPref", "Change Player Settings");
+        Button playerPref = Button.secondary("offerPlayerPref", "Player Settings");
         buttons.add(playerPref);
-        Button listGames = Buttons.gray("searchMyGames", "List All My Games");
+        Button listGames = Button.secondary("searchMyGames", "List My Games");
         buttons.add(listGames);
         buttons.add(Buttons.green("showObjInfo_both", "Scoring Info"));
         if (!game.isFowMode()) {
-            buttons.add(Buttons.gray("chooseMapView", "Highlight Map Features"));
+            buttons.add(Button.secondary("chooseMapView", "Map Features"));
         }
         boolean hadAnyUnplayedSCs = false;
         for (Integer SC : player.getSCs()) {
