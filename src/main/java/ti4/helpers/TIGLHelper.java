@@ -1,10 +1,76 @@
 package ti4.helpers;
 
+import java.util.List;
+
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class TIGLHelper {
-        public static void sendTIGLSetupText(Game game) {
+
+    public enum TIGLRank {
+        MINISTER("Minister"),
+        AGENT("Agent"),
+        COMMANDER("Commander"),
+        HERO("Hero"),
+        HERO_JOLNAR("Hero - JolNarHerosName"),
+        HERO_MAHACT("Name - Mahact'sName"),
+        ARBITER("Imperial Arbiter");
+
+        private final String name;
+
+        TIGLRank(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+
+        public Role getRole() {
+            List<Role> roles = AsyncTI4DiscordBot.guildPrimary.getRolesByName(name, false);
+            if (roles.isEmpty()) {
+                return null;
+            }
+            return roles.getFirst();
+        }
+
+        /**
+         * Converts a string identifier to the corresponding SimpleStatistics enum value.
+         * 
+         * @param id the string identifier
+         * @return the SimpleStatistics enum value, or null if not found
+         */
+        public static TIGLRank fromString(String id) {
+            for (TIGLRank rank : values()) {
+                if (id.equals(rank.toString())) {
+                    return rank;
+                }
+            }
+            return null;
+        }
+    }
+
+    private static final String TIGL_CHANNEL_NAME = "ti_global_league";
+    private static final String TIGL_PROMOTION_THREAD = "tigl_promotions";
+
+    public static boolean validateRoles() {
+        boolean hasABadRole = false;
+        for (TIGLRank rank : TIGLRank.values()) {
+            if (rank.getRole() == null) {
+                BotLogger.log("`TIGLHelper.TIGLRank.validateRoles()`: no role found: " + rank.name);
+                hasABadRole = true;
+            }
+        }
+        return hasABadRole;
+    }
+
+    public static void sendTIGLSetupText(Game game) {
         game.setCompetitiveTIGLGame(true);
         String message = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
             "Please ensure you have all:\n" +
@@ -13,5 +79,17 @@ public class TIGLHelper {
             "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360\n" +
             "By continuing forward with this game, it is assumed you have accepted and are subject to the TIGL Code of Conduct";
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+    }
+
+    public static Role getLowestCommonRoleBetweenPlayers(List<User> users) {
+        return null;
+    }
+
+    public static void promoteUser(User user, TIGLRank toRank) {
+
+    }
+
+    public static TextChannel getTIGLChannel() {
+        return AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(TIGL_CHANNEL_NAME, false).getFirst();
     }
 }
