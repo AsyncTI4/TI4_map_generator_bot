@@ -1,0 +1,3 @@
+Twilight Imperium Global League (TIGL) has an async ranking system.
+If all players agree to play a TIGL game, the winner is granted the rank of Minister, if a game consisting of all minister ranks or higher is won, the rank of Agent is awarded, if all ranks are agent or higher, commander, commander or higher, hero, and the winner gets the title of the hero that they won with associated with their user name, until someone else wins with that hero.
+They lose the faction title, but keep the rank of hero in that case

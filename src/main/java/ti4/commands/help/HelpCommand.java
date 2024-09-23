@@ -58,6 +58,7 @@ public class HelpCommand implements Command {
         subcommands.add(new HowToMoveUnits());
         subcommands.add(new SampleColors());
         subcommands.add(new SampleDecals());
+        subcommands.add(new WhatsTIGL());
 
         return subcommands;
     }
