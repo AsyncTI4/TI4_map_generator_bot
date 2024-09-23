@@ -511,9 +511,45 @@ public class TransactionHelper {
         String sender = buttonID.split("_")[2];
         String receiver = buttonID.split("_")[3];
         String extraDetail = buttonID.split("_")[4];
-        player.addTransactionItem("sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail);
         Player p1 = game.getPlayerFromColorOrFaction(sender);
         Player p2 = game.getPlayerFromColorOrFaction(receiver);
+        if (item.equalsIgnoreCase("washComms")) {
+            int oldP1Comms = p1.getCommodities();
+            int newP1Comms = 0;
+            int totalWashPowerP1 = p1.getCommodities() + p1.getTg();
+            int totalWashPowerP2 = p2.getCommodities() + p2.getTg();
+            if (oldP1Comms > totalWashPowerP2) {
+                newP1Comms = oldP1Comms - totalWashPowerP2;
+            }
+            int commsOfP1Washed = oldP1Comms - newP1Comms;
+            int oldP2Comms = p2.getCommodities();
+            int newP2Comms = 0;
+            if (oldP2Comms > totalWashPowerP1) {
+                newP2Comms = oldP2Comms - totalWashPowerP1;
+            }
+            int commsOfP2Washed = oldP2Comms - newP2Comms;
+            int tgP1Sent = commsOfP2Washed - commsOfP1Washed;
+            int tgP2Sent = commsOfP1Washed - commsOfP2Washed;
+            if (commsOfP1Washed > 0) {
+                player.addTransactionItem("sending" + p1.getFaction() + "_receiving" + p2.getFaction() + "_Comms_" + commsOfP1Washed);
+            }
+            if (commsOfP2Washed > 0) {
+                player.addTransactionItem("sending" + p2.getFaction() + "_receiving" + p1.getFaction() + "_Comms_" + commsOfP2Washed);
+            }
+            if (tgP1Sent > 0) {
+                player.addTransactionItem("sending" + p1.getFaction() + "_receiving" + p2.getFaction() + "_TGs_" + tgP1Sent);
+            }
+            if (tgP2Sent > 0) {
+                player.addTransactionItem("sending" + p2.getFaction() + "_receiving" + p1.getFaction() + "_TGs_" + tgP2Sent);
+            }
+        } else {
+            player.addTransactionItem("sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail);
+        }
+
+        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p1.hasAbility("binding_debts")) {
+            int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
+            player.addTransactionItem("sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount);
+        }
         Player opposing = p2;
         if (player == p2) {
             opposing = p1;
@@ -575,6 +611,7 @@ public class TransactionHelper {
         buttons.add(Buttons.red("rejectOffer_" + player.getFaction(), "Reject"));
         buttons.add(Buttons.red("resetOffer_" + player.getFaction(), "Reject and CounterOffer"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2.getRepresentation() + " you have received a transaction offer from " + player.getRepresentationNoPing() + ":\n" + buildTransactionOffer(player, p2, game, false), buttons);
+        checkTransactionLegality(game, p2, player);
     }
 
     @ButtonHandler("transact_")
@@ -752,7 +789,7 @@ public class TransactionHelper {
                 p2.setTg(p2.getTg() + tgAmount);
                 CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
-                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
+                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     ClearDebt.clearDebt(p2, p1, amount);
                     message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
@@ -777,7 +814,7 @@ public class TransactionHelper {
                 CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
-                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0) {
+                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     ClearDebt.clearDebt(p2, p1, amount);
                     message2 = message2 + "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident;
@@ -1040,7 +1077,7 @@ public class TransactionHelper {
         if (p1 == player && !game.isFowMode() && (p1.getCommodities() > 0 || p2.getCommodities() > 0)
             && !p1.hasAbility("military_industrial_complex")
             && !p1.getAllianceMembers().contains(p2.getFaction())) {
-            Button transact = Buttons.gray("send_WashComms_" + p2.getFaction() + "_0",
+            Button transact = Buttons.gray("offerToTransact_washComms_" + player.getFaction() + "_" + p2.getFaction() + "_0",
                 "Wash Both Players Comms");
             stuffToTransButtons.add(transact);
         }
