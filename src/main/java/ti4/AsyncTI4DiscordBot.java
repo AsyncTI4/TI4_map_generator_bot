@@ -92,6 +92,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
+import ti4.helpers.TIGLHelper;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.map.GameSaveLoadManager;
@@ -278,6 +279,7 @@ public class AsyncTI4DiscordBot {
         Storage.init();
         SelectionManager.init();
         initializeWhitelistedRoles();
+        TIGLHelper.validateRoles();
 
         // LOAD GAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
