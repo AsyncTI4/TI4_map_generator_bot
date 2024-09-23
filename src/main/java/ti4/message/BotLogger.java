@@ -274,11 +274,12 @@ public class BotLogger {
         if (ignoredError(e)) return;
 
         // Otherwise... maybe actionable!
-        BotLogger.log("Encountered REST error", e);
 
         // If it gets too annoying, we can limit to testing mode/debug mode
         boolean debugMode = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
-        if (System.getenv("TESTING") != null || debugMode);
+        if (System.getenv("TESTING") != null || debugMode) {
+            BotLogger.log("Encountered REST error", e);
+        }
     }
 
     private static boolean ignoredError(Throwable error) {

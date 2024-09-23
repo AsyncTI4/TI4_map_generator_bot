@@ -1446,14 +1446,13 @@ public class ButtonHelperModifyUnits {
                 boolean hasConstruction = false;
                 for (Integer sc : player.getSCs()) {
                     StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
-                    if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("pok4construction")) {
+                    if (scModel != null && scModel.getBotSCAutomationID().equalsIgnoreCase("pok4construction") && game.getScPlayed().containsKey(sc)) {
                         hasConstruction = true;
                         break;
                     }
                 }
-                if (!player.getSCs().contains(Integer.parseInt("4"))
-                    && !hasConstruction && ("action".equalsIgnoreCase(game.getPhaseOfGame())
-                        || game.getCurrentAgendaInfo().contains("Strategy"))
+                if (!hasConstruction && ("action".equalsIgnoreCase(game.getPhaseOfGame())
+                    || game.getCurrentAgendaInfo().contains("Strategy"))
                     && !ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
                     String color = player.getColor();
                     String tileID = AliasHandler.resolveTile(planetName.toLowerCase());

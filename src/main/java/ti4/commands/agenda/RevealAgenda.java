@@ -24,6 +24,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.SecretObjectiveModel;
 
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
@@ -261,6 +262,18 @@ public class RevealAgenda extends AgendaSubcommandData {
             ButtonHelper.updateMap(game, event,
                 "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
             game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, new Date().getTime() + "");
+        }
+        if (game.getCurrentAgendaInfo().contains("Secret")) {
+            String summary = "The scored secrets so far are:\n";
+            for (Player p2 : game.getRealPlayers()) {
+                for (String soID : p2.getSecretsScored().keySet()) {
+                    SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+                    if (so != null) {
+                        summary = summary + so.getName() + ": " + so.getText() + "\n";
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(channel, summary);
         }
     }
 }
