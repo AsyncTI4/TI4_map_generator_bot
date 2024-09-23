@@ -481,7 +481,7 @@
     "name": "Hostile World",
     "phase": "Action",
     "window": "After another player commits units to land on a planet you control",
-    "text": "Roll a number of dice equal to the resource or influence value of that planet. For each result of 6 or greater, produce 1 hit against those units.",
+    "text": "Roll a number of dice equal to the resource value of that planet. For each result of 6 or greater, produce 1 hit against those units.",
     "flavorText": "The old soldier interrupted the discussion of N'orr ground tactics with a snort. \"It's not the enemy you need to be worried about, lads. It's the godforsaken planet.\"",
     "source": "action_deck_2"
   },
