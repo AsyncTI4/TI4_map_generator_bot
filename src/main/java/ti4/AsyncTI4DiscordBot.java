@@ -279,7 +279,7 @@ public class AsyncTI4DiscordBot {
         Storage.init();
         SelectionManager.init();
         initializeWhitelistedRoles();
-        TIGLHelper.validateRoles();
+        TIGLHelper.validateTIGLness();
 
         // LOAD GAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");

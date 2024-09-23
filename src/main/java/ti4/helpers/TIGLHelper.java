@@ -5,14 +5,17 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class TIGLHelper {
 
     public enum TIGLRank {
+        UNRANKED("Unranked"),
         MINISTER("Minister"),
         AGENT("Agent"),
         COMMANDER("Commander"),
@@ -54,20 +57,40 @@ public class TIGLHelper {
             }
             return null;
         }
+
+        public TIGLRank getNextRank() {
+            return switch (this) {
+                case UNRANKED -> TIGLRank.MINISTER;
+                case MINISTER -> TIGLRank.AGENT;
+                case AGENT -> TIGLRank.COMMANDER;
+                case COMMANDER -> TIGLRank.HERO;
+                case HERO -> TIGLRank.ARBITER;
+                case ARBITER -> TIGLRank.ARBITER;
+                default -> null;
+            };
+        }
     }
 
-    private static final String TIGL_CHANNEL_NAME = "ti_global_league";
-    private static final String TIGL_PROMOTION_THREAD = "tigl_promotions";
+    private static final String TIGL_CHANNEL_NAME = "ti-global-league";
+    private static final String TIGL_ADMIN_THREAD = "tigl-admin";
 
-    public static boolean validateRoles() {
-        boolean hasABadRole = false;
+    public static boolean validateTIGLness() {
+        boolean tiglProblem = false;
         for (TIGLRank rank : TIGLRank.values()) {
             if (rank.getRole() == null) {
-                BotLogger.log("`TIGLHelper.TIGLRank.validateRoles()`: no role found: " + rank.name);
-                hasABadRole = true;
+                BotLogger.log("TIGLHelper.validateRoles: missing Role: `" + rank.name + "`");
+                tiglProblem = true;
             }
         }
-        return hasABadRole;
+        if (getTIGLChannel() == null) {
+            BotLogger.log("TIGLHelper.validateTIGLness: missing channel: `" + TIGL_CHANNEL_NAME + "`");
+            tiglProblem = true;
+        }
+        if (getTIGLAdminThread() == null) {            
+            BotLogger.log("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
+            tiglProblem = true;
+        }
+        return tiglProblem;
     }
 
     public static void sendTIGLSetupText(Game game) {
@@ -85,11 +108,49 @@ public class TIGLHelper {
         return null;
     }
 
-    public static void promoteUser(User user, TIGLRank toRank) {
+    private static void promoteUser(User user, TIGLRank toRank) {
 
     }
 
+    private static void dethroneHero(String faction) {
+
+    }
+
+    public static void checkIfTIGLRankUpOnGameEnd(Game game) {
+        TIGLRank gameRank = game.getMinimumTIGLRankAtGameStart();
+        Player winner = game.getWinner().orElse(null);
+        if (gameRank == null || winner == null || !game.isCompetitiveTIGLGame()) {
+            return;
+        }
+    }
+
     public static TextChannel getTIGLChannel() {
-        return AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(TIGL_CHANNEL_NAME, false).getFirst();
+        List<TextChannel> channels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName(TIGL_CHANNEL_NAME, false);
+        if (channels.isEmpty()) {
+            return null;
+        } else if (channels.size() > 1) {
+            BotLogger.log("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
+        }
+        return channels.getFirst();
+    }
+
+    public static ThreadChannel getTIGLAdminThread() {
+        if (getTIGLChannel() == null) {
+            return null;
+        }
+        ThreadChannel thread = getTIGLChannel().getThreadChannels().stream()
+            .filter(c -> TIGL_ADMIN_THREAD.equals(c.getName()))
+            .findFirst()
+            .orElse(null);
+        if (thread != null) {
+            return thread;
+        }
+        for (ThreadChannel archivedThread : getTIGLChannel().retrieveArchivedPrivateThreadChannels().complete()) {
+            if (TIGL_ADMIN_THREAD.equals(archivedThread.getName())) {
+                archivedThread.getManager().setArchived(false).complete();
+                thread = archivedThread;
+            }
+        }
+        return thread;
     }
 }
