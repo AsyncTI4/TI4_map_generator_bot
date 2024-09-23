@@ -526,7 +526,7 @@
     "name": "Liberation",
     "phase": "Any",
     "window": "After you gain control of a planet",
-    "text": "Produce a number of ground forces on that planet up to that planet's resource or influence value; you may spend influence as if it were resources to produce these units.",
+    "text": "Produce any number of ground forces on that planet up to that planet's resource or influence value; you may spend influence as if it were resources to produce these units.",
     "flavorText": "Harsh penal colonies were all too common, always filled with hardy folk eager for a chance at revenge.",
     "source": "action_deck_2"
   },
