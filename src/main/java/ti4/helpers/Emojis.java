@@ -394,6 +394,18 @@ public class Emojis {
     public static final String KjalengardAgent = "<:KjalengardAgent:1162423340141658112>";
     public static final String KjalengardCommander = "<:KjalengardCommander:1162423346768646266>";
     public static final String KjalengardHero = "<:KjalengardHero:1162423348828065932>";
+    // public static final String KolleccAgent = "";
+    public static final String KolleccCommander = "<:KolleccCommander:1287842294371975261>";
+    public static final String KolleccHero = "<:KolleccHero:1287842295797776480>";
+    public static final String KolumeAgent = "<:KolumeAgent:1287842177098977381>";
+    public static final String KolumeCommander = "<:KolumeCommander:1287842178386759702>";
+    public static final String KolumeHero = "<:KolumeHero:1287842180341305464>";
+    public static final String KortaliAgent = "<:KortaliAgent:1287842241821544550>";
+    public static final String KortaliCommander = "<:KortaliCommander:1287842243201204406>";
+    public static final String KortaliHero = "<:KortaliHero:1287842244531060828>";
+    public static final String LanefirAgent = "<:LanefirAgent:1287842323190775920>";
+    public static final String LanefirCommander = "<:LanefirCommander:1287842324218384405>";
+    // public static final String LanefirHero = "";
 
     public static final String Agent = "<:Agent:1235272542030270614>";
     public static final String Commander = "<:Commander:1235272679838453801>";
@@ -787,7 +799,6 @@ public class Emojis {
     public static final String splittorquoise = "<:splittorquoise:1165037013486022726>";
     public static final String splityellow = "<:splityellow:1165037014995963965>";
     public static final String riftset = "<:riftset:1281263062715990057>";
-
 
     // END EMOJI FARM 10
 
@@ -1776,9 +1787,9 @@ public class Emojis {
             case "empyreanhero" -> EmpyreanHero;
             case "hacanhero" -> HacanHero;
             case "jolnarhero" -> JolNarHero;
-            case "keleresherokuuasi" -> KeleresHeroKuuasi;
-            case "keleresheroodlynn" -> KeleresHeroOdlynn;
-            case "keleresheroharka" -> KeleresHeroHarka;
+            case "keleresherokuuasi", "keleresahero" -> KeleresHeroKuuasi;
+            case "keleresheroodlynn", "keleresxhero" -> KeleresHeroOdlynn;
+            case "keleresheroharka", "keleresmhero" -> KeleresHeroHarka;
             case "l1z1xhero" -> L1Z1XHero;
             case "letnevhero" -> LetnevHero;
             case "mahacthero" -> MahactHero;
@@ -1847,6 +1858,18 @@ public class Emojis {
             case "kjalengardagent" -> KjalengardAgent;
             case "kjalengardcommander" -> KjalengardCommander;
             case "kjalengardhero" -> KjalengardHero;
+            // case "kollecagent" -> "";
+            case "kollecccommander" -> KolleccCommander;
+            case "kollecchero" -> KolleccHero;
+            case "kolumeagent" -> KolumeAgent;
+            case "kolumecommander" -> KolumeCommander;
+            case "kolumehero" -> KolumeHero;
+            case "kortaliagent" -> KortaliAgent;
+            case "kortalicommander" -> KortaliCommander;
+            case "kortalihero" -> KortaliHero;
+            case "lanefiragent" -> LanefirAgent;
+            case "lanefircommander" -> LanefirCommander;
+            // case "lanefirhero" -> "";
 
             // OTHER
             case "whalpha" -> WHalpha;
@@ -1934,5 +1957,5 @@ public class Emojis {
             case 9 -> Emojis.d10green_9;
             default -> String.valueOf(value);
         };
-    } 
+    }
 }

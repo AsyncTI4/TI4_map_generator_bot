@@ -29,8 +29,7 @@ import ti4.message.MessageHelper;
 public class CreateGameButton extends GameSubcommandData {
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel")
-            .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -105,26 +104,6 @@ public class CreateGameButton extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
             ActionRow actionRow = ActionRow.of(buttons);
             baseMessageObject.addComponents(actionRow);
-            // Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
-            // event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
-            //     String msg = bothelperRole.getAsMention() + " this game is ready for launching "
-            //         + message_.getJumpUrl();
-            //     TextChannel bothelperLoungeChannel = AsyncTI4DiscordBot.guildPrimary
-            //         .getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-            //     if (bothelperLoungeChannel == null)
-            //         return;
-            //     List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
-            //     if (threadChannels.isEmpty())
-            //         return;
-            //     String threadName = "game-starts-and-ends";
-            //     // SEARCH FOR EXISTING OPEN THREAD
-            //     for (ThreadChannel threadChannel_ : threadChannels) {
-            //         if (threadChannel_.getName().equals(threadName)) {
-            //             MessageHelper.sendMessageToChannel(threadChannel_, msg);
-            //             break;
-            //         }
-            //     }
-            // });
         }
     }
 

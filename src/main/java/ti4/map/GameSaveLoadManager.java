@@ -54,6 +54,7 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.json.ObjectMapperFactory;
@@ -770,6 +771,11 @@ public class GameSaveLoadManager {
         writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", game.getRunMigrations()));
         writer.write(System.lineSeparator());
 
+        if (game.getMinimumTIGLRankAtGameStart() != null) {
+            writer.write(Constants.TIGL_RANK + " " + game.getMinimumTIGLRankAtGameStart().toString());
+            writer.write(System.lineSeparator());
+        }
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -1062,6 +1068,11 @@ public class GameSaveLoadManager {
             }
             writer.write(Constants.PLAYER_TEMP_MODS + " " + String.join("|", tempCombatMods));
             writer.write(System.lineSeparator());
+
+            if (player.getPlayerTIGLRankAtGameStart() != null) {
+                writer.write(Constants.TIGL_RANK + " " + player.getPlayerTIGLRankAtGameStart().toString());
+                writer.write(System.lineSeparator());
+            }
 
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
@@ -2157,6 +2168,10 @@ public class GameSaveLoadManager {
                 }
                 case Constants.MILTY_DRAFT_SETTINGS -> game.setMiltyJson(info); // We will parse this later
                 case Constants.GAME_TAGS -> game.setTags(getCardList(info));
+                case Constants.TIGL_RANK -> {
+                    TIGLRank rank = TIGLRank.fromString(info);
+                    game.setMinimumTIGLRankAtGameStart(rank);
+                }
             }
         }
     }
@@ -2464,6 +2479,11 @@ public class GameSaveLoadManager {
                     }
                 }
                 case Constants.ELIMINATED -> player.setEliminated(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.TIGL_RANK -> {
+                    String rankID = tokenizer.nextToken();
+                    TIGLRank rank = TIGLRank.fromString(rankID);
+                    player.setPlayerTIGLRankAtGameStart(rank);
+                }
             }
         }
     }

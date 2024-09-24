@@ -380,15 +380,15 @@ public class CreateGameChannels extends BothelperSubcommandData {
         GameSaveLoadManager.saveMap(newGame, event);
         GameCreate.reportNewGameCreated(newGame);
 
-        // AUTOCLOSE THREAD AFTER RUNNING COMMAND
+        // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread) {
             if (thread.getParentChannel().getName().equals("making-new-games")) {
                 newGame.setLaunchPostThreadID(thread.getId());
                 ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                     .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR);
-                if (thread.getName().toLowerCase().contains(" tigl ")) {
-                    TIGLHelper.sendTIGLSetupText(newGame);
+                if (thread.getName().toLowerCase().contains("tigl")) {
+                    TIGLHelper.initializeTIGLGame(newGame);
                 }
                 if (missingMembers.isEmpty()) {
                     manager.setArchived(true);

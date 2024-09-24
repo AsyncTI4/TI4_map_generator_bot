@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.*;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -66,6 +66,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
@@ -167,6 +168,8 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private String miltyJson = null;
+    @Getter @Setter
+    private TIGLRank minimumTIGLRankAtGameStart;
 
     public Game() {
         setCreationDate(Helper.getDateRepresentation(new Date().getTime()));
