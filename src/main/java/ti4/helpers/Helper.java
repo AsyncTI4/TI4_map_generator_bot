@@ -2858,8 +2858,8 @@ public class Helper {
             buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                game.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, game)
-                    + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
+                "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
+                    + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
                 List<Button> titleButton = new ArrayList<>();

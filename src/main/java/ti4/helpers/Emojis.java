@@ -1787,9 +1787,9 @@ public class Emojis {
             case "empyreanhero" -> EmpyreanHero;
             case "hacanhero" -> HacanHero;
             case "jolnarhero" -> JolNarHero;
-            case "keleresherokuuasi" -> KeleresHeroKuuasi;
-            case "keleresheroodlynn" -> KeleresHeroOdlynn;
-            case "keleresheroharka" -> KeleresHeroHarka;
+            case "keleresherokuuasi", "keleresahero" -> KeleresHeroKuuasi;
+            case "keleresheroodlynn", "keleresxhero" -> KeleresHeroOdlynn;
+            case "keleresheroharka", "keleresmhero" -> KeleresHeroHarka;
             case "l1z1xhero" -> L1Z1XHero;
             case "letnevhero" -> LetnevHero;
             case "mahacthero" -> MahactHero;

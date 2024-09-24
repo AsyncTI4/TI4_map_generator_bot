@@ -35,6 +35,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
+import ti4.helpers.TIGLHelper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
@@ -64,6 +65,7 @@ public class StartPhase extends GameSubcommandData {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
+            case "P1Special" -> TIGLHelper.initializeTIGLGame(game);
             case "shuffleDecks" -> game.shuffleDecks();
             case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
