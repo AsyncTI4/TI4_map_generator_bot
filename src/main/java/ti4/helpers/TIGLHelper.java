@@ -158,7 +158,7 @@ public class TIGLHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
     }
 
-    private static List<Role> getAllTIGLRoles() {
+    public static List<Role> getAllTIGLRoles() {
         List<Role> roles = new ArrayList<>();
         for (TIGLRank rank : TIGLRank.values()) {
             roles.add(rank.getRole());
@@ -168,6 +168,13 @@ public class TIGLHelper {
 
     private static List<TIGLRank> getAllTIGLRanks() {
         return List.of(TIGLRank.values());
+    }
+
+    public static List<TIGLRank> getAllHeroTIGLRanks() {
+        return getAllTIGLRanks().stream()
+            .filter(r -> r.getIndex() == -1)
+            .sorted(Comparator.comparing(TIGLRank::toString))
+            .toList();
     }
 
     private static TIGLRank getTIGLRankFromRole(@Nullable Role role) {
@@ -193,7 +200,7 @@ public class TIGLHelper {
         return lowestRank;
     }
 
-    private static List<TIGLRank> getUsersTIGLRanks(User user) {
+    public static List<TIGLRank> getUsersTIGLRanks(User user) {
         Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
         if (hubMember == null) {
             return new ArrayList<>();

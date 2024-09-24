@@ -1164,4 +1164,5 @@ public class Constants {
     public static final String GAME_TAGS = "game_tags";
     public static final String SHOW_UNPLAYED_AC = "show_unplayed_ac";
     public static final String TIGL_RANK = "tigl_rank";
+    public static final String TIGL = "tigl";
 }
