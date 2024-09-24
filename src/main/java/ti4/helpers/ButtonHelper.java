@@ -48,6 +48,7 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
@@ -80,6 +81,7 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.generator.GenerateTile;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -2668,9 +2670,16 @@ public class ButtonHelper {
         // System.out.printf("%d %d %d %d%n", fleetCap, numOfCapitalShips, capacity,
         // numInfNFightersNMechs);
         if (capacityViolated || fleetSupplyViolated) {
-            Button remove = Buttons.red("getDamageButtons_" + tile.getPosition() + "_remove",
-                "Remove units in " + tile.getRepresentationForButtons(game, player));
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), message, remove);
+            List<Button> buttons = new ArrayList<>();
+            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),
+                event, player);
+            buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
+                "Remove units in " + tile.getRepresentationForButtons(game, player)));
+            buttons.add(Buttons.red("deleteButtons",
+                "Dismiss These Buttons"));
+
+            MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message, buttons);
+
         }
         return (numFighter2sFleet + numOfCapitalShips + 1) / 2;
     }
@@ -6462,6 +6471,10 @@ public class ButtonHelper {
     }
 
     public static String getListOfStuffAvailableToSpend(Player player, Game game) {
+        return getListOfStuffAvailableToSpend(player, game, false);
+    }
+
+    public static String getListOfStuffAvailableToSpend(Player player, Game game, boolean production) {
         String youCanSpend;
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         StringBuilder youCanSpendBuilder = new StringBuilder("You have available to you to spend: ");
@@ -6474,6 +6487,14 @@ public class ButtonHelper {
         }
         if (!game.getPhaseOfGame().contains("agenda")) {
             youCanSpend = youCanSpend + "and " + player.getTg() + " TG" + (player.getTg() == 1 ? "" : "s");
+        }
+        if (production) {
+            if (player.hasTech("st")) {
+                youCanSpend = youCanSpend + ". You also have sarween tools";
+            }
+            if (player.hasTechReady("aida")) {
+                youCanSpend = youCanSpend + ". You also have AIDEV for " + ButtonHelper.getNumberOfUnitUpgrades(player) + " resources";
+            }
         }
 
         return youCanSpend;

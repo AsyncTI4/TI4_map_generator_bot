@@ -1902,6 +1902,9 @@ public class Helper {
                 if (warfareNOtherstuff.contains("integrated") && !unitHolder.getName().equalsIgnoreCase(planetInteg)) {
                     continue;
                 }
+                if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())) {
+                    continue;
+                }
 
                 String pp = planet.getName();
                 if ("genericBuild".equalsIgnoreCase(warfareNOtherstuff)) {
@@ -2865,9 +2868,10 @@ public class Helper {
                 List<Button> titleButton = new ArrayList<>();
                 titleButton.add(Buttons.blue("offerToGiveTitles", "Offer to bestow a Title"));
                 titleButton.add(Buttons.gray("deleteButtons", "No titles for this game"));
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), 
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                     "Offer everyone a chance to bestow a title. This is totally optional.\n"
-                    + "Press **End Game** only after done giving titles.", titleButton);
+                        + "Press **End Game** only after done giving titles.",
+                    titleButton);
             }
         }
     }

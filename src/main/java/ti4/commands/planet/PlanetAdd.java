@@ -126,9 +126,7 @@ public class PlanetAdd extends PlanetAddRemove {
                             Helper.checkEndGame(game, player);
                         }
                     }
-                    if (Mapper.getPlanet(planet) != null
-                        && "action_cards_pok".equals(game.getAcDeckID())
-                        && !game.getDiscardActionCards().containsKey("reparations")) {
+                    if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
                             + " has a window to play Reparations for the taking of "
                             + Mapper.getPlanet(planet).getName();

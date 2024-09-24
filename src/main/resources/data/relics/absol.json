@@ -44,7 +44,7 @@
     {
         "alias": "absol_plenaryorbital",
         "name": "Plenary Orbital",
-        "text": "PLENARY ORBITAL Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that you control and which does not contain a space dock. The planet this card is attached to contains this unit.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card.\nUp to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in this system do not count against your fleet pool. PRODUCTION 10, PLANETARY SHIELD",
+        "text": "PLENARY ORBITAL DEPLOY:  After you activate a system, you may place this space dock on a non-home planet you control in that system other than Mecatol Rex and which does not contain a space dock.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in this system do not count against your fleet pool. PRODUCTION 10;PLANETARY SHIELD",
         "source": "absol",
         "flavourText": "*To many, the ring represented hope - a testament to the preseverance of the Gashlai.  To Magmus, it represented waste.  Extravagance.  Foolishness.  He sneered.*"
     },
