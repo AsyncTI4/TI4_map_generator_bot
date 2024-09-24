@@ -59,7 +59,7 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
-            event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.").setEphemeral(true).queue();
+            event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
 
@@ -71,6 +71,7 @@ public class MessageListener extends ListenerAdapter {
             && !event.getInteraction().getName().equals(Constants.STATISTICS)
             && !event.getInteraction().getName().equals(Constants.USER)
             && !event.getInteraction().getName().equals(Constants.SEARCH)
+            && !event.getInteraction().getName().equals(Constants.TIGL)
             && (event.getInteraction().getSubcommandName() == null
                 || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && event.getOption(Constants.GAME_NAME) == null) {

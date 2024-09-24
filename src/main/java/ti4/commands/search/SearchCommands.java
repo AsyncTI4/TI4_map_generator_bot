@@ -27,7 +27,7 @@ public class SearchCommands extends SearchSubcommandData {
         StringBuilder sb = new StringBuilder("__**Command List**__");
         List<Command> commands = event.getGuild().retrieveCommands().complete();
         int commandCount = commands.size();
-        sb.append(" (").append(commandCount).append("/50)\n");
+        sb.append(" (").append(commandCount).append("/100)\n");
 
         //COMMANDS
         for (Command command : commands) {
