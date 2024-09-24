@@ -1,0 +1,10 @@
+# Discordant Stars
+Async Channel: https://discord.com/channels/943410040369479690/1168522933283598437
+## __Reference Document__
+> [Discordant Stars Reference Document](https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg) - This document is a complete reference for Discordant Stars, and should be treated as an authority on the project's content.
+
+## __Rules Clarifications__
+> [Discordant Stars Rules Clarifications](https://drive.google.com/file/d/11stOJknvmhmPeNDuhEkkykQypUi8stVY) - Some questions are more prone to confusion, so we wrote a handy reference sheet for some of the most common questions.
+
+## __Project Folder__
+> [Discordant Stars Project Folder](https://drive.google.com/drive/folders/1AipLLvGhyp2v--w2oeT7uQIovmH_HyVn) - All up-to-date assets can be found in the project's online shared folder.

@@ -85,7 +85,7 @@ public class WeirdGameSetup extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
-            TIGLHelper.sendTIGLSetupText(game);
+            TIGLHelper.initializeTIGLGame(game);
             return true;
         }
 

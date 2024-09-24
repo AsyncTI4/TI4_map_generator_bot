@@ -57,6 +57,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
@@ -213,6 +214,10 @@ public class Player {
     private boolean hasUsedEnvironmentPlunderAbility;
     @Setter
     private boolean hasUsedPeopleConnectAbility;
+
+    // TIGL
+    @Getter @Setter
+    private TIGLRank playerTIGLRankAtGameStart;
 
     // Statistics
     private int numberOfTurns;

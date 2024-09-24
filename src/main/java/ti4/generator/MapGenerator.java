@@ -79,6 +79,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.WebHelper;
@@ -713,6 +714,12 @@ public class MapGenerator {
         int deltaY = -150;
         if (game.isCompetitiveTIGLGame()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_TIGL.png");
+            TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
+            if (rank != null) {
+                graphics.setFont(Storage.getFont18());
+                superDrawString(graphics, rank.getShortName(), x + deltaX + 50, y + deltaY + 75, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Top, stroke2, Color.BLACK);
+                graphics.setFont(Storage.getFont32());
+            }
             deltaX += 100;
         }
         if (game.isAbsolMode()) {
