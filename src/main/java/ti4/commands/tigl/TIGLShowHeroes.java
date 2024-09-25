@@ -37,11 +37,11 @@ public class TIGLShowHeroes extends TIGLSubcommandData {
             String heroEmoji = Emojis.getEmojiFromDiscord(faction + "hero");
             List<Member> members = AsyncTI4DiscordBot.guildPrimary.getMembersWithRoles(role);
 
-            sb.append("> ").append(factionIcon).append(heroEmoji);
+            sb.append("> ").append(factionIcon);
             for (Member member : members) {
                 sb.append(member.getEffectiveName());
             }
-            sb.append("  ").append(rank.getShortName());
+            sb.append("  ").append(heroEmoji).append(rank.getShortName());
             sb.append("\n");
         }
 
