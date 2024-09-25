@@ -2774,9 +2774,12 @@ public class MapGenerator {
      * @param outlineColor
      */
     private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign horizontalAlignment, VerticalAlign verticalAlignment, Stroke outlineSize, Color outlineColor) {
+        boolean debugPosition = false;
         if (txt == null) return;
+        if (debugPosition) drawCrosshair(g, x, y); // debug
+
+        int width = g.getFontMetrics().stringWidth(txt);
         if (horizontalAlignment != null) {
-            double width = g.getFontMetrics().stringWidth(txt);
             switch (horizontalAlignment) {
                 case Center -> x -= width / 2.0;
                 case Right -> x -= width;
@@ -2784,8 +2787,9 @@ public class MapGenerator {
                 }
             }
         }
+
+        int height = g.getFontMetrics().getAscent() - g.getFontMetrics().getDescent();
         if (verticalAlignment != null) {
-            double height = g.getFontMetrics().getStringBounds(txt, g).getHeight();
             switch (verticalAlignment) {
                 case Center -> y += height / 2.0;
                 case Top -> y += height;
@@ -2793,11 +2797,13 @@ public class MapGenerator {
                 }
             }
         }
+
         if (outlineSize == null) outlineSize = stroke2;
         if (outlineColor == null && textColor == null) {
             outlineColor = Color.BLACK;
             textColor = Color.WHITE;
         }
+        if (debugPosition) g.drawRect(x, y - height, width, height); // debug
         if (outlineSize == null || outlineColor == null) {
             g.drawString(txt, x, y);
         } else {
@@ -4849,7 +4855,7 @@ public class MapGenerator {
                 }
                 Integer distance = game.getTileDistances().get(tile.getPosition());
                 if (distance == null) {
-                    break;
+                    distance = 100;
                 }
 
                 BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
@@ -4859,14 +4865,14 @@ public class MapGenerator {
 
                 int x = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
                 int y = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
-
-                BufferedImage distanceColor = ImageHelper
-                    .read(ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
-                tileGraphics.drawImage(distanceColor, x, y, null);
-                tileGraphics.setColor(Color.WHITE);
-                drawCenteredString(tileGraphics, distance.toString(),
-                    new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()),
-                    Storage.getFont100());
+                if (distance > 0) {
+                    BufferedImage distanceColor = ImageHelper.read(ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
+                    tileGraphics.drawImage(distanceColor, x, y, null);
+                }
+                if (distance < 11) {
+                    tileGraphics.setFont(Storage.getFont110());
+                    superDrawString(tileGraphics, distance.toString(), x + tileImage.getWidth() / 2, y + tileImage.getHeight() / 2, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
+                }
             }
             case Wormholes -> {
                 if (game.isFowMode()) {
@@ -5538,6 +5544,11 @@ public class MapGenerator {
 
     public static String getColorFilterForDistance(int distance) {
         return "Distance" + distance + ".png";
+    }
+
+    public static void drawCrosshair(Graphics g, int x, int y) {
+        g.drawLine(x - 100, y, x + 100, y);
+        g.drawLine(x, y - 100, x, y + 100);
     }
 
     private Point getTilePosition(String position, int x, int y) {
