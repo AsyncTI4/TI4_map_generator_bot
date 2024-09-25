@@ -86,7 +86,7 @@ public class Info extends GameSubcommandData {
         }
         sb.append("Map Template: `").append(game.getMapTemplateID()).append("`").append(NEW_LINE);
         if (!privateGame || game.isHasEnded()) {
-            sb.append("Map String: `").append(Helper.getMapString(game)).append("`").append(NEW_LINE);
+            sb.append("Map String: `").append(game.getMapString()).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
         }
