@@ -54,7 +54,6 @@ public class HelpCommand implements Command {
     private Collection<HelpSubcommandData> getSubcommands() {
         Collection<HelpSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new HelpAction());
-        subcommands.add(new SetupTemplatesAction());
         subcommands.add(new HowToMoveUnits());
         subcommands.add(new SampleColors());
         subcommands.add(new SampleDecals());
