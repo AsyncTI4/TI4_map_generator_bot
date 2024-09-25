@@ -243,7 +243,7 @@ public class TransactionHelper {
     }
 
     public static String getNothingMessage() {
-        int result = ThreadLocalRandom.current().nextInt(1, 46);
+        int result = ThreadLocalRandom.current().nextInt(1, 47);
         return switch (result) {
             case 1 -> "Nothing But Respect And Good Will";
             case 2 -> "Some Pocket Lint";
