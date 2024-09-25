@@ -103,7 +103,7 @@
     "name": "Boarding Party",
     "phase": "Action",
     "window": "After you destroy 1 of your opponent's ships that has a cost of 4 or less",
-    "text": "Place 1 matching ship from your reinforcements in the active system. That ship becomes damaged. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
+    "text": "Place 1 matching ship from your reinforcements in the active system. [Note: If the unit is a ground force or structure that the other player is treating as a ship, you cannot place that unit.]",
     "flavorText": "\"Brother,\" the officer cried, \"our ships are breaking up! If we retreat now...\" Milor glared at him. \"No! Launch the remaining fighters and board the enemy in the lifepods. In Darien's name, we fight to the last!\"",
     "source": "action_deck_2"
   },
@@ -513,6 +513,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "last_minute_deliberation",
+    "name": "Last Minute Deliberation",
+    "phase": "Agenda",
+    "window": "Before the \"Ready Planets\" step of the agenda phase",
+    "text": "Ready up to 2 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
+    "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "lazax_cache",
     "name": "Lazax Cache",
     "phase": "Action",
@@ -526,7 +535,7 @@
     "name": "Liberation",
     "phase": "Any",
     "window": "After you gain control of a planet",
-    "text": "Produce any number of ground forces on that planet up to that planet's resource or influence value; you may spend influence as if it were resources to produce these units.",
+    "text": "Place 3 infantry from your reinforcements on that planet.",
     "flavorText": "Harsh penal colonies were all too common, always filled with hardy folk eager for a chance at revenge.",
     "source": "action_deck_2"
   },
@@ -699,15 +708,6 @@
     "window": "After a die is rolled",
     "text": "Apply +3 or -3 to the result of that roll.",
     "flavorText": "Ahk-Syl Siven flared, bright red briefly overtaking blue. \"Would I lie to you?\" The flame pulsed, suspended in the air before him. Was it real? Or just an illusion?",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "public_outcry",
-    "name": "Public Outcry",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome places 1 command token from their reinforcements in a system that contains their units and destroys 3 of their units in that system.",
-    "flavorText": "Ciel laughed as Junn dodged an overripe fruit. \"Agile for your age!\"",
     "source": "action_deck_2"
   },
   {
