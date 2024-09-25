@@ -168,7 +168,8 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private String miltyJson = null;
-    @Getter @Setter
+    @Getter
+    @Setter
     private TIGLRank minimumTIGLRankAtGameStart;
 
     public Game() {
@@ -285,9 +286,8 @@ public class Game extends GameProperties {
                 try {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
-                    // This shouldn't really happen since we
-                    // can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from map.", e);
+                    // This shouldn't really happen since we can even see private fields.
+                    BotLogger.log("Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -589,9 +589,12 @@ public class Game extends GameProperties {
 
     @Nullable
     @JsonIgnore
-    @ExportableField
     public String getGuildId() {
-        return getActionsChannel() == null ? null : getActionsChannel().getGuild().getId();
+        if (getGuild() == null) {
+            return null;
+        }
+        setGuildID(getGuild().getId());
+        return getGuild().getId();
     }
 
     public Map<Integer, Boolean> getScPlayed() {
@@ -4082,6 +4085,7 @@ public class Game extends GameProperties {
     /**
      * @return String : TTS/TTPG Map String
      */
+    @JsonIgnore
     public String getMapString() {
         List<String> tilePositions = new ArrayList<>();
         tilePositions.add("000");
@@ -4109,12 +4113,9 @@ public class Game extends GameProperties {
             for (Tile tile : tileMap.values()) {
                 if (tile.getPosition().equals(position)) {
                     String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
-                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) { // Mecatol Rex in Centre
-                                                                                             // Position
+                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) { // Mecatol Rex in Centre Position
                         sb.append("{18}");
-                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) { // Something else
-                                                                                                     // is in the Centre
-                                                                                                     // Position
+                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) { // Something else is in the Centre Position
                         sb.append("{").append(tileID).append("}");
                     } else {
                         sb.append(tileID);
@@ -4130,6 +4131,7 @@ public class Game extends GameProperties {
             }
             sb.append(" ");
         }
+        setMapString(sb.toString().trim());
         return sb.toString().trim();
     }
 }
