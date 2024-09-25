@@ -168,7 +168,8 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private String miltyJson = null;
-    @Getter @Setter
+    @Getter
+    @Setter
     private TIGLRank minimumTIGLRankAtGameStart;
 
     public Game() {
@@ -285,9 +286,8 @@ public class Game extends GameProperties {
                 try {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
-                    // This shouldn't really happen since we
-                    // can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from map.", e);
+                    // This shouldn't really happen since we can even see private fields.
+                    BotLogger.log("Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -590,7 +590,11 @@ public class Game extends GameProperties {
     @Nullable
     @JsonIgnore
     public String getGuildId() {
-        return getActionsChannel() == null ? null : getActionsChannel().getGuild().getId();
+        if (getGuild() == null) {
+            return null;
+        }
+        setGuildID(getGuild().getId());
+        return getGuild().getId();
     }
 
     public Map<Integer, Boolean> getScPlayed() {
@@ -4076,5 +4080,58 @@ public class Game extends GameProperties {
 
     public void checkCommanderUnlocks(String factionToCheck) {
         CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
+    }
+
+    /**
+     * @return String : TTS/TTPG Map String
+     */
+    @JsonIgnore
+    public String getMapString() {
+        List<String> tilePositions = new ArrayList<>();
+        tilePositions.add("000");
+
+        int ringCountMax = getRingCount();
+        int ringCount = 1;
+        int tileCount = 1;
+        while (ringCount <= ringCountMax) {
+            String position = "" + ringCount + (tileCount < 10 ? "0" + tileCount : tileCount);
+            tilePositions.add(position);
+            tileCount++;
+            if (tileCount > ringCount * 6) {
+                tileCount = 1;
+                ringCount++;
+            }
+        }
+
+        List<String> sortedTilePositions = tilePositions.stream()
+            .sorted(Comparator.comparingInt(Integer::parseInt))
+            .toList();
+        Map<String, Tile> tileMap = new HashMap<>(getTileMap());
+        StringBuilder sb = new StringBuilder();
+        for (String position : sortedTilePositions) {
+            boolean missingTile = true;
+            for (Tile tile : tileMap.values()) {
+                if (tile.getPosition().equals(position)) {
+                    String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
+                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) { // Mecatol Rex in Centre Position
+                        sb.append("{18}");
+                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) { // Something else is in the Centre Position
+                        sb.append("{").append(tileID).append("}");
+                    } else {
+                        sb.append(tileID);
+                    }
+                    missingTile = false;
+                    break;
+                }
+            }
+            if (missingTile && "000".equalsIgnoreCase(position)) {
+                sb.append("{-1}");
+            } else if (missingTile) {
+                sb.append("-1");
+            }
+            sb.append(" ");
+        }
+        setMapString(sb.toString().trim());
+        return sb.toString().trim();
     }
 }
