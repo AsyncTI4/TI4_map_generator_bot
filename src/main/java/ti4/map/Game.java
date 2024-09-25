@@ -589,6 +589,7 @@ public class Game extends GameProperties {
 
     @Nullable
     @JsonIgnore
+    @ExportableField
     public String getGuildId() {
         return getActionsChannel() == null ? null : getActionsChannel().getGuild().getId();
     }
