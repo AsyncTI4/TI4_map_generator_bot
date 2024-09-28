@@ -403,11 +403,14 @@ public class CombatHelper {
 
         List<NamedCombatModifierModel> mods = new ArrayList<>(autoMods);
         mods.addAll(tempMods);
+        Set<NamedCombatModifierModel> set2 = new HashSet<>(mods);
+        mods = new ArrayList<>(set2);
 
         List<NamedCombatModifierModel> modAndExtraRolls = new ArrayList<>(mods);
         modAndExtraRolls.addAll(extraRolls);
-
-        result += CombatMessageHelper.displayModifiers("With modifiers: \n", playerUnits, modAndExtraRolls);
+        Set<NamedCombatModifierModel> set = new HashSet<>(modAndExtraRolls);
+        List<NamedCombatModifierModel> uniqueList = new ArrayList<>(set);
+        result += CombatMessageHelper.displayModifiers("With modifiers: \n", playerUnits, uniqueList);
 
         // Actually roll for each unit
         int totalHits = 0;

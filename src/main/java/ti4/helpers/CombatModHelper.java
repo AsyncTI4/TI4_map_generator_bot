@@ -453,6 +453,14 @@ public class CombatModHelper {
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeSystem.getUnitHolders()
                         .get("space");
+                    if (origUnit.getIsGroundForce() && activeSystem.getPlanetUnitHolders().size() > 0) {
+                        for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                            if (planet.getUnitCount(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()).getUnitType(), player) > 0) {
+                                space = planet;
+                            }
+                        }
+
+                    }
                     int count = 0;
                     if (space.getUnitDamage().get(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()),
                         player.getColorID())) != null) {

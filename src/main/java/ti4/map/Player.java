@@ -216,7 +216,8 @@ public class Player {
     private boolean hasUsedPeopleConnectAbility;
 
     // TIGL
-    @Getter @Setter
+    @Getter
+    @Setter
     private TIGLRank playerTIGLRankAtGameStart;
 
     // Statistics
@@ -1969,6 +1970,8 @@ public class Player {
     public void setTg(int tg) {
         if (tg > -1) {
             this.tg = tg;
+        } else {
+            this.tg = 0;
         }
     }
 
