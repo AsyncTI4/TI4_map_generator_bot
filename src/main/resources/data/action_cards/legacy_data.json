@@ -747,15 +747,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "virulent_gas",
-        "name": "Virulent Gas",
-        "phase": "Action",
-        "window": "After your SPACE CANNON or BOMBARDMENT roll produces hits against another player's units on a planet",
-        "text": "Produce 1 additional hit. Then, roll 1 die; if the result is 6 or greater, repeat this effect.",
-        "flavorText": "As they cut their way through the ancient structure's steel wall, Dart's laser-cutter illuminated a canister close to the beam. Tai let out a nervous squeal, \"E-e-exterrix gas!\"  Without hesitation, Dart ran.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "tributes",
         "name": "Tributes",
         "phase": "Action",
@@ -819,21 +810,30 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "last_minute_deliberation",
-        "name": "Last Minute Deliberation",
-        "phase": "Agenda",
-        "window": "Before the \"Ready Planets\" step of the agenda phase",
-        "text": "Ready up to 2 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
-        "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "defectors",
         "name": "Defectors",
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend influence equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
         "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "public_outcry",
+        "name": "Public Outcry",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome places 1 command token from their reinforcements in a system that contains their units and destroys 3 of their units in that system.",
+        "flavorText": "Ciel laughed as Junn dodged an overripe fruit. \"Agile for your age!\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "liberation",
+        "name": "Liberation",
+        "phase": "Any",
+        "window": "After you gain control of a planet",
+        "text": "Place 3 infantry from your reinforcements on that planet.",
+        "flavorText": "Harsh penal colonies were all too common, always filled with hardy folk eager for a chance at revenge.",
         "source": "action_deck_2_old"
     }
 ]

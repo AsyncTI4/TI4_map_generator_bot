@@ -243,7 +243,7 @@ public class TransactionHelper {
     }
 
     public static String getNothingMessage() {
-        int result = ThreadLocalRandom.current().nextInt(1, 41);
+        int result = ThreadLocalRandom.current().nextInt(1, 47);
         return switch (result) {
             case 1 -> "Nothing But Respect And Good Will";
             case 2 -> "Some Pocket Lint";
@@ -285,6 +285,12 @@ public class TransactionHelper {
             case 38 -> "A Gentle Reminder";
             case 39 -> "A Heartwarming Story";
             case 40 -> "A Whisper of Kindness";
+            case 41 -> "An Expired Gift Certificate";
+            case 42 -> "A Free Trial CD for AOL";
+            case 43 -> "Compost For Your Garden";
+            case 44 -> "A Tupperware Party Invitation";
+            case 45 -> "A Picture of a Sandwich";
+            case 46 -> "Thoughtful Advice About Your Current Situation";    
             default -> "Nothing";
         };
     }

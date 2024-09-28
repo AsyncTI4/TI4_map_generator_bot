@@ -63,6 +63,7 @@ import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
+import ti4.commands.tigl.TIGLCommand;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.AddToken;
@@ -92,6 +93,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
+import ti4.helpers.TIGLHelper;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.map.GameSaveLoadManager;
@@ -212,6 +214,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new PlanetCommand());
         commandManager.addCommand(new SelectionBoxDemo());
         commandManager.addCommand(new UserCommand());
+        commandManager.addCommand(new TIGLCommand());
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -278,6 +281,7 @@ public class AsyncTI4DiscordBot {
         Storage.init();
         SelectionManager.init();
         initializeWhitelistedRoles();
+        TIGLHelper.validateTIGLness();
 
         // LOAD GAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");

@@ -11,16 +11,9 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -35,6 +28,11 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -510,10 +508,10 @@ public class AgendaHelper {
                         for (Player player2 : getPlayersWithLeastPoints(game)) {
                             if (game.isFowMode()) {
                                 buttons.add(Buttons.green("colonialRedTarget_" + player2.getFaction() + "_" + winner,
-                                    "" + player2.getColor()));
+                                        player2.getColor()));
                             } else {
                                 buttons.add(Buttons.green("colonialRedTarget_" + player2.getFaction() + "_" + winner,
-                                    "" + player2.getFaction()));
+                                        player2.getFaction()));
                             }
                         }
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -745,7 +743,7 @@ public class AgendaHelper {
                         "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
                 }
             }
-            if ("artifact".equalsIgnoreCase(agID)) {
+            if ("artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {
                 TextChannel watchParty = watchPartyChannel(game);
                 String watchPartyPing = watchPartyPing(game);
                 if (watchParty != null && !game.isFowMode()) {
@@ -1061,26 +1059,16 @@ public class AgendaHelper {
     }
 
     private static String getAcd2Shenanigans(Game game) {
-        boolean lmdDiscarded = game.isACInDiscard("Last Minute Deliberation");
-        boolean daDiscarded = game.isACInDiscard("Data Archive");
-        StringJoiner stringJoiner = new StringJoiner(" and ");
-        if (!lmdDiscarded)
-            stringJoiner.add("*Last Minute Deliberation*");
-        if (!daDiscarded)
-            stringJoiner.add("*Data Archive*");
-        String acd2Shenanigans;
-        if (stringJoiner.length() > 0) {
-            acd2Shenanigans = "This is the window for " + stringJoiner + "! " + game.getPing();
-        } else {
-            acd2Shenanigans = "*Last Minute Deliberation* and *Data Archive* are in the discard pile. Feel free to move forward.";
+        if (game.isACInDiscard("Last Minute Deliberation")) {
+            return "This is the window for *Last Minute Deliberation*! " + game.getPing();
         }
-        return acd2Shenanigans;
+        return "*Last Minute Deliberation* is in the discard pile. Feel free to move forward.";
     }
 
     @Nullable
     private static String watchPartyPing(Game game) {
         List<Role> roles = AsyncTI4DiscordBot.guildPrimary.getRolesByName("Ixthian Watch Party", true);
-        if (!game.isFowMode() && roles.size() > 0) {
+        if (!game.isFowMode() && !roles.isEmpty()) {
             return roles.get(0).getAsMention();
         }
         return null;

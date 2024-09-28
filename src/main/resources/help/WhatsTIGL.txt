@@ -1,0 +1,23 @@
+# Twilight Imperium Global League (TIGL)
+https://discord.com/channels/943410040369479690/1003741148017336360
+TIGL is a competitive league of TI4 players run in quarterly seasons.
+To be sanctioned requires 6 signed up players playing RAW (no homebrew) and competitive (people trying to win even if having fun).
+Async and splits report results in the week they finish for season purposes. 
+Technically all these games need sign off prior but give the records kept on this discord it is easy for TIGL admin team to audit games if any suspision or concerns arise.
+
+## Aussie Score
+It is what the Aussie server uses in league.
+TIGL uses it as a secondary ranking to break tied brackets of wins, the primary ranking.
+Aussie awards 1 point to the match winner then awards 1 point per player divided by percentage player points / total points.
+This weights toward winning (the 1 point for a win) and then encourages players to score high while also keeping their opponents scores lower.
+Lets say you finish on 10, 9, 9, 9, 9 + 9 (BigAl's 55 point perfection) the winner gets 1 + [(6x1)/5510] = 2.09 while everyone else gets 0 +  [(6x1)/559] = 0.98
+
+Had the winner smashed the field and the finish was 10, 9, 6, 6, 6, 5 then the winner gets 1 + [(6x1)/4210] = 2.43, second place gets 0 +  [(6x1)/429] = 1.28 and those on 6 get  0+[(6x1)/42*6] = 0.85
+
+So here you see first and second both get higher breaker Aussie scores for the match but point sniping the other 4 players.  This 100% works with the Aussie meta, more Cobra Kai than Miagi Doh, and for the most part syncs with the competitive spirit of TIGL. 
+
+## Async Rank
+Async Rank is special to AsyncTI4 only
+Async Rank is a bolt-on thing for TIGL, specific to the async server. Everyone starts with no rank, and then as they win TIGL games, can progress up to Minister, Agent, Commander, Hero, and possibly beyond.
+If all players agree to play a TIGL game, the winner is granted the rank of Minister, if a game consisting of all minister ranks or higher is won, the rank of Agent is awarded, if all ranks are agent or higher, commander, commander or higher, hero, and the winner gets the title of the hero that they won with associated with their user name, until someone else wins with that hero. They lose the faction title, but keep the rank of hero in that case
+[BLT's Spreadsheet](https://docs.google.com/spreadsheets/d/e/2PACX-1vQZqau3XQ_Cw0Ayl1LubodcJiLuf-jmp4rGTY0sEzVPSo0TFyVKQtttFnQZhzbKjGEDanPfdMZfruHR/pubhtml?gid=0&single=true)

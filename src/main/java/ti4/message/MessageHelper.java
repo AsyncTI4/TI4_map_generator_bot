@@ -683,6 +683,15 @@ public class MessageHelper {
 		return ListUtils.partition(embeds, 9); //max 10, but we've had issues with 6k char limit, so max 9
 	}
 
+	public static void sendMessageToThread(MessageChannel channel, String threadName, String messageToSend) {
+		if (channel instanceof MessageChannelUnion union) {
+			sendMessageToThread(union, threadName, messageToSend);
+		} else {
+			messageToSend = "Something went wrong trying to send this to a thread! Sorry!\n" + messageToSend;
+			sendMessageToChannel(channel, messageToSend);
+		}
+	}
+
 	public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty()
 			|| messageToSend.isEmpty())

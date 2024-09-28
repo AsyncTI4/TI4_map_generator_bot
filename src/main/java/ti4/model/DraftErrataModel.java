@@ -3,6 +3,7 @@ package ti4.model;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,6 +34,7 @@ public class DraftErrataModel implements ModelInterface {
     public DraftErrataModel[] AdditionalComponents;
     public DraftErrataModel[] OptionalSwaps;
     public boolean Undraftable;
+    private String alternateText;
 
     public boolean AlwaysAddToPool;
 
@@ -56,6 +58,11 @@ public class DraftErrataModel implements ModelInterface {
         items.clear();
         items.addAll(itemsSet);
         Collections.shuffle(items);
+    }
+
+    @JsonIgnore
+    public String getAlternateText() {
+        return Optional.ofNullable(alternateText).orElse("");
     }
 
     @JsonIgnore

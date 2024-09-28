@@ -38,6 +38,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.Storage;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.WebHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -236,10 +237,9 @@ public class GameEnd extends GameSubcommandData {
 
                 // TIGL Extras
                 if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        getTIGLFormattedGameEndText(game, event));
-                    String blt = Constants.bltPing();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), blt + " bot has been told to ping you when TIGL games end");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.BLT + Constants.bltPing());
+                    TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
                 }
             });
         } else if (publish) { //FOW SUMMARY
