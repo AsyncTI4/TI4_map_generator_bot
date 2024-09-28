@@ -393,7 +393,7 @@ public class ButtonHelperSCs {
         int val = Helper.getProductionValue(player, game, tile, true);
         String message = player.getRepresentation()
             + " Use the buttons to produce. Reminder that when following warfare, you may only use 1 space dock in your home system. "
-            + ButtonHelper.getListOfStuffAvailableToSpend(player, game) + "\n"
+            + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true) + "\n"
             + "You have " + val + " PRODUCTION value in this system.";
         if (val > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
             message = message

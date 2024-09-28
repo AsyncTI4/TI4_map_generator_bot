@@ -114,7 +114,7 @@ public class MessageListener extends ListenerAdapter {
                     harmless = true;
                 }
                 if (userActiveGame != null && !userActiveGame.isFowMode() && !harmless
-                    && userActiveGame.getName().contains("pbd") && !userActiveGame.getName().contains("pbd1000")) {
+                    && userActiveGame.getName().contains("pbd") && !userActiveGame.getName().contains("pbd1000") && !userActiveGame.getName().contains("pbd100two")) {
                     if (event.getMessageChannel() instanceof ThreadChannel thread) {
                         if (!thread.isPublic()) {
                             reportSusSlashCommand(event, m);
@@ -163,8 +163,8 @@ public class MessageListener extends ListenerAdapter {
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 String sb = event.getUser().getEffectiveName() + " " +
-                        "`" + event.getCommandString() + "` " +
-                        commandResponseMessage.getJumpUrl();
+                    "`" + event.getCommandString() + "` " +
+                    commandResponseMessage.getJumpUrl();
                 MessageHelper.sendMessageToChannel(threadChannel_, sb);
                 break;
             }
@@ -336,7 +336,7 @@ public class MessageListener extends ListenerAdapter {
                                         if (!timesPinged.equalsIgnoreCase("2")) {
                                             Player p2 = player;
                                             String sb = p2.getRepresentation(true, true) +
-                                                    Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
+                                                Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
                                             //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
                                             ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
