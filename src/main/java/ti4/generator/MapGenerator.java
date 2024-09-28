@@ -203,7 +203,7 @@ public class MapGenerator {
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * 20;
+        playerY += unrealPlayers * 22;
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
