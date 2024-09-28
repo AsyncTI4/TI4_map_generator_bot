@@ -2,10 +2,12 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -170,8 +172,10 @@ public class CombatModHelper {
                     new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().get(0).getMessage()));
             }
         }
+        Set<NamedCombatModifierModel> set = new HashSet<>(modifiers);
+        List<NamedCombatModifierModel> uniqueList = new ArrayList<>(set);
 
-        return modifiers;
+        return uniqueList;
     }
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,
