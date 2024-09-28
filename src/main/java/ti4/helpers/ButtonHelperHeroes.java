@@ -214,7 +214,7 @@ public class ButtonHelperHeroes {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's planet you want to exhaust or ready",
+            player.getRepresentation(true, true) + " tell the bot whose planet you want to exhaust or ready",
             buttons);
     }
 

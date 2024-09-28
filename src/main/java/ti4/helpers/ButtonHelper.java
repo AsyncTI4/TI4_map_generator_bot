@@ -620,7 +620,7 @@ public class ButtonHelper {
 
     public static void resolveTACheck(Game game, Player player, GenericInteractionCreateEvent event) {
         for (Player p2 : game.getRealPlayers()) {
-            if (p2.getFaction().equalsIgnoreCase(player.getFaction())) {
+            if (p2.getFaction().equalsIgnoreCase(player.getFaction()) || player.getAllianceMembers().contains((p2.getFaction()))) {
                 continue;
             }
             if (p2.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
@@ -628,7 +628,7 @@ public class ButtonHelper {
                 buttons.add(Buttons.green("useTA_" + player.getColor(), "Use TA"));
                 buttons.add(Buttons.red("deleteButtons", "Decline to use TA"));
                 String message = p2.getRepresentation(true, true)
-                    + " a player who's TA you hold has refreshed their comms, would you like to play the TA?";
+                    + " a player whose TA you hold has refreshed their comms, would you like to play the TA?";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, buttons);
             }
         }
