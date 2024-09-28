@@ -365,6 +365,7 @@ public class MiltyDraftHelper {
     // TODO (Jazz): add map template
     public static List<MiltyDraftSlice> parseSlicesFromString(String sliceString, List<ComponentSource> allowedSources) {
         try {
+            sliceString = sliceString.replace("|", ";");
             MiltyDraftManager manager = new MiltyDraftManager();
             manager.init(allowedSources);
             manager.loadSlicesFromString(sliceString);
