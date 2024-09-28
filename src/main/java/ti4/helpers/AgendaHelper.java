@@ -15,6 +15,12 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -28,11 +34,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -508,10 +509,10 @@ public class AgendaHelper {
                         for (Player player2 : getPlayersWithLeastPoints(game)) {
                             if (game.isFowMode()) {
                                 buttons.add(Buttons.green("colonialRedTarget_" + player2.getFaction() + "_" + winner,
-                                        player2.getColor()));
+                                    player2.getColor()));
                             } else {
                                 buttons.add(Buttons.green("colonialRedTarget_" + player2.getFaction() + "_" + winner,
-                                        player2.getFaction()));
+                                    player2.getFaction()));
                             }
                         }
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -2407,7 +2408,7 @@ public class AgendaHelper {
                         }
                         if (specificVote.contains("Diplomacy Rider")) {
                             String message = identity
-                                + " You have a Diplomacy Rider to resolve. Click the name of the planet who's system you wish to Diplo";
+                                + " You have a Diplomacy Rider to resolve. Click the name of the planet whose system you wish to Diplo";
                             List<Button> buttons = Helper.getPlanetSystemDiploButtons(winningR, game, true,
                                 null);
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
@@ -3054,6 +3055,10 @@ public class AgendaHelper {
             + " vote" + (votes.equals("1") ? "" : "s") + ". You may confirm this or you may modify this number if the bot missed something.";
         if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
             msg = msg + " Any Blood Pact Votes will be automatically added";
+        }
+        boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
+        if (prevoting) {
+            game.setStoredValue("preVoting" + player.getFaction(), votes);
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_" + votes,

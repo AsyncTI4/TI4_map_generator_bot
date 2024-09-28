@@ -99,7 +99,7 @@ public class SearchMyGames extends SearchSubcommandData {
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(playerAverageMapTurnLength(player)).append("`]");
         if (game.getWinner().filter(winner -> winner.getUserID().equals(player.getUserID())).isPresent()) sb.append(" **👑WINNER👑**");
         if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
-        if (showSecondaries) {
+        if (showSecondaries && !game.isHasEnded()) {
             List<String> secondaries = new ArrayList<>();
             for (int sc : game.getPlayedSCs()) {
                 if (!player.hasFollowedSC(sc) && !player.getSCs().contains(sc)) {

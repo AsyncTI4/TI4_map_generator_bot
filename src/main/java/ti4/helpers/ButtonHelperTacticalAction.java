@@ -201,9 +201,9 @@ public class ButtonHelperTacticalAction {
                 }
             }
             String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove, tile);
-            List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game,                game.getTileByPosition(pos), remove);
+            List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), remove);
             event.getMessage().editMessage(message)
-                            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
             return;
         }
         int amount = Integer.parseInt(rest.charAt(0) + "");
@@ -265,7 +265,7 @@ public class ButtonHelperTacticalAction {
             game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
         }
         String message = ButtonHelper.buildMessageFromDisplacedUnits(game, false, player, remove, tile);
-        List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game,            game.getTileByPosition(pos), remove);
+        List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), remove);
         event.getMessage().editMessage(message)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -352,7 +352,7 @@ public class ButtonHelperTacticalAction {
                 + "Reminder that you have Prophecy of Ixth and should produce 2 " + Emojis.fighter + " if you want to keep it. Its removal is not automated.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game));
+            message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -498,7 +498,7 @@ public class ButtonHelperTacticalAction {
     public static void selectTileToMoveFrom(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String pos = buttonID.replace("tacticalMoveFrom_", "");
-        List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game,            game.getTileByPosition(pos), "Move");
+        List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), "Move");
         game.resetCurrentMovedUnitsFrom1System();
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Chose to move from "
             + game.getTileByPosition(pos).getRepresentationForButtons(game, player)

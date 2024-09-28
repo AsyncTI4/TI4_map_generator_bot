@@ -79,7 +79,7 @@ public class TIGLHelper {
             if (roles.isEmpty()) {
                 return null;
             }
-            return roles.getFirst();
+            return roles.get(0);
         }
 
         public TIGLRank getNextRank() {
@@ -218,7 +218,7 @@ public class TIGLHelper {
         if (ranks.isEmpty()) {
             return TIGLRank.UNRANKED;
         }
-        return ranks.getLast();
+        return ranks.get(ranks.size() - 1);
     }
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
@@ -290,7 +290,7 @@ public class TIGLHelper {
         } else if (channels.size() > 1) {
             BotLogger.log("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
         }
-        return channels.getFirst();
+        return channels.get(0);
     }
 
     private static ThreadChannel getTIGLAdminThread() {

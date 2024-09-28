@@ -628,7 +628,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's planet you want to uprise",
+            player.getRepresentation(true, true) + " tell the bot whose planet you want to uprise",
             buttons);
     }
 
@@ -671,7 +671,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's CC you want to place down",
+            player.getRepresentation(true, true) + " tell the bot whose CC you want to place down",
             buttons);
     }
 
@@ -716,7 +716,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's planet you want to Plague.",
+            player.getRepresentation(true, true) + " tell the bot whose planet you want to Plague.",
             buttons);
     }
 
@@ -763,7 +763,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's fighters you want to hit",
+            player.getRepresentation(true, true) + " tell the bot whose fighters you want to hit",
             buttons);
     }
 
@@ -822,7 +822,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's planet you want to cripple",
+            player.getRepresentation(true, true) + " tell the bot whose planet you want to cripple",
             buttons);
     }
 
@@ -844,7 +844,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's planet you are infiltrating",
+            player.getRepresentation(true, true) + " tell the bot whose planet you are infiltrating",
             buttons);
     }
 
@@ -964,7 +964,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's planet you want to Unstable Planet",
+            player.getRepresentation(true, true) + " tell the bot whose planet you want to Unstable Planet",
             buttons);
     }
 
@@ -985,7 +985,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who's cultural planets you want to exhaust",
+            player.getRepresentation(true, true) + " tell the bot whose cultural planets you want to exhaust",
             buttons);
     }
 
@@ -1811,12 +1811,13 @@ public class ButtonHelperActionCards {
 
     public static void focusedResearch(Game game, Player player, String buttonID,
         ButtonInteractionEvent event) {
-        if (player.getTg() < 4) {
+        if (player.getTg() < 4 && (!player.hasUnexhaustedLeader("keleresagent") || player.getCommodities() < 1)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "You did not have 4tgs and thus cannot resolve focused research");
             return;
         } else {
+            int oldTg = player.getTg();
             player.setTg(player.getTg() - 4);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " has spent 4tg (" + (player.getTg() + 4) + " ->" + player.getTg() + ") on focused research");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " has spent 4tg (" + oldTg + " ->" + player.getTg() + ") on focused research");
         }
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
