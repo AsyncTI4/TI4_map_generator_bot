@@ -1039,7 +1039,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             message.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game));
+            message3 + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons2);
         ButtonHelper.deleteMessage(event);
     }
@@ -2084,7 +2084,7 @@ public class ButtonHelperHeroes {
         if (game.getTileByPosition("tl").getTileID().equalsIgnoreCase("82a")) {
             buttons.add(Buttons.green("yinHeroPlanet_lockedmallice", "Invade Mallice"));
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),            "Use buttons to select which player owns the planet you want to land on", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which player owns the planet you want to land on", buttons);
     }
 
     public static void yinHeroTarget(ButtonInteractionEvent event, String buttonID, Game game, String finsFactionCheckerPrefix) {
