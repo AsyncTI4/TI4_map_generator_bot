@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -3458,6 +3458,20 @@ public class Game extends GameProperties {
 
         // check if player has any allainces with players that have the commander
         // unlocked
+        if (player.hasAbility("imperia")) {
+            for (Player otherPlayer : getRealPlayers()) {
+                if (otherPlayer.equals(player))
+                    continue;
+                if (player.getMahactCC().contains(otherPlayer.getColor())) {
+
+                    if (otherPlayer.hasLeaderUnlocked(leaderID)) {
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
+                            return leaderID.contains(otherPlayer.getFaction());
+                        }
+                    }
+                }
+            }
+        }
 
         if (leaderIsFake(leaderID)) {
             return false;

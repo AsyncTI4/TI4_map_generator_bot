@@ -1984,10 +1984,10 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.replace("genericRemove_", "");
             game.resetCurrentMovedUnitsFrom1System();
             game.resetCurrentMovedUnitsFrom1TacticalAction();
-            List<Button> systemButtons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game,                game.getTileByPosition(pos), "Remove");
+            List<Button> systemButtons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), "Remove");
             game.resetCurrentMovedUnitsFrom1System();
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Chose to remove units from "                + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),                "Use buttons to select the units you want to remove.", systemButtons);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Chose to remove units from " + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the units you want to remove.", systemButtons);
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("tacticalMoveFrom_")) {
             ButtonHelperTacticalAction.selectTileToMoveFrom(player, game, event, buttonID);
@@ -2992,7 +2992,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "spyNetYssarilChooses" -> ButtonHelperFactionSpecific.resolveSpyNetYssarilChooses(player, game, event);
                 case "spyNetPlayerChooses" -> ButtonHelperFactionSpecific.resolveSpyNetPlayerChooses(player, game, event);
                 case "diploSystem" -> {
-                    String message = trueIdentity + " Click the name of the planet who's system you wish to diplo";
+                    String message = trueIdentity + " Click the name of the planet whose system you wish to diplo";
                     List<Button> buttons = Helper.getPlanetSystemDiploButtons(player, game, false, null);
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", buttons);
                 }
