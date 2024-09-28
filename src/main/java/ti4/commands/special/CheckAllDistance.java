@@ -69,7 +69,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Something broke. Ping jazz");
         }
         if (!game.isFowMode()) {
-            sb.append("Map String: `").append(Helper.getMapString(game)).append("`").append("\n");
+            sb.append("Map String: `").append(game.getMapString()).append("`").append("\n");
         } else {
             sb.append("Map String: Cannot show map string for private games").append("\n");
         }

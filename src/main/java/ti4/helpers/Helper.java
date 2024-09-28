@@ -2186,60 +2186,6 @@ public class Helper {
         }
     }
 
-    /**
-     * @param game : ti4.map.Map object
-     * @return String : TTS/TTPG Map String
-     */
-    public static String getMapString(Game game) {
-        List<String> tilePositions = new ArrayList<>();
-        tilePositions.add("000");
-
-        int ringCountMax = game.getRingCount();
-        int ringCount = 1;
-        int tileCount = 1;
-        while (ringCount <= ringCountMax) {
-            String position = "" + ringCount + (tileCount < 10 ? "0" + tileCount : tileCount);
-            tilePositions.add(position);
-            tileCount++;
-            if (tileCount > ringCount * 6) {
-                tileCount = 1;
-                ringCount++;
-            }
-        }
-
-        List<String> sortedTilePositions = tilePositions.stream().sorted(Comparator.comparingInt(Integer::parseInt))
-            .toList();
-        Map<String, Tile> tileMap = new HashMap<>(game.getTileMap());
-        StringBuilder sb = new StringBuilder();
-        for (String position : sortedTilePositions) {
-            boolean missingTile = true;
-            for (Tile tile : tileMap.values()) {
-                if (tile.getPosition().equals(position)) {
-                    String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
-                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) { // Mecatol Rex in Centre
-                                                                                             // Position
-                        sb.append("{18}");
-                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) { // Something else
-                                                                                                     // is in the Centre
-                                                                                                     // Position
-                        sb.append("{").append(tileID).append("}");
-                    } else {
-                        sb.append(tileID);
-                    }
-                    missingTile = false;
-                    break;
-                }
-            }
-            if (missingTile && "000".equalsIgnoreCase(position)) {
-                sb.append("{-1}");
-            } else if (missingTile) {
-                sb.append("-1");
-            }
-            sb.append(" ");
-        }
-        return sb.toString().trim();
-    }
-
     public static Integer getPlayerResourcesAvailable(Player player, Game game) {
         if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
             return null;
@@ -2861,8 +2807,8 @@ public class Helper {
             buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                game.getPing() + " it seems like " + ButtonHelper.getIdentOrColor(player, game)
-                    + " has won the game. Press the end game button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
+                "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
+                    + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
                 List<Button> titleButton = new ArrayList<>();
