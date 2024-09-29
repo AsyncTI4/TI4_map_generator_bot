@@ -332,6 +332,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         newGame.setUndoButtonOffered(true);
         ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
+        Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
+        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to set up a Milty Draft?", miltyButton);
+
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
         buttons2.add(Buttons.red("deleteButtons", "No Homebrew"));
