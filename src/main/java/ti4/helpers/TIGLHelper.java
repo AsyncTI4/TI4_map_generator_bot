@@ -30,24 +30,33 @@ public class TIGLHelper {
         COMMANDER("Async Rank - Commander", 3), //
         HERO("Async Rank - Hero", 4), //
         EMPEROR("Async Rank - Galactic Emperor", 5), //
-        HERO_LETNEV("Async Rank - Darktalon Treilla", -1), //
-        HERO_WINNU("Async Rank - Mathis Mathinus", -1), //
-        HERO_SARDAKK("Async Rank - Sh'val, Harbinger", -1), //
-        HERO_JOLNAR("Async Rank - Rin, The Master's Legacy", -1), //
-        HERO_MAHACT("Async Rank - Airo Shir Aur", -1), //
-        HERO_EMPYREAN("Async Rank - Conservator Procyon", -1), //
-        HERO_NAALU("Async Rank - The Oracle", -1), //
-        HERO_MUAAT("Async Rank - Adjudicator Ba'al", -1), //
-        HERO_NOMAD("Async Rank - Ahk-Syl Siven", -1), //
-        HERO_NEKRO("Async Rank - UNIT.DSGN.FLAYESH", -1), //
-        HERO_SOL("Async Rank - Jace X, 4th Air Legion", -1), //
-        HERO_ARGENT("Async Rank - Mirik Aun Sissiri", -1), //
-        HERO_NAAZ("Async Rank - Hesh and Prit", -1), //
         HERO_ARBOREC("Async Rank - Letani Miasmiala", -1), //
-        HERO_YIN("Async Rank - Dannel of the Tenth", -1), //
-        HERO_KELERESX("Async Rank - Odlynn Myrr", -1), //
+        HERO_ARGENT("Async Rank - Mirik Aun Sissiri", -1), //
+        HERO_CABAL("Async Rank - It Feeds on Carrion", -1), //
+        HERO_EMPYREAN("Async Rank - Conservator Procyon", -1), //
+        HERO_GHOST("Async Rank - Riftwalker Meian", -1), //
+        HERO_HACAN("Async Rank - Harrugh Gefhara", -1), //
+        HERO_JOLNAR("Async Rank - Rin, The Master's Legacy", -1), //
+        HERO_KELERESA("Async Rank - Kuuasi Aun Jalatai", -1), //
         HERO_KELERESM("Async Rank - Harka Leeds", -1), //
-        HERO_YSSARIL("Async Rank - Kyver, Blade and Key", -1); //
+        HERO_KELERESX("Async Rank - Odlynn Myrr", -1), //
+        HERO_L1Z1X("Async Rank - The Helmsman", -1), //
+        HERO_LETNEV("Async Rank - Darktalon Treilla", -1), //
+        HERO_MAHACT("Async Rank - Airo Shir Aur", -1), //
+        HERO_MENTAK("Async Rank - Ipswitch, Loose Cannon", -1), //
+        HERO_MUAAT("Async Rank - Adjudicator Ba'al", -1), //
+        HERO_NAALU("Async Rank - The Oracle", -1), //
+        HERO_NAAZ("Async Rank - Hesh and Prit", -1), //
+        HERO_NEKRO("Async Rank - UNIT.DSGN.FLAYESH", -1), //
+        HERO_NOMAD("Async Rank - Ahk-Syl Siven", -1), //
+        HERO_SAAR("Async Rank - Gurno Aggero", -1), //
+        HERO_SARDAKK("Async Rank - Sh'val, Harbinger", -1), //
+        HERO_SOL("Async Rank - Jace X, 4th Air Legion", -1), //
+        HERO_TITANS("Async Rank - Ul the Progenitor", -1), //
+        HERO_WINNU("Async Rank - Mathis Mathinus", -1), //
+        HERO_XXCHA("Async Rank - Xxekir Grom", -1),//
+        HERO_YIN("Async Rank - Dannel of the Tenth", -1), //
+        HERO_YSSARIL("Async Rank - Kyver, Blade and Key", -1);
 
         private final String name;
         private final Integer index;
