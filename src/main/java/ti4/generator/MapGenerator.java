@@ -203,7 +203,7 @@ public class MapGenerator {
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * 22;
+        playerY += unrealPlayers * 26;
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
@@ -6435,12 +6435,14 @@ public class MapGenerator {
     }
 
     /**
+     * @deprecated use {@link MapGenerator#superDrawString()} instead
      * Draw a String centered in the middle of a Rectangle.
-     *
+     * 
      * @param g The Graphics instance.
      * @param text The String to draw.
      * @param rect The Rectangle to center the text in.
      */
+    @Deprecated
     public static void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
         // Get the FontMetrics
         FontMetrics metrics = g.getFontMetrics(font);
