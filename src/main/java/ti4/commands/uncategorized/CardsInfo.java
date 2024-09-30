@@ -25,6 +25,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class CardsInfo implements Command, InfoThreadCommand {
@@ -327,8 +328,17 @@ public class CardsInfo implements Command, InfoThreadCommand {
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
 
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            "You may use these buttons to do various things.", buttons);
+        String message = "You may use these buttons to do various things:";
+
+        // Refresh the various buttons if they're the last message in the thread
+        player.getCardsInfoThread().retrieveMessageById(player.getCardsInfoThread().getLatestMessageId()).queue(
+            msg -> {
+                if (msg != null && message.equals(msg.getContentRaw())) {
+                    msg.delete().queue();
+                }
+            }, BotLogger::catchRestError);
+
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
     protected String getActionDescription() {
@@ -341,10 +351,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getActionID(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY,
-                    "Long promissory display, y or yes to show full promissory text").setRequired(false))
-                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO,
-                    "Set TRUE to get card info as direct message also").setRequired(false)));
+                .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false)));
     }
 
 }
