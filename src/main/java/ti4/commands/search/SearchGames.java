@@ -67,7 +67,7 @@ public class SearchGames extends SearchSubcommandData {
         List<Entry<String, Game>> dSGames = mapList.entrySet().stream().filter(map -> map.getValue().isDiscordantStarsMode()).toList();
         List<Entry<String, Game>> frankenGames = mapList.entrySet().stream().filter(map -> map.getValue().isFrankenGame()).toList();
         List<Entry<String, Game>> endedGames = mapList.entrySet().stream().filter(map -> map.getValue().isHasEnded()).toList();
-        List<Entry<String, Game>> searchNameGames = mapList.entrySet().stream().filter(map -> map.getValue().getName().toLowerCase().contains(searchName)).toList();
+        List<Entry<String, Game>> searchNameGames = mapList.entrySet().stream().filter(map -> map.getValue().getCustomName().toLowerCase().contains(searchName)).toList();
         List<Entry<String, Game>> searchTagGames = mapList.entrySet().stream().filter(map -> map.getValue().getGameModesText().toLowerCase().contains(searchTags)).toList();
         List<Entry<String, Game>> searchFactionGames = mapList.entrySet().stream().filter(map -> map.getValue().getRealAndEliminatedPlayers().stream().map(p -> p.getFaction().toLowerCase()).anyMatch(s -> s.contains(searchFactions))).toList();
         List<Entry<String, Game>> searchUserGames = mapList.entrySet().stream().filter(map -> map.getValue().hasUser(searchUser)).toList();
