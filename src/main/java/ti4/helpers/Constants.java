@@ -895,6 +895,7 @@ public class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+    public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
 
     //DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
