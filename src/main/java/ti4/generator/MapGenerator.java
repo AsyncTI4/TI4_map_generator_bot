@@ -66,6 +66,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
+import ti4.commands.fow.ShowGameAsPlayer;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -388,7 +389,9 @@ public class MapGenerator {
         if (debug)
             debugStartTime = System.nanoTime();
         if (game.isFowMode() && event != null) {
-            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
+            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) 
+                || event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper) {
+
                 isFoWPrivate = true;
                 Player player = getFowPlayer(event);
 

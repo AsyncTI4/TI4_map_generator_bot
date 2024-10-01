@@ -93,6 +93,7 @@ public class FOWCommand implements Command {
         subcommands.add(new Whisper());
         subcommands.add(new Announce());
         subcommands.add(new FOWOptions());
+        subcommands.add(new ShowGameAsPlayer());
         return subcommands;
     }
 
