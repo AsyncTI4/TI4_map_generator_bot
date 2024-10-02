@@ -66,6 +66,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
+import ti4.commands.fow.ShowGameAsPlayer;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -79,6 +80,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.StringHelper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.WebHelper;
@@ -112,6 +114,7 @@ public class MapGenerator {
     public static final int TILE_PADDING = 100;
     private static final int EXTRA_X = 300;
     private static final int EXTRA_Y = 200;
+    public static final int SPACING_BETWEEN_OBJECTIVE_TYPES = 10;
     private static final Point tilePositionPoint = new Point(255, 295);
     private static final Point labelPositionPoint = new Point(90, 295);
     private static final Point numberPositionPoint = new Point(40, 27);
@@ -183,9 +186,9 @@ public class MapGenerator {
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         if (bufferedImage != null)
-            scoreTokenWidth = bufferedImage.getWidth();
+            scoreTokenWidth = bufferedImage.getWidth() + 6;
         else
-            scoreTokenWidth = 14;
+            scoreTokenWidth = 30;
 
         int stage1 = game.getRevealedPublicObjectives().keySet().stream()
             .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
@@ -201,22 +204,22 @@ public class MapGenerator {
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
         int playerY = playerCountForMap * 340;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * 20;
+        playerY += unrealPlayers * 26;
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
                 playerY -= 190;
+            } else if (player.getSecretsScored().size() == 4) {
+                playerY += 23;
             } else if (player.getSecretsScored().size() > 4) {
-                playerY += (player.getSecretsScored().size() - 4) * 43;
+                playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
             }
         }
 
         int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
         int heightStats = playerY + lawsY + objectivesY + 600;
 
-        int ringCount = game.getRingCount();
-        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-        int mapHeight = (ringCount + 1) * 600 + EXTRA_Y * 2;
-        mapWidth = (ringCount + 1) * 520 + EXTRA_X * 2;
+        int mapHeight = getMapHeight(game);
+        mapWidth = getMapWidth(game);
         extraRow = (mapHeight - EXTRA_Y) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
         if (extraRow) {
             mapWidth += EXTRA_X;
@@ -386,7 +389,9 @@ public class MapGenerator {
         if (debug)
             debugStartTime = System.nanoTime();
         if (game.isFowMode() && event != null) {
-            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
+            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) 
+                || event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper) {
+
                 isFoWPrivate = true;
                 Player player = getFowPlayer(event);
 
@@ -408,6 +413,10 @@ public class MapGenerator {
         }
         if (debug)
             debugFowTime = System.nanoTime() - debugStartTime;
+    }
+
+    public boolean shouldConvertToGeneric(Player player) {
+        return isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
     }
 
     private void logDebug(GenericInteractionCreateEvent event) {
@@ -537,14 +546,14 @@ public class MapGenerator {
         return getPlayerFactionIconImageScaled(player, 95, 95);
     }
 
-    private static BufferedImage getPlayerFactionIconImageScaled(Player player, float scale) {
+    public static BufferedImage getPlayerFactionIconImageScaled(Player player, float scale) {
         int scaledWidth = (int) (95 * scale);
         int scaledHeight = (int) (95 * scale);
         return getPlayerFactionIconImageScaled(player, scaledWidth, scaledHeight);
     }
 
     @Nullable
-    private static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
+    public static BufferedImage getPlayerFactionIconImageScaled(Player player, int width, int height) {
         if (player == null)
             return null;
         Emoji factionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
@@ -609,6 +618,11 @@ public class MapGenerator {
             name = player.getDisplayName().toUpperCase();
         }
         superDrawString(bannerG, name, 29, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
+        int mod = 0;
+        if (player.getInitiative() > 9) {
+            mod = 13;
+        }
+        superDrawString(bannerG, "#" + player.getInitiative(), 300 - mod, 44, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
         String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
@@ -703,6 +717,12 @@ public class MapGenerator {
         int deltaY = -150;
         if (game.isCompetitiveTIGLGame()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_TIGL.png");
+            TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
+            if (rank != null) {
+                graphics.setFont(Storage.getFont18());
+                superDrawString(graphics, rank.getShortName(), x + deltaX + 50, y + deltaY + 75, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Top, stroke2, Color.BLACK);
+                graphics.setFont(Storage.getFont32());
+            }
             deltaX += 100;
         }
         if (game.isAbsolMode()) {
@@ -1079,7 +1099,7 @@ public class MapGenerator {
                 y += 200;
 
                 // Secret Objectives
-                int soCount = objectivesSO(yPlayArea + 165, player);
+                int soCount = objectivesSO(yPlayArea + 170, player);
 
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
@@ -1133,6 +1153,9 @@ public class MapGenerator {
                 }
 
                 g2.setColor(color);
+                if (soCount >= 4) {
+                    y += 23;
+                }
                 if (soCount > 4) {
                     y += (soCount - 4) * 43;
                 }
@@ -1673,7 +1696,7 @@ public class MapGenerator {
         drawControlToken(graphics, controlToken, p, x, y, hideFactionIcon, scale);
     }
 
-    private static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, boolean hideFactionIcon, float scale) {
+    public static void drawControlToken(Graphics graphics, BufferedImage bottomTokenImage, Player player, int x, int y, boolean hideFactionIcon, float scale) {
         graphics.drawImage(bottomTokenImage, x, y, null);
 
         if (hideFactionIcon)
@@ -1808,9 +1831,12 @@ public class MapGenerator {
         UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
         if (reinforcementsPosition != null && playerColor != null) {
             int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
+            if (!game.getStoredValue("ccLimit").isEmpty()) {
+                positionCount = Integer.parseInt(game.getStoredValue("ccLimit"));
+            }
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {
-                for (int i = 0; i < remainingReinforcements; i++) {
+                for (int i = 0; i < remainingReinforcements && i < 16; i++) {
                     try {
                         String ccID = Mapper.getCCID(playerColor);
                         Point position = reinforcementsPosition.getPosition(CC_TAG);
@@ -2751,9 +2777,12 @@ public class MapGenerator {
      * @param outlineColor
      */
     private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign horizontalAlignment, VerticalAlign verticalAlignment, Stroke outlineSize, Color outlineColor) {
+        boolean debugPosition = false;
         if (txt == null) return;
+        if (debugPosition) drawCrosshair(g, x, y); // debug
+
+        int width = g.getFontMetrics().stringWidth(txt);
         if (horizontalAlignment != null) {
-            double width = g.getFontMetrics().stringWidth(txt);
             switch (horizontalAlignment) {
                 case Center -> x -= width / 2.0;
                 case Right -> x -= width;
@@ -2761,8 +2790,9 @@ public class MapGenerator {
                 }
             }
         }
+
+        int height = g.getFontMetrics().getAscent() - g.getFontMetrics().getDescent();
         if (verticalAlignment != null) {
-            double height = g.getFontMetrics().getStringBounds(txt, g).getHeight();
             switch (verticalAlignment) {
                 case Center -> y += height / 2.0;
                 case Top -> y += height;
@@ -2770,11 +2800,13 @@ public class MapGenerator {
                 }
             }
         }
+
         if (outlineSize == null) outlineSize = stroke2;
         if (outlineColor == null && textColor == null) {
             outlineColor = Color.BLACK;
             textColor = Color.WHITE;
         }
+        if (debugPosition) g.drawRect(x, y - height, width, height); // debug
         if (outlineSize == null || outlineColor == null) {
             g.drawString(txt, x, y);
         } else {
@@ -4055,58 +4087,30 @@ public class MapGenerator {
     private int drawObjectives(int y) {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke3);
-        Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(game.getScoredPublicObjectives());
-        Map<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(game.getRevealedPublicObjectives());
-        Map<String, Player> players = game.getPlayers();
-
         graphics.setFont(Storage.getFont26());
 
-        int spacingBetweenObjectiveTypes = 10;
-        int maxObjWidth = (mapWidth - spacingBetweenObjectiveTypes * 4) / 3;
-        int maxYFound = 0;
-
         int top = y;
-        int left = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
-        int boxWidth = 0;
-        // STAGE 1
-        Map<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
-        Set<String> po1 = publicObjectivesState1.keySet();
-        graphics.setColor(Stage1RevealedColor);
-        Coord coord = coord(left, y);
-        coord = displayObjectives(top, coord.x, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, null);
-        boxWidth = coord.x;
-        graphics.setColor(Stage1HiddenColor);
-        int y1b = displayUnrevealedObjectives(coord.y, left, boxWidth, game.getPublicObjectives1Peakable(), 1, game);
-        maxYFound = Math.max(maxYFound, y1b);
+        int x = 5 + (displayType == DisplayType.landscape ? mapWidth : 0);
+        int maxY = y;
 
-        // STAGE 2
-        Map<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
-        Set<String> po2 = publicObjectivesState2.keySet();
-        left += coord.x + spacingBetweenObjectiveTypes;
-        coord = coord(left, top);
-        graphics.setColor(Stage2RevealedColor);
-        coord = displayObjectives(top, left, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, null);
-        boxWidth = coord.x;
-        graphics.setColor(Stage2HiddenColor);
-        int y2b = displayUnrevealedObjectives(coord.y, left, boxWidth, game.getPublicObjectives2Peakable(), 2, game);
-        maxYFound = Math.max(maxYFound, y2b);
+        List<Objective> objectives = Objective.retrieve(game);
+        int maxTextWidth = ObjectiveBox.GetMaxTextWidth(game, graphics, objectives);
+        int boxWidth = ObjectiveBox.GetBoxWidth(game, maxTextWidth, scoreTokenWidth);
+        Objective.Type lastType = Objective.Type.Stage1;
 
-        // CUSTOM
-        Map<String, Integer> customPublicVP = game.getCustomPublicVP();
-        Map<String, String> customPublics = customPublicVP.keySet().stream()
-            .collect(Collectors.toMap(key -> key, name -> {
-                name = name.replace("extra1", "");
-                name = name.replace("extra2", "");
-                String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
-                return nameOfPO != null ? nameOfPO : name;
-            }, (key1, key2) -> key1, LinkedHashMap::new));
-        Set<String> customVP = customPublicVP.keySet();
-        left += coord.x + spacingBetweenObjectiveTypes;
-        coord = coord(left, top);
-        graphics.setColor(Color.WHITE);
-        coord = displayObjectives(top, coord.x, maxObjWidth, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, customPublicVP);
-        maxYFound = Math.max(maxYFound, coord.y) + 15;
-        return maxYFound;
+        for (Objective objective : objectives) {
+            if (objective.type() != lastType) {
+                x += boxWidth + SPACING_BETWEEN_OBJECTIVE_TYPES;
+                maxY = Math.max(y, maxY);
+                y = top;
+                lastType = objective.type();
+            }
+            ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenWidth);
+            box.Display(game, graphics, this, objective);
+            y += ObjectiveBox.GetVerticalSpacing();
+        }
+
+        return maxY + 15;
     }
 
     private int laws(int y) {
@@ -4338,80 +4342,6 @@ public class MapGenerator {
         return secretsScored.keySet().size();
     }
 
-    private Coord displayObjectives(
-        int y,
-        int x,
-        int maximumBoxWidth,
-        Map<String, List<String>> scoredObjectives,
-        Map<String, Integer> revealedObjectives,
-        Map<String, Player> players,
-        Map<String, String> publicObjectivesState,
-        Set<String> po,
-        Integer objectiveWorth,
-        Map<String, Integer> customPublicVP) {
-
-        Set<String> keysToRemove = new HashSet<>();
-        int objectiveBoxHeight = 38;
-        int spacingBetweenBoxes = 5;
-        int bufferBetweenTextAndTokens = 15;
-        int playerCount = players.size();
-        int minimumBoxWidth = 400;
-        if (game.isRedTapeMode()) { //TODO: move and handle method displayUnrevealedObjectives into this method and calc boxWidth properly
-            minimumBoxWidth += 400;
-        }
-
-        int maxTextWidth = 0;
-
-        // BUILD KEY / TEXT PAIRS & CALC LONGEST STRING
-        Map<String, String> objectivesKeyDisplayName = new LinkedHashMap<>();
-        for (Map.Entry<String, Integer> revealed : revealedObjectives.entrySet()) {
-            String key = revealed.getKey();
-            if (!po.contains(key)) {
-                continue;
-            }
-            String name = publicObjectivesState.get(key);
-            Integer index = revealedObjectives.get(key);
-            if (index == null) {
-                continue;
-            }
-            keysToRemove.add(key);
-            if (customPublicVP != null) {
-                objectiveWorth = customPublicVP.get(key);
-                if (objectiveWorth == null) {
-                    objectiveWorth = 1;
-                }
-            }
-            String text = "(" + index + ") " + name + " - " + objectiveWorth + " VP";
-            int textWidth = graphics.getFontMetrics().stringWidth(text);
-            maxTextWidth = Math.max(maxTextWidth, textWidth);
-            objectivesKeyDisplayName.put(key, text);
-        }
-
-        int maxLengthOfAllTokens = maxTextWidth + bufferBetweenTextAndTokens * 2 + playerCount * scoreTokenWidth;
-        int boxWidth = Math.max(minimumBoxWidth, Math.min(maximumBoxWidth, maxLengthOfAllTokens));
-
-        // DRAW STRINGS & BOXES
-        for (Map.Entry<String, String> revealed : objectivesKeyDisplayName.entrySet()) {
-            String key = revealed.getKey();
-            String text = revealed.getValue();
-            graphics.drawString(text, x, y + 23);
-
-            List<String> scoredPlayerID = scoredObjectives.get(key);
-            boolean multiScoring = Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || (isFoWPrivate != null && isFoWPrivate);
-            if (scoredPlayerID != null) {
-                int tokenX = x + maxTextWidth + bufferBetweenTextAndTokens;
-                int tokenY = y;
-                drawScoreControlMarkers(tokenX, tokenY, players, scoredPlayerID, multiScoring);
-            }
-            graphics.drawRect(x - 4, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
-
-            y += objectiveBoxHeight + spacingBetweenBoxes;
-        }
-        keysToRemove.forEach(revealedObjectives::remove);
-
-        return coord(boxWidth, y);
-    }
-
     private int displaySecretObjectives(
         int y,
         int x,
@@ -4457,97 +4387,6 @@ public class MapGenerator {
         keysToRemove.forEach(revealedPublicObjectives::remove);
 
         return y;
-    }
-
-    private int displayUnrevealedObjectives(
-        int y,
-        int x,
-        int boxWidth,
-        List<String> unrevealedPublicObjectives,
-        Integer objectiveWorth,
-        Game game) {
-
-        Integer index = 1;
-
-        for (String unRevealed : unrevealedPublicObjectives) {
-
-            String name = Mapper.getPublicObjective(unRevealed).getName();
-
-            if (game.isRedTapeMode()) {
-                graphics.drawString(String.format("(%d) <Unrevealed> %s - %d VP", index, name, objectiveWorth), x, y + 23);
-            } else {
-                graphics.drawString(String.format("(%d) <Unrevealed> - %d VP", index, objectiveWorth), x, y + 23);
-            }
-
-            graphics.drawRect(x - 4, y - 5, boxWidth, 38);
-
-            if (game.getPublicObjectives1Peeked().containsKey(unRevealed) || game.getPublicObjectives2Peeked().containsKey(unRevealed)) {
-                List<String> playerIDs;
-                if (game.getPublicObjectives1Peeked().containsKey(unRevealed)) {
-                    playerIDs = game.getPublicObjectives1Peeked().get(unRevealed);
-                } else {
-                    playerIDs = game.getPublicObjectives2Peeked().get(unRevealed);
-                }
-                drawPeekedMarkers(x + 515, y, game.getPlayers(), playerIDs);
-            }
-
-            y += 43;
-            index++;
-        }
-        return y;
-    }
-
-    private void drawPeekedMarkers(int x, int y, Map<String, Player> players, List<String> peekedPlayerID) {
-        try {
-            int tempX = 0;
-
-            for (Map.Entry<String, Player> playerEntry : players.entrySet()) {
-                Player player = playerEntry.getValue();
-                String userID = player.getUserID();
-
-                if (peekedPlayerID.contains(userID)) {
-                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
-                    String ccColor = convertToGeneric ? "gray" : player.getColor();
-                    String controlID = Mapper.getControlID(ccColor);
-
-                    if (controlID.contains("null")) {
-                        continue;
-                    }
-
-                    float scale = 0.55f;
-
-                    BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
-                    if (controlTokenImage == null)
-                        return;
-
-                    String peekID = "peek" + getBlackWhiteFileSuffix(Mapper.getColorID(ccColor));
-                    BufferedImage peekMarkerImage = ImageHelper.readScaled(Mapper.getPeekMarkerPath(peekID), scale);
-                    if (peekMarkerImage == null)
-                        return;
-
-                    drawControlToken(graphics, controlTokenImage, player, x + tempX, y, true, scale);
-
-                    int centreCustomTokenHorizontally = controlTokenImage.getWidth() / 2 - peekMarkerImage.getWidth() / 2;
-                    int centreCustomTokenVertically = controlTokenImage.getHeight() / 2 - peekMarkerImage.getHeight() / 2;
-
-                    graphics.drawImage(peekMarkerImage, x + centreCustomTokenHorizontally + tempX, y + centreCustomTokenVertically, null);
-                }
-
-                // This needs to be updated regardless if the player peeked or not to maintain marker alignment with PO score markers.
-                tempX += scoreTokenWidth;
-            }
-        } catch (Exception e) {
-            BotLogger.log("Could not draw peek markers", e);
-        }
-    }
-
-    private void drawScoreControlMarkers(
-        int x,
-        int y,
-        Map<String, Player> players,
-        List<String> scoredPlayerID,
-        boolean multiScoring) {
-        drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, false);
     }
 
     private void drawScoreControlMarkers(
@@ -5019,7 +4858,7 @@ public class MapGenerator {
                 }
                 Integer distance = game.getTileDistances().get(tile.getPosition());
                 if (distance == null) {
-                    break;
+                    distance = 100;
                 }
 
                 BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
@@ -5029,14 +4868,14 @@ public class MapGenerator {
 
                 int x = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
                 int y = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
-
-                BufferedImage distanceColor = ImageHelper
-                    .read(ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
-                tileGraphics.drawImage(distanceColor, x, y, null);
-                tileGraphics.setColor(Color.WHITE);
-                drawCenteredString(tileGraphics, distance.toString(),
-                    new Rectangle(TILE_PADDING, TILE_PADDING, tileImage.getWidth(), tileImage.getHeight()),
-                    Storage.getFont100());
+                if (distance > 0) {
+                    BufferedImage distanceColor = ImageHelper.read(ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
+                    tileGraphics.drawImage(distanceColor, x, y, null);
+                }
+                if (distance < 11) {
+                    tileGraphics.setFont(Storage.getFont110());
+                    superDrawString(tileGraphics, distance.toString(), x + tileImage.getWidth() / 2, y + tileImage.getHeight() / 2, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
+                }
             }
             case Wormholes -> {
                 if (game.isFowMode()) {
@@ -5708,6 +5547,11 @@ public class MapGenerator {
 
     public static String getColorFilterForDistance(int distance) {
         return "Distance" + distance + ".png";
+    }
+
+    public static void drawCrosshair(Graphics g, int x, int y) {
+        g.drawLine(x - 100, y, x + 100, y);
+        g.drawLine(x, y - 100, x, y + 100);
     }
 
     private Point getTilePosition(String position, int x, int y) {
@@ -6457,7 +6301,7 @@ public class MapGenerator {
                         position = new Point(x2 + 30 * (mult - 1), y2);
                     }
                 }
-                if (fighterOrInfantry && position == null) {
+                if (unitKey.getUnitType() == UnitType.Infantry && position == null) {
                     UnitTokenPosition unitTokenPosition2 = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
                     if (unitTokenPosition2 == null) {
                         unitTokenPosition2 = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
@@ -6594,12 +6438,14 @@ public class MapGenerator {
     }
 
     /**
+     * @deprecated use {@link MapGenerator#superDrawString()} instead
      * Draw a String centered in the middle of a Rectangle.
-     *
+     * 
      * @param g The Graphics instance.
      * @param text The String to draw.
      * @param rect The Rectangle to center the text in.
      */
+    @Deprecated
     public static void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
         // Get the FontMetrics
         FontMetrics metrics = g.getFontMetrics(font);
@@ -6694,4 +6540,29 @@ public class MapGenerator {
         return text;
     }
 
+    public static int getRingCount(Game game) {
+        return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
+    }
+
+    private static int getMapHeight(Game game) {
+        return (getRingCount(game) + 1) * 600 + EXTRA_Y * 2;
+    }
+
+    private static int getMapPlayerCount(Game game) {
+        return game.getRealPlayers().size() + game.getDummies().size();
+    }
+
+    private static boolean hasExtraRow(Game game) {
+        return (getMapHeight(game) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
+    }
+
+    private static int getMapWidth(Game game) {
+        int mapWidth = (getRingCount(game) + 1) * 520 + EXTRA_X * 2;
+        mapWidth += hasExtraRow(game) ? EXTRA_X : 0;
+        return mapWidth;
+    }
+
+    protected static int getMaxObjectWidth(Game game) {
+        return (MapGenerator.getMapWidth(game) - MapGenerator.SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
+    }
 }

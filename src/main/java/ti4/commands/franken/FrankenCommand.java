@@ -108,6 +108,7 @@ public class FrankenCommand implements Command {
         subcommands.add(new ShowFrankenBag());
         subcommands.add(new ShowFrankenHand());
         subcommands.add(new FrankenViewCard());
+        subcommands.add(new BanAbility());
         subcommands.add(new ApplyDraftBags());
         subcommands.add(new SetHomeSystemPosition());
         return subcommands;

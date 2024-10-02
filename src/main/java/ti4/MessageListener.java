@@ -30,10 +30,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
+import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.fow.Whisper;
+import ti4.commands.tech.GetTechButton;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -57,7 +59,7 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
-            event.getInteraction().reply("Please try again in a moment. The bot is is not ready to receive commands.").setEphemeral(true).queue();
+            event.getInteraction().reply("Please try again in a moment.\nThe bot is rebooting and is not ready to receive commands.").setEphemeral(true).queue();
             return;
         }
 
@@ -69,6 +71,7 @@ public class MessageListener extends ListenerAdapter {
             && !event.getInteraction().getName().equals(Constants.STATISTICS)
             && !event.getInteraction().getName().equals(Constants.USER)
             && !event.getInteraction().getName().equals(Constants.SEARCH)
+            && !event.getInteraction().getName().equals(Constants.TIGL)
             && (event.getInteraction().getSubcommandName() == null
                 || !event.getInteraction().getSubcommandName().equalsIgnoreCase(Constants.CREATE_GAME_BUTTON))
             && event.getOption(Constants.GAME_NAME) == null) {
@@ -112,7 +115,7 @@ public class MessageListener extends ListenerAdapter {
                     harmless = true;
                 }
                 if (userActiveGame != null && !userActiveGame.isFowMode() && !harmless
-                    && userActiveGame.getName().contains("pbd") && !userActiveGame.getName().contains("pbd1000")) {
+                    && userActiveGame.getName().contains("pbd") && !userActiveGame.getName().contains("pbd1000") && !userActiveGame.getName().contains("pbd100two")) {
                     if (event.getMessageChannel() instanceof ThreadChannel thread) {
                         if (!thread.isPublic()) {
                             reportSusSlashCommand(event, m);
@@ -160,11 +163,10 @@ public class MessageListener extends ListenerAdapter {
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(event.getUser().getEffectiveName()).append(" ");
-                sb.append("`").append(event.getCommandString()).append("` ");
-                sb.append(commandResponseMessage.getJumpUrl());
-                MessageHelper.sendMessageToChannel(threadChannel_, sb.toString());
+                String sb = event.getUser().getEffectiveName() + " " +
+                    "`" + event.getCommandString() + "` " +
+                    commandResponseMessage.getJumpUrl();
+                MessageHelper.sendMessageToChannel(threadChannel_, sb);
                 break;
             }
         }
@@ -193,10 +195,6 @@ public class MessageListener extends ListenerAdapter {
             || !gameManager.getUserActiveGame(userID).getName().equals(gameID)
                 && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isCommunityMode()
                     || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
-            if (gameManager.getUserActiveGame(userID) != null
-                && !gameManager.getUserActiveGame(userID).getName().equals(gameID)) {
-                // MessageHelper.sendMessageToChannel(channel, "Active game set to: " + gameID);
-            }
             gameManager.setGameForUser(userID, gameID);
         } else if (gameManager.isUserWithActiveGame(userID)) {
             if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
@@ -307,8 +305,8 @@ public class MessageListener extends ListenerAdapter {
                                     twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollow"));
                                     half = twenty4 / 2;
                                 }
-                                long twelveHrs = half * 60 * 60 * multiplier;
-                                long twentyFourhrs = twenty4 * 60 * 60 * multiplier;
+                                long twelveHrs = (long) half * 60 * 60 * multiplier;
+                                long twentyFourhrs = (long) twenty4 * 60 * 60 * multiplier;
                                 String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
@@ -337,13 +335,12 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                     if (timeDifference > twentyFourhrs) {
                                         if (!timesPinged.equalsIgnoreCase("2")) {
-                                            StringBuilder sb = new StringBuilder();
                                             Player p2 = player;
-                                            sb.append(p2.getRepresentation(true, true));
-                                            sb.append(Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n");
+                                            String sb = p2.getRepresentation(true, true) +
+                                                Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
                                             //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
-                                            ButtonHelper.sendMessageToRightStratThread(player, game, sb.toString(), ButtonHelper.getStratName(sc));
+                                            ButtonHelper.sendMessageToRightStratThread(player, game, sb, ButtonHelper.getStratName(sc));
                                             player.addFollowedSC(sc);
                                             game.setStoredValue("scPlayPingCount" + sc + player.getFaction(),
                                                 "2");
@@ -402,7 +399,7 @@ public class MessageListener extends ListenerAdapter {
                 if (!game.getStoredValue(key2).isEmpty() && !game.getStoredValue(key2).equalsIgnoreCase("0")) {
                     game.setStoredValue(key2, (Integer.parseInt(game.getStoredValue(key2)) - 1) + "");
                     if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-                        ButtonHelper.postTechSummary(game);
+                        GetTechButton.postTechSummary(game);
                     }
                 }
                 if (game.getAutoPingStatus() && spacer != 0 && !game.isTemporaryPingDisable()) {
@@ -629,14 +626,14 @@ public class MessageListener extends ListenerAdapter {
                                             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                                                 "Active player has been pinged. This is ping #" + pingNumber);
                                         } else {
-                                            MessageChannel gameChannel = game.getMainGameChannel();
+                                            MessageChannel gameChannel = player.getCorrectChannel();
                                             if (gameChannel != null) {
                                                 MessageHelper.sendMessageToChannel(gameChannel, ping);
                                                 if (ping != null && ping.contains("courtesy notice")) {
                                                     List<Button> buttons = new ArrayList<>();
-                                                    buttons.add(Button.danger("temporaryPingDisable",
+                                                    buttons.add(Buttons.red("temporaryPingDisable",
                                                         "Disable Pings For Turn"));
-                                                    buttons.add(Button.secondary("deleteButtons", "Delete These Buttons"));
+                                                    buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
                                                     MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity
                                                         + " if the game is not waiting on you, you may disable the auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                                                         buttons);
@@ -805,21 +802,22 @@ public class MessageListener extends ListenerAdapter {
                     MessageChannel pChannel = player.getPrivateChannel();
                     TextChannel pChan = (TextChannel) pChannel;
                     if (pChan != null) {
-                        String newMessage = player.getRepresentation(true, true) + " Someone said: " + messageText;
+                        String threadName = event.getChannel().getName();
+                        boolean combatParticipant = threadName.contains("-" + player.getColor() + "-");
+                        String newMessage = player.getRepresentation(true, combatParticipant) + " Someone said: " + messageText;
                         if (event.getAuthor().isBot() && messageText.contains("Total hits ")) {
                             String hits = StringUtils.substringAfter(messageText, "Total hits ");
                             String location = StringUtils.substringAfter(messageText, "rolls for ");
                             location = StringUtils.substringBefore(location, " Combat");
-                            newMessage = player.getRepresentation(true, true) + " Someone rolled dice for " + location
+                            newMessage = player.getRepresentation(true, combatParticipant) + " Someone rolled dice for " + location
                                 + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "" : "s");
                         }
                         if (!event.getAuthor().isBot() && player3 != null && player3.isRealPlayer()) {
-                            newMessage = player.getRepresentation(true, true) + " "
+                            newMessage = player.getRepresentation(true, combatParticipant) + " "
                                 + StringUtils.capitalize(player3.getColor()) + " said: " + messageText;
                         }
 
                         newMessage = newMessage.replace("Total hits", "");
-                        String threadName = event.getChannel().getName();
                         List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                         for (ThreadChannel threadChannel_ : threadChannels) {
                             if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {

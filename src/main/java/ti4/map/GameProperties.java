@@ -111,12 +111,13 @@ public class GameProperties {
     private @ExportableField boolean reverseSpeakerOrder;
 
     // Discord Snowflakes
+    private @ExportableField String guildID;
     private String speaker = "";
     private String activePlayerID;
     private String launchPostThreadID;
-    private String botMapUpdatesThreadID;
-    private String tableTalkChannelID;
-    private String mainChannelID;
+    private @ExportableField String botMapUpdatesThreadID;
+    private @ExportableField String tableTalkChannelID;
+    private @ExportableField String mainChannelID;
     private String savedChannelID;
     private String bagDraftStatusMessageID;
     private String latestAfterMsg = "";
@@ -125,6 +126,7 @@ public class GameProperties {
     private String latestUpNextMsg = "";
 
     // More complex objects below
+    private @ExportableField String mapString;
 
     // Decks
     private List<String> secretObjectives;

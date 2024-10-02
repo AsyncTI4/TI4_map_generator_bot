@@ -37,7 +37,6 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
             game.addActionCardDuplicates(ACs);
         }
         if (count == 3) {
-            game.triplicateRelics();
             game.triplicateExplores();
             game.triplicateACs();
             game.triplicateSOs();

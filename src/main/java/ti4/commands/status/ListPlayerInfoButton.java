@@ -6,8 +6,8 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -43,19 +43,19 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
     public static void offerInfoButtons(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Button.success("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
-        buttons.add(Button.success("offerInfoButtonStep2_objective", "Objective Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_abilities", "Ability Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_stats", "Player Stats Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_agent", "Agent Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_commander", "Commander Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_hero", "Hero Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_relic", "Relic Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_planet", "Planet Info"));
-        buttons.add(Button.success("offerInfoButtonStep2_units", "Special Units"));
-        buttons.add(Button.success("offerInfoButtonStep2_pn", "Faction PN"));
-        buttons.add(Button.success("offerInfoButtonStep2_tech", "Researched Tech"));
-        buttons.add(Button.success("offerInfoButtonStep2_ftech", "Faction Tech"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_objective", "Objective Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_abilities", "Ability Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_stats", "Player Stats Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_agent", "Agent Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_commander", "Commander Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_hero", "Hero Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_relic", "Relic Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_planet", "Planet Info"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_units", "Special Units"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_pn", "Faction PN"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_tech", "Researched Tech"));
+        buttons.add(Buttons.green("offerInfoButtonStep2_ftech", "Faction Tech"));
         buttons.add(Buttons.REFRESH_INFO);
         String msg = "Select the category you'd like more info on. You will then be able to select either a specific faction's info you want, or every factions";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -67,17 +67,17 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         List<Button> buttons = new ArrayList<>();
         String msg = "";
         if (category.equalsIgnoreCase("objective")) {
-            buttons.add(Button.success("showObjInfo_both", "All Objectives in Game"));
-            buttons.add(Button.primary("showObjInfo_1", "All Stage 1s Possible"));
-            buttons.add(Button.primary("showObjInfo_2", "All Stage 2s Possible"));
+            buttons.add(Buttons.green("showObjInfo_both", "All Objectives in Game"));
+            buttons.add(Buttons.blue("showObjInfo_1", "All Stage 1s Possible"));
+            buttons.add(Buttons.blue("showObjInfo_2", "All Stage 2s Possible"));
         } else {
             for (Player p2 : game.getRealPlayers()) {
-                Button button = Button.secondary("offerInfoButtonStep3_" + category + "_" + p2.getFaction(), " ");
+                Button button = Buttons.gray("offerInfoButtonStep3_" + category + "_" + p2.getFaction(), " ");
                 String factionEmojiString = p2.getFactionEmoji();
                 button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                 buttons.add(button);
             }
-            buttons.add(Button.success("offerInfoButtonStep3_" + category + "_all", "All Factions"));
+            buttons.add(Buttons.green("offerInfoButtonStep3_" + category + "_all", "All Factions"));
 
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -274,9 +274,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
         String extent = buttonID.split("_")[1];
         if (extent.equalsIgnoreCase("both")) {
-            ListPlayerInfoButton.displayerScoringProgression(game, true, event, "both");
+            ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
         } else {
-            ListPlayerInfoButton.displayerScoringProgression(game, false, event, extent);
+            ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), extent);
             event.getMessage().delete().queue();
         }
     }
@@ -360,7 +360,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static void displayerScoringProgression(Game game, boolean onlyThisGameObj,
-        GenericInteractionCreateEvent event, String stage1sOrTwos) {
+        MessageChannel channel, String stage1sOrTwos) {
         String msg = "";
         int x = 1;
         if (onlyThisGameObj) {
@@ -374,6 +374,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 msg = msg + representScoring(game, id, x, true) + "\n";
                 x++;
             }
+            msg = msg + representSecrets(game) + "\n";
+            msg = msg + representSupports(game) + "\n";
+            msg = msg + representTotalVPs(game) + "\n";
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id).getSource() == ComponentSource.pok
@@ -387,7 +390,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        MessageHelper.sendMessageToChannel(channel, msg);
     }
 
     public static String representScoring(Game game, String objID, int x) {
@@ -428,6 +431,36 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                             + getObjectiveThreshold(objID, game) + "  ";
                     }
                 }
+            }
+        }
+        return representation;
+    }
+
+    public static String representSecrets(Game game) {
+        String representation = "__**Scored Secrets**__\n> ";
+        if (!game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                representation = representation + player.getFactionEmoji() + ": " + player.getSoScored() + "/" + player.getMaxSOCount() + "  ";
+            }
+        }
+        return representation;
+    }
+
+    public static String representSupports(Game game) {
+        String representation = "__**Support VPs**__\n> ";
+        if (!game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                representation = representation + player.getFactionEmoji() + ": " + player.getSupportForTheThroneVictoryPoints() + "/1  ";
+            }
+        }
+        return representation;
+    }
+
+    public static String representTotalVPs(Game game) {
+        String representation = "__**Total VPs**__\n> ";
+        if (!game.isFowMode()) {
+            for (Player player : game.getRealPlayers()) {
+                representation = representation + player.getFactionEmoji() + ": " + player.getTotalVictoryPoints() + "/" + game.getVp() + "  ";
             }
         }
         return representation;
@@ -484,9 +517,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return counter;
             }
             case "corner", "unify_colonies" -> {
-                int max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial"),
-                    ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural"));
-                max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous"), max);
+                int max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false),
+                    ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false));
+                max = Math.max(ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false), max);
                 return max;
             }
             case "develop", "revolutionize" -> {
@@ -772,7 +805,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 }
             }
             case "mrm" -> {
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous"); //4 hazardous
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "hazardous", false); //4 hazardous
             }
             case "mlp" -> {//4 techs of a color
                 int maxNum = 0;
@@ -783,7 +816,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return maxNum;
             }
             case "mp" -> {
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial"); // 4 industrial
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", false); // 4 industrial
             }
             case "lsc" -> {
                 int count = 0;
@@ -808,7 +841,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return player.getAc(); // 5 AC
             }
             case "gamf" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought"); // 5 dreads
+                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "dreadnought", false); // 5 dreads
             }
             case "ans" -> {
                 int count = 0;
@@ -868,7 +901,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds"); // 4 PDS
             }
             case "faa" -> { // 4 cultural
-                return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural");
+                return ButtonHelper.getNumberOfXTypePlanets(player, game, "cultural", false);
             }
             case "fc" -> {
                 return player.getNeighbourCount(); // neighbors

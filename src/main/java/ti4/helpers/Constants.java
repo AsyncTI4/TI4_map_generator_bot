@@ -631,17 +631,17 @@ public class Constants {
     public static final String AGENDAS = "agendas";
     public static final String AGENDA_DECK = "agenda_deck";
     public static final String AGENDA = "agenda";
-    public static final String RELIC_SHOW_REMAINING = "relic_show_remaining";
-    public static final String RELIC_DRAW_SPECIFIC = "relic_draw_specific";
+    public static final String RELIC_SHOW_REMAINING = "show_remaining";
+    public static final String RELIC_DRAW_SPECIFIC = "draw_specific";
     public static final String DRAW = "draw";
-    public static final String RELIC_DRAW = "relic_draw";
+    public static final String RELIC_DRAW = "draw";
     public static final String ALSO_DRAW_RELIC = "also_draw_relic";
-    public static final String RELIC_EXHAUST = "relic_exhaust";
-    public static final String RELIC_REFRESH = "relic_ready";
-    public static final String RELIC_PURGE = "relic_purge";
-    public static final String SHUFFLE_BACK = "relic_shuffle_back";
-    public static final String ADD_BACK_INTO_DECK = "relic_add_back_into_deck";
-    public static final String RELIC_INFO = "relic_info";
+    public static final String RELIC_EXHAUST = "exhaust";
+    public static final String RELIC_REFRESH = "ready";
+    public static final String RELIC_PURGE = "purge";
+    public static final String SHUFFLE_BACK = "shuffle_back";
+    public static final String ADD_BACK_INTO_DECK = "add_back_into_deck";
+    public static final String RELIC_INFO = "info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
@@ -723,6 +723,7 @@ public class Constants {
     public static final String RESULT = "result";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "draw";
+    public static final String ONLY_PHASE = "only_phase";
     public static final String DEAL_SO = "deal";
     public static final String DEAL_SO_TO_ALL = "deal_to_all";
     public static final String SHOW_SO = "show";
@@ -871,6 +872,7 @@ public class Constants {
     public static final String LIST_OLD_CHANNELS = "list_old_channels";
     public static final String LIST_DEAD_GAMES = "list_dead_games";
     public static final String LIST_SLASH_COMMANDS_USED = "list_slash_commands_used";
+    public static final String LIST_TITLES_GIVEN = "list_titles_given";
     public static final String LIST_OLD_THREADS = "list_old_threads";
     public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
@@ -893,6 +895,7 @@ public class Constants {
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
+    public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
 
     //DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
@@ -900,6 +903,7 @@ public class Constants {
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
 
     public static final String ABILITY = "ability";
+    public static final String BAN_ABILITY = "ban_ability";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
     public static final String ABILITY_3 = "ability_3";
@@ -909,7 +913,7 @@ public class Constants {
     public static final String ABILITY_INFO = "ability_info";
     public static final String ABILITY_ADD = "ability_add";
     public static final String ABILITY_REMOVE = "ability_remove";
-    public static final String RELIC_LOOK_AT_TOP = "relic_look_at_top";
+    public static final String RELIC_LOOK_AT_TOP = "look_at_top";
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
     public static final String DRAFT_BAG_INFO_THREAD_CHANNEL_ID = "draft_bag_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
@@ -929,7 +933,7 @@ public class Constants {
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
     public static final String HAS_HAD_A_STATUS_PHASE = "has_had_a_status_phase";
     public static final String BOT_SHUSHING = "bot_shushing";
-    public static final String RELIC_SEND = "relic_send";
+    public static final String RELIC_SEND = "send";
     public static final String FOLLOWED_SC = "followed_sc";
 
     // Installation constants
@@ -959,6 +963,7 @@ public class Constants {
         VERBOSITY_OPTIONS.add(VERBOSITY_MINIMAL);
     }
     public static final String BETA_TEST_MODE = "beta_test_mode";
+    public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
@@ -1158,4 +1163,10 @@ public class Constants {
     public static final String GAME_LAUNCH_THREAD_ID = "game_launch_thread_id";
     public static final String INCLUDE_HUB = "include_hub";
     public static final String GAME_TAGS = "game_tags";
+    public static final String SHOW_UNPLAYED_AC = "show_unplayed_ac";
+    public static final String TIGL_RANK = "tigl_rank";
+    public static final String TIGL = "tigl";
+    public static final String SEARCH_NAMES = "search_names";
+    public static final String SEARCH_TAGS = "search_tags";
+    public static final String SEARCH_USERS = "search_users";
 }

@@ -41,6 +41,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
 import ti4.AsyncTI4DiscordBot;
+import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
@@ -122,7 +123,7 @@ public class MessageHelper {
 						.map(fileName -> fileName.replace(Constants.TXT, ""))
 						.map(Integer::parseInt).toList();
 					int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-					newButtons.add(Button.secondary("ultimateUndo_" + maxNumber, "UNDO"));
+					newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
 				} catch (Exception e) {
 					BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
 				}
@@ -680,6 +681,15 @@ public class MessageHelper {
 			return new ArrayList<>();
 		}
 		return ListUtils.partition(embeds, 9); //max 10, but we've had issues with 6k char limit, so max 9
+	}
+
+	public static void sendMessageToThread(MessageChannel channel, String threadName, String messageToSend) {
+		if (channel instanceof MessageChannelUnion union) {
+			sendMessageToThread(union, threadName, messageToSend);
+		} else {
+			messageToSend = "Something went wrong trying to send this to a thread! Sorry!\n" + messageToSend;
+			sendMessageToChannel(channel, messageToSend);
+		}
 	}
 
 	public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {

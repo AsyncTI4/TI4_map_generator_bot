@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.explore.DrawRelic;
 import ti4.commands.planet.PlanetRefresh;
+import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.ListTurnOrder;
@@ -154,7 +154,7 @@ public class HeroPlay extends LeaderAction {
         }
 
         switch (playerLeader.getId()) {
-            case "kollecchero" -> DrawRelic.drawWithAdvantage(player, event, game, game.getRealPlayers().size());
+            case "kollecchero" -> RelicDraw.drawWithAdvantage(player, event, game, game.getRealPlayers().size());
             case "titanshero" -> {
                 Tile t = player.getHomeSystemTile();
                 if (game.getTileFromPlanet("elysium") != null && game.getTileFromPlanet("elysium") == t) {
@@ -169,7 +169,7 @@ public class HeroPlay extends LeaderAction {
             case "florzenhero" -> {
                 for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                        if (player.getPlanets().contains(uH.getName())
+                        if (player.getPlanetsAllianceMode().contains(uH.getName())
                             && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
                             new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", game);
                             break;
@@ -215,8 +215,8 @@ public class HeroPlay extends LeaderAction {
             case "cymiaehero" -> {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(
-                    Button.success("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve Cymiae Hero"));
-                buttons.add(Button.primary("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
+                    Buttons.green("cymiaeHeroStep1_" + (game.getRealPlayers().size() + 1), "Resolve Cymiae Hero"));
+                buttons.add(Buttons.blue("cymiaeHeroAutonetic", "Resolve Autonetic Memory First"));
 
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation() + " choose whether to resolve Autonetic Memory or not.", buttons);
@@ -225,7 +225,7 @@ public class HeroPlay extends LeaderAction {
             case "lizhohero" -> {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
                     "You may use the buttons in your cards info to set traps, then when you're done with that, press the following button to start distributing 12 fighters.",
-                    Button.success("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
+                    Buttons.green("lizhoHeroFighterResolution", "Distribute 12 Fighters"));
             }
             case "solhero" -> {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -300,7 +300,7 @@ public class HeroPlay extends LeaderAction {
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
                     + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
                 DrawAgenda.drawAgenda(event, size, game, player);
-                Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
+                Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
             }
@@ -393,16 +393,16 @@ public class HeroPlay extends LeaderAction {
             }
             case "yinhero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "yinHeroStart",
                     "Invade A Planet With Yin Hero"));
-                buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
                     + " use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.",
                     buttons);
             }
             case "naazhero" -> {
-                DrawRelic.drawRelicAndNotify(player, event, game);
+                RelicDraw.drawRelicAndNotify(player, event, game);
                 List<Button> buttons = ButtonHelperHeroes.getNRAHeroButtons(game);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true,
                     showFlavourText)
@@ -425,11 +425,11 @@ public class HeroPlay extends LeaderAction {
             }
             case "augershero" -> {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 1,
                     "Resolve Ilyxum Hero on Stage 1 Deck"));
-                buttons.add(Button.primary(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
+                buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "augersHeroStart_" + 2,
                     "ResolveIlyxum Hero on Stage 2 Deck"));
-                buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     player.getRepresentation(true, showFlavourText)
                         + " use the button to choose on which objective type you wanna resolve Atropha, the Ilyxum hero.",

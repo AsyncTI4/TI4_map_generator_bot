@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelperCommanders;
@@ -21,6 +22,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.SecretObjectiveModel;
 
 public class RevealSpecificAgenda extends AgendaSubcommandData {
     public RevealSpecificAgenda() {
@@ -161,12 +163,12 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
 
         ListVoteCount.turnOrder(event, game, channel);
-        Button proceed = Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone");
+        Button proceed = Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
-        Button transaction = Button.primary("transaction", "Transaction");
+        Button transaction = Buttons.blue("transaction", "Transaction");
         proceedButtons.add(transaction);
-        proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
-        proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
+        proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+        proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
         MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
@@ -178,6 +180,18 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                     player.getRepresentation(true, true) + " you have Florzen commander and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
+        }
+        if (game.getCurrentAgendaInfo().contains("Secret")) {
+            String summary = "The scored secrets so far are:\n";
+            for (Player p2 : game.getRealPlayers()) {
+                for (String soID : p2.getSecretsScored().keySet()) {
+                    SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+                    if (so != null) {
+                        summary = summary + so.getName() + ": " + so.getText() + "\n";
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(channel, summary);
         }
     }
 }

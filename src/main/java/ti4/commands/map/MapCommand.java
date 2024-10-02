@@ -55,6 +55,7 @@ public class MapCommand implements Command {
         //subcommands.add(new InitTspmap());
         subcommands.add(new Preset());
         subcommands.add(new ShowMapSetup());
+        subcommands.add(new ShowMapString());
         subcommands.add(new SetMapTemplate());
         return subcommands;
     }

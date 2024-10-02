@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
@@ -109,8 +110,8 @@ public class GameSettings extends SettingsMenu {
     protected List<Button> specialButtons() {
         List<Button> buttons = new ArrayList<>();
         String prefix = menuAction + "_" + navId() + "_";
-        buttons.add(Button.danger(prefix + "preset14pt", "Long War (14pt)"));
-        buttons.add(Button.danger(prefix + "preset444", "4/4/4 mode"));
+        buttons.add(Buttons.red(prefix + "preset14pt", "Long War (14pt)"));
+        buttons.add(Buttons.red(prefix + "preset444", "4/4/4 mode"));
         return buttons;
     }
 

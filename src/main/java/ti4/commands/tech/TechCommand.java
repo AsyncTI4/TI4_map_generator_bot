@@ -3,6 +3,7 @@ package ti4.commands.tech;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -80,7 +81,7 @@ public class TechCommand implements Command {
         subcommands.add(new TechExhaust());
         subcommands.add(new TechRefresh());
         subcommands.add(new TechInfo());
-        subcommands.add(new TechButton());
+        subcommands.add(new GetTechButton());
         subcommands.add(new TechChangeType());
         subcommands.add(new TechShowDeck());
 

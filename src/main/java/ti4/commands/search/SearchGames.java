@@ -1,6 +1,14 @@
 package ti4.commands.search;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,17 +20,11 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 public class SearchGames extends SearchSubcommandData {
 
     public SearchGames() {
         super(Constants.SEARCH_GAMES, "List all games");
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to also show ended games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NORMAL_GAME, "True to include Normal (none of the other modes) games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to include TIGL games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to include community games"));
@@ -31,7 +33,10 @@ public class SearchGames extends SearchSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to include Absol's Agenda & Relics games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to include Discordant Stars games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FRANKEN_MODE, "True to include Franken games"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to also show ended games"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH_NAMES, "Include games with this text in game name"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH_TAGS, "Include games with this text in game tags"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SEARCH_FACTIONS, "Include games with this faction in the game"));
+        addOptions(new OptionData(OptionType.USER, Constants.SEARCH_USERS, "Include games with this user in the game"));
     }
 
     @Override
@@ -47,23 +52,69 @@ public class SearchGames extends SearchSubcommandData {
         boolean includeDSGames = event.getOption(Constants.DISCORDANT_STARS_MODE, false, OptionMapping::getAsBoolean);
         boolean includeFrankenGames = event.getOption(Constants.FRANKEN_MODE, false, OptionMapping::getAsBoolean);
         boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
+        String searchName = event.getOption(Constants.SEARCH_NAMES, "", OptionMapping::getAsString).toLowerCase();
+        String searchTags = event.getOption(Constants.SEARCH_TAGS, "", OptionMapping::getAsString).toLowerCase();
+        String searchFactions = event.getOption(Constants.SEARCH_FACTIONS, "", OptionMapping::getAsString).toLowerCase();
+        User searchUser = event.getOption(Constants.SEARCH_USERS, null, OptionMapping::getAsUser);
 
-        StringBuilder sb = new StringBuilder("__**Map List:**__\n");
+        List<Entry<String, Game>> normalGames = mapList.entrySet().stream().filter(map -> map.getValue().isNormalGame()).toList();
+        List<Entry<String, Game>> tIGLGames = mapList.entrySet().stream().filter(map -> map.getValue().isCompetitiveTIGLGame()).toList();
+        List<Entry<String, Game>> communityGames = mapList.entrySet().stream().filter(map -> map.getValue().isCommunityMode()).toList();
+        List<Entry<String, Game>> allianceGames = mapList.entrySet().stream().filter(map -> map.getValue().isAllianceMode()).toList();
+        List<Entry<String, Game>> foWGames = mapList.entrySet().stream().filter(map -> map.getValue().isFowMode()).toList();
+        List<Entry<String, Game>> absolGames = mapList.entrySet().stream().filter(map -> map.getValue().isAbsolMode()).toList();
+        List<Entry<String, Game>> miltyModGames = mapList.entrySet().stream().filter(map -> map.getValue().isMiltyModMode()).toList();
+        List<Entry<String, Game>> dSGames = mapList.entrySet().stream().filter(map -> map.getValue().isDiscordantStarsMode()).toList();
+        List<Entry<String, Game>> frankenGames = mapList.entrySet().stream().filter(map -> map.getValue().isFrankenGame()).toList();
+        List<Entry<String, Game>> endedGames = mapList.entrySet().stream().filter(map -> map.getValue().isHasEnded()).toList();
+        List<Entry<String, Game>> searchNameGames = mapList.entrySet().stream().filter(map -> map.getValue().getCustomName().toLowerCase().contains(searchName)).toList();
+        List<Entry<String, Game>> searchTagGames = mapList.entrySet().stream().filter(map -> map.getValue().getGameModesText().toLowerCase().contains(searchTags)).toList();
+        List<Entry<String, Game>> searchFactionGames = mapList.entrySet().stream().filter(map -> map.getValue().getRealAndEliminatedPlayers().stream().map(p -> p.getFaction().toLowerCase()).anyMatch(s -> s.contains(searchFactions))).toList();
+        List<Entry<String, Game>> searchUserGames = mapList.entrySet().stream().filter(map -> map.getValue().hasUser(searchUser)).toList();
+        
+        
         List<Entry<String, Game>> filteredListOfMaps = new ArrayList<>();
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeNormalGames && map.getValue().isNormalGame()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeTIGLGames && map.getValue().isCompetitiveTIGLGame()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeCommunityGames && map.getValue().isCommunityMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAllianceGames && map.getValue().isAllianceMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFoWGames && map.getValue().isFowMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAbsolGames && map.getValue().isAbsolMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeMiltyModGames && map.getValue().isMiltyModMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeDSGames && map.getValue().isDiscordantStarsMode()).toList());
-        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeFrankenGames && map.getValue().isFrankenGame()).toList());
+        if (includeNormalGames) filteredListOfMaps.addAll(normalGames);
+        if (includeTIGLGames) filteredListOfMaps.addAll(tIGLGames);
+        if (includeCommunityGames) filteredListOfMaps.addAll(communityGames);
+        if (includeAllianceGames) filteredListOfMaps.addAll(allianceGames);
+        if (includeFoWGames) filteredListOfMaps.addAll(foWGames);
+        if (includeAbsolGames) filteredListOfMaps.addAll(absolGames);
+        if (includeMiltyModGames) filteredListOfMaps.addAll(miltyModGames);
+        if (includeDSGames) filteredListOfMaps.addAll(dSGames);
+        if (includeFrankenGames) filteredListOfMaps.addAll(frankenGames);
+        if (!searchName.isEmpty()) filteredListOfMaps.addAll(searchNameGames);
+        if (!searchTags.isEmpty()) filteredListOfMaps.addAll(searchTagGames);
+        if (!searchFactions.isEmpty()) filteredListOfMaps.addAll(searchFactionGames);
+        if (searchUser != null) filteredListOfMaps.addAll(searchUserGames);
+        if (!includeEndedGames) filteredListOfMaps.removeIf(g -> g.getValue().isHasEnded());
 
         Set<Entry<String, Game>> filteredSetOfMaps = new HashSet<>(filteredListOfMaps);
 
+        int totalGames = mapList.size();
+
+        StringBuilder sb = new StringBuilder("__**Search Games:**__\n");
+        sb.append("-# Statistics:\n");
+        sb.append("-# > Total Games: `").append(totalGames).append("`\n");
+        sb.append("-# > Games Found: `").append(filteredSetOfMaps.size()).append("`\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeNormalGames)).append("includeNormalGames (").append(normalGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeTIGLGames)).append("includeTIGLGames (").append(tIGLGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeCommunityGames)).append("includeCommunityGames (").append(communityGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeAllianceGames)).append("includeAllianceGames (").append(allianceGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeFoWGames)).append("includeFoWGames (").append(foWGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeAbsolGames)).append("includeAbsolGames (").append(absolGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeMiltyModGames)).append("includeMiltyModGames (").append(miltyModGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeDSGames)).append("includeDSGames (").append(dSGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeFrankenGames)).append("includeFrankenGames (").append(frankenGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(includeEndedGames)).append("includeEndedGames (").append(endedGames.size()).append("/").append(totalGames).append(")\n");
+
+        sb.append("-# > ").append(trueFalseEmoji(!searchName.isEmpty())).append("gamesWithName `").append(searchName).append("` (").append(searchNameGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(!searchTags.isEmpty())).append("gamesWithTag `").append(searchTags).append("` (").append(searchTagGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(!searchFactions.isEmpty())).append("gamesWithFaction `").append(searchFactions).append("` (").append(searchFactionGames.size()).append("/").append(totalGames).append(")\n");
+        sb.append("-# > ").append(trueFalseEmoji(searchUser != null)).append("gamesWithUser `").append(searchUser != null ? searchUser.getEffectiveName() : "").append("` (").append(searchUserGames.size()).append("/").append(totalGames).append(")\n");
+
         if (filteredSetOfMaps.isEmpty()) {
-            sb.append("> No maps match the selected filters.");
+            sb.append("No games match the selected filters.");
         } else {
             sb.append(filteredSetOfMaps.stream()
                 .filter(map -> includeEndedGames || !map.getValue().isHasEnded())
@@ -72,21 +123,32 @@ public class SearchGames extends SearchSubcommandData {
                 .collect(Collectors.joining("\n")));
         }
 
-        MessageHelper.sendMessageToThread(event.getChannel(), "Map List", sb.toString());
+        String message = sb.toString();
+        message = message.replace("``", "");
+        MessageHelper.sendMessageToThread(event.getChannel(), "Search Games", message);
+    }
+
+    private String trueFalseEmoji(boolean bool) {
+        return bool ? "✅" : "❌";
     }
 
     private String getRepresentationText(Map<String, Game> mapList, String mapName) {
-        Game gameToShow = mapList.get(mapName);
-        StringBuilder representationText = new StringBuilder("> **" + mapName + "**").append(" ");
-        representationText.append("   Created: ").append(gameToShow.getCreationDate());
-        representationText.append("   Last Modified: ").append(Helper.getDateRepresentation(gameToShow.getLastModifiedDate())).append("  ");
-        for (Player player : gameToShow.getPlayers().values()) {
-            if (!gameToShow.isFowMode() && player.getFaction() != null) {
-                representationText.append(player.getFactionEmoji());
+        Game game = mapList.get(mapName);
+        StringBuilder sb = new StringBuilder("- **" + mapName + "**").append(" ");
+        sb.append("`").append(game.getCreationDate()).append("`-`");
+        if (game.isHasEnded() && game.getEndedDate() > 100) {
+            sb.append(Helper.getDateRepresentation(game.getEndedDate()));
+        } else {
+            sb.append(Helper.getDateRepresentation(game.getLastModifiedDate()));
+        }
+        sb.append("`  ");
+        for (Player player : game.getPlayers().values()) {
+            if (!game.isFowMode() && player.getFaction() != null) {
+                sb.append(player.getFactionEmoji());
             }
         }
-        representationText.append(" [").append(gameToShow.getGameModesText()).append("] ");
-        if (gameToShow.isHasEnded()) representationText.append(" ENDED");
-        return representationText.toString();
+        sb.append(" [").append(game.getGameModesText()).append("] ");
+        if (game.isHasEnded()) sb.append(" ENDED");
+        return sb.toString();
     }
 }

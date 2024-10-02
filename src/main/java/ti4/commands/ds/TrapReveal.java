@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -106,8 +108,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                 }
                                 if (p2.getPlanets().contains(planet)) {
                                     List<Button> buttons = new ArrayList<>();
-                                    buttons.add(Button.success("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + ButtonHelper.getIdentOrColor(p2, game)));
-                                    buttons.add(Button.primary("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    buttons.add(Buttons.green("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    buttons.add(Buttons.blue("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, game)));
                                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " use buttons to resolve",
                                         buttons);
                                 }

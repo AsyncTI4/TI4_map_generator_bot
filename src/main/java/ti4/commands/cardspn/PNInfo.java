@@ -3,10 +3,12 @@ package ti4.commands.cardspn;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -70,10 +72,10 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
 
             Button transact;
             if (game.isFowMode()) {
-                transact = Button.success("resolvePNPlay_" + pnShortHand,
+                transact = Buttons.green("resolvePNPlay_" + pnShortHand,
                     "Play " + owner.getColor() + " " + promissoryNote.getName());
             } else {
-                transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
+                transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
                     .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
             }
             buttons.add(transact);

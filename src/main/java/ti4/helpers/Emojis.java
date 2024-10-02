@@ -188,6 +188,16 @@ public class Emojis {
     public static final String Hazardous = "<:Hazardous:1159118854987976734>";
     public static final String Frontier = "<:Frontier:1156670537699971082>";
 
+    public static String getFragEmoji(String frag) {
+        frag = frag.toLowerCase();
+        return switch (frag) {
+            case "crf" -> CFrag;
+            case "irf" -> IFrag;
+            case "hrf" -> HFrag;
+            default -> UFrag;
+        };
+    }
+
     // CARDS
     public static final String SC1 = "<:SC1:1056594715673366548>";
     public static final String SC1Back = "<:SC1Back:1065285486425411705>";
@@ -384,6 +394,18 @@ public class Emojis {
     public static final String KjalengardAgent = "<:KjalengardAgent:1162423340141658112>";
     public static final String KjalengardCommander = "<:KjalengardCommander:1162423346768646266>";
     public static final String KjalengardHero = "<:KjalengardHero:1162423348828065932>";
+    // public static final String KolleccAgent = "";
+    public static final String KolleccCommander = "<:KolleccCommander:1287842294371975261>";
+    public static final String KolleccHero = "<:KolleccHero:1287842295797776480>";
+    public static final String KolumeAgent = "<:KolumeAgent:1287842177098977381>";
+    public static final String KolumeCommander = "<:KolumeCommander:1287842178386759702>";
+    public static final String KolumeHero = "<:KolumeHero:1287842180341305464>";
+    public static final String KortaliAgent = "<:KortaliAgent:1287842241821544550>";
+    public static final String KortaliCommander = "<:KortaliCommander:1287842243201204406>";
+    public static final String KortaliHero = "<:KortaliHero:1287842244531060828>";
+    public static final String LanefirAgent = "<:LanefirAgent:1287842323190775920>";
+    public static final String LanefirCommander = "<:LanefirCommander:1287842324218384405>";
+    // public static final String LanefirHero = "";
 
     public static final String Agent = "<:Agent:1235272542030270614>";
     public static final String Commander = "<:Commander:1235272679838453801>";
@@ -776,6 +798,7 @@ public class Emojis {
     public static final String splitteal = "<:splitteal:1165037010910728242>";
     public static final String splittorquoise = "<:splittorquoise:1165037013486022726>";
     public static final String splityellow = "<:splityellow:1165037014995963965>";
+    public static final String riftset = "<:riftset:1281263062715990057>";
 
     // END EMOJI FARM 10
 
@@ -905,6 +928,26 @@ public class Emojis {
     public static final String d10red_7 = "<:d10red_7:1189667994977181796>";
     public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
     public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
+    public static final String d10blue_0 = "<:d10blue_0:1290145967592574976>";
+    public static final String d10blue_1 = "<:d10blue_1:1290145968414785559>";
+    public static final String d10blue_2 = "<:d10blue_2:1290145969542926336>";
+    public static final String d10blue_3 = "<:d10blue_3:1290145970486775869>";
+    public static final String d10blue_4 = "<:d10blue_4:1290145994142515300>";
+    public static final String d10blue_5 = "<:d10blue_5:1290145994989768867>";
+    public static final String d10blue_6 = "<:d10blue_6:1290145996017373194>";
+    public static final String d10blue_7 = "<:d10blue_7:1290145996969476147>";
+    public static final String d10blue_8 = "<:d10blue_8:1290146014832885864>";
+    public static final String d10blue_9 = "<:d10blue_9:1290146015877529693>";
+    public static final String d10grey_0 = "<:d10grey_0:1290146062396297346>";
+    public static final String d10grey_1 = "<:d10grey_1:1290146035594694658>";
+    public static final String d10grey_2 = "<:d10grey_2:1290146036827820184>";
+    public static final String d10grey_3 = "<:d10grey_3:1290146037520138252>";
+    public static final String d10grey_4 = "<:d10grey_4:1290146038614724628>";
+    public static final String d10grey_5 = "<:d10grey_5:1290146080385798225>";
+    public static final String d10grey_6 = "<:d10grey_6:1290146081379713108>";
+    public static final String d10grey_7 = "<:d10grey_7:1290146082843656212>";
+    public static final String d10grey_8 = "<:d10grey_8:1290146097129324668>";
+    public static final String d10grey_9 = "<:d10grey_9:1290146098576490496>";
 
     // MILTY DRAFT
     public static final String sliceUnpicked = "<:sliceUnpicked:1225188657703682250>";
@@ -1433,6 +1476,7 @@ public class Emojis {
             case "splitnvy", "splitnavy" -> splitnavy + "**SplitNavy**";
             case "splitptr", "splitpetrol" -> splitpetrol + "**SplitPetrol**";
             case "splitrbw", "splitrainbow" -> splitrainbow + "**SplitRainbow**";
+            case "ero", "riftset" -> riftset + "**RiftSet**";
             default -> color;
         };
     }
@@ -1487,6 +1531,7 @@ public class Emojis {
             case "splitnvy", "splitnavy" -> splitnavy;
             case "splitptr", "splitpetrol" -> splitpetrol;
             case "splitrbw", "splitrainbow" -> splitrainbow;
+            case "ero", "riftset" -> riftset;
 
             default -> getRandomGoodDog();
         };
@@ -1762,9 +1807,9 @@ public class Emojis {
             case "empyreanhero" -> EmpyreanHero;
             case "hacanhero" -> HacanHero;
             case "jolnarhero" -> JolNarHero;
-            case "keleresherokuuasi" -> KeleresHeroKuuasi;
-            case "keleresheroodlynn" -> KeleresHeroOdlynn;
-            case "keleresheroharka" -> KeleresHeroHarka;
+            case "keleresherokuuasi", "keleresahero" -> KeleresHeroKuuasi;
+            case "keleresheroodlynn", "keleresxhero" -> KeleresHeroOdlynn;
+            case "keleresheroharka", "keleresmhero" -> KeleresHeroHarka;
             case "l1z1xhero" -> L1Z1XHero;
             case "letnevhero" -> LetnevHero;
             case "mahacthero" -> MahactHero;
@@ -1833,6 +1878,18 @@ public class Emojis {
             case "kjalengardagent" -> KjalengardAgent;
             case "kjalengardcommander" -> KjalengardCommander;
             case "kjalengardhero" -> KjalengardHero;
+            // case "kollecagent" -> "";
+            case "kollecccommander" -> KolleccCommander;
+            case "kollecchero" -> KolleccHero;
+            case "kolumeagent" -> KolumeAgent;
+            case "kolumecommander" -> KolumeCommander;
+            case "kolumehero" -> KolumeHero;
+            case "kortaliagent" -> KortaliAgent;
+            case "kortalicommander" -> KortaliCommander;
+            case "kortalihero" -> KortaliHero;
+            case "lanefiragent" -> LanefirAgent;
+            case "lanefircommander" -> LanefirCommander;
+            // case "lanefirhero" -> "";
 
             // OTHER
             case "whalpha" -> WHalpha;
@@ -1888,5 +1945,69 @@ public class Emojis {
 
     public static String comm(int count) {
         return StringUtils.repeat(Emojis.comm, count);
+    }
+
+    public static String getRedDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10red_0;
+            case 1 -> Emojis.d10red_1;
+            case 2 -> Emojis.d10red_2;
+            case 3 -> Emojis.d10red_3;
+            case 4 -> Emojis.d10red_4;
+            case 5 -> Emojis.d10red_5;
+            case 6 -> Emojis.d10red_6;
+            case 7 -> Emojis.d10red_7;
+            case 8 -> Emojis.d10red_8;
+            case 9 -> Emojis.d10red_9;
+            default -> String.valueOf(value);
+        };
+    }
+
+    public static String getGreenDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10green_0;
+            case 1 -> Emojis.d10green_1;
+            case 2 -> Emojis.d10green_2;
+            case 3 -> Emojis.d10green_3;
+            case 4 -> Emojis.d10green_4;
+            case 5 -> Emojis.d10green_5;
+            case 6 -> Emojis.d10green_6;
+            case 7 -> Emojis.d10green_7;
+            case 8 -> Emojis.d10green_8;
+            case 9 -> Emojis.d10green_9;
+            default -> String.valueOf(value);
+        };
+    }
+
+    public static String getBlueDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10blue_0;
+            case 1 -> Emojis.d10blue_1;
+            case 2 -> Emojis.d10blue_2;
+            case 3 -> Emojis.d10blue_3;
+            case 4 -> Emojis.d10blue_4;
+            case 5 -> Emojis.d10blue_5;
+            case 6 -> Emojis.d10blue_6;
+            case 7 -> Emojis.d10blue_7;
+            case 8 -> Emojis.d10blue_8;
+            case 9 -> Emojis.d10blue_9;
+            default -> String.valueOf(value);
+        };
+    }
+
+    public static String getGrayDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10grey_0;
+            case 1 -> Emojis.d10grey_1;
+            case 2 -> Emojis.d10grey_2;
+            case 3 -> Emojis.d10grey_3;
+            case 4 -> Emojis.d10grey_4;
+            case 5 -> Emojis.d10grey_5;
+            case 6 -> Emojis.d10grey_6;
+            case 7 -> Emojis.d10grey_7;
+            case 8 -> Emojis.d10grey_8;
+            case 9 -> Emojis.d10grey_9;
+            default -> String.valueOf(value);
+        };
     }
 }

@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
+import ti4.helpers.TIGLHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -26,6 +26,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "CC limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, "extra_secret_mode", "True to allow each player to start with 2 secrets. Great for SftT-less games!"));
     }
 
@@ -59,6 +60,9 @@ public class WeirdGameSetup extends GameSubcommandData {
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
+
+        Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
+        if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
@@ -81,8 +85,7 @@ public class WeirdGameSetup extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
-            game.setCompetitiveTIGLGame(true);
-            sendTIGLSetupText(game);
+            TIGLHelper.initializeTIGLGame(game);
             return true;
         }
 
@@ -212,14 +215,5 @@ public class WeirdGameSetup extends GameSubcommandData {
         }
 
         return true;
-    }
-
-    public static void sendTIGLSetupText(Game game) {
-        String sb = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
-            "Please ensure you have all:\n" +
-            "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6)\n" +
-            "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
-            "For more information, please see this channel: https://discord.com/channels/943410040369479690/1003741148017336360";
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb);
     }
 }
