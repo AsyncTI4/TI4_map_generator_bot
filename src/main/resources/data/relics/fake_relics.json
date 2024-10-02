@@ -137,5 +137,12 @@
         "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
         "isFakeRelic": true,
         "source": "ignis_aurora"       
-    }
-]
+    },
+{
+        "alias": "votetoken5",
+        "name": "Vote Token 5",
+        "shortName": "Vote\nToken5",
+        "text": "When you cast votes on an agenda, you may purge this token to cast 5 votes.",
+        "isFakeRelic": true,
+        "source": "ignis_aurora"       
+    }]
