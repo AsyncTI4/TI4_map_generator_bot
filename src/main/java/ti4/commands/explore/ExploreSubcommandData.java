@@ -594,6 +594,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }
         CommanderUnlockCheck.checkPlayer(player, game, "bentor", event);
+        CommanderUnlockCheck.checkPlayer(player, "ghost");
 
         if (player.hasAbility("awaken") && !game.getAllPlanetsWithSleeperTokens().contains(planetID)
             && player.getPlanetsAllianceMode().contains(planetID)) {
