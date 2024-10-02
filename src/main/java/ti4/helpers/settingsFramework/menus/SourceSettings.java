@@ -127,7 +127,7 @@ public class SourceSettings extends SettingsMenu {
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
-        if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
+        //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
 
@@ -141,7 +141,7 @@ public class SourceSettings extends SettingsMenu {
         if (absol.isVal()) sources.add(ComponentSource.absol);
         if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
-        if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
+        //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
 }
