@@ -1,0 +1,16 @@
+[
+    {
+        "id": "alexg9830_imperial",
+        "initiative": 8,
+        "name": "Imperial",
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements.",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 2 secret objectives, select 1 and shuffle the other in the secret objectives deck."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 2 secret objectives, select 1 and shuffle the other in the secret objectives deck."
+        ],
+        "colourHexCode": "#752b90",
+        "source": "other"
+    }
+]

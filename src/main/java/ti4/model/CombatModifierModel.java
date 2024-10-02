@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import lombok.Data;
+
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.Data;
 import ti4.helpers.CombatRollType;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -59,6 +61,9 @@ public class CombatModifierModel implements ModelInterface {
             }
             if ("_ship_".equals(scope)) {
                 isInScope = unit.getIsShip();
+            }
+            if ("_ship_no_ff".equals(scope)) {
+                isInScope = unit.getIsShip() && !unit.getBaseType().equalsIgnoreCase("fighter");
             }
             if ("_groundforce_".equals(scope)) {
                 isInScope = unit.getIsGroundForce();

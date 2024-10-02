@@ -5,6 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -37,7 +38,7 @@ public class ButtonHelperStats {
             message += " using their space station";
         }
 
-        ButtonHelper.fullCommanderUnlockCheck(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
@@ -107,9 +108,7 @@ public class ButtonHelperStats {
             String axis = player.getRepresentation(true, true) + " you have the opportunity to buy axis orders";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
-        if (player.getLeaderIDs().contains("mykomentoricommander") && !player.hasLeaderUnlocked("mykomentoricommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "mykomentori", null);
-        }
+        CommanderUnlockCheck.checkPlayer(player, game, "mykomentori", null);
     }
 
     public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {

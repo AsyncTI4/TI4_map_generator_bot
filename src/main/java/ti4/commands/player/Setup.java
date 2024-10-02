@@ -240,7 +240,7 @@ public class Setup extends PlayerSubcommandData {
 
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
-                Button getTech = Button.success("getKeleresTechOptions", "Get Keleres Tech Options");
+                Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Tech Options");
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(getTech);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -314,9 +314,8 @@ public class Setup extends PlayerSubcommandData {
         for (Game activeGame2 : mapList.values()) {
             for (Player player2 : activeGame2.getRealPlayers()) {
                 if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                    player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
-                    if (player2.getPersonalPingInterval() > 0) {
-                        player.setPersonalPingInterval(player2.getPersonalPingInterval());
+                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
+                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
                     }
                     if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
                         player.setPreferenceForDistanceBasedTacticalActions(true);

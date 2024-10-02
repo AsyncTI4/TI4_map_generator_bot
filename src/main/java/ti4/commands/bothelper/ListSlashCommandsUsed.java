@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -71,6 +72,9 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                 }
                 for (String acID : game.getDiscardActionCards().keySet()) {
                     ActionCardModel ac = Mapper.getActionCard(acID);
+                    if (ac == null) {
+                        continue;
+                    }
                     String acName = ac.getName();
                     int numUsed = 1;
                     int numUsed2 = 0;
@@ -81,6 +85,9 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
                 }
                 for (String acID : game.getPurgedActionCards().keySet()) {
                     ActionCardModel ac = Mapper.getActionCard(acID);
+                    if (ac == null) {
+                        continue;
+                    }
                     String acName = ac.getName();
                     int numUsed = 1;
                     int numUsed2 = 0;

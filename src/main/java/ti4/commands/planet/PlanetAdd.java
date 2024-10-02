@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -81,7 +83,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 String message2 = player.getRepresentation(true, true)
                     + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-                Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+                Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
                 buttons.add(DoneExhausting);
                 if (!player.hasAbility("reclamation")) {
                     MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
@@ -124,9 +126,7 @@ public class PlanetAdd extends PlanetAddRemove {
                             Helper.checkEndGame(game, player);
                         }
                     }
-                    if (Mapper.getPlanet(planet) != null
-                        && "action_cards_pok".equals(game.getAcDeckID())
-                        && !game.getDiscardActionCards().containsKey("reparations")) {
+                    if (Mapper.getPlanet(planet) != null) {
                         String msg = player_.getRepresentation()
                             + " has a window to play Reparations for the taking of "
                             + Mapper.getPlanet(planet).getName();
@@ -203,7 +203,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 game.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
 
-        if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
+        if ((game.getPhaseOfGame().contains("agenda") || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
             && player.hasAbility("scavenge") && !doubleCheck && !setUP) {
             String fac = player.getFactionEmoji();
 
@@ -218,10 +218,10 @@ public class PlanetAdd extends PlanetAddRemove {
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
             && player.hasUnexhaustedLeader("vaylerianagent") && !setUP) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("exhaustAgent_vaylerianagent_" + player.getFaction(),
+            buttons.add(Buttons.green("exhaustAgent_vaylerianagent_" + player.getFaction(),
                 "Use Vaylerian Agent")
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
-            buttons.add(Button.danger("deleteButtons", "Decline"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
@@ -231,9 +231,9 @@ public class PlanetAdd extends PlanetAddRemove {
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
             && player.hasAbility("scour") && !setUP) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("scourPlanet_" + planet, "Use Scour")
+            buttons.add(Buttons.green("scourPlanet_" + planet, "Use Scour")
                 .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
-            buttons.add(Button.danger("deleteButtons", "Decline"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
                 + " if you have not already used Scour this tactical action, you may discard 1AC to ready the planet "
                 + Helper.getPlanetRepresentation(planet, game);
@@ -245,9 +245,9 @@ public class PlanetAdd extends PlanetAddRemove {
             && game.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !tile.isHomeSystem()
             && FoWHelper.playerHasShipsInSystem(player, tile)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship")
+            buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship")
                 .withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
-            buttons.add(Button.danger("deleteButtons", "Decline"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
                 + " you may produce 1 ship in the system due to President Cyhn, the Free Systems Commander.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
@@ -257,9 +257,9 @@ public class PlanetAdd extends PlanetAddRemove {
         if (game.getActivePlayer() == player
             && game.playerHasLeaderUnlockedOrAlliance(player, "cymiaecommander")) {
             List<Button> saarButton = new ArrayList<>();
-            saarButton.add(Button.success("cymiaeCommanderRes_" + planet,
+            saarButton.add(Buttons.green("cymiaeCommanderRes_" + planet,
                 "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, game)));
-            saarButton.add(Button.danger("deleteButtons", "Decline"));
+            saarButton.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
                     + " due to Koryl Ferax, the Cymiae Commander, you may discard 1AC here to place or move 1 mech on "
@@ -272,8 +272,8 @@ public class PlanetAdd extends PlanetAddRemove {
             && (player.hasUnit("mykomentori_spacedock") || player.hasUnit("mykomentori_spacedock2"))
             && !doubleCheck && event != null) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.success("deployMykoSD_" + planet, "Deploy Space Dock " + planet));
-            buttons.add(Button.danger("deleteButtons", "Decline"));
+            buttons.add(Buttons.green("deployMykoSD_" + planet, "Deploy Space Dock " + planet));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentation(true, true)
@@ -308,9 +308,9 @@ public class PlanetAdd extends PlanetAddRemove {
             || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             List<Button> saarButton = new ArrayList<>();
-            saarButton.add(Button.success("saarMechRes_" + planet,
+            saarButton.add(Buttons.green("saarMechRes_" + planet,
                 "Pay 1TG for mech on " + Helper.getPlanetRepresentation(planet, game)));
-            saarButton.add(Button.danger("deleteButtons", "Decline"));
+            saarButton.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation(true, true)
                     + " you may pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
@@ -319,31 +319,14 @@ public class PlanetAdd extends PlanetAddRemove {
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {
             String message = player.getRepresentation() + " Click the button to resolve an integrated build on " + Helper.getPlanetRepresentation(planet, game);
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Button.primary("integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, game)));
-            buttons.add(Button.danger("deleteButtons", "Decline"));
+            buttons.add(Buttons.blue("integratedBuild_" + planet, "Integrated on " + Helper.getPlanetRepresentation(planet, game)));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message, buttons);
         }
-        if (player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "sol", event);
-        }
-        if (player.getLeaderIDs().contains("vayleriancommander") && !player.hasLeaderUnlocked("vayleriancommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "vaylerian", event);
-        }
-        if (player.getLeaderIDs().contains("olradincommander") && !player.hasLeaderUnlocked("olradincommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "olradin", event);
-        }
-        if (player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "xxcha", event);
-        }
-        if (player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "sardakk", event);
-        }
-        for (Player p2 : game.getRealPlayers()) {
-            ButtonHelper.fullCommanderUnlockCheck(p2, game, "freesystems", event);
-        }
-        if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.getLeaderIDs().contains("winnucommander")
-            && !player.hasLeaderUnlocked("winnucommander") && player.controlsMecatol(true)) {
-            ButtonHelper.commanderUnlockCheck(player, game, "winnu", event);
+        CommanderUnlockCheck.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
+        CommanderUnlockCheck.checkAllPlayersInGame(game, "freesystems");
+        if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.controlsMecatol(true)) {
+            CommanderUnlockCheck.checkPlayer(player, "winnu");
         }
     }
 }

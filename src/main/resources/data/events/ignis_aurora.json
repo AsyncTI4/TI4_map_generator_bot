@@ -304,7 +304,7 @@
         "type": "Event",
         "category": "event",
         "categoryDescription": "immediate",
-        "text": "Each player may place a command token from their reinforcements on their home system. If they do not, they must remove two of their non-fighter ships from the gameboard.",
+        "text": "Each player may place a command token from their reinforcements on their home system. If they do not, or if the system already contains one of their command tokens, they must remove two of their non-fighter ships from the gameboard.",
         "source": "ignis_aurora"
     },
     {

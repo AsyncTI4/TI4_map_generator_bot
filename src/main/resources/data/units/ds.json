@@ -368,7 +368,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After this unit moves into the active system, you may produce up to 2 units that have a combined cost of 4 or less in that system."
+        "ability": "After this unit moves into the active system, you may produce up to 2 units that have a combined cost of 4 or less in that system. [Note: this cannot produce ships if enemy ships are present]"
     },
     {
         "id": "dihmohn_mech",
@@ -1126,7 +1126,6 @@
         "source": "ds",
         "faction": "Mirveda",
         "moveValue": 1,
-        "capacityUsed": 1,
         "bombardHitsOn": 6,
         "bombardDieCount": 1,
         "spaceCannonHitsOn": 6,
@@ -1146,13 +1145,11 @@
         "faction": "Mirveda",
         "moveValue": 2,
         "capacityValue": 1,
-        "capacityUsed": 1,
         "bombardHitsOn": 4,
         "bombardDieCount": 1,
         "spaceCannonHitsOn": 4,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": false,
-        "planetaryShield": true,
         "isStructure": true,
         "ability": "This unit is placed in a space area instead of on a planet. This unit can move and retreat as if it were a ship. This unit can be blockaded, if it is blockaded, it is destroyed."
     },

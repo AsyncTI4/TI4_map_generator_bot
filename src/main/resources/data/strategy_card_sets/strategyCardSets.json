@@ -205,6 +205,38 @@
     "source": "pbd1000"
   },
   {
+    "name": "PBD #100two Strategy Cards",
+    "alias": "pbd100two",
+    "scIDs": [
+      "grouped1A",
+      "grouped1B",
+      "grouped1C",
+      "grouped2A",
+      "grouped2B",
+      "grouped2C",
+      "grouped3A",
+      "grouped3B",
+      "grouped3C",
+      "grouped4A",
+      "grouped4B",
+      "grouped4C",
+      "grouped5A",
+      "grouped5B",
+      "grouped5C",
+      "grouped6A",
+      "grouped6B",
+      "grouped6C",
+      "grouped7A",
+      "grouped7B",
+      "grouped7C",
+      "grouped8A",
+      "grouped8B",
+      "grouped8C"
+    ],
+    "description": "Grouped SCs for PBD #100two",
+    "source": "pbd1000"
+  },
+  {
     "name": "Ignis Aurora Strategy Cards",
     "alias": "ignis_aurora",
     "scIDs": [

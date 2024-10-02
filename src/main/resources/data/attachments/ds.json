@@ -23,6 +23,42 @@
         "source": "ds"
     },
     {
+        "id": "lizhotrap2",
+        "imagePath": "attachment_lizhotrap2.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap3",
+        "imagePath": "attachment_lizhotrap3.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap4",
+        "imagePath": "attachment_lizhotrap4.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap5",
+        "imagePath": "attachment_lizhotrap5.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap6",
+        "imagePath": "attachment_lizhotrap6.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id": "lizhotrap1",
+        "imagePath": "attachment_lizhotrap1.png",
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
         "id": "veldyrtaxhaven",
         "imagePath": "attachment_veldyrtaxhaven.png",
         "influenceModifier": 1,

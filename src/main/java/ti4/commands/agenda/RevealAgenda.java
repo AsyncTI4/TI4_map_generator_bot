@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.buttons.Buttons;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -23,6 +24,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.SecretObjectiveModel;
 
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
@@ -71,7 +73,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         String agendaID = game.revealAgenda(revealFromBottom);
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
-        // Button manualResolve = Button.danger("autoresolve_manual", "Resolve it
+        // Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it
         // Manually");
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -89,7 +91,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         if ("Emergency Session".equalsIgnoreCase(agendaName)) {
             MessageHelper.sendMessageToChannel(channel, "# " + game.getPing()
                 + " __Emergency Session__ revealed.\n## This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
-            aCount = Integer.parseInt(agendaCount) - 1;
+            aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
             return;
@@ -99,7 +101,17 @@ public class RevealAgenda extends AgendaSubcommandData {
             MessageHelper.sendMessageToChannel(channel,
                 game.getPing() + "A Law Related Agenda (" + agendaName
                     + ") was revealed when no laws in play, flipping next agenda");
-            aCount = Integer.parseInt(agendaCount) - 1;
+            aCount -= 1;
+            game.setStoredValue("agendaCount", aCount + "");
+            revealAgenda(event, revealFromBottom, game, channel);
+            return;
+        }
+        if ((agendaTarget.toLowerCase().contains("secret objective"))
+            && game.getScoredSecrets() < 1) {
+            MessageHelper.sendMessageToChannel(channel,
+                game.getPing() + "An Elect Secret Agenda (" + agendaName
+                    + ") was revealed when no scored secrets were in play, flipping next agenda");
+            aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
             return;
@@ -115,7 +127,13 @@ public class RevealAgenda extends AgendaSubcommandData {
                         + " Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
                 notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
-                if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution"))
+                String id2 = game.getNextAgenda(revealFromBottom);
+                AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
+                agendaTarget = agendaDetails2.getTarget();
+                agendaType = agendaDetails2.getType();
+                agendaName = agendaModel.getName();
+                game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
+                if ((agendaTarget.toLowerCase().contains("elect law") || id2.equalsIgnoreCase("constitution"))
                     && game.getLaws().size() < 1) {
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
@@ -123,12 +141,14 @@ public class RevealAgenda extends AgendaSubcommandData {
                         game.getPing()
                             + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
                 }
-                String id2 = game.getNextAgenda(revealFromBottom);
-                AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
-                agendaTarget = agendaDetails2.getTarget();
-                agendaType = agendaDetails2.getType();
-                agendaName = agendaModel.getName();
-                game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
+                if ((agendaTarget.toLowerCase().contains("secret objective"))
+                    && game.getScoredSecrets() < 1) {
+                    MessageHelper.sendMessageToChannel(channel,
+                        game.getPing() + "An Elect Secret Agenda (" + agendaName
+                            + ") was revealed under COvert when no scored secrets were in play, flipping next agenda");
+                    notEmergency = false;
+                    game.revealAgenda(revealFromBottom);
+                }
 
                 if (notEmergency) {
                     cov = true;
@@ -151,12 +171,6 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         game.setStoredValue("Pass On Shenanigans", "");
         game.setStoredValue("Abstain On Agenda", "");
-        if (!action) {
-            AgendaHelper.offerEveryonePrepassOnShenanigans(game);
-            AgendaHelper.offerEveryonePreAbstain(game);
-            AgendaHelper.checkForAssigningGeneticRecombination(game);
-            AgendaHelper.checkForPoliticalSecret(game);
-        }
         game.resetCurrentAgendaVotes();
         game.setHasHackElectionBeenPlayed(false);
         game.setPlayersWhoHitPersistentNoAfter("");
@@ -168,6 +182,13 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         game.setLatestWhenMsg("");
         game.setLatestAfterMsg("");
+        if (!action) {
+            AgendaHelper.offerEveryonePrepassOnShenanigans(game);
+            AgendaHelper.offerEveryonePreAbstain(game);
+            AgendaHelper.checkForAssigningGeneticRecombination(game);
+            AgendaHelper.checkForPoliticalSecret(game);
+        }
+
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + "\nAn agenda has been revealed";
         MessageHelper.sendMessageToChannelWithEmbed(channel, revealMessage, agendaEmbed);
@@ -198,15 +219,15 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         if (action) {
             msg = "It seems likely you are resolving Midir, the Edyn hero, you may use this button to skip straight to the resolution.";
-            proceedButtons.add(Button.danger("autoresolve_manual", "Skip Straight To Resolution"));
+            proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             ListVoteCount.turnOrder(event, game, channel);
             msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
-            proceedButtons.add(Button.danger("proceedToVoting", "Skip waiting and start the voting for everyone"));
-            proceedButtons.add(Button.primary("transaction", "Transaction"));
-            proceedButtons.add(Button.danger("eraseMyVote", "Erase my vote & have me vote again"));
-            proceedButtons.add(Button.danger("eraseMyRiders", "Erase my riders"));
-            proceedButtons.add(Button.secondary("refreshAgenda", "Refresh Agenda"));
+            proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
+            proceedButtons.add(Buttons.blue("transaction", "Transaction"));
+            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+            proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
+            proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         if (cov) {
@@ -241,6 +262,18 @@ public class RevealAgenda extends AgendaSubcommandData {
             ButtonHelper.updateMap(game, event,
                 "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
             game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, new Date().getTime() + "");
+        }
+        if (game.getCurrentAgendaInfo().contains("Secret")) {
+            String summary = "The scored secrets so far are:\n";
+            for (Player p2 : game.getRealPlayers()) {
+                for (String soID : p2.getSecretsScored().keySet()) {
+                    SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+                    if (so != null) {
+                        summary = summary + so.getName() + ": " + so.getText() + "\n";
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(channel, summary);
         }
     }
 }

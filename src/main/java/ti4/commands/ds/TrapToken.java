@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
@@ -64,7 +65,6 @@ public class TrapToken extends DiscordantStarsSubcommandData {
         }
 
         setTrapForPlanet(event, game, planetName, stringTrapID, player);
-
     }
 
     public void setTrapForPlanet(GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player) {
@@ -78,12 +78,8 @@ public class TrapToken extends DiscordantStarsSubcommandData {
         ButtonHelperAbilities.addATrapToken(game, planetName);
         player.setTrapCardPlanet(trap, unitHolder.getName());
         player.setTrapCard(trap);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " put a trap on the planet " + Helper.getPlanetRepresentation(planetName, game));
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " set the trap " + ButtonHelperAbilities.translateNameIntoTrapIDOrReverse(trap)
-            + " on the planet " + Helper.getPlanetRepresentation(planetName, game));
-        if (player.getLeaderIDs().contains("lizhocommander") && !player.hasLeaderUnlocked("lizhocommander")) {
-            ButtonHelper.commanderUnlockCheck(player, game, "lizho", event);
-        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true) + " put a trap on the planet " + Helper.getPlanetRepresentation(planetName, game));
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + " set the trap " + ButtonHelperAbilities.translateNameIntoTrapIDOrReverse(trap) + " on the planet " + Helper.getPlanetRepresentation(planetName, game));
+        CommanderUnlockCheck.checkPlayer(player, game, "lizho", event);
     }
 }

@@ -52,7 +52,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players cannon cancel more than 1 hit with SUSTAIN DAMAGE during each space combat round in this system.",
+        "ability": "Other players cannot cancel more than 1 hit with SUSTAIN DAMAGE during each space combat round in this system.",
         "unlock": "When you resolve your PILLAGE faction ability, place 1 control token on this card.\nUNLOCK: have 6 control tokens on this card.",
         "homebrewReplacesID": "mentak_flagship"
     },
@@ -128,8 +128,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After you use your STAR FORGE faction ability in this system, you may gain 1 trade good.",
-        "unlock": "UNLOCK: Have a war sun in or adjacent to a system that contains your supernova.",
+        "ability": "ACTION: Spend 1 token from your strategy pool to place ships with a combined cost of 2 or less in this system.",
+        "unlock": "UNLOCK: Have a war sun in or adjacent to a system that contains a supernova.",
         "homebrewReplacesID": "muaat_flagship"
     },
     {
@@ -147,8 +147,24 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When 1 of your war suns in this system would be destroyed, you may damage or destroy this ship instead.\nACTION: Spend 1 token from your strategy pool to resolve your STAR FORGE faction ability in this system twice, then gain 1 trade good.",
+        "ability": "When 1 of your war suns in this system would be destroyed, you may damage or destroy this ship instead.\nACTION: Spend 1 token from your strategy pool to place ships with a combined cost of 2 or less in this or adjacent systems.",
         "unlock": "UNLOCK: Have 2 of your war suns in or adjacent to the system that contains The Inferno I"
+    },
+    {
+        "id": "sigma_muaat_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Ember Colossus",
+        "source": "flagshipping",
+        "faction": "Muaat",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "When you use your STAR FORGE faction ability in this or an adjacent system, or use the component action of your flagship when it is in this or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "homebrewReplacesID": "muaat_mech"
     },
     
     {
@@ -182,7 +198,7 @@
         "capacityValue": 4,
         "cost": 8,
         "combatHitsOn": 7,
-        "combatDieCount": 6,
+        "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
@@ -207,8 +223,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Hits produced by this ship must be assigned to non-fighter ships if able.",
-        "bombardHitsOn": 8,
-        "bombardDieCount": 1,
+        "bombardHitsOn": 6,
+        "bombardDieCount": 2,
         "unlock": "UNLOCK: produce 3 BOMBARDMENT hits during 1 invasion.",
         "homebrewReplacesID": "l1z1x_flagship"
     },
@@ -228,8 +244,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "Hits produced by this ship and by your dreadnoughts in or adjacent to this system must be assigned to non-fighter ships if able, and cannot be canceled.",
-        "bombardHitsOn": 4,
-        "bombardDieCount": 2,
+        "bombardHitsOn": 6,
+        "bombardDieCount": 4,
         "unlock": "UNLOCK: produce 6 BOMBARDMENT hits during 1 invasion."
     },
     
@@ -267,7 +283,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this ship makes a combat roll, it rolls a number of dice equal to the number ships your your had at the start of the space combat.",
+        "ability": "When this ship makes a combat roll, it rolls a number of dice equal to the number of ships your opponent had in the active system at the start of the space combat.",
         "unlock": "UNLOCK: Control Mecatol Rex and 2 legendary planets."
     },
     
@@ -454,7 +470,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that die immediately.",
+        "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that dice immediately.",
         "unlock": "UNLOCK: Control a planet with a technology speciality.",
         "homebrewReplacesID": "jolnar_flagship"
     },
@@ -473,7 +489,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that die immediately.",
+        "ability": "When this ship produces a hit with a combat roll, it gains 1 additional combat dice for this round of combat; roll that dice immediately.",
         "unlock": "If you control a planet with a technology speciality, or own 4 technologies of 1 color, place the technology token of the corresponding color on this card.\nUNLOCK: Have 4 tokens on this card."
     },
     
@@ -631,7 +647,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may spend any number of trade goods to cancel up to 3 hits each, all produced by the same player against your units in this system; that player gains the trade good.",
-        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card. UNLOCK: Have 3 control tokens for each other player in the game on this card."
+        "unlock": "When you resolve a transaction with another player, place 1 of their control tokens on this card. UNLOCK: Have 6 control tokens for each other player in the game on this card."
     },
     
     {
@@ -649,7 +665,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You treat this systems as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts.",
+        "ability": "You treat this system as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts.",
         "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 4 or more wormholes.",
         "homebrewReplacesID": "ghost_flagship"
     },
@@ -668,7 +684,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You treat this systems as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts. You may move this ship to an adjacent system at the start of a space combat there.",
+        "ability": "You treat this system as if it contained a delta wormhole. During movement, this ship may move before or after your other ships. This ship does not roll for gravity rifts. You may move this ship to an adjacent system at the start of a space combat there.",
         "unlock": "UNLOCK: Have ships in systems that collectively contain a total of 6 or more wormholes."
     },
     
@@ -746,7 +762,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may tread this unit as though it were adjacent to systems that contain 1 or more of your mechs.",
+        "ability": "You may treat this unit as though it were adjacent to systems that contain 1 or more of your mechs.",
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "unlock": "UNLOCK: When you would score a public objective or draw a secret objective, you may instead unlock the Memoria II."
@@ -788,7 +804,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When you capture a unit in this system, also capture a fighter or infantry token from the supply. When your produce this ship, you may return 24 fighters and/or infantry tokens instead of spending resources.",
+        "ability": "When you capture a unit in this system, also capture a fighter or infantry token from the supply. When you produce this ship, you may return 24 fighters and/or infantry tokens instead of spending resources.",
         "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 4 of 1 player's control tokens on this card.",
         "homebrewReplacesID": "cabal_flagship"
     },
@@ -807,7 +823,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When another unit is destroyed in this system, including your own, capture it, then capture a fighter or infantry token from the supply. When your produce this ship, you may return 16 fighters and/or infantry tokens instead of spending resources.",
+        "ability": "When another unit is destroyed in this system, including your own, capture it, then capture a fighter or infantry token from the supply. When you produce this ship, you may return 16 fighters and/or infantry tokens instead of spending resources.",
         "unlock": "When you capture another player's unit, place 1 of that player's control tokens on this card.\nUNLOCK: Have 12 of 1 player's control tokens on this card."
     },
     
@@ -978,8 +994,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players must spend 2 influence to activate the system that contains this ship.",
-        "unlock": "UNLOCK: Give another player 4 commodities or trade goods when resolving a transaction.",
+        "ability": "Other players must spend 2 influence to activate this system.",
+        "unlock": "UNLOCK: Give another player 4 commodities and/or trade goods when resolving a transaction.",
         "homebrewReplacesID": "keleres_flagship"
     },
     {
@@ -997,8 +1013,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other players must spend 4 influence to activate the system that contains this ship. When they do, gain 1 command token from this system or your reinforcements.",
-        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 8 commodities or trade goods when resolving a transaction."
+        "ability": "Other players must spend 4 influence to activate this system. When they do, gain 1 command token from this system or your reinforcements.",
+        "unlock": "UNLOCK: With the Artemiris I unlocked, give another player 8 commodities and/or trade goods when resolving a transaction."
     },
     {
         "id": "sigma_keleresm_flagship_1",

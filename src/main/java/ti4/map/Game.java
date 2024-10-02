@@ -51,6 +51,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -65,6 +66,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
@@ -166,6 +168,9 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private String miltyJson = null;
+    @Getter
+    @Setter
+    private TIGLRank minimumTIGLRankAtGameStart;
 
     public Game() {
         setCreationDate(Helper.getDateRepresentation(new Date().getTime()));
@@ -281,9 +286,8 @@ public class Game extends GameProperties {
                 try {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
-                    // This shouldn't really happen since we
-                    // can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from map.", e);
+                    // This shouldn't really happen since we can even see private fields.
+                    BotLogger.log("Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -384,19 +388,10 @@ public class Game extends GameProperties {
     }
 
     public boolean isACInDiscard(String name) {
-        boolean isInDiscard = false;
-        for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
-
-            if (Mapper.getActionCard(ac.getKey()) != null
-                && Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
-                return true;
-            } else {
-                if (Mapper.getActionCard(ac.getKey()) == null) {
-                    BotLogger.log(ac.getKey() + " is returning a null AC when sent to Mapper in game " + getName());
-                }
-            }
-        }
-        return isInDiscard;
+        return discardActionCards.keySet().stream()
+            .map(Mapper::getActionCard)
+            .anyMatch(ac -> ac.getName() != null &&
+                ac.getName().toLowerCase().contains(name.toLowerCase()));
     }
 
     public String[] getListOfTilesPinged() {
@@ -595,7 +590,11 @@ public class Game extends GameProperties {
     @Nullable
     @JsonIgnore
     public String getGuildId() {
-        return getActionsChannel() == null ? null : getActionsChannel().getGuild().getId();
+        if (getGuild() == null) {
+            return null;
+        }
+        setGuildID(getGuild().getId());
+        return getGuild().getId();
     }
 
     public Map<Integer, Boolean> getScPlayed() {
@@ -623,6 +622,16 @@ public class Game extends GameProperties {
             return checkingForAllReacts.get(messageID);
         } else {
             return "";
+        }
+    }
+
+    public void clearAllEmptyStoredValues() {
+        java.util.Iterator<Map.Entry<String, String>> iterator = checkingForAllReacts.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = iterator.next();
+            if (entry.getValue() == null || entry.getValue().isEmpty()) {
+                iterator.remove(); // Remove the entry if the value is empty  
+            }
         }
     }
 
@@ -1643,6 +1652,14 @@ public class Game extends GameProperties {
         return laws;
     }
 
+    public int getScoredSecrets() {
+        int count = 0;
+        for (Player player : getRealPlayers()) {
+            count += player.getSoScored();
+        }
+        return count;
+    }
+
     public Map<String, String> getLawsInfo() {
         return lawsInfo;
     }
@@ -1756,6 +1773,13 @@ public class Game extends GameProperties {
             laws.put(id, identifier);
             if (optionalText != null) {
                 lawsInfo.put(id, optionalText);
+            }
+            if (getLaws().size() > 2) {
+                for (Player p : getRealPlayers()) {
+                    if (p.getSecretsUnscored().keySet().contains("dp")) {
+                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentation(true, true) + " reminder that you have dictate policy and a 3rd law just got put into play");
+                    }
+                }
             }
             return true;
         }
@@ -2270,6 +2294,15 @@ public class Game extends GameProperties {
             .toList();
     }
 
+    @JsonIgnore
+    public List<TechnologyModel> getUnitUpgradeTechDeck() {
+        return getTechnologyDeck().stream()
+            .map(Mapper::getTech)
+            .filter(TechnologyModel::isUnitUpgrade)
+            .sorted(TechnologyModel.sortByTechRequirements)
+            .toList();
+    }
+
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
         String result = null;
@@ -2383,7 +2416,9 @@ public class Game extends GameProperties {
 
     public void triplicateExplores() {
         explore = Mapper.getDecks().get("explores_pok").getNewDeck();
-        for (String card : explore) {
+        List<String> exp2 = new ArrayList<>();
+        exp2.addAll(explore);
+        for (String card : exp2) {
             explore.add(card + "extra1");
             explore.add(card + "extra2");
         }
@@ -2405,11 +2440,13 @@ public class Game extends GameProperties {
 
     private List<String> multiplyDeck(int totalCopies, String... deckIDs) {
         List<String> newDeck = Arrays.stream(deckIDs).flatMap(deckID -> Mapper.getDecks().get(deckID).getNewDeck().stream()).toList();
+        List<String> newDeck2 = new ArrayList<>();
+        newDeck2.addAll(newDeck);
         for (String card : newDeck)
             for (int i = 1; i < totalCopies; i++)
-                newDeck.add(card + "extra" + i);
-        Collections.shuffle(newDeck);
-        return newDeck;
+                newDeck2.add(card + "extra" + i);
+        Collections.shuffle(newDeck2);
+        return newDeck2;
     }
 
     public String drawRelic() {
@@ -3421,6 +3458,20 @@ public class Game extends GameProperties {
 
         // check if player has any allainces with players that have the commander
         // unlocked
+        if (player.hasAbility("imperia")) {
+            for (Player otherPlayer : getRealPlayers()) {
+                if (otherPlayer.equals(player))
+                    continue;
+                if (player.getMahactCC().contains(otherPlayer.getColor())) {
+
+                    if (otherPlayer.hasLeaderUnlocked(leaderID)) {
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
+                            return leaderID.contains(otherPlayer.getFaction());
+                        }
+                    }
+                }
+            }
+        }
 
         if (leaderIsFake(leaderID)) {
             return false;
@@ -3752,6 +3803,15 @@ public class Game extends GameProperties {
     }
 
     @Nullable
+    public Planet getUnitHolderFromPlanet(String planetName) {
+        Tile tile_ = getTileFromPlanet(planetName);
+        if (tile_ == null) {
+            return null;
+        }
+        return tile_.getUnitHolderFromPlanet(planetName);
+    }
+
+    @Nullable
     public Player getPlayerFromColorOrFaction(String factionOrColor) {
         Player player = null;
         if (factionOrColor != null) {
@@ -4030,5 +4090,76 @@ public class Game extends GameProperties {
 
     public boolean removeTag(String tag) {
         return getTags().remove(tag);
+    }
+
+    public void checkCommanderUnlocks(String factionToCheck) {
+        CommanderUnlockCheck.checkAllPlayersInGame(this, factionToCheck);
+    }
+
+    /**
+     * @return String : TTS/TTPG Map String
+     */
+    @JsonIgnore
+    public String getMapString() {
+        List<String> tilePositions = new ArrayList<>();
+        tilePositions.add("000");
+
+        int ringCountMax = getRingCount();
+        int ringCount = 1;
+        int tileCount = 1;
+        while (ringCount <= ringCountMax) {
+            String position = "" + ringCount + (tileCount < 10 ? "0" + tileCount : tileCount);
+            tilePositions.add(position);
+            tileCount++;
+            if (tileCount > ringCount * 6) {
+                tileCount = 1;
+                ringCount++;
+            }
+        }
+
+        List<String> sortedTilePositions = tilePositions.stream()
+            .sorted(Comparator.comparingInt(Integer::parseInt))
+            .toList();
+        Map<String, Tile> tileMap = new HashMap<>(getTileMap());
+        StringBuilder sb = new StringBuilder();
+        for (String position : sortedTilePositions) {
+            boolean missingTile = true;
+            for (Tile tile : tileMap.values()) {
+                if (tile.getPosition().equals(position)) {
+                    String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
+                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) { // Mecatol Rex in Centre Position
+                        sb.append("{18}");
+                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) { // Something else is in the Centre Position
+                        sb.append("{").append(tileID).append("}");
+                    } else {
+                        sb.append(tileID);
+                    }
+                    missingTile = false;
+                    break;
+                }
+            }
+            if (missingTile && "000".equalsIgnoreCase(position)) {
+                sb.append("{-1}");
+            } else if (missingTile) {
+                sb.append("-1");
+            }
+            sb.append(" ");
+        }
+        setMapString(sb.toString().trim());
+        return sb.toString().trim();
+    }
+
+    public boolean hasUser(User user) {
+        if (user == null) return false;
+        String id = user.getId();
+        for (Player player : getPlayers().values()) {
+            if (player.getUserID().equals(id)) {
+                return true;
+            }
+            if (player.getTeamMateIDs().contains(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

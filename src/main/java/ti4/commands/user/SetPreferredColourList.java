@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class SetPreferredColourList extends UserSubcommandData {
 
     public SetPreferredColourList() {
-        super("set_preferred_colours", "Show your User Settings");
+        super("set_preferred_colours", "Set your preferred colour list");
         addOption(OptionType.STRING, "colour_list", "Enter an ordered comma separated list of your preferred player colour.", true);
     }
 

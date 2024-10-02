@@ -1,6 +1,6 @@
 package ti4.commands.game;
 
-import static ti4.helpers.StringHelper.ordinal;
+import static ti4.helpers.StringHelper.*;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -36,7 +36,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.Storage;
+import ti4.helpers.TIGLHelper;
 import ti4.helpers.WebHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -205,7 +207,7 @@ public class GameEnd extends GameSubcommandData {
         game.setAutoPing(false);
         game.setAutoPingSpacer(0);
         if (!game.isFowMode()) {
-            ButtonHelper.offerEveryoneTitlePossibilities(game);
+            PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
         }
 
         TextChannel summaryChannel = getGameSummaryChannel(game);
@@ -224,10 +226,10 @@ public class GameEnd extends GameSubcommandData {
                     summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
                         m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
                         m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
-                          t -> {
-                            sendFeedbackMessage(t, game);
-                            sendRoundSummariesToThread(t, game);
-                          });
+                            t -> {
+                                sendFeedbackMessage(t, game);
+                                sendRoundSummariesToThread(t, game);
+                            });
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
                     });
@@ -235,10 +237,9 @@ public class GameEnd extends GameSubcommandData {
 
                 // TIGL Extras
                 if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        getTIGLFormattedGameEndText(game, event));
-                    String blt = Constants.bltPing();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), blt + " bot has been told to ping you when TIGL games end");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), Emojis.BLT + Constants.bltPing());
+                    TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
                 }
             });
         } else if (publish) { //FOW SUMMARY
@@ -247,12 +248,12 @@ public class GameEnd extends GameSubcommandData {
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
-            summaryChannel.createThreadChannel(gameName, true).queue( 
-                t -> { 
+            summaryChannel.createThreadChannel(gameName, true).queue(
+                t -> {
                     MessageHelper.sendMessageToChannel(t, gameEndText);
                     sendFeedbackMessage(t, game);
                     sendRoundSummariesToThread(t, game);
-            });
+                });
         }
     }
 
@@ -286,7 +287,7 @@ public class GameEnd extends GameSubcommandData {
         }
         message.append(
             "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
-        
+
         MessageHelper.sendMessageToChannel(t, message.toString());
     }
 
@@ -375,7 +376,7 @@ public class GameEnd extends GameSubcommandData {
                     .append(playerCount).append("P)")
                     .append(", this path has been seen ")
                     .append(winningPathCount - 1)
-                    .append(" times before. It's the ").append(winningPathCommonality).append("most common path at ")
+                    .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of " + winningPathCounts.size() + " paths) at ")
                     .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
                 if (winningPathCount == 1) {
                     sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");

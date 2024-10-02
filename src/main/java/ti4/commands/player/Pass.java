@@ -44,7 +44,7 @@ public class Pass extends PlayerSubcommandData {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
 
-        String text = player.getRepresentation() + " PASSED";
+        String text = player.getRepresentation(true, false) + " PASSED";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have AI Development Algorithm, you may research 1 unit upgrade now for 6 influence.";

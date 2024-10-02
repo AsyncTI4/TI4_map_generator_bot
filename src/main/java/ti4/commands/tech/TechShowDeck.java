@@ -37,6 +37,7 @@ public class TechShowDeck extends TechSubcommandData {
             case Constants.WARFARE -> game.getWarfareTechDeck();
             case Constants.CYBERNETIC -> game.getCyberneticTechDeck();
             case Constants.BIOTIC -> game.getBioticTechDeck();
+            case Constants.UNIT_UPGRADE -> game.getUnitUpgradeTechDeck();
             default -> new ArrayList<>();
         };
         List<MessageEmbed> embeds = techs.stream()

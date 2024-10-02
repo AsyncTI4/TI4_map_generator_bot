@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.PlayerPreferenceHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -23,7 +24,7 @@ public class OfferAFKTimeOptions extends CustomSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player/Faction/Color could not be found in map:" + game.getName());
             return;
         }
-        ButtonHelper.offerAFKTimeOptions(game, mainPlayer);
+        PlayerPreferenceHelper.offerAFKTimeOptions(game, mainPlayer);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Offered AFK options to " + mainPlayer.getFactionEmoji());
     }
 }

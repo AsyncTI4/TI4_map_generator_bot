@@ -114,7 +114,7 @@ public class GameStats extends StatisticsSubcommandData {
         @Override
         public String toString() {
             return super.toString().toLowerCase();
-        }
+        } 
 
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.

@@ -78,12 +78,10 @@ public class DataMigrationManager {
     }
 
     /// MIGRATION: Example Migration method
-    /// <Description of how data is changing, and optionally what code fix it
-    /// relates to>
-    public static Boolean migrateExampleMigration_241223(Game game) {
+    /// <Description of how data is changing, and optionally what code fix it relates to>
+    public static Boolean migrateExampleMigration_241223(Game game) { // method_DDMMYY where DD = Day, MM = Month, YY = Year
         // Do your migration here for each non-finshed map
-        // This will run once, and the map will log that it has had your migration run
-        // so it doesnt re-run next time.
+        // This will run once, and the map will log that it has had your migration run so it doesnt re-run next time.
         return false;
     }
 

@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -59,9 +60,33 @@ public class Info extends GameSubcommandData {
         sb.append("SO Count: ").append(game.getMaxSOCountPerPlayer()).append(NEW_LINE);
         sb.append("Private Game: ").append(privateGame).append(NEW_LINE);
         sb.append("Game Modes: ").append(game.getGameModesText()).append(NEW_LINE);
+        if (game.isCompetitiveTIGLGame()) {
+            // Game Rank
+            sb.append("TIGL Rank of Game: **");
+            TIGLRank rank = game.getMinimumTIGLRankAtGameStart();
+            if (rank == null) {
+                sb.append(" Unknown Rank");
+            } else {
+                sb.append(game.getMinimumTIGLRankAtGameStart().getName()).append("**");
+            }
+            sb.append("\n");
+
+            // Player Rank
+            sb.append("TIGL Ranks at Start of Game:\n");
+            for (Player player : game.getPlayers().values()) {
+                rank = player.getPlayerTIGLRankAtGameStart();
+                sb.append("> ").append(player.getRepresentationNoPing());
+                if (rank == null) {
+                    sb.append(" Unknown Rank");
+                } else {
+                    sb.append(" **").append(rank.getName()).append("**");
+                }
+                sb.append("\n");
+            }
+        }
         sb.append("Map Template: `").append(game.getMapTemplateID()).append("`").append(NEW_LINE);
         if (!privateGame || game.isHasEnded()) {
-            sb.append("Map String: `").append(Helper.getMapString(game)).append("`").append(NEW_LINE);
+            sb.append("Map String: `").append(game.getMapString()).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
         }
@@ -73,7 +98,7 @@ public class Info extends GameSubcommandData {
         sb.append("- ").append(Emojis.Public1).append("Stage 1 Public Objective Deck: `").append(game.getStage1PublicDeckID()).append("` ").append(game.getPublicObjectives1DeckSize()).append("/").append(game.getPublicObjectives1FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Public2).append("Stage 2 Public Objective Deck: `").append(game.getStage2PublicDeckID()).append("` ").append(game.getPublicObjectives2DeckSize()).append("/").append(game.getPublicObjectives2FullDeckSize()).append(NEW_LINE);
         sb.append("- ").append(Emojis.Agenda).append("Agenda Deck: `").append(game.getAgendaDeckID()).append("` ").append(game.getAgendaDeckSize()).append("/").append(game.getAgendaFullDeckSize()).append(NEW_LINE);
-        if (game.getEventDeckID() != null && !"null".equals(game.getEventDeckID())) {
+        if (game.getEventDeckID() != null && !"null".equals(game.getEventDeckID()) && !game.getEventDeckID().isEmpty()) {
             sb.append("- ").append("Event Deck: `").append(game.getEventDeckID()).append("` ").append(game.getEventDeckSize()).append("/").append(game.getEventFullDeckSize()).append(NEW_LINE);
         }
         sb.append("- ").append(Emojis.NonUnitTechSkip).append("Technology Deck: `").append(game.getTechnologyDeckID()).append("`").append(NEW_LINE);
@@ -86,7 +111,15 @@ public class Info extends GameSubcommandData {
 
         sb.append("### Settings: ").append(NEW_LINE);
         sb.append("Beta Test Mode: ").append(game.isTestBetaFeaturesMode()).append(NEW_LINE);
-        sb.append("Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Game Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Player's Auto-Ping Time Interval (hrs):\n");
+        for (Player player : game.getRealPlayers()) {
+            String interval = String.valueOf(player.getPersonalPingInterval());
+            if ("0".equals(interval)) {
+                interval = "Off";
+            }
+            sb.append("> ").append(player.getFactionEmojiOrColor()).append(": `").append(interval).append("`\n");
+        }
         sb.append("Text Size: ").append(game.getTextSize()).append(NEW_LINE);
         sb.append("Full Text Output: ").append(game.isShowFullComponentTextEmbeds()).append(NEW_LINE);
         sb.append("Output Verbosity: ").append(game.getOutputVerbosity()).append(NEW_LINE);
