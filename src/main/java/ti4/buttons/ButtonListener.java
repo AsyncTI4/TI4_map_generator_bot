@@ -2493,7 +2493,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getHook().sendMessage(msg).setEphemeral(true).queue();
 
         } else if (buttonID.startsWith("addIonStorm_")) {
-            ButtonHelper.addIonStorm(game, buttonID, event);
+            ButtonHelper.addIonStorm(game, buttonID, event, player);
         } else if (buttonID.startsWith("flipIonStorm_")) {
             ButtonHelper.flipIonStorm(game, buttonID, event);
         } else if (buttonID.startsWith("terraformPlanet_")) {

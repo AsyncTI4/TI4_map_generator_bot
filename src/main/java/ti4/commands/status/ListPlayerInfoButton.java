@@ -778,7 +778,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "te" -> {
                 int count = 0;
-                for (Player p2 : game.getRealPlayers()) {
+                for (Player p2 : game.getRealPlayersNDummies()) {
                     if (p2 == player) {
                         continue;
                     }
