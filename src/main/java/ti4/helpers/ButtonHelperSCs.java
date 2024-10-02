@@ -194,6 +194,9 @@ public class ButtonHelperSCs {
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("imperial").orElse(null);
         }
+        if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
+        }
         if (!game.getPhaseOfGame().contains("agenda") && !used && scModel != null && scModel.usesAutomationForSCID("pok8imperial")
             && !player.getFollowedSCs().contains(scModel.getInitiative())
             && game.getPlayedSCs().contains(scModel.getInitiative())) {
@@ -211,11 +214,8 @@ public class ButtonHelperSCs {
         if (used2) {
             return;
         }
-        if (!player.getFollowedSCs().contains(8)) {
-            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, 8, game, event);
-        }
 
-        Player imperialHolder = Helper.getPlayerWithThisSC(game, 8);
+        Player imperialHolder = Helper.getPlayerWithThisSC(game, scModel.getInitiative());
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeaker());
         }

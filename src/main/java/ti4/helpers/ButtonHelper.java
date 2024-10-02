@@ -4526,7 +4526,7 @@ public class ButtonHelper {
         }
     }
 
-    public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event) {
+    public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event,Player player) {
         String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         Tile tile = game.getTileByPosition(pos);
         if (buttonID.contains("alpha")) {
@@ -4542,6 +4542,7 @@ public class ButtonHelper {
                 "Added ionstorm beta to " + tile.getRepresentation());
         }
         deleteMessage(event);
+        CommanderUnlockCheck.checkPlayer(player, "ghost");
     }
 
     public static void checkForIonStorm(Game game, Tile tile, Player player) {
