@@ -752,7 +752,7 @@
         "faction": "arborec",
         "baseUpgrade": "absol_inf2",
         "source": "absol",
-        "text": "COST: 1(x2); COMBAT 7\n \n AAfter this unit is destroyed, place the unit on this card. At the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control and return the rest to your reinforcements.\n \n PRODUCTION 2",
+        "text": "COST: 1(x2); COMBAT 7\n\nAfter this unit is destroyed, place the unit on this card./nAt the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control and return the rest to your reinforcements.\n\nPRODUCTION 2",
         "homebrewReplacesID": "lw2"
     },
     {
