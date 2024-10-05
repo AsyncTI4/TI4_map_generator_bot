@@ -53,12 +53,14 @@
     },
     {
         "id": "miningworld",
+        "name": "Mining World",
         "imagePath": "attachment_miningworld.png",
         "resourcesModifier": 2,
         "source": "pok"
     },
     {
         "id": "nanoforge",
+        "name": "Nanoforge",
         "imagePath": "attachment_nanoforge.png",
         "resourcesModifier": 2,
         "influenceModifier": 2,

@@ -24,7 +24,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
     private String requiredTechId;
-    private ComponentSource source;
     private String faction;
     private int moveValue;
     private int productionValue;
@@ -50,6 +49,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String ability;
     private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
+    private String imageURL;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     //Source: units.json - source of json: https://docs.google.com/spreadsheets/d/1nbHylJyn4VURCRKX8ePmOrLa6dAsc504ww0BPZXIRxU/edit?usp=sharing

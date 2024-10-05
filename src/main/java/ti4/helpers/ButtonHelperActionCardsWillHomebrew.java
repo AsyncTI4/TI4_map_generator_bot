@@ -408,7 +408,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 message, buttons);
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentation(planet, game));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " refreshed and explored " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game));
     }
 
 }
