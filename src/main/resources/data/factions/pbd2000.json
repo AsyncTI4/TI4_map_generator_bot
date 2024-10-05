@@ -30,21 +30,6 @@
         "source": "pbd2000"
     },
     {
-        "alias": "raven",
-        "factionName": "The Raven",
-        "homeSystem": "62",
-        "startingFleet": "dn,cv,dd,2 ff,3 inf s,sd s",
-        "commodities": 4,
-        "factionTech": ["stco", "negr"],
-        "startingTech": [],
-        "homePlanets": ["semlore"],
-        "abilities": ["voidmaker", "impairment", "tachyonpulse"],
-        "leaders": ["ravenagent", "ravencommander", "ravenhero"],
-        "promissoryNotes": ["strotemarket"],
-        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "pbd2000_raven_flagship", "infantry", "pbd2000_raven_mech", "pds", "spacedock"],
-        "source": "pbd2000"
-    },
-    {
         "alias": "terminator",
         "factionName": "The Terminator",
         "homeSystem": "62",
