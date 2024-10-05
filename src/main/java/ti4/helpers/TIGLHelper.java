@@ -244,7 +244,7 @@ public class TIGLHelper {
         TIGLRank currentRank = getUsersHighestTIGLRank(user);
         if (toRank.getIndex() - currentRank.getIndex() == 1) {
             AsyncTI4DiscordBot.guildPrimary.addRoleToMember(user, toRank.getRole()).queue();
-            AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5, TimeUnit.SECONDS);
+            // AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(user, currentRank.getRole()).queueAfter(5, TimeUnit.SECONDS);
         }
         String message = user.getAsMention() + " has been promoted to **" + toRank.getRole().getName() + "**!";
         MessageHelper.sendMessageToChannel(getTIGLChannel(), message);

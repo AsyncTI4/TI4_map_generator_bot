@@ -551,7 +551,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             game.setStoredValue("fortuneSeekers", "Used");
         }
 
-        CommanderUnlockCheck.checkPlayer(player, "kollecc", "bentor");
+        CommanderUnlockCheck.checkPlayer(player, "kollecc", "bentor", "ghost");
         if (player.getPlanets().contains(planetID)) {
             ButtonHelperAbilities.offerOrladinPlunderButtons(player, game, planetID);
         }
