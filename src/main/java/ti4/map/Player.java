@@ -2140,6 +2140,11 @@ public class Player {
         commodities = comms;
     }
 
+    @JsonIgnore
+    public String getCommoditiesRepresentation() {
+        return getCommodities() + "/" + getCommoditiesTotal();
+    }
+
     public List<String> getTechs() {
         return techs;
     }

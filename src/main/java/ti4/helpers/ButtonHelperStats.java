@@ -90,11 +90,7 @@ public class ButtonHelperStats {
 
     public static void gainTGs(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean skipOutput) {
         if (amt == 0) return;
-
-        int init = player.getTg();
-        player.setTg(init + amt);
-
-        String message = "has gained " + amt + " trade goods (" + init + "->" + player.getTg() + ")";
+        String message = "has gained " + amt + " trade goods " + player.gainTG(amt);
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
@@ -108,7 +104,7 @@ public class ButtonHelperStats {
             String axis = player.getRepresentation(true, true) + " you have the opportunity to buy axis orders";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "mykomentori", null);
+        CommanderUnlockCheck.checkPlayer(player, "mykomentori");
     }
 
     public static void sendGainCCButtons(Game game, Player player, boolean redistribute) {
