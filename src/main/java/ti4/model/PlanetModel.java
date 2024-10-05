@@ -37,7 +37,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String factionHomeworld;
     private PlanetTypeModel.PlanetType planetType;
     private List<PlanetTypeModel.PlanetType> planetTypes;
-    private String imageURL;
+    private String cardImagePath;
     private List<TechSpecialtyModel.TechSpecialty> techSpecialties;
     private String legendaryAbilityName;
     private String legendaryAbilityText;

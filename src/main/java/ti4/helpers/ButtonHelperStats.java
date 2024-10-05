@@ -55,10 +55,10 @@ public class ButtonHelperStats {
         if (player.getCommodities() + amt >= player.getCommoditiesTotal()) {
             player.setCommodities(player.getCommoditiesTotal());
             int gained = player.getCommodities() - initComm;
-            message = "Gained " + gained + " Commodities (comms are now at max)";
+            message = "Gained " + gained + " Commodities (" + initComm + "->" + player.getCommoditiesRepresentation() + ")";
         } else {
             player.setCommodities(player.getCommodities() + amt);
-            message = "Gained " + amt + " Commodities (" + initComm + "->" + player.getCommodities() + ")";
+            message = "Gained " + amt + " Commodities (" + initComm + "->" + player.getCommoditiesRepresentation() + ")";
         }
         int finalComm = player.getCommodities();
 

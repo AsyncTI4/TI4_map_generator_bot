@@ -3474,7 +3474,7 @@ public class ButtonHelper {
             Tile tile = game.getTileFromPlanet(planetName);
             String messageText = player.getRepresentation() + " explored " +
                 Emojis.getEmojiFromDiscord(drawColor) +
-                "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tile.getPosition()
+                "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tile.getPosition()
                 + ")*:";
             ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
@@ -6475,29 +6475,27 @@ public class ButtonHelper {
     }
 
     public static String getListOfStuffAvailableToSpend(Player player, Game game, boolean production) {
-        String youCanSpend;
+        StringBuilder youCanSpend = new StringBuilder("You have available to you to spend: ");
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-        StringBuilder youCanSpendBuilder = new StringBuilder("You have available to you to spend: ");
-        for (String planet : planets) {
-            youCanSpendBuilder.append(Helper.getPlanetRepresentation(planet, game)).append(", ");
-        }
-        youCanSpend = youCanSpendBuilder.toString();
         if (planets.isEmpty()) {
-            youCanSpend = "You have available to you 0 unexhausted planets ";
+            youCanSpend.append(" No Ready Planets ");
+        } else {
+            for (String planet : planets) {
+                youCanSpend.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)).append(", ");
+            }
         }
         if (!game.getPhaseOfGame().contains("agenda")) {
-            youCanSpend = youCanSpend + "and " + player.getTg() + " TG" + (player.getTg() == 1 ? "" : "s");
+            youCanSpend.append("and " + player.getTg() + Emojis.tg + " TG" + (player.getTg() == 1 ? "" : "s"));
         }
         if (production) {
             if (player.hasTech("st")) {
-                youCanSpend = youCanSpend + ". You also have sarween tools";
+                youCanSpend.append(". You also have " + Emojis.CyberneticTech + "Sarween Tools");
             }
             if (player.hasTechReady("aida")) {
-                youCanSpend = youCanSpend + ". You also have AIDEV for " + ButtonHelper.getNumberOfUnitUpgrades(player) + " resources";
+                youCanSpend.append(". You also have " + Emojis.WarfareTech + "AIDEV for " + ButtonHelper.getNumberOfUnitUpgrades(player) + " resources");
             }
         }
-
-        return youCanSpend;
+        return youCanSpend.toString();
     }
 
     public static List<Tile> getTilesOfPlayersSpecificUnits(Game game, Player p1, UnitType... type) {

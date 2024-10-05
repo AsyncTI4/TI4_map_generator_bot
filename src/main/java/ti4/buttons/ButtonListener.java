@@ -903,7 +903,7 @@ public class ButtonListener extends ListenerAdapter {
             Tile tile = game.getTileFromPlanet(planetName);
             String tileName = tile == null ? "no tile" : tile.getPosition();
             String messageText = player.getRepresentation() + " explored " + "Planet "
-                + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + tileName + ")*:";
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + tileName + ")*:";
             if (buttonID.contains("_distantSuns")) {
                 messageText = player.getFactionEmoji() + " chose to resolve: ";
             }
@@ -1731,7 +1731,7 @@ public class ButtonListener extends ListenerAdapter {
             String pos = buttonID.split("_")[0];
             List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), type,
                 "placeOneNDone_dontskip");
-            String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
+            String message = player.getRepresentation() + " Use the buttons to produce 1 unit.\n> "
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
 
