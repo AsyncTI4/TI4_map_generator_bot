@@ -24,6 +24,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String text1;
     private String text2;
     private String mapText;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 

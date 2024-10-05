@@ -194,13 +194,12 @@ public class ExplorePlanet extends ExploreSubcommandData {
         }
         String position_ = tile == null ? "none" : tile.getPosition();
         String messageText = player.getRepresentation() + " explored " + Emojis.getEmojiFromDiscord(drawColor) +
-            "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile " + position_ + ")*:";
+            "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile " + position_ + ")*:";
         if (player.hasUnexhaustedLeader("lanefiragent")) {
             ExploreModel exploreModel = Mapper.getExplore(cardID);
             String name1 = exploreModel.getName();
             Button resolveExplore1 = Buttons.green("lanefirAgentRes_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Choose " + name1);
-            Button resolveExplore2 = Buttons.green("lanefirAgentRes_Accept_" + drawColor + "_" + planetName,
-                "Use Lanefir Agent");
+            Button resolveExplore2 = Buttons.green("lanefirAgentRes_Accept_" + drawColor + "_" + planetName, "Use Lanefir Agent");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
             String message = player.getRepresentation(true, true) + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Vassa Hagi, the Lanefir" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, and thus may decline this explore to draw another one instead.";
