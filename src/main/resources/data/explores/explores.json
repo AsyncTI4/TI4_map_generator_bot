@@ -77,7 +77,7 @@
         "name": "Dyson Sphere",
         "type": "Cultural",
         "resolution": "Attach",
-        "text": "This planet's resource value is increased by 2 and its influence values is increased by 1.",
+        "text": "This planet's resource value is increased by 2 and its influence value is increased by 1.",
         "attachmentId": "dysonsphere",
         "source": "pok"
     },
