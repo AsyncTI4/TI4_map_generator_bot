@@ -107,7 +107,6 @@ public class Mapper {
     public static void loadData() throws Exception {
         importJsonObjectsFromFolder("colors", colors, ColorModel.class);
         importJsonObjectsFromFolder("factions", factions, FactionModel.class);
-        //readData("color.properties", colors);
         readData("decals.properties", decals);
         readData("tokens.properties", tokens);
         readData("special_case.properties", special_case);
