@@ -258,11 +258,6 @@ public class MessageHelper {
 		replyToMessage(event, fileUpload, false, null, false);
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload,
-		boolean forceShowMap) {
-		replyToMessage(event, fileUpload, forceShowMap, null, false);
-	}
-
 	public static void editMessageWithButtons(ButtonInteractionEvent event, String message, List<Button> buttons) {
 		editMessageWithButtonsAndFiles(event, message, buttons, Collections.emptyList());
 	}

@@ -32,7 +32,9 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private List<String> units;
     private ComponentSource source;
     private String homebrewReplacesID;
-    private String factionSheetURL;
+    private String factionSheetFrontImageURL;
+    private String factionSheetBackImageURL;
+    private String factionReferenceImageURL;
 
     public boolean isValid() {
         return alias != null
@@ -90,8 +92,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(homebrewReplacesID);
     }
 
-    public Optional<String> getFactionSheetURL() {
-        return Optional.ofNullable(factionSheetURL);
+    public Optional<String> getFactionSheetFrontImageURL() {
+        return Optional.ofNullable(factionSheetFrontImageURL);
     }
 
     @Override
@@ -109,7 +111,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         StringBuilder description = new StringBuilder();
         eb.setDescription(description.toString());
 
-        if (getFactionSheetURL().isPresent()) eb.setImage(getFactionSheetURL().get());
+        if (getFactionSheetFrontImageURL().isPresent()) eb.setImage(getFactionSheetFrontImageURL().get());
 
         //FOOTER
         StringBuilder footer = new StringBuilder();

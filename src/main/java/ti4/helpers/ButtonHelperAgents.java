@@ -1255,7 +1255,7 @@ public class ButtonHelperAgents {
                 Tile tile = game.getTileFromPlanet(planetName);
                 String messageText = player.getRepresentation() + " explored " +
                     Emojis.getEmojiFromDiscord(drawColor) +
-                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile "
+                    "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile "
                     + tile.getPosition() + ")*:";
                 ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
@@ -1295,7 +1295,7 @@ public class ButtonHelperAgents {
                 String cardID = game.drawExplore(drawColor);
                 String messageText = player.getRepresentation() + " explored " +
                     Emojis.getEmojiFromDiscord(drawColor) +
-                    "Planet " + Helper.getPlanetRepresentationPlusEmoji(planetName) + " *(tile "
+                    "Planet " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game) + " *(tile "
                     + tile.getPosition() + ")*:";
                 ExploreSubcommandData.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
