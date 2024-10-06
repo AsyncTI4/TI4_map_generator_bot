@@ -25,6 +25,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     private String target;
     private String text;
     private String mapText;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 

@@ -25,6 +25,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private ComponentSource source;
     private String text;
     private String homebrewReplacesID;
+    private String imageURL;
     private List<String> searchTags = new ArrayList<>();
     private boolean dupe = false;
 
