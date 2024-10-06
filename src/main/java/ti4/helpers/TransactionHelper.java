@@ -243,12 +243,16 @@ public class TransactionHelper {
     }
 
     public static String getNothingMessage() {
-        int result = ThreadLocalRandom.current().nextInt(1, 47);
+        if (ThreadLocalRandom.current().nextInt(1000000) == 0)
+        {
+            return "The joy of sharing a one in a million emptry transaction offer message";
+        }
+        int result = ThreadLocalRandom.current().nextInt(1, 90);
         return switch (result) {
             case 1 -> "Nothing But Respect And Good Will";
             case 2 -> "Some Pocket Lint";
             case 3 -> "Sunshine and Rainbows";
-            case 4 -> "A Feeling Of Accomplishment";
+            case 4 -> "A Sense of Pride and Accomplishment";
             case 5 -> "A Crisp High Five";
             case 6 -> "A Well Written Thank-You Note";
             case 7 -> "Heartfelt Thanks";
@@ -290,7 +294,51 @@ public class TransactionHelper {
             case 43 -> "Compost For Your Garden";
             case 44 -> "A Tupperware Party Invitation";
             case 45 -> "A Picture of a Sandwich";
-            case 46 -> "Thoughtful Advice About Your Current Situation";    
+            case 46 -> "Thoughtful Advice About Your Current Situation";
+            case 47 -> "Zip; Zilch; Nada";
+            case 48 -> "Approximately " + String.format("%,d", 5*ThreadLocalRandom.current().nextInt(200, 2000) + ThreadLocalRandom.current().nextInt(1, 5)) + " Unique Snow Globes";
+            case 49 -> "Forgiveness For Future Mistakes (Terms and Conditions Apply)";
+            case 50 -> "A Token Labelled \"Traid Gud\"";
+            case 51 -> "A Hill of Beans";
+            case 52 -> "This Small Portrait of Benjamin Franklin, Done in Oil Paints";
+            case 53 -> "Favourable Timing on Bureaucracy";
+            case 54 -> "A Comfortable Sinecure, When I'm Galactic Emperor";
+            case 55 -> "This Box of One Dozen Starving, Crazed Weasels";
+            case 56 -> "A jpeg Depicting a Cartoon Monkey";
+            case 57 -> "A Somewhat Rare Beanie Baby";
+            case 58 -> "Some Good News About Our Lord and Saviour, Harrugh Gefhara";
+            case 59 -> "No Spoilers for that TV Show You're Watching";
+            case 60 -> "Payment in Exposure";
+            case 61 -> "A VHS Recording of an Episode of _Bill Nye The Science Guy_";
+            case 62 -> "A Short But Comprehensive Lecture on Medieval Siege Weaponry";
+            case 63 -> "An _E.T. the Extra-Terrestrial_ Cartridge for the Atari 2600";
+            case 64 -> "A Nice Solid Thumbs Up";
+            case 65 -> "A Handful of Dog Treats";
+            case 66 -> "One Peppercorn";
+            case 67 -> "Poutine";
+            case 68 -> "The Deputy Speakership";
+            case 69 -> "Half a Slice of Pizza, With or Without Pineapple";
+            case 70 -> "The Wi-Fi Password";
+            case 71 -> "A Second-Hand Toothbrush";
+            case 72 -> "A Lamp That Might Contain a Genie, But Probably Doesn't";
+            case 73 -> "An Acoustic Rendition of _Wonderwall_";
+            case 74 -> "As Many Spiders as You Desire";
+            case 75 -> "Fruit Salad (yummy, yummy)";
+            case 76 -> "One Chocolate Chip Muffin Amongst Eleven Raisin Muffins";
+            case 77 -> "Invoking the A̴̰̽̑ͅn̶͙͝ĉ̸̤̜̽i̶̯̯͋ě̶͓̜͑n̶̤̩̉t̸̯̎͊͜ ̷́ͅP̶̘̀a̸̧̔̅c̶̣̋̔t̷̺̪͛͋";
+            case 78 -> "Some Perfunctory Laughter at Your Next Attempt at a Joke";
+            case 79 -> "The Front Half of Our Pantomime Horse";
+            case 80 -> "~~False~~ Reassurances";
+            case 81 -> "A Big Mouth Billy Bass";
+            case 82 -> "More Cowbell";
+            case 83 -> "Some Subpar Macaroni Art";
+            case 84 -> "A Chocolate Teapot";
+            case 85 -> "Some Week-Old Sushi";
+            case 86 -> "My Second Finest Bottle of Wine Drink™";
+            case 87 -> "A Riddle, Wrapped in a Mystery, Inside an Enigma, Coated in Chocolate";
+            case 88 -> "A Brand-New Luxury Car, Missing Only Fuel, Tires and Car";
+            case 89 -> "Either \"Peace\" or \"Peas\"; the Ambassador Failed to Elaborate";
+            case 9999 -> "Some Free Candy, From My Windowless Van";
             default -> "Nothing";
         };
     }
