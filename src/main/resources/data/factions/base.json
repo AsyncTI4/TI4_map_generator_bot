@@ -243,7 +243,7 @@
       "leaders": ["yinagent", "yincommander", "yinhero"],
       "promissoryNotes": ["greyfire"],
       "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "yin_flagship", "infantry", "yin_mech", "pds", "spacedock"],
-      "factionSheetURL" : "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/14/Yin1.jpg",
+      "factionSheetFrontImageURL" : "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/14/Yin1.jpg",
       "source": "base"
     },
     {

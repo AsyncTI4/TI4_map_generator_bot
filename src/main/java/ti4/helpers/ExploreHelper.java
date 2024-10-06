@@ -16,6 +16,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -199,5 +200,20 @@ public class ExploreHelper {
         } else {
             ButtonHelper.addReaction(event, false, false, message, "");
         }
+    }
+
+    public static String getUnitListEmojisOnPlanetForHazardousExplorePurposes(Game game, Player player, String planetID) {
+        String message = "";
+        Planet planet = game.getUnitHolderFromPlanet(planetID);
+        if (planet != null) {
+            String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
+            String unitList = planet.getPlayersUnitListEmojisOnHolder(player);
+            if (unitList.isEmpty()) {
+                message += "no units on " + planetName;
+            } else {
+                message += unitList + " on " + planetName;
+            }
+        }
+        return message;
     }
 }

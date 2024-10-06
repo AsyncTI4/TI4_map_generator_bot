@@ -25,9 +25,10 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
     private String requirements;
     private String faction;
     private String baseUpgrade;
-    private ComponentSource source;
     private String text;
     private String homebrewReplacesID;
+    private String imageURL;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     public enum TechnologyType {

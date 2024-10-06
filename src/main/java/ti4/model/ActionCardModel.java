@@ -20,6 +20,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String window;
     private String text;
     private String flavorText;
+    private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
