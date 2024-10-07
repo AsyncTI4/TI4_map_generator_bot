@@ -234,7 +234,11 @@ public class WeirdGameSetup extends GameSubcommandData {
 
             // Add envoys to players
             for (Player player : game.getPlayers().values()) {
-                String leaderID = player.getFaction() + "envoy";
+                String faction = player.getFaction();
+                if (faction.startsWith("keleres")) {
+                    faction = "keleres";
+                }
+                String leaderID = faction + "envoy";
                 if (Mapper.isValidLeader(leaderID)) {
                     player.addLeader(leaderID);
                 }
