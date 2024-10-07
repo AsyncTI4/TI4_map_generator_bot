@@ -1,7 +1,10 @@
 package ti4.commands.cardsac;
 
 import java.util.Map;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -33,27 +36,29 @@ public class DiscardAC extends ACCardsSubcommandData {
             return;
         }
         int acIndex = option.getAsInt();
+        discardAC(event, game, player, acIndex);
+    }
+
+    // @ButtonHandler("ac_discard_from_hand")
+    public static void discardAC(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String acID = buttonID.replace("ac_discard_from_hand_", "");
+        discardAC(event, game, player, Integer.parseInt(acID));
+    }
+
+    public static void discardAC(GenericInteractionCreateEvent event, Game game, Player player, int acNumericalID) {
         String acID = null;
-        for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
+        for (Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+            if (ac.getValue().equals(acNumericalID)) {
+                acID = ac.getKey();
             }
         }
 
-        if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+        if (acID == null || game.discardActionCard(player.getUserID(), acNumericalID)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry: " + acID);
             return;
         }
-
-        boolean removed = game.discardActionCard(player.getUserID(), option.getAsInt());
-        if (!removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
-            return;
-        }
-        String sb = "Player: " + player.getUserName() + " - " +
-            "Discarded Action Card:" + "\n" +
-            Mapper.getActionCard(acID).getRepresentation() + "\n";
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
+        String message = player.getRepresentationNoPing() + " discarded Action Card: " + Mapper.getActionCard(acID).getRepresentationJustName();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         ACInfo.sendActionCardInfo(game, player);
     }
 }
