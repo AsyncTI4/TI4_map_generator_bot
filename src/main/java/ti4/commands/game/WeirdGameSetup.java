@@ -41,11 +41,6 @@ public class WeirdGameSetup extends GameSubcommandData {
         Boolean fowMode = event.getOption(Constants.FOW_MODE, null, OptionMapping::getAsBoolean);
         if (fowMode != null) game.setFowMode(fowMode);
 
-        String customGameName = event.getOption(Constants.GAME_CUSTOM_NAME, null, OptionMapping::getAsString);
-        if (customGameName != null) {
-            game.setCustomName(customGameName);
-        }
-
         if (!setGameMode(event, game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the game modes could not be set, please see error above.");
         }
@@ -68,7 +63,7 @@ public class WeirdGameSetup extends GameSubcommandData {
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
         if (event.getOption(Constants.TIGL_GAME) == null && event.getOption(Constants.ABSOL_MODE) == null && event.getOption(Constants.DISCORDANT_STARS_MODE) == null
-            && event.getOption(Constants.BASE_GAME_MODE) == null && event.getOption(Constants.MILTYMOD_MODE) == null) {
+            && event.getOption(Constants.BASE_GAME_MODE) == null && event.getOption(Constants.MILTYMOD_MODE) == null && event.getOption(Constants.CRYYPTER_MODE) == null) {
             return true; //no changes were made
         }
         boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, game.isCompetitiveTIGLGame(), OptionMapping::getAsBoolean);
