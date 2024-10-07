@@ -466,6 +466,7 @@ public class Game extends GameProperties {
                 put("FoW", isFowMode());
                 put("Franken", isFrankenGame());
                 put(Emojis.Absol + "Absol", isAbsolMode());
+                put("Cryypter", isCryypterMode());
                 put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
@@ -3979,6 +3980,8 @@ public class Game extends GameProperties {
             sources.add(ComponentSource.pok);
         if (isAbsolMode())
             sources.add(ComponentSource.absol);
+        if (isCryypterMode())
+            sources.add(ComponentSource.cryypter);
         if (isMiltyModMode())
             sources.add(ComponentSource.miltymod);
         if (isDiscordantStarsMode())
@@ -3999,6 +4002,7 @@ public class Game extends GameProperties {
             || isFrankenGame()
             || isMiltyModMode()
             || isAbsolMode()
+            || isCryypterMode()
             || isPromisesPromisesMode()
             || isFlagshippingMode()
             || isAllianceMode()
