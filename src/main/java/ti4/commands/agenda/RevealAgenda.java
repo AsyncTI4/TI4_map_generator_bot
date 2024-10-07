@@ -20,6 +20,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
+import ti4.helpers.CryypterHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -67,14 +68,15 @@ public class RevealAgenda extends AgendaSubcommandData {
             MapGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
         }
 
+        CryypterHelper.checkEnvoyUnlocks(game);
+
         game.setStoredValue("AssassinatedReps", "");
         game.setStoredValue("riskedPredictive", "");
         game.setStoredValue("conspiratorsFaction", "");
         String agendaID = game.revealAgenda(revealFromBottom);
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
-        // Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it
-        // Manually");
+        // Button manualResolve = Buttons.red("autoresolve_manual", "Resolve it Manually");
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");

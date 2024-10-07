@@ -226,6 +226,7 @@ public class WeirdGameSetup extends GameSubcommandData {
             game.swapOutVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
+            game.setCryypterMode(true);
 
             // Add envoys to players
             for (Player player : game.getPlayers().values()) {

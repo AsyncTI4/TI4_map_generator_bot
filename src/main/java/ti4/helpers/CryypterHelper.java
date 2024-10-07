@@ -1,19 +1,16 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.event.RevealEvent;
 import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.player.SCPlay;
+import ti4.commands.leaders.UnlockLeader;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -56,6 +53,18 @@ public class CryypterHelper {
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+    }
+
+    public static void checkEnvoyUnlocks(Game game) {
+        if (!game.isCryypterMode()) {
+            return;
+        }
+        for (Player player : game.getRealPlayers()) {
+            Leader envoy = player.getLeaderByType("envoy").orElse(null);
+            if (envoy != null && envoy.isLocked()) {
+                UnlockLeader.unlockLeader(envoy.getId(), game, player);
+            }
+        }
     }
 
 }
