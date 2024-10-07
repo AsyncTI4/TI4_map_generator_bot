@@ -2898,6 +2898,8 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        int peekableStageOneCount = getPublicObjectives1Peakable().size();
+        setUpPeakableObjectives(0, 1);
         if (getRevealedPublicObjectives().size() > 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
                 + deck.getName() + "** while there are revealed public objectives.");
@@ -2906,10 +2908,13 @@ public class Game extends GameProperties {
 
         setStage1PublicDeckID(deck.getAlias());
         setPublicObjectives1(deck.getNewShuffledDeck());
+        setUpPeakableObjectives(peekableStageOneCount, 1);
         return true;
     }
 
     public boolean validateAndSetPublicObjectivesStage2Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        int peekableStageTwoCount = getPublicObjectives2Peakable().size();
+        setUpPeakableObjectives(0, 2);
         if (getRevealedPublicObjectives().size() > 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
                 + deck.getName() + "** while there are revealed public objectives.");
@@ -2918,6 +2923,7 @@ public class Game extends GameProperties {
 
         setStage2PublicDeckID(deck.getAlias());
         setPublicObjectives2(deck.getNewShuffledDeck());
+        setUpPeakableObjectives(peekableStageTwoCount, 2);
         return true;
     }
 
