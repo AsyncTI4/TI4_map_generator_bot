@@ -232,7 +232,7 @@ public class WeirdGameSetup extends GameSubcommandData {
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
              for (Player player : game.getPlayers().values()) {
-                player.addLeader(player.getFaction() + "envoy")
+                player.addLeader(player.getFaction() + "envoy");
              }
         }
 
