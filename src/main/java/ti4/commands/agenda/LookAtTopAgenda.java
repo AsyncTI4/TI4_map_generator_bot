@@ -54,7 +54,7 @@ public class LookAtTopAgenda extends AgendaSubcommandData {
         int count = Integer.parseInt(StringUtils.substringBetween(buttonID, "[count:","]"));
         boolean lookAtBottom = Boolean.parseBoolean(StringUtils.substringBetween(buttonID, "[lookAtBottom:","]"));
         lookAtAgendas(game, player, count, lookAtBottom);
-        event.editButton(event.getButton().asDisabled()).queue();
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void lookAtAgendas(Game game, Player player, int count, boolean lookFromBottom) {
