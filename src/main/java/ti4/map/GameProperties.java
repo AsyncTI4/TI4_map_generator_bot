@@ -108,6 +108,7 @@ public class GameProperties {
     private @ExportableField boolean spinMode;
     private @ExportableField boolean fastSCFollowMode;
     private @ExportableField boolean extraSecretMode;
+    private @ExportableField boolean cryypterMode;
     private @ExportableField boolean reverseSpeakerOrder;
 
     // Discord Snowflakes

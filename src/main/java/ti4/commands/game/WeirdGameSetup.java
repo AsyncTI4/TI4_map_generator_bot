@@ -231,9 +231,14 @@ public class WeirdGameSetup extends GameSubcommandData {
             game.swapOutVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
-             for (Player player : game.getPlayers().values()) {
-                player.addLeader(player.getFaction() + "envoy");
-             }
+
+            // Add envoys to players
+            for (Player player : game.getPlayers().values()) {
+                String leaderID = player.getFaction() + "envoy";
+                if (Mapper.isValidLeader(leaderID)) {
+                    player.addLeader(leaderID);
+                }
+            }
         }
 
         return true;

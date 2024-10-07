@@ -3875,16 +3875,9 @@ public class Game extends GameProperties {
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
                     if ((variantUnit.getHomebrewReplacesID().isPresent()
-                        && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant
-                        // unit replacing a
-                        // PoK unit
+                        && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit
                         || (playerUnit.getHomebrewReplacesID().isPresent()
-                            && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK
-                                                                                                                                                        // "variant"
-                                                                                                                                                        // replacing
-                                                                                                                                                        // a true
-                                                                                                                                                        // variant
-                                                                                                                                                        // unit
+                            && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK "variant" replacing a true variant unit
                     ) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());

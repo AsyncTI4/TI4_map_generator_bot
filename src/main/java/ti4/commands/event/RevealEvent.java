@@ -38,7 +38,7 @@ public class RevealEvent extends EventSubcommandData {
         if (eventModel != null) {
             channel.sendMessageEmbeds(eventModel.getRepresentationEmbed()).queue();
         } else {
-            MessageHelper.sendMessageToEventChannel(event, "Something went wrong");
+            MessageHelper.sendMessageToEventChannel(event, "Something went wrong revealing an event; eventID: " + eventID);
         }
     }
 }

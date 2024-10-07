@@ -213,13 +213,13 @@ public class SCPlay extends PlayerSubcommandData {
                             message_.addReaction(reactionEmoji2).queue();
                             p2.addFollowedSC(scToPlay, event);
                             if (scToPlay == 8) {
-                                String key = "factionsThatAreNotDiscardingSOs";
                                 String key3 = "potentialBlockers";
                                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
                                     game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
                                 }
-                                game.setStoredValue(key,
-                                    game.getStoredValue(key) + player.getFaction() + "*");
+
+                                String key = "factionsThatAreNotDiscardingSOs";
+                                game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
                             }
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following SC #" + scToPlay + " because the bot believes you can't follow");
                         }
@@ -230,8 +230,7 @@ public class SCPlay extends PlayerSubcommandData {
             game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId());
             game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
             for (Player p2 : game.getRealPlayers()) {
-                if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction())
-                    .isEmpty()) {
+                if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction()).isEmpty()) {
                     game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());
                 }
             }
@@ -256,8 +255,9 @@ public class SCPlay extends PlayerSubcommandData {
                         scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1TG"));
                         scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), "Send 1 debt"));
                     }
-                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_,
-                        "These buttons will work inside the thread", scButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(threadChannel_, "These buttons will work inside the thread", scButtons);
+
+                    // Trade Neighbour Message
                     if (scModel.usesAutomationForSCID("pok5trade")) {
                         String neighborsMsg = "NOT neighbors with the trade holder:";
                         for (Player p2 : game.getRealPlayers()) {
@@ -278,24 +278,26 @@ public class SCPlay extends PlayerSubcommandData {
                     }
 
                 });
-
             }
         });
 
+        // Trade Primary
         if (scModel.usesAutomationForSCID("pok5trade")) {
             ButtonHelper.tradePrimary(game, event, player);
         }
-        // POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
-        if (scModel.usesAutomationForSCID("pok3politics")) {
+
+        // Politics Assign Speaker Buttons
+        if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
             game.setStoredValue("hasntSetSpeaker", "waiting");
             String assignSpeakerMessage = player.getRepresentation()
                 + ", please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
                 + Emojis.SpeakerToken;
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                assignSpeakerMessage, assignSpeakerActionRow);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
         }
+
+        // Handle Kyro Hero
         if (scToPlay == ButtonHelper.getKyroHeroSC(game)
             && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -303,17 +305,22 @@ public class SCPlay extends PlayerSubcommandData {
                     + " this is a reminder that this strategy card is Kyro Cursed and therefore you should only do 1 of its clauses. ");
         }
 
-        if (scModel.usesAutomationForSCID("pok3politics")) {
-            String assignSpeakerMessage2 = player.getRepresentation()
-                + " after assigning speaker, Use this button to draw agendas into your cards info thread.";
-
-            List<Button> drawAgendaButton = new ArrayList<>();
-            Button draw2Agenda = Buttons.green("FFCC_" + player.getFaction() + "_" + "drawAgenda_2", "Draw 2 agendas");
-            drawAgendaButton.add(draw2Agenda);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                assignSpeakerMessage2, drawAgendaButton);
+        // Politics Agenda Draw Buttons
+        if (scModel.usesAutomationForSCID("pok3politics") || scModel.usesAutomationForSCID("cryypter_3")) {
+            String drawAgendasMessage = player.getRepresentation() + " after assigning speaker, use this button to draw agendas into your cards info thread.";
+            Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "drawAgenda_2", "Draw 2 Agendas", Emojis.Agenda);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), drawAgendasMessage, draw2Agenda);
 
         }
+
+        // Cryypter's Additional Look at Top Agenda Buttons
+        if (scModel.usesAutomationForSCID("cryypter_3")) {
+            String lookAtTopMessage = player.getRepresentation() + " after placing the drawn agendas on top/bottom, you must look a the top two cards of the agenda deck.";
+            Button draw2Agenda = Buttons.green(player.getFinsFactionCheckerPrefix() + "agendaLookAt[count:2][lookAtBottom:false]", "Look at top 2 Agendas", Emojis.Agenda);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), lookAtTopMessage, draw2Agenda);
+        }
+
+        // Red Tape Diplomacy
         if (scToPlay == 2 && game.isRedTapeMode()) {
             ButtonHelper.offerRedTapButtons(game, player);
         }
@@ -414,6 +421,11 @@ public class SCPlay extends PlayerSubcommandData {
         }
     }
 
+    /**
+     * These buttons are only the buttons to be attached to the SC play itself, for all players to use - any additional buttons for the Primary SC holder should add specific logic to {@link SCPlay#scPlay()}
+     * 
+     * @return Buttons for the SCPlay message only (for all players to use)
+     */
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel == null) {
@@ -437,11 +449,16 @@ public class SCPlay extends PlayerSubcommandData {
             case "pok6warfare" -> getWarfareButtons(sc);
             case "pok7technology" -> getTechnologyButtons(sc);
             case "pok8imperial" -> getImperialButtons(sc);
+
             // add your own special button resolutions here as additional cases
             // ignis aurora
             case "ignisaurora3" -> getGenericButtons(sc); //TODO: do it
             case "ignisaurora8" -> getIgnisAuroraSC8Buttons(sc);
-            case "cryypter_3" -> getCryypterSC3Buttons(sc, game);
+
+            // cryypter
+            case "cryypter_3" -> CryypterHelper.getCryypterSC3Buttons(sc);
+
+            // unhandled
             default -> getGenericButtons(sc);
         };
     }
@@ -496,27 +513,23 @@ public class SCPlay extends PlayerSubcommandData {
     private static List<Button> getPoliticsButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+        Button draw2AC = Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", Emojis.ActionCard);
         return List.of(followButton, noFollowButton, draw2AC);
     }
 
-    private static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politics) {
+    private static List<Button> getPoliticsAssignSpeakerButtons(Game game, Player politicsHolder) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
-        for (Player player : game.getPlayers().values()) {
-            if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
+        for (Player player : game.getRealPlayers()) {
+            if (!player.isSpeaker()) {
                 String faction = player.getFaction();
-                if (faction != null && Mapper.isValidFaction(faction)) {
+                if (Mapper.isValidFaction(faction)) {
                     if (!game.isFowMode()) {
-                        Button button = Buttons.gray(politics.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
-                        String factionEmojiString = player.getFactionEmoji();
-                        button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, null, player.getFactionEmoji());
                         assignSpeakerButtons.add(button);
                     } else {
-                        Button button = Buttons.gray(politics.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
-                            player.getColor());
+                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, player.getColor(), Emojis.getColorEmoji(player.getColor()));
                         assignSpeakerButtons.add(button);
                     }
-
                 }
             }
         }
@@ -525,8 +538,8 @@ public class SCPlay extends PlayerSubcommandData {
 
     private static List<Button> getConstructionButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
-        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock));
-        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds));
+        Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock);
+        Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
@@ -535,8 +548,8 @@ public class SCPlay extends PlayerSubcommandData {
         // Button tradePrimary = Buttons.green("trade_primary", "Resolve Primary");
         Button followButton = Buttons.green("sc_trade_follow", "Spend A Strategy CC");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button refreshAndWash = Buttons.gray("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button refresh = Buttons.gray("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        Button refreshAndWash = Buttons.gray("sc_refresh_and_wash", "Replenish and Wash", Emojis.Wash);
+        Button refresh = Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm);
         return List.of(followButton, noFollowButton, refresh, refreshAndWash);
     }
 
@@ -558,9 +571,9 @@ public class SCPlay extends PlayerSubcommandData {
     private static List<Button> getImperialButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy CC");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
-        Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial").withEmoji(Emoji.fromFormatted(Emojis.Mecatol));
-        Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public").withEmoji(Emoji.fromFormatted(Emojis.Public1));
+        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective);
+        Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", Emojis.Mecatol);
+        Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public", Emojis.Public1);
         return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective);
     }
 
