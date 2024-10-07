@@ -100,7 +100,7 @@ public class CryypterHelper {
     @ButtonHandler("cryypterSC3Draw")
     public static void resolveCryypterSC3Draw(ButtonInteractionEvent event, Game game, Player player) {
         event.editButton(event.getButton().asDisabled()).queue();
-        drawXPickYActionCards(game, player, 3, 1, true)
+        drawXPickYActionCards(game, player, 3, 1, true);
         RevealEvent.revealEvent(event, game, game.getMainGameChannel());
     }
 

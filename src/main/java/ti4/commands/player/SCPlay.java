@@ -441,7 +441,7 @@ public class SCPlay extends PlayerSubcommandData {
             // ignis aurora
             case "ignisaurora3" -> getGenericButtons(sc); //TODO: do it
             case "ignisaurora8" -> getIgnisAuroraSC8Buttons(sc);
-            case "cryypter_3" -> getCryypterSC3Buttons(sc, game)
+            case "cryypter_3" -> getCryypterSC3Buttons(sc, game);
             default -> getGenericButtons(sc);
         };
     }
