@@ -37,7 +37,7 @@ public class SourceSettings extends SettingsMenu {
         absol = new BooleanSetting("Absol", "Absol Mod", false);
         miltymod = new BooleanSetting("MiltyMod", "Milty Mod", false);
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
-        cryypter = new BooleanSetting("Cryypter", "Voices of the Council", false);
+        // cryypter = new BooleanSetting("Cryypter", "Voices of the Council", false);
 
         // Emojis
         base.setEmoji(Emojis.TI4BaseGame);
@@ -67,7 +67,7 @@ public class SourceSettings extends SettingsMenu {
             absol.initialize(json.get("absol"));
             miltymod.initialize(json.get("miltymod"));
             eronous.initialize(json.get("eronous"));
-            cryypter.initialize(json.get("cryypter"));
+            // cryypter.initialize(json.get("cryypter"));
         }
     }
 
@@ -109,7 +109,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(absol);
         ls.add(miltymod);
         ls.add(eronous);
-        ls.add(cryypter);
+        // ls.add(cryypter);
         return ls;
 
     }
