@@ -1169,4 +1169,5 @@ public class Constants {
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";
+    public static final String CRYYPTER_MODE = "cryypter_mode";
 }
