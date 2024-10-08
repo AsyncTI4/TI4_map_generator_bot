@@ -466,6 +466,7 @@ public class Game extends GameProperties {
                 put("FoW", isFowMode());
                 put("Franken", isFrankenGame());
                 put(Emojis.Absol + "Absol", isAbsolMode());
+                put("Cryypter", isCryypterMode());
                 put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
@@ -2898,6 +2899,8 @@ public class Game extends GameProperties {
     }
 
     public boolean validateAndSetPublicObjectivesStage1Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        int peekableStageOneCount = getPublicObjectives1Peakable().size();
+        setUpPeakableObjectives(0, 1);
         if (getRevealedPublicObjectives().size() > 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
                 + deck.getName() + "** while there are revealed public objectives.");
@@ -2906,10 +2909,13 @@ public class Game extends GameProperties {
 
         setStage1PublicDeckID(deck.getAlias());
         setPublicObjectives1(deck.getNewShuffledDeck());
+        setUpPeakableObjectives(peekableStageOneCount, 1);
         return true;
     }
 
     public boolean validateAndSetPublicObjectivesStage2Deck(GenericInteractionCreateEvent event, DeckModel deck) {
+        int peekableStageTwoCount = getPublicObjectives2Peakable().size();
+        setUpPeakableObjectives(0, 2);
         if (getRevealedPublicObjectives().size() > 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot change public objective deck to **"
                 + deck.getName() + "** while there are revealed public objectives.");
@@ -2918,6 +2924,7 @@ public class Game extends GameProperties {
 
         setStage2PublicDeckID(deck.getAlias());
         setPublicObjectives2(deck.getNewShuffledDeck());
+        setUpPeakableObjectives(peekableStageTwoCount, 2);
         return true;
     }
 
@@ -3875,16 +3882,9 @@ public class Game extends GameProperties {
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
                     if ((variantUnit.getHomebrewReplacesID().isPresent()
-                        && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant
-                        // unit replacing a
-                        // PoK unit
+                        && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit
                         || (playerUnit.getHomebrewReplacesID().isPresent()
-                            && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK
-                                                                                                                                                        // "variant"
-                                                                                                                                                        // replacing
-                                                                                                                                                        // a true
-                                                                                                                                                        // variant
-                                                                                                                                                        // unit
+                            && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK "variant" replacing a true variant unit
                     ) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());
@@ -3980,6 +3980,8 @@ public class Game extends GameProperties {
             sources.add(ComponentSource.pok);
         if (isAbsolMode())
             sources.add(ComponentSource.absol);
+        if (isCryypterMode())
+            sources.add(ComponentSource.cryypter);
         if (isMiltyModMode())
             sources.add(ComponentSource.miltymod);
         if (isDiscordantStarsMode())
@@ -4000,6 +4002,7 @@ public class Game extends GameProperties {
             || isFrankenGame()
             || isMiltyModMode()
             || isAbsolMode()
+            || isCryypterMode()
             || isPromisesPromisesMode()
             || isFlagshippingMode()
             || isAllianceMode()
