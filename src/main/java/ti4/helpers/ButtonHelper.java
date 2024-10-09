@@ -2503,7 +2503,12 @@ public class ButtonHelper {
         if (player.hasTech("dsghotg") && tile == player.getHomeSystemTile()) {
             armadaValue = armadaValue + 3;
         }
-        int fleetCap = (player.getFleetCC() + armadaValue + player.getMahactCC().size()) * 2;
+        int fleetCap = (
+            player.getFleetCC() 
+            + armadaValue 
+            + player.getMahactCC().size() 
+            + tile.getFleetSupplyBonusForPlayer(player)
+        ) * 2; // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
             fleetCap += 1000;
         }
@@ -2575,7 +2580,6 @@ public class ButtonHelper {
             }
             if (capChecker.getUnitCount(UnitType.PlenaryOrbital, player.getColor()) > 0) {
                 fightersIgnored += 8;
-                fleetCap = fleetCap + 4;
             }
         }
         // System.out.println(fightersIgnored);
@@ -2657,7 +2661,7 @@ public class ButtonHelper {
         if (fleetSupplyViolated) {
             message += " You are violating fleet supply in tile " + tile.getRepresentation()
                 + ". Specifically, you have " + fleetCap / 2
-                + " fleet supply, and that you currently are filling "
+                + " fleet supply in this system, and you currently are filling "
                 + (numFighter2sFleet + numOfCapitalShips + 1) / 2
                 + " of that. ";
         }
