@@ -389,7 +389,7 @@ public class MapGenerator {
         if (debug)
             debugStartTime = System.nanoTime();
         if (game.isFowMode() && event != null) {
-            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) 
+            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)
                 || event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper) {
 
                 isFoWPrivate = true;
@@ -3571,7 +3571,7 @@ public class MapGenerator {
                 }
                 x -= (offBoardHighlighting == 3 ? 40 : 0) + (offBoardHighlighting == 2 ? 60 : 0);
             }
-        } else if (displayType == DisplayType.anomalies && (player.hasTech("dt2") || player.getUnitsOwned().contains("cabal_spacedock"))) {
+        } else if (displayType == DisplayType.anomalies && player.ownsUnitSubstring("cabal_spacedock")) {
             UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
             UnitKey unitKeyCabal = Mapper.getUnitKey("csd", player.getColor());
             int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
@@ -6189,8 +6189,7 @@ public class MapGenerator {
                 }
                 if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != null) {
                     Player p = game.getPlayerByColorID(unitKey.getColorID()).get();
-                    if ((p.ownsUnit("cabal_spacedock") || p.ownsUnit("cabal_spacedock2"))
-                        && unitKey.getUnitType() == UnitType.Spacedock) {
+                    if (unitKey.getUnitType() == UnitType.Spacedock && p.ownsUnitSubstring("cabal_spacedock")) {
                         unitPath = unitPath.replace("sd", "csd");
                     }
                     if (unitKey.getUnitType() == UnitType.TyrantsLament) {
@@ -6439,7 +6438,7 @@ public class MapGenerator {
 
     /**
      * @deprecated use {@link MapGenerator#superDrawString()} instead
-     * Draw a String centered in the middle of a Rectangle.
+     *             Draw a String centered in the middle of a Rectangle.
      * 
      * @param g The Graphics instance.
      * @param text The String to draw.
