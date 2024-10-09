@@ -949,6 +949,17 @@ public class Player {
         return unitsOwned.contains(unitID);
     }
 
+    /**
+     * Returns whether the player owns a unit containing the given substring.
+     * 
+     * @param unitIDSubstring The substring to
+     * @return true if player owns a unit containing the given substring; false otherwise
+     */
+    public boolean ownsUnitSubstring(final String unitIDSubstring) {
+        return getUnitModels().stream()
+            .anyMatch(unit -> unit.getId().contains(unitIDSubstring));
+    }
+
     public boolean removeOwnedUnitByID(String unitID) {
         return unitsOwned.remove(unitID);
     }
