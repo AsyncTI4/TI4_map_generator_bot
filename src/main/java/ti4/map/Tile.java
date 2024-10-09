@@ -603,6 +603,18 @@ public class Tile {
         return false;
     }
 
+    @JsonIgnore
+    public int getFleetSupplyBonusForPlayer(final Player player) {
+        return getUnitHolders().values().stream()
+            .flatMap(unitHolder -> unitHolder.getUnits().entrySet().stream())
+            .filter(entry -> entry.getValue() > 0 && player.unitBelongsToPlayer(entry.getKey()))
+            .map(Map.Entry::getKey)
+            .map(player::getUnitFromUnitKey)
+            .filter(Objects::nonNull)
+            .mapToInt(unit -> unit.getFleetSupplyBonus())
+            .sum();
+    }
+
     public static Predicate<Tile> tileHasPlayerShips(Player player) {
         return tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
     }
