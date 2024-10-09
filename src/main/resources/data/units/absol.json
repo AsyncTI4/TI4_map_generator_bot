@@ -7,6 +7,7 @@
         "source": "absol",
         "productionValue": 10,
         "capacityValue": 8,
+        "fleetSupplyBonus": 2,
         "planetaryShield": true,
         "isStructure": true,
         "ability": "Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in the system do not count against your fleet pool.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card."
@@ -153,6 +154,7 @@
         "source": "absol",
         "productionValue": "+4",
         "capacityValue": 5,
+        "fleetSupplyBonus": 1,
         "isStructure": true,
         "homebrewReplacesID": "spacedock2"
     },
@@ -435,6 +437,7 @@
         "moveValue": 2,
         "productionValue": 7,
         "capacityValue": 6,
+        "fleetSupplyBonus": 1,
         "isStructure": true,
         "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "saar_spacedock2"
@@ -529,8 +532,9 @@
         "source": "absol",
         "faction": "cabal",
         "productionValue": 7,
+        "fleetSupplyBonus": 1,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity.",
+        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 10 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "cabal_spacedock2"
     },
     {
