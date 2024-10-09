@@ -26,6 +26,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     private String imageFileName;
     private String flavourText;
     private String colourHexCode;
+    private String imageURL;
     private ComponentSource source;
 
     @Override

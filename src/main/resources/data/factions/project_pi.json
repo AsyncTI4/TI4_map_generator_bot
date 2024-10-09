@@ -258,7 +258,6 @@
       "leaders": ["pi_yinagent", "yincommander", "yinhero"],
       "promissoryNotes": ["pi_gfm"],
       "units": ["fighter", "pi_destroyer", "cruiser", "carrier", "dreadnought", "pi_yin_flagship", "infantry", "pi_yin_mech", "pds", "spacedock"],
-      "factionSheetURL" : "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/14/Yin1.jpg",
       "source": "project_pi",
       "homebrewReplacesID": "yin"
 	},

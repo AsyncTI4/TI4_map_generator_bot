@@ -19,8 +19,9 @@ public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
     private String phase;
     private String text;
     private int points;
-    private ComponentSource source;
     private String homebrewReplacesID;
+    private String imageURL;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
