@@ -928,6 +928,26 @@ public class Emojis {
     public static final String d10red_7 = "<:d10red_7:1189667994977181796>";
     public static final String d10red_8 = "<:d10red_8:1189667995883143279>";
     public static final String d10red_9 = "<:d10red_9:1189667996852039800>";
+    public static final String d10blue_0 = "<:d10blue_0:1290145967592574976>";
+    public static final String d10blue_1 = "<:d10blue_1:1290145968414785559>";
+    public static final String d10blue_2 = "<:d10blue_2:1290145969542926336>";
+    public static final String d10blue_3 = "<:d10blue_3:1290145970486775869>";
+    public static final String d10blue_4 = "<:d10blue_4:1290145994142515300>";
+    public static final String d10blue_5 = "<:d10blue_5:1290145994989768867>";
+    public static final String d10blue_6 = "<:d10blue_6:1290145996017373194>";
+    public static final String d10blue_7 = "<:d10blue_7:1290145996969476147>";
+    public static final String d10blue_8 = "<:d10blue_8:1290146014832885864>";
+    public static final String d10blue_9 = "<:d10blue_9:1290146015877529693>";
+    public static final String d10grey_0 = "<:d10grey_0:1290146062396297346>";
+    public static final String d10grey_1 = "<:d10grey_1:1290146035594694658>";
+    public static final String d10grey_2 = "<:d10grey_2:1290146036827820184>";
+    public static final String d10grey_3 = "<:d10grey_3:1290146037520138252>";
+    public static final String d10grey_4 = "<:d10grey_4:1290146038614724628>";
+    public static final String d10grey_5 = "<:d10grey_5:1290146080385798225>";
+    public static final String d10grey_6 = "<:d10grey_6:1290146081379713108>";
+    public static final String d10grey_7 = "<:d10grey_7:1290146082843656212>";
+    public static final String d10grey_8 = "<:d10grey_8:1290146097129324668>";
+    public static final String d10grey_9 = "<:d10grey_9:1290146098576490496>";
 
     // MILTY DRAFT
     public static final String sliceUnpicked = "<:sliceUnpicked:1225188657703682250>";
@@ -1955,6 +1975,38 @@ public class Emojis {
             case 7 -> Emojis.d10green_7;
             case 8 -> Emojis.d10green_8;
             case 9 -> Emojis.d10green_9;
+            default -> String.valueOf(value);
+        };
+    }
+
+    public static String getBlueDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10blue_0;
+            case 1 -> Emojis.d10blue_1;
+            case 2 -> Emojis.d10blue_2;
+            case 3 -> Emojis.d10blue_3;
+            case 4 -> Emojis.d10blue_4;
+            case 5 -> Emojis.d10blue_5;
+            case 6 -> Emojis.d10blue_6;
+            case 7 -> Emojis.d10blue_7;
+            case 8 -> Emojis.d10blue_8;
+            case 9 -> Emojis.d10blue_9;
+            default -> String.valueOf(value);
+        };
+    }
+
+    public static String getGrayDieEmoji(int value) {
+        return switch (value) {
+            case 0, 10 -> Emojis.d10grey_0;
+            case 1 -> Emojis.d10grey_1;
+            case 2 -> Emojis.d10grey_2;
+            case 3 -> Emojis.d10grey_3;
+            case 4 -> Emojis.d10grey_4;
+            case 5 -> Emojis.d10grey_5;
+            case 6 -> Emojis.d10grey_6;
+            case 7 -> Emojis.d10grey_7;
+            case 8 -> Emojis.d10grey_8;
+            case 9 -> Emojis.d10grey_9;
             default -> String.valueOf(value);
         };
     }

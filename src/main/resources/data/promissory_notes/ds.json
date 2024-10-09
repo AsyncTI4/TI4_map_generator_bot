@@ -169,7 +169,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "At the start of invasion, place this card in your play area.During this invasion, all other player's units lose SPACE CANNON and PLANETARY SHIELD.At the start of your next turn, return this card to the Kolume player."
+        "text": "At the start of invasion, place this card in your play area./nDuring this invasion, all other player's units lose SPACE CANNON and PLANETARY SHIELD./nAt the start of your next turn, return this card to the Kolume player."
     },
     {
         "alias": "dspnkort",

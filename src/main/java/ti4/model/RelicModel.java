@@ -19,8 +19,9 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String text;
     private String flavourText;
     private String flavourTextFormatted;
-    private ComponentSource source;
     private Boolean isFakeRelic;
+    private String imageURL;
+    private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {

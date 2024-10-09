@@ -866,21 +866,21 @@ public class Helper {
         return name.toString();
     }
 
-    public static String getPlanetRepresentation(String planet, Game game) {
-        planet = planet.toLowerCase().replace(" ", "");
-        planet = planet.replace("'", "");
-        planet = planet.replace("-", "");
-        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
+    public static String getPlanetRepresentation(String planetID, Game game) {
+        planetID = planetID.toLowerCase().replace(" ", "");
+        planetID = planetID.replace("'", "");
+        planetID = planetID.replace("-", "");
+        Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         Planet planet2 = unitHolder;
         if (planet2 == null) {
-            return planet + " bot error. Tell fin";
+            return planetID + " bot error. Tell fin";
         }
         boolean containsDMZ = unitHolder.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
         if (unitHolder != null && containsDMZ) {
-            return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" + planet2.getResources()
+            return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " (" + planet2.getResources()
                 + "/" + planet2.getInfluence() + ") [DMZ]";
         }
-        return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" + planet2.getResources()
+        return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID)) + " (" + planet2.getResources()
             + "/" + planet2.getInfluence() + ")";
     }
 

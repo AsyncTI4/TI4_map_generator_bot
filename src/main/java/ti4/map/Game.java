@@ -4148,4 +4148,18 @@ public class Game extends GameProperties {
         setMapString(sb.toString().trim());
         return sb.toString().trim();
     }
+
+    public boolean hasUser(User user) {
+        if (user == null) return false;
+        String id = user.getId();
+        for (Player player : getPlayers().values()) {
+            if (player.getUserID().equals(id)) {
+                return true;
+            }
+            if (player.getTeamMateIDs().contains(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
