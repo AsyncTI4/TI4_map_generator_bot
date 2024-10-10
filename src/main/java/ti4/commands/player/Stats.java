@@ -299,12 +299,13 @@ public class Stats extends PlayerSubcommandData {
 
         Tile homeSystemTile = player.getHomeSystemTile();
         if (homeSystemTile != null) {
-            sb.append("> Home System:  `").append(player.getHomeSystemTile().getPosition()).append("`\n");
+            sb.append("> Home System:  `").append(homeSystemTile.getPosition()).append("`\n");
         }
 
         sb.append("> Abilities: `").append(player.getAbilities()).append("`\n");
         sb.append("> Planets: `").append(player.getPlanets()).append("`\n");
         sb.append("> Techs: `").append(player.getTechs()).append("`\n");
+        sb.append("> Faction Techs: `").append(player.getFactionTechs()).append("`\n");
         sb.append("> Fragments: `").append(player.getFragments()).append("`\n");
         sb.append("> Relics: `").append(player.getRelics()).append("`\n");
         sb.append("> Mahact CC: `").append(player.getMahactCC()).append("`\n");
