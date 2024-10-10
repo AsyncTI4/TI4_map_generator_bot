@@ -219,7 +219,7 @@ public class MessageListener extends ListenerAdapter {
                 msg.delete().queue();
             }
             if (!msg.getAuthor().isBot() && (msg.getContentRaw().contains("boldly go where no stroter has gone before") || msg.getContentRaw().contains("go boldly where no stroter has gone before"))) {
-                msg.reply("to explore strange new maps; to seek out new tiles and new factions || https://discord.gg/RZ7qg9kbVZ ||").queue();
+                msg.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
             }
             //947310962485108816
             Role lfgRole = CreateGameChannels.getRole("LFG", event.getGuild());
