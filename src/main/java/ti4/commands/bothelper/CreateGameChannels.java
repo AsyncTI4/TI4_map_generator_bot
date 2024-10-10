@@ -3,11 +3,13 @@ package ti4.commands.bothelper;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +38,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.game.GameCreate;
-import ti4.commands.game.WeirdGameSetup;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -55,10 +56,8 @@ import ti4.message.MessageHelper;
 public class CreateGameChannels extends BothelperSubcommandData {
     public CreateGameChannels() {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME,
-            "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1,
-            "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4 @playerName"));
@@ -66,10 +65,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME,
-            "Override default game/role name (next pbd###)"));
-        addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY,
-            "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY, "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
     }
 
     @Override
@@ -171,8 +168,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         createGameChannels(members, event, gameFunName, gameName, gameOwner, categoryChannel);
     }
 
-    public static void createGameChannels(List<Member> members, GenericInteractionCreateEvent event, String gameFunName,
-        String gameName, Member gameOwner, Category categoryChannel) {
+    public static void createGameChannels(List<Member> members, GenericInteractionCreateEvent event, String gameFunName, String gameName, Member gameOwner, Category categoryChannel) {
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
         if (guild == null) {
@@ -372,10 +368,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the async code of conduct, which is described here: https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006");
 
-        String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
-            "> " + chatChannel.getAsMention() + "\n" +
-            "> " + actionsChannel.getAsMention() + "\n";
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        String message = "Role and Channels have been set up:\n> " +
+            role.getName() + "\n> " +
+            chatChannel.getAsMention() + "\n> " +
+            actionsChannel.getAsMention() + "\n";
+        MessageHelper.sendMessageToEventChannel(event, message);
 
         newGame.setUpPeakableObjectives(5, 1);
         newGame.setUpPeakableObjectives(5, 2);
@@ -503,7 +500,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     @Nullable
-    private static Guild getNextAvailableServer() {
+    private static Guild getNextAvailableServerOrdinal() {
         List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn;
 
         // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
@@ -550,6 +547,25 @@ public class CreateGameChannels extends BothelperSubcommandData {
         return null;
     }
 
+    @Nullable
+    private static Guild getServerWithMostCapacity() {
+        List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn.stream()
+            .filter(CreateGameChannels::serverHasRoomForNewFullCategory)
+            .sorted(Comparator.comparing(CreateGameChannels::getServerCapacityForNewGames))
+            .toList();
+
+        if (guilds.isEmpty() && serverHasRoomForNewFullCategory(AsyncTI4DiscordBot.guildPrimary)) {
+            return AsyncTI4DiscordBot.guildPrimary;
+        }
+
+        String debugText = guilds.stream()
+            .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
+            .collect(Collectors.joining("\n"));
+        BotLogger.log("Server Game Capacity Check:\n" + debugText);
+
+        return guilds.getLast();
+    }
+
     private static boolean serverCanHostNewGame(Guild guild) {
         return guild != null && serverHasRoomForNewRole(guild)
             && serverHasRoomForNewChannels(guild);
@@ -563,6 +579,18 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return false;
         }
         return true;
+    }
+
+    private static int getServerCapacityForNewGames(Guild guild) {
+        int maxRoleCount = 250;
+        int roleCount = guild.getRoles().size();
+        int gameCountByRole = maxRoleCount - roleCount;
+
+        int maxChannelCount = 500;
+        int channelCount = guild.getChannels().size();
+        int gameCountByChannel = (maxChannelCount - channelCount) / 2;
+
+        return Math.min(gameCountByRole, gameCountByChannel);
     }
 
     private static boolean serverHasRoomForNewFullCategory(Guild guild) {
@@ -580,8 +608,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();
         int channelMax = 500;
-        int channelsCountRequiredForNewCategory = 1 + 2 * Math.max(1, Math.min(25,
-            GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+        int channelsCountRequiredForNewCategory = 1 + 2 * Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
         if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                 + guild.getName() + "** currently has " + channelCount + " channels.");
@@ -641,10 +668,17 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     public static Category createNewCategory(String categoryName) {
-        Guild guild = getNextAvailableServer();
+        Guild guild = getServerWithMostCapacity();
         if (guild == null) {
             BotLogger.log("`CreateGameChannels.createNewCategory` No available servers to create a new game category");
             return null;
+        }
+
+        List<Category> categories = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryName, false);
+        if (!categories.isEmpty()) {
+            String message = categories.stream().map(c -> c.getAsMention()).collect(Collectors.joining("\n"));
+            BotLogger.log("Game Channel Creation - Category Already Exists:\n" + message);
+            return categories.getFirst();
         }
 
         // ADD LEADER NAME TO CATEGORY NAME FOR FUN

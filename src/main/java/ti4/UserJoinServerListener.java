@@ -96,21 +96,15 @@ public class UserJoinServerListener extends ListenerAdapter {
             for (Game g : mapsJoined) {
                 String gameMessage = user.getAsMention() + " has joined the server!";
                 MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
-                checkIfCanCloseGameLaunchThread(g);
+                checkIfCanCloseGameLaunchThread(g, true);
             }
         }
     }
 
-    private void checkIfCanCloseGameLaunchThread(Game game) {
+    public static void checkIfCanCloseGameLaunchThread(Game game, boolean notify) {
         Guild guild = game.getGuild();
         if (guild == null) {
             return;
-        }
-        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
-        for (String playerIDs : game.getPlayerIDs()) {
-            if (!guildMemberIDs.contains(playerIDs)) {
-                return;
-            }
         }
         String threadID = game.getLaunchPostThreadID();
         if (threadID == null) {
@@ -120,8 +114,16 @@ public class UserJoinServerListener extends ListenerAdapter {
         if (threadChannel == null) {
             return;
         }
-        MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), game.getPing() + " all users have now joined the server! Let the games begin!");
-        MessageHelper.sendMessageToChannel(threadChannel, "All users have joined the game, this thread will now be closed.");
+        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
+        for (String playerIDs : game.getPlayerIDs()) {
+            if (!guildMemberIDs.contains(playerIDs)) {
+                return;
+            }
+        }
+        if (notify) {
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), game.getPing() + " all users have now joined the server! Let the games begin!");
+            MessageHelper.sendMessageToChannel(threadChannel, "All users have joined the game, this thread will now be closed.");
+        }
         threadChannel.getManager().setArchived(true).queue();
     }
 

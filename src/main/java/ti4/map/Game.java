@@ -579,6 +579,16 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public ThreadChannel getLaunchPostThread() {
+        if (StringUtils.isNumeric(getLaunchPostThreadID())) {
+            ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
+            if (threadChannel != null) {
+                return threadChannel;
+            }
+        }
+        return null;
+    }
+
     /**
      * @return Guild that the ActionsChannel or MainGameChannel resides
      */
