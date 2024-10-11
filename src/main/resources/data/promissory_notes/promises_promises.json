@@ -249,7 +249,7 @@
         "faction": "ghosts",
         "color": "",
         "playArea": "true",
-        "attachment": "weirdway",
+        "attachment": "sigma_weirdway",
         "source": "promises_promises",
         "text": "ACTION: Attach this card to a planet. Its system contains an alpha and beta wormhole. When another player activates this system, they apply -1 to the move value of each of their ships during this activation. When another player gains control of this planet, detach this card and return it to the Creuss player."
     },
@@ -340,7 +340,7 @@
         "faction": "keleresa",
         "color": "",
         "playArea": "true",
-        "attachment": "senate_sanctuary",
+        "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
         "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     },
@@ -350,7 +350,7 @@
         "faction": "keleresm",
         "color": "",
         "playArea": "true",
-        "attachment": "senate_sanctuary",
+        "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
         "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     },
@@ -360,7 +360,7 @@
         "faction": "keleresx",
         "color": "",
         "playArea": "true",
-        "attachment": "senate_sanctuary",
+        "attachment": "sigma_senate_sanctuary",
         "source": "promises_promises",
         "text": "ACTION: Attach this card to a planet you control other than Mecatol Rex. Other players cannot activate this system. A player may spend 3 influence at any time to detach this card and return it to the Keleres player."
     }
