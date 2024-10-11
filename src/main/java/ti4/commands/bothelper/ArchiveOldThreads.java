@@ -56,8 +56,7 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
                 .onErrorMap((e) -> {
                     LoggerHandler.logError("Error map error:");
                     return null;
-                })
-                .queue();
+                }).queue();
         }
     }
 }

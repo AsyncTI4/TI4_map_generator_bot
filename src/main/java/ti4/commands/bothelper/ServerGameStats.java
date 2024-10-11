@@ -15,8 +15,8 @@ import ti4.helpers.Constants;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class GameStats extends BothelperSubcommandData {
-    public GameStats() {
+public class ServerGameStats extends BothelperSubcommandData {
+    public ServerGameStats() {
         super(Constants.SERVER_GAME_STATS, "Game Statistics for Administration");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_HUB, "Include the HUB server in these stats"));
     }
