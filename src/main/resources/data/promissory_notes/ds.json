@@ -28,7 +28,7 @@
         "playImmediately": false,
         "attachment": "encryptionkey",
         "source": "ds",
-        "text": "Action: Attach this card to a non-home planet you control.This planet has 1 technology specialty of any color."
+        "text": "Action: Attach this card to a non-home planet you control.\nThis planet has 1 technology specialty of any color."
     },
     {
         "alias": "dspnblex",
@@ -75,7 +75,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "When 1 of your ships would be destroyed: Instead of destroying that ship, place this card face up in your play area.Return this card to the Dih-Mohn player at the start of the status phase."
+        "text": "When 1 of your ships would be destroyed: Instead of destroying that ship, place this card face up in your play area.\nReturn this card to the Dih-Mohn player at the start of the status phase."
     },
     {
         "alias": "dspnedyn",
@@ -93,7 +93,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you would gain a relic: You may draw 1 additional card.  Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.\nThen, return this card to the Florzen player."
+        "text": "When you would gain a relic: You may draw 1 additional card. Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.\nThen, return this card to the Florzen player."
     },
     {
         "alias": "dspnfree",
@@ -132,7 +132,7 @@
         "playImmediately": false,
         "attachment": "gledgebase",
         "source": "ds",
-        "text": "Action: Attach this card to a non-home planet you control. This planet's resource value is increased by 2."
+        "text": "Action: Attach this card to a non-home planet you control.\nThis planet's resource value is increased by 2."
     },
     {
         "alias": "dspnkhra",
@@ -150,7 +150,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "At the start of combat: Apply +1 to the results of each of your fighters' combat rolls during this combat. The Kjalengard player captures each of your fighters destroyed during this combat.\nThen, return this card to the Kjalengard player."
+        "text": "At the start of combat: Apply +1 to the results of each of your fighters' combat rolls during this combat.\nThe Kjalengard player captures each of your fighters destroyed during this combat.\nThen, return this card to the Kjalengard player."
     },
     {
         "alias": "dspnkoll",
@@ -179,7 +179,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.At the start of the status phase, return this card to the Kortali player."
+        "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.\nAt the start of the status phase, return this card to the Kortali player."
     },
     {
         "alias": "dspnkyro",
@@ -274,7 +274,7 @@
         "playImmediately": false,
         "attachment": "automatons",
         "source": "ds",
-        "text": "At the end of your turn, you may attach this card to a non-home planet you control other than Mecatol Rex. This planet has PRODUCTION 3 as if it were a unit."
+        "text": "At the end of your turn, you may attach this card to a non-home planet you control other than Mecatol Rex.\nThis planet has PRODUCTION 3 as if it were a unit."
     },
     {
         "alias": "dspntnel",
@@ -283,7 +283,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you draw 1 or more secret objective cards: Draw 1 additional secret objective card. Then, return 1 secret objective card to the secret objective deck. Shuffle that deck. Then, return this card to the Tnelis player."
+        "text": "When you draw 1 or more secret objective cards: Draw 1 additional secret objective card. Then, return 1 secret objective card to the secret objective deck. Shuffle that deck.\nThen, return this card to the Tnelis player."
     },
     {
         "alias": "dspnvade",
@@ -312,7 +312,7 @@
         "playImmediately": true,
         "attachment": "veldyr1",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its influence value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1."
     },
     {
         "alias": "dspnveld2",
@@ -323,7 +323,7 @@
         "playImmediately": true,
         "attachment": "veldyr2",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its influence value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts influence value is increased by 1."
     },
     {
         "alias": "dspnveld3",
@@ -334,7 +334,7 @@
         "playImmediately": true,
         "attachment": "veldyr3",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its resource value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1."
     },
     {
         "alias": "dspnveld4",
@@ -345,7 +345,7 @@
         "playImmediately": true,
         "attachment": "veldyr4",
         "source": "ds",
-        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment. Its resource value is increased by 1."
+        "text": "When you receive this card, you must attach it to a non-home planet you control other than Mecatol Rex that does not have a Branch Office attachment.\nIts resource value is increased by 1."
     },
     {
         "alias": "dspnrhod",
@@ -354,7 +354,7 @@
         "color": "",
         "playArea": false,
         "source": "ds",
-        "text": "When you ignore a prerequisite on a technology card you are researching: You may ignore 1 additional prerequisite of the same color.Then, return this card to the Rhodun player."
+        "text": "When you ignore a prerequisite on a technology card you are researching: You may ignore 1 additional prerequisite of the same color.\nThen, return this card to the Rhodun player."
     },
     {
         "alias": "dspnzeli",
