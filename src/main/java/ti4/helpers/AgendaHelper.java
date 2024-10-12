@@ -3055,9 +3055,10 @@ public class AgendaHelper {
             int currentPoints = player.getPublicVictoryPoints(false) + player.getSecretVictoryPoints();
 
             Integer poIndex = game.addCustomPO(
-                StringUtils.capitalize(player.getColor()) + " VP Scored Prior to Agenda Wipe", currentPoints);
-            message.append("Custom PO '")
-                .append(StringUtils.capitalize(player.getColor()
+                game.isFowMode() ? "" : StringUtils.capitalize(player.getColor()) 
+                + " VP Scored Prior to Agenda Wipe", currentPoints);
+            message.append("Custom PO '").append(
+                    game.isFowMode() ? "" : StringUtils.capitalize(player.getColor()
                     + " VP Scored Prior to Agenda Wipe' has been added and scored by that color, worth "
                     + currentPoints + " points. \n"));
             game.scorePublicObjective(player.getUserID(), poIndex);
