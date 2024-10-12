@@ -25,11 +25,11 @@ public class NewPlayerInfo extends HelpSubcommandData {
     }
 
     public static String getNewPlayerInfoText() {
-        String path = ResourceHelper.getInstance().getHelpFile("NewPlayerInfo.txt");
+        String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
         try {
             return new String(Files.readAllBytes(Paths.get(path)));
         } catch (Exception e) {
-            return "NewPlayerInfo HELP FILE IS BLANK";
+            return "NewPlayerIntro HELP FILE IS BLANK";
         }
     }
 }
