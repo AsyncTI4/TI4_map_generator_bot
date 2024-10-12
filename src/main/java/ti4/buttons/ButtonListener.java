@@ -2377,7 +2377,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                     if ("fin".equalsIgnoreCase(pnKey)) {
-                        MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + "You don't have a Keleres Rider");
+                        MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You don't have a Keleres Rider");
                         return;
                     }
                     if (player.getFaction().contains("keleres")) {
