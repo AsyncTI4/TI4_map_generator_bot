@@ -2503,12 +2503,10 @@ public class ButtonHelper {
         if (player.hasTech("dsghotg") && tile == player.getHomeSystemTile()) {
             armadaValue = armadaValue + 3;
         }
-        int fleetCap = (
-            player.getFleetCC() 
-            + armadaValue 
-            + player.getMahactCC().size() 
-            + tile.getFleetSupplyBonusForPlayer(player)
-        ) * 2; // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
+        int fleetCap = (player.getFleetCC()
+            + armadaValue
+            + player.getMahactCC().size()
+            + tile.getFleetSupplyBonusForPlayer(player)) * 2; // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
             fleetCap += 1000;
         }
@@ -4530,7 +4528,7 @@ public class ButtonHelper {
         }
     }
 
-    public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event,Player player) {
+    public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         Tile tile = game.getTileByPosition(pos);
         if (buttonID.contains("alpha")) {
@@ -5351,25 +5349,22 @@ public class ButtonHelper {
     }
 
     public static void offerPlayerSetupButtons(MessageChannel channel, Game game) {
-        List<Button> buttons = new ArrayList<>();
+        Helper.checkThreadLimitAndArchive(game.getGuild());
 
+        List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("startPlayerSetup", "Setup a Player"));
+        String message = "After setting up the map, you may use this button instead of /player setup if you wish.";
         for (Player player : game.getPlayers().values()) {
             try {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentation()
-                        + "After setting up the map, you may use this button instead of /player setup if you wish.",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + message, buttons);
             } catch (Exception e) {
-                BotLogger.log("Failing to set up player cards info threads in " + game.getName());
+                BotLogger.log("Failing to set up player cards info threads in " + game.getName(), e);
             }
-
         }
-        MessageHelper.sendMessageToChannelWithButtons(channel,
-            "After setting up the map, you may use this button instead of /player setup if you wish.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
-    public static void offerRedTapButtons(Game game, Player player) {
+    public static void offerRedTapeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String poS : game.getPublicObjectives1Peakable()) {
             buttons.add(Buttons.green("cutTape_" + poS, Mapper.getPublicObjective(poS).getName()));

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.helpers.LoggerHandler;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class ArchiveOldThreads extends BothelperSubcommandData {
@@ -32,18 +32,18 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
     }
 
     public static void archiveOldThreads(Guild guild, Integer threadCount) {
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
 
-        threadChannels = threadChannels.stream()
+        // Try gathering all threads that are not bot-map or cards-info threads
+        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()
             .filter(ListOldThreads.filter)
             .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates") && !threadChannel.getName().contains("cards-info"))
             .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
             .limit(threadCount)
             .toList();
 
+        // If there are less channels in the list than requested to close, include cards-info threads
         if (threadChannels.size() < (threadCount - 1)) {
-            threadChannels = guild.getThreadChannels();
-            threadChannels = threadChannels.stream()
+            threadChannels = guild.getThreadChannels().stream()
                 .filter(ListOldThreads.filter)
                 .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates"))
                 .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
@@ -52,11 +52,9 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         }
 
         for (ThreadChannel threadChannel : threadChannels) {
-            threadChannel.getManager().setArchived(true)
-                .onErrorMap((e) -> {
-                    LoggerHandler.logError("Error map error:");
-                    return null;
-                }).queue();
+            threadChannel.getManager()
+                .setArchived(true)
+                .queue(null, BotLogger::catchRestError);
         }
     }
 }

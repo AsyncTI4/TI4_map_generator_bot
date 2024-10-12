@@ -3101,13 +3101,9 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public String getPing() {
-        Guild guild = getGuild();
-        if (guild != null) {
-            for (Role role : guild.getRoles()) {
-                if (getName().equals(role.getName().toLowerCase())) {
-                    return role.getAsMention();
-                }
-            }
+        Role role = getGameRole();
+        if (role != null) {
+            return role.getAsMention();
         }
         StringBuilder sb = new StringBuilder(getName()).append(" ");
         for (String playerID : getPlayerIDs()) {
@@ -3116,6 +3112,18 @@ public class Game extends GameProperties {
                 sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
+    }
+
+    @JsonIgnore
+    public Role getGameRole() {
+        if (getGuild() != null) {
+            for (Role role : getGuild().getRoles()) {
+                if (getName().equals(role.getName().toLowerCase())) {
+                    return role;
+                }
+            }
+        }
+        return null;
     }
 
     public Map<String, Tile> getTileMap() {

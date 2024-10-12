@@ -83,6 +83,8 @@ public class ObjectiveBox {
 		try {
 			for (String playerID : playerIDs) {
 				Player player = game.getPlayer(playerID);
+				if (player == null) continue;
+				
 				boolean convertToGeneric = generator.shouldConvertToGeneric(player);
 				String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 

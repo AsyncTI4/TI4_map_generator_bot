@@ -395,7 +395,7 @@ public class Stats extends PlayerSubcommandData {
             ButtonHelperAbilities.pillageCheck(player, game);
             if (scNumber == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {
-                    ButtonHelper.offerRedTapButtons(game, player);
+                    ButtonHelper.offerRedTapeButtons(game, player);
                 }
             }
         }
