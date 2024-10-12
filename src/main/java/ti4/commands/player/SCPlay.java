@@ -322,7 +322,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         // Red Tape Diplomacy
         if (scToPlay == 2 && game.isRedTapeMode()) {
-            ButtonHelper.offerRedTapButtons(game, player);
+            ButtonHelper.offerRedTapeButtons(game, player);
         }
 
         if (scModel.usesAutomationForSCID("pok5trade")) {

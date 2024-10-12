@@ -166,7 +166,7 @@ public class SCPick extends PlayerSubcommandData {
             game.setScTradeGood(scPicked, 0);
             if (scPicked == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {
-                    ButtonHelper.offerRedTapButtons(game, player);
+                    ButtonHelper.offerRedTapeButtons(game, player);
                 }
             }
         }
