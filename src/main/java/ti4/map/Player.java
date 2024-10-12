@@ -577,20 +577,18 @@ public class Player {
     public ThreadChannel getCardsInfoThread() {
         Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFowMode() || game.isCommunityMode())
+        if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
+        }
         if (actionsChannel == null) {
             actionsChannel = game.getMainGameChannel();
         }
         if (actionsChannel == null) {
-            BotLogger.log(
-                "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
-                    + game.getName());
+            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: " + game.getName());
             return null;
         }
 
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
-            + getUserName().replaceAll("/", "");
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-" + getUserName().replaceAll("/", "");
         if (game.isFowMode()) {
             threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
         }
@@ -626,8 +624,7 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: "
-                + cardsInfoThreadID + " for potential thread name: " + threadName, e);
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
         }
 
         // ATTEMPT TO FIND BY NAME
@@ -648,8 +645,7 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
-                    .complete();
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -659,8 +655,7 @@ public class Player {
             }
         } catch (Exception e) {
             BotLogger.log(
-                "`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName,
-                e);
+                "`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
         }
 
         // CREATE NEW THREAD
@@ -676,7 +671,6 @@ public class Player {
         }
         ThreadChannel threadChannel = threadAction.complete();
         setCardsInfoThreadID(threadChannel.getId());
-        Helper.checkThreadLimitAndArchive(game.getGuild());
         return threadChannel;
     }
 
