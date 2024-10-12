@@ -14,9 +14,12 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.color.ColorSpace;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
+import java.awt.image.RescaleOp;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -2985,6 +2988,20 @@ public class MapGenerator {
                     BufferedImage bufferedImage = getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, y - 70, null);
+                        x += 100;
+                    }
+                }
+            }
+            x += 100;
+            for (Player player : game.getPassedPlayers()) {
+                String faction = player.getFaction();
+                if (faction != null) {
+                    BufferedImage bufferedImage = getPlayerFactionIconImage(player);
+                    if (bufferedImage != null) {
+                        bufferedImage = makeGrayscale(bufferedImage);
+                        graphics.drawImage(bufferedImage, x, y - 70, null);
+                        graphics.setColor(Color.RED);
+                        graphics.drawString("PASSED", x + 10, y + 34);
                         x += 100;
                     }
                 }
@@ -6563,5 +6580,18 @@ public class MapGenerator {
 
     protected static int getMaxObjectWidth(Game game) {
         return (MapGenerator.getMapWidth(game) - MapGenerator.SPACING_BETWEEN_OBJECTIVE_TYPES * 4) / 3;
+    }
+
+    // The first parameter is the scale factor (contrast), the second is the offset (brightness)
+    private static BufferedImage adjustContrast(BufferedImage image, float contrast) {
+        RescaleOp op = new RescaleOp(contrast, 0, null);
+        return op.filter(image, null);
+    }
+
+    // The first parameter is the scale factor (contrast), the second is the offset (brightness)
+    private static BufferedImage makeGrayscale(BufferedImage image) {
+        ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
+        ColorConvertOp op = new ColorConvertOp(cs, null);
+        return op.filter(image, null);
     }
 }
