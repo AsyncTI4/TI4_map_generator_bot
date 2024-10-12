@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.entities.messages.MessagePoll.LayoutType;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -773,7 +774,7 @@ public class MessageHelper {
 			goodButtonIDs.add(button.getId());
 
 			// REMOVE EMOJIS IF EMOJI NOT
-			if (button.getEmoji() != null && button.getEmoji() instanceof CustomEmoji emoji) {
+			if (button.getEmoji() instanceof CustomEmoji emoji) {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
 					badButtonIDsAndReason
 						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel()
@@ -785,6 +786,9 @@ public class MessageHelper {
 					}
 					button = Button.of(button.getStyle(), button.getId(), label);
 				}
+			}
+			if (button.getEmoji() instanceof UnicodeEmoji) {
+				BotLogger.log("sanitizeButtons: Temporary Logging of UnicodeEmojis on buttons: " + button.getEmoji().getFormatted() + " `" + button.getEmoji().getFormatted() + "`");
 			}
 			newButtons.add(button);
 		}
