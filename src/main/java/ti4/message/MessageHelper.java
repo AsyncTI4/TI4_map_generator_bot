@@ -773,7 +773,7 @@ public class MessageHelper {
 			}
 			goodButtonIDs.add(button.getId());
 
-			// REMOVE EMOJIS IF EMOJI NOT
+			// REMOVE EMOJIS IF BOT CAN'T SEE IT
 			if (button.getEmoji() instanceof CustomEmoji emoji) {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
 					badButtonIDsAndReason
