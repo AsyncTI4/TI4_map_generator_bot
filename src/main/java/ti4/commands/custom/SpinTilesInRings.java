@@ -77,7 +77,7 @@ public class SpinTilesInRings extends CustomSubcommandData {
     }
     game.rebuildTilePositionAutoCompleteList();
     OptionMapping flavourMsg = event.getOption(Constants.MESSAGE);
-    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), flavourMsg != null ? flavourMsg.getAsString() : "Spun the rings");
+    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), flavourMsg != null ? flavourMsg.getAsString() : "## Spun the rings");
   }
 
   private static int parseInt(String number) {
@@ -134,6 +134,6 @@ public class SpinTilesInRings extends CustomSubcommandData {
       game.setTile(tile);
     }
     game.rebuildTilePositionAutoCompleteList();
-    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Spun the rings");
+    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Spun the rings");
   }
 }
