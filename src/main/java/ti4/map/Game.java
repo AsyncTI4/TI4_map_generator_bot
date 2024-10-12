@@ -3245,6 +3245,17 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public List<Player> getPassedPlayers() {
+        List<Player> passedPlayers = new ArrayList<>();
+        for (Player player : getRealPlayers()) {
+            if (player.isPassed()) {
+                passedPlayers.add(player);
+            }
+        }
+        return passedPlayers;
+    }
+
+    @JsonIgnore
     public Set<String> getFactions() {
         return getRealAndEliminatedAndDummyPlayers().stream().map(Player::getFaction).collect(Collectors.toSet());
     }
