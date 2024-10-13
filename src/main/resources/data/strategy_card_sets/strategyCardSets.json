@@ -347,5 +347,21 @@
     ],
     "description": "The Strategic Alliance set of strategy cards",
     "source": "salliance"
+  },
+  {
+    "name": "VotC Strategy Cards",
+    "alias": "votc",
+    "scIDs": [
+      "pok1leadership",
+      "pok2diplomacy",
+      "cryypter_3",
+      "pok4construction",
+      "pok5trade",
+      "pok6warfare",
+      "pok7technology",
+      "pok8imperial"
+    ],
+    "description": "Strategy cards for Voices of the Council",
+    "source": "cryypter"
   }
 ]

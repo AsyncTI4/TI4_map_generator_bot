@@ -28,6 +28,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private int moveValue;
     private int productionValue;
     private int capacityValue;
+    private int fleetSupplyBonus;
     private int capacityUsed;
     private float cost;
     private int combatHitsOn;
