@@ -670,6 +670,8 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.CRYYPTER_MODE + " " + game.isCryypterMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + game.isMiltyModMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.PROMISES_PROMISES + " " + game.isPromisesPromisesMode());
@@ -2014,6 +2016,14 @@ public class GameSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setAbsolMode(value);
+                    } catch (Exception e) {
+                        // Do nothing
+                    }
+                }
+                case Constants.CRYYPTER_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        game.setCryypterMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }

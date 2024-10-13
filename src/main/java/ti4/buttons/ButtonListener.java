@@ -4268,8 +4268,7 @@ public class ButtonListener extends ListenerAdapter {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player,
-        MessageChannel actionsChannel) {
+    private static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel) { //TODO: bake this into /ac discard
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
         boolean stalling = false;
         boolean drawReplacement = false;
@@ -4382,8 +4381,7 @@ public class ButtonListener extends ListenerAdapter {
         }
     }
 
-    private static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player,
-        MessageChannel actionsChannel, String fowIdentity) {
+    private static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel, String fowIdentity) { //TODO: bake this into /ac play
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel;
         if (game.getMainGameChannel() != null) {
