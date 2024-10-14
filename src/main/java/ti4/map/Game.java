@@ -579,6 +579,16 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public ThreadChannel getLaunchPostThread() {
+        if (StringUtils.isNumeric(getLaunchPostThreadID())) {
+            ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(getLaunchPostThreadID());
+            if (threadChannel != null) {
+                return threadChannel;
+            }
+        }
+        return null;
+    }
+
     /**
      * @return Guild that the ActionsChannel or MainGameChannel resides
      */
@@ -3091,13 +3101,9 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public String getPing() {
-        Guild guild = getGuild();
-        if (guild != null) {
-            for (Role role : guild.getRoles()) {
-                if (getName().equals(role.getName().toLowerCase())) {
-                    return role.getAsMention();
-                }
-            }
+        Role role = getGameRole();
+        if (role != null) {
+            return role.getAsMention();
         }
         StringBuilder sb = new StringBuilder(getName()).append(" ");
         for (String playerID : getPlayerIDs()) {
@@ -3106,6 +3112,18 @@ public class Game extends GameProperties {
                 sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
+    }
+
+    @JsonIgnore
+    public Role getGameRole() {
+        if (getGuild() != null) {
+            for (Role role : getGuild().getRoles()) {
+                if (getName().equals(role.getName().toLowerCase())) {
+                    return role;
+                }
+            }
+        }
+        return null;
     }
 
     public Map<String, Tile> getTileMap() {
@@ -3224,6 +3242,17 @@ public class Game extends GameProperties {
             Member user = getGuild().getMemberById(player.getUserID());
             return user != null && user.getRoles().contains(gmRole);
         }).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public List<Player> getPassedPlayers() {
+        List<Player> passedPlayers = new ArrayList<>();
+        for (Player player : getRealPlayers()) {
+            if (player.isPassed()) {
+                passedPlayers.add(player);
+            }
+        }
+        return passedPlayers;
     }
 
     @JsonIgnore

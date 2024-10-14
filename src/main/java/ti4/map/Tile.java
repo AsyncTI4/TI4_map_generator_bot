@@ -468,7 +468,7 @@ public class Tile {
                 }
                 if (unit.getUnitType() == UnitType.Spacedock && game != null) {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
-                    if (player != null && (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2"))) {
+                    if (player != null && player.getUnitFromUnitKey(unit).getId().contains("cabal_spacedock")) {
                         return true;
                     }
                 }
@@ -601,6 +601,18 @@ public class Tile {
             }
         }
         return false;
+    }
+
+    @JsonIgnore
+    public int getFleetSupplyBonusForPlayer(final Player player) {
+        return getUnitHolders().values().stream()
+            .flatMap(unitHolder -> unitHolder.getUnits().entrySet().stream())
+            .filter(entry -> entry.getValue() > 0 && player.unitBelongsToPlayer(entry.getKey()))
+            .map(Map.Entry::getKey)
+            .map(player::getUnitFromUnitKey)
+            .filter(Objects::nonNull)
+            .mapToInt(unit -> unit.getFleetSupplyBonus())
+            .sum();
     }
 
     public static Predicate<Tile> tileHasPlayerShips(Player player) {

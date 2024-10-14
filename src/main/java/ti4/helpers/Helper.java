@@ -2409,18 +2409,13 @@ public class Helper {
     }
 
     public static void checkThreadLimitAndArchive(Guild guild) {
-        if (guild == null)
-            return;
+        if (guild == null) return;
         long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
-        int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(),
-            Integer.class, 20);
-        int maxThreadCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(),
-            Integer.class, 975);
+        int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 25);
+        int maxThreadCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(), Integer.class, 975);
 
         if (threadCount >= maxThreadCount) {
-            BotLogger.log("`Helper.checkThreadLimitAndArchive:` Server: **" + guild.getName()
-                + "** thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount
-                + " threads. The oldest thread was " + ListOldThreads.getHowOldOldestThreadIs(guild));
+            BotLogger.log("AutoArchiving Threads on **" + guild.getName() + "** - (" + threadCount + " > " + maxThreadCount + ") -> archiving " + closeCount + " threads");
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }
     }

@@ -60,6 +60,7 @@ public class HelpCommand implements Command {
         subcommands.add(new WhatsTIGL());
         subcommands.add(new Absol());
         subcommands.add(new DiscordantStars());
+        subcommands.add(new NewPlayerInfo());
 
         return subcommands;
     }

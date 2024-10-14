@@ -2503,7 +2503,10 @@ public class ButtonHelper {
         if (player.hasTech("dsghotg") && tile == player.getHomeSystemTile()) {
             armadaValue = armadaValue + 3;
         }
-        int fleetCap = (player.getFleetCC() + armadaValue + player.getMahactCC().size()) * 2;
+        int fleetCap = (player.getFleetCC()
+            + armadaValue
+            + player.getMahactCC().size()
+            + tile.getFleetSupplyBonusForPlayer(player)) * 2; // fleetCap is double to more easily deal with half-capacity, e.g., Naalu Fighter II
         if (player.getLeader("letnevhero").map(Leader::isActive).orElse(false)) {
             fleetCap += 1000;
         }
@@ -2575,7 +2578,6 @@ public class ButtonHelper {
             }
             if (capChecker.getUnitCount(UnitType.PlenaryOrbital, player.getColor()) > 0) {
                 fightersIgnored += 8;
-                fleetCap = fleetCap + 4;
             }
         }
         // System.out.println(fightersIgnored);
@@ -2657,7 +2659,7 @@ public class ButtonHelper {
         if (fleetSupplyViolated) {
             message += " You are violating fleet supply in tile " + tile.getRepresentation()
                 + ". Specifically, you have " + fleetCap / 2
-                + " fleet supply, and that you currently are filling "
+                + " fleet supply in this system, and you currently are filling "
                 + (numFighter2sFleet + numOfCapitalShips + 1) / 2
                 + " of that. ";
         }
@@ -4526,7 +4528,7 @@ public class ButtonHelper {
         }
     }
 
-    public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event,Player player) {
+    public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         Tile tile = game.getTileByPosition(pos);
         if (buttonID.contains("alpha")) {
@@ -5347,25 +5349,22 @@ public class ButtonHelper {
     }
 
     public static void offerPlayerSetupButtons(MessageChannel channel, Game game) {
-        List<Button> buttons = new ArrayList<>();
+        Helper.checkThreadLimitAndArchive(game.getGuild());
 
+        List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("startPlayerSetup", "Setup a Player"));
+        String message = "After setting up the map, you may use this button instead of /player setup if you wish.";
         for (Player player : game.getPlayers().values()) {
             try {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentation()
-                        + "After setting up the map, you may use this button instead of /player setup if you wish.",
-                    buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + message, buttons);
             } catch (Exception e) {
-                BotLogger.log("Failing to set up player cards info threads in " + game.getName());
+                BotLogger.log("Failing to set up player cards info threads in " + game.getName(), e);
             }
-
         }
-        MessageHelper.sendMessageToChannelWithButtons(channel,
-            "After setting up the map, you may use this button instead of /player setup if you wish.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
     }
 
-    public static void offerRedTapButtons(Game game, Player player) {
+    public static void offerRedTapeButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String poS : game.getPublicObjectives1Peakable()) {
             buttons.add(Buttons.green("cutTape_" + poS, Mapper.getPublicObjective(poS).getName()));

@@ -1,5 +1,17 @@
 [
     {
+        "id": "sigma_senate_sanctuary",
+        "imagePath": "attachment_sigma_senate_sanctuary.png",
+        "token": "sigma_senate_sanctuary",
+        "source": "promises_promises"
+    },
+    {
+        "id": "sigma_weirdway",
+        "imagePath": "attachment_sigma_weirdway.png",
+        "token": "sigma_weirdway",
+        "source": "promises_promises"
+    },
+    {
         "id": "sigma_ancient_hall",
         "imagePath": "attachment_sigma_ancient_hall.png",
         "token": "sigma_ancient_hall",
