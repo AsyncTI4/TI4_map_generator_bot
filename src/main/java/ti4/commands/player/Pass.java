@@ -53,7 +53,7 @@ public class Pass extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
                     player.getRepresentation(true, true) + " you may use the button to get your tech.",
-                    Collections.singletonList(Buttons.GET_A_TECH));
+                    Collections.singletonList(Buttons.GET_A_TECH_WITH_INF));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";

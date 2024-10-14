@@ -43,7 +43,9 @@ public class GetTechButton extends TechSubcommandData {
     public static void getTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String ident = player.getFactionEmoji();
         boolean paymentRequired = !buttonID.contains("__noPay");
-        buttonID = buttonID.replace("__noPay", "");
+        final String[] buttonIDComponents = buttonID.split("__");
+        buttonID = buttonIDComponents[0];
+        final String paymentType = buttonIDComponents.length > 1 ? buttonIDComponents[1] : "res";
 
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
         techID = AliasHandler.resolveTech(techID);
@@ -157,8 +159,7 @@ public class GetTechButton extends TechSubcommandData {
             postTechSummary(game);
         }
         if (paymentRequired) {
-            payForTech(game, player, event, techID);
-
+            payForTech(game, player, event, techID, paymentType);
         } else {
             if (player.hasLeader("zealotshero") && player.getLeader("zealotshero").get().isActive()) {
                 if (game.getStoredValue("zealotsHeroTechs").isEmpty()) {
@@ -236,10 +237,22 @@ public class GetTechButton extends TechSubcommandData {
         }
     }
 
-    public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech) {
+    /**
+     * Generate buttons to pay for tech.
+     * @param game
+     * @param player
+     * @param event
+     * @param tech
+     * @param payWith Possible values: {@code ["res", "inf"]}
+     */
+    public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech, final String payWith) {
         String trueIdentity = player.getRepresentation(true, true);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
-        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res" + "tech");
+        String payType = payWith != null ? payWith : "res";
+        if (!payType.equals("res") && !payType.equals("inf")) {
+            payType = "res";
+        }
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, payType + "tech");
         TechnologyModel techM = Mapper.getTechs().get(AliasHandler.resolveTech(tech));
         if (techM.isUnitUpgrade() && player.hasTechReady("aida")) {
             Button aiDEVButton = Buttons.red("exhaustTech_aida", "Exhaust AI Development Algorithm");
@@ -277,8 +290,8 @@ public class GetTechButton extends TechSubcommandData {
 
         }
         if (player.hasTechReady("is")) {
-            Button aiDEVButton = Buttons.gray("exhaustTech_is", "Exhaust Inheritance Systems");
-            buttons.add(aiDEVButton);
+            Button inheritanceSystemsButton = Buttons.gray("exhaustTech_is", "Exhaust Inheritance Systems");
+            buttons.add(inheritanceSystemsButton);
         }
         if (player.hasRelicReady("prophetstears")) {
             Button pT1 = Buttons.red("prophetsTears_AC", "Exhaust Prophets Tears for AC");
