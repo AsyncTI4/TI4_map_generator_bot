@@ -247,7 +247,7 @@ public class TransactionHelper {
         {
             return "The joy of sharing a one in a million emptry transaction offer message";
         }
-        int result = ThreadLocalRandom.current().nextInt(1, 90);
+        int result = ThreadLocalRandom.current().nextInt(1, 122);
         return switch (result) {
             case 1 -> "Nothing But Respect And Good Will";
             case 2 -> "Some Pocket Lint";
@@ -314,7 +314,7 @@ public class TransactionHelper {
             case 63 -> "An _E.T. the Extra-Terrestrial_ Cartridge for the Atari 2600";
             case 64 -> "A Nice Solid Thumbs Up";
             case 65 -> "A Handful of Dog Treats";
-            case 66 -> "One Peppercorn";
+            case 66 -> "One (1) Peppercorn";
             case 67 -> "Poutine";
             case 68 -> "The Deputy Speakership";
             case 69 -> "Half a Slice of Pizza, With or Without Pineapple";
@@ -338,6 +338,38 @@ public class TransactionHelper {
             case 87 -> "A Riddle, Wrapped in a Mystery, Inside an Enigma, Coated in Chocolate";
             case 88 -> "A Brand-New Luxury Car, Missing Only Fuel, Tires and Car";
             case 89 -> "Either \"Peace\" or \"Peas\"; the Ambassador Failed to Elaborate";
+            case 90 -> "A Year's Supply of Brussels Sprouts"
+            case 91 -> "A Nintendo Power Glove; ***Now You're Playing With Power***"
+            case 92 -> "A Wooden Spoon"
+            case 93 -> "An Ingot of Pyrite"
+            case 94 -> "A White Elephant"
+            case 95 -> "Ennui"
+            case 96 -> "A Smurf TV Tray"
+            case 97 -> "A Creepy Doll"
+            case 98 -> "A Ziploc Bag of Ranch Dressing"
+            case 99 -> "Nothing. And Furthermore, Carthage Must be Destroyed!"
+            case 100 -> "All of the Goulash"
+            case 101 -> "Waldo's Location"
+            case 102 -> "A Billet of Ea-nāṣir's Finest Copper"
+            case 103 -> "All the Silver in Fort Knox"
+            case 104 -> "A Controlling Share of The Bereg Jet Ski Company"
+            case 105 -> "A Handful of Specially Marked Cereal Boxtops"
+            case 106 -> "An Aperture Science Thing We Don't Know What It Does"
+            case 107 -> "Nothing, Because I'm a Cheapskate"
+            case 108 -> "A Brick, Delivery Speed TBD"
+            case 109 -> "An Inanimate Carbon Rod"
+            case 110 -> "A Set of Left-Handed Sarween Tools"
+            case 111 -> "A Bridge That's For Sale"
+            case 112 -> "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // To brighten your day, yes indeed!"
+            case 113 -> "The Chameleon's Dish"
+            case 114 -> "The Sound of One Hand Clapping"
+            case 115 -> "An Unpaired Sock"
+            case 116 -> "\"101 Ways To Make Toast\""
+            case 117 -> "A Chess Set With 31 Missing Pieces"
+            case 118 -> "Your Horoscope Reading"
+            case 119 -> "Just Deserts"
+            case 120 -> "Surprise and Delight"
+            case 121 -> "`//Could somebody get ChatGPT to generate a few more messages - Dev`"
             case 9999 -> "Some Free Candy, From My Windowless Van";
             default -> "Nothing";
         };
