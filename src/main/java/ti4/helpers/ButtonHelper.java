@@ -6575,13 +6575,26 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, String messageID,
-    boolean sc) {
-        ButtonHelper.acquireATech(player, game, event, messageID, sc, "res");
+    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, String messageID, 
+            boolean sc) {
+        ButtonHelper.acquireATech(
+            player, game, event, messageID, sc, 
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT), 
+            "res"
+        );
+    }
+
+    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, String messageID, 
+            boolean sc, final String payType) {
+        ButtonHelper.acquireATech(
+            player, game, event, messageID, sc, 
+            Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT), 
+            payType
+        );
     }
 
     public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, String messageID,
-        boolean sc, String payType) {
+            boolean sc, final Set<String> techTypes, final String payType) {
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
         if (sc) {
@@ -6602,30 +6615,42 @@ public class ButtonHelper {
         } else {
             game.setComponentAction(true);
         }
-        Button propulsionTech = Buttons.blue(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_" + payType,
-            "Get a Blue Tech");
-        propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
-        buttons.add(propulsionTech);
 
-        Button bioticTech = Buttons.green(finsFactionCheckerPrefix + "getAllTechOfType_biotic_" + payType, 
-            "Get a Green Tech");
-        bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
-        buttons.add(bioticTech);
+        if (techTypes.contains(Constants.PROPULSION)) {
+            Button propulsionTech = Buttons.blue(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_" + payType,
+                "Get a Blue Tech");
+            propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
+            buttons.add(propulsionTech);
+        }
 
-        Button cyberneticTech = Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic_" + payType,
-            "Get a Yellow Tech");
-        cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
-        buttons.add(cyberneticTech);
+        if (techTypes.contains(Constants.BIOTIC)) {
+            Button bioticTech = Buttons.green(finsFactionCheckerPrefix + "getAllTechOfType_biotic_" + payType, 
+                "Get a Green Tech");
+            bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+            buttons.add(bioticTech);
+        }
 
-        Button warfareTech = Buttons.red(finsFactionCheckerPrefix + "getAllTechOfType_warfare_" + payType, 
-                "Get a Red Tech");
-        warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
-        buttons.add(warfareTech);
+        if (techTypes.contains(Constants.CYBERNETIC)) {
+            Button cyberneticTech = Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic_" + payType,
+                "Get a Yellow Tech");
+            cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
+            buttons.add(cyberneticTech);
+        }
 
-        Button unitupgradesTech = Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_" + payType,
-            "Get A Unit Upgrade Tech");
-        unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
-        buttons.add(unitupgradesTech);
+        if (techTypes.contains(Constants.WARFARE)) {
+            Button warfareTech = Buttons.red(finsFactionCheckerPrefix + "getAllTechOfType_warfare_" + payType, 
+                    "Get a Red Tech");
+            warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
+            buttons.add(warfareTech);
+        }
+
+        if (techTypes.contains(Constants.UNIT)) {
+            Button unitupgradesTech = Buttons.gray(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade_" + payType,
+                "Get A Unit Upgrade Tech");
+            unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Emojis.UnitUpgradeTech));
+            buttons.add(unitupgradesTech);
+        }
+
         ButtonHelperCommanders.yinCommanderSummary(player, game);
         String message = player.getRepresentation() + " What type of tech would you want?";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -2804,7 +2805,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, messageID, false);
-                case "acquireATechWithInf" -> ButtonHelper.acquireATech(player, game, event, messageID, false, "inf");
+                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event, messageID, false, Set.of(Constants.UNIT), "inf");
                 case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, messageID, true);
                 case Constants.SO_NO_SCORING -> {
                     String message = player.getRepresentation()
