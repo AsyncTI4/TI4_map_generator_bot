@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.UserJoinServerListener;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PlayPN;
@@ -352,8 +353,6 @@ public class StartPhase extends GameSubcommandData {
         }
 
         for (Player player : game.getRealPlayers()) {
-            Leader playerLeader = player.getLeader("naaluhero").orElse(null);
-
             if (game.getRound() < 4) {
                 String preferences = "";
                 for (Player p2 : game.getRealPlayers()) {
@@ -373,6 +372,7 @@ public class StartPhase extends GameSubcommandData {
                 }
             }
 
+            Leader playerLeader = player.getLeader("naaluhero").orElse(null);
             if (player.hasLeader("naaluhero") && player.getLeaderByID("naaluhero").isPresent() && playerLeader != null && !playerLeader.isLocked()) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("naaluHeroInitiation", "Play Naalu Hero", Emojis.NaaluHero));
@@ -449,6 +449,7 @@ public class StartPhase extends GameSubcommandData {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Remember to click Ready for " + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
         }
+        UserJoinServerListener.checkIfCanCloseGameLaunchThread(game, false);
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {
@@ -568,5 +569,6 @@ public class StartPhase extends GameSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you have the opportunity to use Imperial Arbiter", buttons);
             }
         }
+        UserJoinServerListener.checkIfCanCloseGameLaunchThread(game, false);
     }
 }

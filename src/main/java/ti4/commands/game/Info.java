@@ -128,6 +128,7 @@ public class Info extends GameSubcommandData {
         if (game.getTableTalkChannel() != null) sb.append("Table Talk Channel: ").append(game.getTableTalkChannel().getAsMention()).append(NEW_LINE);
         if (game.getActionsChannel() != null) sb.append("Actions Channel: ").append(game.getActionsChannel().getAsMention()).append(NEW_LINE);
         if (game.getBotMapUpdatesThread() != null) sb.append("Bot Map Thread: ").append(game.getBotMapUpdatesThread().getAsMention()).append(NEW_LINE);
+        if (game.getLaunchPostThread() != null) sb.append("Launch Post Thread: ").append(game.getLaunchPostThread().getAsMention()).append(NEW_LINE);
         if (game.isFowMode()) {
             sb.append("FoW Options:");
             for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
