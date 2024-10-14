@@ -543,7 +543,7 @@ public class Player {
     @JsonIgnore
     public boolean hasWarsunTech() {
         return getTechs().contains("pws2") || getTechs().contains("dsrohdws") || getTechs().contains("ws")
-            || getTechs().contains("absol_ws")
+            || getTechs().contains("absol_ws") || getTechs().contains("absol_pws2")
             || hasUnit("muaat_warsun") || hasUnit("rohdhna_warsun");
     }
 
