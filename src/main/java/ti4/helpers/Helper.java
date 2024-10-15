@@ -1299,10 +1299,8 @@ public class Helper {
         String msg = player.getFactionEmoji() + " exhausted the following: \n";
         int res = 0;
         int inf = 0;
-        //boolean tech = false;
         if (resOrInfOrBoth.contains("tech")) {
             resOrInfOrBoth = resOrInfOrBoth.replace("tech", "");
-            //tech = true;
         }
         int tg = player.getSpentTgsThisWindow();
         boolean xxcha = player.hasLeaderUnlocked("xxchahero");
@@ -2565,7 +2563,7 @@ public class Helper {
         }
     }
 
-    public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
+    public static List<Button> getTechButtons(List<TechnologyModel> techs, Player player) {
         return getTechButtons(techs, player, "nope");
     }
 
@@ -2578,10 +2576,12 @@ public class Helper {
             String techName = tech.getName();
             String techID = tech.getAlias();
             String buttonID;
-            if ("nope".equalsIgnoreCase(buttonPrefixType)) { // default
+            if ("nope".equalsIgnoreCase(buttonPrefixType) || "res".equalsIgnoreCase(buttonPrefixType)) { // default
                 buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;
             } else if ("nekro".equalsIgnoreCase(buttonPrefixType)) {
                 buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
+            } else if ("inf".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__inf";
             } else {
                 buttonID = "FFCC_" + player.getFaction() + "_swapTechs__" + buttonPrefixType + "__" + techID;
             }

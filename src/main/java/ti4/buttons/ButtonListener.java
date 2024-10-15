@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -1046,15 +1047,19 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("getAllTechOfType_")) {
             String techType = buttonID.replace("getAllTechOfType_", "");
-            boolean noPay = false;
+            String payType = null;
             if (techType.contains("_")) {
-                techType = techType.split("_")[0];
-                noPay = true;
+                final String[] split = techType.split("_");
+                techType = split[0];
+                payType = split[1];
             }
             List<TechnologyModel> techs = Helper.getAllTechOfAType(game, techType, player);
-            List<Button> buttons = Helper.getTechButtons(techs, techType, player);
-            if (noPay) {
-                buttons = Helper.getTechButtons(techs, player, "nekro");
+
+            List<Button> buttons;
+            if (payType == null) {
+                buttons = Helper.getTechButtons(techs, player);
+            } else{
+                buttons = Helper.getTechButtons(techs, player, payType);
             }
 
             if (game.isComponentAction()) {
@@ -2800,6 +2805,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteMessage(event);
                 }
                 case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, messageID, false);
+                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event, messageID, false, Set.of(Constants.UNIT), "inf");
                 case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, messageID, true);
                 case Constants.SO_NO_SCORING -> {
                     String message = player.getRepresentation()
