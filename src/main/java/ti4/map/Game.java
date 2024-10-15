@@ -466,7 +466,7 @@ public class Game extends GameProperties {
                 put("FoW", isFowMode());
                 put("Franken", isFrankenGame());
                 put(Emojis.Absol + "Absol", isAbsolMode());
-                put("Cryypter", isVotCMode());
+                put("VotC", isVotCMode());
                 put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
