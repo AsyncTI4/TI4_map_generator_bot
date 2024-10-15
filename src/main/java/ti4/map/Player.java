@@ -579,8 +579,11 @@ public class Player {
         return getCardsInfoThread(true, false);
     }
 
+    /**
+     * Will create new Player Cards-Info threads (even if they exist but are archived) unless they exist and are open
+     */
     public void createCardsInfoThreadChannelsIfRequired() {
-        getCardsInfoThread(true, true);
+        getCardsInfoThread(false, true);
     }
 
     /**
