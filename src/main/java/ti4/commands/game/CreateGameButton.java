@@ -135,7 +135,6 @@ public class CreateGameButton extends GameSubcommandData {
         } else if (mapreference != null) {
             mapreference.setStoredValue("gameCreator" + member.getIdLong(), "created");
         }
-        event.editButton(null).queue();
 
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
