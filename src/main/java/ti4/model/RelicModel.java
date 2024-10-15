@@ -50,6 +50,10 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isFakeRelic).orElse(false);
     }
 
+    public Optional<String> getImageURL() {
+        return Optional.ofNullable(imageURL);
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false, false);
     }
@@ -70,6 +74,9 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         } else {
             eb.setColor(Color.yellow);
         }
+
+        // getImageURL().ifPresent(eb::setImage);
+        getImageURL().ifPresent(eb::setUrl);
 
         // Footer
         StringBuilder footer = new StringBuilder();
