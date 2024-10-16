@@ -236,32 +236,35 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         newGame.setTableTalkChannelID(chatChannel.getId());
-        
+
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-        .syncPermissionOverrides()
-        .addRolePermissionOverride(gameRoleID, permission, 0)
-        .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-        
+
         // CREATE BOT/MAP THREAD
         try {
             actionsChannel.createThreadChannel(newBotThreadName)
-            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-            .queueAfter(1, TimeUnit.SECONDS, botThread -> {
-                newGame.setBotMapUpdatesThreadID(botThread.getId());
-                introductionToBotMapUpdatesThread(newGame);
-                introductionForNewPlayers(newGame);
-            }, BotLogger::catchRestError);
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+                .queueAfter(1, TimeUnit.SECONDS, botThread -> {
+                    newGame.setBotMapUpdatesThreadID(botThread.getId());
+                    introductionToBotMapUpdatesThread(newGame);
+                    introductionForNewPlayers(newGame);
+                }, BotLogger::catchRestError);
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(newGame.getMainGameChannel(), "You will need to make your own bot-map-updates thread. Ping bothelper if you don't know how");
         }
-        
+
         introductionToTableTalkChannel(newGame);
         introductionToActionsChannel(newGame);
         sendMessageAboutAggressionMetas(newGame);
 
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
+        // Create Cards Info Threads
+        for (Player player : newGame.getPlayers().values()) {
+            player.createCardsInfoThreadChannelsIfRequired();
+        }
 
         Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
         MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to set up a Milty Draft?", miltyButton);

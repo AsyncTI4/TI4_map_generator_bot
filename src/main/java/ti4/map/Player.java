@@ -543,7 +543,7 @@ public class Player {
     @JsonIgnore
     public boolean hasWarsunTech() {
         return getTechs().contains("pws2") || getTechs().contains("dsrohdws") || getTechs().contains("ws")
-            || getTechs().contains("absol_ws")
+            || getTechs().contains("absol_ws") || getTechs().contains("absol_pws2")
             || hasUnit("muaat_warsun") || hasUnit("rohdhna_warsun");
     }
 
@@ -574,7 +574,26 @@ public class Player {
     }
 
     @JsonIgnore
+    @NotNull
     public ThreadChannel getCardsInfoThread() {
+        return getCardsInfoThread(true, false);
+    }
+
+    /**
+     * Will create new Player Cards-Info threads (even if they exist but are archived) unless they exist and are open
+     */
+    public void createCardsInfoThreadChannelsIfRequired() {
+        getCardsInfoThread(false, true);
+    }
+
+    /**
+     * @param useComplete if false, will skip the RestAction.complete() steps, which may cause new Cards Info threads to be created despite
+     * @param createWithQueue if true, will return null, and will create a new CardsInfo thread (if required) using a RestAction.queue() instead of a .complete()
+     * @return
+     */
+    @JsonIgnore
+    @Nullable
+    private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
         Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
@@ -588,20 +607,20 @@ public class Player {
             return null;
         }
 
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-" + getUserName().replaceAll("/", "");
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-" + getUserName().replace("/", "");
         if (game.isFowMode()) {
-            threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
+            threadName = game.getName() + "-" + "cards-info-" + getUserName().replace("/", "") + "-private";
         }
 
-        // ATTEMPT TO FIND BY ID
-        String cardsInfoThreadID = getCardsInfoThreadID();
-        boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank()
-            && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
-        try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+        List<ThreadChannel> hiddenThreadChannels = new ArrayList<>();
 
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
+        // ATTEMPT TO FIND BY ID
+        try {
+            String cardsInfoThreadID = getCardsInfoThreadID();
+            boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
+            if (hasCardsInfoThreadId) {
+                ThreadChannel threadChannel = actionsChannel.getGuild().getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null)
                     return threadChannel;
 
@@ -614,12 +633,13 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
-                    .complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
+                if (useComplete) {
+                    hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                    for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                        if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                            setCardsInfoThreadID(threadChannel_.getId());
+                            return threadChannel_;
+                        }
                     }
                 }
             }
@@ -629,23 +649,17 @@ public class Player {
 
         // ATTEMPT TO FIND BY NAME
         try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null)
-                    return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
                 }
+            }
 
-                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            if (useComplete) {
+                if (hiddenThreadChannels.isEmpty()) hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -654,8 +668,7 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log(
-                "`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thread using name: " + threadName, e);
         }
 
         // CREATE NEW THREAD
@@ -665,87 +678,24 @@ public class Player {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }
-        ThreadChannel threadChannel = threadAction.complete();
-        setCardsInfoThreadID(threadChannel.getId());
-        return threadChannel;
-    }
-
-    @JsonIgnore
-    public ThreadChannel getCardsInfoThreadWithoutCompletes() {
-        Game game = getGame();
-        TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFowMode() || game.isCommunityMode())
-            actionsChannel = (TextChannel) getPrivateChannel();
-        if (actionsChannel == null) {
-            actionsChannel = game.getMainGameChannel();
-        }
-        if (actionsChannel == null) {
-            BotLogger.log(
-                "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
-                    + game.getName());
+        if (createWithQueue) {
+            threadAction.queue(c -> {
+                setCardsInfoThreadID(c.getId());
+                String message = "Hello " + getPing() + "! This is your private channel.";
+                MessageHelper.sendMessageToChannel(c, message);
+            }, BotLogger::catchRestError);
             return null;
         }
-
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
-            + getUserName().replaceAll("/", "");
-        if (game.isFowMode()) {
-            threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
+        ThreadChannel threadChannel = null;
+        if (useComplete) {
+            threadChannel = threadAction.complete();
+            setCardsInfoThreadID(threadChannel.getId());
         }
-
-        // ATTEMPT TO FIND BY ID
-        String cardsInfoThreadID = getCardsInfoThreadID();
-        boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank()
-            && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
-        try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null)
-                    return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-
-            }
-        } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: "
-                + cardsInfoThreadID + " for potential thread name: " + threadName, e);
-        }
-
-        // ATTEMPT TO FIND BY NAME
-        try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null)
-                    return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            BotLogger.log(
-                "`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName,
-                e);
-        }
-
-        return null;
+        return threadChannel;
     }
 
     public void setUserID(String userID) {
