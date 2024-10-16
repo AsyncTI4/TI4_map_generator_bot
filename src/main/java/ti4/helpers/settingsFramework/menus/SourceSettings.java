@@ -67,7 +67,7 @@ public class SourceSettings extends SettingsMenu {
             absol.initialize(json.get("absol"));
             miltymod.initialize(json.get("miltymod"));
             eronous.initialize(json.get("eronous"));
-            // cryypter.initialize(json.get("cryypter"));
+            // cryypter.initialize(json.get("voice_of_the_council"));
         }
     }
 
