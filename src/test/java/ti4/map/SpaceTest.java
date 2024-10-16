@@ -38,10 +38,10 @@ public class SpaceTest extends BaseTi4Test {
         space.addCC(expectedCommandCounter);
         space.addControl(expectedControl);
         space.addToken(expectedToken);
-        
+
         return space;
     }
-    
+
     @Test
     public void testSpaceHasNoUnexpectedProperties() throws Exception {
         // Given        
@@ -54,8 +54,7 @@ public class SpaceTest extends BaseTi4Test {
             "unitsDamage",
             "commandCounterList",
             "controlList",
-            "tokenList"
-        ));
+            "tokenList"));
 
         // When
         JsonValidator.assertAvailableJsonAttributes(space, knownJsonAttributes);

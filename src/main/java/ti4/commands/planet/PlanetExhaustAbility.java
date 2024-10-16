@@ -172,8 +172,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.add(button);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to force into giving you a PN or AC", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " tell the bot who you want to force into giving you a PN or AC", buttons);
     }
 
     public static void resolvePrismStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -199,11 +198,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         if ("pn".equalsIgnoreCase(pnOrAC)) {
             buttons = ButtonHelper.getForcedPNSendButtons(game, p2, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " resolve", buttons);
-
         } else {
             String buttonID2 = "transact_ACs_" + p2.getFaction();
             TransactionHelper.resolveSpecificTransButtonsOld(game, player, buttonID2, event);
         }
-
     }
 }

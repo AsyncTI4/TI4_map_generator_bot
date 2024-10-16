@@ -55,8 +55,7 @@ public class CombatModifierModel implements ModelInterface {
             }
             if ("_best_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
-                sortedAllUnits.sort(
-                    Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
+                sortedAllUnits.sort(Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
                 isInScope = Objects.equals(sortedAllUnits.get(0).getAsyncId(), unit.getAsyncId());
             }
             if ("_ship_".equals(scope)) {

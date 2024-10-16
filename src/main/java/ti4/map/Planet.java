@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitKey;
 import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
@@ -107,11 +106,17 @@ public class Planet extends UnitHolder {
         }).toList();
     }
 
-    @JsonIgnore
     public boolean hasGroundForces(Player player) {
         return getUnits().keySet().stream()
-            .map(UnitKey::asyncID)
-            .map(unitID -> player.getPriorityUnitByAsyncID(unitID, this))
+            .filter(player::unitBelongsToPlayer)
+            .map(uk -> player.getPriorityUnitByAsyncID(uk.asyncID(), this))
+            .filter(Objects::nonNull)
+            .anyMatch(UnitModel::getIsGroundForce);
+    }
+
+    public boolean hasGroundForces(Game game) {
+        return getUnits().keySet().stream()
+            .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
             .filter(Objects::nonNull)
             .anyMatch(UnitModel::getIsGroundForce);
     }
@@ -192,6 +197,11 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public int getMaxResInf() {
+        return Math.max(getResources(), getInfluence());
+    }
+
+    @JsonIgnore
     public int getOptimalResources() {
         if (getResources() > getInfluence()) {
             return getResources();
@@ -235,6 +245,10 @@ public class Planet extends UnitHolder {
         return planetType;
     }
 
+    public PlanetModel getPlanetModel() {
+        return Mapper.getPlanet(getName());
+    }
+
     @JsonIgnore
     public Set<String> getPlanetTypes() {
         Set<String> types = new HashSet<String>();
@@ -266,6 +280,9 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public boolean isLegendary() {
+        PlanetModel model = getPlanetModel();
+        if (model.isLegendary()) return true;
+
         for (String token : tokenList) {
             AttachmentModel attachment = Mapper.getAttachmentInfo(token);
             if (attachment == null)

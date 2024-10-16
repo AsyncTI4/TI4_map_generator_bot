@@ -18,8 +18,9 @@ import ti4.json.ObjectMapperFactory;
  */
 public final class JsonValidator<T> {
     private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
-    
-    private JsonValidator() {}
+
+    private JsonValidator() {
+    }
 
     /**
      * Subjects the provided object to a save/restore JSON loop where we serialize the object to

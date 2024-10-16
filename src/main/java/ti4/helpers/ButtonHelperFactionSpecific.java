@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
@@ -554,19 +553,17 @@ public class ButtonHelperFactionSpecific {
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
             if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
-                techs.add(Buttons.green("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
-                    Mapper.getTech(tech).getName()));
+                techs.add(Buttons.green("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
         event.getMessage().delete().queue();
         List<Button> techs2 = new ArrayList<>(techs);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " use the buttons to get a tech the other players had",
+            player.getRepresentation(true, true) + " use the buttons to gain a technology the other players have:",
             techs);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " use the buttons to get another tech the other players had",
+            player.getRepresentation(true, true) + " use the buttons to gain another technology the other players have:",
             techs2);
-
     }
 
     public static void offerArgentStartingTech(Player player, Game game) {
@@ -1172,8 +1169,7 @@ public class ButtonHelperFactionSpecific {
                         if (game.isFowMode()) {
                             buttons.add(Buttons.gray(buttonID, player.getColor() + " " + unitName));
                         } else {
-                            buttons.add(Buttons.gray(buttonID, unitName)
-                                .withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+                            buttons.add(Buttons.gray(buttonID, unitName).withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
                         }
                     }
                 }
@@ -1191,8 +1187,7 @@ public class ButtonHelperFactionSpecific {
                 if (player.unitBelongsToPlayer(unitKey)) {
                     String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
                     String buttonID = "kolleccRelease_" + unitName;
-                    buttons.add(Buttons.gray(buttonID, "Release 1  " + unitName)
-                        .withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+                    buttons.add(Buttons.gray(buttonID, "Release 1  " + unitName).withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
                 }
 
             }
@@ -1383,31 +1378,34 @@ public class ButtonHelperFactionSpecific {
 
     public static void offerMahactInfButtons(Player player, Game game) {
         String message = player.getRepresentation(true, true) + " Resolve Mahact infantry loss using the buttons";
-        List<Button> buttons = gainOrConvertCommButtons(player);
+        List<Button> buttons = gainOrConvertCommButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     public static void offerHoldingCompanyButtons(Player player, Game game) {
         String message = player.getRepresentation(true, true)
             + " Resolve Holding Company comm gain using the buttons. Remember you get 1 comm per attachment you've given out. ";
-        List<Button> buttons = gainOrConvertCommButtons(player);
+        List<Button> buttons = gainOrConvertCommButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     public static void offerNekrophageButtons(Player player, ButtonInteractionEvent event) {
         String message = player.getRepresentation(true, true) + " Resolve Necrophage ability using buttons. ";
-        List<Button> buttons = gainOrConvertCommButtons(player);
+        List<Button> buttons = gainOrConvertCommButtons(player, true);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 
-    public static List<Button> gainOrConvertCommButtons(Player player) {
+    public static List<Button> gainOrConvertCommButtons(Player player, boolean deleteAfter) {
         List<Button> buttons = new ArrayList<>();
         String ffcc = player.getFinsFactionCheckerPrefix();
-        buttons.add(Button.of(ButtonStyle.SUCCESS, ffcc + "convert_1_comms", "Convert 1 comm to TG",
-            Emoji.fromFormatted(Emojis.Wash)));
-        buttons.add(Button.of(ButtonStyle.PRIMARY, ffcc + "gain_1_comms_stay", "Gain 1 comm",
-            Emoji.fromFormatted(Emojis.comm)));
+        if (deleteAfter) {
+            buttons.add(Buttons.green(ffcc + "convertComms_1", "Convert 1 comm to TG", Emojis.Wash));
+            buttons.add(Buttons.blue(ffcc + "gainComms_1", "Gain 1 comm", Emojis.comm));
+        } else {
+            buttons.add(Buttons.green(ffcc + "convertComms_1_stay", "Convert 1 comm to TG", Emojis.Wash));
+            buttons.add(Buttons.blue(ffcc + "gainComms_1_stay", "Gain 1 comm", Emojis.comm));
+        }
         buttons.add(Buttons.red("deleteButtons", "Done resolving"));
         return buttons;
     }
@@ -1418,14 +1416,8 @@ public class ButtonHelperFactionSpecific {
             return; // no mecatol tile
         for (Planet mecatol : tile.getPlanetUnitHolders()) {
             if (Constants.MECATOLS.contains(mecatol.getName())) {
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1))
-                    mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2))
-                    mecatol.removeToken(Constants.ATTACHMENT_IIHQ_2);
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1))
-                    mecatol.removeToken("token_custodiavigilia_1.png");
-                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2))
-                    mecatol.removeToken("token_custodiavigilia_2.png");
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_1)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_1);
+                if (mecatol.getTokenList().contains(Constants.ATTACHMENT_IIHQ_2)) mecatol.removeToken(Constants.ATTACHMENT_IIHQ_2);
 
                 for (Player player : game.getRealPlayers()) {
                     if (!player.hasTech("iihq"))
@@ -2101,10 +2093,9 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getCreussIFFTypeOptions() {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(
-            Buttons.red("creussIFFStart_alpha", "Alpha").withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
-        buttons.add(Buttons.green("creussIFFStart_beta", "Beta").withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
-        buttons.add(Buttons.blue("creussIFFStart_gamma", "Gamma").withEmoji(Emoji.fromFormatted(Emojis.CreussGamma)));
+        buttons.add(Buttons.red("creussIFFStart_alpha", "Alpha", Emojis.CreussAlpha));
+        buttons.add(Buttons.green("creussIFFStart_beta", "Beta", Emojis.CreussBeta));
+        buttons.add(Buttons.blue("creussIFFStart_gamma", "Gamma", Emojis.CreussGamma));
         return buttons;
     }
 
@@ -2178,12 +2169,9 @@ public class ButtonHelperFactionSpecific {
     public static void creussMechStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         String tilePos = buttonID.split("_")[1];
-        buttons.add(Buttons.red("creussMechStep3_" + tilePos + "_alpha", "Alpha")
-            .withEmoji(Emoji.fromFormatted(Emojis.CreussAlpha)));
-        buttons.add(Buttons.green("creussMechStep3_" + tilePos + "_beta", "Beta")
-            .withEmoji(Emoji.fromFormatted(Emojis.CreussBeta)));
-        buttons.add(Buttons.blue("creussMechStep3_" + tilePos + "_gamma", "Gamma")
-            .withEmoji(Emoji.fromFormatted(Emojis.CreussGamma)));
+        buttons.add(Buttons.red("creussMechStep3_" + tilePos + "_alpha", "Alpha", Emojis.CreussAlpha));
+        buttons.add(Buttons.green("creussMechStep3_" + tilePos + "_beta", "Beta", Emojis.CreussBeta));
+        buttons.add(Buttons.blue("creussMechStep3_" + tilePos + "_gamma", "Gamma", Emojis.CreussGamma));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true) + " choose the type of wormhole you wish to place in " + tilePos
                 + ".",

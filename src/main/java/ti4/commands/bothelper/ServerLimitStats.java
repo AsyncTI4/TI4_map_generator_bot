@@ -12,7 +12,7 @@ import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
 public class ServerLimitStats extends BothelperSubcommandData {
-    public ServerLimitStats(){
+    public ServerLimitStats() {
         super(Constants.SERVER_LIMIT_STATS, "Server Limit Stats");
     }
 
@@ -29,7 +29,7 @@ public class ServerLimitStats extends BothelperSubcommandData {
         //CHANNELS
         List<GuildChannel> channels = guild.getChannels();
         int channelCount = channels.size(); //500
-        roomForGames = Math.min(roomForGames, (500 - channelCount)/2);
+        roomForGames = Math.min(roomForGames, (500 - channelCount) / 2);
         long pbdChannelCount = channels.stream().filter(c -> c.getName().startsWith("pbd")).count();
         long categoryChannelCount = channels.stream().filter(c -> c.getType() == ChannelType.CATEGORY).count();
 
@@ -47,24 +47,24 @@ public class ServerLimitStats extends BothelperSubcommandData {
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();
 
-      String sb = "## Server Limit Statistics:\n" + "### Server: " + guild.getName() + "\n" +
-          "- " + memberCount + " / " + memberMax + getPercentage(memberCount, memberMax) + " - members" + "\n" +
-          "- " + boostCount + " - boosts" + "\n" +
-          "- " + emojiCount + " / " + emojiMax + getPercentage(emojiCount, emojiMax) + " - emojis" + "\n" +
-          "- " + roleCount + " / 250" + getPercentage(roleCount, 250) + " - roles" + "\n" +
-          "- space for **" + roomForGames + "** more games\n" +
-          "### Channels:\n" +
-          "- " + "**" + channelCount + " / 500" + getPercentage(channelCount, 500) + " - channels**" + "\n" +
-          " - " + categoryChannelCount + "   " + getPercentage(categoryChannelCount, channelCount) + "  categories" + "\n" +
-          " - " + pbdChannelCount + "   " + getPercentage(pbdChannelCount, channelCount) + "  'pbd' channels" + "\n" +
-          "### Threads:\n" +
-          "- " + "**" + threadCount + " / 1000" + getPercentage(threadCount, 1000) + " - threads**" + "\n" +
-          " - " + "   " + threadArchivedCount + " - loaded archived threads" + "\n" +
-          "- " + privateThreadCount + "   " + getPercentage(privateThreadCount, threadCount) + "  private threads" + "\n" +
-          " - " + cardsInfoThreadCount + "   " + getPercentage(cardsInfoThreadCount, threadCount) + "  'Cards Info' threads (/cards_info)" + "\n" +
-          "- " + publicThreadCount + "   " + getPercentage(publicThreadCount, threadCount) + "  public threads" + "\n" +
-          " - " + botThreadCount + "   " + getPercentage(botThreadCount, threadCount) + "  '-bot-map-updates' threads" + "\n" +
-          " - " + roundThreadCount + "   " + getPercentage(roundThreadCount, threadCount) + "  '-round-' threads (/sc play and combat)" + "\n";
+        String sb = "## Server Limit Statistics:\n" + "### Server: " + guild.getName() + "\n" +
+            "- " + memberCount + " / " + memberMax + getPercentage(memberCount, memberMax) + " - members" + "\n" +
+            "- " + boostCount + " - boosts" + "\n" +
+            "- " + emojiCount + " / " + emojiMax + getPercentage(emojiCount, emojiMax) + " - emojis" + "\n" +
+            "- " + roleCount + " / 250" + getPercentage(roleCount, 250) + " - roles" + "\n" +
+            "- space for **" + roomForGames + "** more games\n" +
+            "### Channels:\n" +
+            "- " + "**" + channelCount + " / 500" + getPercentage(channelCount, 500) + " - channels**" + "\n" +
+            " - " + categoryChannelCount + "   " + getPercentage(categoryChannelCount, channelCount) + "  categories" + "\n" +
+            " - " + pbdChannelCount + "   " + getPercentage(pbdChannelCount, channelCount) + "  'pbd' channels" + "\n" +
+            "### Threads:\n" +
+            "- " + "**" + threadCount + " / 1000" + getPercentage(threadCount, 1000) + " - threads**" + "\n" +
+            " - " + "   " + threadArchivedCount + " - loaded archived threads" + "\n" +
+            "- " + privateThreadCount + "   " + getPercentage(privateThreadCount, threadCount) + "  private threads" + "\n" +
+            " - " + cardsInfoThreadCount + "   " + getPercentage(cardsInfoThreadCount, threadCount) + "  'Cards Info' threads (/cards_info)" + "\n" +
+            "- " + publicThreadCount + "   " + getPercentage(publicThreadCount, threadCount) + "  public threads" + "\n" +
+            " - " + botThreadCount + "   " + getPercentage(botThreadCount, threadCount) + "  '-bot-map-updates' threads" + "\n" +
+            " - " + roundThreadCount + "   " + getPercentage(roundThreadCount, threadCount) + "  '-round-' threads (/sc play and combat)" + "\n";
         MessageHelper.sendMessageToEventChannel(event, sb);
     }
 

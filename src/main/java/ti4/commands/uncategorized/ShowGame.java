@@ -72,10 +72,8 @@ public class ShowGame implements Command {
                 MapGenerator.saveImage(game, displayType, event)
                     .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
-            }
-            else {
-                for (DisplayType i: DisplayType.values())
-                {
+            } else {
+                for (DisplayType i : DisplayType.values()) {
                     if (temp.equals(i.getValue())) {
                         displayType = i;
                         break;
@@ -83,8 +81,7 @@ public class ShowGame implements Command {
                 }
             }
         }
-        if (displayType == null)
-        {
+        if (displayType == null) {
             displayType = DisplayType.all;
         }
         simpleShowGame(game, event, displayType);
@@ -119,14 +116,14 @@ public class ShowGame implements Command {
             case attachments:
             case shipless:
                 return false;
+            default:
+                return true;
         }
-        return true;
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapGenerator.saveImage(game, displayType, event).thenAccept(fileUpload -> {
-            if (includeButtons(displayType))
-            {
+            if (includeButtons(displayType)) {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {
                     Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
@@ -145,9 +142,7 @@ public class ShowGame implements Command {
                 }
 
                 MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
-            }
-            else
-            {
+            } else {
                 MessageChannel channel = event.getMessageChannel();
                 if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
                     channel = game.getBotMapUpdatesThread();

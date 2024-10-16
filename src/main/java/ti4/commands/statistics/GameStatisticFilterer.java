@@ -1,8 +1,11 @@
 package ti4.commands.statistics;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -17,6 +20,17 @@ public final class GameStatisticFilterer {
     public static final String HAS_WINNER_FILTER = "has_winner";
 
     private GameStatisticFilterer() {
+    }
+
+    public static List<OptionData> gameStatsFilters() {
+        List<OptionData> filters = new ArrayList<>();
+        filters.add(new OptionData(OptionType.INTEGER, GameStatisticFilterer.PLAYER_COUNT_FILTER, "Filter games of player by player count, e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, GameStatisticFilterer.VICTORY_POINT_GOAL_FILTER, "Filter games of player by victory point goal, e.g. 10-14"));
+        filters.add(new OptionData(OptionType.STRING, GameStatisticFilterer.GAME_TYPE_FILTER, "Filter games of player by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.FOG_FILTER, "Filter games of player by if the game is a fog game"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HOMEBREW_FILTER, "Filter games of player by if the game has any homebrew"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HAS_WINNER_FILTER, "Filter games of player by if the game has a winner"));
+        return filters;
     }
 
     public static List<Game> getFilteredGames(SlashCommandInteractionEvent event) {
