@@ -33,8 +33,8 @@ public class ListVoteCount extends AgendaSubcommandData {
         for (Player player : orderList) {
             votes = votes + AgendaHelper.getTotalVoteCount(game, player);
         }
-        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " 
-          + (Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_TOTAL_VOTES)) ? "???" : votes));
+        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: "
+            + (Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_TOTAL_VOTES)) ? "???" : votes));
         sb.append("):__**\n");
         int itemNo = 1;
         for (Player player : orderList) {

@@ -30,10 +30,8 @@ public class MiltySettings extends SettingsMenu {
     // Categories
     private GameSettings gameSettings;
     private SliceGenerationSettings sliceSettings;
-    //private FrankenSettings frankenSettings;
     private PlayerFactionSettings playerSettings;
     private SourceSettings sourceSettings;
-
     // Bonus Attributes
     @JsonIgnore
     private Game game;

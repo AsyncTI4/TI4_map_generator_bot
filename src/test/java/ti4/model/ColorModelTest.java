@@ -2,7 +2,6 @@ package ti4.model;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

@@ -58,13 +58,13 @@ public class ButtonHelperCommanders {
                 "You can't afford the cost of Spc. Phquaiset, the Cheiran Commander, right now. Get more money ya broke crab.");
             return;
         }
-        String msg = ButtonHelper.getIdentOrColor(player, game) + " used Spc. Phquaiset, the Cheiran Commander, spending 1 " + msg2
+        String msg = player.getFactionEmojiOrColor() + " used Spc. Phquaiset, the Cheiran Commander, spending 1 " + msg2
             + " to cancel 1 hit. They may do this once per round of combat.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     public static void kortaliCommanderBlock(Player player, Game game, ButtonInteractionEvent event) {
-        String msg = ButtonHelper.getIdentOrColor(player, game)
+        String msg = player.getFactionEmojiOrColor()
             + " used Queen Lorena, the Kortali commander, to cancel 1 hit in the first round of combat.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteTheOneButton(event);
@@ -422,7 +422,7 @@ public class ButtonHelperCommanders {
                 String mMessage = player.getRepresentation(true, true)
                     + " you have Magmus, the Muaat Commander, unlocked, you may gain 1TG, but you are in Pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1TG").withEmoji(Emoji.fromFormatted(Emojis.tg)));
+                buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1TG", Emojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
@@ -536,13 +536,12 @@ public class ButtonHelperCommanders {
         }
         CommanderUnlockCheck.checkPlayer(player, game, "keleres", event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdentOrColor(player, game) + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + "(" + oldTg + "->"
+            player.getFactionEmojiOrColor() + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + "(" + oldTg + "->"
                 + player.getTg() + ")");
         event.getMessage().delete().queue();
     }
 
-    public static void resolveSardakkCommander(Game game, Player p1, String buttonID,
-        ButtonInteractionEvent event, String ident) {
+    public static void resolveSardakkCommander(Game game, Player p1, String buttonID, ButtonInteractionEvent event, String ident) {
         String mechorInf = buttonID.split("_")[1];
         String planet1 = buttonID.split("_")[2];
         String planet2 = buttonID.split("_")[3];
@@ -551,25 +550,19 @@ public class ButtonHelperCommanders {
 
         String message = ident + " moved 1 " + mechorInf + " from " + planetRepresentation2 + " to "
             + planetRepresentation + " using G'hom Sek'kus, the N'orr Commander.";
-        new RemoveUnits().unitParsing(event, p1.getColor(),
-            game.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2,
-            game);
+        new RemoveUnits().unitParsing(event, p1.getColor(), game.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2, game);
 
         Tile tile = game.getTileFromPlanet(planet1);
         tile = MoveUnits.flipMallice(event, tile, game);
         planet1 = planet1.replace("lockedm", "m");
-        new AddUnits().unitParsing(event, p1.getColor(),
-            game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1,
-            game);
+        new AddUnits().unitParsing(event, p1.getColor(), game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1, game);
 
         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message);
         CommanderUnlockCheck.checkPlayer(p1, game, "naaz", event);
         ButtonHelper.deleteTheOneButton(event);
     }
 
-    public static List<Button> getSardakkCommanderButtons(Game game, Player player,
-        GenericInteractionCreateEvent event) {
-
+    public static List<Button> getSardakkCommanderButtons(Game game, Player player, GenericInteractionCreateEvent event) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
@@ -601,17 +594,14 @@ public class ButtonHelperCommanders {
                     String planetId2 = planetReal2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planetId2, game);
                     if (numInf > 0 && !planetId.equalsIgnoreCase(planetId2)) {
-                        buttons.add(Button
-                            .success("sardakkcommander_infantry_" + planetId + "_" + planetId2,
-                                "Commit 1 infantry from " + planetRepresentation2 + " to "
-                                    + planetRepresentation)
-                            .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+                        String id = "sardakkcommander_infantry_" + planetId + "_" + planetId2;
+                        String label = "Commit 1 infantry from " + planetRepresentation2 + " to " + planetRepresentation;
+                        buttons.add(Buttons.green(id, label, Emojis.Sardakk));
                     }
                     if (numMechs > 0 && !planetId.equalsIgnoreCase(planetId2)) {
-                        buttons.add(Button
-                            .primary("sardakkcommander_mech_" + planetId + "_" + planetId2,
-                                "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation)
-                            .withEmoji(Emoji.fromFormatted(Emojis.Sardakk)));
+                        String id = "sardakkcommander_mech_" + planetId + "_" + planetId2;
+                        String label = "Commit 1 mech from " + planetRepresentation2 + " to " + planetRepresentation;
+                        buttons.add(Buttons.blue(id, label, Emojis.Sardakk));
                     }
                 }
             }

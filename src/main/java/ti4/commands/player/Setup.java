@@ -30,7 +30,6 @@ import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -42,6 +41,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TechnologyModel;
 
 public class Setup extends PlayerSubcommandData {
     public Setup() {
@@ -102,6 +102,12 @@ public class Setup extends PlayerSubcommandData {
                 }
             }
         }
+
+        if (ChangeColor.colorIsExclusive(color, player)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This color is not valid, please try set up again manually with a different color.");
+            return;
+        }
+
         if (player.isRealPlayer() && player.getSo() > 0) {
             String message = player.getRepresentationNoPing() + "has SOs that would get lost to the void if they were setup again. If they wish to change color, use /player change_color. If they want to setup as another faction, they must discard their SOs first";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -116,11 +122,11 @@ public class Setup extends PlayerSubcommandData {
         player.getTechs().clear();
         player.getFactionTechs().clear();
 
+        FactionModel setupInfo = player.getFactionSetupInfo();
+
         if (game.isBaseGameMode()) {
             player.setLeaders(new ArrayList<>());
         }
-
-        FactionModel setupInfo = player.getFactionSetupInfo();
 
         if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !game.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
@@ -168,12 +174,16 @@ public class Setup extends PlayerSubcommandData {
         addUnits(setupInfo, tile, color, event);
 
         // STARTING TECH
-        for (String tech : setupInfo.getStartingTech()) {
-            if (tech.trim().isEmpty()) {
-                continue;
+        List<String> startingTech = setupInfo.getStartingTech();
+        if (startingTech != null) {
+            for (String tech : setupInfo.getStartingTech()) {
+                if (tech.trim().isEmpty()) {
+                    continue;
+                }
+                player.addTech(tech);
             }
-            player.addTech(tech);
         }
+
         if (game.getTechnologyDeckID().contains("absol")) {
             List<String> techs = new ArrayList<>();
             techs.addAll(player.getTechs());
@@ -241,20 +251,35 @@ public class Setup extends PlayerSubcommandData {
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
                 Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Tech Options");
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(getTech);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true)
-                        + " after every other faction gets their tech, press this button to resolve Keleres tech",
-                    buttons);
-            } else if (player.getFaction().contains("winnu")) {
-                ButtonHelperFactionSpecific.offerWinnuStartingTech(player, game);
-            } else if (player.getFaction().contains("argent")) {
-                ButtonHelperFactionSpecific.offerArgentStartingTech(player, game);
+                String msg = player.getRepresentation(true, true) + " after every other faction gets their tech, press this button to resolve Keleres tech";
+                MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use the button to get your starting tech.",
-                    List.of(Buttons.GET_A_TECH));
+                // STARTING TECH OPTIONS
+                Integer bonusOptions = setupInfo.getStartingTechAmount();
+                List<String> startingTechOptions = setupInfo.getStartingTechOptions();
+                if (startingTechOptions != null && bonusOptions != null && bonusOptions > 0) {
+                    List<TechnologyModel> techs = new ArrayList<>();
+                    if (!startingTechOptions.isEmpty()) {
+                        for (String tech : game.getTechnologyDeck()) {
+                            TechnologyModel model = Mapper.getTech(tech);
+                            boolean homebrewReplacesAnOption = model.getHomebrewReplacesID().map(startingTechOptions::contains).orElse(false);
+                            if (startingTechOptions.contains(model.getAlias()) || homebrewReplacesAnOption) {
+                                techs.add(model);
+                            }
+                        }
+                    }
+
+                    List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
+                    String msg = player.getRepresentation(true, true) + " use the buttons to choose your starting technology:";
+                    if (techs.isEmpty() && bonusOptions > 0) {
+                        buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                    } else if (bonusOptions > 0) {
+                        for (int x = 0; x < bonusOptions; x++) {
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        }
+                    }
+                }
             }
         }
 
@@ -311,8 +336,8 @@ public class Setup extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game activeGame2 : mapList.values()) {
-            for (Player player2 : activeGame2.getRealPlayers()) {
+        for (Game game2 : mapList.values()) {
+            for (Player player2 : game2.getRealPlayers()) {
                 if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                     if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
                         player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());

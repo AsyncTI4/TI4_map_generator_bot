@@ -1,0 +1,42 @@
+[
+    {
+        "id": "glory",
+        "imagePath": "token_ds_glory.png",
+        "spaceOrPlanet": "space",
+        "source": "ds"
+    },
+    {
+        "id": "wound",
+        "imagePath": "token_ds_wound.png",
+        "spaceOrPlanet": "space",
+        "isAnomaly": true,
+        "isRift": true,
+        "isNebula": true,
+        "source": "ds"
+    },
+    {
+        "id": "gledge_core",
+        "imagePath": "token_ds_gledgecore.png",
+        "spaceOrPlanet": "planet",
+        "source": "ds"
+    },
+    {
+        "id": "blight",
+        "imagePath": "token_ds_blight.png",
+        "spaceOrPlanet": "idk",
+        "source": "ds"
+    },
+    {
+        "id": "sigil",
+        "imagePath": "token_ds_sigil.png",
+        "spaceOrPlanet": "planet",
+        "source": "ds"
+    },
+    {
+        "id": "freesystems_raccoon",
+        "imagePath": "token_raccoon.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": ["freesystems_raccoon", "raccoon", "coon"],
+        "source": "ds"
+    }
+]

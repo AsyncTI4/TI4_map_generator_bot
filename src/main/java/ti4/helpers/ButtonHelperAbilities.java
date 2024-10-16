@@ -33,6 +33,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -276,17 +277,14 @@ public class ButtonHelperAbilities {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
         if (scPlayed > 3 && (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3))) {
-            scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards")
-                .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+            scButtons.add(Buttons.gray("sc_ac_draw", "Draw 2 Action Cards", Emojis.ActionCard));
         }
         if (scPlayed > 4 && (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4))) {
-            scButtons.add(
-                Buttons.green("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock));
+            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds));
         }
         if (scPlayed > 5 && (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5))) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities")
-                .withEmoji(Emoji.fromFormatted(Emojis.comm)));
+            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
         }
         if (scPlayed > 6 && (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6))) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
@@ -295,8 +293,7 @@ public class ButtonHelperAbilities {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (scPlayed > 8 && (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8))) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective")
-                .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
 
@@ -623,12 +620,7 @@ public class ButtonHelperAbilities {
             MessageHelper.sendMessageToChannel(channel1, pillagedMessage);
             if (player.hasUnexhaustedLeader("mentakagent")) {
                 List<Button> buttons = new ArrayList<>();
-                Button winnuButton = Button
-                    .success(
-                        "FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_"
-                            + pillaged.getFaction(),
-                        "Use Mentak Agent")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
+                Button winnuButton = Buttons.green("FFCC_" + player.getFaction() + "_" + "exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent", Emojis.Mentak);
                 buttons.add(winnuButton);
                 buttons.add(Buttons.red("deleteButtons", "Done"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2,
@@ -638,12 +630,7 @@ public class ButtonHelperAbilities {
                 if (p2 != pillaged && p2 != player && p2.hasUnexhaustedLeader("yssarilagent")
                     && player.hasLeader("mentakagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    Button winnuButton = Button
-                        .success(
-                            "FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_"
-                                + pillaged.getFaction(),
-                            "Use Mentak Agent")
-                        .withEmoji(Emoji.fromFormatted(Emojis.Mentak));
+                    Button winnuButton = Buttons.green("FFCC_" + p2.getFaction() + "_" + "exhaustAgent_mentakagent_" + pillaged.getFaction(), "Use Mentak Agent", Emojis.Mentak);
                     buttons.add(winnuButton);
                     buttons.add(Buttons.red("deleteButtons", "Done"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
@@ -1135,8 +1122,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList,
-        Game game) {
+    public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList, Game game) {
         List<Button> techToGain = new ArrayList<>();
         for (String tech : currentList) {
             techToGain.add(Buttons.green("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
@@ -1145,8 +1131,7 @@ public class ButtonHelperAbilities {
         return techToGain;
     }
 
-    public static List<String> getPossibleTechForNekroToGainFromPlayer(Player nekro, Player victim,
-        List<String> currentList, Game game) {
+    public static List<String> getPossibleTechForNekroToGainFromPlayer(Player nekro, Player victim, List<String> currentList, Game game) {
         List<String> techToGain = new ArrayList<>(currentList);
         for (String tech : victim.getTechs()) {
             if (!nekro.getTechs().contains(tech) && !techToGain.contains(tech) && !"iihq".equalsIgnoreCase(tech)) {
@@ -1209,23 +1194,21 @@ public class ButtonHelperAbilities {
         }
     }
 
-    public static void starforgeTile(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
+    @ButtonHandler("starforgeTile_")
+    public static void starforgeTile(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String pos = buttonID.replace("starforgeTile_", "");
+
+        String prefix = player.getFinsFactionCheckerPrefix() + "starforge_";
         List<Button> buttons = new ArrayList<>();
-        Button starforgerStroter = Buttons.red("starforge_destroyer_" + pos, "Starforge Destroyer")
-            .withEmoji(Emoji.fromFormatted(Emojis.destroyer));
-        buttons.add(starforgerStroter);
-        Button starforgerFighters = Buttons.red("starforge_fighters_" + pos, "Starforge 2 Fighters")
-            .withEmoji(Emoji.fromFormatted(Emojis.fighter));
-        buttons.add(starforgerFighters);
+        buttons.add(Buttons.red(prefix + "destroyer_" + pos, "Starforge Destroyer", Emojis.destroyer));
+        buttons.add(Buttons.red(prefix + "fighters_" + pos, "Starforge 2 Fighters", Emojis.fighter));
         String message = "Use the buttons to select what you would like to starforge.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
+        ButtonHelper.deleteMessage(event);
     }
 
-    public static void starforge(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
+    @ButtonHandler("starforge_")
+    public static void starforge(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlace = buttonID.replace("starforge_", "");
         String unit = unitNPlace.split("_")[0];
         String pos = unitNPlace.split("_")[1];
@@ -1240,6 +1223,7 @@ public class ButtonHelperAbilities {
             successMessage = "Exhausted Scepter of Emelpar";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
+
         List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
         if ("destroyer".equals(unit)) {
             new AddUnits().unitParsing(event, player.getColor(), tile, "1 destroyer", game);
@@ -1296,8 +1280,7 @@ public class ButtonHelperAbilities {
                     if (!player.getPlanetsAllianceMode().contains(planet2) && !planetRepresentation2.contains("Mecatol")
                         && (planetReal2.getUnits() == null || planetReal2.getUnits().isEmpty())
                         && !planetsChecked.contains(planet2)) {
-                        buttons.add(Buttons.green(finChecker + "peaceAccords_" + planet2, planetRepresentation2)
-                            .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
+                        buttons.add(Buttons.green(finChecker + "peaceAccords_" + planet2, planetRepresentation2, Emojis.Xxcha));
                         planetsChecked.add(planet2);
                     }
                 }
@@ -1320,8 +1303,7 @@ public class ButtonHelperAbilities {
                     String planet2 = planetReal2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!planetsChecked.contains(planet2)) {
-                        buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2)
-                            .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
+                        buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2, Emojis.Xxcha));
                         planetsChecked.add(planet2);
                     }
                 }
@@ -1331,8 +1313,7 @@ public class ButtonHelperAbilities {
                 String planet2 = planetReal2.getName();
                 String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                 if (!planetsChecked.contains(planet2)) {
-                    buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2)
-                        .withEmoji(Emoji.fromFormatted(Emojis.Xxcha)));
+                    buttons.add(Buttons.green(finChecker + "contagion_" + planet2, planetRepresentation2, Emojis.Xxcha));
                     planetsChecked.add(planet2);
                 }
             }

@@ -115,9 +115,7 @@ public class TechExhaust extends TechAddRemove {
             }
             case "absol_nm" -> { // Absol's Neural Motivator
                 deleteIfButtonEvent(event);
-                Button draw2ACButton = Button
-                    .secondary(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards")
-                    .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                Button draw2ACButton = Buttons.gray(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards", Emojis.ActionCard);
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 //sendNextActionButtonsIfButtonEvent(event, game, player);
             }

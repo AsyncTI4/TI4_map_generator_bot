@@ -150,8 +150,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
-                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, Emojis.ActionCard));
                 }
             }
         }
@@ -181,8 +180,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && "Action".equalsIgnoreCase(actionCardWindow)) {
-                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name)
-                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, Emojis.ActionCard));
                 }
             }
         }
@@ -231,9 +229,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Button
-                        .secondary("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name)
-                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Buttons.gray("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name, Emojis.ActionCard));
                 }
             }
         }
@@ -249,8 +245,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
-                    acButtons.add(Buttons.red("takeAC_" + value + "_" + player.getFaction(), ac_name)
-                        .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Buttons.red("takeAC_" + value + "_" + player.getFaction(), ac_name, Emojis.ActionCard));
                 }
             }
         }

@@ -41,7 +41,7 @@ public class Cleanup extends StatusSubcommandData {
     }
 
     public void runStatusCleanup(Game game) {
-        game.setStoredValue("deflectedSC", "");
+        game.removeStoredValue("deflectedSC");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
@@ -96,16 +96,16 @@ public class Cleanup extends StatusSubcommandData {
                 game.setStoredValue("exhaustedSC" + x, "");
             }
         }
-        game.setStoredValue("absolMOW", "");
-        game.setStoredValue("naaluPNUser", "");
         game.setStoredValue("agendaCount", "0");
-        game.setStoredValue("politicalStabilityFaction", "");
-        game.setStoredValue("forcedScoringOrder", "");
-        game.setStoredValue("Public Disgrace", "");
-        game.setStoredValue("Public Disgrace Only", "");
-        game.setStoredValue("edynAgentPreset", "");
-        game.setStoredValue("Coup", "");
-        game.setStoredValue("PublicExecution", "");
+        game.removeStoredValue("absolMOW");
+        game.removeStoredValue("naaluPNUser");
+        game.removeStoredValue("politicalStabilityFaction");
+        game.removeStoredValue("forcedScoringOrder");
+        game.removeStoredValue("Public Disgrace");
+        game.removeStoredValue("Public Disgrace Only");
+        game.removeStoredValue("edynAgentPreset");
+        game.removeStoredValue("Coup");
+        game.removeStoredValue("PublicExecution");
         game.setHasHadAStatusPhase(true);
         if (game.isSpinMode()) {
             SpinTilesInRings.spinRings(game);

@@ -50,12 +50,10 @@ public class BorderAnomalyModel {
             return null;
         }
         Map<String, BorderAnomalyType> allTypes = Arrays.stream(BorderAnomalyType.values())
-            .collect(
-                Collectors.toMap(
-                    BorderAnomalyType::toSearchString,
-                    (t -> t)));
-        if (allTypes.containsKey(type.toLowerCase()))
+            .collect(Collectors.toMap(BorderAnomalyType::toSearchString, (t -> t)));
+        if (allTypes.containsKey(type.toLowerCase())) {
             return allTypes.get(type.toLowerCase());
+        }
         return null;
     }
 }

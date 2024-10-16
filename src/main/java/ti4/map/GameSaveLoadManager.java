@@ -171,17 +171,6 @@ public class GameSaveLoadManager {
     public static void saveMap(Game game, boolean keepModifiedDate, String saveReason) {
         long saveStart = System.nanoTime();
 
-        // ADD COMMAND/BUTTON FOR UNDO INFORMATION
-        List<String> trivialSaveReasons = new ArrayList<>(List.of(
-            "Last Command Unknown - No Event Provided",
-            "Bot Reload",
-            "Auto Ping"));
-        //boolean lastSaveTrivial = trivialSaveReasons.contains(game.getLatestCommand());
-        boolean thisSaveTrivial = saveReason == null || trivialSaveReasons.contains(saveReason);
-        //if (keepModifiedDate && game.isHasEnded() && lastSaveTrivial && thisSaveTrivial) {
-            // return;
-        //}
-
         game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
 
         try {
@@ -254,15 +243,14 @@ public class GameSaveLoadManager {
                         .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
                         .map(fileName -> fileName.replace(Constants.TXT, ""))
                         .map(Integer::parseInt).toList();
-                    int maxNumber = numbers.isEmpty() ? 0
-                        : numbers.stream().mapToInt(value -> value)
-                            .max().orElseThrow(NoSuchElementException::new);
-
+                    int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
                     File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                     CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                     mapUndoStorage.delete();
                     Game loadedGame = loadMap(originalMapFile);
+                    if (loadedGame == null) throw new Exception("Failed to load undo copy");
+
                     for (Player p1 : loadedGame.getRealPlayers()) {
                         Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
                         if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
@@ -309,8 +297,10 @@ public class GameSaveLoadManager {
         File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
         if (originalMapFile.exists()) {
             Game loadedGame = loadMap(originalMapFile);
-            GameManager.getInstance().deleteGame(game.getName());
-            GameManager.getInstance().addGame(loadedGame);
+            if (loadedGame != null) {
+                GameManager.getInstance().deleteGame(game.getName());
+                GameManager.getInstance().addGame(loadedGame);
+            }
         }
     }
 
@@ -1003,11 +993,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
             writer.write(System.lineSeparator());
-            writer.write(Constants.STRATEGY_CARD + " "
-                + String.join(",", player.getSCs().stream().map(String::valueOf).toList()));
+            writer.write(Constants.STRATEGY_CARD + " " + String.join(",", player.getSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
-            writer.write(Constants.FOLLOWED_SC + " "
-                + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
+            writer.write(Constants.FOLLOWED_SC + " " + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
 
             StringBuilder leaderInfo = new StringBuilder();
@@ -1191,36 +1179,35 @@ public class GameSaveLoadManager {
         long loadStart = System.nanoTime();
         try (Stream<Path> pathStream = Files.list(Storage.getMapImageDirectory().toPath())) {
             pathStream.parallel()
-                    .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
-                    .forEach(path -> {
-                        File file = path.toFile();
-                        try {
-                            Game game = loadMap(file);
-                            if (game == null || game.getName() == null) {
-                                BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
-                                return;
-                            }
-                            GameManager.getInstance().addGame(game);
-                        } catch (Exception e) {
-                            BotLogger.log("Could not load game: " + file.getName(), e);
+                .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
+                .forEach(path -> {
+                    File file = path.toFile();
+                    try {
+                        Game game = loadMap(file);
+                        if (game == null || game.getName() == null) {
+                            BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
+                            return;
                         }
-                    });
+                        GameManager.getInstance().addGame(game);
+                    } catch (Exception e) {
+                        BotLogger.log("Could not load game: " + file.getName(), e);
+                    }
+                });
         } catch (IOException e) {
             BotLogger.log("Exception occurred while streaming map directory.", e);
         }
         long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size()
-                + "` games: ", loadTime, loadTime));
+        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size() + "` games: ", loadTime, loadTime));
     }
 
     @Nullable
     public static Game loadMap(File mapFile) {
         if (mapFile == null || !mapFile.exists()) {
-            BotLogger.log("Could not load map, map file does not exist: " +
-                    (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
+            BotLogger.log("Could not load map, map file does not exist: " + (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
             return null;
         }
         Game game = new Game();
+        boolean fatalError = false;
         try {
             Iterator<String> gameFileLines = Files.readAllLines(mapFile.toPath(), Charset.defaultCharset()).listIterator();
             game.setOwnerID(gameFileLines.next());
@@ -1247,6 +1234,7 @@ public class GameSaveLoadManager {
                         readGameInfo(game, data);
                     } catch (Exception e) {
                         BotLogger.log("Data is bad: " + game.getName(), e);
+                        fatalError = true;
                     }
                 }
 
@@ -1273,7 +1261,12 @@ public class GameSaveLoadManager {
                     }
                 }
             }
-            game.setTileMap(getTileMap(gameFileLines, game, mapFile));
+            Map<String, Tile> tileMap = getTileMap(gameFileLines, game, mapFile);
+            if (tileMap == null || fatalError) {
+                BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                return null;
+            }
+            game.setTileMap(tileMap);
             game.endGameIfOld();
             return game;
         } catch (Exception e) {
@@ -1301,8 +1294,7 @@ public class GameSaveLoadManager {
                 if (tile != null) {
                     tileMap.put(tile.getPosition(), tile);
                 } else {
-                    BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `"
-                            + tileData + "` - tile will be skipped - check save file");
+                    BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData + "` - tile will be skipped - check save file");
                 }
 
                 while (gameFileLines.hasNext()) {
@@ -1323,8 +1315,7 @@ public class GameSaveLoadManager {
                                 if (Constants.MIRAGE.equals(spaceHolder)) {
                                     Helper.addMirageToTile(tile);
                                 } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                    BotLogger.log(game.getName() + ": Not valid space holder detected: "
-                                            + spaceHolder);
+                                    BotLogger.log(game.getName() + ": Not valid space holder detected: " + spaceHolder);
                                 }
                             }
                             continue;
@@ -1370,6 +1361,7 @@ public class GameSaveLoadManager {
             }
         } catch (Exception e) {
             BotLogger.log("Data read error: " + mapFile.getName(), e);
+            return null;
         }
         return tileMap;
     }
@@ -2277,10 +2269,8 @@ public class GameSaveLoadManager {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<>(
-                    getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
-                case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<>(
-                    getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
+                case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
+                case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
@@ -2527,8 +2517,7 @@ public class GameSaveLoadManager {
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
-        if (tile == null)
-            return;
+        if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();

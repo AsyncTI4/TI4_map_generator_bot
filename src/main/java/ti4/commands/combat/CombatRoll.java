@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -142,8 +141,7 @@ public class CombatRoll extends CombatSubcommandData {
                 "Planet needs to be specified to fire space cannon defence on tile " + tile.getPosition());
         }
 
-        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
-            rollType, game);
+        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
         if (ButtonHelper.isLawInPlay(game, "articles_war")) {
             if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
@@ -183,7 +181,6 @@ public class CombatRoll extends CombatSubcommandData {
                     + " for player " + player.getColor() + " "
                     + player.getFactionEmoji() + " for the combat roll type " + rollType.toString() + "\n"
                     + "Ping bothelper if this seems to be in error.");
-
             return 0;
         }
 
@@ -201,8 +198,7 @@ public class CombatRoll extends CombatSubcommandData {
         if (opponent == null) {
             opponent = player;
         }
-        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent, event,
-            rollType, game);
+        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
         List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
@@ -252,7 +248,7 @@ public class CombatRoll extends CombatSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (message.contains("adding +1, at the risk of your")) {
             MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos. Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc. Sol and Letnev agents automatically are given as extra dice for unit 1.",
-                Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+                Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", Emojis.Relic));
         }
         if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " you suffered " + h + " hit" + (h == 1 ? "" : "s") + " in round #" + round2;

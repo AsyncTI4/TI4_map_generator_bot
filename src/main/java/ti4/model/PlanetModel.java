@@ -15,12 +15,12 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
-import net.dv8tion.jda.api.entities.sticker.StickerUnion;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Emojis;
 import ti4.helpers.Stickers;
+import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 
@@ -65,14 +65,22 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return getId();
     }
 
+    @Deprecated
     public PlanetTypeModel.PlanetType getPlanetType() {
         if (planetType != null) {
             return planetType;
         }
-        if (planetTypes.size() > 0) {
-            return planetTypes.get(0);
+        if (getPlanetTypes().size() > 0) {
+            return getPlanetTypes().get(0);
         }
         return PlanetTypeModel.PlanetType.NONE;
+    }
+
+    public List<PlanetTypeModel.PlanetType> getPlanetTypes() {
+        List<PlanetType> types = new ArrayList<>();
+        if (planetTypes != null) types.addAll(planetTypes);
+        if (planetType != null) types.add(planetType);
+        return types;
     }
 
     @JsonIgnore
@@ -92,11 +100,13 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         sb.append(getEmoji()).append("__").append(getName()).append("__");
         eb.setTitle(sb.toString());
 
-        switch (getPlanetType()) {
-            case HAZARDOUS -> eb.setColor(Color.red);
-            case INDUSTRIAL -> eb.setColor(Color.green);
-            case CULTURAL -> eb.setColor(Color.blue);
-            default -> eb.setColor(Color.white);
+        if (getPlanetType() != null) {
+            switch (getPlanetType()) {
+                case HAZARDOUS -> eb.setColor(Color.red);
+                case INDUSTRIAL -> eb.setColor(Color.green);
+                case CULTURAL -> eb.setColor(Color.blue);
+                default -> eb.setColor(Color.white);
+            }
         }
 
         TileModel tile = TileHelper.getTile(getTileId());
@@ -215,8 +225,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getStickerOrEmojiURL() {
         long ident = Stickers.getPlanetSticker(getId());
-        if (ident == -1)
-        {
+        if (ident == -1) {
             return getEmojiURL();
         }
         return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();
