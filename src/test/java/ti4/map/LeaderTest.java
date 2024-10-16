@@ -15,7 +15,7 @@ import ti4.testUtils.JsonValidator;
 
 public class LeaderTest extends BaseTi4Test {
     private final String expectedId = "testId";
-    private final  String expectedType = "testType";
+    private final String expectedType = "testType";
     private final int expectedTgCount = 1;
     private final boolean expectedExhausted = false;
     private final boolean expectedLocked = true;
@@ -24,7 +24,7 @@ public class LeaderTest extends BaseTi4Test {
     private Leader buildLeader() {
         return new Leader(expectedId, expectedType, expectedTgCount, expectedExhausted, expectedLocked, expectedActive);
     }
-    
+
     @Test
     public void testLeaderHasNoUnexpectedProperties() throws Exception {
         // Given        
@@ -35,8 +35,7 @@ public class LeaderTest extends BaseTi4Test {
             "tgCount",
             "exhausted",
             "locked",
-            "active"
-        ));
+            "active"));
 
         // When
         JsonValidator.assertAvailableJsonAttributes(leader, knownJsonAttributes);

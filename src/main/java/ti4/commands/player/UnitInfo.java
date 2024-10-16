@@ -61,7 +61,7 @@ public class UnitInfo extends PlayerSubcommandData {
         return buttons;
     }
 
-    private static List<MessageEmbed> getUnitMessageEmbeds(Player player, boolean includeAllUnits) {
+    public static List<MessageEmbed> getUnitMessageEmbeds(Player player, boolean includeAllUnits) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         List<String> unitList = new ArrayList<>();

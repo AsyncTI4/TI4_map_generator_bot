@@ -182,11 +182,11 @@ public class SCPlay extends PlayerSubcommandData {
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
         if (scModel != null && scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
-            scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
+            scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs", Emojis.Nekro));
         }
 
         if (scModel != null && scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
-            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
+            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf", Emojis.Titans));
         }
         scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
@@ -367,7 +367,7 @@ public class SCPlay extends PlayerSubcommandData {
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, game, event).size() > 0 && !winnuHero) {
                     Button mahactA = Buttons.red("mahactA_follow_" + scToPlay,
-                        "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
+                        "Use Mahact Agent", Emojis.Mahact);
                     empNMahButtons.add(0, mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -54,7 +53,7 @@ public class GetTechButton extends TechSubcommandData {
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);
-        StringBuilder message = new StringBuilder(ident).append(" Acquired The Tech ")
+        StringBuilder message = new StringBuilder(ident).append(" acquired the technology: ")
             .append(techM.getRepresentation(false));
 
         if (techM.getRequirements().isPresent() && techM.getRequirements().get().length() > 1) {
@@ -75,7 +74,7 @@ public class GetTechButton extends TechSubcommandData {
                 && "action".equalsIgnoreCase(game.getPhaseOfGame())) {
                 String msg = player.getRepresentation()
                     + " due to your obsessive designs ability, you may use your space dock at home PRODUCTION ability to build units of the type you just upgraded, reducing the total cost by 2.";
-                String generalMsg = ButtonHelper.getIdentOrColor(player, game)
+                String generalMsg = player.getFactionEmojiOrColor()
                     + " has an opportunity to use their obsessive designs ability to build " + techM.getName()
                     + " at home";
                 List<Button> buttons;
@@ -104,13 +103,13 @@ public class GetTechButton extends TechSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), generalMsg);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Produce Units", buttons);
-
             }
         }
+
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             List<Button> buttons = new ArrayList<>();
-            Button hacanButton = Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Zealots Agent", Emojis.zealots);
-            buttons.add(hacanButton);
+            Button zealotsButton = Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Zealots Agent", Emojis.zealots);
+            buttons.add(zealotsButton);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentation(true, true)
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh, the Rhodun"
@@ -172,12 +171,9 @@ public class GetTechButton extends TechSubcommandData {
         }
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji()
-                    + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
-            String message2 = player.getRepresentation(true, true)
-                + " Use buttons to drop 1 mech on a legendary planet or planet with a tech skip";
-            List<Button> buttons2 = new ArrayList<>(
-                Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+                player.getFactionEmoji() + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
+            String message2 = player.getRepresentation(true, true) + " Use buttons to drop 1 mech on a legendary planet or planet with a tech skip";
+            List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
         }
 
@@ -265,26 +261,22 @@ public class GetTechButton extends TechSubcommandData {
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
             for (int x = 1; x < player.getCrf() + 1; x++) {
-                Button transact = Buttons.blue("purge_Frags_CRF_" + x,
-                    "Purge Cultural Fragments (" + x + ")");
+                Button transact = Buttons.blue("purge_Frags_CRF_" + x, "Purge Cultural Fragments (" + x + ")", Emojis.CFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; (x < player.getIrf() + 1 && x < 4); x++) {
-                Button transact = Buttons.green("purge_Frags_IRF_" + x,
-                    "Purge Industrial Fragments (" + x + ")");
+                Button transact = Buttons.green("purge_Frags_IRF_" + x, "Purge Industrial Fragments (" + x + ")", Emojis.IFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; (x < player.getHrf() + 1 && x < 4); x++) {
-                Button transact = Buttons.red("purge_Frags_HRF_" + x,
-                    "Purge Hazardous Fragments (" + x + ")");
+                Button transact = Buttons.red("purge_Frags_HRF_" + x, "Purge Hazardous Fragments (" + x + ")", Emojis.HFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; x < player.getUrf() + 1; x++) {
-                Button transact = Buttons.gray("purge_Frags_URF_" + x,
-                    "Purge Frontier Fragments (" + x + ")");
+                Button transact = Buttons.gray("purge_Frags_URF_" + x, "Purge Frontier Fragments (" + x + ")", Emojis.UFrag);
                 buttons.add(transact);
             }
 
@@ -300,21 +292,15 @@ public class GetTechButton extends TechSubcommandData {
             buttons.add(pT2);
         }
         if (player.hasExternalAccessToLeader("jolnaragent") || player.hasUnexhaustedLeader("jolnaragent")) {
-            Button pT2 = Buttons.gray("exhaustAgent_jolnaragent",
-                "Use Jol-Nar Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.Jolnar));
+            Button pT2 = Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", Emojis.Jolnar);
             buttons.add(pT2);
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
-            Button winnuButton = Button
-                .danger("exhaustAgent_veldyragent_" + player.getFaction(),
-                    "Use Veldyr Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.veldyr));
+            Button winnuButton = Buttons.red("exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent", Emojis.veldyr);
             buttons.add(winnuButton);
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
-            Button pT2 = Buttons.gray("yinCommanderStep1_", "Remove infantry via Yin Commander")
-                .withEmoji(Emoji.fromFormatted(Emojis.Yin));
+            Button pT2 = Buttons.gray("yinCommanderStep1_", "Remove infantry via Yin Commander", Emojis.Yin);
             buttons.add(pT2);
         }
         Button doneExhausting = Buttons.red("deleteButtons_technology", "Done Exhausting Planets");

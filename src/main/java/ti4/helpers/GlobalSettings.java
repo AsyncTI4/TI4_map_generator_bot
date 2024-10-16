@@ -30,6 +30,7 @@ public class GlobalSettings {
         LOG_CACHE_STATS_INTERVAL_MINUTES, //
         GUILD_ID_FOR_NEW_GAME_CATEGORIES, //Which guild to create new game categories in (DEPRECATED)
         MAX_GAMES_PER_CATEGORY, //Max # of games when creating a category
+        UNDO_COPIES, //Max # of undo copies saved per map
         READY_TO_RECEIVE_COMMANDS; //Whether the bot is ready to receive commands
 
         @Override

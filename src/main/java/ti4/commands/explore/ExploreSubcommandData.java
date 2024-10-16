@@ -11,15 +11,12 @@ import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -524,7 +521,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int tgGain = tile == null ? 0 : tile.getUnitHolders().size() - 1;
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG"
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " gained " + tgGain + "TG"
                     + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
@@ -541,7 +538,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
-            gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
+            gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm", Emojis.comm));
             gainComm.add(Buttons.red("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
             sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability\n");

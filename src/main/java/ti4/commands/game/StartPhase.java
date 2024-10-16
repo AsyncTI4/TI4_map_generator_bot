@@ -64,7 +64,7 @@ public class StartPhase extends GameSubcommandData {
     public static void startPhase(GenericInteractionCreateEvent event, Game game, String phase) {
         switch (phase) {
             case "strategy" -> startStrategyPhase(event, game);
-            case "voting" -> AgendaHelper.startTheVoting(game);
+            case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "P1Special" -> TIGLHelper.initializeTIGLGame(game);
             case "shuffleDecks" -> game.shuffleDecks();

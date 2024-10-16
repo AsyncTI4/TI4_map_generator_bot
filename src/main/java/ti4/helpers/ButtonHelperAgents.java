@@ -119,43 +119,37 @@ public class ButtonHelperAgents {
         Button unitButton2;
         unit2 = "destroyer";
         if (maxComms > 0 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, unit2) < 8) {
-            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
+            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
 
         unit2 = "mech";
         if (maxComms > 1 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, unit2) < 4) {
-            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
+            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
 
         unit2 = "cruiser";
         if (maxComms > 1 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, unit2) < 8) {
-            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
+            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         unit2 = "carrier";
         if (maxComms > 2 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, unit2) < 4) {
 
-            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
+            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         unit2 = "dreadnought";
         if (maxComms > 3 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, unit2) < 5) {
 
-            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
+            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         unit2 = "flagship";
         if (maxComms > 7 && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, unit2) < 1) {
 
-            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2)
-                .withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
+            unitButton2 = Buttons.red("cabalAgentCapture_" + unit2 + "_" + p2.getFaction(), "Capture " + unit2).withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord(unit2)));
             buttons.add(unitButton2);
         }
         return buttons;
@@ -484,7 +478,7 @@ public class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void exhaustAgent(String buttonID, GenericInteractionCreateEvent event, Game game, Player player, String ident) {
+    public static void exhaustAgent(String buttonID, GenericInteractionCreateEvent event, Game game, Player player) {
         String agent = buttonID.replace("exhaustAgent_", "");
         String rest = agent;
         String trueIdentity = player.getRepresentation(true, true);
@@ -498,7 +492,7 @@ public class ButtonHelperAgents {
         }
 
         ExhaustLeader.exhaustLeader(event, game, player, playerLeader);
-        
+
         MessageChannel channel = player.getCorrectChannel();
         String message = "";
 
@@ -813,7 +807,7 @@ public class ButtonHelperAgents {
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             if (p2 == null)
                 return;
-            String successMessage = ident + " drew 1 AC.";
+            String successMessage = player.getFactionEmoji() + " drew 1 AC.";
             String successMessage2 = p2.getFactionEmoji() + " drew 1 AC.";
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
@@ -873,7 +867,7 @@ public class ButtonHelperAgents {
             String planetName = posNPlanet.split("_")[1];
             new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
                 "2 gf " + planetName, game);
-            String successMessage = ident + " placed 2 " + Emojis.infantry + " on "
+            String successMessage = player.getFactionEmoji() + " placed 2 " + Emojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         }
@@ -906,7 +900,7 @@ public class ButtonHelperAgents {
                 "1 infantry " + planetName, game);
             new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(pos),
                 "1 mech " + planetName, game);
-            String successMessage = ident + " replaced 1 " + Emojis.infantry + " on "
+            String successMessage = player.getFactionEmoji() + " replaced 1 " + Emojis.infantry + " on "
                 + Helper.getPlanetRepresentation(planetName, game) + " with 1 mech.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         }
@@ -1189,10 +1183,9 @@ public class ButtonHelperAgents {
                 if (preset.split("_")[1].equalsIgnoreCase(passedPlayer.getFaction())) {
                     Player edyn2 = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
                     Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[0]);
-                    exhaustAgent("exhaustAgent_edynagent", event, game, edyn2, edyn2.getFactionEmoji());
+                    exhaustAgent("exhaustAgent_edynagent", event, game, edyn2);
                     game.setStoredValue("edynAgentPreset", "");
-                    game.setStoredValue("edynAgentInAction",
-                        newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
+                    game.setStoredValue("edynAgentInAction", newActivePlayer.getFaction() + "_" + edyn2.getFaction() + "_" + upNextPlayer.getFaction());
                     List<Button> buttons = TurnStart.getStartOfTurnButtons(newActivePlayer, game, true, event);
                     MessageHelper.sendMessageToChannel(newActivePlayer.getCorrectChannel(),
                         newActivePlayer.getRepresentation(true, true)
@@ -1278,7 +1271,7 @@ public class ButtonHelperAgents {
                 }
             }
         } else {
-            exhaustAgent("exhaustAgent_lanefiragent", event, game, player, player.getFactionEmoji());
+            exhaustAgent("exhaustAgent_lanefiragent", event, game, player);
             if (buttonID.contains("frontier")) {
                 String cardChosen = game.drawExplore(Constants.FRONTIER);
                 String pos = buttonID.split("_")[3];
