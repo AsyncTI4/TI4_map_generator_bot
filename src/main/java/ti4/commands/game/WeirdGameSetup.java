@@ -71,7 +71,7 @@ public class WeirdGameSetup extends GameSubcommandData {
         boolean miltyModMode = event.getOption(Constants.MILTYMOD_MODE, game.isMiltyModMode(), OptionMapping::getAsBoolean);
         boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
-        boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotCMode(), OptionMapping::getAsBoolean);
+        boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
         return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
     }
 
@@ -226,7 +226,7 @@ public class WeirdGameSetup extends GameSubcommandData {
             game.swapOutVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
-            game.setVotCMode(true);
+            game.setVotcMode(true);
 
             // Add envoys to players
             for (Player player : game.getPlayers().values()) {

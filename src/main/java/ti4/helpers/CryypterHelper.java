@@ -56,7 +56,7 @@ public class CryypterHelper {
     }
 
     public static void checkEnvoyUnlocks(Game game) {
-        if (!game.isVotCMode()) {
+        if (!game.isVotcMode()) {
             return;
         }
         for (Player player : game.getRealPlayers()) {
