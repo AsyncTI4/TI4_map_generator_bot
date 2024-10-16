@@ -660,7 +660,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.VOTC_MODE + " " + game.isVotCMode());
+        writer.write(Constants.VOTC_MODE + " " + game.isVotcMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + game.isMiltyModMode());
         writer.write(System.lineSeparator());
@@ -2015,7 +2015,7 @@ public class GameSaveLoadManager {
                 case Constants.VOTC_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setVotCMode(value);
+                        game.setVotcMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
