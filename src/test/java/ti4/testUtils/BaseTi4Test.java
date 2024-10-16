@@ -17,7 +17,7 @@ public class BaseTi4Test {
     /**
      * Logic which is ran once at the start of the entire test suit (before any test class is ran).
      */
-    private static void globalBeforeAll(){
+    private static void globalBeforeAll() {
         // This is set when running tests within docker. However, this must be manually
         // set when running tests within vs code for resources to be loaded properly.
         if (System.getenv(Storage.ENV_VAR_RESOURCE_PATH) == null) {

@@ -1,0 +1,38 @@
+[
+    {
+        "id": "creussalpha",
+        "imagePath": "token_creussalpha.png",
+        "spaceOrPlanet": "space",
+        "aliasList": [
+            "creussalpha",
+            "token_creussalpha",
+            "ghostalpha",
+            "a",
+            "alpha_wormhole"
+        ],
+        "wormholes": ["ALPHA"],
+        "source": "base"
+    },
+    {
+        "id": "creussbeta",
+        "imagePath": "token_creussbeta.png",
+        "spaceOrPlanet": "space",
+        "aliasList": ["creussbeta", "token_creussbeta", "ghostbeta"],
+        "wormholes": ["BETA"],
+        "source": "base"
+    },
+    {
+        "id": "custodian",
+        "imagePath": "token_custodian.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": ["custodian", "token_custodian"],
+        "source": "base"
+    },
+    {
+        "id": "custodianvp",
+        "imagePath": "token_custodianvp.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": ["custodianvp", "token_custodianvp"],
+        "source": "base"
+    }
+]

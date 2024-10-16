@@ -208,6 +208,7 @@ public class ResourceHelper {
         tokenCache.put(name, token);
         return token;
     }
+
     @Nullable
     public String getExtraFile(String name) {
         String tokenPath = tokenCache.get(name);

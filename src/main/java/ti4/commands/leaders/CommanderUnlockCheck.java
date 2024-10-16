@@ -17,6 +17,7 @@ public class CommanderUnlockCheck {
 
     /**
      * Will run {@link CommanderUnlockCheck#checkPlayer()} on all players within the game
+     * 
      * @param game - the {@link Game} to check
      * @param factionToCheck - the factions of the leader to check the unlock conditions of
      */

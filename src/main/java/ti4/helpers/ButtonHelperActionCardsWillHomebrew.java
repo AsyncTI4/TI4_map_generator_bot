@@ -121,17 +121,14 @@ public class ButtonHelperActionCardsWillHomebrew {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
         if (player.getSCs().contains(3)) {
-            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards")
-                .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", Emojis.ActionCard));
         }
         if (player.getSCs().contains(4)) {
-            scButtons.add(
-                Buttons.green("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock));
+            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds));
         }
         if (player.getSCs().contains(5)) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities")
-                .withEmoji(Emoji.fromFormatted(Emojis.comm)));
+            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
         }
         if (player.getSCs().contains(6)) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
@@ -140,8 +137,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (player.getSCs().contains(8)) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective")
-                .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " use buttons to resolve", scButtons);

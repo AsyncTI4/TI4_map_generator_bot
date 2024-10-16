@@ -5,14 +5,35 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
+import ti4.message.BotLogger;
 
 public class RegexHelper {
+
+    public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function) {
+        return runMatcher(regex, buttonID, function, fail -> {
+            BotLogger.log("Error matching regex: " + buttonID + "\n" + Constants.jazzPing());
+        });
+    }
+
+    public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function, Consumer<Void> failure) {
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            function.accept(matcher);
+            return true;
+        } else {
+            failure.accept(null);
+            return false;
+        }
+    }
 
     private static String regexBuilder(String groupname, Set<String> options) {
         StringBuilder sb = new StringBuilder("(?<").append(groupname).append(">(");
@@ -142,6 +163,7 @@ public class RegexHelper {
     public static String unitHolderRegex(Game game, String group) {
         Set<String> unitholders = new HashSet<>();
         unitholders.addAll(game.getPlanets());
+        game.getPlanetsInfo().values().forEach(p -> unitholders.add(p.getName()));
         unitholders.add("space");
         return regexBuilder(group, unitholders);
     }

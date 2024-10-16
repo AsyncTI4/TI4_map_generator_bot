@@ -60,6 +60,7 @@ public class AdminCommand implements Command {
 
     private Collection<AdminSubcommandData> getSubcommands() {
         Collection<AdminSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new DeleteGame());
         subcommands.add(new SaveMaps());
         subcommands.add(new SaveMap());
         subcommands.add(new ResetEmojiCache());
