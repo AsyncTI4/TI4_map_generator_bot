@@ -102,7 +102,7 @@ public class GameEnd extends GameSubcommandData {
             "This game's channels' permissions have been updated.");
 
         // DELETE THE ROLE
-        if (deleteRole && archiveChannels) {
+        if (deleteRole && archiveChannels && !rematch) {
             Role gameRole = gameRoles.get(0);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
@@ -122,7 +122,7 @@ public class GameEnd extends GameSubcommandData {
         Category inLimboCategory = limbos.isEmpty() ? null : limbos.get(0);
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (inLimboCategory != null && archiveChannels) {
+        if (inLimboCategory != null && archiveChannels && !rematch) {
             if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
                 cleanUpInLimboCategory(event.getGuild(), 3);
             }
@@ -140,7 +140,7 @@ public class GameEnd extends GameSubcommandData {
         }
 
         //DELETE FOW CHANNELS
-        if (game.isFowMode() && archiveChannels) {
+        if (game.isFowMode() && archiveChannels && !rematch) {
             Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).get(0);
             if (fogCategory != null) {
                 List<TextChannel> channels = new ArrayList<>();
@@ -225,11 +225,10 @@ public class GameEnd extends GameSubcommandData {
                     // INFORM PLAYERS
                     summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
                         m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
-                        m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS,
-                            t -> {
-                                sendFeedbackMessage(t, game);
-                                sendRoundSummariesToThread(t, game);
-                            });
+                        m.createThreadChannel(gameName).queueAfter(2, TimeUnit.SECONDS, t -> {
+                            sendFeedbackMessage(t, game);
+                            sendRoundSummariesToThread(t, game);
+                        });
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "Game summary has been posted in the " + summaryChannel.getAsMention() + " channel: " + m.getJumpUrl());
                     });
@@ -248,12 +247,11 @@ public class GameEnd extends GameSubcommandData {
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
-            summaryChannel.createThreadChannel(gameName, true).queue(
-                t -> {
-                    MessageHelper.sendMessageToChannel(t, gameEndText);
-                    sendFeedbackMessage(t, game);
-                    sendRoundSummariesToThread(t, game);
-                });
+            summaryChannel.createThreadChannel(gameName, true).queue(t -> {
+                MessageHelper.sendMessageToChannel(t, gameEndText);
+                sendFeedbackMessage(t, game);
+                sendRoundSummariesToThread(t, game);
+            });
         }
     }
 
@@ -285,8 +283,7 @@ public class GameEnd extends GameSubcommandData {
             if (member != null)
                 message.append(member.getAsMention()).append(" ");
         }
-        message.append(
-            "\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
+        message.append("\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
 
         MessageHelper.sendMessageToChannel(t, message.toString());
     }

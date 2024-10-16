@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -75,6 +76,7 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
@@ -180,16 +182,19 @@ public class Game extends GameProperties {
     }
 
     public void newGameSetup() {
-        setSecretObjectives(Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck());
-        setActionCards(Mapper.getDecks().get("action_cards_pok").getNewShuffledDeck());
-        explore = Mapper.getDecks().get("explores_pok").getNewShuffledDeck();
-        publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getNewShuffledDeck();
-        publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getNewShuffledDeck();
-        setAgendas(Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck());
-        setEvents(new ArrayList<>());
-        relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
-        addCustomPO(Constants.CUSTODIAN, 1);
+        // Normal Decks
+        setPublicObjectives1(Mapper.getShuffledDeck("public_stage_1_objectives_pok"));
+        setPublicObjectives2(Mapper.getShuffledDeck("public_stage_2_objectives_pok"));
+        setSecretObjectives(Mapper.getShuffledDeck("secret_objectives_pok"));
+        setActionCards(Mapper.getShuffledDeck("action_cards_pok"));
+        setAgendas(Mapper.getShuffledDeck("agendas_pok"));
+        setExploreDeck(Mapper.getShuffledDeck("explores_pok"));
+        setRelics(Mapper.getShuffledDeck("relics_pok"));
         setStrategyCardSet("pok");
+
+        // OTHER
+        setEvents(new ArrayList<>()); // ignis_aurora
+        addCustomPO(Constants.CUSTODIAN, 1);
     }
 
     public void fixScrewedSOs() {
@@ -224,8 +229,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
-        addPlayer("572698679618568193", "Dicecord"); //Dicecord
-        Player neutral = getPlayer("572698679618568193");
+        addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
+        Player neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
         neutral.setFaction("neutral");
         neutral.setDummy(true);
@@ -234,6 +239,39 @@ public class Game extends GameProperties {
         neutral.setUnitsOwned(playerOwnedUnits);
 
         return neutral;
+    }
+
+    @JsonIgnore
+    public Player getNeutralPlayer(String fallbackColor) {
+        if (players.get(Constants.dicecordId) != null)
+            return players.get(Constants.dicecordId);
+        return setupNeutralPlayer(fallbackColor);
+    }
+
+    @JsonIgnore
+    public Player getNeutralPlayer() {
+        if (players.get(Constants.dicecordId) != null)
+            return players.get(Constants.dicecordId);
+        return null;
+    }
+
+    public String pickNeutralColorID(List<String> exclusions) {
+        // Start with the preferred colors, but then add all the colors to the list anyway
+        List<String> colorPriority = new ArrayList<>(List.of("gray", "red", "blue", "green", "orange", "yellow", "black", "pink", "purple", "rose", "lime", "brown", "teal", "spring", "petrol", "lightgray"));
+        colorPriority.addAll(Mapper.getColorNames());
+        List<String> preferredNeutralColors = new ArrayList<>(colorPriority.stream().map(Mapper::getColorID).toList());
+
+        // Build the full set of exclusions based on the argument plus the list of players
+        Set<String> excludedColorIDs = new HashSet<>();
+        if (exclusions != null) excludedColorIDs.addAll(exclusions);
+        excludedColorIDs.addAll(getPlayers().values().stream().map(Player::getColorID).toList());
+
+        // Finally, pick a color
+        String neutralColorID = preferredNeutralColors.stream().filter(colorID -> !excludedColorIDs.contains(colorID)).findFirst().orElse(null);
+        if (neutralColorID == null) {
+            MessageHelper.sendMessageToChannel(getActionsChannel(), "Could not determine a good neutral unit color " + Constants.jazzPing());
+        }
+        return neutralColorID;
     }
 
     public int getNumberOfSOsInTheDeck() {
@@ -477,7 +515,7 @@ public class Game extends GameProperties {
         for (String tag : getTags()) {
             gameModes.put(tag, true);
         }
-        return gameModes.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey)
+        return gameModes.entrySet().stream().filter(Entry::getValue).map(Entry::getKey)
             .collect(Collectors.joining(", "));
     }
 
@@ -666,7 +704,7 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Set<Integer> getPlayedSCs() {
-        return getScPlayed().entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey)
+        return getScPlayed().entrySet().stream().filter(Entry::getValue).map(Entry::getKey)
             .collect(Collectors.toSet());
     }
 
@@ -1196,11 +1234,11 @@ public class Game extends GameProperties {
         return objective;
     }
 
-    public Map.Entry<String, Integer> revealSpecificStage1(String id) {
+    public Entry<String, Integer> revealSpecificStage1(String id) {
         return revealSpecificObjective(publicObjectives1, id);
     }
 
-    public Map.Entry<String, Integer> revealSpecificStage2(String id) {
+    public Entry<String, Integer> revealSpecificStage2(String id) {
         return revealSpecificObjective(publicObjectives2, id);
     }
 
@@ -1268,7 +1306,7 @@ public class Game extends GameProperties {
         }
     }
 
-    public Map.Entry<String, Integer> revealObjective(List<String> objectiveList) {
+    public Entry<String, Integer> revealObjective(List<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
             objectiveList.remove(id);
@@ -1279,7 +1317,7 @@ public class Game extends GameProperties {
                 counter = counter - 1;
             }
             addRevealedPublicObjective(id);
-            for (Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+            for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
                 if (entry.getKey().equals(id)) {
                     return entry;
                 }
@@ -1288,11 +1326,11 @@ public class Game extends GameProperties {
         return null;
     }
 
-    public Map.Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
+    public Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
         if (objectiveList.contains(id)) {
             objectiveList.remove(id);
             addRevealedPublicObjective(id);
-            for (Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+            for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
                 if (entry.getKey().equals(id)) {
                     return entry;
                 }
@@ -1301,19 +1339,19 @@ public class Game extends GameProperties {
         return null;
     }
 
-    public Map.Entry<String, Integer> addSpecificStage1(String objective) {
+    public Entry<String, Integer> addSpecificStage1(String objective) {
         return addSpecificObjective(publicObjectives1, objective);
     }
 
-    public Map.Entry<String, Integer> addSpecificStage2(String objective) {
+    public Entry<String, Integer> addSpecificStage2(String objective) {
         return addSpecificObjective(publicObjectives2, objective);
     }
 
-    public Map.Entry<String, Integer> addSpecificObjective(List<String> objectiveList, String objective) {
+    public Entry<String, Integer> addSpecificObjective(List<String> objectiveList, String objective) {
         if (!objectiveList.isEmpty()) {
             objectiveList.remove(objective);
             addRevealedPublicObjective(objective);
-            for (Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+            for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
                 if (entry.getKey().equals(objective)) {
                     return entry;
                 }
@@ -1324,7 +1362,7 @@ public class Game extends GameProperties {
 
     public boolean shuffleObjectiveBackIntoDeck(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(idNumber)) {
                 id = po.getKey();
                 break;
@@ -1377,7 +1415,7 @@ public class Game extends GameProperties {
     public boolean isCustodiansScored() {
         boolean custodiansTaken = false;
         String idC = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(0)) {
                 idC = po.getKey();
                 break;
@@ -1406,7 +1444,7 @@ public class Game extends GameProperties {
 
     public boolean scorePublicObjective(String userID, Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(idNumber)) {
                 id = po.getKey();
                 break;
@@ -1431,7 +1469,7 @@ public class Game extends GameProperties {
 
     public boolean scorePublicObjectiveEvenIfAlreadyScored(String userID, Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(idNumber)) {
                 id = po.getKey();
                 break;
@@ -1448,7 +1486,7 @@ public class Game extends GameProperties {
 
     public boolean unscorePublicObjective(String userID, Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(idNumber)) {
                 id = po.getKey();
                 break;
@@ -1487,7 +1525,7 @@ public class Game extends GameProperties {
 
     public boolean removeCustomPO(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+        for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(idNumber)) {
                 id = po.getKey();
                 break;
@@ -1684,18 +1722,15 @@ public class Game extends GameProperties {
     }
 
     public void resetAgendas() {
-        setAgendas(Mapper.getDecks().get(getAgendaDeckID()).getNewShuffledDeck());
-        discardAgendas = new LinkedHashMap<>();
+        setAgendas(Mapper.getShuffledDeck(getAgendaDeckID()));
+        setDiscardAgendas(new LinkedHashMap<>());
     }
 
     public void resetEvents() {
-        DeckModel eventDeckModel = Mapper.getDecks().get(getEventDeckID());
-        if (eventDeckModel == null) {
-            setEvents(new ArrayList<>());
-        } else {
-            setEvents(eventDeckModel.getNewShuffledDeck());
-        }
-        discardedEvents = new LinkedHashMap<>();
+        if (Mapper.getDeck(getEventDeckID()) == null)
+            return;
+        setEvents(Mapper.getShuffledDeck(getEventDeckID()));
+        setDiscardedEvents(new LinkedHashMap<>());
     }
 
     public void resetDrawStateAgendas() {
@@ -1746,7 +1781,7 @@ public class Game extends GameProperties {
 
     public boolean addEventInEffect(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+        for (Entry<String, Integer> event : discardedEvents.entrySet()) {
             if (event.getValue().equals(idNumber)) {
                 id = event.getKey();
                 break;
@@ -1767,7 +1802,7 @@ public class Game extends GameProperties {
 
     public boolean addLaw(Integer idNumber, String optionalText) {
         String id = "";
-        for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+        for (Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             if (agendas.getValue().equals(idNumber)) {
                 id = agendas.getKey();
                 break;
@@ -1800,7 +1835,7 @@ public class Game extends GameProperties {
     public boolean reviseLaw(Integer idNumber, String optionalText) {
 
         String id = "";
-        for (Map.Entry<String, Integer> ac : laws.entrySet()) {
+        for (Entry<String, Integer> ac : laws.entrySet()) {
             if (ac.getValue().equals(idNumber)) {
                 id = ac.getKey();
                 break;
@@ -1818,7 +1853,7 @@ public class Game extends GameProperties {
             lawsInfo.remove(id);
             idNumber = addDiscardAgenda(id);
         }
-        for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+        for (Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             if (agendas.getValue().equals(idNumber)) {
                 id = agendas.getKey();
                 break;
@@ -1842,7 +1877,7 @@ public class Game extends GameProperties {
 
     public boolean shuffleEventBackIntoDeck(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+        for (Entry<String, Integer> event : discardedEvents.entrySet()) {
             if (event.getValue().equals(idNumber)) {
                 id = event.getKey();
                 break;
@@ -1869,7 +1904,7 @@ public class Game extends GameProperties {
 
     public boolean shuffleAgendaBackIntoDeck(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+        for (Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             if (agendas.getValue().equals(idNumber)) {
                 id = agendas.getKey();
                 break;
@@ -1886,7 +1921,7 @@ public class Game extends GameProperties {
 
     public boolean putEventBackIntoDeckOnTop(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> event : discardedEvents.entrySet()) {
+        for (Entry<String, Integer> event : discardedEvents.entrySet()) {
             if (event.getValue().equals(idNumber)) {
                 id = event.getKey();
                 break;
@@ -1902,7 +1937,7 @@ public class Game extends GameProperties {
 
     public boolean putAgendaBackIntoDeckOnTop(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
+        for (Entry<String, Integer> entry : discardAgendas.entrySet()) {
             if (entry.getValue().equals(idNumber)) {
                 id = entry.getKey();
                 break;
@@ -1927,7 +1962,7 @@ public class Game extends GameProperties {
 
     public boolean removeEventInEffect(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> event : eventsInEffect.entrySet()) {
+        for (Entry<String, Integer> event : eventsInEffect.entrySet()) {
             if (event.getValue().equals(idNumber)) {
                 id = event.getKey();
                 break;
@@ -1943,7 +1978,7 @@ public class Game extends GameProperties {
 
     public boolean removeLaw(Integer idNumber) {
         String id = "";
-        for (Map.Entry<String, Integer> ac : laws.entrySet()) {
+        for (Entry<String, Integer> ac : laws.entrySet()) {
             if (ac.getValue().equals(idNumber)) {
                 id = ac.getKey();
                 break;
@@ -2006,7 +2041,7 @@ public class Game extends GameProperties {
     public boolean putEventTop(Integer idNumber, Player player) {
         if (player.getEvents().containsValue(idNumber)) {
             String id = "";
-            for (Map.Entry<String, Integer> event : player.getEvents().entrySet()) {
+            for (Entry<String, Integer> event : player.getEvents().entrySet()) {
                 if (event.getValue().equals(idNumber)) {
                     id = event.getKey();
                     break;
@@ -2024,7 +2059,7 @@ public class Game extends GameProperties {
     public boolean putEventBottom(Integer idNumber, Player player) {
         if (player.getEvents().containsValue(idNumber)) {
             String id = "";
-            for (Map.Entry<String, Integer> event : player.getEvents().entrySet()) {
+            for (Entry<String, Integer> event : player.getEvents().entrySet()) {
                 if (event.getValue().equals(idNumber)) {
                     id = event.getKey();
                     break;
@@ -2042,7 +2077,7 @@ public class Game extends GameProperties {
     public boolean putAgendaTop(Integer idNumber) {
         if (sentAgendas.containsValue(idNumber)) {
             String id = "";
-            for (Map.Entry<String, Integer> entry : sentAgendas.entrySet()) {
+            for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
                 if (entry.getValue().equals(idNumber)) {
                     id = entry.getKey();
                     break;
@@ -2061,7 +2096,7 @@ public class Game extends GameProperties {
     public boolean putAgendaBottom(Integer idNumber) {
         if (sentAgendas.containsValue(idNumber)) {
             String id = "";
-            for (Map.Entry<String, Integer> ac : sentAgendas.entrySet()) {
+            for (Entry<String, Integer> ac : sentAgendas.entrySet()) {
                 if (ac.getValue().equals(idNumber)) {
                     id = ac.getKey();
                     break;
@@ -2078,12 +2113,12 @@ public class Game extends GameProperties {
     }
 
     @Nullable
-    public Map.Entry<String, Integer> drawAgenda() {
+    public Entry<String, Integer> drawAgenda() {
         if (!getAgendas().isEmpty()) {
             for (String id : getAgendas()) {
                 if (!sentAgendas.containsKey(id)) {
                     setSentAgenda(id);
-                    for (Map.Entry<String, Integer> entry : sentAgendas.entrySet()) {
+                    for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
                         if (entry.getKey().equals(id)) {
                             return entry;
                         }
@@ -2100,7 +2135,7 @@ public class Game extends GameProperties {
             for (String id : getAgendas()) {
                 if (agendaID.equalsIgnoreCase(id)) {
                     setSentAgenda(id);
-                    for (Map.Entry<String, Integer> entry : sentAgendas.entrySet()) {
+                    for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
                         if (entry.getKey().equals(id)) {
                             return entry;
                         }
@@ -2112,13 +2147,13 @@ public class Game extends GameProperties {
     }
 
     @Nullable
-    public Map.Entry<String, Integer> drawBottomAgenda() {
+    public Entry<String, Integer> drawBottomAgenda() {
         if (!getAgendas().isEmpty()) {
             for (int i = getAgendas().size() - 1; i >= 0; i--) {
                 String id = getAgendas().get(i);
                 if (!sentAgendas.containsKey(id)) {
                     setSentAgenda(id);
-                    for (Map.Entry<String, Integer> entry : sentAgendas.entrySet()) {
+                    for (Entry<String, Integer> entry : sentAgendas.entrySet()) {
                         if (entry.getKey().equals(id)) {
                             return entry;
                         }
@@ -2200,6 +2235,16 @@ public class Game extends GameProperties {
         }
     }
 
+    // Don't shuffle back cards with a status
+    private void reshuffleActionCardDiscard() {
+        List<String> acsToShuffle = discardActionCards.keySet().stream().toList();
+        getActionCards().addAll(acsToShuffle);
+        Collections.shuffle(getActionCards());
+        acsToShuffle.stream().forEach(ac -> discardActionCards.remove(ac)); //clear out the shuffled back cards
+        String msg = "#" + getPing() + " shuffling the discarded ACs into the action card deck because the action card deck ran out of cards";
+        MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
+    }
+
     @Nullable
     public Map<String, Integer> drawActionCard(String userID) {
         if (!getActionCards().isEmpty()) {
@@ -2210,15 +2255,9 @@ public class Game extends GameProperties {
                 player.setActionCard(id);
                 return player.getActionCards();
             }
-        } else {
-            if (!discardActionCards.keySet().isEmpty()) {
-                getActionCards().addAll(discardActionCards.keySet());
-                discardActionCards.clear();
-                Collections.shuffle(getActionCards());
-                String msg = "# " + getPing() + " shuffling the discard ACs into the action card deck because the action card deck ran out of cards";
-                MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
-                return drawActionCard(userID);
-            }
+        } else if (!discardActionCards.keySet().isEmpty()) {
+            reshuffleActionCardDiscard();
+            return drawActionCard(userID);
         }
         return null;
     }
@@ -2492,9 +2531,7 @@ public class Game extends GameProperties {
             setDiscardActionCard(id);
             return id;
         } else {
-            getActionCards().addAll(discardActionCards.keySet());
-            discardActionCards.clear();
-            Collections.shuffle(getActionCards());
+            reshuffleActionCardDiscard();
             return drawActionCardAndDiscard();
         }
     }
@@ -2601,7 +2638,7 @@ public class Game extends GameProperties {
         if (player != null) {
             Map<String, Integer> actionCards = player.getActionCards();
             String acID = "";
-            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Entry<String, Integer> ac : actionCards.entrySet()) {
                 if (ac.getValue().equals(acIDNumber)) {
                     acID = ac.getKey();
                     break;
@@ -2621,7 +2658,7 @@ public class Game extends GameProperties {
         if (player != null) {
             Map<String, Integer> actionCards = player.getActionCards();
             String acID = "";
-            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+            for (Entry<String, Integer> ac : actionCards.entrySet()) {
                 if (ac.getValue().equals(acIDNumber)) {
                     acID = ac.getKey();
                     break;
@@ -2652,7 +2689,7 @@ public class Game extends GameProperties {
         Player player = getPlayer(userID);
         if (player != null) {
             String acID = "";
-            for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
+            for (Entry<String, Integer> ac : discardActionCards.entrySet()) {
                 if (ac.getValue().equals(acIDNumber)) {
                     acID = ac.getKey();
                     break;
@@ -2671,7 +2708,7 @@ public class Game extends GameProperties {
         Player player = getPlayer(userID);
         if (player != null) {
             String acID = "";
-            for (Map.Entry<String, Integer> ac : purgedActionCards.entrySet()) {
+            for (Entry<String, Integer> ac : purgedActionCards.entrySet()) {
                 if (ac.getValue().equals(acIDNumber)) {
                     acID = ac.getKey();
                     break;
@@ -2688,7 +2725,7 @@ public class Game extends GameProperties {
 
     public boolean shuffleActionCardBackIntoDeck(Integer acIDNumber) {
         String acID = "";
-        for (Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
+        for (Entry<String, Integer> ac : discardActionCards.entrySet()) {
             if (ac.getValue().equals(acIDNumber)) {
                 acID = ac.getKey();
                 break;
@@ -2708,7 +2745,7 @@ public class Game extends GameProperties {
         if (player != null) {
             Map<String, Integer> secrets = player.getSecrets();
             String soID = "";
-            for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+            for (Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
                     soID = so.getKey();
                     break;
@@ -2728,7 +2765,7 @@ public class Game extends GameProperties {
         if (player != null) {
             Map<String, Integer> secrets = player.getSecretsScored();
             String soID = "";
-            for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+            for (Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
                     soID = so.getKey();
                     break;
@@ -2748,7 +2785,7 @@ public class Game extends GameProperties {
         if (player != null) {
             Map<String, Integer> secrets = player.getSecretsScored();
             String soID = "";
-            for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+            for (Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
                     soID = so.getKey();
                     break;
@@ -2769,7 +2806,7 @@ public class Game extends GameProperties {
         if (player != null) {
             Map<String, Integer> secrets = player.getSecrets();
             String soID = "";
-            for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+            for (Entry<String, Integer> so : secrets.entrySet()) {
                 if (so.getValue().equals(soIDNumber)) {
                     soID = so.getKey();
                     break;
@@ -2830,27 +2867,6 @@ public class Game extends GameProperties {
         relics = Mapper.getDecks().get(getRelicDeckID()).getNewShuffledDeck();
     }
 
-    public void triplicateRelics() {
-        if (isAbsolMode()) {
-            relics = Mapper.getDecks().get("relics_absol").getNewShuffledDeck();
-            for (String relic : Mapper.getDecks().get("relics_absol").getNewShuffledDeck()) {
-                String copy1 = relic + "extra1";
-                String copy2 = relic + "extra2";
-                relics.add(copy1);
-                relics.add(copy2);
-            }
-        } else {
-            relics = Mapper.getDecks().get("relics_pok").getNewShuffledDeck();
-            for (String relic : Mapper.getDecks().get("relics_pok").getNewShuffledDeck()) {
-                String copy1 = relic + "extra1";
-                String copy2 = relic + "extra2";
-                relics.add(copy1);
-                relics.add(copy2);
-            }
-        }
-        Collections.shuffle(relics);
-    }
-
     @JsonIgnore
     public boolean islandMode() {
         boolean otherThings = getName().contains("island") || (getMapTemplateID() != null && getMapTemplateID().equals("1pIsland"));
@@ -2865,8 +2881,6 @@ public class Game extends GameProperties {
         GameSettings settings = miltySettings.getGameSettings();
         setVp(settings.getPointTotal().getVal());
         setMaxSOCountPerPlayer(settings.getSecrets().getVal());
-        setUpPeakableObjectives(settings.getStage1s().getVal(), 1);
-        setUpPeakableObjectives(settings.getStage2s().getVal(), 2);
         setCompetitiveTIGLGame(settings.getTigl().isVal());
         setAllianceMode(settings.getAlliance().isVal());
 
@@ -2888,8 +2902,11 @@ public class Game extends GameProperties {
         success &= validateAndSetActionCardDeck(event, deckSettings.getActionCards().getValue());
         success &= validateAndSetExploreDeck(event, deckSettings.getExplores().getValue());
         success &= validateAndSetTechnologyDeck(event, deckSettings.getTechs().getValue());
-        //success &= validateAndSetEventDeck(event, deckSettings.getEvents().getValue());
         setStrategyCardSet(deckSettings.getStratCards().getChosenKey());
+
+        // Setup peakable objectives
+        setUpPeakableObjectives(miltySettings.getGameSettings().getStage1s().getVal(), 1);
+        setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the agenda deck you chose will be overridden.");
@@ -3149,6 +3166,7 @@ public class Game extends GameProperties {
     }
 
     public Tile getTileByPosition(String position) {
+        if (position == null) return null;
         return tileMap.get(position);
     }
 
@@ -3352,7 +3370,7 @@ public class Game extends GameProperties {
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {
-                for (Map.Entry<String, UnitHolder> unitHolderEntry : tile.getUnitHolders().entrySet()) {
+                for (Entry<String, UnitHolder> unitHolderEntry : tile.getUnitHolders().entrySet()) {
                     if (unitHolderEntry.getValue() instanceof Planet p) {
                         planets.put(unitHolderEntry.getKey(), p);
                     }
@@ -3802,6 +3820,16 @@ public class Game extends GameProperties {
         return getAllPlanetsWithSleeperTokens().size();
     }
 
+    public Optional<UnitModel> getPriorityUnitByUnitKey(UnitKey uk, UnitHolder uh) {
+        return getPlayerByUnitKey(uk).map(p -> p.getPriorityUnitByAsyncID(uk.asyncID(), uh));
+    }
+
+    public Optional<Player> getPlayerByUnitKey(UnitKey unit) {
+        return getRealPlayersNDummies().stream()
+            .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(unit.getColorID()))
+            .findFirst();
+    }
+
     public Optional<Player> getPlayerByColorID(String color) {
         return getRealPlayersNDummies().stream()
             .filter(otherPlayer -> Mapper.getColorID(otherPlayer.getColor()).equals(color))
@@ -3829,7 +3857,7 @@ public class Game extends GameProperties {
     @Nullable
     public Tile getTileFromPlanet(String planetName) {
         for (Tile tile_ : getTileMap().values()) {
-            for (Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+            for (Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
                 if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
                     return tile_;
                 }
@@ -3910,11 +3938,9 @@ public class Game extends GameProperties {
                 .filter(unit -> !source.equals(unit.getSource().toString())).toList();
             for (UnitModel playerUnit : playersUnits) {
                 for (UnitModel variantUnit : variantUnits) {
-                    if ((variantUnit.getHomebrewReplacesID().isPresent()
-                        && variantUnit.getHomebrewReplacesID().get().equals(playerUnit.getId())) // true variant unit replacing a PoK unit
-                        || (playerUnit.getHomebrewReplacesID().isPresent()
-                            && playerUnit.getHomebrewReplacesID().get().equals(variantUnit.getId())) // PoK "variant" replacing a true variant unit
-                    ) {
+                    boolean variantReplacesPok = variantUnit.getHomebrewReplacesID().orElse("-").equals(playerUnit.getId());
+                    boolean pokReplacesVariant = playerUnit.getHomebrewReplacesID().orElse("-").equals(variantUnit.getId());
+                    if (variantReplacesPok || pokReplacesVariant) {
                         player.removeOwnedUnitByID(playerUnit.getId());
                         player.addOwnedUnitByID(variantUnit.getId());
                         break;
@@ -4159,9 +4185,11 @@ public class Game extends GameProperties {
             for (Tile tile : tileMap.values()) {
                 if (tile.getPosition().equals(position)) {
                     String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
-                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) { // Mecatol Rex in Centre Position
+                    if ("000".equalsIgnoreCase(position) && "18".equalsIgnoreCase(tileID)) {
+                        // Mecatol Rex in Centre Position
                         sb.append("{18}");
-                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) { // Something else is in the Centre Position
+                    } else if ("000".equalsIgnoreCase(position) && !"18".equalsIgnoreCase(tileID)) {
+                        // Something else is in the Centre Position
                         sb.append("{").append(tileID).append("}");
                     } else {
                         sb.append(tileID);

@@ -58,7 +58,7 @@ public class HeroPlay extends LeaderAction {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        
+
         String leader = event.getOption(Constants.LEADER, "hero", OptionMapping::getAsString);
         action(event, leader, game, player);
     }
@@ -360,7 +360,7 @@ public class HeroPlay extends LeaderAction {
                             .size() > 0) {
                             String msg = player.getRepresentation(true, true)
                                 + " you may retrieve a unit upgrade tech from players with branch offices, one for each branch office. Here is the possible techs from "
-                                + ButtonHelper.getIdentOrColor(p2, game);
+                                + p2.getFactionEmojiOrColor();
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg,
                                 ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
                         }

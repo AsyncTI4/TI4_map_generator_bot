@@ -18,20 +18,20 @@ public class UnitModelTest extends BaseTi4Test {
             assertTrue(validateHomebrewReplacesID(unitModel), unitModel.getAlias() + ": invalid HomebrewReplacesID");
         }
     }
-    
+
     private static boolean validateBaseType(UnitModel unitModel) {
         if (Mapper.isValidUnit(unitModel.getBaseType())) return true;
         System.out.println("[TEST FAILURE] Unit **" + unitModel.getId() + "** failed validation due to invalid BaseType: `" + unitModel.getBaseType() + "`");
         return false;
     }
-    
+
     private static boolean validateUpgradesFromUnitId(UnitModel unitModel) {
         if (unitModel.getUpgradesFromUnitId().isEmpty()) return true;
         if (Mapper.isValidUnit(unitModel.getUpgradesFromUnitId().get())) return true;
         System.out.println("[TEST FAILURE] Unit **" + unitModel.getId() + "** failed validation due to invalid UpgradesFromUnitId ID: `" + unitModel.getUpgradesFromUnitId().get() + "`");
         return false;
     }
-    
+
     private static boolean validateUpgradesToUnitId(UnitModel unitModel) {
         if (unitModel.getUpgradesToUnitId().isEmpty()) return true;
         if (Mapper.isValidUnit(unitModel.getUpgradesToUnitId().get())) return true;

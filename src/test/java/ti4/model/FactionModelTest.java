@@ -85,9 +85,13 @@ class FactionModelTest extends BaseTi4Test {
     }
 
     private static boolean validateStartingTech(FactionModel faction) {
-        if (Mapper.getTechs().keySet().containsAll(faction.getStartingTech())) return true;
+        List<String> testTechIDs = new ArrayList<>();
+        if (faction.getStartingTech() != null) testTechIDs.addAll(faction.getStartingTech());
+        if (faction.getStartingTechOptions() != null) testTechIDs.addAll(faction.getStartingTechOptions());
+        if (Mapper.getTechs().keySet().containsAll(testTechIDs)) return true;
+
         List<String> invalidStartingTechIDs = new ArrayList<>();
-        for (String startingTechID : faction.getStartingTech()) {
+        for (String startingTechID : testTechIDs) {
             if (!Mapper.getTechs().containsKey(startingTechID)) invalidStartingTechIDs.add(startingTechID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid starting tech IDs: `" + invalidStartingTechIDs + "`");

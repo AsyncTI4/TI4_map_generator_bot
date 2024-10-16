@@ -362,10 +362,8 @@ public class ButtonHelperActionCards {
     }
 
     public static void resolveFreeTrade(Game game, Player player, ButtonInteractionEvent event) {
-        Button convert2CommButton = Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into TG")
-            .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities")
-            .withEmoji(Emoji.fromFormatted(Emojis.comm));
+        Button convert2CommButton = Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into TG", Emojis.Wash);
+        Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities", Emojis.comm);
         List<Button> buttons = List.of(convert2CommButton, get2CommButton,
             Buttons.red("deleteButtons", "Done resolving"));
         String message = "Use buttons to gain or convert commodities as appropriate. You may trade in this window/in between gaining commodities.";
@@ -1717,8 +1715,7 @@ public class ButtonHelperActionCards {
                 + adjective + " Plague and you lost " + hits + " infantry.");
     }
 
-    public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tilePos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(tilePos);

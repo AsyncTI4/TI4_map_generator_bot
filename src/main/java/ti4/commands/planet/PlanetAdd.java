@@ -42,7 +42,7 @@ public class PlanetAdd extends PlanetAddRemove {
         doAction(player, planet, game, null, false);
     }
 
-    public static void doAction(Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setUP) {
+    public static void doAction(Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
 
@@ -56,8 +56,10 @@ public class PlanetAdd extends PlanetAddRemove {
         if (unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
-        if (Constants.MR.equalsIgnoreCase(planet) && player.hasTech("iihq")) {
-            Planet mecatolRex = unitHolder;
+
+        List<String> mecatols = Constants.MECATOLS;
+        if (mecatols.contains(planet) && player.hasTech("iihq")) {
+            Planet mecatolRex = (Planet) unitHolder;
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -185,7 +187,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setUP) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 Planet planetReal = unitHolder;
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
@@ -204,7 +206,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if ((game.getPhaseOfGame().contains("agenda") || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
-            && player.hasAbility("scavenge") && !doubleCheck && !setUP) {
+            && player.hasAbility("scavenge") && !doubleCheck && !setup) {
             String fac = player.getFactionEmoji();
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), fac
@@ -216,11 +218,10 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
-            && player.hasUnexhaustedLeader("vaylerianagent") && !setUP) {
+            && player.hasUnexhaustedLeader("vaylerianagent") && !setup) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("exhaustAgent_vaylerianagent_" + player.getFaction(),
-                "Use Vaylerian Agent")
-                .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
+                "Use Vaylerian Agent", Emojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC";
@@ -229,10 +230,9 @@ public class PlanetAdd extends PlanetAddRemove {
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
-            && player.hasAbility("scour") && !setUP) {
+            && player.hasAbility("scour") && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("scourPlanet_" + planet, "Use Scour")
-                .withEmoji(Emoji.fromFormatted(Emojis.vaylerian)));
+            buttons.add(Buttons.green("scourPlanet_" + planet, "Use Scour", Emojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
                 + " if you have not already used Scour this tactical action, you may discard 1AC to ready the planet "
@@ -245,8 +245,7 @@ public class PlanetAdd extends PlanetAddRemove {
             && game.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !tile.isHomeSystem()
             && FoWHelper.playerHasShipsInSystem(player, tile)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship")
-                .withEmoji(Emoji.fromFormatted(Emojis.freesystems)));
+            buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship", Emojis.freesystems));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentation(true, true)
                 + " you may produce 1 ship in the system due to President Cyhn, the Free Systems Commander.";

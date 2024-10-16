@@ -1,52 +1,52 @@
 {
-  "id": "mirage",
-  "tileId": null,
-  "name": "Mirage",
-  "shortName": null,
-  "aliases": ["mirage", "mirag", "miraj", "miraje", "mrag"],
-  "positionInTile": null,
-  "resources": 1,
-  "influence": 2,
-  "factionHomeworld": null,
-  "planetType": "CULTURAL",
-  "cardImagePath": null,
-  "techSpecialties": null,
-  "legendaryAbilityName": "Mirage Flight Academy",
-  "legendaryAbilityText": "You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships",
-  "legendaryAbilityFlavourText": "*Unsurprisingly, the triple-ace instructors emphasize strike-and-fade tactics and misdirection.*",
-  "unitPositions": {
-    "unitHolderName": "mirage",
-    "coordinateMap": {
-      "control": [{ "x": 36.0, "y": 47.0 }],
-      "sd": [{ "x": 96.0, "y": 82.0 }],
-      "pd": [
-        { "x": 41.0, "y": 74.0 },
-        { "x": 58.0, "y": 74.0 },
-        { "x": 75.0, "y": 74.0 },
-        { "x": 50.0, "y": 85.0 },
-        { "x": 68.0, "y": 85.0 }
-      ],
-      "mf": [
-        { "x": 43.0, "y": 3.0 },
-        { "x": 61.0, "y": 3.0 },
-        { "x": 36.0, "y": 16.0 },
-        { "x": 54.0, "y": 16.0 },
-        { "x": 72.0, "y": 16.0 }
-      ],
-      "tkn_gf": [
-        { "x": 55.0, "y": 44.0 },
-        { "x": 22.0, "y": 44.0 }
-      ],
-      "att": [
-        { "x": 34.0, "y": 36.0 },
-        { "x": 42.0, "y": 5.0 },
-        { "x": 161.0, "y": 36.0 },
-        { "x": 153.0, "y": 5.0 }
-      ]
+    "id": "mirage",
+    "tileId": null,
+    "name": "Mirage",
+    "shortName": null,
+    "aliases": ["mirage", "mirag", "miraj", "miraje", "mrag"],
+    "positionInTile": null,
+    "resources": 1,
+    "influence": 2,
+    "factionHomeworld": null,
+    "planetType": "CULTURAL",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Mirage Flight Academy",
+    "legendaryAbilityText": "You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships",
+    "legendaryAbilityFlavourText": "*Unsurprisingly, the triple-ace instructors emphasize strike-and-fade tactics and misdirection.*",
+    "unitPositions": {
+        "unitHolderName": "mirage",
+        "coordinateMap": {
+            "control": [{ "x": 36.0, "y": 47.0 }],
+            "sd": [{ "x": 96.0, "y": 82.0 }],
+            "pd": [
+                { "x": 41.0, "y": 74.0 },
+                { "x": 58.0, "y": 74.0 },
+                { "x": 75.0, "y": 74.0 },
+                { "x": 50.0, "y": 85.0 },
+                { "x": 68.0, "y": 85.0 }
+            ],
+            "mf": [
+                { "x": 43.0, "y": 3.0 },
+                { "x": 61.0, "y": 3.0 },
+                { "x": 36.0, "y": 16.0 },
+                { "x": 54.0, "y": 16.0 },
+                { "x": 72.0, "y": 16.0 }
+            ],
+            "tkn_gf": [
+                { "x": 55.0, "y": 44.0 },
+                { "x": 22.0, "y": 44.0 }
+            ],
+            "att": [
+                { "x": 34.0, "y": 36.0 },
+                { "x": 42.0, "y": 5.0 },
+                { "x": 161.0, "y": 36.0 },
+                { "x": 153.0, "y": 5.0 }
+            ]
+        },
+        "removeUnitCoordinate": true
     },
-    "removeUnitCoordinate": true
-  },
-  "contrastColor": "orange",
-  "flavourText": "*Exists on no known charts and appears deserted to those who stumble across it. However, secretive locals live in cloaked cities heavily defended by swarms of starfighters.*",
-  "source": "pok"
+    "contrastColor": "orange",
+    "flavourText": "*Exists on no known charts and appears deserted to those who stumble across it. However, secretive locals live in cloaked cities heavily defended by swarms of starfighters.*",
+    "source": "pok"
 }

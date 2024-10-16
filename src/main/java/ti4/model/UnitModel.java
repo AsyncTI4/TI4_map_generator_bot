@@ -179,13 +179,21 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
-        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            return getSpaceCannonDieCount();
-        }
-        if (getBaseType().equalsIgnoreCase("spacedock")) {
-            return 3;
+        if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
+                return 3;
+            }
         }
         return getSpaceCannonDieCount();
+    }
+
+    public int getSpaceCannonHitsOn(Player player, Game game) {
+        if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction()) || player.hasRelic("lightrailordnance")) {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
+                return 5;
+            }
+        }
+        return getSpaceCannonHitsOn();
     }
 
     public int getAfbHitsOn(Player player, Game game) {
@@ -202,21 +210,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return getAfbHitsOn();
     }
 
-    public int getSpaceCannonHitsOn(Player player, Game game) {
-        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            return getSpaceCannonHitsOn();
-        } else {
-            if (getBaseType().equalsIgnoreCase("spacedock")) {
-                return 5;
-            } else {
-                return getSpaceCannonHitsOn();
-            }
-        }
-    }
-
     public int getBombardDieCount(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
-
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction()) && getBombardDieCount() == 0 && getAfbDieCount() > 0) {
                 return getAfbDieCount();
             }

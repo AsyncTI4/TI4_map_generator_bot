@@ -33,16 +33,9 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
 
     public static void showDiscard(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Action card discard list: ").append("\n");
-        int index = 1;
-        for (Map.Entry<String, Integer> ac : game.getDiscardActionCards().entrySet()) {
-            sb.append("`").append(index).append(".").append(Helper.leftpad("(" + ac.getValue(), 4)).append(")` - ");
-            if (Mapper.getActionCard(ac.getKey()) != null) {
-                sb.append(Mapper.getActionCard(ac.getKey()).getRepresentation());
-            }
+        List<Entry<String, Integer>> discards = game.getDiscardActionCards().entrySet().stream().toList();
+        sb.append(discardListCondensed(discards, "Action card discard list"));
 
-            index++;
-        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
@@ -75,15 +68,16 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
     }
 
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {
-        // Sort the action cards by display name
-        Map<String, List<String>> cardsByName = discards.stream().collect(Collectors.groupingBy(ac -> Mapper.getActionCard(ac).getName()));
-        List<Entry<String, List<String>>> entries = new ArrayList<>(cardsByName.entrySet());
-        Collections.sort(entries, Comparator.comparing(Entry::getKey));
+        StringBuilder sb = new StringBuilder();
+        if (title != null) sb.append("**__").append(title).append(":__**");
+        Map<String, List<String>> cardsByName = discards.stream()
+            .collect(Collectors.groupingBy(ac -> Mapper.getActionCard(ac).getName()));
+        int index = 1;
+        int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
 
-        // Print the action cards, sorted by display name
-        StringBuilder sb = new StringBuilder("**__").append(title).append(":__**");
-        int index = 1, pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
-        for (Entry<String, List<String>> acEntryList : entries) {
+        List<Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
+        displayOrder.sort(Comparator.comparing(e -> e.getKey()));
+        for (Entry<String, List<String>> acEntryList : displayOrder) {
             sb.append("\n`").append(Helper.leftpad(index + ".", pad)).append("` - ");
             sb.append(StringUtils.repeat(Emojis.ActionCard, acEntryList.getValue().size()));
             sb.append(" **").append(acEntryList.getKey()).append("**");

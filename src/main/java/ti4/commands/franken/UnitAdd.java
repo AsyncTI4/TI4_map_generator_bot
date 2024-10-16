@@ -23,17 +23,21 @@ public class UnitAdd extends UnitAddRemove {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
-            player.removeOwnedUnitByID(unitModel.getBaseType());
+
             if (player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {
+                UnitModel oldBaseType = null;
+                while ((oldBaseType = player.getUnitByBaseType(unitModel.getBaseType())) != null)
+                    player.removeOwnedUnitByID(oldBaseType.getAlias());
                 sb.append("> ").append(unitID);
+                player.addOwnedUnitByID(unitID);
             }
-            sb.append("\n");
-            player.addOwnedUnitByID(unitID);
             if (unitID.equalsIgnoreCase("naaz_mech")) {
                 player.addOwnedUnitByID("naaz_mech_space");
+                sb.append("> naaz_mech_space");
             }
+            sb.append("\n");
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
     }

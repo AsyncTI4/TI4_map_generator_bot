@@ -3,14 +3,14 @@ package ti4.commands.cardsso;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import ti4.buttons.Buttons;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands.uncategorized.InfoThreadCommand;
@@ -168,7 +168,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName, Emojis.SecretObjective));
                 }
             }
         }
@@ -203,7 +203,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.red("SODISCARD_" + idValue + suffix, "(" + idValue + ") " + soName, Emojis.SecretObjective));
+                    soButtons.add(Buttons.red("discardSecret_" + idValue + suffix, "(" + idValue + ") " + soName, Emojis.SecretObjective));
                 }
             }
         }

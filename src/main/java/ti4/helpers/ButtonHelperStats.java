@@ -1,16 +1,49 @@
 package ti4.helpers;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperStats {
+
+    @ButtonHandler("convertComms_")
+    public static void convertCommButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        boolean deleteMsg = true;
+        if (buttonID.endsWith("_stay")) {
+            deleteMsg = false;
+            buttonID.replace("_stay", "");
+        }
+        String regex = "convertComms_" + RegexHelper.intRegex("amt");
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            int amt = Integer.parseInt(matcher.group("amt"));
+            convertComms(event, game, player, amt, deleteMsg);
+        }
+    }
+
+    @ButtonHandler("gainComms_")
+    public static void gainCommsButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        boolean deleteMsg = true;
+        if (buttonID.endsWith("_stay")) {
+            deleteMsg = false;
+            buttonID.replace("_stay", "");
+        }
+        String regex = "gainComms_" + RegexHelper.intRegex("amt");
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            int amt = Integer.parseInt(matcher.group("amt"));
+            gainComms(event, game, player, amt, deleteMsg);
+        }
+    }
 
     public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt) {
         convertComms(event, game, player, amt, event.getMessage().getContentRaw().contains("explore"));
@@ -33,16 +66,10 @@ public class ButtonHelperStats {
         }
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
-        if (event.getMessage().getContentRaw().toLowerCase().contains("space station")) {
-            ButtonHelper.deleteMessage(event);
-            message += " using their space station";
-        }
-
-        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);
-        if (deleteMsg) {
-            ButtonHelper.deleteMessage(event);
-        }
+
+        if (deleteMsg) ButtonHelper.deleteMessage(event);
     }
 
     public static void gainComms(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean deleteMsg) {
@@ -96,7 +123,7 @@ public class ButtonHelperStats {
 
         // After gain tg checks
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, game, amt);
     }
 
     public static void afterGainCommsChecks(Game game, Player player, int realGain) {

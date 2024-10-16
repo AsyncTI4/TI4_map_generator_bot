@@ -7,14 +7,15 @@ import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
 public class CustomizationOptions extends CustomSubcommandData {
-    private List<Choice> verbChoices = Constants.VERBOSITY_OPTIONS.stream().map(v -> new Choice(v, v)).toList();
-    private List<Choice> onOff = List.of("ON", "OFF").stream().map(v -> new Choice(v, v)).toList();
-    private List<Choice> hexBorderChoices = List.of("off", "dash", "solid").stream().map(v -> new Choice(v, v)).toList();
+    private List<Choice> verbChoices = CommandHelper.toChoices(Constants.VERBOSITY_OPTIONS);
+    private List<Choice> onOff = CommandHelper.toChoices("ON", "OFF");
+    private List<Choice> hexBorderChoices = CommandHelper.toChoices("off", "dash", "solid");
 
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options");
@@ -27,10 +28,8 @@ public class CustomizationOptions extends CustomSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON or OFF").addChoices(onOff));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE,
-            "Reveal all objectives and diplo gets the power to pre-reveal"));
-        addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE, "Reveal all objectives and diplo gets the power to pre-reveal"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
@@ -40,10 +39,8 @@ public class CustomizationOptions extends CustomSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW,
-            "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE,
-            "Swap player's owned units to units from another source").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW, "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
     }
 
     @Override
