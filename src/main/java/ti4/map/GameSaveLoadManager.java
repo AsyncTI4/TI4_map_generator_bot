@@ -660,7 +660,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.CRYYPTER_MODE + " " + game.isCryypterMode());
+        writer.write(Constants.VOTC_MODE + " " + game.isVotcMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + game.isMiltyModMode());
         writer.write(System.lineSeparator());
@@ -2012,10 +2012,10 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case Constants.CRYYPTER_MODE -> {
+                case Constants.VOTC_MODE, "cryypter_mode" -> { //TODO: Remove "cryypter_mode" option if found in prod after Nov 2024
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setCryypterMode(value);
+                        game.setVotcMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
