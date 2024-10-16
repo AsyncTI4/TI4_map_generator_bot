@@ -2012,7 +2012,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case Constants.VOTC_MODE -> {
+                case Constants.VOTC_MODE, "cryypter_mode" -> { //TODO: Remove "cryypter_mode" option if found in prod after Nov 2024
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         game.setVotcMode(value);
