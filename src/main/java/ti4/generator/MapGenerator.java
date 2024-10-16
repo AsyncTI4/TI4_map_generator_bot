@@ -1084,18 +1084,17 @@ public class MapGenerator {
                     xDeltaSecondRow = planetInfo(player, xDeltaSecondRow, yPlayAreaSecondRow);
                 }
 
-                int xDeltaFirstRowFromRightSide = 0;
-                int xDeltaSecondRowFromRightSide = 0;
                 // FIRST ROW RIGHT SIDE
+                int xDeltaFirstRowFromRightSide = 0;
                 xDeltaFirstRowFromRightSide = unitValues(player, xDeltaFirstRowFromRightSide, yPlayArea);
                 xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
+                xDeltaFirstRowFromRightSide = speakerToken(player, xDeltaFirstRowFromRightSide, yPlayArea);
+                
                 // SECOND ROW RIGHT SIDE
+                int xDeltaSecondRowFromRightSide = 0;
                 xDeltaSecondRowFromRightSide = reinforcements(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);
-
                 xDeltaSecondRowFromRightSide = sleeperTokens(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
                 xDeltaSecondRowFromRightSide = creussWormholeTokens(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow);
-                // FIRST ROW RIGHT SIDE
-                xDeltaFirstRowFromRightSide = speakerToken(player, xDeltaFirstRowFromRightSide, yPlayArea);
 
                 if (player.hasAbility("ancient_blueprints")) {
                     xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea);
@@ -1146,16 +1145,16 @@ public class MapGenerator {
         if (debug) debugGameInfoTime = System.nanoTime() - debugStartTime;
     }
 
-    private int speakerToken(Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
+    private int speakerToken(Player player, int xDeltaFromRightSide, int yPlayAreaSecondRow) {
         if (player.getUserID().equals(game.getSpeaker())) {
-            xDeltaSecondRowFromRightSide += 200;
+            xDeltaFromRightSide += 200;
             String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.SPEAKER));
             if (speakerFile != null) {
                 BufferedImage bufferedImage = ImageHelper.read(speakerFile);
-                graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow + 25, null);
+                graphics.drawImage(bufferedImage, width - xDeltaFromRightSide, yPlayAreaSecondRow + 25, null);
             }
         }
-        return xDeltaSecondRowFromRightSide;
+        return xDeltaFromRightSide;
     }
 
     private int displayRemainingFactionTokens(List<Point> points, BufferedImage img, int tokensRemaining, int xDeltaFromRight, int yDelta) {
@@ -1899,7 +1898,7 @@ public class MapGenerator {
         int x = width - widthOfNombox - xDeltaFromRightSide;
         UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
         if (unitHolder == null || unitHolder.getUnits().isEmpty()) {
-            return 0;
+            return xDeltaFromRightSide;
         }
 
         Point infPoint = new Point(50, 75);
