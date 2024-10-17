@@ -84,7 +84,7 @@ public class WebHelper {
 
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
-                .key(String.format("overlays/%s/%s", game.getID(), game.getID()))
+                .key(String.format("overlays/%s/%s.json", game.getID(), game.getID()))
                 .contentType("application/json")
                 .build();
 
