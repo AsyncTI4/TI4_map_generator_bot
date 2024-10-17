@@ -444,6 +444,7 @@ public class MapGenerator {
         if (testing == null && displayTypeBasic == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
             WebHelper.putMap(game.getName(), mainImage);
             WebHelper.putData(game.getName(), game);
+            WebHelper.putOverlays(game);
         } else if (isFoWPrivate != null && isFoWPrivate) {
             Player player = getFowPlayer(event);
             WebHelper.putMap(game.getName(), mainImage, true, player);
@@ -1089,7 +1090,7 @@ public class MapGenerator {
                 xDeltaFirstRowFromRightSide = unitValues(player, xDeltaFirstRowFromRightSide, yPlayArea);
                 xDeltaFirstRowFromRightSide = nombox(player, xDeltaFirstRowFromRightSide, yPlayArea);
                 xDeltaFirstRowFromRightSide = speakerToken(player, xDeltaFirstRowFromRightSide, yPlayArea);
-                
+
                 // SECOND ROW RIGHT SIDE
                 int xDeltaSecondRowFromRightSide = 0;
                 xDeltaSecondRowFromRightSide = reinforcements(player, xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, unitCount);

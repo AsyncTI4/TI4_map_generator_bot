@@ -1,22 +1,5 @@
 package ti4.helpers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.Map;
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import ti4.ResourceHelper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.message.BotLogger;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,8 +12,27 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.ResourceHelper;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.BotLogger;
+import ti4.website.WebsiteOverlay;
 
 public class WebHelper {
     private static final Properties webProperties;
@@ -62,6 +64,34 @@ public class WebHelper {
 
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
+            BotLogger.log("Could not put data to web server", e);
+        }
+    }
+
+    public static void putOverlays(Game game) {
+        // if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+        //     return;
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Map<String, WebsiteOverlay> overlays = game.getWebsiteOverlays();
+            String json = mapper.writeValueAsString(overlays);
+
+            System.out.println(json);
+
+            // Region region = Region.US_EAST_1;
+            // S3Client s3 = S3Client.builder()
+            //     .region(region)
+            //     .build();
+
+            // PutObjectRequest request = PutObjectRequest.builder()
+            //     .bucket(webProperties.getProperty("bucket"))
+            //     .key(String.format("overlays/%s/%s", game.getID(), game.getID()))
+            //     .contentType("application/json")
+            //     .build();
+
+            // s3.putObject(request, RequestBody.fromString(json));
+        } catch (Exception e) {
             BotLogger.log("Could not put data to web server", e);
         }
     }
