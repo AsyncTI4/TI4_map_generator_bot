@@ -273,7 +273,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
                 if (hasSchemingAbility) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true) + " use buttons to discard",
+                        player.getRepresentationUnfogged() + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(game, player, false));
                 }
                 MessageHelper.sendMessageToEventChannel(event, message);
@@ -326,7 +326,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     saarButton.add(Buttons.green("saarMechRes_" + "mirage", "Pay 1TG for Mech on " + Helper.getPlanetRepresentation("mirage", game), Emojis.tg));
                     saarButton.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you may pay one " + Emojis.tg + "trade good to place one " + Emojis.mech + " mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
+                        player.getRepresentationUnfogged() + " you may pay one " + Emojis.tg + "trade good to place one " + Emojis.mech + " mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
                         saarButton);
                 }
 
@@ -446,7 +446,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 CommanderUnlockCheck.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                message += "\n" + player.getRepresentation(true, true) + " your current CCs are " + player.getCCRepresentation()
+                message += "\n" + player.getRepresentationUnfogged() + " your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain " + ccsToGain + " CC" + (ccsToGain > 1 ? "s" : "");
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -542,7 +542,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             gainComm.add(Buttons.red("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
             sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability\n");
-            sb.append(player.getRepresentation(true, true)).append(
+            sb.append(player.getRepresentationUnfogged()).append(
                 " After resolving the explore, you may use this button to get your commodity from your fortune seekers ability.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);
             game.setStoredValue("fortuneSeekers", "Used");

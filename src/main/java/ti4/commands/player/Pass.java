@@ -52,7 +52,7 @@ public class Pass extends PlayerSubcommandData {
             if (!player.hasAbility("propagation")) {
                 MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use the button to get your tech.",
+                    player.getRepresentationUnfogged() + " you may use the button to get your tech.",
                     Collections.singletonList(Buttons.GET_A_UNIT_TECH_WITH_INF));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
@@ -65,7 +65,7 @@ public class Pass extends PlayerSubcommandData {
             String msg = player.getRepresentation() + " since you have deliberate action ability and passed while one of your pools was at 0, you may gain 1 CC to that pool.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentation(true, true) + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
+            String message2 = player.getRepresentationUnfogged() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         if (player.hasTech("dskolug")) {

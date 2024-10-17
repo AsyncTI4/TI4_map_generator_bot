@@ -265,7 +265,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
+                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -312,7 +312,7 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+                    player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
         }
         // if(maxVP+4 > game.getVp()){
@@ -342,7 +342,7 @@ public class TurnEnd extends PlayerSubcommandData {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use the button to pay 3TGs and get a tech, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentationUnfogged() + " you may use the button to pay 3TGs and get a tech, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
@@ -444,7 +444,7 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
         if (arborec != null) {
-            String mitosisMessage = arborec.getRepresentation(true, true) + " reminder to do mitosis!";
+            String mitosisMessage = arborec.getRepresentationUnfogged() + " reminder to do mitosis!";
             MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
         }
         Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");
@@ -461,7 +461,7 @@ public class TurnEnd extends PlayerSubcommandData {
                     if (unitHolder.getUnits() != null) {
                         if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
-                            String genesisMessage = solPlayer.getRepresentation(true, true)
+                            String genesisMessage = solPlayer.getRepresentationUnfogged()
                                 + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
                             if (game.isFowMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);

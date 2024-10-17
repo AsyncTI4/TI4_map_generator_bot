@@ -196,7 +196,7 @@ public class ComponentActionHelper {
                 }
             }
             if (prom == null) {
-                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentation(true, true)
+                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
                     + " you have a null PN. Please use /pn purge after reporting it " + pn);
                 PNInfo.sendPromissoryNoteInfo(game, p1, false);
             }
@@ -293,7 +293,7 @@ public class ComponentActionHelper {
                     List<String> leadersThatNeedSpecialSelection = List.of("naaluagent", "muaatagent", "kolumeagent", "arborecagent", "bentoragent", "xxchaagent", "axisagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
-                        String message = p1.getRepresentation(true, true) + " Use buttons to select the user of the agent";
+                        String message = p1.getRepresentationUnfogged() + " Use buttons to select the user of the agent";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
@@ -413,7 +413,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
 
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
-                    String secretScoreMsg = "_ _\n" + p1.getRepresentation(true, true)
+                    String secretScoreMsg = "_ _\n" + p1.getRepresentationUnfogged()
                         + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ACInfo.getDiscardActionCardButtons(game, p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
@@ -563,7 +563,7 @@ public class ComponentActionHelper {
                     buttons3.add(Buttons.green("exhaustTCS_" + relicID + "_" + player.getFaction(),
                         "Exhaust TCS to Ready " + relicID));
                     buttons3.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentation(true, true)
+                    String msg = p2.getRepresentationUnfogged()
                         + " you have the opportunity to exhaust your TCS tech to ready " + relicID
                         + " and potentially resolve a transaction.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
@@ -602,14 +602,14 @@ public class ComponentActionHelper {
                 } else {
                     player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
-                message = player.getRepresentation(true, true) + " Your TGs increased from " + oldTg + " -> "
+                message = player.getRepresentationUnfogged() + " Your TGs increased from " + oldTg + " -> "
                     + player.getTg();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
             }
             case "stellarconverter" -> {
-                message = player.getRepresentation(true, true) + " Select the planet you want to destroy";
+                message = player.getRepresentationUnfogged() + " Select the planet you want to destroy";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     ButtonHelper.getButtonsForStellar(player, game));
             }

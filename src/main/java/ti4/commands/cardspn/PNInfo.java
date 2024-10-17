@@ -47,7 +47,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentation(true, true) + " Heads up, someone used some command";
+        String headerText = player.getRepresentationUnfogged() + " Heads up, someone used some command";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }

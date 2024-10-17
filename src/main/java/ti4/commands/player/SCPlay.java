@@ -334,14 +334,14 @@ public class SCPlay extends PlayerSubcommandData {
 
             for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                    String message2 = p2.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
+                    String message2 = p2.getRepresentationUnfogged() + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
                     for (Player p3 : game.getRealPlayers()) {
                         if (p2 == p3) {
                             continue;
                         }
                         if (p3.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                            String message3 = p3.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they may force the player to replenish and then you will be prompted to play the TA. ";
+                            String message3 = p3.getRepresentationUnfogged() + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they may force the player to replenish and then you will be prompted to play the TA. ";
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }
                     }
@@ -362,7 +362,7 @@ public class SCPlay extends PlayerSubcommandData {
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
                     empNMahButtons.add(0, emelpar);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with the Scepter of Emelpar.",
+                        player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with the Scepter of Emelpar.",
                         empNMahButtons);
                 }
                 if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, game, event).size() > 0 && !winnuHero) {
@@ -370,7 +370,7 @@ public class SCPlay extends PlayerSubcommandData {
                         "Use Mahact Agent", Emojis.Mahact);
                     empNMahButtons.add(0, mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
                         empNMahButtons);
                 }
@@ -398,7 +398,7 @@ public class SCPlay extends PlayerSubcommandData {
             graceButtons.add(Buttons.green("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you may resolve Grace with the buttons.",
+                player.getRepresentationUnfogged() + " you may resolve Grace with the buttons.",
                 graceButtons);
         }
         if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
@@ -406,7 +406,7 @@ public class SCPlay extends PlayerSubcommandData {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {
-                            String acqMessage = player2.getRepresentation(true, true)
+                            String acqMessage = player2.getRepresentationUnfogged()
                                 + " you may use this button to play Winnu PN!";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquisence"));

@@ -281,7 +281,7 @@ public class ButtonHelperTacticalAction {
                     }
                 }
                 trapButtons.add(Buttons.red("deleteButtons", "Decline"));
-                String msg = player.getRepresentation(true, true)
+                String msg = player.getRepresentationUnfogged()
                     + " you can use the buttons to place a trap on a planet";
                 if (trapButtons.size() > 1) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -294,7 +294,7 @@ public class ButtonHelperTacticalAction {
                 buttons.add(hacanButton);
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true)
+                    player.getRepresentationUnfogged()
                         + " you can use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "George Nobin, the Celdauri" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent to place 1 space dock for 2TGs or 2 commodities",
                     buttons);
@@ -315,7 +315,7 @@ public class ButtonHelperTacticalAction {
         game.setStoredValue("tnelisCommanderTracker", "");
         game.setL1Hero(false);
         game.setStoredValue("vaylerianHeroActive", "");
-        String message = player.getRepresentation(true, true) + " Use buttons to end turn or do another action.";
+        String message = player.getRepresentationUnfogged() + " Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
@@ -390,7 +390,7 @@ public class ButtonHelperTacticalAction {
                                 nonActivePlayer.getRepresentation() + " you triggered voidwatch");
                         }
                         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, nonActivePlayer, player);
-                        String message2 = player.getRepresentation(true, true)
+                        String message2 = player.getRepresentationUnfogged()
                             + " You have triggered void watch. Please select the PN you would like to send";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2,
                             stuffToTransButtons);
@@ -406,7 +406,7 @@ public class ButtonHelperTacticalAction {
                 empyButtons.add(empyButton);
                 empyButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    player.getRepresentation(true, true) + " use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    player.getRepresentationUnfogged() + " use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                         + "Acamar, the Empyrean" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent",
                     empyButtons);
             }
@@ -574,7 +574,7 @@ public class ButtonHelperTacticalAction {
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
         Tile activeSystem = game.getTileByPosition(pos);
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true) + " activated "
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " activated "
             + activeSystem.getRepresentationForButtons(game, player));
 
         if (!game.isFowMode()) {
@@ -589,7 +589,7 @@ public class ButtonHelperTacticalAction {
         } else {
             List<Player> playersAdj = FoWHelper.getAdjacentPlayers(game, pos, true);
             for (Player player_ : playersAdj) {
-                String playerMessage = player_.getRepresentation(true, true) + " - System " + activeSystem.getRepresentationForButtons(game, player_)
+                String playerMessage = player_.getRepresentationUnfogged() + " - System " + activeSystem.getRepresentationForButtons(game, player_)
                     + " has been activated ";
                 MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             }
@@ -607,7 +607,7 @@ public class ButtonHelperTacticalAction {
 
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);
         if (!game.isFowMode() && playersWithPds2.size() > 0 && !game.isL1Hero()) {
-            StringBuilder pdsMessage = new StringBuilder(player.getRepresentation(true, true)
+            StringBuilder pdsMessage = new StringBuilder(player.getRepresentationUnfogged()
                 + " the selected system is in range of space cannon units owned by");
             if (playersWithPds2.size() != 1 || playersWithPds2.get(0) != player) {
                 for (Player playerWithPds : playersWithPds2) {
@@ -619,7 +619,7 @@ public class ButtonHelperTacticalAction {
 
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
-            String msg = player.getRepresentation(true, true) + " You can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            String msg = player.getRepresentationUnfogged() + " You can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "I48S, the L1Z1Z " + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + "agent, if you want.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
         }
@@ -627,7 +627,7 @@ public class ButtonHelperTacticalAction {
         if (tile.getPlanetUnitHolders().isEmpty()
             && ButtonHelper.doesPlayerHaveFSHere("mortheus_flagship", player, tile)
             && !tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-            String msg = player.getRepresentation(true, true)
+            String msg = player.getRepresentationUnfogged()
                 + " automatically added 1 frontier token to the system due to Mortheus Flagship";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             AddToken.addToken(event, tile, Constants.FRONTIER, game);

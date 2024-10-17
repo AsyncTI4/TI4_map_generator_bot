@@ -82,7 +82,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     channel = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
-                String message2 = player.getRepresentation(true, true)
+                String message2 = player.getRepresentationUnfogged()
                     + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
@@ -146,7 +146,7 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
             && player.hasTech("dxa") && !doubleCheck) {
-            String msg10 = player.getRepresentation(true, true)
+            String msg10 = player.getRepresentationUnfogged()
                 + " you may have an opportunity to use Dacxive Animators on "
                 + Helper.getPlanetRepresentation(planet, game)
                 + ". Click to confirm a combat occurred and to add 1 infantry or delete these buttons.";
@@ -223,7 +223,7 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Buttons.green("exhaustAgent_vaylerianagent_" + player.getFaction(),
                 "Use Vaylerian Agent", Emojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            String msg2 = player.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            String msg2 = player.getRepresentationUnfogged() + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
@@ -234,7 +234,7 @@ public class PlanetAdd extends PlanetAddRemove {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("scourPlanet_" + planet, "Use Scour", Emojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            String msg2 = player.getRepresentation(true, true)
+            String msg2 = player.getRepresentationUnfogged()
                 + " if you have not already used Scour this tactical action, you may discard 1AC to ready the planet "
                 + Helper.getPlanetRepresentation(planet, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
@@ -247,7 +247,7 @@ public class PlanetAdd extends PlanetAddRemove {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship", Emojis.freesystems));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            String msg2 = player.getRepresentation(true, true)
+            String msg2 = player.getRepresentationUnfogged()
                 + " you may produce 1 ship in the system due to President Cyhn, the Free Systems Commander.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2,
                 buttons);
@@ -260,7 +260,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 "Discard AC for mech on " + Helper.getPlanetRepresentation(planet, game)));
             saarButton.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true)
+                player.getRepresentationUnfogged()
                     + " due to Koryl Ferax, the Cymiae Commander, you may discard 1AC here to place or move 1 mech on "
                     + Helper.getPlanetRepresentation(planet, game)
                     + ". Do not do this prior to exploring. It is an after, while exploring is a when.",
@@ -275,7 +275,7 @@ public class PlanetAdd extends PlanetAddRemove {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             if (ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd") < 3) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true)
+                    player.getRepresentationUnfogged()
                         + " if you have the correct amount of infantry (3 or 4), you may remove them and deploy 1 space dock on "
                         + planet + " using the buttons.",
                     buttons);
@@ -311,7 +311,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 "Pay 1TG for mech on " + Helper.getPlanetRepresentation(planet, game)));
             saarButton.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true)
+                player.getRepresentationUnfogged()
                     + " you may pay 1TG to place 1 mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
                 saarButton);
         }

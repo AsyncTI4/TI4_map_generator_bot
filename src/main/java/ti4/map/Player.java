@@ -1443,6 +1443,11 @@ public class Player {
     }
 
     @JsonIgnore
+    public String getRepresentationUnfogged() {
+        return getRepresentation(true, true);
+    }
+
+    @JsonIgnore
     public String getRepresentationNoPing() {
         return getRepresentation(false, false);
     }

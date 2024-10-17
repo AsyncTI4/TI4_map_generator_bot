@@ -65,7 +65,7 @@ public class GetTechButton extends TechSubcommandData {
                 List<Button> buttons = new ArrayList<>();
                 Button mirvedaButton = Buttons.gray("exhaustAgent_mirvedaagent_" + player.getFaction(), "Use Mirveda Agent", Emojis.mirveda);
                 buttons.add(mirvedaButton);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina, the Mirveda"
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to spend 1 CC and research a tech of the same color as a prerequisite of the tech you just got.",
                     buttons);
@@ -111,7 +111,7 @@ public class GetTechButton extends TechSubcommandData {
             Button zealotsButton = Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Zealots Agent", Emojis.zealots);
             buttons.add(zealotsButton);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentation(true, true)
+                player.getRepresentationUnfogged()
                     + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh, the Rhodun"
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to produce 1 ship at home or in a system where you have a tech skip planet.",
                 buttons);
@@ -134,7 +134,7 @@ public class GetTechButton extends TechSubcommandData {
                     // Block of code to handle errors
                 }
             }
-            String text = "" + player.getRepresentation(true, true) + " UP NEXT";
+            String text = "" + player.getRepresentationUnfogged() + " UP NEXT";
             String buttonText = "Use buttons to do your turn. ";
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
@@ -172,7 +172,7 @@ public class GetTechButton extends TechSubcommandData {
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getFactionEmoji() + " has the opportunity to deploy an Augur mech on a legendary planet or planet with a tech skip");
-            String message2 = player.getRepresentation(true, true) + " Use buttons to drop 1 mech on a legendary planet or planet with a tech skip";
+            String message2 = player.getRepresentationUnfogged() + " Use buttons to drop 1 mech on a legendary planet or planet with a tech skip";
             List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
         }
@@ -242,7 +242,7 @@ public class GetTechButton extends TechSubcommandData {
      * @param payWith Possible values: {@code ["res", "inf"]}
      */
     public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech, final String payWith) {
-        String trueIdentity = player.getRepresentation(true, true);
+        String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";
         if (!payType.equals("res") && !payType.equals("inf")) {

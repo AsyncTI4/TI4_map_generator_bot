@@ -46,19 +46,19 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used something";
+        String headerText = player.getRepresentationUnfogged() + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " pressed button: " + event.getButton().getLabel();
+        String headerText = player.getRepresentationUnfogged() + " pressed button: " + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendSecretObjectiveInfo(game, player);
     }
