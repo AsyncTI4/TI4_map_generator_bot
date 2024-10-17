@@ -41,7 +41,7 @@ public class PingActivePlayer extends FOWSubcommandData {
         if (milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
-            String ping = player.getRepresentation(true, true) + " this is a gentle reminder that it is your turn.";
+            String ping = player.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
                 MessageHelper.sendPrivateMessageToPlayer(player, game, ping);

@@ -487,7 +487,7 @@ public class MessageHelper {
 		String message, String failText, String successText) {
 		int count = 0;
 		for (Player player : players) {
-			String playerRepresentation = player.getRepresentation(true, true);
+			String playerRepresentation = player.getRepresentationUnfogged();
 			boolean success = sendPrivateMessageToPlayer(player, game, feedbackChannel,
 				playerRepresentation + message, failText, successText);
 			if (success)

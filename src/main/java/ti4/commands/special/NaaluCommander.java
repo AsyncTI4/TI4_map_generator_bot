@@ -40,7 +40,7 @@ public class NaaluCommander extends SpecialSubcommandData {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" you are using the M'aban, the Naalu Commander:");
+        sb.append(player.getRepresentationUnfogged()).append(" you are using the M'aban, the Naalu Commander:");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
 
         // Top Agenda

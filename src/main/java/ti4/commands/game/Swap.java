@@ -114,7 +114,7 @@ public class Swap extends GameSubcommandData {
                 //         //  Block of code to handle errors
                 //     }
                 // }
-                // String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
+                // String text = "# " + player.getRepresentationUnfogged() + " UP NEXT";
                 // String buttonText = "Use buttons to do your turn. ";
                 // List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                 // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);

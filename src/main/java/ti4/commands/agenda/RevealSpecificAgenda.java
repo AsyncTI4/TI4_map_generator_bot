@@ -126,7 +126,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                             StringBuilder sb = new StringBuilder();
                             sb.append("-----------\n");
                             sb.append("Game: ").append(game.getName()).append("\n");
-                            sb.append(speaker.getRepresentation(true, true)).append("\n");
+                            sb.append(speaker.getRepresentationUnfogged()).append("\n");
                             sb.append("Drawn Agendas:\n");
                             sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                             sb.append("\n");
@@ -177,7 +177,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you have Florzen commander and may thus explore and ready a planet.",
+                    player.getRepresentationUnfogged() + " you have Florzen commander and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
         }

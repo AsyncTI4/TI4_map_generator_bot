@@ -205,7 +205,7 @@ public class TechExhaust extends TechAddRemove {
                         buttons.add(button);
                     }
                 }
-                String message = player.getRepresentation(true, true) + " Select who you would like to Mageon.";
+                String message = player.getRepresentationUnfogged() + " Select who you would like to Mageon.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -213,7 +213,7 @@ public class TechExhaust extends TechAddRemove {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "sd",
                     "placeOneNDone_skipbuild");
-                String message = player.getRepresentation(true, true)
+                String message = player.getRepresentationUnfogged()
                     + " select the planet you would like to place or move a space dock to.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
@@ -227,28 +227,28 @@ public class TechExhaust extends TechAddRemove {
             }
             case "dskolug" -> {
                 deleteIfButtonEvent(event);
-                String message = player.getRepresentation(true, true) + " stalled using the Applied Biothermics tech.";
+                String message = player.getRepresentationUnfogged() + " stalled using the Applied Biothermics tech.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "vtx", "absol_vtx" -> { // Vortex
                 deleteIfButtonEvent(event);
                 List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, game, event);
-                String message = player.getRepresentation(true, true) + " Select what unit you would like to capture";
+                String message = player.getRepresentationUnfogged() + " Select what unit you would like to capture";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "wg" -> { // Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentation(true, true) + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "absol_wg" -> { // Absol's Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentation(true, true) + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),

@@ -179,7 +179,7 @@ public class ExploreHelper {
                     game.drawActionCard(player.getUserID());
                     message = player.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true) + " use buttons to discard",
+                        player.getRepresentationUnfogged() + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(game, player, false));
                 } else {
                     game.drawActionCard(player.getUserID());

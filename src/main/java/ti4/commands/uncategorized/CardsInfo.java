@@ -70,7 +70,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         if (player == null)
             return;
-        String headerText = player.getRepresentation(true, true) + CardsInfoHelper.getHeaderText(event);
+        String headerText = player.getRepresentationUnfogged() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendCardsInfo(game, player);
     }

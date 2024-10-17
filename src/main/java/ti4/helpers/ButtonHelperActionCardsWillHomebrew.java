@@ -44,7 +44,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you wish to exhaust and put 1 PDS on",
+            player.getRepresentationUnfogged() + " select the planet you wish to exhaust and put 1 PDS on",
             buttons);
     }
 
@@ -54,7 +54,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "pds " + planet, game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
+            player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
     }
 
     public static void resolveBoardingParty(Player player, Game game, ButtonInteractionEvent event) {
@@ -172,10 +172,10 @@ public class ButtonHelperActionCardsWillHomebrew {
         buttons.add(Buttons.red("deleteButtons", "Don't give comms"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to give 2 comms to",
+            player.getRepresentationUnfogged() + " tell the bot who you want to give 2 comms to",
             buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who else you want to give 2 comms to (different from the first time)",
+            player.getRepresentationUnfogged() + " tell the bot who else you want to give 2 comms to (different from the first time)",
             buttons);
     }
 
@@ -197,7 +197,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
+            player.getRepresentationUnfogged() + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
             buttons);
     }
 
@@ -235,7 +235,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
                 cardID = game.drawExplore(type);
                 sb.append(Mapper.getExplore(cardID).getName()).append(System.lineSeparator());
-                sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
+                sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             } else {
@@ -264,7 +264,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to place a Ghost Ship in",
+            player.getRepresentationUnfogged() + " tell the bot which tile you wish to place a Ghost Ship in",
             buttons);
     }
 
@@ -286,7 +286,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         List<Button> buttons = getSpatialCollapseTilesStep1(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile with your ships you wish to swap with an adjacent system",
+            player.getRepresentationUnfogged() + " tell the bot which tile with your ships you wish to swap with an adjacent system",
             buttons);
     }
 
@@ -322,7 +322,7 @@ public class ButtonHelperActionCardsWillHomebrew {
 
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " Chose the tile you want to swap places with "
+            player.getRepresentationUnfogged() + " Chose the tile you want to swap places with "
                 + tile1.getRepresentationForButtons(game, player),
             buttons);
         event.getMessage().delete().queue();
@@ -341,7 +341,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         game.setTile(tile2);
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " Chose to swap "
+            player.getRepresentationUnfogged() + " Chose to swap "
                 + tile2.getRepresentationForButtons(game, player) + " with "
                 + tile.getRepresentationForButtons(game, player));
         event.getMessage().delete().queue();
