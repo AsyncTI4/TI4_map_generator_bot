@@ -76,7 +76,6 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.json.ObjectMapperFactory;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.ActionCardModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
@@ -89,6 +88,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.website.WebsiteOverlay;
 
 public class Game extends GameProperties {
     // TODO (Jazz): Sort through these and add to GameProperties
@@ -4221,5 +4221,21 @@ public class Game extends GameProperties {
             }
         }
         return false;
+    }
+
+    public void addWebsiteOverlay(Player player, String cardType, String cardID, int x, int y, int width, int height) {
+        getWebsiteOverlays().put(cardType + ":" + cardID + ":" + player.getFaction(), new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+    }
+
+    public void addWebsiteOverlay(String cardType, String cardID, int x, int y, int width, int height) {
+        getWebsiteOverlays().put(cardType + ":" + cardID, new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+    }
+
+    public void addWebsiteOverlay(String id, WebsiteOverlay overlay) {
+        getWebsiteOverlays().put(id, overlay);
+    }
+
+    public void resetWebsiteOverlays() {
+        setWebsiteOverlays(new HashMap<>());
     }
 }
