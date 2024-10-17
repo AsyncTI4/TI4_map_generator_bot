@@ -15,7 +15,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 
 /**
- * <p>Supported Variables (see {@link AnnotationHandler})</p>
+ * <p>ButtonHandler(string) where buttonID.startsWith(string)</p>
+ * <p>Supported Variables:</p>
  * <ul>
  *   <li>events<ul>
  *     <li>{@link GenericInteractionCreateEvent}</li>
@@ -26,7 +27,7 @@ import ti4.map.Player;
  *   <li>{@link MessageChannel} -&gt; event.getMessageChannel()</li>
  *   <li>{@link String} -&gt; buttonID</li>
  * </ul>
- * <p>To handle multiple String parameter you mus use {@link NamedParam}</p>
+ * <p>To handle multiple String parameter you must use {@link NamedParam}</p>
  */
 @Documented
 @Retention(RUNTIME)
