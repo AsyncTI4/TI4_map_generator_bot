@@ -36,7 +36,7 @@ public class PeakAtStage2 extends CustomSubcommandData {
     public void secondHalfOfPeak(GenericInteractionCreateEvent event, Game game, Player player, int loc1) {
         String obj = game.peekAtStage2(loc1, player);
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-        String sb = player.getRepresentation(true, true) +
+        String sb = player.getRepresentationUnfogged() +
             " **Stage 2 Public Objective at location " + loc1 + "**" + "\n" +
             po.getRepresentation() + "\n";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);

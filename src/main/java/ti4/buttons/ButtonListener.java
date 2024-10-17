@@ -235,7 +235,7 @@ public class ButtonListener extends ListenerAdapter {
         String fowIdentity = null;
         String ident = null;
         if (nullable != null) {
-            trueIdentity = player.getRepresentation(true, true);
+            trueIdentity = player.getRepresentationUnfogged();
             fowIdentity = player.getRepresentation(false, true);
             ident = player.getFactionEmoji();
         }
@@ -500,7 +500,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
             buttons.add(Buttons.green("autoneticMemoryStep3a", "Pick A Card From the Discard"));
             buttons.add(Buttons.blue("autoneticMemoryStep3b", "Drop 1 infantry"));
-            String msg = player.getRepresentation(true, true)
+            String msg = player.getRepresentationUnfogged()
                 + " you have the ability to either draw a card from the discard (and then discard a card) or place 1 infantry on a planet you control";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             buttons = new ArrayList<>();
@@ -810,7 +810,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("bombardConfirm_")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.gray(buttonID.replace("bombardConfirm_", ""), "Roll Bombardment"));
-            String message = player.getRepresentation(true, true)
+            String message = player.getRepresentationUnfogged()
                 + " please declare what units are bombarding what planet before hitting this button"
                 + " (e.g. if you have two dreadnoughts and are splitting their bombardment across two planets, specify which planet the first one is hitting)."
                 + " The bot does not track this.";
@@ -908,7 +908,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.deleteTheOneButton(event);
                     MessageHelper
                         .sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                            player.getRepresentation(true, true)
+                            player.getRepresentationUnfogged()
                                 + " use buttons to discard 1 AC and explore a readied planet",
                             absolPAButtons);
                 }
@@ -1381,7 +1381,7 @@ public class ButtonListener extends ListenerAdapter {
                         Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
                         int scNumber = scpick;
                         Integer tgCount = scTradeGoods.get(scNumber);
-                        String msg = player.getRepresentation(true, true) +
+                        String msg = player.getRepresentationUnfogged() +
                             "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
@@ -1433,7 +1433,7 @@ public class ButtonListener extends ListenerAdapter {
             for (MessageEmbed e : embeds) {
                 String message = "";
                 if (first)
-                    message = player.getRepresentation(true, true) + " Here's an overview of the factions:";
+                    message = player.getRepresentationUnfogged() + " Here's an overview of the factions:";
                 MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, e);
                 first = false;
             }
@@ -1460,7 +1460,7 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = ButtonHelperFactionSpecific.getButtonsToTakeSomeonesAC(game, player, victim);
             ShowAllAC.showAll(victim, player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentation(true, true)
+                player.getRepresentationUnfogged()
                     + " Select which AC you would like to steal",
                 buttons);
             ButtonHelper.deleteMessage(event);
@@ -2350,7 +2350,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "drawAgenda_2" -> {
                     if (!game.getStoredValue("hasntSetSpeaker").isEmpty() && !game.isHomebrewSCMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true) + " you need to assign speaker first before drawing agendas. You can override this restriction with /agenda draw");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you need to assign speaker first before drawing agendas. You can override this restriction with /agenda draw");
                         return;
                     }
                     DrawAgenda.drawAgenda(event, 2, game, player);
@@ -2464,7 +2464,7 @@ public class ButtonListener extends ListenerAdapter {
                             }
                             if (properGain > 2) {
                                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                    player.getRepresentation(true, true) + " heads up, bot thinks you should gain "
+                                    player.getRepresentationUnfogged() + " heads up, bot thinks you should gain "
                                         + properGain + " CC now due to: " + reasons);
                             }
                         }
@@ -2510,7 +2510,7 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.addReaction(event, false, false, message, "");
                     if (hasSchemingAbility) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                            player.getRepresentation(true, true) + " use buttons to discard",
+                            player.getRepresentationUnfogged() + " use buttons to discard",
                             ACInfo.getDiscardActionCardButtons(game, player, false));
                     }
                     if (player.getLeaderIDs().contains("yssarilcommander")
@@ -2735,7 +2735,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     if (hasSchemingAbility) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                            player.getRepresentation(true, true) + " use buttons to discard",
+                            player.getRepresentationUnfogged() + " use buttons to discard",
                             ACInfo.getDiscardActionCardButtons(game, player, false));
                     }
 
@@ -2765,7 +2765,7 @@ public class ButtonListener extends ListenerAdapter {
                         message = player.getFactionEmoji() + " Drew 2 ACs With Scheming. Please Discard 1 AC.";
                         ACInfo.sendActionCardInfo(game, player, event);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                            player.getRepresentation(true, true) + " use buttons to discard",
+                            player.getRepresentationUnfogged() + " use buttons to discard",
                             ACInfo.getDiscardActionCardButtons(game, player, false));
 
                     } else if (player.hasAbility("autonetic_memory")) {
@@ -2800,7 +2800,7 @@ public class ButtonListener extends ListenerAdapter {
                         message = player.getFactionEmoji() + " Drew 2 ACs With Scheming. Please Discard 1 AC.";
                         ACInfo.sendActionCardInfo(game, player, event);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                            player.getRepresentation(true, true) + " use buttons to discard",
+                            player.getRepresentationUnfogged() + " use buttons to discard",
                             ACInfo.getDiscardActionCardButtons(game, player, false));
 
                     } else if (player.hasAbility("autonetic_memory")) {
@@ -3099,7 +3099,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     ButtonHelper.addReaction(event, true, false, message, "");
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true) + " use buttons to discard",
+                        player.getRepresentationUnfogged() + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(game, player, false));
 
                     ButtonHelper.deleteMessage(event);
@@ -3311,7 +3311,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     ButtonHelperHeroes.killShipsSardakkHero(player, game, event);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getRepresentation(true, true)
+                        player.getRepresentationUnfogged()
                             + " All ships have been removed, continue to land troops.");
                     ButtonHelper.deleteTheOneButton(event);
                 }
@@ -3394,7 +3394,7 @@ public class ButtonListener extends ListenerAdapter {
                         game.getTileByPosition(game.getActiveSystem()), "2 cruiser, 1 flagship",
                         game);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        player.getRepresentation(true, true) + " 2 cruisers and 1 flagship added.");
+                        player.getRepresentationUnfogged() + " 2 cruisers and 1 flagship added.");
                     ButtonHelper.deleteTheOneButton(event);
                 }
                 case "purgeDihmohnHero" -> {
@@ -3410,7 +3410,7 @@ public class ButtonListener extends ListenerAdapter {
                             "Verrisus Ypru, the Dih-Mohn hero, was not purged - something went wrong.");
                     }
                     ButtonHelperHeroes.resolvDihmohnHero(game);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true)
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged()
                         + " sustained everything. Reminder you do not take hits this round.");
                     ButtonHelper.deleteTheOneButton(event);
                 }
@@ -3732,7 +3732,7 @@ public class ButtonListener extends ListenerAdapter {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
         Player opponent = player;
-        String msg = "\n" + opponent.getRepresentation(true, true) + " cancelled 1 hit with an ability.";
+        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -3750,7 +3750,7 @@ public class ButtonListener extends ListenerAdapter {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
         Player opponent = player;
-        String msg = "\n" + opponent.getRepresentation(true, true) + " cancelled 1 hit with an ability";
+        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -3770,7 +3770,7 @@ public class ButtonListener extends ListenerAdapter {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
         Player opponent = player;
-        String msg = "\n" + opponent.getRepresentation(true, true) + " cancelled 1 hit with an ability";
+        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -3789,7 +3789,7 @@ public class ButtonListener extends ListenerAdapter {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         int h = Integer.parseInt(buttonID.split("_")[2]) - 1;
         Player opponent = player;
-        String msg = "\n" + opponent.getRepresentation(true, true) + " cancelled 1 hit with an ability";
+        String msg = "\n" + opponent.getRepresentationUnfogged() + " cancelled 1 hit with an ability";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         List<Button> buttons = new ArrayList<>();
         String finChecker = "FFCC_" + opponent.getFaction() + "_";
@@ -4013,7 +4013,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                     message = "Wants to score a PO but has people ahead of them in iniative order who need to resolve first. They have been queued and will automatically score their PO when everyone ahead of them is clear. ";
                     if (!game.isFowMode()) {
-                        message += player2.getRepresentation(true, true)
+                        message += player2.getRepresentationUnfogged()
                             + " is the one the game is currently waiting on";
                     }
                     String poID = buttonID.replace(Constants.PO_SCORING, "");
@@ -4193,7 +4193,7 @@ public class ButtonListener extends ListenerAdapter {
                         message = player.getRepresentation()
                             + " Wants to score an SO but has people ahead of them in initiative order who need to resolve first. They have been queued and will automatically score their SO when everyone ahead of them is clear. ";
                         if (!game.isFowMode()) {
-                            message += player2.getRepresentation(true, true)
+                            message += player2.getRepresentationUnfogged()
                                 + " is the one the game is currently waiting on";
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
@@ -4286,7 +4286,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons2.add(hacanButton);
                     MessageHelper.sendMessageToChannelWithButtons(
                         player.getCorrectChannel(),
-                        player.getRepresentation(true, true)
+                        player.getRepresentationUnfogged()
                             + " you may use "
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Skhot Unit X-12, the Cymiae"
@@ -4389,7 +4389,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                         if (netGain < properGain && netGain != 1) {
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                                "# " + player.getRepresentation(true, true)
+                                "# " + player.getRepresentationUnfogged()
                                     + " heads up, bot thinks you should have gained " + properGain
                                     + " CC due to: " + reasons);
                         }
@@ -4555,7 +4555,7 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                     trapButtons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = player.getRepresentation(true, true)
+                    String msg = player.getRepresentationUnfogged()
                         + " you may use the buttons to place a trap on a planet.";
                     if (trapButtons.size() > 1) {
                         MessageHelper.sendMessageToChannelWithButtons(
@@ -4568,7 +4568,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(hacanButton);
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true)
+                        player.getRepresentationUnfogged()
                             + " you may use "
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "George Nobin, the Celdauri"
@@ -4612,7 +4612,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 game.setStoredValue("tnelisCommanderTracker", "");
 
-                String message = player.getRepresentation(true, true)
+                String message = player.getRepresentationUnfogged()
                     + " Use buttons to end turn or do another action.";
                 List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),

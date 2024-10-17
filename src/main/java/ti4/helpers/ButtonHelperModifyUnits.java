@@ -915,7 +915,7 @@ public class ButtonHelperModifyUnits {
                     Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you must pay influence due to Keleres mech" + (mechCount == 1 ? "" : "s"));
+                        player.getRepresentationUnfogged() + " you must pay influence due to Keleres mech" + (mechCount == 1 ? "" : "s"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         "Click the names of the planets you wish to exhaust", buttons);
                 }
@@ -1529,7 +1529,7 @@ public class ButtonHelperModifyUnits {
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
         new RemoveUnits().removeStuff(event, tile, 1, "space", key, player.getColor(), false, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " captured 1 newly produced " + ButtonHelper.getUnitName(unit)
+            player.getRepresentationUnfogged() + " captured 1 newly produced " + ButtonHelper.getUnitName(unit)
                 + " in " + tile.getRepresentationForButtons(game, player)
                 + " using the Cloaked Fleets ability (limit of 2 ships may be captured per build).");
         new AddUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, game);
@@ -1543,7 +1543,7 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileFromPlanet(buttonID.split("_")[1]);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, unit + " " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " captured 1 " + unit + " on "
+            player.getRepresentationUnfogged() + " captured 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, game) + " using the Kollecc Mech abiility");
         new AddUnits().unitParsing(event, player.getColor(), player.getNomboxTile(), unit, game);
         UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
@@ -1814,7 +1814,7 @@ public class ButtonHelperModifyUnits {
         }
         List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "spacecombat");
         if (cause.contains("dihmohn")) {
-            msg = opponent.getRepresentation(true, true) + " " + player.getFactionEmoji()
+            msg = opponent.getRepresentationUnfogged() + " " + player.getFactionEmoji()
                 + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
             buttons = getOpposingUnitsToHit(player, game, event, tile, false);
@@ -1827,7 +1827,7 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to choose 2 opposing ships to destroy. This occurs after any retreats. The dread has been removed.");
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
         } else {
-            msg = opponent.getRepresentation(true, true) + " your opponent used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
+            msg = opponent.getRepresentationUnfogged() + " your opponent used Assault Cannon to force you to destroy a non fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
@@ -1971,7 +1971,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " choose how many fighters you want to convert to infantry",
+            player.getRepresentationUnfogged() + " choose how many fighters you want to convert to infantry",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -1991,7 +1991,7 @@ public class ButtonHelperModifyUnits {
         }
         buttons.add(Buttons.red("deleteButtons", "Delete These"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " choose how many infantry you wish to convert to fighters",
+            player.getRepresentationUnfogged() + " choose how many infantry you wish to convert to fighters",
             buttons);
         ButtonHelper.deleteTheOneButton(event);
     }

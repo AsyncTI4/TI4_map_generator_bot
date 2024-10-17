@@ -116,7 +116,7 @@ public class PlayAC extends ACCardsSubcommandData {
             return "You are trying to play a component action AC and the game does not think you are the active player. You may fix this with /player turn_start. Until then, you are #denied.";
         }
         if (ButtonHelper.isPlayerOverLimit(game, player)) {
-            return player.getRepresentation(true, true)
+            return player.getRepresentationUnfogged()
                 + " The bot thinks you are over the limit and thus will not allow you to play ACs at this time. You may discard the AC and manually resolve if you need to.";
         }
 
@@ -145,7 +145,7 @@ public class PlayAC extends ACCardsSubcommandData {
             Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
             empyButtons.add(refuse);
             MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(),
-                empy.getRepresentation(true, true)
+                empy.getRepresentationUnfogged()
                     + "You have mech(s) adjacent to the player who played the AC. Use buttons to decide whether to cancel.",
                 empyButtons);
         }
@@ -157,7 +157,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 xxchaButtons.add(instinctButton);
                 Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
                 xxchaButtons.add(refuse);
-                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentation(true, true) + "You have Instinct Training unexhausted and a CC available. Use Buttons to decide whether to cancel", xxchaButtons);
+                MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentationUnfogged() + "You have Instinct Training unexhausted and a CC available. Use Buttons to decide whether to cancel", xxchaButtons);
             }
 
         }
@@ -631,7 +631,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
                     boolean unleash = ThreadLocalRandom.current().nextInt(20) == 0;
-                    String message2 = player.getRepresentation(true, true) + " you may " + (unleash ? "unleash" : "unlock") + " Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
+                    String message2 = player.getRepresentationUnfogged() + " you may " + (unleash ? "unleash" : "unlock") + " Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
                     buttons2.add(Buttons.green("pay1tgforKeleres" + (unleash ? "U" : ""), "Pay 1TG to " + (unleash ? "Unleash" : "Unlock") + " Suffi An"));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
@@ -651,7 +651,7 @@ public class PlayAC extends ACCardsSubcommandData {
             List<Button> buttons2 = new ArrayList<>();
             Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", Emojis.cymiae);
             buttons2.add(cymiaeButton);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Skhot Unit X-12, the Cymiae" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to draw 1AC.", buttons2);
         }
 
@@ -667,7 +667,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
             String reverseEngineerID = "reverse_engineer";
             if (player.getActionCards().containsKey(reverseEngineerID)) {
-                String msg = player.getRepresentation(true, true) + " you can use Reverse Engineer on ";
+                String msg = player.getRepresentationUnfogged() + " you can use Reverse Engineer on ";
                 if (actionCards.size() > 1) msg += "one of the following cards:";
 
                 List<Button> reverseButtons = new ArrayList<>();

@@ -261,7 +261,7 @@ public class StartCombat extends CombatSubcommandData {
     private static void initializeCombatThread(ThreadChannel threadChannel, Game game, Player player1,
         Player player2, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround, FileUpload file, String unitHolderName) {
         StringBuilder message = new StringBuilder();
-        message.append(player1.getRepresentation(true, true));
+        message.append(player1.getRepresentationUnfogged());
         if (!game.isFowMode())
             message.append(player2.getRepresentation());
 
@@ -343,7 +343,7 @@ public class StartCombat extends CombatSubcommandData {
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             threadChannel.queue(tc -> {
                 StringBuilder message = new StringBuilder();
-                message.append(player.getRepresentation(true, true));
+                message.append(player.getRepresentationUnfogged());
                 message.append(" Please spectate the interaction here.\n");
                 message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
                 message.append("\nImage of System:");

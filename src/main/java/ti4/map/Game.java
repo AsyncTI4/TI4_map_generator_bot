@@ -1823,7 +1823,7 @@ public class Game extends GameProperties {
             if (getLaws().size() > 2) {
                 for (Player p : getRealPlayers()) {
                     if (p.getSecretsUnscored().keySet().contains("dp")) {
-                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentation(true, true) + " reminder that you have dictate policy and a 3rd law just got put into play");
+                        MessageHelper.sendMessageToChannel(p.getCardsInfoThread(), p.getRepresentationUnfogged() + " reminder that you have dictate policy and a 3rd law just got put into play");
                     }
                 }
             }
@@ -2538,7 +2538,7 @@ public class Game extends GameProperties {
 
     public void checkSOLimit(Player player) {
         if (player.getSecretsScored().size() + player.getSecretsUnscored().size() > player.getMaxSOCount()) {
-            String msg = player.getRepresentation(true, true) + " you have more SOs than the limit ("
+            String msg = player.getRepresentationUnfogged() + " you have more SOs than the limit ("
                 + player.getMaxSOCount()
                 + ") and should discard one. If your game is playing with a higher SO limit, you may change that in /game setup.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
