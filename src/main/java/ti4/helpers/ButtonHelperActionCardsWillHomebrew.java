@@ -14,6 +14,7 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -304,6 +305,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         return buttons;
     }
 
+    @ButtonHandler("spatialCollapseStep2_")
     public static void resolveSpatialCollapseStep2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String pos1 = buttonID.split("_")[1];
@@ -326,6 +328,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("spatialCollapseStep3_")
     public static void resolveSpatialCollapseStep3(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String position = buttonID.split("_")[1];
@@ -392,6 +395,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("brutalOccupationStep2_")
     public static void resolveBrutalOccupationStep2(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];

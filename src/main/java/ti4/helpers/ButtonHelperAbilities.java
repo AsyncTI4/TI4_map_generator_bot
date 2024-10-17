@@ -18,6 +18,8 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
+import ti4.commands.custom.PeakAtStage1;
+import ti4.commands.custom.PeakAtStage2;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExplorePlanet;
@@ -1104,6 +1106,7 @@ public class ButtonHelperAbilities {
         }
     }
 
+    @ButtonHandler("mantleCrack_")
     public static void mantleCracking(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planetName = buttonID.split("_")[1];
         int oldTg = player.getTg();
@@ -1353,6 +1356,7 @@ public class ButtonHelperAbilities {
         game.setStoredValue("munitionsReserves", player.getFaction());
     }
 
+    @ButtonHandler("contagion_")
     public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String planet = buttonID.split("_")[1];
@@ -1465,4 +1469,23 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("augersPeak_")
+    public static void handleAugursPeak(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
+            new PeakAtStage1().secondHalfOfPeak(event, game, player, 1);
+        } else {
+            new PeakAtStage2().secondHalfOfPeak(event, game, player, 1);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("initialPeak")
+    public static void handleAugursPeakInitial(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("augersPeak_1", "Peek At Next Stage 1"));
+        buttons.add(Buttons.green("augersPeak_2", "Peek At Next Stage 2"));
+        String msg = player.getRepresentationUnfogged()
+            + " the bot doesn't know if the next objective is a stage 1 or a stage 2. Please help it out and click the right button.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
 }
