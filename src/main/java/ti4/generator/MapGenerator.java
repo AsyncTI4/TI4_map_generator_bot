@@ -304,6 +304,7 @@ public class MapGenerator {
 
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
+        game.resetWebsiteOverlays();
 
         drawGame(event);
         AsyncTI4DiscordBot.THREAD_POOL.submit(() -> sendToWebsite(event));
@@ -1421,7 +1422,12 @@ public class MapGenerator {
                 graphics.setColor(Color.WHITE);
             }
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            int rectX = x + deltaX - 2;
+            int rectY = y - 2;
+            int rectW = 44;
+            int rectH = 152;
+            graphics.drawRect(rectX, rectY, rectW, rectH);
+            game.addWebsiteOverlay(player, "relic", relicID, rectX, rectY, rectW, rectH);
             drawPAImage(x + deltaX, y, "pa_relics_icon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";

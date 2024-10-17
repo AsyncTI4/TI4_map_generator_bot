@@ -2,6 +2,10 @@ package ti4.website;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class WebsiteOverlay {
     private String cardType;
     private String cardID;

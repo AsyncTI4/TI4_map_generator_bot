@@ -69,8 +69,8 @@ public class WebHelper {
     }
 
     public static void putOverlays(Game game) {
-        // if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
-        //     return;
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+            return;
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -79,18 +79,18 @@ public class WebHelper {
 
             System.out.println(json);
 
-            // Region region = Region.US_EAST_1;
-            // S3Client s3 = S3Client.builder()
-            //     .region(region)
-            //     .build();
+            Region region = Region.US_EAST_1;
+            S3Client s3 = S3Client.builder()
+                .region(region)
+                .build();
 
-            // PutObjectRequest request = PutObjectRequest.builder()
-            //     .bucket(webProperties.getProperty("bucket"))
-            //     .key(String.format("overlays/%s/%s", game.getID(), game.getID()))
-            //     .contentType("application/json")
-            //     .build();
+            PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(webProperties.getProperty("bucket"))
+                .key(String.format("overlays/%s/%s", game.getID(), game.getID()))
+                .contentType("application/json")
+                .build();
 
-            // s3.putObject(request, RequestBody.fromString(json));
+            s3.putObject(request, RequestBody.fromString(json));
         } catch (Exception e) {
             BotLogger.log("Could not put data to web server", e);
         }
