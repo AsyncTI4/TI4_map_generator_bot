@@ -77,8 +77,6 @@ public class WebHelper {
             Map<String, WebsiteOverlay> overlays = game.getWebsiteOverlays();
             String json = mapper.writeValueAsString(overlays);
 
-            System.out.println(json);
-
             Region region = Region.US_EAST_1;
             S3Client s3 = S3Client.builder()
                 .region(region)
