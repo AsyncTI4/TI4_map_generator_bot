@@ -317,7 +317,7 @@ public class MessageListener extends ListenerAdapter {
                                         if (!timesPinged.equalsIgnoreCase("1")) {
                                             StringBuilder sb = new StringBuilder();
                                             Player p2 = player;
-                                            sb.append(p2.getRepresentation(true, true));
+                                            sb.append(p2.getRepresentationUnfogged());
                                             sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                                                 sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
@@ -335,7 +335,7 @@ public class MessageListener extends ListenerAdapter {
                                     if (timeDifference > twentyFourhrs) {
                                         if (!timesPinged.equalsIgnoreCase("2")) {
                                             Player p2 = player;
-                                            String sb = p2.getRepresentation(true, true) +
+                                            String sb = p2.getRepresentationUnfogged() +
                                                 Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
                                             //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
@@ -412,7 +412,7 @@ public class MessageListener extends ListenerAdapter {
                                 String realIdentity = null;
                                 String ping = null;
                                 if (player != null) {
-                                    realIdentity = player.getRepresentation(true, true);
+                                    realIdentity = player.getRepresentationUnfogged();
                                     ping = realIdentity + " this is a gentle reminder that it is your turn.";
                                     if (player != null && player.shouldPlayerBeTenMinReminded()
                                         && milliSinceLastPing > (60 * 5 * multiplier) && (60 * 60 * multiplier * spacer) > milliSinceLastPing) {

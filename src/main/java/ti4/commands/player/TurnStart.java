@@ -91,7 +91,7 @@ public class TurnStart extends PlayerSubcommandData {
                 goingToPass = true;
             }
         }
-        String text = "" + player.getRepresentation(true, true) + " UP NEXT (Turn #" + player.getTurnCount() + ")";
+        String text = "" + player.getRepresentationUnfogged() + " UP NEXT (Turn #" + player.getTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
         if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
             buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
@@ -172,7 +172,7 @@ public class TurnStart extends PlayerSubcommandData {
         }
         if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " you left yourself the following message: \n"
+                player.getRepresentationUnfogged() + " you left yourself the following message: \n"
                     + game.getStoredValue("futureMessageFor" + player.getFaction()));
             game.setStoredValue("futureMessageFor" + player.getFaction(), "");
         }
@@ -183,7 +183,7 @@ public class TurnStart extends PlayerSubcommandData {
                 String msg2 = "This is a message sent from the past:\n" + game
                     .getStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction());
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                    p2.getRepresentation(true, true) + " your future message got delivered");
+                    p2.getRepresentationUnfogged() + " your future message got delivered");
                 Whisper.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
                 game.setStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
             }
@@ -202,7 +202,7 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 if (!player.hasAbility("propagation")) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you may use the button to get your tech.",
+                        player.getRepresentationUnfogged() + " you may use the button to get your tech.",
                         List.of(Buttons.GET_A_TECH));
                 } else {
                     List<Button> buttons2 = ButtonHelper.getGainCCButtons(player);
@@ -233,7 +233,7 @@ public class TurnStart extends PlayerSubcommandData {
         boolean sendReminder = false;
 
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true));
+        sb.append(player.getRepresentationUnfogged());
         sb.append(" Please resolve these before doing anything else:\n");
         for (int sc : game.getPlayedSCsInOrder(player)) {
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
@@ -310,7 +310,7 @@ public class TurnStart extends PlayerSubcommandData {
                 for (Player p2 : game.getRealPlayers()) {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
-                        sb.append(p2.getRepresentation(true, true));
+                        sb.append(p2.getRepresentationUnfogged());
                         sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");

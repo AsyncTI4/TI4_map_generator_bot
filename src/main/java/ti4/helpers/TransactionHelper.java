@@ -81,7 +81,7 @@ public class TransactionHelper {
                             switch (furtherDetail) {
                                 case "generic" -> {
                                     List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, receiver, sender);
-                                    String message = sender.getRepresentation(true, true)
+                                    String message = sender.getRepresentationUnfogged()
                                         + "Please select the promissory note you would like to send.";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
                                 }
@@ -107,8 +107,8 @@ public class TransactionHelper {
         }
 
         // Send Summary to Player's CardsInfo threads
-        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation(true, true) + " " + privateSummary);
-        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + " " + privateSummary);
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentationUnfogged() + " " + privateSummary);
+        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentationUnfogged() + " " + privateSummary);
 
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
@@ -532,7 +532,7 @@ public class TransactionHelper {
 
                     stuffToTransButtons.add(transact);
                 } else {
-                    message = message + p1.getRepresentation(true, true) + " Click the PN you would like to "
+                    message = message + p1.getRepresentationUnfogged() + " Click the PN you would like to "
                         + requestOrOffer;
                     for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                         if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
@@ -780,7 +780,7 @@ public class TransactionHelper {
             }
             case "PNs" -> {
                 PNInfo.sendPromissoryNoteInfo(game, p1, false);
-                String message = p1.getRepresentation(true, true) + " Click the PN you would like to send.";
+                String message = p1.getRepresentationUnfogged() + " Click the PN you would like to send.";
 
                 for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                     if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
@@ -1082,7 +1082,7 @@ public class TransactionHelper {
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" this is a friendly reminder that you ");
+        sb.append(player.getRepresentationUnfogged()).append(" this is a friendly reminder that you ");
         if (!canTheseTwoTransact(game, player, player2)) {
             sb.append("are not neighbors with " + player2.getRepresentation(false, false));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());

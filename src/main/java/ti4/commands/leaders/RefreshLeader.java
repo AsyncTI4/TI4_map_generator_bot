@@ -47,7 +47,7 @@ public class RefreshLeader extends LeaderAction {
             tg += tgCount;
             player.setTg(tg);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s")
+                player.getRepresentationUnfogged() + " you gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s")
                     + " (" + (tg - tgCount) + "->" + tg + ") from " + playerLeader.getId() + " being readied");
             ButtonHelperAbilities.pillageCheck(player, game);
             playerLeader.setTgCount(0);

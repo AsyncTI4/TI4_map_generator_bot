@@ -161,7 +161,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                     }
                     if (speaker != null) {
                         StringBuilder sb = new StringBuilder();
-                        sb.append(speaker.getRepresentation(true, true))
+                        sb.append(speaker.getRepresentationUnfogged())
                             .append(" this is the top agenda for Covert Legislation:");
                         List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
                         MessageHelper.sendMessageEmbedsToCardsInfoThread(game, speaker, sb.toString(), embeds);
@@ -255,7 +255,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             if (!action && game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
                 && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0 && aCount == 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true)
+                    player.getRepresentationUnfogged()
                         + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }

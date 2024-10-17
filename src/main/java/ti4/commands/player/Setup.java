@@ -251,7 +251,7 @@ public class Setup extends PlayerSubcommandData {
         if (player.getTechs().isEmpty() && !player.getFaction().contains("sardakk")) {
             if (player.getFaction().contains("keleres")) {
                 Button getTech = Buttons.green("getKeleresTechOptions", "Get Keleres Tech Options");
-                String msg = player.getRepresentation(true, true) + " after every other faction gets their tech, press this button to resolve Keleres tech";
+                String msg = player.getRepresentationUnfogged() + " after every other faction gets their tech, press this button to resolve Keleres tech";
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
                 // STARTING TECH OPTIONS
@@ -270,7 +270,7 @@ public class Setup extends PlayerSubcommandData {
                     }
 
                     List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
-                    String msg = player.getRepresentation(true, true) + " use the buttons to choose your starting technology:";
+                    String msg = player.getRepresentationUnfogged() + " use the buttons to choose your starting technology:";
                     if (techs.isEmpty() && bonusOptions > 0) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
@@ -293,7 +293,7 @@ public class Setup extends PlayerSubcommandData {
         if (player.hasAbility("diplomats")) {
             ButtonHelperAbilities.resolveFreePeopleAbility(game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set up free people ability markers. " + player.getRepresentation(true, true)
+                "Set up free people ability markers. " + player.getRepresentationUnfogged()
                     + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
         }
 
@@ -324,7 +324,7 @@ public class Setup extends PlayerSubcommandData {
         }
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation(true, true)
+                player.getRepresentationUnfogged()
                     + " you may peek at the next objective in your cards info (by your PNs). This holds true for anyone with your PN. Don't do this until after secrets are dealt and discarded.");
         }
         CardsInfo.sendVariousAdditionalButtons(game, player);

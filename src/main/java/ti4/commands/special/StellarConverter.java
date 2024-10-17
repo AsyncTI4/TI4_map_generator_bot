@@ -73,7 +73,7 @@ public class StellarConverter extends SpecialSubcommandData {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                    p2.getRepresentation(true, true) + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been Stellar Converted.");
+                    p2.getRepresentationUnfogged() + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been Stellar Converted.");
                 int amountToKill = 0;
                 amountToKill = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                 if (p2.hasInf2Tech()) {

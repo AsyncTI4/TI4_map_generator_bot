@@ -411,7 +411,7 @@ public class Helper {
         }
 
         for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
-            String message = player.getRepresentation(true, true) + " Drew Queued Secret Objective From Imperial. ";
+            String message = player.getRepresentationUnfogged() + " Drew Queued Secret Objective From Imperial. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
@@ -429,7 +429,7 @@ public class Helper {
             if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                 && game.getStoredValue(key2).length() > 2) {
                 if (!game.isFowMode()) {
-                    message = player.getRepresentation(true, true)
+                    message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued Imperial follows.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -480,7 +480,7 @@ public class Helper {
             } else {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
-                    String message = player.getRepresentation(true, true)
+                    String message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued public objective scoring.";
                     if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring.";
@@ -490,7 +490,7 @@ public class Helper {
                 }
                 if (game.getStoredValue(key3b).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
-                    String message = player.getRepresentation(true, true)
+                    String message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     if (game.isFowMode()) {
@@ -521,7 +521,7 @@ public class Helper {
             } else {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
-                    String message = player.getRepresentation(true, true)
+                    String message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
                     if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring.";
@@ -2012,7 +2012,7 @@ public class Helper {
                 List<Button> unitButtons2 = new ArrayList<>();
                 unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use this to Yin Spin.", unitButtons2);
+                    player.getRepresentationUnfogged() + " you may use this to Yin Spin.", unitButtons2);
             } else {
                 unitButtons.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
             }
@@ -2686,9 +2686,9 @@ public class Helper {
                 for (Player player : sortedPlayers) {
                     new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
                     if (player.isSpeaker()) {
-                        msg = msg + player.getRepresentation(true, true) + " " + Emojis.SpeakerToken + " \n";
+                        msg = msg + player.getRepresentationUnfogged() + " " + Emojis.SpeakerToken + " \n";
                     } else {
-                        msg = msg + player.getRepresentation(true, true) + " \n";
+                        msg = msg + player.getRepresentationUnfogged() + " \n";
                     }
                 }
                 if (!players.isEmpty()) {

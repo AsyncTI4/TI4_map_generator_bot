@@ -27,7 +27,7 @@ public class ButtonHelperRelics {
             buttons.add(sdButton);
             buttons.add(pdsButton);
             buttons.add(tgButton);
-            String msg = p2.getRepresentation(true, true) + " Use buttons to decide what structure to build";
+            String msg = p2.getRepresentationUnfogged() + " Use buttons to decide what structure to build";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
             ButtonHelper.deleteMessage(event);
         }
@@ -46,7 +46,7 @@ public class ButtonHelperRelics {
                 message = player.getFactionEmoji()
                     + " Drew 2 ACs With Scheming. Please Discard 1 AC with the blue buttons";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentation(true, true) + " use buttons to discard",
+                    player.getRepresentationUnfogged() + " use buttons to discard",
                     ACInfo.getDiscardActionCardButtons(game, player, false));
             } else if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);

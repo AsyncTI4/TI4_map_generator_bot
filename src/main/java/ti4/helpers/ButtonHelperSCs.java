@@ -237,7 +237,7 @@ public class ButtonHelperSCs {
                 message = "Wants to draw an SO but has people ahead of them in speaker order who need to resolve first. They have been queued and will automatically draw an SO when everyone ahead of them is clear."
                     + " They may cancel this by hitting 'No Follow'";
                 if (!game.isFowMode()) {
-                    message = message + "\n" + player2.getRepresentation(true, true)
+                    message = message + "\n" + player2.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on. Remember it is not enough to simply draw an SO, they will also need to discard one. ";
                 }
                 game.setStoredValue(key2,
@@ -282,7 +282,7 @@ public class ButtonHelperSCs {
 
         if (player.hasAbility("military_industrial_complex")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
-                .getRepresentation(true, true)
+                .getRepresentationUnfogged()
                 + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
             return;
         }
@@ -326,7 +326,7 @@ public class ButtonHelperSCs {
                     p2.setCommodities(p2.getCommodities() - washedCommsPower);
                     ButtonHelperAbilities.pillageCheck(p2, game);
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                        p2.getRepresentation(true, true) + " " + washedCommsPower
+                        p2.getRepresentationUnfogged() + " " + washedCommsPower
                             + " of your commodities got washed in the process of washing "
                             + ButtonHelper.getIdentOrColor(player, game));
                     ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
@@ -338,7 +338,7 @@ public class ButtonHelperSCs {
                     p2.setCommodities(0);
                     ButtonHelperAbilities.pillageCheck(p2, game);
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                        p2.getRepresentation(true, true)
+                        p2.getRepresentationUnfogged()
                             + " your commodities got washed in the process of washing "
                             + ButtonHelper.getIdentOrColor(player, game));
                     ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
@@ -721,7 +721,7 @@ public class ButtonHelperSCs {
         ButtonHelper.addReaction(event, false, false, message, "");
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentation(true, true) + " use buttons to discard",
+                player.getRepresentationUnfogged() + " use buttons to discard",
                 ACInfo.getDiscardActionCardButtons(game, player, false));
         }
         CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);

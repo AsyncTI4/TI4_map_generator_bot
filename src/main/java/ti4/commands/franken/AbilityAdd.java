@@ -69,7 +69,7 @@ public class AbilityAdd extends AbilityAddRemove {
             if (abilityID.equalsIgnoreCase("diplomats")) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set up free people ability markers. " + player.getRepresentation(true, true)
+                    "Set up free people ability markers. " + player.getRepresentationUnfogged()
                         + " any planet with the free people token on it will show up as spendable in your various spends. Once spent, the token will be removed");
             }
         }

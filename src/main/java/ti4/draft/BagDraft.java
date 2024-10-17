@@ -81,7 +81,7 @@ public abstract class BagDraft {
         }
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
-            player.getRepresentation(true, true) + " you have been passed a new draft bag!",
+            player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
             Buttons.gray(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
     }
 
