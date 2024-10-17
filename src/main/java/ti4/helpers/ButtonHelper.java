@@ -470,6 +470,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("resolveAlliancePlanetTrade_")
     public static void resolveAllianceMemberPlanetTrade(Player p1, Game game, ButtonInteractionEvent event, String buttonID) {
         String dmzPlanet = buttonID.split("_")[1];
         String receiverFaction = buttonID.split("_")[2];
@@ -508,6 +509,7 @@ public class ButtonHelper {
         }
     }
 
+    @ButtonHandler("resolveDMZTrade_")
     public static void resolveDMZTrade(Player p1, Game game, ButtonInteractionEvent event, String buttonID) {
         String dmzPlanet = buttonID.split("_")[1];
         String receiverFaction = buttonID.split("_")[2];
@@ -1208,22 +1210,20 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
             if (checkForTechSkips(game, planet)) {
-                buttons.add(Buttons.green("psychoExhaust_" + planet,
-                    "Exhaust " + Helper.getPlanetRepresentation(planet, game)));
+                buttons.add(Buttons.green("psychoExhaust_" + planet, "Exhaust " + Helper.getPlanetRepresentation(planet, game)));
             }
         }
         buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
         return buttons;
     }
 
+    @ButtonHandler("psychoExhaust_")
     public static void resolvePsychoExhaust(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
         int oldTg = player.getTg();
         player.setTg(oldTg + 1);
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
-                + " and gained 1TG (" + oldTg + "->" + player.getTg() + ") using the Psychoarcheology tech");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and gained 1TG (" + oldTg + "->" + player.getTg() + ") using the Psychoarcheology tech");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
         deleteTheOneButton(event);
@@ -1235,13 +1235,11 @@ public class ButtonHelper {
         if (buttonID.contains("tech_")) {
             last = buttonID.replace("tech_", "");
             player.refreshTech(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
-            CommanderUnlockCheck.checkPlayer(player, game, "kolume", event);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied tech: " + Mapper.getTech(last).getRepresentation(false));
+            CommanderUnlockCheck.checkPlayer(player, "kolume");
         } else {
             player.refreshPlanet(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                + " readied planet: " + Helper.getPlanetRepresentation(last, game));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied planet: " + Helper.getPlanetRepresentation(last, game));
         }
     }
 

@@ -30,6 +30,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -1365,6 +1366,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true) + " select the planet you want to Infiltrate", buttons);
     }
 
+    @ButtonHandler("resolveUpgrade_")
     public static void resolveUpgrade(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
@@ -1521,6 +1523,7 @@ public class ButtonHelperActionCards {
             player.getRepresentation(true, true) + " use buttons to move up to 2 troops", buttons);
     }
 
+    @ButtonHandler("resolveEmergencyRepairs_")
     public static void resolveEmergencyRepairs(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);

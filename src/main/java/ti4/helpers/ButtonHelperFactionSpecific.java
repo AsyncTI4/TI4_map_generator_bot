@@ -118,6 +118,7 @@ public class ButtonHelperFactionSpecific {
         player.removeDebtTokens(game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1);
     }
 
+    @ButtonHandler("collateralizedLoans_")
     public static void collateralizedLoans(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
@@ -135,6 +136,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("gheminaMechStart_")
     public static void gheminaMechStart(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
 
@@ -756,6 +758,7 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    @ButtonHandler("tnelisDeploy_")
     public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];
@@ -775,6 +778,7 @@ public class ButtonHelperFactionSpecific {
             player.getRepresentation(true, true) + " pay 3r for the mech", options);
     }
 
+    @ButtonHandler("raghsCallStepOne_")
     public static void resolveRaghsCallStepOne(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String origPlanet = buttonID.split("_")[1];
@@ -793,6 +797,7 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("hacanMechTradeStepOne_")
     public static void resolveHacanMechTradeStepOne(Player hacan, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String origPlanet = buttonID.split("_")[1];
@@ -810,6 +815,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("productionBiomes_")
     public static void resolveProductionBiomesStep2(Player hacan, Game game, ButtonInteractionEvent event,
         String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -972,6 +978,7 @@ public class ButtonHelperFactionSpecific {
         StartPhase.startActionPhase(event, game);
     }
 
+    @ButtonHandler("raghsCallStepTwo_")
     public static void resolveRaghsCallStepTwo(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String origPlanet = buttonID.split("_")[1];
@@ -1004,6 +1011,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("hacanMechTradeStepTwo_")
     public static void resolveHacanMechTradeStepTwo(Player hacan, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String origPlanet = buttonID.split("_")[1];
@@ -1910,6 +1918,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    @ButtonHandler("scourPlanet_")
     public static void resolveScour(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " used the Scour ability to discard 1 AC and ready "
@@ -2099,6 +2108,7 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    @ButtonHandler("creussMechStep3_")
     public static void creussMechStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String tilePos = buttonID.split("_")[1];
         String type = buttonID.split("_")[2];
@@ -2130,6 +2140,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("nivynMechStep2_")
     public static void nivynMechStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String tilePos = buttonID.split("_")[1];
         String tokenName = "wound";
@@ -2162,10 +2173,11 @@ public class ButtonHelperFactionSpecific {
         }
         String msg = sb.toString();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        CommanderUnlockCheck.checkPlayer(player, game, "nivyn", event);
+        CommanderUnlockCheck.checkPlayer(player, "nivyn");
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("creussMechStep2_")
     public static void creussMechStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         String tilePos = buttonID.split("_")[1];
@@ -2173,12 +2185,12 @@ public class ButtonHelperFactionSpecific {
         buttons.add(Buttons.green("creussMechStep3_" + tilePos + "_beta", "Beta", Emojis.CreussBeta));
         buttons.add(Buttons.blue("creussMechStep3_" + tilePos + "_gamma", "Gamma", Emojis.CreussGamma));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " choose the type of wormhole you wish to place in " + tilePos
-                + ".",
+            player.getRepresentation(true, true) + " choose the type of wormhole you wish to place in " + tilePos + ".",
             buttons);
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("creussMechStep1_")
     public static void creussMechStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
@@ -2191,6 +2203,7 @@ public class ButtonHelperFactionSpecific {
             buttons);
     }
 
+    @ButtonHandler("nivynMechStep1_")
     public static void nivynMechStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)) {
@@ -2251,6 +2264,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("creussIFFResolve_")
     public static void resolveCreussIFF(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         String pos = buttonID.split("_")[2];

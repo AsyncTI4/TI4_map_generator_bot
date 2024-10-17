@@ -1141,6 +1141,7 @@ public class ButtonHelperHeroes {
         return empties;
     }
 
+    @ButtonHandler("cabalHeroTile_")
     public static void executeCabalHero(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
         String pos = buttonID.replace("cabalHeroTile_", "");
         Tile tile = game.getTileByPosition(pos);
@@ -1319,6 +1320,7 @@ public class ButtonHelperHeroes {
 
     }
 
+    @ButtonHandler("augerHeroSwap.")
     public static void augersHeroSwap(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         buttonID = buttonID.replace("augerHeroSwap.", "");
         String id = StringUtils.substringAfter(buttonID, ".");
@@ -1335,6 +1337,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("augersHeroStart_")
     public static void augersHeroResolution(Player player, Game game, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
@@ -1409,6 +1412,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
     }
 
+    @ButtonHandler("olradinHeroFlip_")
     public static void olradinHeroFlipPolicy(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         int negativePolicies = 0;
@@ -1764,6 +1768,7 @@ public class ButtonHelperHeroes {
 
     }
 
+    @ButtonHandler("creussHeroStep1_")
     public static void getGhostHeroTilesStep2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String pos1 = buttonID.split("_")[1];
@@ -1807,6 +1812,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(vaden.getCorrectChannel(), "Use buttons to resolve", buttons);
     }
 
+    @ButtonHandler("vadenHeroClearDebt")
     public static void vadenHeroClearDebt(Game game, Player vaden, ButtonInteractionEvent event, String buttonID) {
         Player target = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
@@ -1828,6 +1834,7 @@ public class ButtonHelperHeroes {
         }
     }
 
+    @ButtonHandler("sendVadenHeroSomething_")
     public static void sendVadenHeroSomething(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String tgOrComm = buttonID.split("_")[2];
@@ -2055,6 +2062,7 @@ public class ButtonHelperHeroes {
         }
     }
 
+    @ButtonHandler("creussHeroStep2_")
     public static void resolveGhostHeroStep2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String position = buttonID.split("_")[1];

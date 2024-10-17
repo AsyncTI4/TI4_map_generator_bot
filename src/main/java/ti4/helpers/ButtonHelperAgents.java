@@ -267,6 +267,7 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
+    @ButtonHandler("spendStratNReadyAgent_")
     public static void resolveAbsolHyperAgentReady(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String agent = StringUtils.substringAfterLast(buttonID, "_");
         player.setStrategicCC(player.getStrategicCC() - 1);
@@ -299,20 +300,19 @@ public class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("nekroAgentRes_")
     public static void nekroAgentRes(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
-        p2.setTg(p2.getTg() + 2);
+        String msg2 = ButtonHelper.getIdentOrColor(player, game) + " selected "
+        + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+        + "Nekro Malleon, the Nekro" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
+        String message = p2.getRepresentation(true, true) + " increased your TGs by 2 " + p2.gainTG(2)
+        + ". Use buttons in your cards info thread to discard 1 AC, or lose 1 CC";
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
         ButtonHelperAbilities.pillageCheck(p2, game);
         resolveArtunoCheck(p2, game, 2);
-        String msg2 = ButtonHelper.getIdentOrColor(player, game) + " selected "
-            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-            + "Nekro Malleon, the Nekro" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
-        String message = p2.getRepresentation(true, true) + " increased your TGs by 2 (" + (p2.getTg() - 2) + "->"
-            + p2.getTg()
-            + "). Use buttons in your cards info thread to discard 1 AC, or lose 1 CC";
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentation(true, true) + " use buttons to discard",
             ACInfo.getDiscardActionCardButtons(game, p2, false));
@@ -336,6 +336,7 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
+    @ButtonHandler("kolleccAgentRes_")
     public static void kolleccAgentResStep1(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String faction = buttonID.split("_")[1];
@@ -465,6 +466,7 @@ public class ButtonHelperAgents {
             unitButtons);
     }
 
+    @ButtonHandler("vaylerianAgent_")
     public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -2082,6 +2084,7 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
+    @ButtonHandler("step2axisagent_")
     public static void resolveStep2OfAxisAgent(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         List<Button> buttons = new ArrayList<>();

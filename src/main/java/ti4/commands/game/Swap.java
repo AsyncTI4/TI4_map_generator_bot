@@ -73,7 +73,7 @@ public class Swap extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
-    public void secondHalfOfSwap(Game game, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
+    public static void secondHalfOfSwap(Game game, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
         StringBuilder message = new StringBuilder("Users have swapped factions:\n");
         message.append("> **Before:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
         Collection<Player> players = game.getPlayers().values();

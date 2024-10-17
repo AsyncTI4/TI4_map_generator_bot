@@ -27,6 +27,7 @@ import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -39,6 +40,7 @@ import ti4.model.TechnologyModel;
 
 public class ButtonHelperCommanders {
 
+    @ButtonHandler("cheiranCommanderBlock_")
     public static void cheiranCommanderBlock(Player player, Game game, ButtonInteractionEvent event) {
         String msg2 = "";
         int oldThing = 0;
@@ -63,6 +65,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
+    @ButtonHandler("kortaliCommanderBlock_")
     public static void kortaliCommanderBlock(Player player, Game game, ButtonInteractionEvent event) {
         String msg = player.getFactionEmojiOrColor()
             + " used Queen Lorena, the Kortali commander, to cancel 1 hit in the first round of combat.";
@@ -174,6 +177,7 @@ public class ButtonHelperCommanders {
 
     }
 
+    @ButtonHandler("yinCommanderStep1_")
     public static void yinCommanderStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Infantry)) {
@@ -193,6 +197,7 @@ public class ButtonHelperCommanders {
             player.getRepresentation(true, true) + " use buttons to remove 1 infantry", buttons);
     }
 
+    @ButtonHandler("yinCommanderRemoval_")
     public static void resolveYinCommanderRemoval(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
@@ -371,16 +376,16 @@ public class ButtonHelperCommanders {
         }
     }
 
+    @ButtonHandler("placeGhostCommanderFF_")
     public static void resolveGhostCommanderPlacement(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", game);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation()
-                + " using Sai Seravus, the Creuss commander");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " placed 1 fighter in " + tile.getRepresentation() + " using Sai Seravus, the Creuss commander");
     }
 
+    @ButtonHandler("placeKhraskCommanderInf_")
     public static void resolveKhraskCommanderPlacement(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
