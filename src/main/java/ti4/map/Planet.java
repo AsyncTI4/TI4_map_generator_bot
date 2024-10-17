@@ -245,6 +245,7 @@ public class Planet extends UnitHolder {
         return planetType;
     }
 
+    @JsonIgnore
     public PlanetModel getPlanetModel() {
         return Mapper.getPlanet(getName());
     }
