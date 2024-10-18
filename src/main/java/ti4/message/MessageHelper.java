@@ -794,8 +794,8 @@ public class MessageHelper {
 					button = Button.of(button.getStyle(), button.getId(), label);
 				}
 			}
-			if (button.getEmoji() instanceof UnicodeEmoji) {
-				BotLogger.log("sanitizeButtons: Temporary Logging of UnicodeEmojis on buttons: " + button.getEmoji().getFormatted() + " `" + button.getEmoji().getFormatted() + "`");
+			if (button.getEmoji() instanceof UnicodeEmoji emoji) {
+				BotLogger.log("sanitizeButtons: Temporary Logging of UnicodeEmojis on buttons:\n> " + emoji.getName() + ": " + emoji.getFormatted() + " `" + emoji.getFormatted() + "`  CP:" + emoji.getAsCodepoints() + "  RC:" + emoji.getAsReactionCode());
 			}
 			newButtons.add(button);
 		}
