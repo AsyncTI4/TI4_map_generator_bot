@@ -72,7 +72,7 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         ACInfo.sendActionCardInfo(game, player);
     }
 
-    public static void pickACardFromDiscardStep1(Game game, Player player) {
+    public static void pickACardFromDiscardStep1(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : game.getDiscardActionCards().keySet()) {
             buttons.add(Buttons.green("pickFromDiscard_" + acStringID, Mapper.getActionCard(acStringID).getName()));

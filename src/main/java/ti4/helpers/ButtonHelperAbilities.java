@@ -507,7 +507,7 @@ public class ButtonHelperAbilities {
 
     public static void autoneticMemoryStep3a(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        PickACFromDiscard.pickACardFromDiscardStep1(game, player);
+        PickACFromDiscard.pickACardFromDiscardStep1(event, game, player);
     }
 
     public static void addOmenDie(Game game, int omenDie) {

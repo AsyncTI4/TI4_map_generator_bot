@@ -1833,6 +1833,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("repealLaw_")
     public static void repealLaw(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String numID = buttonID.split("_")[1];
         String name = "";

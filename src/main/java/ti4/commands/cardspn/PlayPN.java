@@ -188,7 +188,7 @@ public class PlayPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         if ("dspncymi".equalsIgnoreCase(id)) {
-            PickACFromDiscard.pickACardFromDiscardStep1(game, player);
+            PickACFromDiscard.pickACardFromDiscardStep1(event, game, player);
         }
         if ("dspnkort".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "kortalipn");
