@@ -86,11 +86,12 @@ public class WebHelper {
                 .bucket(webProperties.getProperty("bucket"))
                 .key(String.format("overlays/%s/%s.json", game.getID(), game.getID()))
                 .contentType("application/json")
+                .cacheControl("no-cache, no-store, must-revalidate")
                 .build();
 
             s3.putObject(request, RequestBody.fromString(json));
         } catch (Exception e) {
-            BotLogger.log("Could not put data to web server", e);
+            BotLogger.log("Could not put overlay to web server", e);
         }
     }
 

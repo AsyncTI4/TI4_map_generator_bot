@@ -4137,6 +4137,14 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<ColorModel> getUnusedColors() {
+        List<String> priorityColourIDs = List.of("red", "blue", "yellow", "purple", "green", "orange", "pink", "black");
+        List<ColorModel> priorityColours = priorityColourIDs.stream()
+            .map(Mapper::getColor)
+            .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
+            .toList();
+        if (!priorityColours.isEmpty()) {
+            return priorityColours;
+        }
         return Mapper.getColors().stream()
             .filter(color -> getPlayers().values().stream().noneMatch(player -> player.getColor().equals(color.getName())))
             .toList();
