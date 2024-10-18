@@ -96,6 +96,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
+import ti4.model.AgendaModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
@@ -819,10 +820,11 @@ public class MapGenerator {
                 }
                 y += 4;
 
-                // PAINT SCs
+                // PAINT STRATEGY CARDS (SCs)
                 Set<Integer> playerSCs = player.getSCs();
                 if (playerSCs.size() == 1) {
                     int sc = playerSCs.stream().findFirst().get();
+                    StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
                     String scText = sc == 0 ? " " : Integer.toString(sc);
                     if (sc != 0) {
                         scText = game.getSCNumberIfNaaluInPlay(player, scText);
@@ -844,16 +846,14 @@ public class MapGenerator {
                         if (sc == ButtonHelper.getKyroHeroSC(game)) {
                             graphics.drawString("" + (game.getSCList().size() + 1), x + 90, y + 70 + yDelta);
                         } else {
-                            if (sc == 1) {
-                                graphics.drawString(scText, x + 102, y + 70 + yDelta);
-                            } else {
-                                graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                            superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
+                            if (scModel != null) {
+                                game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
+                                // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setFont(Storage.getFont40());
-                                graphics.setColor(Color.RED);
-
-                                graphics.drawString("X", x + 100, y + 60 + yDelta);
+                                superDrawString(graphics, "X", x + 120, y + 60, Color.RED, HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             }
 
                         }
@@ -1322,7 +1322,7 @@ public class MapGenerator {
         Collection<Player> players = game.getPlayers().values();
         for (String pn : player.getPromissoryNotesInPlayArea()) {
             graphics.setColor(Color.WHITE);
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, "pn", pn);
 
             boolean commanderUnlocked = false;
             Player promissoryNoteOwner = game.getPNOwner(pn);
@@ -1342,10 +1342,9 @@ public class MapGenerator {
                         || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
-
-                        if (game.isFrankenGame())
-                            drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1,
-                                y + 86, 42, 42);
+                        if (game.isFrankenGame()) {
+                            drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
+                        }
                         drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
                         Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader != null) {
@@ -1373,8 +1372,7 @@ public class MapGenerator {
                 found: for (Tile tile : game.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
-                            drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png",
-                                unitHolder.getName());
+                            drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png", unitHolder.getName());
                             break found;
                         }
                     }
@@ -1413,6 +1411,9 @@ public class MapGenerator {
 
         List<String> exhaustedRelics = player.getExhaustedRelics();
 
+        int rectW = 44;
+        int rectH = 152;
+        int rectY = y - 2;
         for (String relicID : relics) {
             RelicModel relicModel = Mapper.getRelic(relicID);
             boolean isExhausted = exhaustedRelics.contains(relicID);
@@ -1423,11 +1424,7 @@ public class MapGenerator {
             }
 
             int rectX = x + deltaX - 2;
-            int rectY = y - 2;
-            int rectW = 44;
-            int rectH = 152;
-            graphics.drawRect(rectX, rectY, rectW, rectH);
-            game.addWebsiteOverlay(player, "relic", relicID, rectX, rectY, rectW, rectH);
+            drawRectWithOverlay(g2, rectX, rectY, rectW, rectH, game, "relic", relicID);
             drawPAImage(x + deltaX, y, "pa_relics_icon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
@@ -1529,7 +1526,7 @@ public class MapGenerator {
             }
 
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, "leader", leader.getId());
 
             if (Mapper.isValidLeader(leader.getId())) {
                 LeaderModel leaderModel = Mapper.getLeader(leader.getId());
@@ -1592,18 +1589,11 @@ public class MapGenerator {
                     if (mahactCCs.contains(playerColor)) {
                         Leader leader_ = player_.unsafeGetLeader(Constants.COMMANDER);
                         if (leader_ != null) {
-                            boolean locked = leader_.isLocked();
-                            String imperiaColorFile = "pa_leaders_imperia";
-                            if (locked) {
-                                imperiaColorFile += "_exh";
-                            } else {
-                                imperiaColorFile += "_rdy";
-                            }
-                            imperiaColorFile += ".png";
-                            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+                            String status_ = leader_.isLocked() ? "_exh" : "_rdy";
+                            String imperiaColorFile = "pa_leaders_imperia" + status_ + ".png";
+                            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "leader", leader_.getId());
                             drawPlayerFactionIconImage(graphics, player_, x + deltaX - 1, y + 108, 42, 42);
                             drawPAImage(x + deltaX, y, imperiaColorFile);
-                            String status_ = locked ? "_exh" : "_rdy";
                             String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
                             drawPAImage(x + deltaX, y, leaderPipInfo);
                             deltaX += 48;
@@ -2412,7 +2402,7 @@ public class MapGenerator {
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 148, 130);
             }
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "tech", tech);
             deltaX += 48;
         }
         return deltaX;
@@ -2462,7 +2452,7 @@ public class MapGenerator {
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 130, 110);
             }
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "tech", tech);
             deltaX += 48;
         }
         return deltaX;
@@ -2485,7 +2475,7 @@ public class MapGenerator {
             centerX += 5;
         }
         graphics.drawString(String.valueOf(stasisInfantry), x + deltaX + 3 + centerX, y + 148);
-        graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "stasisCapsule", String.valueOf(stasisInfantry));
         deltaX += 48;
         return deltaX;
     }
@@ -2616,18 +2606,18 @@ public class MapGenerator {
         }
 
         // Add faction icons on top of upgraded or upgradable units
-        for (String u : player.getUnitsOwned()) {
-            UnitModel unit = Mapper.getUnit(u);
-            if (unit == null) {
-                System.out.println("Invalid unitID found:" + u);
-            } else if (unit.getFaction().isPresent()) {
+        for (UnitModel unit : player.getUnitModels()) {
+            Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
+            if (unit.getFaction().isPresent()) {
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent() || unit.getUpgradesToUnitId().isPresent();
                 if (game.isFrankenGame() || unitHasUpgrade || player.getFactionModel().getAlias().equals("echoes")) {
                     // Always paint the faction icon in franken
-                    Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
                     drawFactionIconImage(graphics, unit.getFaction().get().toLowerCase(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
                 }
             }
+            // Unit Overlays
+            game.addWebsiteOverlay(player, "unit", unit.getId(), x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+            // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
         }
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 252, 152);
@@ -2926,6 +2916,7 @@ public class MapGenerator {
             if (sc == 0) {
                 continue;
             }
+            StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
             graphics.setFont(Storage.getFont64());
             int textWidth = graphics.getFontMetrics().stringWidth(Integer.toString(sc));
 
@@ -2936,6 +2927,8 @@ public class MapGenerator {
                 }
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
+                // graphics.drawRect(x, y + 24, textWidth, 64); // debug
+                game.addWebsiteOverlay("strategyCard", scModel.getId(), x, y + 24, textWidth, 60);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
                     graphics.setFont(Storage.getFont24());
@@ -3395,12 +3388,17 @@ public class MapGenerator {
             point.translate(-1 * (scsize / 2) * (playerSCs.size() - 1), -1 * (scsize / 2));
 
             for (int sc : playerSCs) {
+                StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
                 if (sc == 0) {
                     drawPAImageScaled(point.x, point.y, "pa_telepathic.png", scsize);
                     point.translate(scsize, 0);
                 } else {
                     int fontYoffset = (scsize / 2) + 25;
                     superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
+                    if (scModel != null) {
+                        game.addWebsiteOverlay("strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
+                    }
                     point.translate(scsize, 0);
                 }
             }
@@ -4150,8 +4148,12 @@ public class MapGenerator {
             String optionalText = lawsInfo.get(lawID);
             graphics.setFont(Storage.getFont35());
             graphics.setColor(LawColor);
+            AgendaModel agendaModel = Mapper.getAgenda(lawID);
 
             graphics.drawRect(x, y, 1178, 110);
+            if (agendaModel != null) {
+                game.addWebsiteOverlay("agenda", agendaModel.getAlias(), x, y, 1178, 110);
+            }
             String agendaTitle = Mapper.getAgendaTitle(lawID);
             if (agendaTitle == null) {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
@@ -4400,7 +4402,7 @@ public class MapGenerator {
             if (scoredPlayerID != null) {
                 drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, true);
             }
-            graphics.drawRect(x - 4, y - 5, 600, 38);
+            drawRectWithOverlay(graphics, x - 4, y - 5, 600, 38, game, "so", key);
 
             y += 43;
         }
@@ -6587,5 +6589,10 @@ public class MapGenerator {
         ColorSpace cs = ColorSpace.getInstance(ColorSpace.CS_GRAY);
         ColorConvertOp op = new ColorConvertOp(cs, null);
         return op.filter(image, null);
+    }
+
+    private static void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, String cardType, String cardID) {
+        g.drawRect(x, y, width, height);
+        game.addWebsiteOverlay(cardType, cardID, x, y, width, height);
     }
 }
