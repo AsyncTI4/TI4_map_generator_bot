@@ -90,7 +90,7 @@ public class WebHelper {
 
             s3.putObject(request, RequestBody.fromString(json));
         } catch (Exception e) {
-            BotLogger.log("Could not put data to web server", e);
+            BotLogger.log("Could not put overlay to web server", e);
         }
     }
 

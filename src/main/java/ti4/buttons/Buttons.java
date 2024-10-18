@@ -94,7 +94,7 @@ public class Buttons {
             return null;
         }
         if (e == null && (label == null || label.isBlank())) {
-            BotLogger.log("Button sanitized: " + id);
+            // BotLogger.log("Button sanitized: " + id);
             return Button.of(style, id, " ", e);
         }
         return Button.of(style, id, label, e);
