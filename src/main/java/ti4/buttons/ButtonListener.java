@@ -1058,26 +1058,27 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.deleteMessage(event);
         } else if (buttonID.startsWith("play_after_")) {
             String riderName = buttonID.replace("play_after_", "");
-            ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            String pnKey = "fin";
+
             if ("Keleres Rider".equalsIgnoreCase(riderName) || "Edyn Rider".equalsIgnoreCase(riderName)
                 || "Kyro Rider".equalsIgnoreCase(riderName)) {
                 if ("Keleres Rider".equalsIgnoreCase(riderName)) {
-                    String pnKey = "fin";
                     for (String pn : player.getPromissoryNotes().keySet()) {
                         if (pn.contains("rider")) {
                             pnKey = pn;
                         }
                     }
                     if ("fin".equalsIgnoreCase(pnKey)) {
-                        MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Keleres Rider");
+                        MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You don't have a Keleres Rider");
                         return;
                     }
-                    PlayPN.resolvePNPlay(pnKey, player, game, event);
-                }
-                if ("Edyn Rider".equalsIgnoreCase(riderName)) {
-                    String pnKey = "fin";
+                    if (player.getFaction().contains("keleres")) {
+                        MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You cannot play your own promissory note");
+                        return;
+                    }
+                } else if ("Edyn Rider".equalsIgnoreCase(riderName)) {
                     for (String pn : player.getPromissoryNotes().keySet()) {
                         if (pn.contains("dspnedyn")) {
                             pnKey = pn;
@@ -1087,10 +1088,7 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
                         return;
                     }
-                    PlayPN.resolvePNPlay(pnKey, player, game, event);
-                }
-                if ("Kyro Rider".equalsIgnoreCase(riderName)) {
-                    String pnKey = "fin";
+                } else if ("Kyro Rider".equalsIgnoreCase(riderName)) {
                     for (String pn : player.getPromissoryNotes().keySet()) {
                         if (pn.contains("dspnkyro")) {
                             pnKey = pn;
@@ -1100,9 +1098,13 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Kyro Rider");
                         return;
                     }
-                    PlayPN.resolvePNPlay(pnKey, player, game, event);
                 }
+
+                ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
+                PlayPN.resolvePNPlay(pnKey, player, game, event);
             } else {
+                ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
+
                 if (riderName.contains("Unity Algorithm")) {
                     player.exhaustTech("dsedyng");
                 }
