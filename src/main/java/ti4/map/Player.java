@@ -2847,6 +2847,10 @@ public class Player {
         return adjacentPlayers;
     }
 
+    public boolean isNeighboursWith(Player player) {
+        return getNeighbouringPlayers().contains(player);
+    }
+
     @JsonIgnore
     public int getNeighbourCount() {
         return getNeighbouringPlayers().size();
@@ -3146,5 +3150,12 @@ public class Player {
 
     public void checkCommanderUnlock(String factionToCheck) {
         CommanderUnlockCheck.checkPlayer(this, factionToCheck);
+    }
+
+    @JsonIgnore
+    public List<Player> getOtherRealPlayers() {
+        return getGame().getRealPlayers().stream()
+            .filter(p -> !p.equals(this))
+            .toList();
     }
 }
