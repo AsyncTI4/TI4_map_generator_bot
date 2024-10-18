@@ -52,6 +52,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.ShowDiscardedAgendas;
 import ti4.commands.cardsac.ACInfo;
@@ -2200,9 +2201,28 @@ public class ButtonHelper {
         return AgendaHelper.getPlayerOutcomeButtons(game, null, "exhaustAgent_" + agent, null);
     }
 
+    @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent && bevent.getMessage() != null)
+        if (event != null && event instanceof ButtonInteractionEvent bevent && bevent.getMessage() != null) {
             bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+            if (bevent.getButton() != null) {
+                String message = bevent.getButton().getId().replace("deleteMessage_", "");
+                if (!message.isEmpty()) {
+                    MessageHelper.sendMessageToEventChannel(event, message);
+                }
+            }
+        }
+    }
+
+    @ButtonHandler("editMessage_") // editMessage_{Optional String to edit the message to}
+    public static void editMessage(GenericInteractionCreateEvent event) {
+        if (event != null && event instanceof ButtonInteractionEvent bevent && bevent.getMessage() != null && bevent.getButton() != null) {
+            String message = bevent.getButton().getId().replace("editMessage_", "");
+            if (!message.isEmpty()) {
+                MessageHelper.sendMessageToEventChannel(event, message);
+            }
+            bevent.editMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
+        }
     }
 
     public static void deleteAllButtons(ButtonInteractionEvent event) {
@@ -6297,7 +6317,7 @@ public class ButtonHelper {
                 game.setStoredValue(messageId, player.getFaction());
             }
 
-            ButtonListener.checkForAllReactions(event, game);
+            UnfiledButtonHandlers.checkForAllReactions(event, game);
             if (message == null || message.isEmpty()) {
                 return;
             }
@@ -6357,7 +6377,7 @@ public class ButtonHelper {
                     } else {
                         game.setStoredValue(messageId, player.getFaction());
                     }
-                    ButtonListener.checkForAllReactions(messageId, game);
+                    UnfiledButtonHandlers.checkForAllReactions(messageId, game);
                     if (message == null || message.isEmpty()) {
                         return;
                     }

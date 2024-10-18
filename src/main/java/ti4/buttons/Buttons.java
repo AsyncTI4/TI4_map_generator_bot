@@ -110,4 +110,12 @@ public class Buttons {
         }
         return null;
     }
+
+    public static Button declineAndEdit(String buttonLabel, String editMessage) {
+        return gray("editMessage_" + editMessage, buttonLabel);
+    }
+
+    public static Button declineAndNotify(String buttonLabel, String notificationMessage) {
+        return gray("deleteMessage_" + notificationMessage, buttonLabel);
+    }
 }
