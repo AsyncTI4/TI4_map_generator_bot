@@ -40,6 +40,7 @@ import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.WebHelper;
+import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -260,10 +261,10 @@ public class GameEnd extends GameSubcommandData {
 
         for (int x = 1; x < game.getRound() + 1; x++) {
             String summary = "";
-            for (Player player : game.getRealPlayers()) {
-                String summaryKey = "endofround" + x + player.getFaction();
+            for (Player player : game.getPlayers().values()) {
+                String summaryKey = RoundSummaryHelper.resolveRoundSummaryKey(player, String.valueOf(x));
                 if (!game.getStoredValue(summaryKey).isEmpty()) {
-                    summary += player.getFactionEmoji() + ": " + game.getStoredValue(summaryKey) + "\n";
+                    summary += RoundSummaryHelper.resolvePlayerEmoji(player) + ": " + game.getStoredValue(summaryKey) + "\n";
                 }
             }
             if (!summary.isEmpty()) {

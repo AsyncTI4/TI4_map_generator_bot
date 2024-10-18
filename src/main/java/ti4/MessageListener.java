@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -182,6 +183,18 @@ public class MessageListener extends ListenerAdapter {
 
         String gameID = StringUtils.substringBefore(channelName, "-");
         boolean gameExists = mapList.contains(gameID);
+        
+        boolean isThreadEnabledSubcommand = 
+            (Constants.COMBAT.equals(eventName) && Constants.COMBAT_ROLL.equals(subCommandName));
+        if (!gameExists && channel instanceof ThreadChannel && isThreadEnabledSubcommand) {
+            IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
+            if (parentChannel != null) {
+                channelName = parentChannel.getName();
+                gameID = StringUtils.substringBefore(channelName, "-");
+                gameExists = mapList.contains(gameID);
+            }
+        }
+
         boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME)
             || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)
             || eventName.contains(Constants.DEVELOPER);
@@ -897,7 +910,7 @@ public class MessageListener extends ListenerAdapter {
                     game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
                 } else if (endOfRoundSummary) {
-                    RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true);
+                    RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);

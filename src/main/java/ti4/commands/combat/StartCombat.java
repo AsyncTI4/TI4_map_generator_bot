@@ -168,7 +168,7 @@ public class StartCombat extends CombatSubcommandData {
                 if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
                     continue;
                 }
-                createSpectatorThread(game, player3, threadName, tile, event);
+                createSpectatorThread(game, player3, threadName, tile, event, "space");
             }
         }
     }
@@ -207,7 +207,7 @@ public class StartCombat extends CombatSubcommandData {
                 if (!tile.getRepresentationForButtons(game, player3).contains("(")) {
                     continue;
                 }
-                createSpectatorThread(game, player3, threadName, tile, event);
+                createSpectatorThread(game, player3, threadName, tile, event, "ground");
             }
         }
     }
@@ -332,25 +332,45 @@ public class StartCombat extends CombatSubcommandData {
         }
     }
 
-    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event) {
+    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event,
+        String spaceOrGround) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),
             event, player);
 
+        // Use existing thread, if it exists
+        TextChannel textChannel = (TextChannel) player.getPrivateChannel();
+        for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
+            if (threadChannel_.getName().equals(threadName)) {
+                initializeSpectatorThread(threadChannel_, game, player, tile, event, systemWithContext, spaceOrGround);
+                return;
+            }
+        }
+        
         MessageChannel channel = player.getPrivateChannel();
         channel.sendMessage("Spectate Combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = ((TextChannel) channel).createThreadChannel(threadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             threadChannel.queue(tc -> {
-                StringBuilder message = new StringBuilder();
-                message.append(player.getRepresentationUnfogged());
-                message.append(" Please spectate the interaction here.\n");
-                message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
-                message.append("\nImage of System:");
-                MessageHelper.sendMessageWithFile(tc, systemWithContext, message.toString(), false);
-                sendGeneralCombatButtonsToThread(tc, game, player, player, tile, "justPicture", event);
+                initializeSpectatorThread(tc, game, player, tile, event, systemWithContext, spaceOrGround);
             });
         });
+    }
+
+    private static void initializeSpectatorThread(ThreadChannel threadChannel, Game game, Player player,
+        Tile tile, GenericInteractionCreateEvent event, FileUpload systemWithContext, String spaceOrGround) {
+        StringBuilder message = new StringBuilder();
+        message.append(player.getRepresentationUnfogged());
+        message.append(" Please spectate the interaction here.\n");
+        if ("ground".equals(spaceOrGround)) {
+            message.append("## Invasion");  
+        } else {
+            message.append("## Space Combat");            
+        }
+        message.append("\nPlease note, that although you can see the combat participants' messages, you cannot communicate with them.\n");
+        message.append("\nImage of System:");
+        MessageHelper.sendMessageWithFile(threadChannel, systemWithContext, message.toString(), false);
+        sendGeneralCombatButtonsToThread(threadChannel, game, player, player, tile, "justPicture", event);
     }
 
     public static void sendSpaceCannonButtonsToThread(MessageChannel threadChannel, Game game,

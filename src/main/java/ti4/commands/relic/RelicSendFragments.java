@@ -45,7 +45,7 @@ public class RelicSendFragments extends RelicSubcommandData {
 			return;
 		}
 		String trait = event.getOption(Constants.TRAIT, null, OptionMapping::getAsString);
-		int count = event.getOption(Constants.COUNT, 3, OptionMapping::getAsInt);
+		int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
 		ButtonHelperAbilities.pillageCheck(sender, game);
 		ButtonHelperAbilities.pillageCheck(receiver, game);
 		sendFrags(event, sender, receiver, trait, count, game);
