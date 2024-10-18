@@ -897,7 +897,7 @@ public class MessageListener extends ListenerAdapter {
                     game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
                 } else if (endOfRoundSummary) {
-                    RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true);
+                    RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
                     factionColor = AliasHandler.resolveFaction(factionColor);
