@@ -50,8 +50,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import ti4.ResourceHelper;
-import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
@@ -304,7 +304,7 @@ public class Helper {
             return false;
         }
         if (player.getAc() == 0) {
-            return !ButtonListener.checkForASpecificPlayerReact(messageID, player, game);
+            return !UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game);
         }
         if (player.isAFK()) {
             return false;
@@ -312,7 +312,7 @@ public class Helper {
         if (player.getAutoSaboPassMedian() == 0) {
             return false;
         }
-        return !ButtonListener.checkForASpecificPlayerReact(messageID, player, game);
+        return !UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game);
     }
 
     private static boolean playerHasSabotage(Player player) {
@@ -584,7 +584,7 @@ public class Helper {
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
         for (String messageID : messageIDs) {
-            if (!ButtonListener.checkForASpecificPlayerReact(messageID, player, game)) {
+            if (!UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game)) {
                 game.getMainGameChannel().retrieveMessageById(messageID).queue(mainMessage -> {
                     Emoji reactionEmoji = Emoji.fromFormatted(player.getFactionEmoji());
                     if (game.isFowMode()) {
@@ -633,13 +633,13 @@ public class Helper {
                 if (shouldDoIt2) {
                     String whensID = game.getLatestWhenMsg();
                     if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                        && !ButtonListener.checkForASpecificPlayerReact(whensID, player, game)) {
+                        && !UnfiledButtonHandlers.checkForASpecificPlayerReact(whensID, player, game)) {
                         String message = game.isFowMode() ? "No whens" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, whensID, game);
                     }
                     String aftersID = game.getLatestAfterMsg();
                     if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                        && !ButtonListener.checkForASpecificPlayerReact(aftersID, player, game)) {
+                        && !UnfiledButtonHandlers.checkForASpecificPlayerReact(aftersID, player, game)) {
                         String message = game.isFowMode() ? "No afters" : null;
                         ButtonHelper.addReaction(player, false, false, message, null, aftersID, game);
                     }
