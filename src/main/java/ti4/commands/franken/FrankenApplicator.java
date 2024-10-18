@@ -114,6 +114,7 @@ public class FrankenApplicator {
     private static void addStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {
         FactionModel faction = Mapper.getFaction(itemID);
         List<String> startingTech = faction.getStartingTech();
+        if (startingTech == null) return;
         for (String tech : startingTech) {
             TechAdd.addTech(event, player.getGame(), player, tech);
         }
@@ -122,6 +123,7 @@ public class FrankenApplicator {
     private static void removeStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {
         FactionModel faction = Mapper.getFaction(itemID);
         List<String> startingTech = faction.getStartingTech();
+        if (startingTech == null) return;
         for (String tech : startingTech) {
             TechRemove.removeTech(event, player, tech);
         }

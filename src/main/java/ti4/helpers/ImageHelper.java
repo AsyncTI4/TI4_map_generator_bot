@@ -30,6 +30,7 @@ import javax.imageio.ImageIO;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.MapGenerator;
+import ti4.helpers.Emojis.TI4Emoji;
 import ti4.message.BotLogger;
 
 public class ImageHelper {
@@ -107,6 +108,13 @@ public class ImageHelper {
             }
             return scale(image, width, height);
         });
+    }
+
+    @Nullable
+    public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
+        if (emoji.asEmoji() instanceof CustomEmoji e)
+            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
+        return null;
     }
 
     @Nullable

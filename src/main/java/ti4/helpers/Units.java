@@ -183,6 +183,10 @@ public class Units {
         return new UnitKey(u, colorID);
     }
 
+    public static UnitKey getUnitKey(UnitType unitType, String colorID) {
+        return new UnitKey(unitType, colorID);
+    }
+
     @Nullable
     public static UnitKey parseID(String id) {
         if (id.contains(".png")) {

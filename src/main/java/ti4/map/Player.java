@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,6 +43,7 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.commands.player.ChangeColor;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.user.UserSettings;
@@ -519,6 +521,11 @@ public class Player {
         return bagInfoThreadID;
     }
 
+    public String finChecker() {
+        return getFinsFactionCheckerPrefix();
+    }
+
+    @JsonIgnore
     public String getFinsFactionCheckerPrefix() {
         return "FFCC_" + getFaction() + "_";
     }
@@ -543,7 +550,7 @@ public class Player {
     @JsonIgnore
     public boolean hasWarsunTech() {
         return getTechs().contains("pws2") || getTechs().contains("dsrohdws") || getTechs().contains("ws")
-            || getTechs().contains("absol_ws")
+            || getTechs().contains("absol_ws") || getTechs().contains("absol_pws2")
             || hasUnit("muaat_warsun") || hasUnit("rohdhna_warsun");
     }
 
@@ -574,7 +581,26 @@ public class Player {
     }
 
     @JsonIgnore
+    @NotNull
     public ThreadChannel getCardsInfoThread() {
+        return getCardsInfoThread(true, false);
+    }
+
+    /**
+     * Will create new Player Cards-Info threads (even if they exist but are archived) unless they exist and are open
+     */
+    public void createCardsInfoThreadChannelsIfRequired() {
+        getCardsInfoThread(false, true);
+    }
+
+    /**
+     * @param useComplete if false, will skip the RestAction.complete() steps, which may cause new Cards Info threads to be created despite
+     * @param createWithQueue if true, will return null, and will create a new CardsInfo thread (if required) using a RestAction.queue() instead of a .complete()
+     * @return
+     */
+    @JsonIgnore
+    @Nullable
+    private ThreadChannel getCardsInfoThread(boolean useComplete, boolean createWithQueue) {
         Game game = getGame();
         TextChannel actionsChannel = game.getMainGameChannel();
         if (game.isFowMode() || game.isCommunityMode()) {
@@ -588,20 +614,20 @@ public class Player {
             return null;
         }
 
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-" + getUserName().replaceAll("/", "");
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-" + getUserName().replace("/", "");
         if (game.isFowMode()) {
-            threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
+            threadName = game.getName() + "-" + "cards-info-" + getUserName().replace("/", "") + "-private";
         }
 
-        // ATTEMPT TO FIND BY ID
-        String cardsInfoThreadID = getCardsInfoThreadID();
-        boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank()
-            && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
-        try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+        List<ThreadChannel> hiddenThreadChannels = new ArrayList<>();
 
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
+        // ATTEMPT TO FIND BY ID
+        try {
+            String cardsInfoThreadID = getCardsInfoThreadID();
+            boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
+            if (cardsInfoThreadID != null && hasCardsInfoThreadId) {
+                ThreadChannel threadChannel = actionsChannel.getGuild().getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null)
                     return threadChannel;
 
@@ -614,12 +640,13 @@ public class Player {
                 }
 
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels()
-                    .complete();
-                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
+                if (useComplete) {
+                    hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                    for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                        if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                            setCardsInfoThreadID(threadChannel_.getId());
+                            return threadChannel_;
+                        }
                     }
                 }
             }
@@ -629,23 +656,17 @@ public class Player {
 
         // ATTEMPT TO FIND BY NAME
         try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null)
-                    return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
                 }
+            }
 
-                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            if (useComplete) {
+                if (hiddenThreadChannels.isEmpty()) hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
@@ -654,8 +675,7 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log(
-                "`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thread using name: " + threadName, e);
         }
 
         // CREATE NEW THREAD
@@ -665,87 +685,24 @@ public class Player {
             isPrivateChannel = true;
         }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK);
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }
-        ThreadChannel threadChannel = threadAction.complete();
-        setCardsInfoThreadID(threadChannel.getId());
-        return threadChannel;
-    }
-
-    @JsonIgnore
-    public ThreadChannel getCardsInfoThreadWithoutCompletes() {
-        Game game = getGame();
-        TextChannel actionsChannel = game.getMainGameChannel();
-        if (game.isFowMode() || game.isCommunityMode())
-            actionsChannel = (TextChannel) getPrivateChannel();
-        if (actionsChannel == null) {
-            actionsChannel = game.getMainGameChannel();
-        }
-        if (actionsChannel == null) {
-            BotLogger.log(
-                "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: "
-                    + game.getName());
+        if (createWithQueue) {
+            threadAction.queue(c -> {
+                setCardsInfoThreadID(c.getId());
+                String message = "Hello " + getPing() + "! This is your private channel.";
+                MessageHelper.sendMessageToChannel(c, message);
+            }, BotLogger::catchRestError);
             return null;
         }
-
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + game.getName() + "-"
-            + getUserName().replaceAll("/", "");
-        if (game.isFowMode()) {
-            threadName = game.getName() + "-" + "cards-info-" + getUserName().replaceAll("/", "") + "-private";
+        ThreadChannel threadChannel = null;
+        if (useComplete) {
+            threadChannel = threadAction.complete();
+            setCardsInfoThreadID(threadChannel.getId());
         }
-
-        // ATTEMPT TO FIND BY ID
-        String cardsInfoThreadID = getCardsInfoThreadID();
-        boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank()
-            && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
-        try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null)
-                    return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-
-            }
-        } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: "
-                + cardsInfoThreadID + " for potential thread name: " + threadName, e);
-        }
-
-        // ATTEMPT TO FIND BY NAME
-        try {
-            if (hasCardsInfoThreadId) {
-                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-
-                ThreadChannel threadChannel = AsyncTI4DiscordBot.jda.getThreadChannelById(cardsInfoThreadID);
-                if (threadChannel != null)
-                    return threadChannel;
-
-                // SEARCH FOR EXISTING OPEN THREAD
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
-                        setCardsInfoThreadID(threadChannel_.getId());
-                        return threadChannel_;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            BotLogger.log(
-                "`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName,
-                e);
-        }
-
-        return null;
+        return threadChannel;
     }
 
     public void setUserID(String userID) {
@@ -902,6 +859,10 @@ public class Player {
         return promissoryNotes;
     }
 
+    public boolean hasPlayablePromissoryInHand(String pn) {
+        return getPromissoryNotes().containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
+    }
+
     public List<String> getPromissoryNotesInPlayArea() {
         return promissoryNotesInPlayArea;
     }
@@ -926,9 +887,10 @@ public class Player {
 
     @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
-        return unitsOwned.stream()
+        Set<String> specialUnits = new HashSet<>(unitsOwned.stream()
             .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
-            .collect(Collectors.toSet());
+            .collect(Collectors.toSet()));
+        return specialUnits;
     }
 
     public boolean hasUnit(String unit) {
@@ -996,16 +958,14 @@ public class Player {
         if (allUnits.size() == 1) {
             return allUnits.get(0);
         }
-        allUnits.sort((d1, d2) -> GetUnitModelPriority(d2, unitHolder) - GetUnitModelPriority(d1, unitHolder));
+        allUnits.sort((d1, d2) -> getUnitModelPriority(d2, unitHolder) - getUnitModelPriority(d1, unitHolder));
 
         return allUnits.get(0);
     }
 
-    private Integer GetUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
+    private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
-
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
-            && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse("")))
+        if (StringUtils.isNotBlank(unit.getFaction().orElse("")) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse("")))
             score += 4;
         if (StringUtils.isNotBlank(unit.getFaction().orElse("")))
             score += 3;
@@ -1038,7 +998,7 @@ public class Player {
     }
 
     @JsonIgnore
-    public Map<String, Integer> getUnitsOwnedByBaseType() {
+    private Map<String, Integer> getUnitsOwnedByBaseType() {
         Map<String, Integer> unitCount = new HashMap<>();
         for (String unitID : getUnitsOwned()) {
             UnitModel unitModel = Mapper.getUnit(unitID);
@@ -1483,6 +1443,11 @@ public class Player {
     }
 
     @JsonIgnore
+    public String getRepresentationUnfogged() {
+        return getRepresentation(true, true);
+    }
+
+    @JsonIgnore
     public String getRepresentationNoPing() {
         return getRepresentation(false, false);
     }
@@ -1562,9 +1527,9 @@ public class Player {
 
         StringBuilder sb = new StringBuilder(userById.getAsMention());
         switch (getUserID()) {
-            case "154000388121559040" -> sb.append(Emojis.BortWindow); // mysonisalsonamedbort
-            case "150809002974904321" -> sb.append(Emojis.SpoonAbides); // tispoon
-            case "228999251328368640" -> sb.append(Emojis.Scout); // Jazzx
+            case Constants.bortId -> sb.append(Emojis.BortWindow); // mysonisalsonamedbort
+            case Constants.tspId -> sb.append(Emojis.SpoonAbides); // tispoon
+            case Constants.jazzId -> sb.append(Emojis.Scout); // Jazzx
         }
         return sb.toString();
     }
@@ -1579,6 +1544,13 @@ public class Player {
             emoji = getFactionModel().getFactionEmoji();
         }
         return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
+    }
+
+    @JsonIgnore
+    public String fogSafeEmoji() {
+        if (getGame() != null && getGame().isFowMode())
+            return Emojis.getColorEmoji(getColor());
+        return getFactionEmoji();
     }
 
     @JsonIgnore
@@ -1706,7 +1678,7 @@ public class Player {
 
     public Optional<Leader> getLeaderByID(String leaderID) {
         for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID)) {
+            if (leader.getId().equalsIgnoreCase(leaderID)) {
                 return Optional.of(leader);
             }
         }
@@ -2098,7 +2070,6 @@ public class Player {
 
     public void setSCs(Set<Integer> SCs) {
         this.SCs = new LinkedHashSet<>(SCs);
-        this.SCs.remove(0); // TEMPORARY MIGRATION TO REMOVE 0 IF PLAYER HAS IT FROM OLD SAVES
     }
 
     public void addSC(int sc) {
@@ -2194,14 +2165,14 @@ public class Player {
         return techs.contains(techID);
     }
 
+    public boolean hasTechReady(String techID) {
+        return hasTech(techID) && !exhaustedTechs.contains(techID);
+    }
+
     public boolean controlsMecatol(boolean includeAlliance) {
         if (includeAlliance)
             return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
         return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);
-    }
-
-    public boolean hasTechReady(String techID) {
-        return hasTech(techID) && !exhaustedTechs.contains(techID);
     }
 
     public List<String> getPlanets() {
@@ -2876,6 +2847,10 @@ public class Player {
         return adjacentPlayers;
     }
 
+    public boolean isNeighboursWith(Player player) {
+        return getNeighbouringPlayers().contains(player);
+    }
+
     @JsonIgnore
     public int getNeighbourCount() {
         return getNeighbouringPlayers().size();
@@ -2983,10 +2958,12 @@ public class Player {
         if (getColor() != null && !getColor().equals("null")) {
             return getColor();
         }
+        Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
         String color = getPreferredColours().stream()
             .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
+            .filter(c -> !ChangeColor.colorIsExclusive(c, this))
             .findFirst()
-            .orElse(getGame().getUnusedColors().stream().findFirst().map(ColorModel::getName).orElse(null));
+            .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
     }
 
@@ -3021,6 +2998,17 @@ public class Player {
         } else {
             return getGame().getMainGameChannel();
         }
+    }
+
+    public String bannerName() {
+        String name = Mapper.getFaction(getFaction()).getFactionName().toUpperCase();
+        if (name.contains("KELERES")) {
+            return "THE COUNCIL KELERES";
+        }
+        if (name.contains("FRANKEN") && getDisplayName() != null && !getDisplayName().isEmpty() && !getDisplayName().equalsIgnoreCase("null")) {
+            return getDisplayName().toUpperCase();
+        }
+        return name;
     }
 
     public String getFlexibleDisplayName() {
@@ -3162,5 +3150,12 @@ public class Player {
 
     public void checkCommanderUnlock(String factionToCheck) {
         CommanderUnlockCheck.checkPlayer(this, factionToCheck);
+    }
+
+    @JsonIgnore
+    public List<Player> getOtherRealPlayers() {
+        return getGame().getRealPlayers().stream()
+            .filter(p -> !p.equals(this))
+            .toList();
     }
 }

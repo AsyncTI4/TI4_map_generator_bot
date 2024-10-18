@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import ti4.generator.Mapper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 
@@ -49,6 +51,15 @@ abstract public class UnitHolder {
         @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
+    }
+
+    public void inheritEverythingFrom(UnitHolder other) {
+        units.putAll(other.getUnits());
+        unitsDamage.putAll(other.getUnitDamage());
+
+        ccList.addAll(other.getCCList());
+        controlList.addAll(other.getControlList());
+        tokenList.addAll(other.getTokenList());
     }
 
     public void addUnit(UnitKey unit, Integer count) {
@@ -167,30 +178,39 @@ abstract public class UnitHolder {
     }
 
     public Map<UnitKey, Integer> getUnits() {
+        for (UnitKey uk : units.keySet())
+            if (units.get(uk) == null || units.get(uk) <= 0)
+                units.remove(uk);
         return units;
     }
 
-    @NotNull
-    public Integer getUnitCount(UnitType unitType, Player player) {
+    @JsonIgnore
+    public int getUnitCount() {
+        int count = 0;
+        for (Integer x : units.values())
+            if (x != null) count += x;
+        return count;
+    }
+
+    public int getUnitCount(UnitType unitType, Player player) {
         return getUnitCount(unitType, player.getColor());
     }
 
-    @NotNull
-    public Integer getUnitCount(UnitType unitType, String color) {
-        if (unitType == null || color == null) return 0;
-        String colorIDofUnit = Mapper.getColorID(color);
-        if (colorIDofUnit == null) {
-            colorIDofUnit = color;
-        }
-        String effinColor = colorIDofUnit;
-        return units.entrySet().stream()
-            .filter(e -> e != null && e.getKey() != null && e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(effinColor))
-            .findFirst().map(Entry::getValue).orElse(0);
+    public int getUnitCount(UnitType unitType, String color) {
+        UnitKey uk = Units.getUnitKey(unitType, Mapper.getColorID(color));
+        return getUnitCount(uk);
+    }
+
+    public int getUnitCount(UnitKey unitKey) {
+        return Optional.ofNullable(getUnits().get(unitKey)).orElse(0);
     }
 
     @JsonIgnore
     public boolean hasUnits() {
-        return !getUnits().isEmpty();
+        if (units == null) return false;
+        for (Integer count : units.values())
+            if (count > 0) return true;
+        return false;
     }
 
     @JsonProperty("unitsDamage")
@@ -203,6 +223,12 @@ abstract public class UnitHolder {
         return unitsDamage.entrySet().stream()
             .filter(e -> e.getKey().getUnitType() == unitType && e.getKey().getColorID().equals(colorID))
             .findFirst().map(Entry::getValue).orElse(0);
+    }
+
+    @NotNull
+    @JsonIgnore
+    public Integer getUnitDamageCount(UnitKey unitKey) {
+        return getUnitDamageCount(unitKey.getUnitType(), unitKey.getColorID());
     }
 
     /**
@@ -225,9 +251,9 @@ abstract public class UnitHolder {
         return holderCenterPosition;
     }
 
-    public Map<String, Integer> getUnitAsyncIdsOnHolder(String color) {
+    public Map<String, Integer> getUnitAsyncIdsOnHolder(String colorID) {
         return new HashMap<>(units.entrySet().stream()
-            .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(color))
+            .filter(unitEntry -> getUnitColor(unitEntry.getKey()).equals(Mapper.getColorID(colorID)))
             .collect(Collectors.toMap(entry -> getUnitAliasId(entry.getKey()), Entry::getValue)));
     }
 

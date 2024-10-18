@@ -2,8 +2,10 @@
 - [Setup a Test Bot](#setup-a-test-bot)
   - [Run Locally](#run-locally)
     - [JAVA, IntelliJ, VSCode, or other Java IDE](#java-intellij-vscode-or-other-java-ide)
+    - [Default Formatter](#default-formatter)
   - [Run Docker Container](#run-docker-container)
     - [Windows 10, VS Code, Docker Desktop](#windows-10-vs-code-docker-desktop)
+- [Adding New Buttons](#adding-new-buttons)
 - [Adding Homebrew Content](#adding-homebrew-content)
 - [Testing your Changes](#testing-your-changes)
   - [VSCode Test](#vscode-test)
@@ -93,6 +95,10 @@ docker run -v ${PWD}/storage:/opt/STORAGE tibot $discordBotKey $discordUserID $d
 ```
 
 Bot should now be running and able to receive commands on your test server!
+
+# Adding New Buttons
+
+Don't add anything to ButtonListener.java! The if/elseif chain and select case method is deprecated. Use the @ButtonHandler annotation on your resolver method, ideally nearby where you sent/created the button!
 
 # Adding Homebrew Content
 

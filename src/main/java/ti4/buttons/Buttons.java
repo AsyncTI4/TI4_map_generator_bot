@@ -6,12 +6,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.message.BotLogger;
 
 public class Buttons {
     public static final Button GET_A_TECH = green("acquireATech", "Get a Tech");
+    public static final Button GET_A_UNIT_TECH_WITH_INF = green("acquireAUnitTechWithInf", "Get a Unit Tech");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Tech");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute CCs");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
@@ -45,84 +47,57 @@ public class Buttons {
         REFRESH_PLANET_INFO,
         FACTION_EMBED);
 
-    /**
-     * A blue button (primary style)
-     */
+    /** A blue button (primary style) */
     public static Button blue(String buttonID, String buttonLabel) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
-        }
-        return Button.primary(buttonID, buttonLabel);
+        return makeButton(ButtonStyle.PRIMARY, buttonID, buttonLabel, null);
     }
 
-    /**
-     * A blue button (primary style) with an emoji
-     */
+    /** A blue button (primary style) with an emoji */
     public static Button blue(String buttonID, String buttonLabel, String emoji) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
-        }
-        return Button.primary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
+        return makeButton(ButtonStyle.PRIMARY, buttonID, buttonLabel, emoji);
     }
 
-    /**
-     * A gray button (secondary style)
-     */
+    /** A gray button (secondary style) */
     public static Button gray(String buttonID, String buttonLabel) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
-        }
-        return Button.secondary(buttonID, buttonLabel);
+        return makeButton(ButtonStyle.SECONDARY, buttonID, buttonLabel, null);
     }
 
-    /**
-     * A gray button (secondary style) with an emoji
-     */
+    /** A gray button (secondary style) with an emoji */
     public static Button gray(String buttonID, String buttonLabel, String emoji) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
-        }
-        return Button.secondary(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
+        return makeButton(ButtonStyle.SECONDARY, buttonID, buttonLabel, emoji);
     }
 
-    /**
-     * A green button (success style)
-     */
+    /** A green button (success style) */
     public static Button green(String buttonID, String buttonLabel) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
-        }
-        return Button.success(buttonID, buttonLabel);
+        return makeButton(ButtonStyle.SUCCESS, buttonID, buttonLabel, null);
     }
 
-    /**
-     * A green button (success style) with an emoji
-     */
+    /** A green button (success style) with an emoji */
     public static Button green(String buttonID, String buttonLabel, String emoji) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
-        }
-        return Button.success(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
+        return makeButton(ButtonStyle.SUCCESS, buttonID, buttonLabel, emoji);
     }
 
-    /**
-     * A red button (danger style) with an emoji
-     */
+    /** A red button (danger style) */
     public static Button red(String buttonID, String buttonLabel) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
-        }
-        return Button.danger(buttonID, buttonLabel);
+        return makeButton(ButtonStyle.DANGER, buttonID, buttonLabel, null);
     }
 
-    /**
-     * A red button (danger style) with an emoji
-     */
+    /** A red button (danger style) with an emoji */
     public static Button red(String buttonID, String buttonLabel, String emoji) {
-        if (StringUtils.isEmpty(buttonLabel)) {
-            buttonLabel = " ";
+        return makeButton(ButtonStyle.DANGER, buttonID, buttonLabel, emoji);
+    }
+
+    private static Button makeButton(ButtonStyle style, String id, String label, String emoji) {
+        Emoji e = getEmoji(emoji);
+        if (id == null || id.isBlank()) {
+            BotLogger.log("Illegal button attempt", new Throwable("Illegal button attempt"));
+            return null;
         }
-        return Button.danger(buttonID, buttonLabel).withEmoji(getEmoji(emoji));
+        if (e == null && (label == null || label.isBlank())) {
+            // BotLogger.log("Button sanitized: " + id);
+            return Button.of(style, id, " ", e);
+        }
+        return Button.of(style, id, label, e);
     }
 
     private static Emoji getEmoji(String emoji) {

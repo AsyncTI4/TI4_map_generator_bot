@@ -259,6 +259,14 @@ public class MessageHelper {
 		replyToMessage(event, fileUpload, false, null, false);
 	}
 
+	public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap) {
+		replyToMessage(event, fileUpload, forceShowMap, null, false);
+	}
+
+	public static void editMessageButtons(ButtonInteractionEvent event, List<Button> buttons) {
+		editMessageWithButtons(event, event.getMessage().getContentRaw(), buttons);
+	}
+
 	public static void editMessageWithButtons(ButtonInteractionEvent event, String message, List<Button> buttons) {
 		editMessageWithButtonsAndFiles(event, message, buttons, Collections.emptyList());
 	}
@@ -479,7 +487,7 @@ public class MessageHelper {
 		String message, String failText, String successText) {
 		int count = 0;
 		for (Player player : players) {
-			String playerRepresentation = player.getRepresentation(true, true);
+			String playerRepresentation = player.getRepresentationUnfogged();
 			boolean success = sendPrivateMessageToPlayer(player, game, feedbackChannel,
 				playerRepresentation + message, failText, successText);
 			if (success)
@@ -689,8 +697,7 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
-		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty()
-			|| messageToSend.isEmpty())
+		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty())
 			return;
 		if (channel instanceof TextChannel) {
 			Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
@@ -787,8 +794,8 @@ public class MessageHelper {
 					button = Button.of(button.getStyle(), button.getId(), label);
 				}
 			}
-			if (button.getEmoji() instanceof UnicodeEmoji) {
-				BotLogger.log("sanitizeButtons: Temporary Logging of UnicodeEmojis on buttons: " + button.getEmoji().getFormatted() + " `" + button.getEmoji().getFormatted() + "`");
+			if (button.getEmoji() instanceof UnicodeEmoji emoji) {
+				BotLogger.log("sanitizeButtons: Temporary Logging of UnicodeEmojis on buttons:\n> " + emoji.getName() + ": " + emoji.getFormatted() + " `" + emoji.getFormatted() + "`  CP:" + emoji.getAsCodepoints() + "  RC:" + emoji.getAsReactionCode());
 			}
 			newButtons.add(button);
 		}

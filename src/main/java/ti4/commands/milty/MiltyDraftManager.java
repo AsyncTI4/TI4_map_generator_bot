@@ -378,6 +378,8 @@ public class MiltyDraftManager {
         clearOldPing(game);
         setNextPlayerInDraft();
         if (draftIndex < draftOrder.size()) {
+            game.updateActivePlayer(getCurrentDraftPlayer(game));
+
             // Check if the next player only has one option to pick
             String fauxPlayerPick = null;
             Player nextDrafter = getCurrentDraftPlayer(game);
@@ -398,6 +400,7 @@ public class MiltyDraftManager {
         } else {
             MessageHelper.sendMessageToChannel(mainGameChannel, game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
             finishDraft(game, event);
+            game.updateActivePlayer(null);
         }
     }
 
@@ -446,6 +449,7 @@ public class MiltyDraftManager {
                     Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
                 }
             }
+            game.setPhaseOfGame("playerSetup");
             AddTileList.finishSetup(game, event);
             if (keleresExists) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " be sure to wait for keleres to get set up before dealing out secrets.");
@@ -551,7 +555,7 @@ public class MiltyDraftManager {
         for (MiltyDraftSlice slice : getSlices()) {
             if (isSliceTaken(slice.getName())) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getMiltyDraftEmoji(slice.getName()));
-            Button button = Buttons.green("milty_slice_" + slice.getName(), " ",  emoji.getFormatted());
+            Button button = Buttons.green("milty_slice_" + slice.getName(), " ", emoji.getFormatted());
             sliceButtons.add(button);
         }
         return sliceButtons;
@@ -578,7 +582,7 @@ public class MiltyDraftManager {
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getSpeakerPickEmoji(speakerOrder));
-            Button button = Buttons.green("milty_order_" + speakerOrder, " ",  emoji.getFormatted());
+            Button button = Buttons.green("milty_order_" + speakerOrder, " ", emoji.getFormatted());
             orderButtons.add(button);
         }
         return orderButtons;

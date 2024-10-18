@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +20,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +53,6 @@ import ti4.ResourceHelper;
 import ti4.buttons.ButtonListener;
 import ti4.buttons.Buttons;
 import ti4.commands.bothelper.ArchiveOldThreads;
-import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.game.SetOrder;
@@ -153,15 +152,19 @@ public class Helper {
         return player;
     }
 
+    public static List<String> unplayedACs(Game game) {
+        List<String> acs = new ArrayList<>(game.getActionCards());
+        for (Player p : game.getRealPlayers())
+            acs.addAll(p.getActionCards().keySet());
+        Collections.sort(acs);
+        return acs;
+    }
+
     public static boolean isSaboAllowed(Game game, Player player) {
-        if ("pbd100".equalsIgnoreCase(game.getName())) {
-            return true;
-        }
         if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
             return false;
         }
-        if (player.hasTech("tp") && game.getActivePlayerID() != null
-            && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
+        if (player.hasTech("tp") && game.getActivePlayerID() != null && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -173,6 +176,20 @@ public class Helper {
             return false;
         }
         return true;
+    }
+
+    public static String noSaboReason(Game game, Player player) {
+        if (checkForAllSabotagesDiscarded(game) || checkAcd2ForAllSabotagesDiscarded(game)) {
+            return "All sabotages are in the discard.";
+        }
+        if (player.hasTech("tp") && game.getActivePlayerID() != null && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player) continue;
+                if (!p2.isPassed()) return null;
+            }
+            return "Player has " + Emojis.Yssaril + " **Transparasteel Plating**, and all other players have passed.";
+        }
+        return null;
     }
 
     private static boolean checkForAllSabotagesDiscarded(Game game) {
@@ -188,6 +205,15 @@ public class Helper {
             && game.getDiscardActionCards().containsKey("sabotage2_acd2")
             && game.getDiscardActionCards().containsKey("sabotage3_acd2")
             && game.getDiscardActionCards().containsKey("sabotage4_acd2");
+    }
+
+    public static boolean doesAnyoneOwnPlanet(Game game, String planet) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.getPlanets().contains(planet)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean doesAllianceMemberOwnPlanet(Game game, String planet, Player p1) {
@@ -385,7 +411,7 @@ public class Helper {
         }
 
         for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
-            String message = player.getRepresentation(true, true) + " Drew Queued Secret Objective From Imperial. ";
+            String message = player.getRepresentationUnfogged() + " Drew Queued Secret Objective From Imperial. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {
@@ -403,7 +429,7 @@ public class Helper {
             if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                 && game.getStoredValue(key2).length() > 2) {
                 if (!game.isFowMode()) {
-                    message = player.getRepresentation(true, true)
+                    message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued Imperial follows.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -454,7 +480,7 @@ public class Helper {
             } else {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
-                    String message = player.getRepresentation(true, true)
+                    String message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued public objective scoring.";
                     if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring.";
@@ -464,7 +490,7 @@ public class Helper {
                 }
                 if (game.getStoredValue(key3b).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
-                    String message = player.getRepresentation(true, true)
+                    String message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                     if (game.isFowMode()) {
@@ -495,7 +521,7 @@ public class Helper {
             } else {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
                     && game.getStoredValue(key2).length() > 2) {
-                    String message = player.getRepresentation(true, true)
+                    String message = player.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on before advancing to the next player, with regards to queued secret objective scoring.";
                     if (game.isFowMode()) {
                         message = "Waiting on someone else before proceeding with scoring.";
@@ -768,14 +794,14 @@ public class Helper {
             return getSCName(sc, game);
         }
         return switch (sc) {
-            case 1 -> Emojis.SC1Mention;
-            case 2 -> Emojis.SC2Mention;
-            case 3 -> Emojis.SC3Mention;
-            case 4 -> Emojis.SC4Mention;
-            case 5 -> Emojis.SC5Mention;
-            case 6 -> Emojis.SC6Mention;
-            case 7 -> Emojis.SC7Mention;
-            case 8 -> Emojis.SC8Mention;
+            case 1 -> Emojis.SC1Mention();
+            case 2 -> Emojis.SC2Mention();
+            case 3 -> Emojis.SC3Mention();
+            case 4 -> Emojis.SC4Mention();
+            case 5 -> Emojis.SC5Mention();
+            case 6 -> Emojis.SC6Mention();
+            case 7 -> Emojis.SC7Mention();
+            case 8 -> Emojis.SC8Mention();
             default -> "**SC" + sc + "**";
         };
     }
@@ -864,6 +890,14 @@ public class Helper {
             name = new StringBuilder(name.substring(0, name.length() - 2) + ")");
         }
         return name.toString();
+    }
+
+    public static String getUnitHolderRepresentation(Tile tile, String planetOrSpace, Game game, Player player) {
+        if (planetOrSpace.equals("space")) {
+            return tile.getRepresentationForButtons(game, player);
+        } else {
+            return Helper.getPlanetRepresentation(planetOrSpace, game);
+        }
     }
 
     public static String getPlanetRepresentation(String planetID, Game game) {
@@ -1299,13 +1333,11 @@ public class Helper {
         String msg = player.getFactionEmoji() + " exhausted the following: \n";
         int res = 0;
         int inf = 0;
-        //boolean tech = false;
         if (resOrInfOrBoth.contains("tech")) {
             resOrInfOrBoth = resOrInfOrBoth.replace("tech", "");
-            //tech = true;
         }
         int tg = player.getSpentTgsThisWindow();
-        boolean xxcha = player.hasLeaderUnlocked("xxchahero");
+        boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
         int bestRes = 0;
         int keleresAgent = 0;
         for (String thing : spentThings) {
@@ -1345,38 +1377,36 @@ public class Helper {
                         }
                     }
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
-                        if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
-                            res = res + planet.getSumResourcesInfluence();
+                        if (xxchaHero) {
+                            msg += getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            res += planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResources(thing, game) + "\n";
-                            res = res + planet.getResources();
+                            msg += getPlanetRepresentationPlusEmojiPlusResources(thing, game) + "\n";
+                            res += planet.getResources();
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
-                        if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
-                            inf = inf + planet.getSumResourcesInfluence();
+                        if (xxchaHero) {
+                            msg += getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                            inf += planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusInfluence(thing, game) + "\n";
-                            inf = inf + planet.getInfluence();
+                            msg += getPlanetRepresentationPlusEmojiPlusInfluence(thing, game) + "\n";
+                            inf += planet.getInfluence();
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
-                        if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
-                            res = res + planet.getSumResourcesInfluence();
+                        msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                        if (xxchaHero) {
+                            res += planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
-                            res = res + Math.max(planet.getInfluence(), planet.getResources());
+                            res += planet.getMaxResInf();
                         }
                     } else {
-                        if (xxcha) {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
-                            inf = inf + planet.getSumResourcesInfluence();
-                            res = res + planet.getSumResourcesInfluence();
+                        msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
+                        if (xxchaHero) {
+                            inf += planet.getSumResourcesInfluence();
+                            res += planet.getSumResourcesInfluence();
                         } else {
-                            msg = msg + getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game) + "\n";
-                            inf = inf + planet.getInfluence();
-                            res = res + planet.getResources();
+                            inf += planet.getInfluence();
+                            res += planet.getResources();
                         }
                     }
                 }
@@ -1612,6 +1642,11 @@ public class Helper {
                 productionValueTotal++;
             }
         }
+        if (uH.getName().equals("space")) {
+            if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                productionValueTotal = productionValueTotal + 5;
+            }
+        }
 
         return productionValueTotal;
 
@@ -1621,14 +1656,11 @@ public class Helper {
         int productionValueTotal = 0;
         if (!singleDock) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
-                productionValueTotal = productionValueTotal + getProductionValueOfUnitHolder(player, game, tile, uH);
-            }
-            if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                productionValueTotal = productionValueTotal + 5;
+                productionValueTotal += getProductionValueOfUnitHolder(player, game, tile, uH);
             }
             if (tile.getUnitHolders().size() == 1 && player.hasTech("dsmorty")
                 && FoWHelper.playerHasShipsInSystem(player, tile)) {
-                productionValueTotal = productionValueTotal + 2;
+                productionValueTotal += 2;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
@@ -1887,7 +1919,8 @@ public class Helper {
         }
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet && !"sling".equalsIgnoreCase(warfareNOtherstuff)) {
-                if ("warfare".equalsIgnoreCase(warfareNOtherstuff) && !"mr".equalsIgnoreCase(unitHolder.getName())) {
+                boolean singleDock = "warfare".equalsIgnoreCase(warfareNOtherstuff);
+                if (singleDock) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
                         && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
                         && !player.hasUnit("saar_spacedock") && !player.hasUnit("absol_saar_spacedock")
@@ -1977,13 +2010,11 @@ public class Helper {
         if (player.hasTech("yso")) {
             if ("sling".equalsIgnoreCase(warfareNOtherstuff)) {
                 List<Button> unitButtons2 = new ArrayList<>();
-                unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+                unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use this to Yin Spin.", unitButtons2);
+                    player.getRepresentationUnfogged() + " you may use this to Yin Spin.", unitButtons2);
             } else {
-                unitButtons.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders")
-                    .withEmoji(Emoji.fromFormatted(Emojis.Yin)));
+                unitButtons.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
             }
         }
 
@@ -2155,23 +2186,14 @@ public class Helper {
         return ccCount;
     }
 
-    private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Game game, String color,
-        int ccCount) {
+    private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Game game, String color, int ccCount) {
         int limit = 16;
         if (!game.getStoredValue("ccLimit").isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
         }
         boolean ccCountIsOver = ccCount > limit;
         if (ccCountIsOver && game.isCcNPlasticLimit()) {
-            Player player = null;
-            String factionColor = AliasHandler.resolveColor(color.toLowerCase());
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor())) {
-                    player = player_;
-                }
-            }
+            Player player = game.getPlayerFromColorOrFaction(color);
 
             String msg = game.getPing() + " ";
             if (!game.isFowMode()) {
@@ -2182,187 +2204,80 @@ public class Helper {
             }
 
             msg += "(" + color + ") is over the command token limit of " + limit + ". Command tokens used: " + ccCount;
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            if (player != null) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            } else if (!game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+            }
         }
+    }
+
+    private static Integer getTotalPlanetSumValue(Game game, Player player, ToIntFunction<Planet> valueFunction) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            valueFunction = p -> p.getResources() + p.getInfluence();
+        }
+
+        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).mapToInt(valueFunction).sum();
+    }
+
+    private static Integer getAvailablePlanetSumValue(Game game, Player player, ToIntFunction<Planet> valueFunction) {
+        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
+        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
+
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            valueFunction = p -> p.getResources() + p.getInfluence();
+        }
+
+        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).mapToInt(valueFunction).sum();
     }
 
     public static Integer getPlayerResourcesAvailable(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        int resourcesCount = 0;
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
-            resourcesCount += resourcesCountFromPlanetsRes;
-        }
-
-        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getResources).sum();
-
-        resourcesCount += resourcesCountFromPlanets;
-        return resourcesCount;
+        return getAvailablePlanetSumValue(game, player, Planet::getResources);
     }
 
     public static Integer getPlayerResourcesTotal(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        int resourcesCount = 0;
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
-            resourcesCount += resourcesCountFromPlanetsRes;
-        }
-        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getResources).sum();
-
-        resourcesCount += resourcesCountFromPlanets;
-        return resourcesCount;
+        return getTotalPlanetSumValue(game, player, Planet::getResources);
     }
 
     public static Integer getPlayerOptimalResourcesAvailable(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-        }
-
-        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getOptimalResources).sum();
+        return getAvailablePlanetSumValue(game, player, Planet::getOptimalResources);
     }
 
     public static Integer getPlayerOptimalResourcesTotal(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-        }
-
-        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getOptimalResources).sum();
+        return getTotalPlanetSumValue(game, player, Planet::getOptimalResources);
     }
 
     public static Integer getPlayerInfluenceAvailable(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        int influenceCount = 0;
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> planet).mapToInt(Planet::getResources).sum();
-            influenceCount += influenceCountFromPlanetsRes;
-        }
-
-        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
-
-        influenceCount += influenceCountFromPlanets;
-        return influenceCount;
+        return getAvailablePlanetSumValue(game, player, Planet::getInfluence);
     }
 
     public static Integer getPlayerInfluenceTotal(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        int influenceCount = 0;
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> planet).mapToInt(Planet::getResources).sum();
-            influenceCount += influenceCountFromPlanetsRes;
-        }
-
-        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getInfluence).sum();
-
-        influenceCount += influenceCountFromPlanets;
-        return influenceCount;
+        return getTotalPlanetSumValue(game, player, Planet::getInfluence);
     }
 
     public static Integer getPlayerOptimalInfluenceAvailable(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
-                .mapToInt(Planet::getSumResourcesInfluence).sum();
-        }
-
-        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getOptimalInfluence).sum();
+        return getAvailablePlanetSumValue(game, player, Planet::getOptimalInfluence);
     }
 
     public static Integer getPlayerOptimalInfluenceTotal(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-        }
-
-        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getOptimalInfluence).sum();
+        return getTotalPlanetSumValue(game, player, Planet::getOptimalInfluence);
     }
 
     public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
-                .mapToInt(Planet::getSumResourcesInfluence).sum();
-        }
-
-        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
+        return getAvailablePlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
     }
 
     public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game game) {
-        if (player.getFaction() == null || player.getColor() == null || "null".equals(player.getColor())) {
-            return null;
-        }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-
-        Map<String, Planet> planetsInfo = game.getPlanetsInfo();
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> planet)
-                .mapToInt(Planet::getSumResourcesInfluence).sum();
-        }
-
-        return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
+        return getTotalPlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
     }
 
     public static String getPlayerResourceInfluenceRepresentation(Player player, Game game) {
@@ -2565,8 +2480,8 @@ public class Helper {
         }
     }
 
-    public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
-        return getTechButtons(techs, player, "nope");
+    public static List<Button> getTechButtons(List<TechnologyModel> techs, Player player) {
+        return getTechButtons(techs, player, "normal");
     }
 
     public static List<Button> getTechButtons(List<TechnologyModel> techs, Player player, String buttonPrefixType) {
@@ -2578,20 +2493,22 @@ public class Helper {
             String techName = tech.getName();
             String techID = tech.getAlias();
             String buttonID;
-            if ("nope".equalsIgnoreCase(buttonPrefixType)) { // default
-                buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID;
+            if ("normal".equalsIgnoreCase(buttonPrefixType) || "res".equalsIgnoreCase(buttonPrefixType)) { // default
+                buttonID = player.finChecker() + "getTech_" + techID;
             } else if ("nekro".equalsIgnoreCase(buttonPrefixType)) {
-                buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techID + "__noPay";
+                buttonID = player.finChecker() + "getTech_" + techID + "__noPay";
+            } else if ("free".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = player.finChecker() + "getTech_" + techID + "__noPay!comp";
+            } else if ("inf".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = player.finChecker() + "getTech_" + techID + "__inf";
             } else {
-                buttonID = "FFCC_" + player.getFaction() + "_swapTechs__" + buttonPrefixType + "__" + techID;
+                buttonID = player.finChecker() + "swapTechs__" + buttonPrefixType + "__" + techID;
             }
 
             ButtonStyle style;
             String requirementsEmoji = tech.getCondensedReqsEmojis(true);
             if (tech.isPropulsionTech()) {
                 style = ButtonStyle.PRIMARY;
-            } else if (tech.isCyberneticTech()) {
-                style = ButtonStyle.SECONDARY;
             } else if (tech.isBioticTech()) {
                 style = ButtonStyle.SUCCESS;
             } else if (tech.isWarfareTech()) {
@@ -2735,8 +2652,13 @@ public class Helper {
                 tile = game.getTile("17");
             }
             if (tile != null) {
-                hsLocations.add(Integer.parseInt(tile.getPosition()));
-                unsortedPlayers.put(Integer.parseInt(tile.getPosition()), player);
+                int parsedLocation = 9999;
+                try {
+                    parsedLocation = Integer.parseInt(tile.getPosition());
+                } catch (Exception e) {
+                }
+                hsLocations.add(parsedLocation);
+                unsortedPlayers.put(parsedLocation, player);
             }
         }
         Collections.sort(hsLocations);
@@ -2764,9 +2686,9 @@ public class Helper {
                 for (Player player : sortedPlayers) {
                     new SetOrder().setPlayerOrder(newPlayerOrder, players, player);
                     if (player.isSpeaker()) {
-                        msg = msg + player.getRepresentation(true, true) + " " + Emojis.SpeakerToken + " \n";
+                        msg = msg + player.getRepresentationUnfogged() + " " + Emojis.SpeakerToken + " \n";
                     } else {
-                        msg = msg + player.getRepresentation(true, true) + " \n";
+                        msg = msg + player.getRepresentationUnfogged() + " \n";
                     }
                 }
                 if (!players.isEmpty()) {
@@ -2907,16 +2829,12 @@ public class Helper {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
         if (defaultChannel == null || !(defaultChannel instanceof TextChannel)) {
             BotLogger.log("Default channel is not available or is not a text channel on " + guild.getName());
-        }
-        TextChannel textChannel = (TextChannel) defaultChannel;
-        try {
-            return textChannel.createInvite()
+        } else if (defaultChannel != null && defaultChannel instanceof TextChannel tc) {
+            return tc.createInvite()
                 .setMaxUses(uses)
                 .setMaxAge((long) (forever ? 0 : 4), TimeUnit.DAYS)
                 .complete()
                 .getUrl();
-        } catch (Exception e) {
-            BotLogger.log("Failed to create invite: " + e.getMessage() + " on " + guild.getName());
         }
         return "Whoops invalid url. Have one of the players on the server generate an invite";
     }

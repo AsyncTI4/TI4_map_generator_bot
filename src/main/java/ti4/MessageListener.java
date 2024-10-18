@@ -172,8 +172,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName,
-        String subCommandName) {
+    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
         String channelName = channel.getName();
         GameManager gameManager = GameManager.getInstance();
         Game userActiveGame = gameManager.getUserActiveGame(userID);
@@ -238,7 +237,7 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
 
-            autoPingGames(event);
+            autoPingGames();
             handleFoWWhispersAndFowCombats(event, msg);
             mapLog(event, msg);
             saveJSONInTTPGExportsChannel(event);
@@ -270,7 +269,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    private void autoPingGames(MessageReceivedEvent event) {
+    public static void autoPingGames() {
         Game mapreference = GameManager.getInstance().getGame("finreference");
         if (mapreference == null) return;
         int multiplier = 1000; // should be 1000
@@ -318,7 +317,7 @@ public class MessageListener extends ListenerAdapter {
                                         if (!timesPinged.equalsIgnoreCase("1")) {
                                             StringBuilder sb = new StringBuilder();
                                             Player p2 = player;
-                                            sb.append(p2.getRepresentation(true, true));
+                                            sb.append(p2.getRepresentationUnfogged());
                                             sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                                                 sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
@@ -336,7 +335,7 @@ public class MessageListener extends ListenerAdapter {
                                     if (timeDifference > twentyFourhrs) {
                                         if (!timesPinged.equalsIgnoreCase("2")) {
                                             Player p2 = player;
-                                            String sb = p2.getRepresentation(true, true) +
+                                            String sb = p2.getRepresentationUnfogged() +
                                                 Helper.getSCName(sc, game) + " has been played and now it has been the allotted time and they haven't reacted, so they have been marked as not following.\n";
 
                                             //MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), sb.toString());
@@ -404,7 +403,6 @@ public class MessageListener extends ListenerAdapter {
                 }
                 if (game.getAutoPingStatus() && spacer != 0 && !game.isTemporaryPingDisable()) {
                     if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
-
                         if (player != null || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                             long milliSinceLastPing = new Date().getTime()
                                 - game.getLastActivePlayerPing().getTime();
@@ -414,14 +412,14 @@ public class MessageListener extends ListenerAdapter {
                                 String realIdentity = null;
                                 String ping = null;
                                 if (player != null) {
-                                    realIdentity = player.getRepresentation(true, true);
+                                    realIdentity = player.getRepresentationUnfogged();
                                     ping = realIdentity + " this is a gentle reminder that it is your turn.";
                                     if (player != null && player.shouldPlayerBeTenMinReminded()
                                         && milliSinceLastPing > (60 * 5 * multiplier) && (60 * 60 * multiplier * spacer) > milliSinceLastPing) {
                                         ping = realIdentity + " this is a quick nudge in case you forgot to end turn. Please forgive the impertinance";
                                     }
                                     String playersInCombat = game.getStoredValue("factionsInCombat");
-                                    if (playersInCombat.contains(player.getFaction())) {
+                                    if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
                                         for (Player p2 : game.getRealPlayers()) {
                                             if (p2 == player) {
                                                 continue;
@@ -742,7 +740,7 @@ public class MessageListener extends ListenerAdapter {
         boolean messageToFutureColor = false;
         boolean messageToMyself = false;
         boolean messageToJazz = false;
-        boolean endOfRoundSummery = false;
+        boolean endOfRoundSummary = false;
         for (String color : colors) {
             if (messageLowerCase.startsWith("to" + color)) {
                 messageToColor = true;
@@ -757,14 +755,17 @@ public class MessageListener extends ListenerAdapter {
             messageToMyself = true;
         }
         if (messageLowerCase.startsWith("endofround")) {
-            endOfRoundSummery = true;
+            endOfRoundSummary = true;
         }
         if (messageLowerCase.startsWith("tojazz") || messageLowerCase.startsWith("tofuturejazz")) {
             messageToJazz = true;
         }
 
-        if (event.getChannel() instanceof ThreadChannel && event.getChannel().getName().contains("vs")
-            && event.getChannel().getName().contains("private")) {
+        // FoW - replicate messages in combat threads so that observers can see
+        boolean isFowCombatThread = event.getChannel() instanceof ThreadChannel
+            && event.getChannel().getName().contains("vs")
+            && event.getChannel().getName().contains("private");
+        if (isFowCombatThread) {
             String gameName2 = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
             Game game = GameManager.getInstance().getGame(gameName2);
@@ -826,14 +827,11 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                 }
-                // activeMap.getActionsChannel().addReactionById(event.getChannel().getId(),
-                // emojiToUse).queue();
-
             }
-
         }
 
-        if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz || endOfRoundSummery) {
+        // All Games - send whispers etc
+        if (messageToColor || messageToMyself || messageToFutureColor || messageToJazz || endOfRoundSummary) {
             String messageContent = StringUtils.substringAfter(messageText, " ");
             String messageBeginning = StringUtils.substringBefore(messageText, " ");
             String gameName = event.getChannel().getName();
@@ -858,10 +856,8 @@ public class MessageListener extends ListenerAdapter {
                 }
 
                 Player player_ = game.getPlayer(event.getAuthor().getId());
-
-                String jazzId = "228999251328368640";
-                if (messageToJazz && game.getRealPlayerIDs().contains(jazzId)) {
-                    if (player_.getUserID().equals(jazzId)) {
+                if (messageToJazz && game.getRealPlayerIDs().contains(Constants.jazzId)) {
+                    if (player_.getUserID().equals(Constants.jazzId)) {
                         messageToMyself = true;
                     } else {
                         if (messageLowerCase.startsWith("tofuture")) {
@@ -881,7 +877,7 @@ public class MessageListener extends ListenerAdapter {
                             player_ = player3;
                             break;
                         }
-                        if ("228999251328368640".equals(player3.getUserID()) && messageToJazz) {
+                        if (Constants.jazzId.equals(player3.getUserID()) && messageToJazz) {
                             player_ = player3;
                             break;
                         }
@@ -892,8 +888,7 @@ public class MessageListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found.");
                         return;
                     }
-                    Whisper.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(),
-                        event.getGuild());
+                    Whisper.sendWhisper(game, player, player_, messageContent, "n", event.getChannel(), event.getGuild());
                 } else if (messageToMyself) {
                     String previousThoughts = "";
                     if (!game.getStoredValue("futureMessageFor" + player.getFaction()).isEmpty()) {
@@ -901,7 +896,7 @@ public class MessageListener extends ListenerAdapter {
                     }
                     game.setStoredValue("futureMessageFor" + player.getFaction(), previousThoughts + messageContent);
                     MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " sent themselves a future message");
-                } else if (endOfRoundSummery) {
+                } else if (endOfRoundSummary) {
                     RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true);
                 } else {
                     String factionColor = StringUtils.substringBefore(messageLowerCase, " ").substring(8);
@@ -912,7 +907,7 @@ public class MessageListener extends ListenerAdapter {
                             player_ = player3;
                             break;
                         }
-                        if ("228999251328368640".equals(player3.getUserID()) && messageToJazz) {
+                        if (Constants.jazzId.equals(player3.getUserID()) && messageToJazz) {
                             player_ = player3;
                             break;
                         }

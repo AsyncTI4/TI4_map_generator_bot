@@ -13,13 +13,13 @@ public class Source {
         ds, absol, franken, uncharted_space,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises, 
+        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises,
 
         // async homebrew
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma,
+        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma,
 
         // catchall
         other;

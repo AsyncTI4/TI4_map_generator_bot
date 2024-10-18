@@ -2,10 +2,12 @@ package ti4.map;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
+import ti4.website.WebsiteOverlay;
 
 @Getter
 @Setter
@@ -56,6 +58,9 @@ public class GameProperties {
     private boolean componentAction;
     private boolean justPlayedComponentAC;
     private boolean hasHackElectionBeenPlayed;
+
+    // Website Overlays
+    private Map<String, WebsiteOverlay> websiteOverlays; // ID, WebsiteOverlay
 
     // Aggregate Game Stats
     private @ExportableField int activationCount;
@@ -108,7 +113,7 @@ public class GameProperties {
     private @ExportableField boolean spinMode;
     private @ExportableField boolean fastSCFollowMode;
     private @ExportableField boolean extraSecretMode;
-    private @ExportableField boolean cryypterMode;
+    private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
 
     // Discord Snowflakes
@@ -133,6 +138,10 @@ public class GameProperties {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private List<String> agendas;
-    private List<String> events;
+    private List<String> events; // ignis_aurora
 
+    // Misc Helpers
+    public String getID() {
+        return getName();
+    }
 }

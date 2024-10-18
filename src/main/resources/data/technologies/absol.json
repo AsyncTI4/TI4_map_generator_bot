@@ -921,7 +921,7 @@
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "GGG",
+        "requirements": "GG",
         "faction": "mahact",
         "baseUpgrade": "absol_inf2",
         "source": "absol",

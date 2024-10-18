@@ -2,9 +2,7 @@
     {
         "id": "biotic",
         "imagePath": "attachment_biotic.png",
-        "techSpeciality": [
-            "biotic"
-        ],
+        "techSpeciality": ["biotic"],
         "source": "pok"
     },
     {
@@ -17,9 +15,7 @@
     {
         "id": "cybernetic",
         "imagePath": "attachment_cybernetic.png",
-        "techSpeciality": [
-            "cybernetic"
-        ],
+        "techSpeciality": ["cybernetic"],
         "source": "pok"
     },
     {
@@ -78,9 +74,7 @@
     {
         "id": "propulsion",
         "imagePath": "attachment_propulsion.png",
-        "techSpeciality": [
-            "propulsion"
-        ],
+        "techSpeciality": ["propulsion"],
         "source": "pok"
     },
     {
@@ -114,11 +108,7 @@
         "imagePath": "attachment_titanspn.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
-        "planetTypes": [
-            "cultural",
-            "industrial",
-            "hazardous"
-        ],
+        "planetTypes": ["cultural", "industrial", "hazardous"],
         "source": "pok"
     },
     {
@@ -130,9 +120,7 @@
     {
         "id": "warfare",
         "imagePath": "attachment_warfare.png",
-        "techSpeciality": [
-            "warfare"
-        ],
+        "techSpeciality": ["warfare"],
         "source": "pok"
     },
     {

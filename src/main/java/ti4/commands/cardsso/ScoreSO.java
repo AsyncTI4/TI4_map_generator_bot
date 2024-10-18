@@ -79,7 +79,7 @@ public class ScoreSO extends SOCardsSubcommandData {
                     String soStringID = entry.getKey();
                     buttons.add(Buttons.green("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
+                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }

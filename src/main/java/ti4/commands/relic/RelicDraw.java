@@ -53,7 +53,7 @@ public class RelicDraw extends RelicSubcommandData {
             buttons.add(Buttons.green("drawRelicAtPosition_" + x, relicData.getName()));
             info.append(relicData.getName()).append(": ").append(relicData.getText()).append("\n");
         }
-        String msg = player.getRepresentation(true, true) + " choose the relic that you want. The relic text is reproduced for your conveinenance";
+        String msg = player.getRepresentationUnfogged() + " choose the relic that you want. The relic text is reproduced for your conveinenance";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info.toString());
     }

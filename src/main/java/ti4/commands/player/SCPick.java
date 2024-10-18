@@ -170,7 +170,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " chose which player to give this stratgy card to.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " chose which player to give this stratgy card to.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -182,7 +182,7 @@ public class SCPick extends PlayerSubcommandData {
 
         Stats.secondHalfOfPickSC(event, game, p2, scpick);
 
-        String recipientMessage = p2.getRepresentation(true, true) + " was given " + Helper.getSCName(scpick, game)
+        String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
             + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
@@ -231,7 +231,7 @@ public class SCPick extends PlayerSubcommandData {
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                privatePlayer.getRepresentation(true, true) + "Use buttons to pick which strategy card you want to give someone else.", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                privatePlayer.getRepresentationUnfogged() + "Use buttons to pick which strategy card you want to give someone else.", Helper.getRemainingSCButtons(event, game, privatePlayer));
         }
     }
 
@@ -264,7 +264,7 @@ public class SCPick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentation(true, true) + " to pick strategy card.";
+                msgExtra += player_.getRepresentationUnfogged() + " to pick strategy card.";
                 game.setPhaseOfGame("strategy");
                 privatePlayer = player_;
                 allPicked = false;
@@ -340,7 +340,7 @@ public class SCPick extends PlayerSubcommandData {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = "" + privatePlayer.getRepresentation(true, true) + " UP NEXT";
+                msgExtra = "" + privatePlayer.getRepresentationUnfogged() + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -411,14 +411,14 @@ public class SCPick extends PlayerSubcommandData {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you have the opportunity to use QDN", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use QDN", buttons);
                 }
                 buttons = new ArrayList<>();
                 if (game.getLaws().containsKey("arbiter") && game.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())) {
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
-                        p2.getRepresentation(true, true) + " you have the opportunity to use Imperial Arbiter", buttons);
+                        p2.getRepresentationUnfogged() + " you have the opportunity to use Imperial Arbiter", buttons);
                 }
             }
         }

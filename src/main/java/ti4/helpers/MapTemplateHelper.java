@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -33,9 +34,14 @@ public class MapTemplateHelper {
             .toList();
 
         Map<String, String> positionMap = new HashMap<>();
+        List<MapTemplateTile> badTemplateTiles = new ArrayList<>();
         for (MapTemplateTile templateTile : template.getTemplateTiles()) {
             Entry<String, String> tileEntry = inferTileFromTemplateAndDraft(templateTile, speakerOrdered);
-            positionMap.put(tileEntry.getKey(), tileEntry.getValue());
+            if (tileEntry == null) {
+                badTemplateTiles.add(templateTile);
+            } else {
+                positionMap.put(tileEntry.getKey(), tileEntry.getValue());
+            }
         }
 
         List<String> badTiles = AddTileList.addTileMapToGame(game, positionMap);
@@ -69,8 +75,8 @@ public class MapTemplateHelper {
         }
 
         if (position == null || tileId == null) {
-            String tileStr = templateTile.toString();
-            throw new Exception("Unable to map template tile to draft tile. Template file may be improperly formatted: " + tileStr);
+            // don't need to error out here
+            return null;
         }
         return Map.entry(position, AliasHandler.resolveTile(tileId));
     }
