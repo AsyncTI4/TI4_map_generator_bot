@@ -575,7 +575,7 @@ public class FoWHelper {
 				Set<String> tokenList = unitHolder.getTokenList();
 				for (String token : tokenList) {
 					for (String wormholeID : wormholeIDs) {
-						if (token.contains(wormholeID)) {
+						if (token.contains(wormholeID) && !(wormholeID.equals("eta") && token.contains("beta"))) {
 							adjacentPositions.add(position_);
 						}
 					}

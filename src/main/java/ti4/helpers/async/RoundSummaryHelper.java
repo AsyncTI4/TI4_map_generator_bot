@@ -88,11 +88,11 @@ public class RoundSummaryHelper {
     }
 
     public static String resolveRoundSummaryKey(Player player, String roundNum) {
-        String keySuffix = player.isRealPlayer() ? player.getFaction() : player.getUserName();
+        String keySuffix = player.isRealPlayer() || player.isEliminated() ? player.getFaction() : player.getUserName();
         return "endofround" + roundNum + keySuffix;
     }
 
     public static String resolvePlayerEmoji(Player player) {
-        return player.isRealPlayer() ? player.getFactionEmoji() : Emojis.getRandomGoodDog(player.getUserID());
+        return player.isRealPlayer() || player.isEliminated() ? player.getFactionEmoji() : Emojis.getRandomGoodDog(player.getUserID());
     }
 }
