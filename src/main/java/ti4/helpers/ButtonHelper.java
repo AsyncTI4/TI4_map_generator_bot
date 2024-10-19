@@ -2208,7 +2208,7 @@ public class ButtonHelper {
             if (bevent.getButton() != null) {
                 String message = bevent.getButton().getId().replace("deleteMessage_", "");
                 if (!message.isEmpty()) {
-                    MessageHelper.sendMessageToEventChannel(event, message);
+                    // MessageHelper.sendMessageToEventChannel(event, message);
                 }
             }
         }
@@ -2219,9 +2219,9 @@ public class ButtonHelper {
         if (event != null && event instanceof ButtonInteractionEvent bevent && bevent.getMessage() != null && bevent.getButton() != null) {
             String message = bevent.getButton().getId().replace("editMessage_", "");
             if (!message.isEmpty()) {
-                MessageHelper.sendMessageToEventChannel(event, message);
+                // MessageHelper.sendMessageToEventChannel(event, message);
             }
-            bevent.editMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
+            // bevent.editMessage(message).queue(Consumers.nop(), BotLogger::catchRestError);
         }
     }
 
