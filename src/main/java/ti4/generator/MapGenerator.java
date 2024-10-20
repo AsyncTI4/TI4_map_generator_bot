@@ -438,7 +438,6 @@ public class MapGenerator {
     private FileUpload uploadToDiscord() {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
-        float quality = 1 / 6.0f;
         switch (displayType) {
             case wormholes:
             case anomalies:
@@ -451,7 +450,6 @@ public class MapGenerator {
             case attachments:
             case shipless:
             case landscape:
-                quality = 1 / 4.0f;
         }
 
         FileUpload fileUpload = uploadToDiscord(mainImage, game.getName());
