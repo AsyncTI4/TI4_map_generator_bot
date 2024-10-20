@@ -476,7 +476,6 @@ public class MapGenerator {
 
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            // CONVERT PNG TO JPG
             BufferedImage bufferedImage = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
             bufferedImage.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
             ImageIO.write(bufferedImage, "webp", out);
