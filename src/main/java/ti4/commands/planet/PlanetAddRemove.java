@@ -75,6 +75,10 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
                 Set<String> planets = game.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                 if (possiblePlanets.isEmpty()) {
+                    if (player.getPlanets().remove(planetID)) { //To remove an invalid planet from player
+                        MessageHelper.sendMessageToEventChannel(event, "> Invalid planet '" + planetID + "'' removed.");
+                        return;
+                    }
                     MessageHelper.sendMessageToEventChannel(event, "> No matching Planet '" + planetID + "'' found - please try again.");
                     return;
                 } else if (possiblePlanets.size() > 1) {
