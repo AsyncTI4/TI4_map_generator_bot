@@ -1297,7 +1297,7 @@ public class MapGenerator {
         Collection<Player> players = game.getPlayers().values();
         for (String pn : player.getPromissoryNotesInPlayArea()) {
             graphics.setColor(Color.WHITE);
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, "pn", pn);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "pn", pn);
 
             boolean commanderUnlocked = false;
             Player promissoryNoteOwner = game.getPNOwner(pn);
@@ -1399,7 +1399,7 @@ public class MapGenerator {
             }
 
             int rectX = x + deltaX - 2;
-            drawRectWithOverlay(g2, rectX, rectY, rectW, rectH, game, "relic", relicID);
+            drawRectWithOverlay(g2, rectX, rectY, rectW, rectH, game, player, "relic", relicID);
             drawPAImage(x + deltaX, y, "pa_relics_icon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
@@ -1501,7 +1501,7 @@ public class MapGenerator {
             }
 
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, "leader", leader.getId());
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "leader", leader.getId());
 
             if (Mapper.isValidLeader(leader.getId())) {
                 LeaderModel leaderModel = Mapper.getLeader(leader.getId());
@@ -1566,7 +1566,7 @@ public class MapGenerator {
                         if (leader_ != null) {
                             String status_ = leader_.isLocked() ? "_exh" : "_rdy";
                             String imperiaColorFile = "pa_leaders_imperia" + status_ + ".png";
-                            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "leader", leader_.getId());
+                            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "leader", leader_.getId());
                             drawPlayerFactionIconImage(graphics, player_, x + deltaX - 1, y + 108, 42, 42);
                             drawPAImage(x + deltaX, y, imperiaColorFile);
                             String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
@@ -2324,7 +2324,7 @@ public class MapGenerator {
         g2.setStroke(stroke2);
 
         int deltaX = 20;
-        deltaX = factionTechField(x, y, techs, deltaX);
+        deltaX = factionTechField(player, x, y, techs, deltaX);
         return x + deltaX + 20;
     }
 
@@ -2377,13 +2377,13 @@ public class MapGenerator {
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 148, 130);
             }
 
-            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "tech", tech);
+            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "tech", tech);
             deltaX += 48;
         }
         return deltaX;
     }
 
-    private int factionTechField(int x, int y, List<String> techs, int deltaX) {
+    private int factionTechField(Player player, int x, int y, List<String> techs, int deltaX) {
         if (techs == null) {
             return deltaX;
         }
@@ -2427,7 +2427,7 @@ public class MapGenerator {
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 130, 110);
             }
 
-            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "tech", tech);
+            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "tech", tech);
             deltaX += 48;
         }
         return deltaX;
@@ -2450,7 +2450,7 @@ public class MapGenerator {
             centerX += 5;
         }
         graphics.drawString(String.valueOf(stasisInfantry), x + deltaX + 3 + centerX, y + 148);
-        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, "stasisCapsule", String.valueOf(stasisInfantry));
+        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "stasisCapsule", String.valueOf(stasisInfantry));
         deltaX += 48;
         return deltaX;
     }
@@ -4377,7 +4377,7 @@ public class MapGenerator {
             if (scoredPlayerID != null) {
                 drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, true);
             }
-            drawRectWithOverlay(graphics, x - 4, y - 5, 600, 38, game, "so", key);
+            drawRectWithOverlay(graphics, x - 4, y - 5, 600, 38, game, null, "so", key);
 
             y += 43;
         }
@@ -6563,7 +6563,7 @@ public class MapGenerator {
         return op.filter(image, null);
     }
 
-    private static void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, String cardType, String cardID) {
+    private static void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, Player player, String cardType, String cardID) {
         g.drawRect(x, y, width, height);
         game.addWebsiteOverlay(cardType, cardID, x, y, width, height);
     }
