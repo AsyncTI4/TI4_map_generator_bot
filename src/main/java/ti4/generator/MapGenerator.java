@@ -1819,6 +1819,7 @@ public class MapGenerator {
         int widthOfSection = 180;
         int leftSide = width - widthOfSection - xDeltaFromRightSide;
         int verticalSpacing = 39;
+        game.addWebsiteOverlay(player, "unitCombatSummary", null, leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
         int imageSize = verticalSpacing - 2;
         drawPAImageScaled(leftSide, y + verticalSpacing, "pa_resources.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
@@ -1827,39 +1828,28 @@ public class MapGenerator {
         //drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_unitimage.png", imageSize);
         graphics.setColor(Color.WHITE);
         leftSide += verticalSpacing + 10;
-        drawCenteredString(graphics, "Space |",
-            new Rectangle(leftSide - 4, y, 50, verticalSpacing), Storage.getFont18());
-        drawCenteredString(graphics, "____________",
-            new Rectangle(leftSide, y, 110, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, "Space |", new Rectangle(leftSide - 4, y, 50, verticalSpacing), Storage.getFont18());
+        drawCenteredString(graphics, "____________", new Rectangle(leftSide, y, 110, verticalSpacing), Storage.getFont24());
         float val = player.getTotalResourceValueOfUnits("space");
         if (isWholeNumber(val) || val > 10) {
-            drawCenteredString(graphics, String.valueOf((int) val),
-                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
+            drawCenteredString(graphics, String.valueOf((int) val), new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         } else {
-            drawCenteredString(graphics, String.valueOf(val),
-                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
+            drawCenteredString(graphics, String.valueOf(val), new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         }
-        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("space")),
-            new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
-        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits("space")),
-            new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("space")), new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits("space")), new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
         leftSide += verticalSpacing + 20;
-        drawCenteredString(graphics, "  Ground",
-            new Rectangle(leftSide, y, 50, verticalSpacing), Storage.getFont18());
+        drawCenteredString(graphics, "  Ground", new Rectangle(leftSide, y, 50, verticalSpacing), Storage.getFont18());
         // drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits("ground")),
         //     new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
         val = player.getTotalResourceValueOfUnits("ground");
         if (isWholeNumber(val) || val > 10) {
-            drawCenteredString(graphics, String.valueOf((int) val),
-                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
+            drawCenteredString(graphics, String.valueOf((int) val), new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         } else {
-            drawCenteredString(graphics, String.valueOf(val),
-                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
+            drawCenteredString(graphics, String.valueOf(val), new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         }
-        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("ground")),
-            new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
-        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits("ground")),
-            new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("ground")), new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
+        drawCenteredString(graphics, String.valueOf(player.getTotalCombatValueOfUnits("ground")), new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
         //drawCenteredString(graphics, String.valueOf(player.getTotalUnitAbilityValueOfUnits()),
         //    new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
         return xDeltaFromRightSide + widthOfSection;
@@ -6565,6 +6555,6 @@ public class MapGenerator {
 
     private static void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, Player player, String cardType, String cardID) {
         g.drawRect(x, y, width, height);
-        game.addWebsiteOverlay(cardType, cardID, x, y, width, height);
+        game.addWebsiteOverlay(player, cardType, cardID, x, y, width, height);
     }
 }

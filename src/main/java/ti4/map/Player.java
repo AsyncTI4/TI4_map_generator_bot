@@ -3175,4 +3175,9 @@ public class Player {
             .filter(p -> !p.equals(this))
             .toList();
     }
+
+    @JsonIgnore
+    public boolean isActivePlayer() {
+        return this.equals(getGame().getActivePlayer());
+    }
 }

@@ -40,7 +40,7 @@ public class FighterConscription extends SpecialSubcommandData {
         doFfCon(event, player, game);
     }
 
-    public void doFfCon(GenericInteractionCreateEvent event, Player player, Game game) {
+    public static void doFfCon(GenericInteractionCreateEvent event, Player player, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
 
         List<Tile> tilesAffected = new ArrayList<>();

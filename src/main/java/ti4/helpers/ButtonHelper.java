@@ -2813,8 +2813,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void resolveSpecialRex(Player player, Game game, String buttonID, String ident,
-        ButtonInteractionEvent event) {
+    public static void resolveSpecialRex(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -2822,10 +2821,8 @@ public class ButtonHelper {
             return;
 
         String mechOrInf = buttonID.split("_")[3];
-        String msg = ident + " used the special Mecatol Rex power to remove 1 " + mechOrInf + " on "
-            + Helper.getPlanetRepresentation(planet, game);
-        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet),
-            "1 " + mechOrInf + " " + planet, game);
+        String msg = player.getFactionEmojiOrColor() + " used the special Mecatol Rex power to remove 1 " + mechOrInf + " on "            + Helper.getPlanetRepresentation(planet, game);
+        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet),            "1 " + mechOrInf + " " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         deleteMessage(event);
     }
