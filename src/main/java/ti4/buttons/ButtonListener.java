@@ -151,10 +151,8 @@ public class ButtonListener extends ListenerAdapter {
         String buttonLabel = event.getButton().getLabel();
         String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
         String finsFactionCheckerPrefix = nullable == null ? "FFCC_nullPlayer_" : nullable.getFinsFactionCheckerPrefix();
-        String fowIdentity = null;
         String ident = null;
         if (nullable != null) {
-            fowIdentity = player.getRepresentation(false, true);
             ident = player.getFactionEmoji();
         }
 
@@ -163,7 +161,7 @@ public class ButtonListener extends ListenerAdapter {
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
-            UnfiledButtonHandlers.acPlayFromHand(event, buttonID, game, player, mainGameChannel, fowIdentity);
+            UnfiledButtonHandlers.acPlayFromHand(event, buttonID, game, player);
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
             UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
