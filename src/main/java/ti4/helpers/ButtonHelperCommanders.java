@@ -334,8 +334,7 @@ public class ButtonHelperCommanders {
         }
     }
 
-    public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player, String ident) {
+    public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         int cTG = player.getTg();
         int fTG = cTG + 1;
         player.setTg(fTG);
@@ -346,10 +345,7 @@ public class ButtonHelperCommanders {
             msg = msg + "This tg can be spent before pillage resolves, since it is a when.";
         }
         player.addSpentThing(msg);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + msg);
-        //String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-        //ButtonHelper.deleteTheOneButton(event);
-        //event.getMessage().editMessage(exhaustedMessage).queue();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + msg);
     }
 
     public static void resolveLetnevCommanderCheck(Player player, Game game,
@@ -505,8 +501,7 @@ public class ButtonHelperCommanders {
                 + Helper.getPlanetRepresentation(planet, game) + " using Claire Gibson, the Sol Commander.");
     }
 
-    public static void yssarilCommander(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
+    public static void yssarilCommander(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("yssarilcommander_", "");
         String enemyFaction = buttonID.split("_")[1];
         Player enemy = game.getPlayerFromColorOrFaction(enemyFaction);
@@ -535,35 +530,29 @@ public class ButtonHelperCommanders {
     }
 
     public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event, Boolean unleash) {
-        int oldTg = player.getTg();
-        if (player.getTg() > 0) {
-            player.setTg(oldTg - 1);
-        }
-        CommanderUnlockCheck.checkPlayer(player, game, "keleres", event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmojiOrColor() + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + "(" + oldTg + "->"
-                + player.getTg() + ")");
+        CommanderUnlockCheck.checkPlayer(player, "keleres");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + player.gainTG(-1));
         event.getMessage().delete().queue();
     }
 
-    public static void resolveSardakkCommander(Game game, Player p1, String buttonID, ButtonInteractionEvent event, String ident) {
+    public static void resolveSardakkCommander(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String mechorInf = buttonID.split("_")[1];
         String planet1 = buttonID.split("_")[2];
         String planet2 = buttonID.split("_")[3];
         String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
         String planetRepresentation = Helper.getPlanetRepresentation(planet1, game);
 
-        String message = ident + " moved 1 " + mechorInf + " from " + planetRepresentation2 + " to "
+        String message = player.getFactionEmojiOrColor() + " moved 1 " + mechorInf + " from " + planetRepresentation2 + " to "
             + planetRepresentation + " using G'hom Sek'kus, the N'orr Commander.";
-        new RemoveUnits().unitParsing(event, p1.getColor(), game.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2, game);
+        new RemoveUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet2), "1 " + mechorInf + " " + planet2, game);
 
         Tile tile = game.getTileFromPlanet(planet1);
         tile = MoveUnits.flipMallice(event, tile, game);
         planet1 = planet1.replace("lockedm", "m");
-        new AddUnits().unitParsing(event, p1.getColor(), game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1, game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet1), "1 " + mechorInf + " " + planet1, game);
 
-        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), message);
-        CommanderUnlockCheck.checkPlayer(p1, game, "naaz", event);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        CommanderUnlockCheck.checkPlayer(player, "naaz");
         ButtonHelper.deleteTheOneButton(event);
     }
 
