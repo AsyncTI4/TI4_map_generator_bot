@@ -696,7 +696,7 @@ public class ButtonHelperFactionSpecific {
         int remaining = 2 - numCruisers;
         int numDestroyers = Math.min(remaining, space.getUnitCount(UnitType.Destroyer, player.getColor()));
 
-        String result = ButtonHelper.getIdentOrColor(player, game) + " rolling for ambush:\n";
+        String result = player.getFactionEmojiOrColor() + " rolling for ambush:\n";
 
         // Actually roll for each unit
         int totalHits = 0;
@@ -998,7 +998,7 @@ public class ButtonHelperFactionSpecific {
                     amount + " " + unitName + " " + newPlanet, game);
             }
         }
-        String ident = ButtonHelper.getIdentOrColor(player, game);
+        String ident = player.getFactionEmojiOrColor();
         String message2 = ident + " moved the ground forces on the planet "
             + Helper.getPlanetRepresentation(origPlanet, game) + " to "
             + Helper.getPlanetRepresentation(newPlanet, game);
@@ -1085,7 +1085,7 @@ public class ButtonHelperFactionSpecific {
         String unit = buttonID.split("_")[2];
         new RemoveUnits().unitParsing(event, player.getColor(), cabal.getNomboxTile(), unit, game);
         MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
-            cabal.getRepresentationUnfogged() + " released 1 " + ButtonHelper.getIdentOrColor(player, game)
+            cabal.getRepresentationUnfogged() + " released 1 " + player.getFactionEmojiOrColor()
                 + " " + unit + " from prison");
         if (cabal != player) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1261,31 +1261,23 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player,
-        String ident) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation()
-            + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4. They cannot produce ships if enemy ships are in the system. ");
+    public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4. They cannot produce ships if enemy ships are in the system. ");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
         // Muaat agent works here as it's similar so no need to add more fluff
-        buttons = Helper.getPlaceUnitButtons(event, player, game,
-            game.getTileByPosition(pos), "muaatagent", "place");
+        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "muaatagent", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
 
-    public static void resolveImpressmentPrograms(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player,
-        String ident) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " May produce 1 ship in the explored planet system.");
+    public static void resolveImpressmentPrograms(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " May produce 1 ship in the explored planet system.");
         String pos = buttonID.replace("dsdihmy_", "");
         List<Button> buttons;
         // Sling relay works for this
-        buttons = Helper.getPlaceUnitButtons(event, player, game,
-            game.getTileByPosition(pos), "sling", "place");
+        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "sling", "place");
         String message = player.getRepresentation() + " Use the buttons to produce 1 ship. ";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         event.getMessage().delete().queue();
@@ -1295,13 +1287,13 @@ public class ButtonHelperFactionSpecific {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(sc) && p2 != player && p2.hasAbility("fine_print")) {
                 SendDebt.sendDebt(player, p2, 1);
-                CommanderUnlockCheck.checkPlayer(p2, game, "vaden", event);
+                CommanderUnlockCheck.checkPlayer(p2, "vaden");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you sent 1 debt token to "
-                        + ButtonHelper.getIdentOrColor(p2, game) + " due to their fine print ability");
+                        + p2.getFactionEmojiOrColor() + " due to their fine print ability");
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2
                     .getRepresentationUnfogged() + " you collected 1 debt token from "
-                    + ButtonHelper.getIdentOrColor(player, game)
+                    + player.getFactionEmojiOrColor()
                     + " due to your fine print ability. This is technically optional, done automatically for conveinance.");
                 break;
             }
@@ -1334,11 +1326,9 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveMykoMech(Player player, Game game) {
         decreaseMykoMech(game);
-        List<Button> buttons = new ArrayList<>(
-            ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, ""));
+        List<Button> buttons = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game));
         String message = player.getRepresentationUnfogged() + " Use buttons to replace 1 infantry with 1 mech";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     public static void resolveMykoMechCheck(Player player, Game game) {
@@ -1600,15 +1590,12 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
-    public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
+    public static void replacePDSWithFS(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("replacePDSWithFS_", "");
         String planet = buttonID;
-        String message = ident + " replaced " + Emojis.pds + " on " + Helper.getPlanetRepresentation(planet, game)
-            + " with a " + Emojis.flagship;
+        String message = player.getFactionEmojiOrColor() + " replaced " + Emojis.pds + " on " + Helper.getPlanetRepresentation(planet, game) + " with a " + Emojis.flagship;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)),
-            "flagship", game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), "flagship", game);
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), player.getColor());
         game.getTile(AliasHandler.resolveTile(planet)).removeUnit(planet, unitKey, 1);
         event.getMessage().delete().queue();
@@ -2252,12 +2239,10 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveCreussIFFStart(Game game, @NotNull Player player, String buttonID, String ident,
-        ButtonInteractionEvent event) {
+    public static void resolveCreussIFFStart(Game game, @NotNull Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(game, player, type);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            ident + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
         event.getMessage().delete().queue();
     }
 

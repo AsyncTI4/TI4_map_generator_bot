@@ -493,7 +493,7 @@ public class ButtonHelperSCs {
         return contains;
     }
 
-    public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID, String ident, String lastchar) {
+    public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID, String lastchar) {
         boolean setstatus = true;
         int scnum = 1;
         try {
@@ -514,7 +514,7 @@ public class ButtonHelperSCs {
         MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scnum);
         if (buttonID.contains("mahact")) {
             MessageHelper.sendMessageToChannel(channel,
-                ident + " exhausted " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                player.getFactionEmojiOrColor() + " exhausted " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow " + Helper.getSCName(scnum, game));
             Leader playerLeader = player.unsafeGetLeader("mahactagent");
             if (playerLeader != null) {
@@ -552,8 +552,7 @@ public class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void scNoFollow(String messageID, Game game, Player player,
-        @NotNull ButtonInteractionEvent event, String defaultText, String buttonID, Player nullable, String lastchar) {
+    public static void scNoFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID, Player nullable, String lastchar) {
         int scNum = 1;
         boolean setStatus = true;
         try {
@@ -581,24 +580,23 @@ public class ButtonHelperSCs {
             return;
         }
         if ("pok8imperial".equals(scModel.getBotSCAutomationID())) {// HANDLE SO QUEUEING
-            String key = "factionsThatAreNotDiscardingSOs";
-            String key2 = "queueToDrawSOs";
-            String key3 = "potentialBlockers";
-            if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-                game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+            String key = "queueToDrawSOs";
+            if (game.getStoredValue(key).contains(player.getFaction() + "*")) {
+                game.setStoredValue(key, game.getStoredValue(key).replace(player.getFaction() + "*", ""));
             }
+            key = "factionsThatAreNotDiscardingSOs";
             if (!game.getStoredValue(key).contains(player.getFaction() + "*")) {
                 game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
             }
-            if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-                game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+            key = "potentialBlockers";
+            if (game.getStoredValue(key).contains(player.getFaction() + "*")) {
+                game.setStoredValue(key, game.getStoredValue(key).replace(player.getFaction() + "*", ""));
                 Helper.resolveQueue(game);
             }
         }
     }
 
-    public static void scFollow(String messageID, Game game, Player player,
-        @NotNull ButtonInteractionEvent event, String defaultText, String buttonID, Player nullable, String lastchar) {
+    public static void scFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID, Player nullable, String lastchar) {
         int scNum = 1;
         boolean setStatus = true;
         try {
