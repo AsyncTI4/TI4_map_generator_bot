@@ -851,8 +851,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveGheminaLordHero(String buttonID, String ident, Player player, Game game,
-        ButtonInteractionEvent event) {
+    public static void resolveGheminaLordHero(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         if ("lockedmallice".equalsIgnoreCase(planet)) {
             planet = "mallice";
@@ -862,7 +861,7 @@ public class ButtonHelperHeroes {
         PlanetAdd.doAction(player, planet, game, event, false);
         PlanetRefresh.doAction(player, planet, game);
         String planetRepresentation2 = Helper.getPlanetRepresentation(planet, game);
-        String msg = ident + " claimed the planet " + planetRepresentation2 + " using The Lord, a Ghemina hero.";
+        String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRepresentation2 + " using The Lord, a Ghemina hero.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -1279,7 +1278,7 @@ public class ButtonHelperHeroes {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String relic = buttonID.split("_")[2];
-        String msg = ButtonHelper.getIdentOrColor(player, game) + " stole " + Mapper.getRelic(relic).getName()
+        String msg = player.getFactionEmojiOrColor() + " stole " + Mapper.getRelic(relic).getName()
             + " from " + ButtonHelper.getIdentOrColor(p2, game);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
@@ -1554,26 +1553,19 @@ public class ButtonHelperHeroes {
         }
     }
 
-    public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String trueIdentity) {
+    public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planetNInf = buttonID.replace("yinHeroInfantry_", "");
         String planet = planetNInf.split("_")[0];
         String amount = planetNInf.split("_")[1];
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
-
-        new AddUnits().unitParsing(event, player.getColor(),
-            game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet,
-            game);
-        MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " Chose to land " + amount
-            + " infantry on " + Helper.getPlanetRepresentation(planet, game));
+        new AddUnits().unitParsing(event, player.getColor(), game.getTile(AliasHandler.resolveTile(planet)), amount + " inf " + planet, game);
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " Chose to land " + amount + " infantry on " + Helper.getPlanetRepresentation(planet, game));
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
         if (players.size() > 1) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                + " Reminder that Dannel of the Tenth, the Yin hero, skips space cannon fire.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Reminder that Dannel of the Tenth, the Yin hero, skips space cannon fire.");
             StartCombat.startGroundCombat(players.get(0), players.get(1), game, event, unitHolder, tile);
         }
-
         ButtonHelper.deleteMessage(event);
     }
 

@@ -1395,8 +1395,7 @@ public class AgendaHelper {
         }
     }
 
-    public static void exhaustStuffForVoting(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player, String ident, String buttonLabel) {
+    public static void exhaustStuffForVoting(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
         String planetName = StringUtils.substringAfter(buttonID, "_");
         String votes = StringUtils.substringBetween(buttonLabel, "(", ")");
         if (!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive")
@@ -1723,16 +1722,9 @@ public class AgendaHelper {
         }
     }
 
-    public static void reverseRider(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
+    public static void reverseRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String choice = buttonID.substring(buttonID.indexOf("_") + 1);
-
-        String voteMessage = " Chose to reverse the " + choice;
-        if (game.isFowMode()) {
-            voteMessage = player.getColor() + voteMessage;
-        } else {
-            voteMessage = ident + voteMessage;
-        }
+        String voteMessage = player.getFactionEmojiOrColor() + " Chose to reverse the " + choice;
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
@@ -1751,9 +1743,7 @@ public class AgendaHelper {
                 }
                 game.setCurrentAgendaVote(outcome, total);
             }
-
         }
-
         player.getCorrectChannel().sendMessage(voteMessage).queue();
     }
 
@@ -1785,8 +1775,7 @@ public class AgendaHelper {
         }
     }
 
-    public static void placeRider(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
+    public static void placeRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String[] choiceParams = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.lastIndexOf("_")).split(";");
         // String choiceType = choiceParams[0];
         String choice = choiceParams[1];
@@ -1800,7 +1789,7 @@ public class AgendaHelper {
         }
         String voteMessage = "Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
         if (!game.isFowMode()) {
-            voteMessage = ident + " " + voteMessage;
+            voteMessage = player.getFactionEmojiOrColor() + " " + voteMessage;
         }
         String identifier;
         if (game.isFowMode()) {

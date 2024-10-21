@@ -795,7 +795,7 @@ public class ButtonHelperModifyUnits {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            ButtonHelper.getIdentOrColor(player, game) + " replaced " + pdsAmount + " PDS and " + sdAmount
+            player.getFactionEmojiOrColor() + " replaced " + pdsAmount + " PDS and " + sdAmount
                 + " space dock" + (sdAmount == 1 ? "" : "s") + " on "
                 + Helper.getPlanetRepresentation(uH.getName(), game) + " with their own units");
 
@@ -1121,7 +1121,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-    public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident, String buttonLabel) {
+    public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
         String rest = buttonID.replace("retreatGroundUnits_", "").replace("'", "");
         String pos1 = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos1 + "_", "");
@@ -1153,7 +1153,7 @@ public class ButtonHelperModifyUnits {
             player.getColor(), false, game);
 
         List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, game, event, pos1, pos2);
-        String retreatMessage = ident + " Retreated " + amount + " " + unitType + " on " + planet + " to "
+        String retreatMessage = player.getFactionEmojiOrColor() + " Retreated " + amount + " " + unitType + " on " + planet + " to "
             + game.getTileByPosition(pos2).getRepresentationForButtons(game, player);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), retreatMessage);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
@@ -1749,8 +1749,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-    public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident, String buttonLabel) {
+    public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
         String rest = buttonID.replace("spaceUnits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos + "_", "");
@@ -1781,7 +1780,7 @@ public class ButtonHelperModifyUnits {
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            ident + "Undid landing of " + amount + " " + unitName + " on " + planet);
+            player.getFactionEmojiOrColor() + "Undid landing of " + amount + " " + unitName + " on " + planet);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -1827,7 +1826,7 @@ public class ButtonHelperModifyUnits {
 
     }
 
-    public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident, String buttonLabel) {
+    public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
         String rest = buttonID.replace("landUnits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos + "_", "");
@@ -1989,8 +1988,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.deleteTheOneButton(event);
     }
 
-    public static void resolvingMirvedaCommander(ButtonInteractionEvent event, Game game, Player player,
-        String ident, String buttonID) {
+    public static void resolvingMirvedaCommander(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff = Integer.parseInt(buttonID.split("_")[1]);
         if (numff > 0) {
@@ -1998,13 +1996,12 @@ public class ButtonHelperModifyUnits {
             new AddUnits().unitParsing(event, player.getColor(), tile, numff + " fighters", game);
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
-        String msg = ident + " Turned " + numff + " infantry into " + numff + " fighter" + (numff == 1 ? "" : "s") + " using the combat drone ability";
+        String msg = player.getFactionEmojiOrColor() + " Turned " + numff + " infantry into " + numff + " fighter" + (numff == 1 ? "" : "s") + " using the combat drone ability";
         event.getMessage().editMessage(msg)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
-    public static void resolvingCombatDrones(ButtonInteractionEvent event, Game game, Player player, String ident,
-        String buttonID) {
+    public static void resolvingCombatDrones(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff = Integer.parseInt(buttonID.split("_")[1]);
         if (numff > 0) {
@@ -2012,12 +2009,12 @@ public class ButtonHelperModifyUnits {
             new AddUnits().unitParsing(event, player.getColor(), tile, numff + " infantry", game);
         }
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
-        String msg = ident + " Turned " + numff + " fighter" + (numff == 1 ? "" : "s") + " into " + numff + " infantry using the combat drone ability";
+        String msg = player.getFactionEmojiOrColor() + " Turned " + numff + " fighter" + (numff == 1 ? "" : "s") + " into " + numff + " infantry using the combat drone ability";
         event.getMessage().editMessage(msg)
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
-    public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident, String buttonLabel) {
+    public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
         String rest;
         rest = buttonID.replace("assignHits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));
@@ -2131,9 +2128,9 @@ public class ButtonHelperModifyUnits {
                     }
                 }
             }
-            String message2 = ident + " Removed all units";
+            String message2 = player.getFactionEmojiOrColor() + " Removed all units";
             if (rest.contains("AllShips")) {
-                message2 = ident + " Removed all units in space area";
+                message2 = player.getFactionEmojiOrColor() + " Removed all units in space area";
             }
             String message = event.getMessage().getContentRaw();
             assignType = "combat";
@@ -2231,7 +2228,7 @@ public class ButtonHelperModifyUnits {
         }
 
         String message = event.getMessage().getContentRaw();
-        String message2 = ident + " Removed " + amount + " " + unitName + " from " + planetName + " in tile "
+        String message2 = player.getFactionEmojiOrColor() + " Removed " + amount + " " + unitName + " from " + planetName + " in tile "
             + tile.getRepresentationForButtons(game, player);
         assignType = "combat";
         if (!game.getStoredValue(player.getFaction() + "latestAssignHits").isEmpty()) {
@@ -2244,8 +2241,7 @@ public class ButtonHelperModifyUnits {
 
     }
 
-    public static void repairDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident) {
+    public static void repairDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String rest;
         rest = buttonID.replace("repairDamage_", "");
 
@@ -2275,7 +2271,7 @@ public class ButtonHelperModifyUnits {
         }
         tile.removeUnitDamage(planetName, unitKey, amount);
         String message = event.getMessage().getContentRaw();
-        String message2 = ident + " Repaired " + amount + " " + unitName + " from " + planetName + " in tile "
+        String message2 = player.getFactionEmojiOrColor() + " Repaired " + amount + " " + unitName + " from " + planetName + " in tile "
             + tile.getRepresentationForButtons(game, player);
         List<Button> systemButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, tile);
         event.getMessage().editMessage(message)
@@ -2283,7 +2279,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
     }
 
-    public static void assignDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident) {
+    public static void assignDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String rest;
         rest = buttonID.replace("assignDamage_", "");
 
@@ -2313,7 +2309,7 @@ public class ButtonHelperModifyUnits {
         }
         tile.addUnitDamage(planetName, unitKey, amount);
         String message = event.getMessage().getContentRaw();
-        String message2 = ident + " Sustained " + amount + " " + unitName + " from " + planetName + " in tile "
+        String message2 = player.getFactionEmojiOrColor() + " Sustained " + amount + " " + unitName + " from " + planetName + " in tile "
             + tile.getRepresentationForButtons(game, player);
 
         if (player.hasTech("nes")) {

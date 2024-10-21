@@ -112,7 +112,7 @@ public class DiscardSO extends SOCardsSubcommandData {
     }
 
     public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String soID, Game game) {
-        String publicMsg = game.getPing() + " this is a public notice that " + ButtonHelper.getIdentOrColor(player, game) + " is picking up a secret that they accidentally discarded.";
+        String publicMsg = game.getPing() + " this is a public notice that " + player.getFactionEmojiOrColor() + " is picking up a secret that they accidentally discarded.";
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(soID, player.getUserID());
         if (secrets == null) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "SO not retrieved, most likely because someone else has it in hand. Ping a bothelper to help.");
