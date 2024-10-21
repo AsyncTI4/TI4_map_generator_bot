@@ -411,8 +411,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static void resolveArcExpButtons(Game game, Player player, String buttonID,
-        ButtonInteractionEvent event, String trueIdentity) {
+    public static void resolveArcExpButtons(Game game, Player player, String buttonID,        ButtonInteractionEvent event) {
         String type = buttonID.replace("arcExp_", "");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 3; i++) {
@@ -421,7 +420,7 @@ public class ButtonHelperActionCards {
             sb.append(card.textRepresentation()).append(System.lineSeparator());
             String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-                sb.append(trueIdentity).append(" Gained relic fragment\n");
+                sb.append(player.getRepresentationUnfogged()).append(" Gained a relic fragment\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             }

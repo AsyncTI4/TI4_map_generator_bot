@@ -305,11 +305,11 @@ public class ButtonHelperAgents {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String msg2 = ButtonHelper.getIdentOrColor(player, game) + " selected "
-        + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-        + "Nekro Malleon, the Nekro" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
+            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + "Nekro Malleon, the Nekro" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         String message = p2.getRepresentationUnfogged() + " increased your TGs by 2 " + p2.gainTG(2)
-        + ". Use buttons in your cards info thread to discard 1 AC, or lose 1 CC";
+            + ". Use buttons in your cards info thread to discard 1 AC, or lose 1 CC";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
         ButtonHelperAbilities.pillageCheck(p2, game);
         resolveArtunoCheck(p2, game, 2);
@@ -367,13 +367,13 @@ public class ButtonHelperAgents {
                 game.purgeExplore(cardID);
             }
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+        CommanderUnlockCheck.checkPlayer(player, "kollecc");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident, String trueIdentity) {
+    public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident) {
         String faction = buttonID.replace("hacanAgentRefresh_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) {
@@ -383,10 +383,10 @@ public class ButtonHelperAgents {
         }
         String message;
         if (p2 == player) {
-            message = trueIdentity + "Increased your commodities by two";
+            message = player.getRepresentationUnfogged() + " increased your commodities by two";
             ButtonHelperStats.gainComms(event, game, player, 2, false, true);
         } else {
-            message = "Refreshed " + ButtonHelper.getIdentOrColor(p2, game) + "'s commodities";
+            message = "Refreshed " + player.getFactionEmojiOrColor() + "'s commodities";
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " your commodities were refreshed by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Carth of Golden Sands, the Hacan" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             ButtonHelperStats.replenishComms(event, game, p2, true);
@@ -2123,11 +2123,10 @@ public class ButtonHelperAgents {
         }
     }
 
-    public static void yinAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String ident, String trueIdentity) {
+    public static void yinAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            trueIdentity + " Use buttons to select faction to give " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            player.getRepresentationUnfogged() + " Use buttons to select faction to give " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.",
             buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
