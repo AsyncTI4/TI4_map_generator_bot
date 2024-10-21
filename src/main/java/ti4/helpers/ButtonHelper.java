@@ -117,6 +117,13 @@ import ti4.selections.selectmenus.SelectFaction;
 
 public class ButtonHelper {
 
+    public static String getButtonRepresentation(Button button) {
+        String id = button.getId();
+        String label = button.getLabel();
+        EmojiUnion emoji = button.getEmoji();
+        return (emoji != null ? emoji.getFormatted() : "") + "__**" + (label.isEmpty() ? " " : label) + "**__  `[" + id + "]`";
+    }
+
     public static boolean doesPlayerHaveFSHere(String flagshipID, Player player, Tile tile) {
         if (!player.hasUnit(flagshipID) || tile == null) {
             return false;
