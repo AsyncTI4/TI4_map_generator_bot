@@ -42,7 +42,9 @@ public class ObjectiveBox {
 
 		graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
 		graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
-		game.addWebsiteOverlay("objective", objective.key(), x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+		if (objective.revealed()) {
+			game.addWebsiteOverlay("objective", objective.key(), x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+		}
 
 		x += maxTextWidth + bufferBetweenTextAndTokens;
 		displayScoreMarkers(game, graphics, generator, objective);
