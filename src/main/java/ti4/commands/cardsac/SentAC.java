@@ -3,6 +3,7 @@ package ti4.commands.cardsac;
 import java.util.Map;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -68,10 +69,24 @@ public class SentAC extends ACCardsSubcommandData {
             FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
         }
 
-        player.removeActionCard(acIndex);
-        player_.setActionCard(acID);
-        ButtonHelper.checkACLimit(game, event, player_);
-        ACInfo.sendActionCardInfo(game, player_);
+        sendActionCard(event, game, player, player_, acID);
+    }
+
+    public static void sendActionCard(GenericInteractionCreateEvent event, Game game, Player player, Player p2, String acID) {
+        Integer handIndex = player.getActionCards().get(acID);
+        ButtonHelper.checkACLimit(game, event, p2);
+        if (acID == null || handIndex == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find AC in your hand.");
+            return;
+        }
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find other player.");
+            return;
+        }
+
+        player.removeActionCard(handIndex);
+        p2.setActionCard(acID);
         ACInfo.sendActionCardInfo(game, player);
+        ACInfo.sendActionCardInfo(game, p2);
     }
 }

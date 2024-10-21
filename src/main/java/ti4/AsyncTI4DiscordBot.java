@@ -72,7 +72,6 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.tokens.RemoveToken;
 import ti4.commands.uncategorized.AllInfo;
 import ti4.commands.uncategorized.CardsInfo;
-import ti4.commands.uncategorized.DeleteGame;
 import ti4.commands.uncategorized.SelectionBoxDemo;
 import ti4.commands.uncategorized.ShowDistances;
 import ti4.commands.uncategorized.ShowGame;
@@ -167,7 +166,6 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new ShowGame());
         commandManager.addCommand(new ShowDistances());
-        commandManager.addCommand(new DeleteGame());
         commandManager.addCommand(new AddCC());
         commandManager.addCommand(new RemoveCC());
         commandManager.addCommand(new RemoveAllCC());
@@ -184,8 +182,8 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new SearchCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new RelicCommand());
-        commandManager.addCommand(new AdminCommand());
 
+        commandManager.addCommand(new AdminCommand());
         commandManager.addCommand(new DeveloperCommand());
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
@@ -393,9 +391,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1250131684393881613")); // Async Senary (Tommer Hawk)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
-        bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
-        bothelperRoles.add(jda.getRoleById("1215450829096624129")); //Sigma's Server
-        bothelperRoles.add(jda.getRoleById("1225597399385374781")); //ForlornGeas's Server
+        bothelperRoles.add(jda.getRoleById("1225597399385374781")); // ForlornGeas's Server
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
         bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server

@@ -201,7 +201,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
             Button resolveExplore1 = Buttons.green("lanefirAgentRes_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Choose " + name1);
             Button resolveExplore2 = Buttons.green("lanefirAgentRes_Accept_" + drawColor + "_" + planetName, "Use Lanefir Agent");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentation(true, true) + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            String message = player.getRepresentationUnfogged() + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Vassa Hagi, the Lanefir" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, and thus may decline this explore to draw another one instead.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
@@ -220,7 +220,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
             Button resolveExplore1 = Buttons.green("absolsdn_Decline_" + drawColor + "_" + cardID + "_" + planetName, "Resolve " + name1);
             Button resolveExplore2 = Buttons.green("absolsdn_Accept" + drawColor + "_" + planetName, "Get 1TG");
             List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-            String message = player.getRepresentation(true, true) + " You have Scanlink Drone Network, and thus may decline this explore to get 1TG.";
+            String message = player.getRepresentationUnfogged() + " You have Scanlink Drone Network, and thus may decline this explore to get 1TG.";
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                 String pF = player.getFactionEmoji();
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), pF + " found a " + name1 + " on " + planetName);
@@ -264,11 +264,10 @@ public class ExplorePlanet extends ExploreSubcommandData {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasUnexhaustedLeader("augersagent")) {
                     List<Button> buttons = new ArrayList<>();
-                    buttons.add(Buttons.green("exhaustAgent_augersagent_" + player.getFaction(),
-                        "Use Augers Agent on " + player.getColor()).withEmoji(Emoji.fromFormatted(Emojis.augers)));
+                    buttons.add(Buttons.green("exhaustAgent_augersagent_" + player.getFaction(), "Use Augers Agent on " + player.getColor(), Emojis.augers));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg2 = p2.getRepresentation(true, true) + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                        + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on " + ButtonHelper.getIdentOrColor(player, game) + " to give them 2TGs.";
+                    String msg2 = p2.getRepresentationUnfogged() + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        + "Clodho, the Augers" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on " + player.getFactionEmojiOrColor() + " to give them 2TGs.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg2, buttons);
                 }
             }

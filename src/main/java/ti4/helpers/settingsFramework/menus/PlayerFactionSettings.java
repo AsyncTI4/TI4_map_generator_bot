@@ -99,6 +99,7 @@ public class PlayerFactionSettings extends SettingsMenu {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
             Map<String, FactionModel> allFactions = Mapper.getFactions().stream()
                 .filter(model -> sources.contains(model.getSource()))
+                .filter(model -> !model.getAlias().contains("keleres") || model.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
                 .collect(Collectors.toMap(f -> f.getAlias(), f -> f));
             banFactions.setAllValues(allFactions);
             priFactions.setAllValues(allFactions);

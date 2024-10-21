@@ -11,10 +11,13 @@ import ti4.AsyncTI4DiscordBot;
 public class Constants {
     // Staff Pings
     public static final String chassitId = "183213554445320192";
+    public static final String eronousId = "465241936408608769";
     public static final String tspId = "150809002974904321";
     public static final String jazzId = "228999251328368640";
-    public static final String prisonerOneID = "481860200169472030";
+    public static final String prisonerOneId = "481860200169472030";
     public static final String bltId = "757405214398480486";
+    public static final String gedsDeadId = "586504147746947090";
+    public static final String sigmaId = "214326507458396161";
     public static List<String> honoraryJazz = Arrays.asList("1153503280706625606", tspId);
 
     public static String jazzPing() {
@@ -30,6 +33,11 @@ public class Constants {
     // Tourney Winners
     public static final String cal1nos = "740848810749722646";
     public static List<String> tourneyWinners = List.of(cal1nos);
+
+    // Other People IDs
+    public static final String cagesId = "203608548440014848";
+    public static final String bortId = "154000388121559040";
+    public static final String dicecordId = "572698679618568193";
 
     // other stuff
     public static final String READY_TO_PASS_BAG = "ready_to_pass_bag";
@@ -268,6 +276,7 @@ public class Constants {
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
+    public static final String INTERACTIVE_BUILDER = "interactive_builder";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";
     public static final String CC = "cc";
@@ -1169,5 +1178,5 @@ public class Constants {
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";
-    public static final String CRYYPTER_MODE = "cryypter_mode";
+    public static final String VOTC_MODE = "votc_mode";
 }

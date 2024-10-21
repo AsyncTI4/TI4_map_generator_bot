@@ -112,17 +112,16 @@ abstract public class AddRemoveUnits implements Command {
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
 
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
         unitParsing(event, color, tile, unitList, game);
     }
 
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList,
-        Game game) {
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game game) {
 
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
@@ -135,7 +134,7 @@ abstract public class AddRemoveUnits implements Command {
         if (!Mapper.isValidColor(color)) {
             return;
         }
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 

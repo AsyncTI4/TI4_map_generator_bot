@@ -62,7 +62,7 @@ public class UserJoinServerListener extends ListenerAdapter {
                 }
 
                 checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
-            });
+            }, BotLogger::catchRestError);
         } catch (Exception e) {
             BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
         }
@@ -75,8 +75,11 @@ public class UserJoinServerListener extends ListenerAdapter {
             if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
                 Helper.fixGameChannelPermissions(guild, game);
-                if (game.getBotMapUpdatesThread() != null) {
-                    game.getBotMapUpdatesThread().addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
+                ThreadChannel mapThread = game.getBotMapUpdatesThread();
+                if (mapThread != null && !mapThread.isLocked()) {
+                    mapThread.getManager().setArchived(false).queue(success -> {
+                        mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
+                    }, BotLogger::catchRestError);
                 }
                 Player player = game.getPlayer(user.getId());
                 if (player != null && ButtonHelper.isPlayerNew(game, player)) {
@@ -130,7 +133,8 @@ public class UserJoinServerListener extends ListenerAdapter {
     private void checkIfUserLeftActiveGames(Guild guild, User user, boolean voluntary) {
         List<Game> gamesQuit = new ArrayList<>();
         for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
-            if (game.isHasEnded()) continue;
+            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
+            if (game.isHasEnded() || endVPReachedButNotEnded) continue;
             Guild gameGuild = game.getGuild();
             if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 gamesQuit.add(game);

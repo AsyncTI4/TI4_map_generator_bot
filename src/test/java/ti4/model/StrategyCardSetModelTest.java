@@ -14,7 +14,6 @@ public class StrategyCardSetModelTest extends BaseTi4Test {
             assertTrue(scSetModel.isValid(), scSetModel.getAlias() + "'s data is invalid");
             assertTrue(validateSCIDs(scSetModel), scSetModel.getAlias() + " [" + scSetModel.getName() + "]: Invalid SC IDs");
             assertTrue(validateNoDuplicateInitiatives(scSetModel), scSetModel.getAlias() + " [" + scSetModel.getName() + "]: Duplicate Initiative Values");
-        
         }
     }
 

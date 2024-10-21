@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -21,6 +22,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class Replace extends GameSubcommandData {
@@ -94,13 +96,19 @@ public class Replace extends GameSubcommandData {
 
         //ADD ROLE
         Member addedMember = guild.getMemberById(addedUser.getId());
+        if (addedMember == null) return;
+
         if (roles.size() == 1) {
             guild.addRoleToMember(addedMember, roles.get(0)).queue();
         }
 
         String message;
-        if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) || players.stream().anyMatch(player -> player.getUserID().equals(addedUser.getId()))) {
-            MessageHelper.replyToMessage(event, "Specify player that is in game to be removed and player that is not in game to be replacement");
+        if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
+            MessageHelper.replyToMessage(event, "Specify player that is in game to be removed");
+            return;
+        }
+        if (players.stream().anyMatch(player -> player.getUserID().equals(addedUser.getId()))) {
+            MessageHelper.replyToMessage(event, "Specify player that is **__not__** in the game to be the replacement");
             return;
         }
 
@@ -129,8 +137,11 @@ public class Replace extends GameSubcommandData {
         }
 
         Helper.fixGameChannelPermissions(event.getGuild(), game);
-        if (game.getBotMapUpdatesThread() != null) {
-            game.getBotMapUpdatesThread().addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS);
+        ThreadChannel mapThread = game.getBotMapUpdatesThread();
+        if (mapThread != null && !mapThread.isLocked()) {
+            mapThread.getManager().setArchived(false).queue(success -> {
+                mapThread.addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS);
+            }, BotLogger::catchRestError);
         }
         game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, player.getUserID());
 

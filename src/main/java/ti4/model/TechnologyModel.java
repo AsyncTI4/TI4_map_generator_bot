@@ -37,6 +37,17 @@ public class TechnologyModel implements ModelInterface, EmbeddableModel {
         public String toString() {
             return super.toString().toLowerCase();
         }
+
+        public String emoji() {
+            return switch (this) {
+                case PROPULSION -> Emojis.PropulsionTech;
+                case CYBERNETIC -> Emojis.CyberneticTech;
+                case WARFARE -> Emojis.WarfareTech;
+                case BIOTIC -> Emojis.BioticTech;
+                case UNITUPGRADE -> Emojis.UnitUpgradeTech;
+                default -> "";
+            };
+        }
     }
 
     public boolean isValid() {

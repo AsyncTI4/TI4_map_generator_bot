@@ -1,11 +1,7 @@
 package ti4.commands.help;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -36,20 +32,18 @@ public class SampleDecals extends HelpSubcommandData {
         List<String> decals = Mapper.getDecals().stream()
             .filter(decalID -> ChangeUnitDecal.userMayUseDecal(event.getUser().getId(), decalID))
             .collect(Collectors.toList());
-        ;
+
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
         if (input == null || input.getAsString().equals("ALL") || input.getAsString().equals("")) {
         } else if (input.getAsString().equals("Other")) {
-            List<String> others = Arrays.asList(new String[] { "cb_10", "cb_10", "cb_52", "cb_81" });
+            List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
             decals = decals.stream()
                 .filter(decalID -> others.contains(decalID))
                 .collect(Collectors.toList());
-            ;
         } else {
             decals = decals.stream()
                 .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
                 .collect(Collectors.toList());
-            ;
         }
         Collections.sort(decals);
         if (decals.size() == 0) {
@@ -90,8 +84,7 @@ public class SampleDecals extends HelpSubcommandData {
             int mid = -1;
             int i = label.indexOf(" ");
             while (i >= 0) {
-                if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2) > Math.abs(label.length() / 2.0 - 0.5 - i)) // the (n%2) means that tie breaks will alternate each decal, hopefully reducing collisions
-                {
+                if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2) > Math.abs(label.length() / 2.0 - 0.5 - i)) { // the (n%2) means that tie breaks will alternate each decal, hopefully reducing collisions
                     mid = i;
                 }
                 i = label.indexOf(" ", i + 1);
@@ -120,7 +113,7 @@ public class SampleDecals extends HelpSubcommandData {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, 1.0f, "decal_sample_" + top + "_" + left)
+        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, "decal_sample_" + top + "_" + left)
             .setDescription("Decal samples for units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }

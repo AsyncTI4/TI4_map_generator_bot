@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -142,8 +141,7 @@ public class CombatRoll extends CombatSubcommandData {
                 "Planet needs to be specified to fire space cannon defence on tile " + tile.getPosition());
         }
 
-        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event,
-            rollType, game);
+        Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player, event, rollType, game);
         if (ButtonHelper.isLawInPlay(game, "articles_war")) {
             if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
@@ -183,7 +181,6 @@ public class CombatRoll extends CombatSubcommandData {
                     + " for player " + player.getColor() + " "
                     + player.getFactionEmoji() + " for the combat roll type " + rollType.toString() + "\n"
                     + "Ping bothelper if this seems to be in error.");
-
             return 0;
         }
 
@@ -201,8 +198,7 @@ public class CombatRoll extends CombatSubcommandData {
         if (opponent == null) {
             opponent = player;
         }
-        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent, event,
-            rollType, game);
+        Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
 
         TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
         List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
@@ -251,15 +247,17 @@ public class CombatRoll extends CombatSubcommandData {
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (message.contains("adding +1, at the risk of your")) {
-            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "Use this button to roll for Thalnos. Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc. Sol and Letnev agents automatically are given as extra dice for unit 1.",
-                Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos").withEmoji(Emoji.fromFormatted(Emojis.Relic)));
+            Button thalnosButton = Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", Emojis.Relic);
+            Button decline = Buttons.gray("editMessage_" + player.getFactionEmoji() + " declined Thalnos", "Decline");
+            String thalnosMessage = "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), thalnosMessage, List.of(thalnosButton, decline));
         }
         if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " you suffered " + h + " hit" + (h == 1 ? "" : "s") + " in round #" + round2;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (!automated) {
                 if (h > 0) {
-                    String msg = opponent.getRepresentation(true, true) + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
+                    String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
                     List<Button> buttons = new ArrayList<>();
                     if (opponent.isDummy()) {
                         if (round2 > round) {
@@ -277,7 +275,7 @@ public class CombatRoll extends CombatSubcommandData {
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                     if (opponent.hasTech("vpw")) {
-                        msg = player.getRepresentation(true, true) + " you got hit by Valkyrie Particle Weave. You may autoassign 1 hit.";
+                        msg = player.getRepresentationUnfogged() + " you got hit by Valkyrie Particle Weave. You may autoassign 1 hit.";
                         buttons = new ArrayList<>();
                         buttons.add(Buttons.green(opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
@@ -285,7 +283,7 @@ public class CombatRoll extends CombatSubcommandData {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                     }
                 } else {
-                    String msg = opponent.getRepresentation(true, true) + " you may roll dice for Combat Round #" + (round + 1) + ".";
+                    String msg = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #" + (round + 1) + ".";
                     List<Button> buttons = new ArrayList<>();
                     if (opponent.isDummy()) {
                         if (round2 > round) {
@@ -332,7 +330,7 @@ public class CombatRoll extends CombatSubcommandData {
                     String msg2 = opponent.getFactionEmoji() + " may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
                 } else {
-                    String msg2 = opponent.getRepresentation(true, true) + " you may roll dice for Combat Round #" + (round + 1) + ".";
+                    String msg2 = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #" + (round + 1) + ".";
                     if (round2 > round) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
                     }
@@ -345,7 +343,7 @@ public class CombatRoll extends CombatSubcommandData {
                             buttons.add(Buttons.blue(opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Dummy for Combat Round #" + (round + 1)));
                         }
                         buttons.add(Buttons.green(opponent.dummyPlayerSpoof() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
-                        String msg = opponent.getRepresentation(true, true) + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
+                        String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
                     } else {
                         buttons.add(Buttons.green(opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hits For Dummy"));
@@ -359,7 +357,7 @@ public class CombatRoll extends CombatSubcommandData {
             String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from AFB";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
-                String msg = opponent.getRepresentation(true, true) + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
+                String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit" + (h == 1 ? "" : "s") + ".";
                 List<Button> buttons = new ArrayList<>();
                 String finChecker = "FFCC_" + opponent.getFaction() + "_";
                 buttons.add(Buttons.green(finChecker + "autoAssignAFBHits_" + tile.getPosition() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s")));

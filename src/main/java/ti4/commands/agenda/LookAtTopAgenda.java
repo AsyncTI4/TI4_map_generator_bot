@@ -59,7 +59,7 @@ public class LookAtTopAgenda extends AgendaSubcommandData {
 
     public static void lookAtAgendas(Game game, Player player, int count, boolean lookFromBottom) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have looked at:");
+        sb.append(player.getRepresentationUnfogged()).append(" here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have looked at:");
         List<MessageEmbed> agendaEmbeds = getAgendaEmbeds(count, lookFromBottom, game);
 
         Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);

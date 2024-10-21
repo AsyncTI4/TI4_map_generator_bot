@@ -12,9 +12,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -35,6 +32,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -236,32 +235,35 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         newGame.setTableTalkChannelID(chatChannel.getId());
-        
+
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-        .syncPermissionOverrides()
-        .addRolePermissionOverride(gameRoleID, permission, 0)
-        .complete();
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-        
+
         // CREATE BOT/MAP THREAD
         try {
             actionsChannel.createThreadChannel(newBotThreadName)
-            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-            .queueAfter(1, TimeUnit.SECONDS, botThread -> {
-                newGame.setBotMapUpdatesThreadID(botThread.getId());
-                introductionToBotMapUpdatesThread(newGame);
-                introductionForNewPlayers(newGame);
-            }, BotLogger::catchRestError);
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+                .queueAfter(1, TimeUnit.SECONDS, botThread -> {
+                    newGame.setBotMapUpdatesThreadID(botThread.getId());
+                    introductionToBotMapUpdatesThread(newGame);
+                    introductionForNewPlayers(newGame);
+                }, BotLogger::catchRestError);
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(newGame.getMainGameChannel(), "You will need to make your own bot-map-updates thread. Ping bothelper if you don't know how");
         }
-        
+
         introductionToTableTalkChannel(newGame);
         introductionToActionsChannel(newGame);
         sendMessageAboutAggressionMetas(newGame);
 
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
+        // Create Cards Info Threads
+        for (Player player : newGame.getPlayers().values()) {
+            player.createCardsInfoThreadChannelsIfRequired();
+        }
 
         Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
         MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to set up a Milty Draft?", miltyButton);
@@ -397,7 +399,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                     }
                     MessageHelper.sendMessageToChannel(introThread, message);
                     BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                    FileUpload fileUpload = MapGenerator.uploadToDiscord(colorsImage, 1.0f, "colors");
+                    FileUpload fileUpload = MapGenerator.uploadToDiscord(colorsImage, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
                     BotLogger.log("newPlayerIntro", e);

@@ -172,8 +172,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.add(button);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to force into giving you a PN or AC", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who you want to force into giving you a PN or AC", buttons);
     }
 
     public static void resolvePrismStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -187,7 +186,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " chose " + ButtonHelper.getIdentOrColor(p2, game) + " as the target of the prism ability. The target has been sent buttons to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-            p2.getRepresentation(true, true) + " you have had the Prism ability hit you. Please tell the bot if you wish to send an AC or a PN", buttons);
+            p2.getRepresentationUnfogged() + " you have had the Prism ability hit you. Please tell the bot if you wish to send an AC or a PN", buttons);
     }
 
     public static void resolvePrismStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
@@ -198,12 +197,10 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " chose to send a " + pnOrAC);
         if ("pn".equalsIgnoreCase(pnOrAC)) {
             buttons = ButtonHelper.getForcedPNSendButtons(game, p2, player);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true) + " resolve", buttons);
-
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " resolve", buttons);
         } else {
             String buttonID2 = "transact_ACs_" + p2.getFaction();
             TransactionHelper.resolveSpecificTransButtonsOld(game, player, buttonID2, event);
         }
-
     }
 }

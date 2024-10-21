@@ -65,7 +65,7 @@ public class AddAllianceMember extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " heads up, in an alliance game with Mahact as an alliance partner, you do not get mahacts alliance, they in fact grab a CC from your pool. This is because Dane thought Mahact's commander was too powerful to share.");
 
         }
-        String msg = player.getRepresentation(true, true) + player_.getRepresentation(true, true)
+        String msg = player.getRepresentationUnfogged() + player_.getRepresentationUnfogged()
             + " pinging you into this";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(), msg);

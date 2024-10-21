@@ -109,7 +109,7 @@ public class PlayPN extends PNCardsSubcommandData {
             if (id.contains("Checked")) {
                 id = "dspnflor";
             } else {
-                MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, player.getRepresentation(true, true)
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, player.getRepresentationUnfogged()
                     + " this PN will be applied automatically the next time you draw a relic. It will not work if you play it before then, so I am stopping you here");
                 return;
             }
@@ -151,7 +151,7 @@ public class PlayPN extends PNCardsSubcommandData {
         // And refresh cards info
         PNInfo.sendPromissoryNoteInfo(game, player, false);
         PNInfo.sendPromissoryNoteInfo(game, owner, false);
-        MessageHelper.sendMessageToChannel(owner.getCardsInfoThread(), owner.getRepresentation(true, true) + " someone played one of your PNs (" + pnName + ")");
+        MessageHelper.sendMessageToChannel(owner.getCardsInfoThread(), owner.getRepresentationUnfogged() + " someone played one of your PNs (" + pnName + ")");
 
         if (id.contains("dspnveld")) {
             ButtonHelperFactionSpecific.offerVeldyrButtons(player, game, id);
@@ -173,22 +173,22 @@ public class PlayPN extends PNCardsSubcommandData {
         }
         if ("iff".equalsIgnoreCase(id)) {
             List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-            String message = player.getRepresentation(true, true) + " select type of wormhole you wish to drop";
+            String message = player.getRepresentationUnfogged() + " select type of wormhole you wish to drop";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("greyfire".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelperFactionSpecific.getGreyfireButtons(game);
-            String message = player.getRepresentation(true, true) + " select planet you wish to use greyfire on";
+            String message = player.getRepresentationUnfogged() + " select planet you wish to use greyfire on";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if ("dspnlizh".equalsIgnoreCase(id) || "dspnchei".equalsIgnoreCase(id)) {
             new AddUnits().unitParsing(event, player.getColor(),
                 game.getTileByPosition(game.getActiveSystem()), "2 ff", game);
-            String message = player.getRepresentation(true, true) + " added 2 fighters to the active system";
+            String message = player.getRepresentationUnfogged() + " added 2 fighters to the active system";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         }
         if ("dspncymi".equalsIgnoreCase(id)) {
-            PickACFromDiscard.pickACardFromDiscardStep1(game, player);
+            PickACFromDiscard.pickACardFromDiscardStep1(event, game, player);
         }
         if ("dspnkort".equalsIgnoreCase(id)) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "kortalipn");
@@ -196,7 +196,7 @@ public class PlayPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
         }
         if ("ragh".equalsIgnoreCase(id)) {
-            String message = player.getRepresentation(true, true) + " select planet to Ragh's Call on";
+            String message = player.getRepresentationUnfogged() + " select planet to Ragh's Call on";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message,
                 ButtonHelperFactionSpecific.getRaghsCallButtons(player, game,
                     game.getTileByPosition(game.getActiveSystem())));
@@ -221,14 +221,14 @@ public class PlayPN extends PNCardsSubcommandData {
             if (owner.getStrategicCC() > 0) {
                 owner.setStrategicCC(owner.getStrategicCC() - 1);
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(),
-                    owner.getRepresentation(true, true)
+                    owner.getRepresentationUnfogged()
                         + " lost a command counter from strategy pool due to a Military Support play");
             }
-            String message = player.getRepresentation(true, true) + " Use buttons to drop 2 infantry on a planet";
+            String message = player.getRepresentationUnfogged() + " Use buttons to drop 2 infantry on a planet";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         if (!"agendas_absol".equals(game.getAgendaDeckID()) && id.endsWith("_ps")) {
-            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentation(true, true)
+            MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
                 + " due to a play of your Political Secret, you will be unable to vote in agenda (unless you have Xxcha alliance). The bot doesn't enforce the other restrictions regarding no abilities, but you should abide by them.");
             game.setStoredValue("AssassinatedReps",
                 game.getStoredValue("AssassinatedReps") + owner.getFaction());
@@ -236,10 +236,10 @@ public class PlayPN extends PNCardsSubcommandData {
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheck.checkPlayer(player, "mirveda");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, true) + " acquired War Sun tech");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired War Sun tech");
             owner.setFleetCC(owner.getFleetCC() - 1);
             ButtonHelper.checkFleetInEveryTile(owner, game, event);
-            String reducedMsg = owner.getRepresentation(true, true) + " reduced your fleet CC by 1 due to fires being played";
+            String reducedMsg = owner.getRepresentationUnfogged() + " reduced your fleet CC by 1 due to fires being played";
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
             } else {
@@ -249,8 +249,8 @@ public class PlayPN extends PNCardsSubcommandData {
         if (id.endsWith("_ta")) {
             int comms = owner.getCommodities();
             owner.setCommodities(0);
-            String reducedMsg = owner.getRepresentation(true, true) + " your TA was played.";
-            String reducedMsg2 = player.getRepresentation(true, true)
+            String reducedMsg = owner.getRepresentationUnfogged() + " your TA was played.";
+            String reducedMsg2 = player.getRepresentationUnfogged()
                 + " you gained TGs equal to the number of comms the player had (your TGs went from "
                 + player.getTg() + "TG" + (player.getTg() == 1 ? "" : "s") + " to -> " + (player.getTg() + comms)
                 + "TG" + (player.getTg() + comms == 1 ? "" : "s")
@@ -264,7 +264,7 @@ public class PlayPN extends PNCardsSubcommandData {
         if (("favor".equalsIgnoreCase(id))) {
             if (owner.getStrategicCC() > 0) {
                 owner.setStrategicCC(owner.getStrategicCC() - 1);
-                String reducedMsg = owner.getRepresentation(true, true)
+                String reducedMsg = owner.getRepresentationUnfogged()
                     + " reduced your strategy CC by 1 due to your PN getting played";
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
@@ -280,7 +280,7 @@ public class PlayPN extends PNCardsSubcommandData {
             }
         }
         if (("scepter".equalsIgnoreCase(id))) {
-            String message = player.getRepresentation(true, true) + " Use buttons choose which system to mahact diplo";
+            String message = player.getRepresentationUnfogged() + " Use buttons choose which system to mahact diplo";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
                 Helper.getPlanetSystemDiploButtons(player, game, false, owner));
         }
