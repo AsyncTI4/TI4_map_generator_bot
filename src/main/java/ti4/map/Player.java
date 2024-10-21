@@ -1437,19 +1437,36 @@ public class Player {
         initAbilities();
     }
 
+    /**
+     * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName]
+     */
     @JsonIgnore
     public String getRepresentation() {
         return getRepresentation(false, true);
     }
 
+        /**
+     * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name)
+     */
     @JsonIgnore
     public String getRepresentationUnfogged() {
         return getRepresentation(true, true);
     }
 
+    /**
+     * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName] - won't ping player
+     */
     @JsonIgnore
     public String getRepresentationNoPing() {
         return getRepresentation(false, false);
+    }
+
+    /**
+     * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name) - won't ping player
+     */
+    @JsonIgnore
+    public String getRepresentationUnfoggedNoPing() {
+        return getRepresentation(true, false);
     }
 
     @JsonIgnore
