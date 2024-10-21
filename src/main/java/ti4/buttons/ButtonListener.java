@@ -9,12 +9,9 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
@@ -145,11 +142,10 @@ public class ButtonListener extends ListenerAdapter {
         MessageChannel actionsChannel = context.getActionsChannel();
 
         // hacking
-        Player nullable = player;
+        Player nullable = player; // why?
 
         // Setup some additional helper values for buttons
         String buttonLabel = event.getButton().getLabel();
-        String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         String finsFactionCheckerPrefix = nullable == null ? "FFCC_nullPlayer_" : nullable.getFinsFactionCheckerPrefix();
 
         // Check the list of buttons first
@@ -293,13 +289,13 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("exhaustRelic_")) {
             UnfiledButtonHandlers.exhaustRelic(event, player, buttonID, game);
         } else if (buttonID.startsWith("scepterE_follow_") || buttonID.startsWith("mahactA_follow_")) {
-            ButtonHelperSCs.mahactAndScepterFollow(game, player, event, buttonID, lastchar);
+            ButtonHelperSCs.mahactAndScepterFollow(game, player, event, buttonID);
         } else if (buttonID.startsWith("spendAStratCC")) {
             UnfiledButtonHandlers.spendAStratCC(event, player, game);
         } else if (buttonID.startsWith("sc_follow_")) {
-            ButtonHelperSCs.scFollow(messageID, game, player, event, buttonID, nullable, lastchar);
+            ButtonHelperSCs.scFollow(messageID, game, player, event, buttonID);
         } else if (buttonID.startsWith("sc_no_follow_")) {
-            ButtonHelperSCs.scNoFollow(messageID, game, player, event, buttonID, nullable, lastchar);
+            ButtonHelperSCs.scNoFollow(messageID, game, player, event, buttonID);
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ButtonHelper.addReaction(event, false, false, null, "");
         } else if (buttonID.startsWith("movedNExplored_")) {
