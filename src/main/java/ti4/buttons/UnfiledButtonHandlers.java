@@ -92,7 +92,8 @@ import ti4.model.TechnologyModel;
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
  */
-public class UnfiledButtonHandlers {
+public class UnfiledButtonHandlers { // TODO: move all of these methods to a better location, closer to the orignal button call and/or other related code
+    
     public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);

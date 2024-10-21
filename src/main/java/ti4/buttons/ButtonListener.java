@@ -992,166 +992,16 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperTacticalAction.finishMovingForTacticalAction(player, game, event, buttonID);
         } else if (buttonID.startsWith("transactWith_") || buttonID.startsWith("resetOffer_")) {
             UnfiledButtonHandlers.transactWith(event, player, buttonID, game);
-        } else if (buttonID.startsWith("rejectOffer_")) { // TODO: P1 finish refactor
-            Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-            if (p1 != null) {
-                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " your offer to " + player.getRepresentation(false, false) + " has been rejected.");
-                ButtonHelper.deleteMessage(event);
-            }
-            int i = 10;
-
+        } else if (buttonID.startsWith("rejectOffer_")) {
+            TransactionHelper.rejectOffer(event, player, buttonID, game);
         } else if (buttonID.startsWith("rescindOffer_")) {
-            Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-            if (p2 != null) {
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the latest offer from " + player.getRepresentation(false, false) + " has been rescinded.");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "you rescinded the latest offer to " + p2.getRepresentation(false, false));
-                player.clearTransactionItemsWithPlayer(p2);
-                ButtonHelper.deleteMessage(event);
-            }
+            TransactionHelper.rescindOffer(event, player, buttonID, game);
         } else if (buttonID.startsWith("acceptOffer_")) {
-            Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-            if (buttonID.split("_").length > 2) {
-                String offerNum = buttonID.split("_")[2];
-                String key = "offerFrom" + p1.getFaction() + "To" + player.getFaction();
-                String oldOffer = game.getStoredValue(key);
-                if (!offerNum.equalsIgnoreCase(oldOffer)) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Only the most recent offer is acceptable. This is an old transaction offer and it can no longer be accepted");
-                    return;
-                }
-            }
-            TransactionHelper.acceptTransactionOffer(p1, player, game, event);
-            ButtonHelper.deleteMessage(event);
+            TransactionHelper.acceptOffer(event, game, player, buttonID);
         } else if (buttonID.startsWith("play_after_")) {
-            String riderName = buttonID.replace("play_after_", "");
-            List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-            String pnKey = "fin";
-
-            if ("Keleres Rider".equalsIgnoreCase(riderName) || "Edyn Rider".equalsIgnoreCase(riderName)
-                || "Kyro Rider".equalsIgnoreCase(riderName)) {
-                if ("Keleres Rider".equalsIgnoreCase(riderName)) {
-                    for (String pn : player.getPromissoryNotes().keySet()) {
-                        if (pn.contains("rider")) {
-                            pnKey = pn;
-                        }
-                    }
-                    if ("fin".equalsIgnoreCase(pnKey)) {
-                        MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You don't have a Keleres Rider");
-                        return;
-                    }
-                    if (player.getFaction().contains("keleres")) {
-                        MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You cannot play your own promissory note");
-                        return;
-                    }
-                } else if ("Edyn Rider".equalsIgnoreCase(riderName)) {
-                    for (String pn : player.getPromissoryNotes().keySet()) {
-                        if (pn.contains("dspnedyn")) {
-                            pnKey = pn;
-                        }
-                    }
-                    if ("fin".equalsIgnoreCase(pnKey)) {
-                        MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
-                        return;
-                    }
-                } else if ("Kyro Rider".equalsIgnoreCase(riderName)) {
-                    for (String pn : player.getPromissoryNotes().keySet()) {
-                        if (pn.contains("dspnkyro")) {
-                            pnKey = pn;
-                        }
-                    }
-                    if ("fin".equalsIgnoreCase(pnKey)) {
-                        MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Kyro Rider");
-                        return;
-                    }
-                }
-
-                ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
-                PlayPN.resolvePNPlay(pnKey, player, game, event);
-            } else {
-                ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
-
-                if (riderName.contains("Unity Algorithm")) {
-                    player.exhaustTech("dsedyng");
-                }
-                if ("conspirators".equalsIgnoreCase(riderName)) {
-                    game.setStoredValue("conspiratorsFaction", player.getFaction());
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        game.getPing()
-                            + " The conspirators ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
-                    if (!game.isFowMode()) {
-                        ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
-                    }
-                } else {
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
-                        "Please select your rider target",
-                        game, player, riderButtons);
-                    if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
-                        Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
-                        if (playerLeader != null) {
-                            StringBuilder message = new StringBuilder(player.getRepresentation());
-                            message.append(" played ");
-                            message.append(Helper.getLeaderFullRepresentation(playerLeader));
-                            boolean purged = player.removeLeader(playerLeader);
-                            if (purged) {
-                                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                                    message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
-                            } else {
-                                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                                    "Odlynn Myrr, the Keleres (Xxcha) hero, was not purged - something went wrong.");
-                            }
-                        }
-                    }
-                }
-                MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel,
-                    "Please indicate no afters again.", game, afterButtons, "after");
-            }
-            // "dspnedyn"
-            ButtonHelper.deleteMessage(event);
+            play_after(event, game, player, buttonID);
         } else if (buttonID.startsWith("ultimateUndo_")) {
-            if (game.getSavedButtons().size() > 0) {
-                String buttonString = game.getSavedButtons().get(0);
-                String colorOrFaction = buttonString.split(";")[0];
-                Player p = game.getPlayerFromColorOrFaction(colorOrFaction);
-                if (p != null && player != p && !colorOrFaction.equals("null")) {
-                    // if the last button was pressed by a non-faction player, allow anyone to undo
-                    // it
-                    String msg = "You were not the player who pressed the latest button. Use /game undo if you truly want to undo "
-                        + game.getLatestCommand();
-                    MessageHelper.sendMessageToChannel(event.getChannel(), msg);
-                    return;
-                }
-            }
-            String highestNumBefore = buttonID.split("_")[1];
-            File mapUndoDirectory = Storage.getMapUndoDirectory();
-            if (!mapUndoDirectory.exists()) {
-                return;
-            }
-            String mapName = game.getName();
-            String mapNameForUndoStart = mapName + "_";
-            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-            if (mapUndoFiles != null && mapUndoFiles.length > 0) {
-                List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                    .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-                    .map(fileName -> fileName.replace(Constants.TXT, ""))
-                    .map(Integer::parseInt).toList();
-                int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-                if (highestNumBefore.equalsIgnoreCase((maxNumber) + "")) {
-                    ButtonHelper.deleteMessage(event);
-                }
-            }
-
-            GameSaveLoadManager.undo(game, event);
-
-            String msg = "You undid something, the details of which can be found in the undo-log thread";
-            List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
-            for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {
-                    msg = msg + ": " + threadChannel_.getJumpUrl();
-                }
-            }
-            event.getHook().sendMessage(msg).setEphemeral(true).queue();
-
+           ultimateUndo(event, game, player, buttonID);
         } else if (buttonID.startsWith("addIonStorm_")) {
             ButtonHelper.addIonStorm(game, buttonID, event, player);
         } else if (buttonID.startsWith("flipIonStorm_")) {
@@ -1167,61 +1017,11 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("veldyrAttach_")) {
             ButtonHelperFactionSpecific.resolveBranchOffice(buttonID, event, game, player);
         } else if (buttonID.startsWith("nanoforgePlanet_")) {
-            String planet = buttonID.replace("nanoforgePlanet_", "");
-            Planet planetReal = game.getPlanetsInfo().get(planet);
-            planetReal.addToken("attachment_nanoforge.png");
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
-            ButtonHelper.deleteMessage(event);
+            nanoforgePlanet(event, buttonID, game);
         } else if (buttonID.startsWith("resolvePNPlay_")) {
-            String pnID = buttonID.replace("resolvePNPlay_", "");
-
-            if (pnID.contains("ra_")) {
-                String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
-                TechnologyModel techModel = Mapper.getTech(tech);
-                pnID = pnID.replace("_" + tech, "");
-                String message = ident + " Acquired The Tech " + techModel.getRepresentation(false)
-                    + " via Research Agreement";
-                player.addTech(tech);
-                String key = "RAForRound" + game.getRound() + player.getFaction();
-                if (game.getStoredValue(key).isEmpty()) {
-                    game.setStoredValue(key, tech);
-                } else {
-                    game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
-                }
-                ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-                if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
-                    CommanderUnlockCheck.checkPlayer(player, game, "jolnar", event);
-                }
-                if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
-                    CommanderUnlockCheck.checkPlayer(player, game, "nekro", event);
-                }
-                if (player.getLeaderIDs().contains("mirvedacommander")
-                    && !player.hasLeaderUnlocked("mirvedacommander")) {
-                    CommanderUnlockCheck.checkPlayer(player, game, "mirveda", event);
-                }
-                if (player.getLeaderIDs().contains("dihmohncommander")
-                    && !player.hasLeaderUnlocked("dihmohncommander")) {
-                    CommanderUnlockCheck.checkPlayer(player, game, "dihmohn", event);
-                }
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            }
-            PlayPN.resolvePNPlay(pnID, player, game, event);
-            if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
-                ButtonHelper.deleteMessage(event);
-            }
-
-            var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID,
-                player.getNumberTurns());
-            if (posssibleCombatMod != null) {
-                player.addNewTempCombatMod(posssibleCombatMod);
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    "Combat modifier will be applied next time you push the combat roll button.");
-            }
-
+            resolvePNPlay(event, player, buttonID, game, ident);
         } else if (buttonID.startsWith("send_")) {
-            TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
-            ButtonHelper.deleteMessage(event);
+            send(event, player, buttonID, game);
         } else if (buttonID.startsWith("replacePDSWithFS_")) {
             ButtonHelperFactionSpecific.replacePDSWithFS(buttonID, event, game, player, ident);
         } else if (buttonID.startsWith("putSleeperOnPlanet_")) {
@@ -1243,42 +1043,19 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("relicSwapStep1")) {
             ButtonHelperHeroes.resolveRelicSwapStep1(player, game, event, buttonID);
         } else if (buttonID.startsWith("retrieveAgenda_")) {
-            String agendaID = buttonID.substring(buttonID.indexOf("_") + 1);
-            DrawAgenda.drawSpecificAgenda(agendaID, game, player);
-            ButtonHelper.deleteTheOneButton(event);
+            retrieveAgenda(event, player, buttonID, game);
         } else if (buttonID.startsWith("topAgenda_")) {
-            String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-            new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), game);
-            String key = "round" + game.getRound() + "AgendaPlacement";
-            if (game.getStoredValue(key).isEmpty()) {
-                game.setStoredValue(key, "top");
-            } else {
-                game.setStoredValue(key, game.getStoredValue(key) + "_top");
-            }
-            AgendaModel agenda = Mapper.getAgenda(game.lookAtTopAgenda(0));
-            Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-            MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-                "Put " + agenda.getName()
-                    + " on the top of the agenda deck. You may use this button to undo that and reassign it.",
-                reassign);
-            ButtonHelper.deleteMessage(event);
+            topAgenda(event, buttonID, game);
         } else if (buttonID.startsWith("resolveCounterStroke_")) {
             ButtonHelperActionCards.resolveCounterStroke(game, player, event, buttonID);
         } else if (buttonID.startsWith("sendTGTo_")) {
             AgendaHelper.erase1DebtTo(game, buttonID, event, player);
         } else if (buttonID.startsWith("primaryOfWarfare")) {
-            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
-            MessageChannel channel = player.getCorrectChannel();
-            MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
+            primaryOfWarfare(event, player, game);
         } else if (buttonID.startsWith("mahactCommander")) {
-            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "mahactCommander");
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.",
-                buttons);
-            ButtonHelper.deleteMessage(event);
+            mahactCommander(event, player, game);
         } else if (buttonID.startsWith("useTA_")) {
-            String ta = buttonID.replace("useTA_", "") + "_ta";
-            PlayPN.resolvePNPlay(ta, player, game, event);
-            ButtonHelper.deleteMessage(event);
+            useTA(event, player, buttonID, game);
         } else if (buttonID.startsWith("combatDroneConvert_")) {
             ButtonHelperModifyUnits.resolvingCombatDrones(event, game, player, ident, buttonID);
         } else if (buttonID.startsWith("cloakedFleets_")) {// kolleccMechCapture_
@@ -1286,82 +1063,25 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("kolleccMechCapture_")) {// kolleccMechCapture_
             ButtonHelperModifyUnits.resolveKolleccMechCapture(buttonID, event, game, player);
         } else if (buttonID.startsWith("refreshLandingButtons")) {
-            List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
-            event.getMessage().editMessage(event.getMessage().getContentRaw())
-                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+            refreshLandingButtons(event, player, game);
         } else if (buttonID.startsWith("resolveMirvedaCommander_")) {
             ButtonHelperModifyUnits.resolvingMirvedaCommander(event, game, player, ident, buttonID);
         } else if (buttonID.startsWith("removeCCFromBoard_")) {
-            ButtonHelper.resolveRemovingYourCC(player, game, event, buttonID);
-            ButtonHelper.deleteMessage(event);
+            removeCCFromBoard(event, player, buttonID, game);
         } else if (buttonID.startsWith("bottomAgenda_")) {
-            String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-            new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), game);
-            AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
-            Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-            MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-                "Put " + agenda.getName()
-                    + " on the bottom of the agenda deck. You may use this button to undo that and reassign it.",
-                reassign);
-            String key = "round" + game.getRound() + "AgendaPlacement";
-            if (game.getStoredValue(key).isEmpty()) {
-                game.setStoredValue(key, "bottom");
-            } else {
-                game.setStoredValue(key, game.getStoredValue(key) + "_bottom");
-            }
-            ButtonHelper.deleteMessage(event);
+            bottomAgenda(event, buttonID, game);
         } else if (buttonID.startsWith("discardAgenda_")) {
-            String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-            String agendaID = game.revealAgenda(false);
-            AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
-            String agendaName = agendaDetails.getName();
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                ButtonHelper.getIdentOrColor(player, game) + "discarded " + agendaName + " using "
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Allant, the Edyn" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent.");
-            ButtonHelper.deleteMessage(event);
+            discardAgenda(event, player, buttonID, game);
         } else if (buttonID.startsWith("agendaResolution_")) {
             AgendaHelper.resolveAgenda(game, buttonID, event, mainGameChannel);
         } else if (buttonID.startsWith("rollIxthian")) {
-            if (game.getSpeaker().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
-                AgendaHelper.rollIxthian(game, true);
-            } else {
-                Button ixthianButton = Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", Emojis.Mecatol);
-                String msg = "The speaker should roll for Ixthain Artifact. Click this button to roll anyway!";
-                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
-            }
-            ButtonHelper.deleteMessage(event);
+            rollIxthian(event, player, buttonID, game);
         } else if (buttonID.startsWith("applytempcombatmod__" + "tech" + "__")) {
-            String acAlias = "sc";
-            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier("tech", acAlias,
-                player.getNumberTurns());
-            if (combatModAC != null) {
-                player.addNewTempCombatMod(combatModAC);
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    player.getFactionEmoji()
-                        + " +1 Modifier will be applied the next time you push the combat roll button due to supercharge.");
-            }
-            player.exhaustTech("sc");
-            ButtonHelper.deleteTheOneButton(event);
+            applytempcombatmodtech(event, player);
         } else if (buttonID.startsWith("applytempcombatmod__" + Constants.AC + "__")) {
-            String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
-            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier(Constants.AC,
-                acAlias,
-                player.getNumberTurns());
-            if (combatModAC != null) {
-                player.addNewTempCombatMod(combatModAC);
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Combat modifier will be applied next time you push the combat roll button.");
-            }
-            ButtonHelper.deleteMessage(event);
+            applytempcombatmodAC(event, player, buttonID);
         } else if (buttonID.startsWith("drawActionCards_")) {
-            try {
-                int count = Integer.parseInt(buttonID.replace("drawActionCards_", ""));
-                DrawAC.drawActionCards(game, player, count, true);
-                ButtonHelper.deleteTheOneButton(event);
-            } catch (Exception ignored) {
-            }
+            drawActionCards(event, player, buttonID, game);
         } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
             game.initializeMiltySettings().parseButtonInput(event);
         } else if (buttonID.startsWith("frankenItemAdd")) {
@@ -1373,9 +1093,9 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("geneticRecombination")) {
             ButtonHelperFactionSpecific.resolveGeneticRecombination(buttonID, event, game, player);
         } else {
-            switch (buttonID) {
+            switch (buttonID) { 
                 // AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
-                case Constants.PO_NO_SCORING -> {
+                case Constants.PO_NO_SCORING -> { // TODO: P1 finish refactor
                     String message = player.getRepresentation()
                         + " - no Public Objective scored.";
                     if (!game.isFowMode()) {
@@ -2791,5 +2511,326 @@ public class ButtonListener extends ListenerAdapter {
                 default -> MessageHelper.sendMessageToEventChannel(event, "Button " + ButtonHelper.getButtonRepresentation(event.getButton()) + " pressed. This button does not do anything.");
             }
         }
+    }
+
+    private void drawActionCards(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        try {
+            int count = Integer.parseInt(buttonID.replace("drawActionCards_", ""));
+            DrawAC.drawActionCards(game, player, count, true);
+            ButtonHelper.deleteTheOneButton(event);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void applytempcombatmodAC(ButtonInteractionEvent event, Player player, String buttonID) {
+        String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
+        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier(Constants.AC,
+            acAlias,
+            player.getNumberTurns());
+        if (combatModAC != null) {
+            player.addNewTempCombatMod(combatModAC);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                "Combat modifier will be applied next time you push the combat roll button.");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void applytempcombatmodtech(ButtonInteractionEvent event, Player player) {
+        String acAlias = "sc";
+        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier("tech", acAlias,
+            player.getNumberTurns());
+        if (combatModAC != null) {
+            player.addNewTempCombatMod(combatModAC);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getFactionEmoji()
+                    + " +1 Modifier will be applied the next time you push the combat roll button due to supercharge.");
+        }
+        player.exhaustTech("sc");
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    private void rollIxthian(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        if (game.getSpeaker().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
+            AgendaHelper.rollIxthian(game, true);
+        } else {
+            Button ixthianButton = Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", Emojis.Mecatol);
+            String msg = "The speaker should roll for Ixthain Artifact. Click this button to roll anyway!";
+            MessageHelper.sendMessageToChannelWithButton(event.getChannel(), msg, ixthianButton);
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void discardAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        String agendaID = game.revealAgenda(false);
+        AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
+        String agendaName = agendaDetails.getName();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            ButtonHelper.getIdentOrColor(player, game) + "discarded " + agendaName + " using "
+                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Allant, the Edyn" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                + " agent.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
+        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), game);
+        AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
+        Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
+        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
+            "Put " + agenda.getName()
+                + " on the bottom of the agenda deck. You may use this button to undo that and reassign it.",
+            reassign);
+        String key = "round" + game.getRound() + "AgendaPlacement";
+        if (game.getStoredValue(key).isEmpty()) {
+            game.setStoredValue(key, "bottom");
+        } else {
+            game.setStoredValue(key, game.getStoredValue(key) + "_bottom");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void removeCCFromBoard(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.resolveRemovingYourCC(player, game, event, buttonID);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void refreshLandingButtons(ButtonInteractionEvent event, Player player, Game game) {
+        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
+        event.getMessage().editMessage(event.getMessage().getContentRaw())
+            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+
+    private void useTA(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String ta = buttonID.replace("useTA_", "") + "_ta";
+        PlayPN.resolvePNPlay(ta, player, game, event);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void mahactCommander(ButtonInteractionEvent event, Player player, Game game) {
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "mahactCommander");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.",
+            buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void primaryOfWarfare(ButtonInteractionEvent event, Player player, Game game) {
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
+        MessageChannel channel = player.getCorrectChannel();
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
+    }
+
+    private void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
+        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), game);
+        String key = "round" + game.getRound() + "AgendaPlacement";
+        if (game.getStoredValue(key).isEmpty()) {
+            game.setStoredValue(key, "top");
+        } else {
+            game.setStoredValue(key, game.getStoredValue(key) + "_top");
+        }
+        AgendaModel agenda = Mapper.getAgenda(game.lookAtTopAgenda(0));
+        Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
+        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
+            "Put " + agenda.getName()
+                + " on the top of the agenda deck. You may use this button to undo that and reassign it.",
+            reassign);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void retrieveAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String agendaID = buttonID.substring(buttonID.indexOf("_") + 1);
+        DrawAgenda.drawSpecificAgenda(agendaID, game, player);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    private void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private void resolvePNPlay(ButtonInteractionEvent event, Player player, String buttonID, Game game, String ident) {
+        String pnID = buttonID.replace("resolvePNPlay_", "");
+
+        if (pnID.contains("ra_")) {
+            String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
+            TechnologyModel techModel = Mapper.getTech(tech);
+            pnID = pnID.replace("_" + tech, "");
+            String message = ident + " Acquired The Tech " + techModel.getRepresentation(false)
+                + " via Research Agreement";
+            player.addTech(tech);
+            String key = "RAForRound" + game.getRound() + player.getFaction();
+            if (game.getStoredValue(key).isEmpty()) {
+                game.setStoredValue(key, tech);
+            } else {
+                game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
+            }
+            ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
+            if (player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")) {
+                CommanderUnlockCheck.checkPlayer(player, game, "jolnar", event);
+            }
+            if (player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")) {
+                CommanderUnlockCheck.checkPlayer(player, game, "nekro", event);
+            }
+            if (player.getLeaderIDs().contains("mirvedacommander")
+                && !player.hasLeaderUnlocked("mirvedacommander")) {
+                CommanderUnlockCheck.checkPlayer(player, game, "mirveda", event);
+            }
+            if (player.getLeaderIDs().contains("dihmohncommander")
+                && !player.hasLeaderUnlocked("dihmohncommander")) {
+                CommanderUnlockCheck.checkPlayer(player, game, "dihmohn", event);
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
+        PlayPN.resolvePNPlay(pnID, player, game, event);
+        if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
+            ButtonHelper.deleteMessage(event);
+        }
+
+        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID,
+            player.getNumberTurns());
+        if (posssibleCombatMod != null) {
+            player.addNewTempCombatMod(posssibleCombatMod);
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                "Combat modifier will be applied next time you push the combat roll button.");
+        }
+    }
+
+    private void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game) {
+        String planet = buttonID.replace("nanoforgePlanet_", "");
+        Planet planetReal = game.getPlanetsInfo().get(planet);
+        planetReal.addToken("attachment_nanoforge.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void play_after(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String riderName = buttonID.replace("play_after_", "");
+        List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
+        List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+        MessageChannel mainGameChannel = game.getMainGameChannel();
+        String pnKey = "fin";
+
+        if ("Keleres Rider".equalsIgnoreCase(riderName) || "Edyn Rider".equalsIgnoreCase(riderName) || "Kyro Rider".equalsIgnoreCase(riderName)) {
+            if ("Keleres Rider".equalsIgnoreCase(riderName)) {
+                for (String pn : player.getPromissoryNotes().keySet()) {
+                    if (pn.contains("rider")) {
+                        pnKey = pn;
+                    }
+                }
+                if ("fin".equalsIgnoreCase(pnKey)) {
+                    MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You don't have a Keleres Rider");
+                    return;
+                }
+                if (player.getFaction().contains("keleres")) {
+                    MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You cannot play your own promissory note");
+                    return;
+                }
+            } else if ("Edyn Rider".equalsIgnoreCase(riderName)) {
+                for (String pn : player.getPromissoryNotes().keySet()) {
+                    if (pn.contains("dspnedyn")) {
+                        pnKey = pn;
+                    }
+                }
+                if ("fin".equalsIgnoreCase(pnKey)) {
+                    MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
+                    return;
+                }
+            } else if ("Kyro Rider".equalsIgnoreCase(riderName)) {
+                for (String pn : player.getPromissoryNotes().keySet()) {
+                    if (pn.contains("dspnkyro")) {
+                        pnKey = pn;
+                    }
+                }
+                if ("fin".equalsIgnoreCase(pnKey)) {
+                    MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Kyro Rider");
+                    return;
+                }
+            }
+
+            ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
+            PlayPN.resolvePNPlay(pnKey, player, game, event);
+        } else {
+            ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
+
+            if (riderName.contains("Unity Algorithm")) {
+                player.exhaustTech("dsedyng");
+            }
+            if ("conspirators".equalsIgnoreCase(riderName)) {
+                game.setStoredValue("conspiratorsFaction", player.getFaction());
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " The conspirators ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
+                if (!game.isFowMode()) {
+                    ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+                }
+            } else {
+                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
+                    "Please select your rider target",
+                    game, player, riderButtons);
+                if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
+                    Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                    if (playerLeader != null) {
+                        StringBuilder message = new StringBuilder(player.getRepresentation());
+                        message.append(" played ");
+                        message.append(Helper.getLeaderFullRepresentation(playerLeader));
+                        boolean purged = player.removeLeader(playerLeader);
+                        if (purged) {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
+                        } else {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Odlynn Myrr, the Keleres (Xxcha) hero, was not purged - something went wrong.");
+                        }
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
+        }
+        // "dspnedyn"
+        ButtonHelper.deleteMessage(event);
+    }
+
+    private static void ultimateUndo(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        if (!game.getSavedButtons().isEmpty()) {
+            String buttonString = game.getSavedButtons().get(0);
+            String colorOrFaction = buttonString.split(";")[0];
+            Player p = game.getPlayerFromColorOrFaction(colorOrFaction);
+            if (p != null && player != p && !colorOrFaction.equals("null")) {
+                // if the last button was pressed by a non-faction player, allow anyone to undo
+                // it
+                String msg = "You were not the player who pressed the latest button. Use /game undo if you truly want to undo "
+                    + game.getLatestCommand();
+                MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+                return;
+            }
+        }
+        String highestNumBefore = buttonID.split("_")[1];
+        File mapUndoDirectory = Storage.getMapUndoDirectory();
+        if (!mapUndoDirectory.exists()) {
+            return;
+        }
+        String mapName = game.getName();
+        String mapNameForUndoStart = mapName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        if (mapUndoFiles != null && mapUndoFiles.length > 0) {
+            List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(Constants.TXT, ""))
+                .map(Integer::parseInt).toList();
+            int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+            if (highestNumBefore.equalsIgnoreCase((maxNumber) + "")) {
+                ButtonHelper.deleteMessage(event);
+            }
+        }
+
+        GameSaveLoadManager.undo(game, event);
+
+        String msg = "You undid something, the details of which can be found in the undo-log thread";
+        List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
+        for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {
+                msg = msg + ": " + threadChannel_.getJumpUrl();
+            }
+        }
+        event.getHook().sendMessage(msg).setEphemeral(true).queue();
     }
 }
