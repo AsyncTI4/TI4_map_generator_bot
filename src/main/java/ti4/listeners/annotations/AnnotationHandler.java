@@ -182,8 +182,6 @@ public class AnnotationHandler {
      * <p>
      * Find all functions that are tagged with `@handlerClass`, and which take parameters based on `contextClass`.
      * <p>
-     * Add classes that need to be checked to {@link AnnotationHandler#classesToCheck}
-     * <p>
      * Untagged String parameters are assumed to be `componentID`. Use {@link NamedParam} to tag string parameters for now
      * 
      * @param <C> {@link AnnotationHandler#contexts}
