@@ -44,6 +44,7 @@ import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
@@ -783,19 +784,21 @@ public class MessageHelper {
 			// REMOVE EMOJIS IF BOT CAN'T SEE IT
 			if (button.getEmoji() instanceof CustomEmoji emoji) {
 				if (AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
-					badButtonIDsAndReason
-						.add("Button:  " + button.getId() + "\n Label:  " + button.getLabel()
-							+ "\n Error:  Emoji Not Found in Cache\n Emoji:  " + emoji.getName() + " "
-							+ emoji.getId());
 					String label = button.getLabel();
 					if (label.isBlank()) {
 						label = String.format(":%s:", emoji.getName());
 					}
+					badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button) + "\n Error:  Emoji Not Found in Cache: " + emoji.getName() + " " + emoji.getId());
 					button = Button.of(button.getStyle(), button.getId(), label);
 				}
 			}
-			if (button.getEmoji() instanceof UnicodeEmoji emoji) {
-				BotLogger.log("sanitizeButtons: Temporary Logging of UnicodeEmojis on buttons:\n> " + emoji.getName() + ": " + emoji.getFormatted() + " `" + emoji.getFormatted() + "`  CP:" + emoji.getAsCodepoints() + "  RC:" + emoji.getAsReactionCode());
+			if (button.getEmoji() instanceof UnicodeEmoji emoji && StringUtils.countMatches(emoji.getAsCodepoints(), "+") > 4) { //TODO: something better than (plus_sign_count > 4)
+				String label = button.getLabel();
+				if (label.isBlank()) {
+					label = String.format(":%s:", emoji.getName());
+				}
+				badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button) + "\n Error:  Bad Unicode Emoji: " + emoji.getName());
+				button = Button.of(button.getStyle(), button.getId(), label);
 			}
 			newButtons.add(button);
 		}
