@@ -130,7 +130,7 @@ public class FrankenDraftHelper {
         BagDraft draft = game.getActiveBagDraft();
         ThreadChannel bagChannel = draft.regenerateBagChannel(player);
         if (player.isReadyToPassBag()) {
-            MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), player.getRepresentation(true, true) + " your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+            MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), player.getRepresentationUnfogged() + " your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
             return;
         }
 
@@ -146,9 +146,9 @@ public class FrankenDraftHelper {
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
         boolean isQueueFull = draftQueueCount >= draft.getPicksFromNextBags() && !isFirstDraft || draftQueueCount >= draft.getPicksFromFirstBag();
         if (draftables.isEmpty()) {
-            MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentation(true, true) + " you cannot legally draft anything from this bag right now.");
+            MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " you cannot legally draft anything from this bag right now.");
         } else if (!isQueueFull) {
-            MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentation(true, true) + " please select an item to draft:", getSelectionButtons(draftables, player));
+            MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + " please select an item to draft:", getSelectionButtons(draftables, player));
         }
 
         if (draftQueueCount > 0) {
@@ -160,7 +160,7 @@ public class FrankenDraftHelper {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Queue:__\n> You are drafting the following from this bag:\n" + getDraftQueueRepresentation(game, player), queueButtons);
 
             if (isQueueFull || draftables.isEmpty()) {
-                MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentation(true, true) + " please confirm or reset your draft picks.");
+                MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " please confirm or reset your draft picks.");
             }
         }
 

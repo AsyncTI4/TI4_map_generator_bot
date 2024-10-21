@@ -25,6 +25,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private int commodities;
     private List<String> factionTech;
     private List<String> startingTech;
+    private List<String> startingTechOptions;
+    private Integer startingTechAmount;
     private List<String> homePlanets;
     private List<String> abilities;
     private List<String> leaders;
@@ -42,7 +44,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && homeSystem != null
             && startingFleet != null
             && factionTech != null
-            && startingTech != null
+            && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
             && homePlanets != null
             && abilities != null
             && leaders != null
@@ -65,6 +67,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public List<String> getStartingTech() {
+        if (startingTech == null) return null;
         return new ArrayList<>(startingTech);
     }
 

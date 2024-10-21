@@ -73,7 +73,7 @@ public class Swap extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
-    public void secondHalfOfSwap(Game game, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
+    public static void secondHalfOfSwap(Game game, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
         StringBuilder message = new StringBuilder("Users have swapped factions:\n");
         message.append("> **Before:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
         Collection<Player> players = game.getPlayers().values();
@@ -114,7 +114,7 @@ public class Swap extends GameSubcommandData {
                 //         //  Block of code to handle errors
                 //     }
                 // }
-                // String text = "# " + player.getRepresentation(true, true) + " UP NEXT";
+                // String text = "# " + player.getRepresentationUnfogged() + " UP NEXT";
                 // String buttonText = "Use buttons to do your turn. ";
                 // List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                 // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);

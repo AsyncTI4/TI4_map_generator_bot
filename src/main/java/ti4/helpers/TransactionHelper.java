@@ -81,7 +81,7 @@ public class TransactionHelper {
                             switch (furtherDetail) {
                                 case "generic" -> {
                                     List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, receiver, sender);
-                                    String message = sender.getRepresentation(true, true)
+                                    String message = sender.getRepresentationUnfogged()
                                         + "Please select the promissory note you would like to send.";
                                     MessageHelper.sendMessageToChannelWithButtons(sender.getCardsInfoThread(), message, stuffToTransButtons);
                                 }
@@ -107,8 +107,8 @@ public class TransactionHelper {
         }
 
         // Send Summary to Player's CardsInfo threads
-        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation(true, true) + " " + privateSummary);
-        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + " " + privateSummary);
+        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentationUnfogged() + " " + privateSummary);
+        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentationUnfogged() + " " + privateSummary);
 
         p1.clearTransactionItemsWithPlayer(p2);
         if (!debtOnly) {
@@ -243,11 +243,10 @@ public class TransactionHelper {
     }
 
     public static String getNothingMessage() {
-        if (ThreadLocalRandom.current().nextInt(1000000) == 0)
-        {
+        if (ThreadLocalRandom.current().nextInt(1000000) == 0) {
             return "The joy of sharing a one in a million emptry transaction offer message";
         }
-        int result = ThreadLocalRandom.current().nextInt(1, 90);
+        int result = ThreadLocalRandom.current().nextInt(1, 122);
         return switch (result) {
             case 1 -> "Nothing But Respect And Good Will";
             case 2 -> "Some Pocket Lint";
@@ -296,7 +295,7 @@ public class TransactionHelper {
             case 45 -> "A Picture of a Sandwich";
             case 46 -> "Thoughtful Advice About Your Current Situation";
             case 47 -> "Zip; Zilch; Nada";
-            case 48 -> "Approximately " + String.format("%,d", 5*ThreadLocalRandom.current().nextInt(200, 2000) + ThreadLocalRandom.current().nextInt(1, 5)) + " Unique Snow Globes";
+            case 48 -> "Approximately " + String.format("%,d", 5 * ThreadLocalRandom.current().nextInt(200, 2000) + ThreadLocalRandom.current().nextInt(1, 5)) + " Unique Snow Globes";
             case 49 -> "Forgiveness For Future Mistakes (Terms and Conditions Apply)";
             case 50 -> "A Token Labelled \"Traid Gud\"";
             case 51 -> "A Hill of Beans";
@@ -314,7 +313,7 @@ public class TransactionHelper {
             case 63 -> "An _E.T. the Extra-Terrestrial_ Cartridge for the Atari 2600";
             case 64 -> "A Nice Solid Thumbs Up";
             case 65 -> "A Handful of Dog Treats";
-            case 66 -> "One Peppercorn";
+            case 66 -> "One (1) Peppercorn";
             case 67 -> "Poutine";
             case 68 -> "The Deputy Speakership";
             case 69 -> "Half a Slice of Pizza, With or Without Pineapple";
@@ -338,6 +337,38 @@ public class TransactionHelper {
             case 87 -> "A Riddle, Wrapped in a Mystery, Inside an Enigma, Coated in Chocolate";
             case 88 -> "A Brand-New Luxury Car, Missing Only Fuel, Tires and Car";
             case 89 -> "Either \"Peace\" or \"Peas\"; the Ambassador Failed to Elaborate";
+            case 90 -> "A Year's Supply of Brussels Sprouts";
+            case 91 -> "A Nintendo Power Glove; ***Now You're Playing With Power***";
+            case 92 -> "A Wooden Spoon";
+            case 93 -> "An Ingot of Pyrite";
+            case 94 -> "A White Elephant";
+            case 95 -> "Ennui";
+            case 96 -> "A Smurf TV Tray";
+            case 97 -> "A Creepy Doll";
+            case 98 -> "A Ziploc Bag of Ranch Dressing";
+            case 99 -> "Nothing. And Furthermore, Carthage Must be Destroyed!";
+            case 100 -> "All of the Goulash";
+            case 101 -> "Waldo's Location";
+            case 102 -> "A Billet of Ea-nāṣir's Finest Copper";
+            case 103 -> "All the Silver in Fort Knox";
+            case 104 -> "A Controlling Share of The Bereg Jet Ski Company";
+            case 105 -> "A Handful of Specially Marked Cereal Boxtops";
+            case 106 -> "An Aperture Science Thing We Don't Know What It Does";
+            case 107 -> "Nothing, Because I'm a Cheapskate";
+            case 108 -> "A Brick, Delivery Speed TBD";
+            case 109 -> "An Inanimate Carbon Rod";
+            case 110 -> "A Set of Left-Handed Sarween Tools";
+            case 111 -> "A Bridge That's For Sale";
+            case 112 -> "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // To brighten your day, yes indeed!";
+            case 113 -> "The Chameleon's Dish";
+            case 114 -> "The Sound of One Hand Clapping";
+            case 115 -> "An Unpaired Sock";
+            case 116 -> "\"101 Ways To Make Toast\"";
+            case 117 -> "A Chess Set With 31 Missing Pieces";
+            case 118 -> "Your Horoscope Reading";
+            case 119 -> "Just Deserts";
+            case 120 -> "Surprise and Delight";
+            case 121 -> "`//Could somebody get ChatGPT to generate a few more messages - Dev`";
             case 9999 -> "Some Free Candy, From My Windowless Van";
             default -> "Nothing";
         };
@@ -489,15 +520,9 @@ public class TransactionHelper {
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                         Player owner = game.getPNOwner(pnShortHand);
                         if (p1.getPromissoryNotes().containsKey(pnShortHand)) {
-                            stuffToTransButtons.add(Button
-                                .success("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
-                                    + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName())
-                                .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+                            stuffToTransButtons.add(Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
                         } else {
-                            stuffToTransButtons.add(Button
-                                .success("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
-                                    + pnShortHand.replace("_", "fin9"), promissoryNote.getName())
-                                .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
+                            stuffToTransButtons.add(Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + pnShortHand.replace("_", "fin9"), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji())));
                         }
 
                     }
@@ -507,7 +532,7 @@ public class TransactionHelper {
 
                     stuffToTransButtons.add(transact);
                 } else {
-                    message = message + p1.getRepresentation(true, true) + " Click the PN you would like to "
+                    message = message + p1.getRepresentationUnfogged() + " Click the PN you would like to "
                         + requestOrOffer;
                     for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                         if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
@@ -516,10 +541,7 @@ public class TransactionHelper {
                         }
                         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
                         Player owner = game.getPNOwner(pnShortHand);
-                        Button transact = Button
-                            .success("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_"
-                                + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName())
-                            .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                        Button transact = Buttons.green("offerToTransact_PNs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
 
                         stuffToTransButtons.add(transact);
                     }
@@ -758,7 +780,7 @@ public class TransactionHelper {
             }
             case "PNs" -> {
                 PNInfo.sendPromissoryNoteInfo(game, p1, false);
-                String message = p1.getRepresentation(true, true) + " Click the PN you would like to send.";
+                String message = p1.getRepresentationUnfogged() + " Click the PN you would like to send.";
 
                 for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                     if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
@@ -774,10 +796,7 @@ public class TransactionHelper {
                                 + p1.getPromissoryNotes().get(pnShortHand),
                             owner.getColor() + " " + promissoryNote.getName());
                     } else {
-                        transact = Button
-                            .success(finChecker + "send_PNs_" + p2.getFaction() + "_"
-                                + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName())
-                            .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                        transact = Buttons.green(finChecker + "send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
                     }
                     stuffToTransButtons.add(transact);
                 }
@@ -1063,7 +1082,7 @@ public class TransactionHelper {
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentation(true, true)).append(" this is a friendly reminder that you ");
+        sb.append(player.getRepresentationUnfogged()).append(" this is a friendly reminder that you ");
         if (!canTheseTwoTransact(game, player, player2)) {
             sb.append("are not neighbors with " + player2.getRepresentation(false, false));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
@@ -1162,15 +1181,11 @@ public class TransactionHelper {
         }
         if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).size() > 0) {
             Button transact = Button
-                .success("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets")
-                .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
+                .success("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
             stuffToTransButtons.add(transact);
         }
         if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).size() > 0) {
-            Button transact = Button
-                .success("newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(),
-                    "Alliance Planets")
-                .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
+            Button transact = Buttons.green("newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
         }
         if ((game.getPhaseOfGame().toLowerCase().contains("agenda") || game.getPhaseOfGame().toLowerCase().contains("strategy"))
@@ -1242,14 +1257,12 @@ public class TransactionHelper {
             stuffToTransButtons.add(transact);
         }
         if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).size() > 0) {
-            Button transact = Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets")
-                .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
+            Button transact = Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
             stuffToTransButtons.add(transact);
         }
         if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).size() > 0) {
             Button transact = Button
-                .success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets")
-                .withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
+                .success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
         }
         if (game.getPhaseOfGame().toLowerCase().contains("agenda")
@@ -1260,5 +1273,39 @@ public class TransactionHelper {
             stuffToTransButtons.add(transact);
         }
         return stuffToTransButtons;
+    }
+
+    public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 != null) {
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the latest offer from " + player.getRepresentation(false, false) + " has been rescinded.");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "you rescinded the latest offer to " + p2.getRepresentation(false, false));
+            player.clearTransactionItemsWithPlayer(p2);
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    public static void rejectOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p1 != null) {
+            MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " your offer to " + player.getRepresentation(false, false) + " has been rejected.");
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    public static void acceptOffer(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (buttonID.split("_").length > 2) {
+            String offerNum = buttonID.split("_")[2];
+            String key = "offerFrom" + p1.getFaction() + "To" + player.getFaction();
+            String oldOffer = game.getStoredValue(key);
+            if (!offerNum.equalsIgnoreCase(oldOffer)) {
+                MessageHelper.sendMessageToChannel(event.getChannel(),
+                    "Only the most recent offer is acceptable. This is an old transaction offer and it can no longer be accepted");
+                return;
+            }
+        }
+        TransactionHelper.acceptTransactionOffer(p1, player, game, event);
+        ButtonHelper.deleteMessage(event);
     }
 }

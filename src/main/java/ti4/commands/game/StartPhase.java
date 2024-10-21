@@ -64,7 +64,7 @@ public class StartPhase extends GameSubcommandData {
     public static void startPhase(GenericInteractionCreateEvent event, Game game, String phase) {
         switch (phase) {
             case "strategy" -> startStrategyPhase(event, game);
-            case "voting" -> AgendaHelper.startTheVoting(game);
+            case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
             case "P1Special" -> TIGLHelper.initializeTIGLGame(game);
             case "shuffleDecks" -> game.shuffleDecks();
@@ -170,7 +170,7 @@ public class StartPhase extends GameSubcommandData {
                     for (String techID : list.split("-")) {
                         buttons.add(Buttons.green("purgeTech_" + techID, "Purge " + Mapper.getTech(techID).getName()));
                     }
-                    String msg = p2.getRepresentation(true, true) + " due to Saint Binal, the Rhodun hero, you have to purge 2 techs. Use buttons to purge ";
+                    String msg = p2.getRepresentationUnfogged() + " due to Saint Binal, the Rhodun hero, you have to purge 2 techs. Use buttons to purge ";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg + "the first tech.", buttons);
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg + "the second tech.", buttons);
                     p2.removeLeader("zealotshero");
@@ -253,7 +253,7 @@ public class StartPhase extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed");
             return;
         }
-        String message = speaker.getRepresentation(true, true) + " UP TO PICK SC\n";
+        String message = speaker.getRepresentationUnfogged() + " UP TO PICK SC\n";
         game.updateActivePlayer(speaker);
         game.setPhaseOfGame("strategy");
         String pickSCMsg = "Use buttons to pick a strategy card.";
@@ -277,7 +277,7 @@ public class StartPhase extends GameSubcommandData {
         }
         for (Player player2 : game.getRealPlayers()) {
             if (player2.getActionCards() != null && player2.getActionCards().containsKey("summit")) {
-                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation(true, true) + "Reminder this is the window to play Summit.");
+                MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentationUnfogged() + "Reminder this is the window to play Summit.");
             }
             for (String pn : player2.getPromissoryNotes().keySet()) {
                 if (!player2.ownsPromissoryNote("scepter") && "scepter".equalsIgnoreCase(pn)) {
@@ -287,7 +287,7 @@ public class StartPhase extends GameSubcommandData {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(transact);
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    String cyberMessage = player2.getRepresentation(true, true) + " reminder this is the window to play Mahact PN if you want (button should work)";
+                    String cyberMessage = player2.getRepresentationUnfogged() + " reminder this is the window to play Mahact PN if you want (button should work)";
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), cyberMessage, buttons);
                     if (!game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "You should all pause for a potential mahact PN play here if you think it relevant");
@@ -324,10 +324,10 @@ public class StartPhase extends GameSubcommandData {
     private static void handleStartOfStrategyForAcd2Player(Game game) {
         for (Player player : game.getRealPlayers()) {
             if (player.getActionCards().containsKey("deflection")) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + "Reminder this is the window to play Deflection.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() + "Reminder this is the window to play Deflection.");
             }
             if (player.getActionCards().containsKey("revolution")) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation(true, true) + "Reminder this is the window to play Revolution.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() + "Reminder this is the window to play Revolution.");
             }
         }
     }
@@ -414,7 +414,7 @@ public class StartPhase extends GameSubcommandData {
 
             for (String pn : player.getPromissoryNotes().keySet()) {
                 if (!player.ownsPromissoryNote("ce") && "ce".equalsIgnoreCase(pn)) {
-                    String cyberMessage = "# " + player.getRepresentation(true, true) + " reminder to use cybernetic enhancements!";
+                    String cyberMessage = "# " + player.getRepresentationUnfogged() + " reminder to use cybernetic enhancements!";
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), cyberMessage);
                 }
             }
@@ -511,7 +511,7 @@ public class StartPhase extends GameSubcommandData {
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
             if (privatePlayer == null)
                 return;
-            msgExtra = "" + privatePlayer.getRepresentation(true, true) + " UP NEXT";
+            msgExtra = "" + privatePlayer.getRepresentationUnfogged() + " UP NEXT";
             game.updateActivePlayer(privatePlayer);
 
             if (!allPicked) {
@@ -560,13 +560,13 @@ public class StartPhase extends GameSubcommandData {
             if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                 buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", Emojis.CyberneticTech));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you have the opportunity to use QDN", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use QDN", buttons);
             }
             buttons = new ArrayList<>();
             if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
                 buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", Emojis.Agenda));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you have the opportunity to use Imperial Arbiter", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use Imperial Arbiter", buttons);
             }
         }
         UserJoinServerListener.checkIfCanCloseGameLaunchThread(game, false);

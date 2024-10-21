@@ -37,7 +37,7 @@ public class PeakAtObjectiveDeck extends CustomSubcommandData {
             peakedObjectives.add(poDeck.get(i));
         }
         StringBuilder sb = new StringBuilder()
-            .append(player.getRepresentation(true, true))
+            .append(player.getRepresentationUnfogged())
             .append(" **Stage ").append(stage).append(" Public Objectives**").append("\n");
         peakedObjectives.stream()
             .map(peakedObjectiveId -> "(" + peakedObjectiveId + "): " + Mapper.getPublicObjective(peakedObjectiveId).getRepresentation())

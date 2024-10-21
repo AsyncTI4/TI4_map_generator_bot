@@ -47,7 +47,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentation(true, true) + " Heads up, someone used some command";
+        String headerText = player.getRepresentationUnfogged() + " Heads up, someone used some command";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }
@@ -75,8 +75,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
                 transact = Buttons.green("resolvePNPlay_" + pnShortHand,
                     "Play " + owner.getColor() + " " + promissoryNote.getName());
             } else {
-                transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
-                    .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
             }
             buttons.add(transact);
         }

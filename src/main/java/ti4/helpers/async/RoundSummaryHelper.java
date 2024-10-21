@@ -12,8 +12,9 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
+import ti4.helpers.Emojis;
 import ti4.helpers.RegexHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -24,15 +25,16 @@ import ti4.message.MessageHelper;
 public class RoundSummaryHelper {
 
     @ButtonHandler("editEndOfRoundSummaries")
-    public static void serveEditSummaryButtons(Game game, Player player) {
+    public static void serveEditSummaryButtons(Game game, Player player, MessageChannel eventChannel) {
         List<Button> buttons = new ArrayList<>();
         for (int x = 1; x <= game.getRound(); x++)
             buttons.add(editSummaryButton(game, player, x));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Choose a round summary to view/edit/create:", buttons);
+        MessageChannel playerChannel = player.isRealPlayer() ? player.getCardsInfoThread() : eventChannel;
+        MessageHelper.sendMessageToChannelWithButtons(playerChannel, "Choose a round summary to view/edit/create:", buttons);
     }
 
     public static Button editSummaryButton(Game game, Player player, int round) {
-        String roundSummary = game.getStoredValue("endofround" + round + player.getFaction());
+        String roundSummary = game.getStoredValue(resolveRoundSummaryKey(player, String.valueOf(round)));
         String buttonID = "editRoundSummary_" + round + "~MDL";
         if (roundSummary.isEmpty()) {
             return Buttons.green(buttonID, "Create round " + round + " summary");
@@ -46,7 +48,7 @@ public class RoundSummaryHelper {
         String roundNum = buttonID.replace("editRoundSummary_", "").replace("~MDL", "");
 
         String modalId = "finishEditRoundSummary_" + roundNum;
-        String currentSummary = game.getStoredValue("endofround" + roundNum + player.getFaction());
+        String currentSummary = game.getStoredValue(resolveRoundSummaryKey(player, roundNum));
         if (currentSummary.isBlank()) currentSummary = null;
 
         String fieldID = "summary";
@@ -66,13 +68,13 @@ public class RoundSummaryHelper {
         if (matcher.matches()) {
             ModalMapping mapping = event.getValue("summary");
             String thoughts = mapping.getAsString();
-            storeEndOfRoundSummary(game, player, matcher.group("round"), thoughts, false);
+            storeEndOfRoundSummary(game, player, matcher.group("round"), thoughts, false, event.getChannel());
         }
     }
 
-    public static void storeEndOfRoundSummary(Game game, Player player, String roundNum, String thoughts, boolean append) {
+    public static void storeEndOfRoundSummary(Game game, Player player, String roundNum, String thoughts, boolean append, MessageChannel eventChannel) {
         roundNum = roundNum.replaceAll("[^0-9]", ""); // I only want the digits
-        String roundKey = "endofround" + roundNum + player.getFaction();
+        String roundKey = resolveRoundSummaryKey(player, roundNum);
         String previousThoughts = "";
         if (append && !game.getStoredValue(roundKey).isEmpty()) {
             previousThoughts = game.getStoredValue(roundKey);
@@ -80,7 +82,17 @@ public class RoundSummaryHelper {
         }
         game.setStoredValue(roundKey, previousThoughts + thoughts);
 
-        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), player.getFactionEmoji() + " stored an end of round summary", Buttons.EDIT_SUMMARIES);
+        MessageChannel playerChannel = player.isRealPlayer() ? player.getCardsInfoThread() : eventChannel;
+        MessageHelper.sendMessageToChannelWithButton(playerChannel, resolvePlayerEmoji(player) + " stored an end of round summary", Buttons.EDIT_SUMMARIES);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Someone stored an end of round summary");
+    }
+
+    public static String resolveRoundSummaryKey(Player player, String roundNum) {
+        String keySuffix = player.isRealPlayer() || player.isEliminated() ? player.getFaction() : player.getUserName();
+        return "endofround" + roundNum + keySuffix;
+    }
+
+    public static String resolvePlayerEmoji(Player player) {
+        return player.isRealPlayer() || player.isEliminated() ? player.getFactionEmoji() : Emojis.getRandomGoodDog(player.getUserID());
     }
 }

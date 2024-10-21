@@ -27,9 +27,9 @@ public class DiscordantStarsHelper {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
                     if (player.getPlanets().contains(planet.getName())) {
-                        if (planet.hasGroundForces(player) && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                        if (planet.hasGroundForces(game) && planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                             planet.removeToken(Constants.GARDEN_WORLDS_PNG);
-                        } else if (!planet.hasGroundForces(player)) {
+                        } else if (!planet.hasGroundForces(game)) {
                             planet.addToken(Constants.GARDEN_WORLDS_PNG);
                         }
                     } else if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
@@ -169,8 +169,7 @@ public class DiscordantStarsHelper {
             player.setHasUsedEconomyEmpowerAbility(true);
             String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName() + " you may resolve the following ability: **The Economy - Empower (+)**: You gain 1 " + Emojis.comm + "commodity.\n";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity")
-                .withEmoji(Emoji.fromFormatted(Emojis.comm));
+            Button getCommButton = Buttons.blue("gain_1_comms", "Gain 1 Commodity", Emojis.comm);
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "Resolve ability", getCommButton);
         }
     }

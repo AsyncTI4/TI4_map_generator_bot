@@ -103,7 +103,7 @@ public class ConvertTTPGtoAsync {
 
     public static final Map<String, String> fakePlayers = new HashMap<>() {
         {
-            put(Constants.prisonerOneID, "PrisonerOne");
+            put(Constants.prisonerOneId, "PrisonerOne");
             put(Constants.tspId, "Holytispoon");
             put("947763140517560331", "TI4 Game Management");
             put("235148962103951360", "Carl-bot");
@@ -160,7 +160,7 @@ public class ConvertTTPGtoAsync {
         Mapper.init();
         Game asyncGame = new Game() {
             {
-                setOwnerID(Constants.prisonerOneID);
+                setOwnerID(Constants.prisonerOneId);
                 setOwnerName("PrisonerOne");
                 setPlayerCountForMap(ttpgMap.getPlayers().size());
                 setVp(ttpgMap.getScoreboard());
@@ -654,7 +654,6 @@ public class ConvertTTPGtoAsync {
                         if (Constants.MIRAGE.equalsIgnoreCase(attachmentResolved)) {
                             Helper.addMirageToTile(tile);
                             tile.addToken(tokenFileName, Constants.SPACE);
-                            // asyncMap.clearPlanetsCache();
                         }
                     } else {
                         System.out.println("                character not recognized:  " + attachment);

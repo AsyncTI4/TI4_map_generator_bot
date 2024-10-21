@@ -44,7 +44,7 @@ public class CryypterHelper {
         ACInfo.sendActionCardInfo(game, player);
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentation(true, true) + " use buttons to discard 1 of the " + draw + " cards just drawn.",
+            player.getRepresentationUnfogged() + " use buttons to discard 1 of the " + draw + " cards just drawn.",
             ACInfo.getDiscardActionCardButtons(game, player, false));
 
         ButtonHelper.checkACLimit(game, null, player);
@@ -56,7 +56,7 @@ public class CryypterHelper {
     }
 
     public static void checkEnvoyUnlocks(Game game) {
-        if (!game.isCryypterMode()) {
+        if (!game.isVotcMode()) {
             return;
         }
         for (Player player : game.getRealPlayers()) {

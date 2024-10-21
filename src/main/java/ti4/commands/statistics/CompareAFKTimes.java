@@ -56,7 +56,7 @@ public class CompareAFKTimes extends StatisticsSubcommandData {
             if (!game.isHasEnded()) {
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(playerID)) {
-                        return player2.getRepresentation(true, true) + "afk hours are: " + player2.getHoursThatPlayerIsAFK().replace(";", ", ") + "\n";
+                        return player2.getRepresentationUnfogged() + "afk hours are: " + player2.getHoursThatPlayerIsAFK().replace(";", ", ") + "\n";
                     }
                 }
             }

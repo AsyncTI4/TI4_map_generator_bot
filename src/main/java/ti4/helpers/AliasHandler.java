@@ -33,7 +33,6 @@ public class AliasHandler {
     private static final Map<String, String> attachmentAliasList = new HashMap<>();
     private static final Map<String, String> tokenAliasList = new HashMap<>();
     private static final Map<String, String> factionAliasList = new HashMap<>();
-    private static final Map<String, String> colorAliasList = new HashMap<>();
     private static final Map<String, String> techAliasList = new HashMap<>();
     private static final Map<String, String> actionCardAliasList = new HashMap<>();
     private static final Map<String, String> agendaAliasList = new HashMap<>();
@@ -60,7 +59,6 @@ public class AliasHandler {
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
-        readAliasFile("color_alias.properties", colorAliasList, "Could not read color alias file");
         readAliasFile("tech_alias.properties", techAliasList, "Could not read tech alias file");
         readAliasFile("action_card_alias.properties", actionCardAliasList, "Could not read action card alias file");
         readAliasFile("agenda_alias.properties", agendaAliasList, "Could not read agenda alias file");

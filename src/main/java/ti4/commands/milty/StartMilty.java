@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.game.WeirdGameSetup;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
@@ -195,6 +194,7 @@ public class StartMilty extends MiltySubcommandData {
         List<String> unbannedFactions = new ArrayList<>(Mapper.getFactions().stream()
             .filter(f -> specs.factionSources.contains(f.getSource()))
             .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
+            .filter(f -> !f.getAlias().contains("keleres") || f.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
             .map(f -> f.getAlias()).toList());
         List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
         draftManager.setFactionDraft(factionDraft);
@@ -243,6 +243,7 @@ public class StartMilty extends MiltySubcommandData {
                     // Kick it off with a bang!
                     draftManager.repostDraftInformation(game);
                     GameSaveLoadManager.saveMap(game, event);
+                    game.setPhaseOfGame("miltydraft");
                 }
             });
         }
@@ -267,8 +268,6 @@ public class StartMilty extends MiltySubcommandData {
     }
 
     private static List<String> createFactionDraft(int factionCount, List<String> factions, List<String> firstFactions) {
-        boolean hasKeleres = false, hasMentak = false, hasXxcha = false, hasArgent = false;
-
         List<String> randomOrder = new ArrayList<>(firstFactions);
         Collections.shuffle(randomOrder);
         Collections.shuffle(factions);
@@ -281,23 +280,6 @@ public class StartMilty extends MiltySubcommandData {
             String f = randomOrder.get(i);
             i++;
             if (output.contains(f)) continue;
-
-            if (List.of("keleresa", "keleresm", "keleresx").contains(f)) {
-                if (hasKeleres) continue;
-                hasKeleres = true;
-            }
-            if (List.of("keleresa", "argent").contains(f)) {
-                if (hasArgent) continue;
-                hasArgent = true;
-            }
-            if (List.of("keleresm", "mentak").contains(f)) {
-                if (hasMentak) continue;
-                hasMentak = true;
-            }
-            if (List.of("keleresx", "xxcha").contains(f)) {
-                if (hasXxcha) continue;
-                hasXxcha = true;
-            }
             output.add(f);
         }
         return output;

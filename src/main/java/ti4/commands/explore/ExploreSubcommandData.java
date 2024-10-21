@@ -11,15 +11,12 @@ import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -276,7 +273,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
                 if (hasSchemingAbility) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                        player.getRepresentation(true, true) + " use buttons to discard",
+                        player.getRepresentationUnfogged() + " use buttons to discard",
                         ACInfo.getDiscardActionCardButtons(game, player, false));
                 }
                 MessageHelper.sendMessageToEventChannel(event, message);
@@ -329,7 +326,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     saarButton.add(Buttons.green("saarMechRes_" + "mirage", "Pay 1TG for Mech on " + Helper.getPlanetRepresentation("mirage", game), Emojis.tg));
                     saarButton.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        player.getRepresentation(true, true) + " you may pay one " + Emojis.tg + "trade good to place one " + Emojis.mech + " mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
+                        player.getRepresentationUnfogged() + " you may pay one " + Emojis.tg + "trade good to place one " + Emojis.mech + " mech here. Do not do this prior to exploring. It is an after, while exploring is a when.",
                         saarButton);
                 }
 
@@ -449,7 +446,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 CommanderUnlockCheck.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                message += "\n" + player.getRepresentation(true, true) + " your current CCs are " + player.getCCRepresentation()
+                message += "\n" + player.getRepresentationUnfogged() + " your current CCs are " + player.getCCRepresentation()
                     + ". Use buttons to gain " + ccsToGain + " CC" + (ccsToGain > 1 ? "s" : "");
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -524,7 +521,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 int tgGain = tile == null ? 0 : tile.getUnitHolders().size() - 1;
                 int oldTg = player.getTg();
                 player.setTg(oldTg + tgGain);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained " + tgGain + "TG"
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " gained " + tgGain + "TG"
                     + (tgGain == 1 ? "" : "s") + " due to the forgotten trade station (" + oldTg + "->" + player.getTg() + ")");
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, tgGain);
@@ -541,11 +538,11 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
             List<Button> gainComm = new ArrayList<>();
-            gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm").withEmoji(Emoji.fromFormatted(Emojis.comm)));
+            gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm", Emojis.comm));
             gainComm.add(Buttons.red("deleteButtons", "Decline"));
             StringBuilder sb = new StringBuilder();
             sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability\n");
-            sb.append(player.getRepresentation(true, true)).append(
+            sb.append(player.getRepresentationUnfogged()).append(
                 " After resolving the explore, you may use this button to get your commodity from your fortune seekers ability.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);
             game.setStoredValue("fortuneSeekers", "Used");

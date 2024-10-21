@@ -54,7 +54,7 @@ public class PingSystem extends FOWSubcommandData {
         List<Player> failList = new ArrayList<>();
         int successfulCount = 0;
         for (Player player_ : players) {
-            String playerMessage = player_.getRepresentation(true, true) + " - System " + position + " has been pinged:\n> " + message;
+            String playerMessage = player_.getRepresentationUnfogged() + " - System " + position + " has been pinged:\n> " + message;
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             if (success) {
                 successfulCount++;

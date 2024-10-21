@@ -36,13 +36,13 @@ public class EventInfo extends EventSubcommandData {
     }
 
     public static void sendEventInfo(Game game, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendEventInfo(game, player);
     }
 
     public static void sendEventInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used something";
+        String headerText = player.getRepresentationUnfogged() + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendEventInfo(game, player);
     }
