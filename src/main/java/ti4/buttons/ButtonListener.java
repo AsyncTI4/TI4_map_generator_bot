@@ -145,7 +145,6 @@ public class ButtonListener extends ListenerAdapter {
         Player nullable = player; // why?
 
         // Setup some additional helper values for buttons
-        String buttonLabel = event.getButton().getLabel();
         String finsFactionCheckerPrefix = nullable == null ? "FFCC_nullPlayer_" : nullable.getFinsFactionCheckerPrefix();
 
         // Check the list of buttons first
@@ -213,7 +212,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("getPsychoButtons")) {
             UnfiledButtonHandlers.getPsychoButtons(player, game);
         } else if (buttonID.startsWith("retreatGroundUnits_")) {
-            ButtonHelperModifyUnits.retreatGroundUnits(buttonID, event, game, player, buttonLabel);
+            ButtonHelperModifyUnits.retreatGroundUnits(buttonID, event, game, player);
         } else if (buttonID.startsWith("resolveShipOrder_")) {
             ButtonHelperAbilities.resolveAxisOrderExhaust(player, game, event, buttonID);
         } else if (buttonID.startsWith("buyAxisOrder_")) {
@@ -381,7 +380,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("autoneticMemoryStep3")) {
             UnfiledButtonHandlers.autoneticMemoryStep3(event, player, buttonID, game);
         } else if (buttonID.startsWith("assignHits_")) {
-            ButtonHelperModifyUnits.assignHits(buttonID, event, game, player, buttonLabel);
+            ButtonHelperModifyUnits.assignHits(buttonID, event, game, player);
         } else if (buttonID.startsWith("startDevotion_")) {
             ButtonHelperModifyUnits.startDevotion(player, game, event, buttonID);
         } else if (buttonID.startsWith("purgeTech_")) {
@@ -436,7 +435,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("mykoheroSteal_")) {
             ButtonHelperHeroes.resolveMykoHero(game, player, event, buttonID);
         } else if (buttonID.startsWith("exhaust_")) {
-            AgendaHelper.exhaustStuffForVoting(buttonID, event, game, player, buttonLabel);
+            AgendaHelper.exhaustStuffForVoting(buttonID, event, game, player);
         } else if (buttonID.startsWith("exhaustViaDiplomats_")) {
             ButtonHelperAbilities.resolveDiplomatExhaust(buttonID, event, game, player);
         } else if (buttonID.startsWith("exhaustForVotes_")) {
@@ -552,7 +551,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("autoresolve_")) {
             UnfiledButtonHandlers.autoResolve(event, player, buttonID, game);
         } else if (buttonID.startsWith("deleteButtons")) {
-            UnfiledButtonHandlers.deleteButtons(event, buttonID, buttonLabel, game, player, mainGameChannel);
+            UnfiledButtonHandlers.deleteButtons(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith("reverse_")) {
             AgendaHelper.reverseRider(buttonID, event, game, player);
         } else if (buttonID.startsWith("moveGlory_")) {
@@ -628,7 +627,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("yssarilHeroRejection_")) {
             ButtonHelperHeroes.yssarilHeroRejection(game, player, event, buttonID);
         } else if (buttonID.startsWith("yssarilHeroInitialOffering_")) {
-            ButtonHelperHeroes.yssarilHeroInitialOffering(game, player, event, buttonID, buttonLabel);
+            ButtonHelperHeroes.yssarilHeroInitialOffering(game, player, event, buttonID);
         } else if (buttonID.startsWith("statusInfRevival_")) {
             ButtonHelper.placeInfantryFromRevival(game, event, player, buttonID);
         } else if (buttonID.startsWith("genericReact")) {
@@ -726,7 +725,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("resolveShrapnelTurrets_")) {// resolveShrapnelTurrets_
             ButtonHelperActionCardsWillHomebrew.resolveShrapnelTurrets(player, game, event, buttonID);
         } else if (buttonID.startsWith("unitTactical")) {
-            ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, game, player, buttonLabel);
+            ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, game, player);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {
             ButtonHelperHeroes.resolveNaaluHeroInitiation(player, game, event);
         } else if (buttonID.startsWith("kyroHeroInitiation")) {
@@ -746,7 +745,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("naaluHeroSend")) {
             ButtonHelperHeroes.resolveNaaluHeroSend(player, game, buttonID, event);
         } else if (buttonID.startsWith("landUnits_")) {
-            ButtonHelperModifyUnits.landingUnits(buttonID, event, game, player, buttonLabel);
+            ButtonHelperModifyUnits.landingUnits(buttonID, event, game, player);
         } else if (buttonID.startsWith("reparationsStep2_")) {
             ButtonHelperActionCards.resolveReparationsStep2(player, game, event, buttonID);
         } else if (buttonID.startsWith("seizeArtifactStep2_")) {
@@ -918,7 +917,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("unstableStep3_")) {
             ButtonHelperActionCards.resolveUnstableStep3(player, game, event, buttonID);
         } else if (buttonID.startsWith("spaceUnits_")) {
-            ButtonHelperModifyUnits.spaceLandedUnits(buttonID, event, game, player, buttonLabel);
+            ButtonHelperModifyUnits.spaceLandedUnits(buttonID, event, game, player);
         } else if (buttonID.startsWith("resetSpend_")) {
             UnfiledButtonHandlers.resetSpend_(event, player, buttonID, game);
         } else if (buttonID.startsWith("reinforcements_cc_placement_")) {

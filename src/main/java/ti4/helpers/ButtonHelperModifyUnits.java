@@ -1121,7 +1121,8 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-    public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
+    public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("retreatGroundUnits_", "").replace("'", "");
         String pos1 = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos1 + "_", "");
@@ -1749,7 +1750,8 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-    public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
+    public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("spaceUnits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos + "_", "");
@@ -1826,7 +1828,8 @@ public class ButtonHelperModifyUnits {
 
     }
 
-    public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
+    public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("landUnits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos + "_", "");
@@ -2014,9 +2017,9 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
-    public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
-        String rest;
-        rest = buttonID.replace("assignHits_", "");
+    public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String buttonLabel = event.getButton().getLabel();
+        String rest = buttonID.replace("assignHits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));
         Tile tile = game.getTileByPosition(pos);
         rest = rest.replace(pos + "_", "");

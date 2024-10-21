@@ -2015,9 +2015,8 @@ public class ButtonHelperHeroes {
         return scButtons;
     }
 
-    public static void yssarilHeroInitialOffering(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID, String buttonLabel) {
-
+    public static void yssarilHeroInitialOffering(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String buttonLabel = event.getButton().getLabel();
         List<Button> acButtons = new ArrayList<>();
         buttonID = buttonID.replace("yssarilHeroInitialOffering_", "");
         String acID = buttonID.split("_")[0];

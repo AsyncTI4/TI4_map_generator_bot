@@ -1672,7 +1672,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    public static void deleteButtons(ButtonInteractionEvent event, String buttonID, String buttonLabel, Game game, Player player, MessageChannel actionsChannel) {
+    public static void deleteButtons(ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel) {
+        String buttonLabel = event.getButton().getLabel();
         buttonID = buttonID.replace("deleteButtons_", "");
         String editedMessage = event.getMessage().getContentRaw();
         if (("Done Gaining CCs".equalsIgnoreCase(buttonLabel)
