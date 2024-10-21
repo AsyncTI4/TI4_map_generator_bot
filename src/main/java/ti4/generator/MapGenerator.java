@@ -6565,6 +6565,6 @@ public class MapGenerator {
 
     private static void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, Player player, String cardType, String cardID) {
         g.drawRect(x, y, width, height);
-        game.addWebsiteOverlay(cardType, cardID, x, y, width, height);
+        game.addWebsiteOverlay(player, cardType, cardID, x, y, width, height);
     }
 }
