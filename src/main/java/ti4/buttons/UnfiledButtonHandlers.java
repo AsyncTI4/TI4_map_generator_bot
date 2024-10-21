@@ -1638,17 +1638,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    public static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel, String fowIdentity) { //TODO: bake this into /ac play
+    public static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) { //TODO: bake this into /ac play
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
-        MessageChannel channel;
-        if (game.getMainGameChannel() != null) {
-            channel = game.getMainGameChannel();
-        } else {
-            channel = actionsChannel;
-        }
+        MessageChannel channel = game.getMainGameChannel();
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                fowIdentity + " please play Sabotage by clicking the Sabo button on the AC you wish to Sabo");
+                player.getRepresentation() + " please play Sabotage by clicking the Sabo button on the AC you wish to Sabo");
             return;
         }
         if (acID.contains("reverse_")) {
@@ -1658,7 +1653,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             scButtons.add(Buttons.green("resolveReverse_" + actionCardTitle,
                 "Pick up " + actionCardTitle + " from the discard"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                fowIdentity + " After checking for Sabos, use buttons to resolve Reverse Engineer.", scButtons);
+                player.getRepresentation() + " After checking for Sabos, use buttons to resolve Reverse Engineer.", scButtons);
         }
         if (acID.contains("counterstroke_")) {
             String tilePos = acID.split("_")[2];
@@ -1667,7 +1662,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             scButtons.add(Buttons.green("resolveCounterStroke_" + tilePos,
                 "Counterstroke in " + tilePos));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                fowIdentity + " After checking for Sabos, use buttons to resolve Counterstroke.", scButtons);
+                player.getRepresentation() + " After checking for Sabos, use buttons to resolve Counterstroke.", scButtons);
         }
         if (channel != null) {
             try {
