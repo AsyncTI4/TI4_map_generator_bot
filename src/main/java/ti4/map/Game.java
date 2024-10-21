@@ -4232,6 +4232,10 @@ public class Game extends GameProperties {
     }
 
     public void addWebsiteOverlay(Player player, String cardType, String cardID, int x, int y, int width, int height) {
+        if (player == null) {
+            addWebsiteOverlay(cardType, cardID, x, y, width, height);
+            return;
+        }
         getWebsiteOverlays().put(cardType + ":" + cardID + ":" + player.getFaction(), new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
     }
 
