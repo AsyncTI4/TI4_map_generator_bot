@@ -2090,20 +2090,20 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which player owns the planet you want to land on", buttons);
     }
 
-    public static void yinHeroTarget(ButtonInteractionEvent event, String buttonID, Game game, String finsFactionCheckerPrefix) {
+    public static void yinHeroTarget(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String faction = buttonID.replace("yinHeroTarget_", "");
         List<Button> buttons = new ArrayList<>();
         Player target = game.getPlayerFromColorOrFaction(faction);
         if (target != null) {
             for (String planet : target.getPlanets()) {
-                buttons.add(Buttons.green(finsFactionCheckerPrefix + "yinHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "yinHeroPlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which planet to invade", buttons);
             ButtonHelper.deleteMessage(event);
         }
     }
 
-    public static void yinHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, String finsFactionCheckerPrefix, String trueIdentity) {
+    public static void yinHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String planet = buttonID.replace("yinHeroPlanet_", "");
         if (planet.equalsIgnoreCase("lockedmallice")) {
             Tile tile = game.getTileFromPlanet("lockedmallice");
@@ -2114,11 +2114,10 @@ public class ButtonHelperHeroes {
             planet = "hexmallice";
             tile = MoveUnits.flipMallice(event, tile, game);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            trueIdentity + " Chose to invade " + Helper.getPlanetRepresentation(planet, game));
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " Chose to invade " + Helper.getPlanetRepresentation(planet, game));
         List<Button> buttons = new ArrayList<>();
         for (int x = 1; x < 4; x++) {
-            buttons.add(Buttons.green(finsFactionCheckerPrefix + "yinHeroInfantry_" + planet + "_" + x, "Land " + x + " infantry", Emojis.infantry));
+            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "yinHeroInfantry_" + planet + "_" + x, "Land " + x + " infantry", Emojis.infantry));
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             "Use buttons to select how many infantry you'd like to land on the planet", buttons);

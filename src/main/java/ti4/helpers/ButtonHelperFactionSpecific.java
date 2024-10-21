@@ -1964,8 +1964,7 @@ public class ButtonHelperFactionSpecific {
         return takeACs;
     }
 
-    public static void mageon(String buttonID, ButtonInteractionEvent event, Game game, Player player,
-        String trueIdentity) {
+    public static void mageon(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("takeAC_", "");
         int acNum = Integer.parseInt(buttonID.split("_")[0]);
 
@@ -1981,7 +1980,7 @@ public class ButtonHelperFactionSpecific {
             return;
         }
         String ident2 = player2.getRepresentation();
-        String message2 = trueIdentity + " took AC #" + acNum + " from " + ident2;
+        String message2 = player.getRepresentationUnfogged() + " took AC #" + acNum + " from " + ident2;
         String acID = null;
         for (Map.Entry<String, Integer> so : player2.getActionCards().entrySet()) {
             if (so.getValue().equals(acNum)) {
@@ -2004,9 +2003,7 @@ public class ButtonHelperFactionSpecific {
         ACInfo.sendActionCardInfo(game, player2);
         ACInfo.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, event, player);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
-            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
-        }
+        CommanderUnlockCheck.checkPlayer(player, "yssaril");
         event.getMessage().delete().queue();
     }
 
