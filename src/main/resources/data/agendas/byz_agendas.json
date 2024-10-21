@@ -1,0 +1,319 @@
+[
+    {
+        "alias": "byz_archived_secret",
+        "name": "Archived Secret",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "Elected player draws 2 secret objectives and discards 1.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_arms_reduction",
+        "name": "Arms Reduction",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player must destroy all but 2 of their dreadnoughts and all but 2 of their carriers.",
+        "text2": "Against: Each player must destroy 2 PDS outside their home system, if able.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_clandestine_operations",
+        "name": "Clandestine Operations",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player who voted “For” gains one command token.",
+        "text2": "Against: Each player who voted “For” removes 2 command tokens from their fleet pool and returns those tokens to their reinforcements.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_colonial_redistribution",
+        "name": "Colonial Redistribution",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Elect Planet",
+        "text1": "Destroy each unit on the elected planet. Then, the player who controls that planet chooses one player with the fewest victory points; that player may place 3 infantry and 1 PDS from their reinforcements on the elected planet.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_conventions_of_war",
+        "name": "Conventions of War",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Players may no longer use Bombardment against planets in another player's home system.",
+        "text2": "Against: Starting with the Speaker and continuing clockwise, each player may use the Production ability of 1 space dock they control.",
+        "mapText": "Players may no longer use Bombardment against planets in another player's home system.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_enforced_travel_ban",
+        "name": "Enforced Travel Ban",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Alpha and beta wormholes have no effect during movement.",
+        "text2": "Against: The Speaker must place an ion storm token in the Mecatol Rex system.",
+        "mapText": "Alpha and beta wormholes have no effect during movement.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_homeland_defense_act",
+        "name": "Homeland Defense Act",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player may add one PDS from their reinforcements to a planet in their home system. Each player can have any number of PDS units on planets they control.",
+        "text2": "Against: All players must destroy all PDS units in their home system.",
+        "mapText": "Each player can have any number of PDS units on planets they control.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_judicial_abolishment",
+        "name": "Judicial Abolishment",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Discard the last public objective to be revealed from play. Draw a new public objective of the same stage and place it near the public objectives.",
+        "text2": "Against: Each player gives one other player of their choice a Political Secret from their hand.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_minister_of_commerce",
+        "name": "Minister of Commerce",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "For: All players gain the War Sun technology. All War Suns lose sustain damage.",
+        "mapText": "After the owner of this card replenishes commodities, they gain 1 trade good for each player that is their neighbor. The owner of this card may discard this card when they replenish commodities to gain 5 trade goods.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_minister_of_exploration",
+        "name": "Minister of Exploration",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. When the owner of this card gains control of a planet, they gain 1 Trade Good. At the end of their turn, the owner of this card may discard this card to explore every planet they control.",
+        "mapText": "When the owner of this card gains control of a planet, they gain 1 Trade Good. At the end of their turn, the owner of this card may discard this card to explore every planet they control.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_minister_of_industry",
+        "name": "Minister of Industry",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities. The owner of this card may discard this card when they use one of their PRODUCTION abilities to increase their production capacity in that system by 8.",
+        "mapText": "When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities. The owner of this card may discard this card when they use one of their PRODUCTION abilities to increase their production capacity in that system by 8.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_minister_of_policy",
+        "name": "Minister of Policy",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. At the beginning of the Strategy phase, the owner of this card draws 1 action card. As an action, the owner of this card may discard this card to draw 5 action cards.",
+        "mapText": "At the beginning of the Strategy phase, the owner of this card draws 1 action card. As an action, the owner of this card may discard this card to draw 5 action cards.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_miscount_disclosed",
+        "name": "Miscount Disclosed",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Starting with the Speaker and going clockwise, each player may score one public objective if they fulfill its requirements.",
+        "text2": "Against: Starting with the player to the left of the speaker and going counterclockwise, each player may score one secret objective if they fulfill its requirements.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_prophecy_of_ixth",
+        "name": "Prophecy of Ixth",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter’s combat rolls. When 1 or more of their fighters make a combat roll, 1 of those units may roll one additional die. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "mapText": "The owner of this card applies +1 to the result of their fighter’s combat rolls. When 1 or more of their fighters make a combat roll, 1 of those units may roll one additional die. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_publicize_weapons_schematics",
+        "name": "Publicize Weapons Schematics",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against (When this agenda is revealed, if no player owns a War Sun technology, discard this card and reveal another agenda from the top of the deck.)",
+        "text1": "For: All players gain the War Sun technology. All War Suns lose sustain damage.",
+        "text2": "Against: Each player that owns a War Sun technology may produce one War Sun from a space dock in their home system, if able.",
+        "mapText": "All War Suns lose sustain damage.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_rearmament_agreement",
+        "name": "Rearmament Agreement",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player places 1 mech from their reinforcements on any planet they control.",
+        "text2": "Against: Each player destroys all of their mechs.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "bvz_regulated_conscription",
+        "name": "Regulated Conscription",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player produces units, they may only build 1 fighter and infantry for its cost instead of 2.",
+        "text2": "Against: The player with the most infantry must destroy half of their infantry, rounded up. The player with the most fighters must destroy half of their fighters, rounded up.",
+        "mapText": "When a player produces units, they may only build 1 fighter and infantry for its cost instead of 2.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_research_grant_allocation",
+        "name": "Research Grant Allocation",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player gains any 1 technology of their choice. Then, for each prerequisite on that technology they do not meet, they remove 1 token from their fleet pool and return it to their reinforcements.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_shared_research",
+        "name": "Shared Research",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player's units can move through nebulae. During movement, players may apply +1 movement to each of their ships that moved out of or through an anomaly.",
+        "text2": "Against: Each player places a command token from their reinforcements in their home system, if able.",
+        "mapText": "Each player's units can move through nebulae. During movement, players may apply +1 movement to each of their ships that moved out of or through an anomaly.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_wormhole_research",
+        "name": "Wormhole Research",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player who has 1 or more ships in a system that contains a wormhole may research 1 technology. Then, destroy all ships in systems that contain an alpha or beta wormhole.",
+        "text2": "Against: Destroy each PDS in or adjacent to a system that contains a wormhole.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_designated_pariah",
+        "name": "Designated Pariah",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "Once per combat, after 1 of the elected player's units is destroyed, the active player may gain one Trade Good from the supply.",
+        "mapText": "Once per combat, after 1 of the elected player's units is destroyed, the active player may gain one Trade Good from the supply.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_manifest_destiny",
+        "name": "Manifest Destiny",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card and 1 victory point. A player gains this card and 1 victory point when they take a planet from the owner of this card. Then, the previous owner of this card loses one victory point.",
+        "mapText": "A player gains this card and 1 victory point when they take a planet from the owner of this card. Then, the previous owner of this card loses one victory point.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_free_trade",
+        "name": "Free Trade",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: All players are neighbors. The commodity value of each faction is increased by one.",
+        "text2": "Against: Each player gives one other player of their choice a Trade Agreement from their hand.",
+        "mapText": "All players are neighbors. The commodity value of each faction is increased by one.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_humanitarian_missions",
+        "name": "Humanitarian Missions",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When players gain control of a planet that was controlled by another player, that planet is not exhausted.",
+        "text2": "Against: At the start of the Strategy Phase, each player chooses one planet controlled by the player to their right and exhausts it.",
+        "mapText": "When players gain control of a planet that was controlled by another player, that planet is not exhausted.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_imperial_champion",
+        "name": "Imperial Champion",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card and 1 victory point. A player gains this card and 1 victory point when they win a combat against the owner of this card. Then, the previous owner of this card loses 1 victory point.",
+        "mapText": "A player gains this card and 1 victory point when they win a combat against the owner of this card. Then, the previous owner of this card loses 1 victory point.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_imperium_rex",
+        "name": "Imperium Rex",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against (When this card is drawn, if it is round 1 or 2, discard this card and reveal another agenda from the top of the deck.)",
+        "text1": "For: The game no longer ends when one player reaches a number of victory points. Instead, the game ends when players would return strategy cards in the upcoming round. Whoever has the most points wins the game, with ties determined by initiative order.",
+        "text2": "Against: Each player loses one victory point.",
+        "mapText": "The game no longer ends when one player reaches a number of victory points. Instead, the game ends when players would return strategy cards in the upcoming round. Whoever has the most points wins the game, with ties determined by initiative order.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_interdict_trade",
+        "name": "Interdict Trade",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player’s may not receive commodities or trade goods from other players in a transaction.",
+        "mapText": "The elected player’s may not receive commodities or trade goods from other players in a transaction.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_research_team",
+        "name": "Research Team",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Technology Group",
+        "text1": "When researching technology, players may ignore all prerequisites of this group.",
+        "mapText": "When researching technology, players may ignore all prerequisites of this group.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_throne_world",
+        "name": "Throne World",
+        "category": "agenda",
+        "type": "Law",
+        "target": "Elect Planet",
+        "text1": "Attach this card to the elected planet's card. The planet's owner gains 1 victory point. Units on this planet cannot use PRODUCTION. When a player gains control of this planet, they gain 1 victory point. When a player loses control of this planet, they lose 1 victory point.",
+        "mapText": "Units on this planet cannot use PRODUCTION. When a player gains control of this planet, they gain 1 victory point. When a player loses control of this planet, they lose 1 victory point.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_trade_war",
+        "name": "Trade War",
+        "category": "agenda",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player who voted “For” gains 3 Trade Goods.",
+        "text2": "Against: Each player who voted “For” loses all of their Trade Goods.",
+        "source": "byz_agendas"
+    },
+    {
+        "alias": "byz_war_bonds",
+        "name": "War Bonds",
+        "category": "agenda",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: After a player wins a combat against another player, they may remove their command token from the active system and return it to their reinforcements.",
+        "text2": "Against: Each player gives one other player of their choice a Ceasefire from their hand.",
+        "mapText": "After a player wins a combat against another player, they may remove their command token from the active system and return it to their reinforcements.",
+        "source": "byz_agendas"
+    }
+]
