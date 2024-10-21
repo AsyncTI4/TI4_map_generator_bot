@@ -30,7 +30,8 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperTacticalAction {
 
-    public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
+    public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String buttonLabel = event.getButton().getLabel();
         String remove = "Move";
         Map<String, Integer> currentSystem = game.getCurrentMovedUnitsFrom1System();
         Map<String, Integer> currentActivation = game.getMovedUnitsFromCurrentActivation();

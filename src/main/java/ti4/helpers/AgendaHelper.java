@@ -1395,7 +1395,8 @@ public class AgendaHelper {
         }
     }
 
-    public static void exhaustStuffForVoting(String buttonID, ButtonInteractionEvent event, Game game, Player player, String buttonLabel) {
+    public static void exhaustStuffForVoting(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String buttonLabel = event.getButton().getLabel();
         String planetName = StringUtils.substringAfter(buttonID, "_");
         String votes = StringUtils.substringBetween(buttonLabel, "(", ")");
         if (!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive")
