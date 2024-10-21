@@ -493,7 +493,8 @@ public class ButtonHelperSCs {
         return contains;
     }
 
-    public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID, String lastchar) {
+    public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         boolean setstatus = true;
         int scnum = 1;
         try {
@@ -552,7 +553,8 @@ public class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void scNoFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID, Player nullable, String lastchar) {
+    public static void scNoFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+        String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
         try {
@@ -596,7 +598,8 @@ public class ButtonHelperSCs {
         }
     }
 
-    public static void scFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID, Player nullable, String lastchar) {
+    public static void scFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+        String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
         try {
@@ -608,7 +611,7 @@ public class ButtonHelperSCs {
                 setStatus = false;
             }
         }
-        if (nullable != null && player.getSCs().contains(scNum)) {
+        if (player != null && player.getSCs().contains(scNum)) {
             String message = player.getRepresentation()
                 + " you currently hold this strategy card and therefore should not be spending a CC here.\nYou may override this protection by running `/player stats strategy_cc:-1`.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
