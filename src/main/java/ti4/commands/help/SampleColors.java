@@ -1,9 +1,6 @@
 package ti4.commands.help;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +43,7 @@ public class SampleColors extends HelpSubcommandData {
         OptionMapping input = event.getOption(Constants.HUE);
         List<String> hues = new ArrayList<String>();
         if (input == null || input.getAsString().equals("ALL") || input.getAsString().equals("")) {
-            hues = Arrays.asList(new String[] { "RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK" });
+            hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK");
         } else {
             SPACING = 12;
             DREADWIDTH = 77 + 2 * SPACING;
@@ -114,7 +111,7 @@ public class SampleColors extends HelpSubcommandData {
             return;
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, 1.0f, "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.get(0) : "ALL"))
+        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.get(0) : "ALL"))
             .setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.get(0) : "ALL the") + " units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }

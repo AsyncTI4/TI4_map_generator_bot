@@ -1,6 +1,6 @@
 package ti4.helpers.async;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +65,6 @@ public class JimboImageHelper {
             g2.drawImage(img, x * size + xoff, y * size, null);
             i++;
         }
-        return MapGenerator.uploadToDiscord(newImage, 0.4f, "jimboStuff");
+        return MapGenerator.uploadToDiscord(newImage, "jimboStuff");
     }
 }

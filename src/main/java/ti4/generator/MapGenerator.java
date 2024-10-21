@@ -1,19 +1,7 @@
 package ti4.generator;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GradientPaint;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -45,17 +33,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -66,6 +43,11 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
@@ -161,16 +143,16 @@ public class MapGenerator {
     private static final BasicStroke stroke7 = new BasicStroke(7.0f);
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
 
-    private static Color EliminatedColor = new Color(150, 0, 24); // Carmine
-    private static Color ActiveColor = new Color(80, 200, 120); // Emerald
-    private static Color PassedColor = new Color(220, 20, 60); // Crimson
-    private static Color DummyColor = new Color(0, 128, 255); // Azure
-    private static Color Stage1RevealedColor = new Color(230, 126, 34);
-    private static Color Stage1HiddenColor = new Color(130, 70, 0);
-    private static Color Stage2RevealedColor = new Color(93, 173, 226);
-    private static Color Stage2HiddenColor = new Color(30, 60, 128);
-    private static Color LawColor = new Color(228, 255, 0);
-    private static Color TradeGoodColor = new Color(241, 176, 0);
+    private static final Color EliminatedColor = new Color(150, 0, 24); // Carmine
+    private static final Color ActiveColor = new Color(80, 200, 120); // Emerald
+    private static final Color PassedColor = new Color(220, 20, 60); // Crimson
+    private static final Color DummyColor = new Color(0, 128, 255); // Azure
+    private static final Color Stage1RevealedColor = new Color(230, 126, 34);
+    private static final Color Stage1HiddenColor = new Color(130, 70, 0);
+    private static final Color Stage2RevealedColor = new Color(93, 173, 226);
+    private static final Color Stage2HiddenColor = new Color(30, 60, 128);
+    private static final Color LawColor = new Color(228, 255, 0);
+    private static final Color TradeGoodColor = new Color(241, 176, 0);
 
     private MapGenerator(Game game) {
         this(game, null, true);
@@ -456,7 +438,6 @@ public class MapGenerator {
     private FileUpload uploadToDiscord() {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
-        float quality = 1 / 6.0f;
         switch (displayType) {
             case wormholes:
             case anomalies:
@@ -469,42 +450,36 @@ public class MapGenerator {
             case attachments:
             case shipless:
             case landscape:
-                quality = 1 / 4.0f;
         }
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, quality, game.getName());
+        FileUpload fileUpload = uploadToDiscord(mainImage, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
     }
 
-    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix) {
-        return uploadToDiscord(imageToUpload, compressionQuality, filenamePrefix, false);
+    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix) {
+        return uploadToDiscord(imageToUpload, filenamePrefix, false);
     }
 
-    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix, boolean saveLocalCopy) {
+    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix, boolean saveLocalCopy) {
         if (imageToUpload == null) return null;
+
+        if (saveLocalCopy) {
+            try {
+                File file = new File(filenamePrefix + ".webp");
+                ImageIO.write(imageToUpload, "webp", file);
+            } catch (IOException e) {
+                BotLogger.log("Could not create File for " + filenamePrefix + ".webp", e);
+            }
+        }
 
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            // CONVERT PNG TO JPG
-            BufferedImage convertedImage = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
-            convertedImage.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
-            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("jpg").next();
-            imageWriter.setOutput(ImageIO.createImageOutputStream(out));
-            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-            if (defaultWriteParam.canWriteCompressed()) {
-                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                defaultWriteParam.setCompressionQuality(compressionQuality);
-            }
-            imageWriter.write(null, new IIOImage(convertedImage, null, null), defaultWriteParam);
-
-            // SAVE LOCAL & UPLOAD TO DISCORD
-            if (saveLocalCopy) {
-                File f = new File(filenamePrefix + ".png");
-                ImageIO.write(imageToUpload, "png", f);
-            }
-            String fileName = filenamePrefix + "_" + getTimeStamp() + ".jpg";
+            BufferedImage bufferedImage = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
+            bufferedImage.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
+            ImageIO.write(bufferedImage, "webp", out);
+            String fileName = filenamePrefix + "_" + getTimeStamp() + ".webp";
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
@@ -626,7 +601,7 @@ public class MapGenerator {
 
         String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
+        FileUpload fileUpload = uploadToDiscord(bannerImage, player.getFaction() + player.getColor() + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
     }
 
@@ -653,7 +628,7 @@ public class MapGenerator {
 
         superDrawString(bannerG, "Agenda #" + num, 55, 35, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
-        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, "agenda" + num + "banner");
+        FileUpload fileUpload = uploadToDiscord(bannerImage, "agenda" + num + "banner");
         MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload);
     }
 
@@ -672,7 +647,7 @@ public class MapGenerator {
         superDrawString(bannerG, roundText, 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
 
         String descr = "Start of " + phase + " phase, round " + round + ".";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, phase + round + "banner").setDescription(descr);
+        FileUpload fileUpload = uploadToDiscord(bannerImage, phase + round + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
     }
 
@@ -784,7 +759,7 @@ public class MapGenerator {
                 boolean fowHidePlayerNames = Boolean.parseBoolean(game.getFowOption(FOWOptions.HIDE_NAMES));
                 if (!fowHidePlayerNames) {
                     graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
-                    userName.append(" ").append(playerName.substring(0, Math.min(playerName.length(), 20)));
+                    userName.append(" ").append(playerName, 0, Math.min(playerName.length(), 20));
                 }
                 y += 34;
                 graphics.setFont(Storage.getFont32());
@@ -1845,7 +1820,7 @@ public class MapGenerator {
         int leftSide = width - widthOfSection - xDeltaFromRightSide;
         int verticalSpacing = 39;
         int imageSize = verticalSpacing - 2;
-        drawPAImageScaled(leftSide, y + verticalSpacing * 1, "pa_resources.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing, "pa_resources.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_hit.png", imageSize);
         //drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_hit.png", imageSize);
@@ -1853,16 +1828,16 @@ public class MapGenerator {
         graphics.setColor(Color.WHITE);
         leftSide += verticalSpacing + 10;
         drawCenteredString(graphics, "Space |",
-            new Rectangle(leftSide - 4, y + verticalSpacing * 0, 50, verticalSpacing), Storage.getFont18());
+            new Rectangle(leftSide - 4, y, 50, verticalSpacing), Storage.getFont18());
         drawCenteredString(graphics, "____________",
-            new Rectangle(leftSide, y + verticalSpacing * 0, 110, verticalSpacing), Storage.getFont24());
+            new Rectangle(leftSide, y, 110, verticalSpacing), Storage.getFont24());
         float val = player.getTotalResourceValueOfUnits("space");
         if (isWholeNumber(val) || val > 10) {
             drawCenteredString(graphics, String.valueOf((int) val),
-                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         } else {
             drawCenteredString(graphics, String.valueOf(val),
-                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         }
         drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("space")),
             new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
@@ -1870,16 +1845,16 @@ public class MapGenerator {
             new Rectangle(leftSide, y + verticalSpacing * 3, 50, verticalSpacing), Storage.getFont24());
         leftSide += verticalSpacing + 20;
         drawCenteredString(graphics, "  Ground",
-            new Rectangle(leftSide, y + verticalSpacing * 0, 50, verticalSpacing), Storage.getFont18());
+            new Rectangle(leftSide, y, 50, verticalSpacing), Storage.getFont18());
         // drawCenteredString(graphics, String.valueOf(player.getTotalResourceValueOfUnits("ground")),
         //     new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
         val = player.getTotalResourceValueOfUnits("ground");
         if (isWholeNumber(val) || val > 10) {
             drawCenteredString(graphics, String.valueOf((int) val),
-                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         } else {
             drawCenteredString(graphics, String.valueOf(val),
-                new Rectangle(leftSide, y + verticalSpacing * 1, 50, verticalSpacing), Storage.getFont24());
+                new Rectangle(leftSide, y + verticalSpacing, 50, verticalSpacing), Storage.getFont24());
         }
         drawCenteredString(graphics, String.valueOf(player.getTotalHPValueOfUnits("ground")),
             new Rectangle(leftSide, y + verticalSpacing * 2, 50, verticalSpacing), Storage.getFont24());
@@ -2752,12 +2727,12 @@ public class MapGenerator {
     }
 
     public enum HorizontalAlign {
-        Left, Center, Right;
-    };
+        Left, Center, Right
+    }
 
     public enum VerticalAlign {
-        Top, Center, Bottom;
-    };
+        Top, Center, Bottom
+    }
 
     /**
      *
@@ -3445,7 +3420,7 @@ public class MapGenerator {
             List<String> reps = Arrays.asList(player.getCCRepresentation().split("/"));
             graphics.setFont(Storage.getFont28());
             point.translate(rightAlign ? 58 : -3, 32);
-            String fleetCCs = Integer.toString(player.getFleetCC() + additionalFleetSupply) + addFS;
+            String fleetCCs = player.getFleetCC() + additionalFleetSupply + addFS;
             superDrawString(graphics, reps.get(0), point.x, point.y, Color.WHITE, align, null, stroke4, Color.BLACK);
             superDrawString(graphics, fleetCCs, point.x, point.y + 65, Color.WHITE, align, null, stroke4, Color.BLACK);
             superDrawString(graphics, reps.get(2), point.x, point.y + 130, Color.WHITE, align, null, stroke4, Color.BLACK);
@@ -5243,7 +5218,7 @@ public class MapGenerator {
                         }
                         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(player.getColor())), scale);
                         drawControlToken(tileGraphics, bufferedImage, player, x, y, false, scale / 2);
-                        drawCenteredString(tileGraphics, "" + numberOfDice + (rerolls ? "*" : ""),
+                        drawCenteredString(tileGraphics, numberOfDice + (rerolls ? "*" : ""),
                             new Rectangle(Math.round(x + 6 * scale), Math.round(y + 12 * scale), Math.round(61 * scale / 2), Math.round(24 * scale * 2 / 3)),
                             bigFont);
                         drawCenteredString(tileGraphics, "(" + expectedHits + ")",
@@ -5613,7 +5588,7 @@ public class MapGenerator {
             BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
             borderDecorationImage = new BufferedImage(cached.getColorModel(), cached.copyData(null), cached.isAlphaPremultiplied(), null);
         } catch (Exception e) {
-            BotLogger.log("Could not find border decoration image! Decoration was " + decorationType.toString());
+            BotLogger.log("Could not find border decoration image! Decoration was " + decorationType);
             return;
         }
 
@@ -5880,10 +5855,7 @@ public class MapGenerator {
                     continue;
                 }
                 if (unitModel.getPlanetaryShield()) {
-                    if (unitModel.getBaseType().equalsIgnoreCase("mech") && ButtonHelper.isLawInPlay(game, "articles_war")) {
-                        return false;
-                    }
-                    return true;
+                    return !unitModel.getBaseType().equalsIgnoreCase("mech") || !ButtonHelper.isLawInPlay(game, "articles_war");
                 }
             }
         }

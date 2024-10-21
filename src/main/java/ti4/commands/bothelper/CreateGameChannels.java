@@ -12,9 +12,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -35,6 +32,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -400,7 +399,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                     }
                     MessageHelper.sendMessageToChannel(introThread, message);
                     BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                    FileUpload fileUpload = MapGenerator.uploadToDiscord(colorsImage, 1.0f, "colors");
+                    FileUpload fileUpload = MapGenerator.uploadToDiscord(colorsImage, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
                     BotLogger.log("newPlayerIntro", e);
