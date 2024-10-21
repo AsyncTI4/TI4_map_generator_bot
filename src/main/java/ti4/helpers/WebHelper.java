@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,13 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -103,44 +98,28 @@ public class WebHelper {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
             return;
 
-        try {
-            Region region = Region.US_EAST_1;
-            S3Client s3 = S3Client.builder()
-                .region(region)
-                .build();
+        try(S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
             String mapPathFormat;
             if (frog != null && frog && player != null) {
-                mapPathFormat = "fogmap/" + player.getUserID() + "/%s/%s.png";
+                mapPathFormat = "fogmap/" + player.getUserID() + "/%s/%s.webp";
             } else {
-                mapPathFormat = "map/%s/%s.png";
+                mapPathFormat = "map/%s/%s.webp";
             }
 
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
             PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(webProperties.getProperty("bucket"))
-                .key(String.format(mapPathFormat, gameId, dtstamp))
-                .contentType("image/png")
-                .build();
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format(mapPathFormat, gameId, dtstamp))
+                    .contentType("image/webp")
+                    .build();
 
-            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
-            imageWriter.setOutput(ImageIO.createImageOutputStream(out));
-            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-            if (defaultWriteParam.canWriteCompressed()) {
-                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                defaultWriteParam.setCompressionQuality(0.01f);
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ImageIO.write(img, "webp", out);
+                s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
             }
 
-            try {
-                imageWriter.write(null, new IIOImage(img, null, null), defaultWriteParam);
-            } catch (IOException e) {
-                BotLogger.log("Could not write image to web server", e);
-                throw new RuntimeException(e);
-            }
-
-            s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
         } catch (SdkClientException e) {
             BotLogger.log("Could not add image for game `" + gameId + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {

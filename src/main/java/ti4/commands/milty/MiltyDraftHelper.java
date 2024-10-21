@@ -1,10 +1,6 @@
 package ti4.commands.milty;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +98,7 @@ public class MiltyDraftHelper {
             desc += slice.ttsString();
         }
 
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(mainImage, 1.0f, game.getName() + "_miltydraft", false);
+        FileUpload fileUpload = MapGenerator.uploadToDiscord(mainImage, game.getName() + "_miltydraft", false);
         fileUpload.setDescription(desc);
         return fileUpload;
     }
@@ -281,8 +277,7 @@ public class MiltyDraftHelper {
                 }
             }
 
-            boolean sourceAllowed = false;
-            if (sources.contains(tileModel.getSource())) sourceAllowed = true;
+            boolean sourceAllowed = sources.contains(tileModel.getSource());
 
             // leaving these as a stop-gap for now until I can verify all sources are setup
             if (tileID.length() <= 2) sourceAllowed = true;
