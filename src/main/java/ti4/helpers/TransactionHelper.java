@@ -1274,4 +1274,38 @@ public class TransactionHelper {
         }
         return stuffToTransButtons;
     }
+
+    public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p2 != null) {
+            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the latest offer from " + player.getRepresentation(false, false) + " has been rescinded.");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + "you rescinded the latest offer to " + p2.getRepresentation(false, false));
+            player.clearTransactionItemsWithPlayer(p2);
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    public static void rejectOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (p1 != null) {
+            MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), p1.getRepresentation() + " your offer to " + player.getRepresentation(false, false) + " has been rejected.");
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    public static void acceptOffer(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (buttonID.split("_").length > 2) {
+            String offerNum = buttonID.split("_")[2];
+            String key = "offerFrom" + p1.getFaction() + "To" + player.getFaction();
+            String oldOffer = game.getStoredValue(key);
+            if (!offerNum.equalsIgnoreCase(oldOffer)) {
+                MessageHelper.sendMessageToChannel(event.getChannel(),
+                    "Only the most recent offer is acceptable. This is an old transaction offer and it can no longer be accepted");
+                return;
+            }
+        }
+        TransactionHelper.acceptTransactionOffer(p1, player, game, event);
+        ButtonHelper.deleteMessage(event);
+    }
 }
