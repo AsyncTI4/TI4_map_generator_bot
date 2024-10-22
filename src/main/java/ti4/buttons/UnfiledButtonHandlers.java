@@ -3500,6 +3500,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
+    @ButtonHandler("drawActionCards_")
     public static void drawActionCards(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         try {
             int count = Integer.parseInt(buttonID.replace("drawActionCards_", ""));
@@ -3509,6 +3510,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
+    @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")
     public static void applytempcombatmodAC(ButtonInteractionEvent event, Player player, String buttonID) {
         String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier(Constants.AC,
@@ -3522,6 +3524,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("applytempcombatmod__" + "tech" + "__")
     public static void applytempcombatmodtech(ButtonInteractionEvent event, Player player) {
         String acAlias = "sc";
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.GetPossibleTempModifier("tech", acAlias,
@@ -3536,6 +3539,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("rollIxthian")
     public static void rollIxthian(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         if (game.getSpeaker().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
             AgendaHelper.rollIxthian(game, true);
@@ -3547,6 +3551,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("discardAgenda_")
     public static void discardAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
         String agendaID = game.revealAgenda(false);
@@ -3560,6 +3565,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("bottomAgenda_")
     public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
         new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), game);
@@ -3578,36 +3584,41 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("removeCCFromBoard_")
     public static void removeCCFromBoard(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.resolveRemovingYourCC(player, game, event, buttonID);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("refreshLandingButtons")
     public static void refreshLandingButtons(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    @ButtonHandler("useTA_")
     public static void useTA(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String ta = buttonID.replace("useTA_", "") + "_ta";
         PlayPN.resolvePNPlay(ta, player, game, event);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("mahactCommander")
     public static void mahactCommander(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "mahactCommander");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.",
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("primaryOfWarfare")
     public static void primaryOfWarfare(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
     }
 
+    @ButtonHandler("topAgenda_")
     public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
         new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), game);

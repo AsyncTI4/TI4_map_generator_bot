@@ -1241,8 +1241,8 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static void resolveGeneticRecombination(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    @ButtonHandler("geneticRecombination")
+    public static void resolveGeneticRecombination(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String[] fields = buttonID.split("_");
         Player mahactPlayer = game.getPlayer(fields[1]);
         String choice = fields[2];

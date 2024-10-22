@@ -3086,6 +3086,7 @@ public class ButtonHelper {
         }
     }
 
+    @ButtonHandler("addToken_")
     public static void addTokenToTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // addtoken_(tokenname)_(pos)_(planet?)
         String regex = "addToken_" + RegexHelper.tokenRegex() + "_" + RegexHelper.posRegex(game)

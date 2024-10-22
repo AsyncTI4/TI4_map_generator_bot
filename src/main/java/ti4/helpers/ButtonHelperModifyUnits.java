@@ -1502,21 +1502,13 @@ public class ButtonHelperModifyUnits {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        CommanderUnlockCheck.checkPlayer(player, "mentak");
-        CommanderUnlockCheck.checkPlayer(player, "l1z1x");
-        CommanderUnlockCheck.checkPlayer(player, "tnelis");
-        CommanderUnlockCheck.checkPlayer(player, "cymiae");
-        CommanderUnlockCheck.checkPlayer(player, "kyro");
-        CommanderUnlockCheck.checkPlayer(player, "ghemina");
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheck.checkPlayer(player, "muaat");
         }
-        CommanderUnlockCheck.checkPlayer(player, "argent");
-
-        CommanderUnlockCheck.checkPlayer(player, "naaz");
-        CommanderUnlockCheck.checkPlayer(player, "arborec");
+        CommanderUnlockCheck.checkPlayer(player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
     }
 
+    @ButtonHandler("cloakedFleets_")
     public static void resolveCloakedFleets(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String unit = buttonID.split("_")[2];
@@ -1531,6 +1523,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("kolleccMechCapture_")
     public static void resolveKolleccMechCapture(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String unit = buttonID.split("_")[2];
@@ -1994,6 +1987,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("resolveMirvedaCommander_")
     public static void resolvingMirvedaCommander(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff = Integer.parseInt(buttonID.split("_")[1]);
@@ -2007,6 +2001,7 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    @ButtonHandler("combatDroneConvert_")
     public static void resolvingCombatDrones(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff = Integer.parseInt(buttonID.split("_")[1]);

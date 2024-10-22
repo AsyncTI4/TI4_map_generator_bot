@@ -334,10 +334,9 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
-        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]),
-            game);
+    @ButtonHandler("resolveCounterStroke_")
+    public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their CC from tile " + buttonID.split("_")[1]
             + " using Counterstroke and gained it to their tactic pool";
         player.setTacticalCC(player.getTacticalCC() + 1);

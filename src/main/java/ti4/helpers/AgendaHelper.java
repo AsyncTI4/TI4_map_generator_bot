@@ -1307,6 +1307,7 @@ public class AgendaHelper {
         }
     }
 
+    @ButtonHandler("sendTGTo_")
     public static void erase1DebtTo(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tgOrDebt = buttonID.split("_")[2];

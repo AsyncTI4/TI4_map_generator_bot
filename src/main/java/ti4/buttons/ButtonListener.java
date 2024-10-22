@@ -982,54 +982,10 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveRelicSwapStep1(player, game, event, buttonID);
         } else if (buttonID.startsWith("retrieveAgenda_")) {
             UnfiledButtonHandlers.retrieveAgenda(event, player, buttonID, game);
-        } else if (buttonID.startsWith("topAgenda_")) {
-            UnfiledButtonHandlers.topAgenda(event, buttonID, game);
-        } else if (buttonID.startsWith("resolveCounterStroke_")) {
-            ButtonHelperActionCards.resolveCounterStroke(game, player, event, buttonID);
-        } else if (buttonID.startsWith("sendTGTo_")) {
-            AgendaHelper.erase1DebtTo(game, buttonID, event, player);
-        } else if (buttonID.startsWith("primaryOfWarfare")) {
-            UnfiledButtonHandlers.primaryOfWarfare(event, player, game);
-        } else if (buttonID.startsWith("mahactCommander")) {
-            UnfiledButtonHandlers.mahactCommander(event, player, game);
-        } else if (buttonID.startsWith("useTA_")) {
-            UnfiledButtonHandlers.useTA(event, player, buttonID, game);
-        } else if (buttonID.startsWith("combatDroneConvert_")) {
-            ButtonHelperModifyUnits.resolvingCombatDrones(event, game, player, buttonID);
-        } else if (buttonID.startsWith("cloakedFleets_")) {// kolleccMechCapture_
-            ButtonHelperModifyUnits.resolveCloakedFleets(buttonID, event, game, player);
-        } else if (buttonID.startsWith("kolleccMechCapture_")) {// kolleccMechCapture_
-            ButtonHelperModifyUnits.resolveKolleccMechCapture(buttonID, event, game, player);
-        } else if (buttonID.startsWith("refreshLandingButtons")) {
-            UnfiledButtonHandlers.refreshLandingButtons(event, player, game);
-        } else if (buttonID.startsWith("resolveMirvedaCommander_")) {
-            ButtonHelperModifyUnits.resolvingMirvedaCommander(event, game, player, buttonID);
-        } else if (buttonID.startsWith("removeCCFromBoard_")) {
-            UnfiledButtonHandlers.removeCCFromBoard(event, player, buttonID, game);
-        } else if (buttonID.startsWith("bottomAgenda_")) {
-            UnfiledButtonHandlers.bottomAgenda(event, buttonID, game);
-        } else if (buttonID.startsWith("discardAgenda_")) {
-            UnfiledButtonHandlers.discardAgenda(event, player, buttonID, game);
         } else if (buttonID.startsWith("agendaResolution_")) {
             AgendaHelper.resolveAgenda(game, buttonID, event, mainGameChannel);
-        } else if (buttonID.startsWith("rollIxthian")) {
-            UnfiledButtonHandlers.rollIxthian(event, player, buttonID, game);
-        } else if (buttonID.startsWith("applytempcombatmod__" + "tech" + "__")) {
-            UnfiledButtonHandlers.applytempcombatmodtech(event, player);
-        } else if (buttonID.startsWith("applytempcombatmod__" + Constants.AC + "__")) {
-            UnfiledButtonHandlers.applytempcombatmodAC(event, player, buttonID);
-        } else if (buttonID.startsWith("drawActionCards_")) {
-            UnfiledButtonHandlers.drawActionCards(event, player, buttonID, game);
         } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
             game.initializeMiltySettings().parseButtonInput(event);
-        } else if (buttonID.startsWith("frankenItemAdd")) {
-            FrankenApplicator.resolveFrankenItemAddButton(event, buttonID, player);
-        } else if (buttonID.startsWith("frankenItemRemove")) {
-            FrankenApplicator.resolveFrankenItemRemoveButton(event, buttonID, player);
-        } else if (buttonID.startsWith("addToken_")) {
-            ButtonHelper.addTokenToTile(event, game, player, buttonID);
-        } else if (buttonID.startsWith("geneticRecombination")) {
-            ButtonHelperFactionSpecific.resolveGeneticRecombination(buttonID, event, game, player);
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
                 case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
