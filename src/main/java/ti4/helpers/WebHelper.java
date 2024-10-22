@@ -40,7 +40,6 @@ public class WebHelper {
         } catch (IOException e) {
             BotLogger.log("Could not load web properties.", e);
         }
-
     }
 
     public static void putData(String gameId, Game game) {
@@ -96,9 +95,9 @@ public class WebHelper {
         try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
             String mapPath;
             if (frog != null && frog && player != null) {
-                mapPath = "fogmap/" + player.getUserID() + "/%s/%s";
+                mapPath = "fogmap/" + player.getUserID() + "/%s/%s.";
             } else {
-                mapPath = "map/%s/%s";
+                mapPath = "map/%s/%s.";
             }
 
             LocalDateTime date = LocalDateTime.now();
@@ -106,7 +105,7 @@ public class WebHelper {
 
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 String format = writeWebpOrDefaultTo(img, out, "png");
-                mapPath += mapPath + "." + format;
+                mapPath += format;
                 PutObjectRequest request = PutObjectRequest.builder()
                         .bucket(webProperties.getProperty("bucket"))
                         .key(String.format(mapPath, gameId, dtstamp))
