@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,8 +29,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
 
-import static ti4.helpers.ImageHelper.writeWebpOrDefaultTo;
-
 public class WebHelper {
     private static final Properties webProperties;
 
@@ -48,10 +47,11 @@ public class WebHelper {
             return;
 
         ObjectMapper mapper = new ObjectMapper();
-        try (HttpClient client = HttpClient.newHttpClient()) {
+        try {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
             String json = mapper.writeValueAsString(exportableFieldMap);
 
+            HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s", gameId)))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
@@ -68,9 +68,14 @@ public class WebHelper {
             return;
 
         ObjectMapper mapper = new ObjectMapper();
-        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+        try {
             Map<String, WebsiteOverlay> overlays = game.getWebsiteOverlays();
             String json = mapper.writeValueAsString(overlays);
+
+            Region region = Region.US_EAST_1;
+            S3Client s3 = S3Client.builder()
+                .region(region)
+                .build();
 
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
@@ -94,27 +99,28 @@ public class WebHelper {
             //Only upload when setting is true
             return;
 
-        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
-            String mapPath;
+        try(S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+            String mapPathFormat;
             if (frog != null && frog && player != null) {
-                mapPath = "fogmap/" + player.getUserID() + "/%s/%s";
+                mapPathFormat = "fogmap/" + player.getUserID() + "/%s/%s.webp";
             } else {
-                mapPath = "map/%s/%s";
+                mapPathFormat = "map/%s/%s.webp";
             }
 
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format(mapPathFormat, gameId, dtstamp))
+                    .contentType("image/webp")
+                    .build();
+
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                String format = writeWebpOrDefaultTo(img, out, "png");
-                mapPath += mapPath + "." + format;
-                PutObjectRequest request = PutObjectRequest.builder()
-                        .bucket(webProperties.getProperty("bucket"))
-                        .key(String.format(mapPath, gameId, dtstamp))
-                        .contentType("image/" + format)
-                        .build();
+                ImageIO.write(img, "webp", out);
                 s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
             }
+
         } catch (SdkClientException e) {
             BotLogger.log("Could not add image for game `" + gameId + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
@@ -126,7 +132,11 @@ public class WebHelper {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
             return;
 
-        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+        try {
+            Region region = Region.US_EAST_1;
+            S3Client s3 = S3Client.builder()
+                .region(region)
+                .build();
             String jsonPathFormat = "json_saves/%s/%s";
 
             PutObjectRequest request = PutObjectRequest.builder()
