@@ -92,7 +92,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
-import static ti4.helpers.ImageHelper.writeWebpOrDefaultTo;
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator {
 
@@ -477,9 +477,10 @@ public class MapGenerator {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             BufferedImage mapWithoutTransparentBackground = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
             mapWithoutTransparentBackground.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
-            String fileName = filenamePrefix + "_" + getTimeStamp();
-            String format = writeWebpOrDefaultTo(mapWithoutTransparentBackground, out, "jpg");
-            fileName += "." + format;
+            // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
+            String format = "jpg";
+            String fileName = filenamePrefix + "_" + getTimeStamp() + "." + format;
+            writeCompressedFormat(mapWithoutTransparentBackground, out, format, 0.2f);
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
@@ -3216,10 +3217,10 @@ public class MapGenerator {
         // Otherwise, cache it
         Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides, style.equals("solid"));
         Collections.sort(openSides);
-        String key = color.getName() + "-HexBorder-" + style;
+        StringBuilder key = new StringBuilder(color.getName() + "-HexBorder-" + style);
         for (int x : openSides)
-            key += "_" + x;
-        return ImageHelper.createOrLoadCalculatedImage(key, loader);
+            key.append("_").append(x);
+        return ImageHelper.createOrLoadCalculatedImage(key.toString(), loader);
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {

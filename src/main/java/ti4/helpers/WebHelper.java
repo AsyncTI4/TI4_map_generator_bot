@@ -28,7 +28,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
 
-import static ti4.helpers.ImageHelper.writeWebpOrDefaultTo;
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class WebHelper {
     private static final Properties webProperties;
@@ -104,7 +104,9 @@ public class WebHelper {
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                String format = writeWebpOrDefaultTo(img, out, "png");
+                // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
+                String format = "png";
+                writeCompressedFormat(img, out, format, 0.1f);
                 mapPath += format;
                 PutObjectRequest request = PutObjectRequest.builder()
                         .bucket(webProperties.getProperty("bucket"))
