@@ -651,12 +651,12 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
+    @ButtonHandler("getDiplomatsButtons")
     public static void resolveGetDiplomatButtons(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         ButtonHelper.deleteTheOneButton(event);
         String message = player.getRepresentation() + " select the planet you would like to exhaust";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
-            getDiplomatButtons(game, player));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, getDiplomatButtons(game, player));
     }
 
     public static List<Button> getDiplomatButtons(Game game, Player player) {
@@ -705,6 +705,7 @@ public class ButtonHelperAbilities {
 
     }
 
+    @ButtonHandler("mitosisInf")
     public static void resolveMitosisInf(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "infantry", "placeOneNDone_skipbuild"));
         String message = player.getRepresentationUnfogged() + " Use buttons to put 1 infantry on a planet";
@@ -714,6 +715,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("mitosisMech")
     public static void resolveMitosisMech(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         List<Button> buttons = new ArrayList<>(getPlanetPlaceUnitButtonsForMechMitosis(player, game));
         String message = player.getRepresentationUnfogged() + " Use buttons to replace 1 infantry with 1 mech";

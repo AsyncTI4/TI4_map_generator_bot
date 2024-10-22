@@ -873,6 +873,7 @@ public class ButtonHelperFactionSpecific {
             hacan.getRepresentationUnfogged() + " choose who should get 2TGs", buttons);
     }
 
+    @ButtonHandler("startQDN")
     public static void resolveQuantumDataHubNodeStep1(Player hacan, Game game, ButtonInteractionEvent event) {
         hacan.exhaustTech("qdn");
         int oldStratCC = hacan.getStrategicCC();
@@ -1601,6 +1602,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("startChaosMapping")
     public static void firstStepOfChaos(Game game, Player p1, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         Set<Tile> tiles = ButtonHelper.getTilesOfUnitsWithProduction(p1, game);

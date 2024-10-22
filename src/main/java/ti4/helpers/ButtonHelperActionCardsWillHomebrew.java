@@ -24,6 +24,7 @@ import ti4.model.ExploreModel;
 
 public class ButtonHelperActionCardsWillHomebrew {
 
+    @ButtonHandler("resolveDataArchive")
     public static void resolveDataArchive(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game, true);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #1", buttons);
@@ -37,6 +38,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("resolveDefenseInstallation")
     public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
@@ -48,6 +50,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             buttons);
     }
 
+    @ButtonHandler("defenseInstallationStep2_")
     public static void resolveDefenseInstallationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
@@ -57,6 +60,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
     }
 
+    @ButtonHandler("resolveBoardingParty")
     public static void resolveBoardingParty(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         String type = "sling";
@@ -67,6 +71,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveMercenaryContract")
     public static void resolveMercenaryContract(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         String type = "sling";
@@ -78,6 +83,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveSisterShip")
     public static void resolveSisterShip(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
@@ -96,6 +102,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             "Select which tile you would like to produce a ship in. The bot will not know that it is reduced cost and limited to a specific ship type, but you know that. ", buttons);
     }
 
+    @ButtonHandler("resolveChainReaction")
     public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         int hits = 1;
@@ -115,6 +122,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + "\n " + player.getRepresentation() + " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
+    @ButtonHandler("resolveFlawlessStrategy")
     public static void resolveFlawlessStrategy(Player player, ButtonInteractionEvent event) {
         List<Button> scButtons = new ArrayList<>();
         event.getMessage().delete().queue();
@@ -145,6 +153,7 @@ public class ButtonHelperActionCardsWillHomebrew {
 
     }
 
+    @ButtonHandler("resolveRendezvousPoint")
     public static void resolveRendezvousPoint(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "rendezvous");
@@ -152,6 +161,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token from what was the active system when you played the card. Then end your turn after doing any end of turn abilities you wish to do.", buttons);
     }
 
+    @ButtonHandler("resolveAncientTradeRoutes")
     public static void resolveAncientTradeRoutes(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         player.setCommodities(player.getCommodities() + 2);
@@ -179,6 +189,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             buttons);
     }
 
+    @ButtonHandler("resolveArmsDeal")
     public static void resolveArmsDeal(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
 
@@ -223,6 +234,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("resolveTombRaiders")
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
         List<String> types = new ArrayList<>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
@@ -243,7 +255,7 @@ public class ButtonHelperActionCardsWillHomebrew {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
             }
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+        CommanderUnlockCheck.checkPlayer(player, "kollecc");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         event.getMessage().delete().queue();
     }
@@ -260,6 +272,7 @@ public class ButtonHelperActionCardsWillHomebrew {
 
     }
 
+    @ButtonHandler("strandedShipStep1")
     public static void resolveStrandedShipStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
@@ -279,9 +292,10 @@ public class ButtonHelperActionCardsWillHomebrew {
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
-        CommanderUnlockCheck.checkPlayer(p2, game, "empyrean", event);
+        CommanderUnlockCheck.checkPlayer(p2, "empyrean");
     }
 
+    @ButtonHandler("spatialCollapseStep1")
     public static void resolveSpatialCollapseStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getSpatialCollapseTilesStep1(game, player);
         event.getMessage().delete().queue();

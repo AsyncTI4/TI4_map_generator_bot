@@ -59,6 +59,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -1147,6 +1148,7 @@ public class AgendaHelper {
         return false;
     }
 
+    @ButtonHandler("vote")
     public static void firstStepOfVoting(Game game, ButtonInteractionEvent event, Player player) {
         String pfaction2 = null;
         if (player != null) {
@@ -1179,7 +1181,24 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
                 outcomeActionRow);
         }
+    }
 
+    @ButtonHandler("erasePreVote")
+    public static void erasePreVote(ButtonInteractionEvent event, Player player, Game game) {
+        game.setStoredValue("preVoting" + player.getFaction(), "");
+        player.resetSpentThings();
+        event.getMessage().delete().queue();
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("preVote", "Pre-Vote"));
+        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
+        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Erased the pre-vote", buttons);
+    }
+
+    @ButtonHandler("preVote")
+    public static void preVote(ButtonInteractionEvent event, Player player, Game game) {
+        game.setStoredValue("preVoting" + player.getFaction(), "0");
+        AgendaHelper.firstStepOfVoting(game, event, player);
     }
 
     public static void offerEveryonePreAbstain(Game game) {
@@ -1748,8 +1767,8 @@ public class AgendaHelper {
         player.getCorrectChannel().sendMessage(voteMessage).queue();
     }
 
+    @ButtonHandler("eraseMyRiders")
     public static void reverseAllRiders(ButtonInteractionEvent event, Game game, Player player) {
-
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
@@ -3194,6 +3213,7 @@ public class AgendaHelper {
         return summary;
     }
 
+    @ButtonHandler("ministerOfWar")
     public static void resolveMinisterOfWar(Game game, Player player, ButtonInteractionEvent event) {
         ButtonHelper.deleteTheOneButton(event);
         boolean success = game.removeLaw(game.getLaws().get("minister_war"));
