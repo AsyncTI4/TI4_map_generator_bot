@@ -1,19 +1,13 @@
 package ti4.helpers;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
-
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +20,12 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import javax.imageio.ImageIO;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.MapGenerator;
@@ -276,5 +275,27 @@ public class ImageHelper {
 
     private static String formatPercent(double d) {
         return percentFormatter.get().format(d);
+    }
+
+    public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat) throws IOException {
+        // max webp dimensions are 16383 x 16383
+        if (image.getHeight() > 16383 || image.getWidth() > 16383) {
+            writeCompressedFormat(out, image, defaultFormat);
+            return defaultFormat;
+        } else {
+            ImageIO.write(image, "webp", out);
+            return "webp";
+        }
+    }
+
+    public static void writeCompressedFormat(ByteArrayOutputStream out, BufferedImage image, String format) throws IOException {
+        ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(format).next();
+        imageWriter.setOutput(ImageIO.createImageOutputStream(out));
+        ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
+        if (defaultWriteParam.canWriteCompressed()) {
+            defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            defaultWriteParam.setCompressionQuality(0.01f);
+        }
+        imageWriter.write(null, new IIOImage(image, null, null), defaultWriteParam);
     }
 }
