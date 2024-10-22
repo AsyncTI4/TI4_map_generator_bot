@@ -317,6 +317,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("checkForAllACAssignments")
     public static void checkForAllAssignmentACs(Game game, Player player) {
         checkForAssigningCoup(game, player);
         checkForAssigningPublicDisgrace(game, player);
@@ -484,11 +485,9 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("forwardSupplyBase")
     public static void resolveForwardSupplyBaseStep1(Player player, Game game, ButtonInteractionEvent event) {
-        int oldTg = player.getTg();
-        player.setTg(oldTg + 3);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " gained 3TGs (" + oldTg + "->" + player.getTg() + ")");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " gained " + Emojis.tg(3) + " (" + player.gainTG(3) + ")");
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
         List<Button> buttons = new ArrayList<>();
@@ -499,15 +498,12 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("forwardSupplyBaseStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("forwardSupplyBaseStep2_" + p2.getFaction(), " ");
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                Button button = Buttons.gray("forwardSupplyBaseStep2_" + p2.getFaction(), null, p2.getFactionEmoji());
                 buttons.add(button);
             }
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " choose who should get 1TG", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " choose who should get a " + Emojis.tg, buttons);
     }
 
     @ButtonHandler("resolveReparationsStep1")
@@ -596,10 +592,10 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveDistinguished")
     public static void resolveDistinguished(Player player, Game game, ButtonInteractionEvent event) {
         player.addSpentThing("distinguished_5");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " added 5 votes to your vote total");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " added 5 votes to your vote total");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1948,14 +1944,14 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("economicInitiative")
     public static void economicInitiative(Player player, Game game, ButtonInteractionEvent event) {
         for (String planet : player.getPlanetsAllianceMode()) {
             if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
                 player.refreshPlanet(planet);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " readied each cultural planet");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied each cultural planet");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1971,6 +1967,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("miningInitiative")
     public static void miningInitiative(Player player, Game game, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
         int count = 0;

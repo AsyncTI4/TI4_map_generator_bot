@@ -1558,7 +1558,8 @@ public class ButtonHelperAgents {
         return tiles;
     }
 
-    public static void ghotiAgentForTg(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    @ButtonHandler("ghotiATG")
+    public static void ghotiAgentForTg(ButtonInteractionEvent event, Game game, Player player) {
         int cTG = player.getTg();
         int fTG = cTG + 1;
         player.setTg(fTG);
@@ -1569,8 +1570,8 @@ public class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void ghotiAgentForProduction(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    @ButtonHandler("ghotiAProd")
+    public static void ghotiAgentForProduction(ButtonInteractionEvent event, Game game,        Player player) {
         String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti"
             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to gain the ability to produce 2 more units. ";
         player.addSpentThing(msg);

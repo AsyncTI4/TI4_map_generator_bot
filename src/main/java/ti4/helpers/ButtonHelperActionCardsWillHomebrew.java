@@ -260,16 +260,15 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("breakthrough") // TODO: this might be annoying at some point in time
     public static void resolveBreakthrough(Player player, Game game, ButtonInteractionEvent event) {
         for (String planet : player.getPlanetsAllianceMode()) {
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 player.refreshPlanet(planet);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " readied every tech skip planet");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied every tech skip planet");
         event.getMessage().delete().queue();
-
     }
 
     @ButtonHandler("strandedShipStep1")
@@ -372,6 +371,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         return buttons;
     }
 
+    @ButtonHandler("sideProject")
     public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage;
         if (player.getStrategicCC() > 0) {

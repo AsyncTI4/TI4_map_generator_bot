@@ -21,6 +21,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -42,6 +43,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         //Game game = getActiveGame();
     }
 
+    @ButtonHandler("gameInfoButtons")
     public static void offerInfoButtons(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
@@ -63,6 +65,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         // event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("offerInfoButtonStep2_")
     public static void resolveOfferInfoButtonStep2(ButtonInteractionEvent event, String buttonID, Game game) {
         String category = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();

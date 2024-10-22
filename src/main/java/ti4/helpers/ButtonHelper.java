@@ -1306,20 +1306,17 @@ public class ButtonHelper {
         updateMap(game, event, "");
     }
 
+    @ButtonHandler("trade_primary")
     public static void tradePrimary(Game game, GenericInteractionCreateEvent event, Player player) {
-        int tg = player.getTg();
-        player.setTg(tg + 3);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
-        CommanderUnlockCheck.checkPlayer(player, "hacan");
-
         boolean reacted = false;
-        ButtonHelperAbilities.pillageCheck(player, game);
         if (event instanceof ButtonInteractionEvent e) {
             reacted = true;
-            String msg = " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " and replenished commodities ("
-                + player.getCommoditiesTotal() + Emojis.comm + ")";
+            String msg = " gained 3" + Emojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " and replenished commodities (" + player.getCommodities() + " -> " + player.getCommoditiesTotal() + Emojis.comm + ")";
             ButtonHelper.addReaction(e, false, false, msg, "");
         }
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
+        ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperStats.replenishComms(event, game, player, reacted);
     }
 
@@ -5224,15 +5221,16 @@ public class ButtonHelper {
         }
     }
 
+    @ButtonHandler("getHomebrewButtons")
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         game.setHomebrew(false);
         buttons.add(Buttons.green("setupHomebrew_444", "4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
-        buttons.add(Buttons.green("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas"));
-        buttons.add(Buttons.green("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs"));
-        buttons.add(Buttons.green("setupHomebrew_dsfactions", "Discordant Stars Factions"));
-        buttons.add(Buttons.green("setupHomebrew_dsexplores", "DS Explores/Relics/ACs"));
-        buttons.add(Buttons.green("setupHomebrew_acDeck2", "Action Cards Deck 2"));
+        buttons.add(Buttons.green("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas", Emojis.Absol));
+        buttons.add(Buttons.green("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs", Emojis.Absol));
+        buttons.add(Buttons.green("setupHomebrew_dsfactions", "Discordant Stars Factions", Emojis.DiscordantStars));
+        buttons.add(Buttons.green("setupHomebrew_dsexplores", "US Explores/Relics/ACs", Emojis.UnchartedSpace));
+        buttons.add(Buttons.green("setupHomebrew_acDeck2", "Action Cards Deck 2", Emojis.ActionDeck2));
         buttons.add(Buttons.green("setupHomebrew_456", "5 stage 1s, 6 stage 2s, 4 secrets, 14 VP"));
         buttons.add(Buttons.green("setupHomebrew_redTape", "Red Tape"));
         buttons.add(Buttons.green("setupHomebrew_removeSupports", "Remove Supports"));
@@ -5338,6 +5336,7 @@ public class ButtonHelper {
         }
     }
 
+    @ButtonHandler("startPlayerSetup")
     public static void resolveSetupStep0(Player player, Game game, ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentation() + "Please tell the bot which user you are setting up",

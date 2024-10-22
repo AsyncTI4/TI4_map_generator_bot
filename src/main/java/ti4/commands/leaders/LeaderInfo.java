@@ -15,6 +15,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -39,6 +40,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         sendLeadersInfo(game, player, event);
     }
 
+    @ButtonHandler(Constants.REFRESH_LEADER_INFO)
     public static void sendLeadersInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);

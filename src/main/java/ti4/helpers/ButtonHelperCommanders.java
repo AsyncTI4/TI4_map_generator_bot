@@ -214,16 +214,16 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("resolveMykoCommander")
     public static void mykoCommanderUsage(Player player, Game game, ButtonInteractionEvent event) {
-        String msg = player.getFactionEmoji() + " spent 1";
+        String msg = player.getFactionEmoji() + " spent 1 ";
         if (player.getCommodities() > 0) {
-            msg = msg + " commodity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
+            msg += Emojis.comm + " commodity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
             player.setCommodities(player.getCommodities() - 1);
         } else {
-            msg = msg + "TG (" + player.getTg() + "->" + (player.getTg() - 1) + ") ";
-            player.setTg(player.getTg() - 1);
+            msg += Emojis.tg + "TG (" + player.gainTG(-1) + ") ";
         }
-        msg = msg + " to cancel one hit";
+        msg += " to cancel one hit";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
@@ -334,38 +334,29 @@ public class ButtonHelperCommanders {
         }
     }
 
-    public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        int cTG = player.getTg();
-        int fTG = cTG + 1;
-        player.setTg(fTG);
+    @ButtonHandler("titansCommanderUsage")
+    public static void titansCommanderUsage(ButtonInteractionEvent event, Game game, Player player) {
+        String msg = player.getFactionEmojiOrColor() + " Automatically used Tungstantus, the Ul commander, to gain 1" + Emojis.tg + "TG " + player.gainTG(1) + ".";
+        if (Helper.getPlayerFromAbility(game, "pillage") != null) {
+            msg += "\nThis tg can be spent before " + Emojis.Mentak + "**Pillage** resolves, since it is a when.";
+        }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-        String msg = " Automatically used Tungstantus, the Ul commander, to gain 1 TG (" + cTG + "->" + fTG + "). ";
-        if (Helper.getPlayerFromAbility(game, "pillage") != null) {
-            msg = msg + "This tg can be spent before pillage resolves, since it is a when.";
-        }
         player.addSpentThing(msg);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + msg);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
-    public static void resolveLetnevCommanderCheck(Player player, Game game,
-        GenericInteractionCreateEvent event) {
+    public static void resolveLetnevCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                int old = player.getTg();
-                int newTg = player.getTg() + 1;
-                player.setTg(player.getTg() + 1);
-                String mMessage = player.getRepresentationUnfogged()
-                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1TG has been added automatically (" + old
-                    + "->" + newTg + ").";
+                String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1TG has been added automatically (" + player.gainTG(1) + ").";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
             } else {
-                String mMessage = player.getRepresentationUnfogged()
-                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
+                String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG"));
+                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG", Emojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }

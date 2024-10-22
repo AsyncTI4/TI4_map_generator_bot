@@ -544,9 +544,9 @@ public class ButtonHelperAbilities {
         return dice;
     }
 
+    @ButtonHandler("getOmenDice")
     public static void offerOmenDiceButtons(Game game, Player player) {
-        String msg = player.getRepresentationUnfogged()
-            + " you may play an omen die with the following buttons. Duplicate dice are not shown.";
+        String msg = player.getRepresentationUnfogged() + " you may play an Omen die with the following buttons. Duplicate dice are not shown.";
         List<Button> buttons = new ArrayList<>();
         List<Integer> dice = new ArrayList<>();
         for (int die : getAllOmenDie(game)) {
@@ -559,11 +559,11 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
+    @ButtonHandler("useOmenDie_")
     public static void useOmenDie(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-
         int die = Integer.parseInt(buttonID.split("_")[1]);
         removeOmenDie(game, die);
-        String msg = player.getRepresentationUnfogged() + " used an omen die with the number " + die;
+        String msg = player.getRepresentationUnfogged() + " used an Omen die with the number " + die;
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
     }
@@ -1323,18 +1323,14 @@ public class ButtonHelperAbilities {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("munitionsReserves")
     public static void munitionsReserves(ButtonInteractionEvent event, Game game, Player player) {
-
         if (player.getTg() < 2) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getRepresentation() + " you don't have 2TGs, and thus can't use munitions reserve");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " you only have " + player.getTg() + Emojis.tg + " and thus can't use Munitions Reserve");
             return;
         }
-        String msg = player.getFactionEmoji() + " used munitions reserves (TGs went from " + player.getTg() + " -> "
-            + (player.getTg() - 2)
-            + "). Their next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls. ";
+        String msg = player.getFactionEmoji() + " spent " + Emojis.tg(2) + " " + player.gainTG(-2) + " to use Munitions Reserves.\nTheir next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-        player.setTg(player.getTg() - 2);
         game.setStoredValue("munitionsReserves", player.getFaction());
     }
 

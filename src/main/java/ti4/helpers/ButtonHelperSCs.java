@@ -19,6 +19,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tech.GetTechButton;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -434,6 +435,7 @@ public class ButtonHelperSCs {
 
     }
 
+    @ButtonHandler("leadershipGenerateCCButtons")
     public static void leadershipGenerateCCButtons(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         int leadershipInitiative = 1;
         StrategyCardModel scModel = null;

@@ -543,14 +543,14 @@ public class ButtonHelperFactionSpecific {
         player.setTg(player.getTg() - 1);
     }
 
+    @ButtonHandler("getKeleresTechOptions")
     public static void offerKeleresStartingTech(Player player, Game game, ButtonInteractionEvent event) {
         List<String> techToGain = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
             }
-            techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain,
-                game);
+            techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain, game);
         }
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
@@ -622,19 +622,19 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
+    @ButtonHandler("spyNetYssarilChooses")
     public static void resolveSpyNetYssarilChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
         String buttonID = "transact_ACs_" + player.getFaction();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-            "Sent Yssaril buttons so that they can send you 1AC.");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Sent Yssaril buttons so that they can send you 1AC.");
         TransactionHelper.resolveSpecificTransButtonsOld(game, yssaril, buttonID, event);
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("spyNetPlayerChooses")
     public static void resolveSpyNetPlayerChooses(Player player, Game game, ButtonInteractionEvent event) {
         Player yssaril = findPNOwner("spynet", game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC",
-            ACInfo.getToBeStolenActionCardButtons(game, yssaril));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Use Buttons to take 1 AC", ACInfo.getToBeStolenActionCardButtons(game, yssaril));
         event.getMessage().delete().queue();
     }
 
@@ -1325,6 +1325,7 @@ public class ButtonHelperFactionSpecific {
         game.setStoredValue("mykoMech", "" + amount);
     }
 
+    @ButtonHandler("resolveMykoMech")
     public static void resolveMykoMech(Player player, Game game) {
         decreaseMykoMech(game);
         List<Button> buttons = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game));
@@ -1388,6 +1389,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    @ButtonHandler("offerNecrophage")
     public static void offerNekrophageButtons(Player player, ButtonInteractionEvent event) {
         String message = player.getRepresentationUnfogged() + " Resolve Necrophage ability using buttons. ";
         List<Button> buttons = gainOrConvertCommButtons(player, true);

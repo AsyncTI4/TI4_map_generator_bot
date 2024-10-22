@@ -12,6 +12,7 @@ import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -35,6 +36,7 @@ public class TechInfo extends TechSubcommandData {
         sendTechInfo(game, player, event);
     }
 
+    @ButtonHandler(Constants.REFRESH_TECH_INFO)
     public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);

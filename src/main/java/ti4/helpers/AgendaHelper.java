@@ -2946,6 +2946,7 @@ public class AgendaHelper {
         return planetButtons;
     }
 
+    @ButtonHandler("refreshAgenda")
     public static void refreshAgenda(Game game, ButtonInteractionEvent event) {
         String agendaDetails = game.getCurrentAgendaInfo();
         String agendaID = "CL";
@@ -2976,6 +2977,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), getSummaryOfVotes(game, true));
     }
 
+    @ButtonHandler("proceedToFinalizingVote")
     public static void proceedToFinalizingVote(Game game, Player player, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         String votes = Helper.buildSpentThingsMessageForVoting(player, game, true);

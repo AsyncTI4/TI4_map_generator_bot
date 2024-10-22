@@ -1952,6 +1952,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("combatDrones")
     public static void offerCombatDroneButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff;
@@ -1972,6 +1973,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("offerMirvedaCommander")
     public static void offerMirvedaCommanderButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numinf;
