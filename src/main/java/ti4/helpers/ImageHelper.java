@@ -280,7 +280,7 @@ public class ImageHelper {
     public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat) throws IOException {
         // max webp dimensions are 16383 x 16383
         if (image.getHeight() > 16383 || image.getWidth() > 16383) {
-            writeCompressedFormat(out, image, defaultFormat);
+            writeCompressedFormat(out, image, defaultFormat, 0.1f);
             return defaultFormat;
         } else {
             ImageIO.write(image, "webp", out);
@@ -288,13 +288,13 @@ public class ImageHelper {
         }
     }
 
-    public static void writeCompressedFormat(ByteArrayOutputStream out, BufferedImage image, String format) throws IOException {
+    public static void writeCompressedFormat(ByteArrayOutputStream out, BufferedImage image, String format, float compressionQuality) throws IOException {
         ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(format).next();
         imageWriter.setOutput(ImageIO.createImageOutputStream(out));
         ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
         if (defaultWriteParam.canWriteCompressed()) {
             defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            defaultWriteParam.setCompressionQuality(0.01f);
+            defaultWriteParam.setCompressionQuality(compressionQuality);
         }
         imageWriter.write(null, new IIOImage(image, null, null), defaultWriteParam);
     }

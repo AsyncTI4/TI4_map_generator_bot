@@ -477,9 +477,9 @@ public class MapGenerator {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             BufferedImage mapWithoutTransparentBackground = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
             mapWithoutTransparentBackground.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
-            // come back to try to upload webp instead in the future?
+            // TODO: come back to try to upload webp instead in the future?
             String fileName = filenamePrefix + "_" + getTimeStamp() + ".jpg";
-            writeCompressedFormat(out, mapWithoutTransparentBackground, "jpg");
+            writeCompressedFormat(out, mapWithoutTransparentBackground, "jpg", 0.2f);
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
