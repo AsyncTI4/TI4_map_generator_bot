@@ -92,7 +92,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
+import static ti4.helpers.ImageHelper.writeWebpOrDefaultTo;
 
 public class MapGenerator {
 
@@ -477,9 +477,9 @@ public class MapGenerator {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             BufferedImage mapWithoutTransparentBackground = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
             mapWithoutTransparentBackground.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
-            // TODO: come back to try to upload webp instead in the future?
-            String fileName = filenamePrefix + "_" + getTimeStamp() + ".jpg";
-            writeCompressedFormat(out, mapWithoutTransparentBackground, "jpg", 0.2f);
+            String fileName = filenamePrefix + "_" + getTimeStamp();
+            String format = writeWebpOrDefaultTo(mapWithoutTransparentBackground, out, "jpg");
+            fileName += "." + format;
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
