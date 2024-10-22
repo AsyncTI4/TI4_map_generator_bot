@@ -92,6 +92,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
+import static ti4.helpers.ImageHelper.writeWebpOrDefaultTo;
+
 public class MapGenerator {
 
     public static final int DELTA_Y = 26;
@@ -459,27 +461,25 @@ public class MapGenerator {
     }
 
     public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix) {
-        return uploadToDiscord(imageToUpload, filenamePrefix, false);
-    }
-
-    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix, boolean saveLocalCopy) {
         if (imageToUpload == null) return null;
 
-        if (saveLocalCopy) {
+        String saveLocalFormat = System.getenv("SAVE_LOCAL_FORMAT");
+        if (saveLocalFormat != null) {
             try {
-                File file = new File(filenamePrefix + ".webp");
-                ImageIO.write(imageToUpload, "webp", file);
+                File file = new File(filenamePrefix + "." + saveLocalFormat);
+                ImageIO.write(imageToUpload, saveLocalFormat, file);
             } catch (IOException e) {
-                BotLogger.log("Could not create File for " + filenamePrefix + ".webp", e);
+                BotLogger.log("Could not create File for " + filenamePrefix + "." + saveLocalFormat, e);
             }
         }
 
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            BufferedImage bufferedImage = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
-            bufferedImage.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
-            ImageIO.write(bufferedImage, "webp", out);
-            String fileName = filenamePrefix + "_" + getTimeStamp() + ".webp";
+            BufferedImage mapWithoutTransparentBackground = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
+            mapWithoutTransparentBackground.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
+            String fileName = filenamePrefix + "_" + getTimeStamp();
+            String format = writeWebpOrDefaultTo(mapWithoutTransparentBackground, out, "jpg");
+            fileName += "." + format;
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
@@ -909,13 +909,6 @@ public class MapGenerator {
                     g2.rotate(-Math.PI / 4);
                     g2.setFont(Storage.getFont20());
                     superDrawString(g2, "ELIMINATED", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
-                    g2.setTransform(transform);
-                } else if (player.isDummy()) {
-                    AffineTransform transform = g2.getTransform();
-                    g2.translate(x + 47 - 3, y + 47 - 6);
-                    g2.rotate(-Math.PI / 4);
-                    g2.setFont(Storage.getFont20());
-                    superDrawString(g2, "DUMMY", 0, 0, DummyColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 } else if (player.isPassed()) {
                     AffineTransform transform = g2.getTransform();
@@ -2754,7 +2747,7 @@ public class MapGenerator {
         int height = g.getFontMetrics().getAscent() - g.getFontMetrics().getDescent();
         if (verticalAlignment != null) {
             switch (verticalAlignment) {
-                case Center -> y += height / 2.0;
+                case Center -> y += height / 2;
                 case Top -> y += height;
                 case Bottom -> {
                 }
