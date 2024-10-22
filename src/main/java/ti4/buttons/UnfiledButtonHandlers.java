@@ -2861,6 +2861,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
+    @ButtonHandler("getDivertFundingButtons")
     public static void getDivertFundingButtons(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             "Use buttons to select tech to return",
@@ -2868,6 +2869,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("getRepealLawButtons")
     public static void getRepealLawButtons(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             "Use buttons to select Law to repeal",

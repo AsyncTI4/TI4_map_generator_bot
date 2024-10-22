@@ -324,11 +324,10 @@ public class ButtonHelperActionCards {
         checkForPlayingSummit(game, player);
     }
 
+    @ButtonHandler("resolveCounterStroke")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
-        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()),
-            game);
-        String message = player.getFactionEmoji() + " removed their CC from tile " + game.getActiveSystem()
-            + " using Counterstroke and gained it to their tactic pool";
+        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
+        String message = player.getFactionEmoji() + " removed their CC from tile " + game.getActiveSystem() + " using Counterstroke and gained it to their tactic pool";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -462,7 +461,7 @@ public class ButtonHelperActionCards {
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " removed the tech " + techM1.getName());
-        resolveResearch(game, player, buttonID, event);
+        resolveResearch(game, player, event);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -511,17 +510,15 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " choose who should get 1TG", buttons);
     }
 
+    @ButtonHandler("resolveReparationsStep1")
     public static void resolveReparationsStep1(Player player, Game game, ButtonInteractionEvent event) {
-
         String message = player.getRepresentationUnfogged() + " Click the names of the planet you wish to ready";
-
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             buttons.add(Buttons.gray("khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
                 Helper.getPlanetRepresentation(planet, game)));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -537,12 +534,11 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot who took the planet from you", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who took the planet from you", buttons);
     }
 
-    public static void resolveDiplomaticPressureStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveDiplomaticPressureStep1")
+    public static void resolveDiplomaticPressureStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -607,6 +603,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveUprisingStep1")
     public static void resolveUprisingStep1(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         List<Button> buttons = new ArrayList<>();
@@ -629,8 +626,8 @@ public class ButtonHelperActionCards {
             buttons);
     }
 
-    public static void resolveAssRepsStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveAssRepsStep1") // don't skip ass day
+    public static void resolveAssRepsStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -650,6 +647,7 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " tell the bot who you want to assassinate", buttons);
     }
 
+    @ButtonHandler("resolveSignalJammingStep1")
     public static void resolveSignalJammingStep1(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         List<Button> buttons = new ArrayList<>();
@@ -894,8 +892,8 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " tell the bot which strategy card(s) you used to have.", buttons);
     }
 
-    public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveImpersonation")
+    public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         String message = player.getFactionEmoji() + " Drew A Secret Objective.";
         game.drawSecretObjective(player.getUserID());
@@ -906,8 +904,7 @@ public class ButtonHelperActionCards {
         SOInfo.sendSecretObjectiveInfo(game, player, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            player.getRepresentation() + " Exhaust stuff to pay the 3 influence", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " Exhaust stuff to pay the 3 influence", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1782,31 +1779,29 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveResearch(Game game, Player player, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("resolveResearch")
+    public static void resolveResearch(Game game, Player player, ButtonInteractionEvent event) {
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you may use the button to get your tech.",
                 List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                + ". Use buttons to gain CCs";
+            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("focusedResearch")
     public static void focusedResearch(Game game, Player player, String buttonID,
         ButtonInteractionEvent event) {
         if (player.getTg() < 4 && (!player.hasUnexhaustedLeader("keleresagent") || player.getCommodities() < 1)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "You did not have 4tgs and thus cannot resolve focused research");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "You did not have " + Emojis.tg(4) + " and thus cannot resolve Focused Research");
             return;
         } else {
-            int oldTg = player.getTg();
-            player.setTg(player.getTg() - 4);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " has spent 4tg (" + oldTg + " ->" + player.getTg() + ") on focused research");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " has spent 4tg " + player.gainTG(-4) + " on focused research");
         }
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -1814,8 +1809,7 @@ public class ButtonHelperActionCards {
                 List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                + ". Use buttons to gain CCs";
+            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }

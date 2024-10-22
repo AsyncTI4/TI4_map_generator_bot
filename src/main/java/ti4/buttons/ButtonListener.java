@@ -1114,23 +1114,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "economicInitiative" -> ButtonHelperActionCards.economicInitiative(player, game, event);
                 case "breakthrough" -> ButtonHelperActionCardsWillHomebrew.resolveBreakthrough(player, game, event);
                 case "sideProject" -> ButtonHelperActionCardsWillHomebrew.resolveSideProject(player, game, event);
-                case "brutalOccupation" -> ButtonHelperActionCardsWillHomebrew.resolveBrutalOccupationStep1(player, game, event);
-                case "getRepealLawButtons" -> UnfiledButtonHandlers.getRepealLawButtons(event, player, game);
-                case "resolveCounterStroke" -> ButtonHelperActionCards.resolveCounterStroke(game, player, event);
-                case "getDivertFundingButtons" -> UnfiledButtonHandlers.getDivertFundingButtons(event, player, game);
-                case "resolveResearch" -> ButtonHelperActionCards.resolveResearch(game, player, buttonID, event);
-                case "focusedResearch" -> ButtonHelperActionCards.focusedResearch(game, player, buttonID, event);
-                case "lizhoHeroFighterResolution" -> ButtonHelperHeroes.lizhoHeroFighterDistribution(player, game, event);
-                case "resolveReparationsStep1" -> ButtonHelperActionCards.resolveReparationsStep1(player, game, event);
-                case "resolveDiplomaticPressureStep1" -> ButtonHelperActionCards.resolveDiplomaticPressureStep1(player, game, event, buttonID);
-                case "resolveImpersonation" -> ButtonHelperActionCards.resolveImpersonation(player, game, event, buttonID);
-                case "resolveUprisingStep1" -> ButtonHelperActionCards.resolveUprisingStep1(player, game, event, buttonID);
-                case "setTrapStep1" -> ButtonHelperAbilities.setTrapStep1(game, player);
-                case "revealTrapStep1" -> ButtonHelperAbilities.revealTrapStep1(game, player);
-                case "removeTrapStep1" -> ButtonHelperAbilities.removeTrapStep1(game, player);
-                case "offerDeckButtons" -> ButtonHelper.offerDeckButtons(game, event);
-                case "resolveAssRepsStep1" -> ButtonHelperActionCards.resolveAssRepsStep1(player, game, event, buttonID);
-                case "resolveSignalJammingStep1" -> ButtonHelperActionCards.resolveSignalJammingStep1(player, game, event, buttonID);
                 
                 
                 case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");

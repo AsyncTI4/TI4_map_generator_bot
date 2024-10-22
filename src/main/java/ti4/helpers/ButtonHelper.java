@@ -636,6 +636,7 @@ public class ButtonHelper {
         }
     }
 
+    @ButtonHandler("offerDeckButtons")
     public static void offerDeckButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("showDeck_frontier", "Frontier", Emojis.Frontier));

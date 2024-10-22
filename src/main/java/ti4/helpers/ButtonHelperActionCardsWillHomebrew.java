@@ -388,13 +388,14 @@ public class ButtonHelperActionCardsWillHomebrew {
         ButtonHelperFactionSpecific.offerWinnuStartingTech(player, game);
     }
 
+    @ButtonHandler("brutalOccupation")
     public static void resolveBrutalOccupationStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             buttons.add(Buttons.green("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation", buttons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of **Brutal Occupation**", buttons);
     }
 
     public static void resolveShrapnelTurrets(Player player, Game game, ButtonInteractionEvent event, String buttonID) {

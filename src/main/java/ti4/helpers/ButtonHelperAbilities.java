@@ -302,6 +302,7 @@ public class ButtonHelperAbilities {
         return scButtons;
     }
 
+    @ButtonHandler("setTrapStep1")
     public static void setTrapStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
@@ -314,8 +315,7 @@ public class ButtonHelperAbilities {
                 buttons.add(button);
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " tell the bot whose planet you want to put a trap on", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " tell the bot whose planet you want to put a trap on", buttons);
     }
 
     public static void setTrapStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
@@ -341,6 +341,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
     }
 
+    @ButtonHandler("removeTrapStep1")
     public static void removeTrapStep1(Game game, Player player) {
         List<Button> availableTraps = new ArrayList<>();
         for (String availableTrap : player.getTrapCardsPlanets().keySet()) {
@@ -351,6 +352,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
     }
 
+    @ButtonHandler("revealTrapStep1")
     public static void revealTrapStep1(Game game, Player player) {
         List<Button> availableTraps = new ArrayList<>();
         for (String availableTrap : player.getTrapCardsPlanets().keySet()) {

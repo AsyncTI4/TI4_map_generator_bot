@@ -325,6 +325,7 @@ public class ButtonHelperHeroes {
 
     }
 
+    @ButtonHandler("lizhoHeroFighterResolution")
     public static void lizhoHeroFighterDistribution(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         List<Button> buttons = new ArrayList<>();
