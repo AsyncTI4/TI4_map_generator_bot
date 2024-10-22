@@ -3273,9 +3273,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", buttons);
     }
 
-    public static void redistributeCCButtons(ButtonInteractionEvent event, Player player, Game game, String finsFactionCheckerPrefix) {
+    public static void redistributeCCButtons(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentationUnfogged() + "! Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain CCs";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         Button getTactic = Buttons.green(finsFactionCheckerPrefix + "increase_tactic_cc", "Gain 1 Tactic CC");
         Button getFleet = Buttons.green(finsFactionCheckerPrefix + "increase_fleet_cc", "Gain 1 Fleet CC");
         Button getStrat = Buttons.green(finsFactionCheckerPrefix + "increase_strategy_cc", "Gain 1 Strategy CC");
@@ -3434,8 +3435,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    public static void acquireAFreeTech(ButtonInteractionEvent event, Player player, Game game, String finsFactionCheckerPrefix) {
+    public static void acquireAFreeTech(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
+        String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         game.setComponentAction(true);
         Button propulsionTech = Buttons.blue(finsFactionCheckerPrefix + "getAllTechOfType_propulsion_noPay", "Get a Blue Tech");
         propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));

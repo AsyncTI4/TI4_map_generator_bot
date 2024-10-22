@@ -1033,27 +1033,18 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
                 case Constants.PO_NO_SCORING -> UnfiledButtonHandlers.poNoScoring(event, player, game);
-                case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
-                case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
                 case "gameInfoButtons" -> ListPlayerInfoButton.offerInfoButtons(event);
-                case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
                 case "refreshSOInfo" -> SOInfo.sendSecretObjectiveInfo(game, player, event);
                 case "refreshAbilityInfo" -> AbilityInfo.sendAbilityInfo(game, player, event);
                 case Constants.REFRESH_RELIC_INFO -> RelicInfo.sendRelicInfo(game, player, event);
                 case Constants.REFRESH_TECH_INFO -> TechInfo.sendTechInfo(game, player, event);
-                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, false);
-                case Constants.REFRESH_ALL_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, true);
                 case Constants.REFRESH_LEADER_INFO -> LeaderInfo.sendLeadersInfo(game, player, event);
                 case Constants.REFRESH_PLANET_INFO -> PlanetInfo.sendPlanetInfo(player);
-                case "warfareBuild" -> ButtonHelperSCs.warfareBuild(game, player, event, buttonID, messageID);
                 case "getKeleresTechOptions" -> ButtonHelperFactionSpecific.offerKeleresStartingTech(player, game, event);
                 case "transaction" -> UnfiledButtonHandlers.transaction(player, game);
                 case "combatDrones" -> ButtonHelperModifyUnits.offerCombatDroneButtons(event, game, player);
                 case "offerMirvedaCommander" -> ButtonHelperModifyUnits.offerMirvedaCommanderButtons(event, game, player);
-                case "acquireAFreeTech" -> UnfiledButtonHandlers.acquireAFreeTech(event, player, game, finsFactionCheckerPrefix); // Buttons.GET_A_FREE_TECH
-                case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, messageID, false);
-                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event, messageID, false, Set.of(Constants.UNIT), "inf");
-                case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, messageID, true);
+                case "acquireAFreeTech" -> UnfiledButtonHandlers.acquireAFreeTech(event, player, game); // Buttons.GET_A_FREE_TECH
                 case Constants.SO_NO_SCORING -> UnfiledButtonHandlers.soNoScoring(event, player, game);
                 case "no_sabotage" -> UnfiledButtonHandlers.noSabotage(event, game);
                 case "titansCommanderUsage" -> ButtonHelperCommanders.titansCommanderUsage(buttonID, event, game, player);
@@ -1066,40 +1057,31 @@ public class ButtonListener extends ListenerAdapter {
                 case "turnOffForcedScoring" -> UnfiledButtonHandlers.turnOffForcedScoring(event, game);
                 case "proceedToFinalizingVote" -> AgendaHelper.proceedToFinalizingVote(game, player, event);
                 case "drawAgenda_2" -> UnfiledButtonHandlers.drawAgenda2(event, game, player);
-                case "nekroFollowTech" -> ButtonHelperSCs.nekroFollowTech(game, player, event, buttonID, messageID);
-                case "diploRefresh2" -> ButtonHelperSCs.diploRefresh2(game, player, event, buttonID, messageID);
                 case "getOmenDice" -> ButtonHelperAbilities.offerOmenDiceButtons(game, player);
                 case "leadershipExhaust" -> UnfiledButtonHandlers.leadershipExhaust(event, player, game);
                 case "nekroTechExhaust" -> UnfiledButtonHandlers.nekroTechExhaust(event, player, game);
                 case "deployTyrant" -> UnfiledButtonHandlers.deployTyrant(event, player, game);
                 case "startStrategyPhase" -> UnfiledButtonHandlers.startStrategyPhase(event, game);
                 case "endOfTurnAbilities" -> UnfiledButtonHandlers.endOfTurnAbilities(event, player, game);
-                case "redistributeCCButtons" -> UnfiledButtonHandlers.redistributeCCButtons(event, player, game, finsFactionCheckerPrefix); // Buttons.REDISTRIBUTE_CCs
+                case "redistributeCCButtons" -> UnfiledButtonHandlers.redistributeCCButtons(event, player, game); // Buttons.REDISTRIBUTE_CCs
                 case "leadershipGenerateCCButtons" -> ButtonHelperSCs.leadershipGenerateCCButtons(game, player, event, buttonID);
                 case "spyNetYssarilChooses" -> ButtonHelperFactionSpecific.resolveSpyNetYssarilChooses(player, game, event);
                 case "spyNetPlayerChooses" -> ButtonHelperFactionSpecific.resolveSpyNetPlayerChooses(player, game, event);
                 case "diploSystem" -> UnfiledButtonHandlers.diploSystem(player, game);
-                case "sc_ac_draw" -> ButtonHelperSCs.scACDraw(game, player, event, buttonID, messageID);
                 case "draw2 AC" -> UnfiledButtonHandlers.draw2AC(event, player, game);
                 case "resolveDistinguished" -> ButtonHelperActionCards.resolveDistinguished(player, game, event);
                 case "resolveMykoMech" -> ButtonHelperFactionSpecific.resolveMykoMech(player, game);
                 case "offerNecrophage" -> ButtonHelperFactionSpecific.offerNekrophageButtons(player, event);
                 case "resolveMykoCommander" -> ButtonHelperCommanders.mykoCommanderUsage(player, game, event);
                 case "checkForAllACAssignments" -> ButtonHelperActionCards.checkForAllAssignmentACs(game, player);
-                case "sc_draw_so" -> ButtonHelperSCs.scDrawSO(game, player, event, buttonID, messageID);
                 case "non_sc_draw_so" -> UnfiledButtonHandlers.nonSCDrawSO(event, player, game);
                 case "edynCommanderSODraw" -> UnfiledButtonHandlers.edynCommanderSODraw(event, player, game);
-                case "sc_trade_follow", "sc_follow_trade" -> ButtonHelperSCs.followTrade(game, player, event, buttonID, messageID);
                 case "flip_agenda" -> UnfiledButtonHandlers.flipAgenda(event, game);
                 case "refreshAgenda" -> AgendaHelper.refreshAgenda(game, event);
                 case "resolveVeto" -> UnfiledButtonHandlers.resolveVeto(event, game);
                 case "hack_election" -> UnfiledButtonHandlers.hackElection(event, game);
                 case "proceed_to_strategy" -> UnfiledButtonHandlers.proceedToStrategy(event, game);
-                case "sc_refresh" -> ButtonHelperSCs.refresh(game, player, event, buttonID, messageID);
-                case "sc_refresh_and_wash" -> ButtonHelperSCs.refreshAndWash(game, player, event, buttonID, messageID);
                 case "trade_primary" -> ButtonHelper.tradePrimary(game, event, player);
-                case "score_imperial" -> ButtonHelperSCs.scoreImperial(game, player, event, buttonID, messageID);
-                case "play_when" -> UnfiledButtonHandlers.playWhen(event, game, mainGameChannel);
                 case "no_when" -> UnfiledButtonHandlers.noWhen(event, player, game);
                 case "no_after" -> UnfiledButtonHandlers.noAfter(event, player, game);
                 case "no_after_persistent" -> UnfiledButtonHandlers.noAfterPersistent(event, player, game);
@@ -1108,19 +1090,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "deal2SOToAll" -> UnfiledButtonHandlers.deal2SOToAll(event, game);
                 case "startOfGameObjReveal" -> UnfiledButtonHandlers.startOfGameObjReveal(event, game, player);
                 case "startYinSpinner" -> UnfiledButtonHandlers.startYinSpinner(event, player, game);
-                case "gain_1_comms" -> ButtonHelperStats.gainComms(event, game, player, 1, true);
-                case "gain_2_comms" -> ButtonHelperStats.gainComms(event, game, player, 2, true);
-                case "gain_3_comms" -> ButtonHelperStats.gainComms(event, game, player, 3, true);
-                case "gain_4_comms" -> ButtonHelperStats.gainComms(event, game, player, 4, true);
-                case "gain_1_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 1, false);
-                case "gain_2_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 2, false);
-                case "gain_3_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 3, false);
-                case "gain_4_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 4, false);
-                case "convert_1_comms" -> ButtonHelperStats.convertComms(event, game, player, 1);
-                case "convert_2_comms" -> ButtonHelperStats.convertComms(event, game, player, 2);
-                case "convert_3_comms" -> ButtonHelperStats.convertComms(event, game, player, 3);
-                case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
-                case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
                 case "startPlayerSetup" -> ButtonHelper.resolveSetupStep0(player, game, event);
                 case "comm_for_AC" -> UnfiledButtonHandlers.commForAC(event, game, player, buttonID);
                 case "increase_strategy_cc" -> UnfiledButtonHandlers.increaseStrategyCC(event, player, game);
@@ -1134,13 +1103,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "decrease_tactic_cc" -> UnfiledButtonHandlers.decreaseTacticCC(event, player, game);
                 case "decrease_fleet_cc" -> UnfiledButtonHandlers.decreaseFleetCC(event, player, game);
                 case "confirm_cc" -> UnfiledButtonHandlers.confirmCC(event, player);
-                case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
-                case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
-                case "gain1tgFromMuaatCommander" -> UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
-                case "gain1tgFromCommander" -> UnfiledButtonHandlers.gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
                 case "mallice_2_tg" -> UnfiledButtonHandlers.mallice2tg(event, player, game);
                 case "mallice_convert_comm" -> UnfiledButtonHandlers.malliceConvertComm(event, player, game);
-                case "decline_explore" -> UnfiledButtonHandlers.declineExplore(event, player, game, mainGameChannel);
                 case "temporaryPingDisable" -> UnfiledButtonHandlers.temporaryPingDisable(event, game);
                 case "riseOfAMessiah" -> UnfiledButtonHandlers.riseOfAMessiah(event, player, game);
                 case "fighterConscription" -> UnfiledButtonHandlers.fighterConscription(event, player, game);
@@ -1158,7 +1122,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "focusedResearch" -> ButtonHelperActionCards.focusedResearch(game, player, buttonID, event);
                 case "lizhoHeroFighterResolution" -> ButtonHelperHeroes.lizhoHeroFighterDistribution(player, game, event);
                 case "resolveReparationsStep1" -> ButtonHelperActionCards.resolveReparationsStep1(player, game, event);
-                case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
                 case "resolveDiplomaticPressureStep1" -> ButtonHelperActionCards.resolveDiplomaticPressureStep1(player, game, event, buttonID);
                 case "resolveImpersonation" -> ButtonHelperActionCards.resolveImpersonation(player, game, event, buttonID);
                 case "resolveUprisingStep1" -> ButtonHelperActionCards.resolveUprisingStep1(player, game, event, buttonID);
@@ -1170,6 +1133,43 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveSignalJammingStep1" -> ButtonHelperActionCards.resolveSignalJammingStep1(player, game, event, buttonID);
                 
                 
+                case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
+                case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
+                case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
+                case "warfareBuild" -> ButtonHelperSCs.warfareBuild(game, player, event, buttonID, messageID);
+                case "diploRefresh2" -> ButtonHelperSCs.diploRefresh2(game, player, event, buttonID, messageID);
+                case "sc_ac_draw" -> ButtonHelperSCs.scACDraw(game, player, event, buttonID, messageID);
+                case "gain_1_comms" -> ButtonHelperStats.gainComms(event, game, player, 1, true);
+                case "gain_2_comms" -> ButtonHelperStats.gainComms(event, game, player, 2, true);
+                case "gain_3_comms" -> ButtonHelperStats.gainComms(event, game, player, 3, true);
+                case "gain_4_comms" -> ButtonHelperStats.gainComms(event, game, player, 4, true);
+                case "gain_1_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 1, false);
+                case "gain_2_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 2, false);
+                case "gain_3_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 3, false);
+                case "gain_4_comms_stay" -> ButtonHelperStats.gainComms(event, game, player, 4, false);
+                case "convert_1_comms" -> ButtonHelperStats.convertComms(event, game, player, 1);
+                case "convert_2_comms" -> ButtonHelperStats.convertComms(event, game, player, 2);
+                case "convert_3_comms" -> ButtonHelperStats.convertComms(event, game, player, 3);
+                case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
+                case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
+                case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
+                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, false);
+                case Constants.REFRESH_ALL_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, true);
+                case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, messageID, false);
+                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event, messageID, false, Set.of(Constants.UNIT), "inf");
+                case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, messageID, true);
+                case "nekroFollowTech" -> ButtonHelperSCs.nekroFollowTech(game, player, event, buttonID, messageID);
+                case "sc_draw_so" -> ButtonHelperSCs.scDrawSO(game, player, event, buttonID, messageID);
+                case "sc_trade_follow", "sc_follow_trade" -> ButtonHelperSCs.followTrade(game, player, event, buttonID, messageID);
+                case "sc_refresh" -> ButtonHelperSCs.refresh(game, player, event, buttonID, messageID);
+                case "sc_refresh_and_wash" -> ButtonHelperSCs.refreshAndWash(game, player, event, buttonID, messageID);
+                case "score_imperial" -> ButtonHelperSCs.scoreImperial(game, player, event, buttonID, messageID);
+                case "play_when" -> UnfiledButtonHandlers.playWhen(event, game, mainGameChannel);
+                case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
+                case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
+                case "gain1tgFromMuaatCommander" -> UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
+                case "gain1tgFromCommander" -> UnfiledButtonHandlers.gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
+                case "decline_explore" -> UnfiledButtonHandlers.declineExplore(event, player, game, mainGameChannel);
                 case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
                 case "pass_on_abilities" -> ButtonHelper.addReaction(event, false, false, " Is " + event.getButton().getLabel(), "");
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);
