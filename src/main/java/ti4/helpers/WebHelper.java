@@ -90,7 +90,8 @@ public class WebHelper {
     }
 
     public static void putMap(String gameId, BufferedImage img, Boolean frog, Player player) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
+            //Only upload when setting is true
             return;
 
         try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
