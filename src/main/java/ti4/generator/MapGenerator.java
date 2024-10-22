@@ -1656,7 +1656,6 @@ public class MapGenerator {
         g2.setStroke(stroke2);
         boolean addedAbilities = false;
         for (String abilityID : player.getAbilities()) {
-
             String abilityFileName = null;
             switch (abilityID) {
                 case "grace" -> abilityFileName = "pa_ds_edyn_grace";
@@ -1681,14 +1680,13 @@ public class MapGenerator {
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             } else if (game.isFrankenGame()) {
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
                 g2.setFont(Storage.getFont16());
                 drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
-                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             }
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "ability", abilityID);
 
             deltaX += 48;
             addedAbilities = true;
