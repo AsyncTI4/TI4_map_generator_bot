@@ -146,61 +146,8 @@ public class ButtonListener extends ListenerAdapter {
             UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             UnfiledButtonHandlers.soScoreFromHand(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
-
-
-
-        } else if (buttonID.startsWith("nullificationField_")) {
-            UnfiledButtonHandlers.nullificationField(event, player, buttonID, game);
-        } else if (buttonID.startsWith("benedictionStep1_")) {
-            UnfiledButtonHandlers.benedictionStep1(event, player, buttonID, game);
-        } else if (buttonID.startsWith("mahactBenedictionFrom_")) {
-            UnfiledButtonHandlers.mahactBenedictionFrom(event, player, buttonID, game);
-        } else if (buttonID.startsWith("retreatUnitsFrom_")) {
-            UnfiledButtonHandlers.retreatUnitsFrom(event, player, buttonID, game);
-        } else if (buttonID.startsWith("retreat_")) {
-            UnfiledButtonHandlers.retreat(event, player, buttonID, game);
-        } else if (buttonID.startsWith("exhaustAgent_")) {
-            ButtonHelperAgents.exhaustAgent(buttonID, event, game, player);
-        } else if (buttonID.startsWith("exhaustTCS_")) {
-            ButtonHelperFactionSpecific.resolveTCSExhaust(buttonID, event, game, player);
-        } else if (buttonID.startsWith("swapSCs_")) {
-            ButtonHelperFactionSpecific.resolveSwapSC(player, game, event, buttonID);
-        } else if (buttonID.startsWith("domnaStepThree_")) {
-            ButtonHelperModifyUnits.resolveDomnaStep3Buttons(event, game, player, buttonID);
-        } else if (buttonID.startsWith("domnaStepTwo_")) {
-            ButtonHelperModifyUnits.offerDomnaStep3Buttons(event, game, player, buttonID);
-        } else if (buttonID.startsWith("domnaStepOne_")) {
-            ButtonHelperModifyUnits.offerDomnaStep2Buttons(event, game, player, buttonID);
-        } else if (buttonID.startsWith("selectBeforeSwapSCs_")) {
-            ButtonHelperFactionSpecific.resolveSelectedBeforeSwapSC(player, game, buttonID);
-        } else if (buttonID.startsWith("sardakkcommander_")) {
-            ButtonHelperCommanders.resolveSardakkCommander(game, player, buttonID, event);
-        } else if (buttonID.startsWith("olradinCommanderStep2_")) {
-            ButtonHelperCommanders.olradinCommanderStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("useOmenDie_")) {
-            ButtonHelperAbilities.useOmenDie(game, player, event, buttonID);
-        } else if (buttonID.startsWith("peaceAccords_")) {
-            ButtonHelperAbilities.resolvePeaceAccords(buttonID, player, game, event);
-        } else if (buttonID.startsWith("gheminaLordHero_")) {
-            ButtonHelperHeroes.resolveGheminaLordHero(buttonID, player, game, event);
-        } else if (buttonID.startsWith("gheminaLadyHero_")) {
-            ButtonHelperHeroes.resolveGheminaLadyHero(player, game, event, buttonID);
-        } else if (buttonID.startsWith("get_so_discard_buttons")) {
-            UnfiledButtonHandlers.getSODiscardButtons(event, player, game);
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
             UnfiledButtonHandlers.poScoring(event, player, buttonID, game, privateChannel);
-        } else if (buttonID.startsWith(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)) {
-            UnfiledButtonHandlers.sc3AssignSpeaker(event, player, buttonID, game);
-        } else if (buttonID.startsWith("assignSpeaker_")) {
-            UnfiledButtonHandlers.assignSpeaker(event, player, buttonID, game);
-        } else if (buttonID.startsWith("reveal_stage_")) {
-            UnfiledButtonHandlers.revealPOStage(event, buttonID, game);
-        } else if (buttonID.startsWith("exhaustRelic_")) {
-            UnfiledButtonHandlers.exhaustRelic(event, player, buttonID, game);
-        } else if (buttonID.startsWith("scepterE_follow_") || buttonID.startsWith("mahactA_follow_")) {
-            ButtonHelperSCs.mahactAndScepterFollow(game, player, event, buttonID);
-        } else if (buttonID.startsWith("spendAStratCC")) {
-            UnfiledButtonHandlers.spendAStratCC(event, player, game);
         } else if (buttonID.startsWith("sc_follow_")) {
             ButtonHelperSCs.scFollow(messageID, game, player, event, buttonID);
         } else if (buttonID.startsWith("sc_no_follow_")) {
@@ -209,10 +156,9 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, false, false, null, "");
         } else if (buttonID.startsWith("movedNExplored_")) {
             UnfiledButtonHandlers.movedNExplored(event, player, buttonID, game, mainGameChannel);
-        } else if (buttonID.startsWith("resolveExp_Look_")) {
-            UnfiledButtonHandlers.resolveExpLook(event, player, buttonID, game);
-        } else if (buttonID.startsWith("discardExploreTop_")) {
-            UnfiledButtonHandlers.discardExploreTop(event, player, buttonID, game);
+
+
+
         } else if (buttonID.startsWith("relic_look_top")) {
             UnfiledButtonHandlers.relicLookTop(event, game, player);
         } else if (buttonID.startsWith("explore_look_All")) {

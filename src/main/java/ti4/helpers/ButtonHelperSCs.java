@@ -495,42 +495,42 @@ public class ButtonHelperSCs {
         return contains;
     }
 
+    @ButtonHandler("scepterE_follow_")
+    @ButtonHandler("mahactA_follow_")
     public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
-        boolean setstatus = true;
-        int scnum = 1;
+        String lastChar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
+        boolean setStatus = true;
+        int scNum = 1;
         try {
-            scnum = Integer.parseInt(StringUtils.substringAfterLast(buttonID, "_"));
+            scNum = Integer.parseInt(StringUtils.substringAfterLast(buttonID, "_"));
         } catch (NumberFormatException e) {
             try {
-                scnum = Integer.parseInt(lastchar);
+                scNum = Integer.parseInt(lastChar);
             } catch (NumberFormatException e2) {
-                setstatus = false;
+                setStatus = false;
             }
         }
-        if (setstatus) {
-            if (!player.getFollowedSCs().contains(scnum)) {
-                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scnum, game, event);
+        if (setStatus) {
+            if (!player.getFollowedSCs().contains(scNum)) {
+                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
             }
-            player.addFollowedSC(scnum, event);
+            player.addFollowedSC(scNum, event);
         }
-        MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scnum);
+        MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scNum);
         if (buttonID.contains("mahact")) {
             MessageHelper.sendMessageToChannel(channel,
                 player.getFactionEmojiOrColor() + " exhausted " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow " + Helper.getSCName(scnum, game));
+                    + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow " + Helper.getSCName(scNum, game));
             Leader playerLeader = player.unsafeGetLeader("mahactagent");
             if (playerLeader != null) {
                 playerLeader.setExhausted(true);
                 for (Player p2 : game.getPlayers().values()) {
                     for (Integer sc2 : p2.getSCs()) {
-                        if (sc2 == scnum) {
+                        if (sc2 == scNum) {
                             List<Button> buttonsToRemoveCC = new ArrayList<>();
-                            String finChecker = "FFCC_" + player.getFaction() + "_";
                             for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, game, event)) {
                                 buttonsToRemoveCC.add(Buttons.green(
-                                    finChecker + "removeCCFromBoard_mahactAgent" + p2.getFaction() + "_"
-                                        + tile.getPosition(),
+                                    player.getFinsFactionCheckerPrefix() + "removeCCFromBoard_mahactAgent" + p2.getFaction() + "_" + tile.getPosition(),
                                     tile.getRepresentationForButtons(game, player)));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel,
@@ -541,7 +541,7 @@ public class ButtonHelperSCs {
             }
         } else {
             MessageHelper.sendMessageToChannel(channel,
-                player.getRepresentationUnfogged() + " exhausted Scepter of Silly Spelling to follow " + Helper.getSCName(scnum, game));
+                player.getRepresentationUnfogged() + " exhausted Scepter of Silly Spelling to follow " + Helper.getSCName(scNum, game));
             player.addExhaustedRelic("emelpar");
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());

@@ -91,7 +91,7 @@ public class ButtonHelperAbilities {
         String unit = buttonID.split("_")[1];
         String unitEmoji = Emojis.getEmojiFromDiscord(AliasHandler.resolveUnit(unit));
         String msg = player.getFactionEmoji() + " chose to produce a " + unitEmoji + unit
-            + " with " + Emojis.mortheus + "**Facsimile** or " + Emojis.mortheus + Emojis.PN +  "**Secrets of the  Weave** and will now spend influence to build it.";
+            + " with " + Emojis.mortheus + "**Facsimile** or " + Emojis.mortheus + Emojis.PN + "**Secrets of the  Weave** and will now spend influence to build it.";
         event.getMessage().delete().queue();
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         new AddUnits().unitParsing(event, player.getColor(), tile, unit, game);
@@ -1354,20 +1354,21 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("peaceAccords_")
     public static void resolvePeaceAccords(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
-        String planet = buttonID.split("_")[1];
-        if ("lockedmallice".equalsIgnoreCase(planet)) {
-            planet = "mallice";
+        String planetID = buttonID.split("_")[1];
+        if ("lockedmallice".equalsIgnoreCase(planetID)) {
+            planetID = "mallice";
             Tile tile = game.getTileFromPlanet("lockedmallice");
-            tile = MoveUnits.flipMallice(event, tile, game);
-        } else if ("hexlockedmallice".equalsIgnoreCase(planet)) {
-            planet = "hexmallice";
+            MoveUnits.flipMallice(event, tile, game);
+        } else if ("hexlockedmallice".equalsIgnoreCase(planetID)) {
+            planetID = "hexmallice";
             Tile tile = game.getTileFromPlanet("hexlockedmallice");
-            tile = MoveUnits.flipMallice(event, tile, game);
+            MoveUnits.flipMallice(event, tile, game);
         }
-        PlanetAdd.doAction(player, planet, game, event, false);
-        String planetRepresentation2 = Helper.getPlanetRepresentation(planet, game);
-        String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRepresentation2 + " using the peace accords ability. ";
+        PlanetAdd.doAction(player, planetID, game, event, false);
+        String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
+        String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRep + " using the " + Emojis.Xxcha + "**Peace Accords** ability.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
     }

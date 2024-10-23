@@ -884,13 +884,11 @@ public class ButtonHelperFactionSpecific {
             return;
         }
 
-        int oldTg = hacan.getTg();
         hacan.setStrategicCC(oldStratCC - 1);
         ButtonHelperCommanders.resolveMuaatCommanderCheck(hacan, game, event);
-        hacan.setTg(oldTg - 3);
 
         MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(),
-            hacan.getFactionEmoji() + " lost a strategy CC and 3TGs (" + oldTg + "->" + hacan.getTg() + ")");
+            hacan.getFactionEmoji() + " lost a strategy CC and 3TGs " + hacan.gainTG(-3));
 
         List<Button> buttons = getSwapSCButtons(game, "qdn", hacan);
         MessageHelper.sendMessageToChannelWithButtons(hacan.getCorrectChannel(),
@@ -929,12 +927,12 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    @ButtonHandler("selectBeforeSwapSCs_")
     public static void resolveSelectedBeforeSwapSC(Player player, Game game, String buttonID) {
         String type = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 == null) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Could not resolve second player, please resolve manually.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not resolve second player, please resolve manually.");
             return;
         }
         List<Button> buttons = new ArrayList<>();
@@ -949,32 +947,30 @@ public class ButtonHelperFactionSpecific {
             buttons);
     }
 
+    @ButtonHandler("swapSCs_")
     public static void resolveSwapSC(Player player1, Game game, ButtonInteractionEvent event, String buttonID) {
         String type = buttonID.split("_")[2];
         Player player2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player2 == null) {
-            MessageHelper.sendMessageToChannel(player1.getCorrectChannel(),
-                "Could not resolve second player, please resolve manually.");
+            MessageHelper.sendMessageToChannel(player1.getCorrectChannel(), "Could not resolve second player, please resolve manually.");
             return;
         }
-        int player1SC = Integer.parseInt(buttonID.split("_")[4]);
-        int player2SC = Integer.parseInt(buttonID.split("_")[3]);
+
         if ("qdn".equalsIgnoreCase(type)) {
-            int oldTg = player2.getTg();
-            player2.setTg(oldTg + 3);
             ButtonHelperAbilities.pillageCheck(player2, game);
             MessageHelper.sendMessageToChannel(player2.getCorrectChannel(),
-                player2.getFactionEmoji() + " gained 3TGs from QDN (" + oldTg + "->" + player2.getTg() + ")");
+                player2.getFactionEmoji() + " gained " + Emojis.tg(3) + " from QDN " + player2.gainTG(3) + "");
         }
+
+        int player1SC = Integer.parseInt(buttonID.split("_")[4]);
+        int player2SC = Integer.parseInt(buttonID.split("_")[3]);
         player1.addSC(player2SC);
         player1.removeSC(player1SC);
         player2.addSC(player1SC);
         player2.removeSC(player2SC);
         String sb = player1.getRepresentation() + " swapped strategy card with " + player2.getRepresentation() + "\n" +
-            "> " + player2.getRepresentation() + Emojis.getSCEmojiFromInteger(player2SC) + " " + ":arrow_right:"
-            + " " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
-            "> " + player1.getRepresentation() + Emojis.getSCEmojiFromInteger(player1SC) + " " + ":arrow_right:"
-            + " " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
+            "> " + player2.getRepresentationNoPing() + Emojis.getSCEmojiFromInteger(player2SC) + " :arrow_right: " + Emojis.getSCEmojiFromInteger(player1SC) + "\n" +
+            "> " + player1.getRepresentationNoPing() + Emojis.getSCEmojiFromInteger(player1SC) + " :arrow_right: " + Emojis.getSCEmojiFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
         event.getMessage().delete().queue();
         StartPhase.startActionPhase(event, game);
@@ -2342,6 +2338,7 @@ public class ButtonHelperFactionSpecific {
         return true;
     }
 
+    @ButtonHandler("exhaustTCS_")
     public static void resolveTCSExhaust(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         buttonID = buttonID.replace("absol_jr", "absoljr");

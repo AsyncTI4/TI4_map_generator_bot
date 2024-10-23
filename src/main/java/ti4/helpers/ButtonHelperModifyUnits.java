@@ -1893,6 +1893,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.editMessageWithButtons(event, oldMessage, systemButtons);
     }
 
+    @ButtonHandler("domnaStepOne_")
     public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game game, Player player,
         String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -1912,6 +1913,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("domnaStepTwo_")
     public static void offerDomnaStep3Buttons(ButtonInteractionEvent event, Game game, Player player,
         String buttonID) {
         String pos1 = buttonID.split("_")[1];
@@ -1931,6 +1933,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("domnaStepThree_")
     public static void resolveDomnaStep3Buttons(ButtonInteractionEvent event, Game game, Player player,
         String buttonID) {
         String pos1 = buttonID.split("_")[1];

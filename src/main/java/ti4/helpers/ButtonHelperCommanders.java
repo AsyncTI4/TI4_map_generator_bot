@@ -122,30 +122,24 @@ public class ButtonHelperCommanders {
 
     }
 
+    @ButtonHandler("olradinCommanderStep2_")
     public static void olradinCommanderStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.split("_")[1];
-        int oldTg = player.getTg();
-        int count = 0;
-        Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        count = Math.max(p.getInfluence(), p.getResources());
-        player.setTg(oldTg + count);
-        PlanetExhaust.doAction(player, planet, game);
+        String planetID = buttonID.split("_")[1];
+        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+        int count = Math.max(planet.getInfluence(), planet.getResources());
+        PlanetExhaust.doAction(player, planetID, game);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
-        String msg = player.getRepresentationUnfogged() + " used Knak Halfear , the Olradin Commander, to exhaust "
-            + Helper.getPlanetRepresentation(planet, game) + " and gain " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->"
-            + player.getTg() + ")";
+        String msg = player.getRepresentationUnfogged() + " used Knak Halfear, the Olradin Commander, to exhaust "
+            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + " and gain " + count + "TG" + (count == 1 ? "" : "s") + " " + player.gainTG(count);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
     }
 
-    public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " will discard 1 AC to move or place 1 mech on "
-            + Helper.getPlanetRepresentation(planet, game);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet,
-            game);
+        String msg = player.getFactionEmoji() + " will discard 1 " + Emojis.ActionCard + " AC to move or place 1 " + Emojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
@@ -526,6 +520,7 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("sardakkcommander_")
     public static void resolveSardakkCommander(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String mechorInf = buttonID.split("_")[1];
         String planet1 = buttonID.split("_")[2];

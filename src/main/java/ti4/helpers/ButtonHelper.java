@@ -6575,11 +6575,9 @@ public class ButtonHelper {
     }
 
     public static void offerSpeakerButtons(Game game, Player player) {
-        String assignSpeakerMessage = "Please, before you draw your action cards or look at agendas, click a faction below to assign Speaker "
-            + Emojis.SpeakerToken;
+        String assignSpeakerMessage = "Please, before you draw your action cards or look at agendas, click a faction below to assign Speaker " + Emojis.SpeakerToken;
         List<Button> assignSpeakerActionRow = getAssignSpeakerButtons(game);
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), assignSpeakerMessage,
-            assignSpeakerActionRow);
+        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
     }
 
     private static List<Button> getAssignSpeakerButtons(Game game) {
@@ -6588,9 +6586,7 @@ public class ButtonHelper {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
-                    Button button = Buttons.gray("assignSpeaker_" + faction, " ");
-                    String factionEmojiString = player.getFactionEmoji();
-                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                    Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmoji());
                     assignSpeakerButtons.add(button);
                 }
             }

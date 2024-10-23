@@ -842,31 +842,33 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
-    public static void resolveGheminaLadyHero(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("gheminaLadyHero_")
+    public static void resolveGheminaLadyHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planetName = buttonID.split("_")[1];
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        String destroyedUnits = "";
         for (Player p2 : game.getRealPlayers()) {
             unitHolder.removeAllUnits(p2.getColor());
+            destroyedUnits += unitHolder.getPlayersUnitListEmojisOnHolder(p2);
         }
-        String planetRepresentation2 = Helper.getPlanetRepresentation(planetName, game);
-        String msg = player.getFactionEmoji() + " destroyed all units on the planet " + planetRepresentation2
-            + " using the The Lady, a Ghemina hero.";
+        String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
+        String msg = player.getFactionEmoji() + " destroyed all units (" + destroyedUnits + ") on the planet " + planetRep + " using the The Lady, a Ghemina hero.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("gheminaLordHero_")
     public static void resolveGheminaLordHero(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
-        String planet = buttonID.split("_")[1];
-        if ("lockedmallice".equalsIgnoreCase(planet)) {
-            planet = "mallice";
+        String planetID = buttonID.split("_")[1];
+        if ("lockedmallice".equalsIgnoreCase(planetID)) {
+            planetID = "mallice";
             Tile tile = game.getTileFromPlanet("lockedmallice");
-            tile = MoveUnits.flipMallice(event, tile, game);
+            MoveUnits.flipMallice(event, tile, game);
         }
-        PlanetAdd.doAction(player, planet, game, event, false);
-        PlanetRefresh.doAction(player, planet, game);
-        String planetRepresentation2 = Helper.getPlanetRepresentation(planet, game);
-        String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRepresentation2 + " using The Lord, a Ghemina hero.";
+        PlanetAdd.doAction(player, planetID, game, event, false);
+        PlanetRefresh.doAction(player, planetID, game);
+        String planetRep = Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game);
+        String msg = player.getFactionEmojiOrColor() + " claimed the planet " + planetRep + " using The Lord, a Ghemina hero.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
