@@ -92,7 +92,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
-import static ti4.helpers.ImageHelper.writeWebpOrDefaultTo;
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator {
 
@@ -477,9 +477,10 @@ public class MapGenerator {
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             BufferedImage mapWithoutTransparentBackground = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
             mapWithoutTransparentBackground.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
-            String fileName = filenamePrefix + "_" + getTimeStamp();
-            String format = writeWebpOrDefaultTo(mapWithoutTransparentBackground, out, "jpg");
-            fileName += "." + format;
+            // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
+            String format = "jpg";
+            String fileName = filenamePrefix + "_" + getTimeStamp() + "." + format;
+            writeCompressedFormat(mapWithoutTransparentBackground, out, format, 0.2f);
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
@@ -823,7 +824,7 @@ public class MapGenerator {
                         } else {
                             superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
-                                game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
+                                // game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
                                 // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
@@ -3216,10 +3217,10 @@ public class MapGenerator {
         // Otherwise, cache it
         Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides, style.equals("solid"));
         Collections.sort(openSides);
-        String key = color.getName() + "-HexBorder-" + style;
+        StringBuilder key = new StringBuilder(color.getName() + "-HexBorder-" + style);
         for (int x : openSides)
-            key += "_" + x;
-        return ImageHelper.createOrLoadCalculatedImage(key, loader);
+            key.append("_").append(x);
+        return ImageHelper.createOrLoadCalculatedImage(key.toString(), loader);
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
@@ -3353,7 +3354,7 @@ public class MapGenerator {
                     int fontYoffset = (scsize / 2) + 25;
                     superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     if (scModel != null) {
-                        game.addWebsiteOverlay("strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        game.addWebsiteOverlay(player, "strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
                         // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
                     }
                     point.translate(scsize, 0);
