@@ -85,9 +85,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
-        // event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("offerInfoButtonStep3_")
     public static void resolveOfferInfoButtonStep3(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String category = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
@@ -181,8 +181,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("showObjInfo_")
     public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game game) {
-
         String extent = buttonID.split("_")[1];
         if (extent.equalsIgnoreCase("both")) {
             ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");

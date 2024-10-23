@@ -98,8 +98,8 @@ public class ButtonHelperAgents {
         }
     }
 
-    public static void startCabalAgent(Player cabal, Game game, String buttonID,
-        GenericInteractionCreateEvent event) {
+    @ButtonHandler("startCabalAgent_")
+    public static void startCabalAgent(Player cabal, Game game, String buttonID, GenericInteractionCreateEvent event) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         List<Button> buttons = getUnitsForCabalAgent(cabal, game, event, p2);
@@ -108,7 +108,6 @@ public class ButtonHelperAgents {
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
         }
-
     }
 
     public static List<Button> getUnitsForCabalAgent(Player player, Game game,
@@ -155,8 +154,8 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static void resolveCabalAgentCapture(String buttonID, Player player, Game game,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("cabalAgentCapture_")
+    public static void resolveCabalAgentCapture(String buttonID, Player player, Game game, ButtonInteractionEvent event) {
         String unit = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -397,6 +396,7 @@ public class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("mercerMove_")
     public static void resolveMercerMove(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planetDestination = buttonID.split("_")[1];
         String pos = buttonID.split("_")[2];
@@ -1147,8 +1147,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void presetEdynAgentStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void presetEdynAgentStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(game, null, "presetEdynAgentStep3_" + faction,
             null);
@@ -1158,8 +1157,7 @@ public class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void presetEdynAgentStep3(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void presetEdynAgentStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String faction1 = buttonID.split("_")[1];
         String faction2 = buttonID.split("_")[2];
         String msg = player.getRepresentationUnfogged() + " you set " + faction1 + " up to take an action once "
@@ -1236,8 +1234,8 @@ public class ButtonHelperAgents {
         return present;
     }
 
-    public static void resolveLanefirAgent(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("lanefirAgentRes_")
+    public static void resolveLanefirAgent(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (buttonID.contains("Decline")) {
             if (buttonID.contains("frontier")) {
                 String cardChosen = buttonID.split("_")[3];
@@ -1431,6 +1429,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
     }
 
+    @ButtonHandler("refreshWithOlradinAgent_")
     public static void resolveRefreshWithOlradinAgent(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planetName = buttonID.split("_")[1];
         Player p2 = player;
@@ -1515,8 +1514,7 @@ public class ButtonHelperAgents {
     }
 
     @ButtonHandler("cheiranAgentStep2_")
-    public static void resolveCheiranAgentStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveCheiranAgentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
         RemoveCC.removeCC(event, player.getColor(), origTile, game);
@@ -1539,8 +1537,7 @@ public class ButtonHelperAgents {
     }
 
     @ButtonHandler("cheiranAgentStep3_")
-    public static void resolveCheiranAgentStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveCheiranAgentStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
         AddCC.addCC(event, player.getColor(), origTile, true);
@@ -1667,8 +1664,7 @@ public class ButtonHelperAgents {
         }
     }
 
-    public static void resolveNokarAgentStep2(Player bentor, Game game, GenericInteractionCreateEvent event,
-        String buttonID) {
+    public static void resolveNokarAgentStep2(Player bentor, Game game, GenericInteractionCreateEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
             MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
@@ -1694,8 +1690,7 @@ public class ButtonHelperAgents {
         }
     }
 
-    public static void resolveZelianAgentStep2(Player bentor, Game game, GenericInteractionCreateEvent event,
-        String buttonID) {
+    public static void resolveZelianAgentStep2(Player bentor, Game game, GenericInteractionCreateEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
             MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
@@ -1730,8 +1725,7 @@ public class ButtonHelperAgents {
 
     }
 
-    public static void resolveKyroAgentStep2(Player kyro, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveKyroAgentStep2(Player kyro, Game game, ButtonInteractionEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
             MessageHelper.sendMessageToChannel(kyro.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
@@ -1860,8 +1854,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
-    public static void fogAllianceAgentStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void fogAllianceAgentStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String msg = player.getRepresentationUnfogged()
             + " use buttons to select the system you want to move ships to";
         List<Button> buttons = new ArrayList<>();
@@ -1895,18 +1888,18 @@ public class ButtonHelperAgents {
         return false;
     }
 
+    @ButtonHandler("moveGloryStart_")
     public static void offerMoveGloryOptions(Game game, Player player, GenericInteractionCreateEvent event) {
-
         String msg = player.getRepresentationUnfogged() + " use buttons to select system to move glory from";
         Tile tileAS = game.getTileByPosition(game.getActiveSystem());
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : getGloryTokenTiles(game)) {
-            buttons.add(Buttons.green("moveGlory_" + tile.getPosition() + "_" + tileAS.getPosition(),
-                tile.getRepresentationForButtons(game, player)));
+            buttons.add(Buttons.green("moveGlory_" + tile.getPosition() + "_" + tileAS.getPosition(), tile.getRepresentationForButtons(game, player)));
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
+    @ButtonHandler("moveGlory_")
     public static void moveGlory(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Tile tileAS = game.getTileByPosition(buttonID.split("_")[2]);
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
@@ -1922,14 +1915,13 @@ public class ButtonHelperAgents {
             space.removeToken(tokenToMove);
         }
         spaceAS.addToken(tokenToMove);
-        String msg = player.getFactionEmoji() + " moved glory token from " + tile.getRepresentation() + " to "
-            + tileAS.getRepresentation();
+        String msg = player.getFactionEmoji() + " moved glory token from " + tile.getRepresentation() + " to " + tileAS.getRepresentation();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("placeGlory_")
     public static void placeGlory(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         List<String> gloryTokens = getGloryTokensLeft(game);
@@ -1940,7 +1932,7 @@ public class ButtonHelperAgents {
         space.addToken(gloryTokens.get(0));
 
         String msg = player.getFactionEmoji() + " added glory token to " + tile.getRepresentation();
-        CommanderUnlockCheck.checkPlayer(player, game, "kjalengard", event);
+        CommanderUnlockCheck.checkPlayer(player, "kjalengard");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -2016,6 +2008,7 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
+    @ButtonHandler("arboAgentPutShip_")
     public static void arboAgentPutShip(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlace = buttonID.replace("arboAgentPutShip_", "");
         String unit = unitNPlace.split("_")[0];
@@ -2082,8 +2075,7 @@ public class ButtonHelperAgents {
     }
 
     @ButtonHandler("step2axisagent_")
-    public static void resolveStep2OfAxisAgent(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveStep2OfAxisAgent(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String message;
         if ("cruiser".equalsIgnoreCase(buttonID.split("_")[1])) {
@@ -2120,6 +2112,7 @@ public class ButtonHelperAgents {
         }
     }
 
+    @ButtonHandler("yinagent_")
     public static void yinAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -2159,8 +2152,8 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static void resolveJolNarAgentRemoval(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("jolNarAgentRemoval_")
+    public static void resolveJolNarAgentRemoval(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String unitHName = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);

@@ -1322,4 +1322,27 @@ public class TransactionHelper {
         TransactionHelper.acceptTransactionOffer(p1, player, game, event);
         ButtonHelper.deleteMessage(event);
     }
+
+    @ButtonHandler("finishTransaction_")
+    public static void finishTransaction(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String player2Color = buttonID.split("_")[1];
+        Player player2 = game.getPlayerFromColorOrFaction(player2Color);
+        ButtonHelperAbilities.pillageCheck(player, game);
+        ButtonHelperAbilities.pillageCheck(player2, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("demandSomething_")
+    public static void demandSomething(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String player2Color = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(player2Color);
+        if (p2 != null) {
+            List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, p2, player);
+            String message = p2.getRepresentation()
+                + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to "
+                + player.getFactionEmojiOrColor();
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
+            ButtonHelper.deleteMessage(event);
+        }
+    }
 }

@@ -136,6 +136,7 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("cymiaeCommanderRes_")
     public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " will discard 1 " + Emojis.ActionCard + " AC to move or place 1 " + Emojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game);
@@ -221,6 +222,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
+    @ButtonHandler("ravenMigration")
     public static void handleRavenCommander(ButtonContext context) {
         Game game = context.getGame();
         Player player = context.getPlayer();
@@ -475,6 +477,7 @@ public class ButtonHelperCommanders {
         }
     }
 
+    @ButtonHandler("utilizeSolCommander_")
     public static void resolveSolCommander(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];

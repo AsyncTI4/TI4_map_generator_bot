@@ -233,6 +233,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
+    @ButtonHandler("statusInfRevival_")
     public static void placeInfantryFromRevival(Game game, ButtonInteractionEvent event, Player player,
         String buttonID) {
         String planet = buttonID.split("_")[1];
@@ -587,6 +588,7 @@ public class ButtonHelper {
         return player.getTechs().contains("mr") && tile.getTileModel().isSupernova();
     }
 
+    @ButtonHandler("forceARefresh_")
     public static void forceARefresh(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String msg = player.getFactionEmoji() + " forced " + getIdentOrColor(p2, game) + " to refresh";
@@ -1239,6 +1241,7 @@ public class ButtonHelper {
         deleteTheOneButton(event);
     }
 
+    @ButtonHandler("biostimsReady_")
     public static void bioStimsReady(Game game, GenericInteractionCreateEvent event, Player player, String buttonID) {
         buttonID = buttonID.replace("biostimsReady_", "");
         String last = buttonID.substring(buttonID.lastIndexOf("_") + 1);
@@ -1251,6 +1254,7 @@ public class ButtonHelper {
             player.refreshPlanet(last);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " readied planet: " + Helper.getPlanetRepresentation(last, game));
         }
+        ButtonHelper.deleteMessage(event);
     }
 
     public static boolean isPlayerOverLimit(Game game, Player player) {
@@ -2838,6 +2842,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("echoPlaceFrontier_")
     public static void resolveEchoPlaceFrontier(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -3500,6 +3505,7 @@ public class ButtonHelper {
             unitHolder.getTokenList().contains(Mapper.getAttachmentImagePath(Constants.PROPULSION));
     }
 
+    @ButtonHandler("absolsdn_")
     public static void resolveAbsolScanlink(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (buttonID.contains("Decline")) {
             String drawColor = buttonID.split("_")[2];
@@ -4230,6 +4236,7 @@ public class ButtonHelper {
             player.getRepresentation() + " use buttons to choose the planet you want to move troops to", buttons);
     }
 
+    @ButtonHandler("transitDiodes_")
     public static void resolveTransitDiodesStep2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         List<Button> buttons = getButtonsForMovingGroundForcesToAPlanet(game, buttonID.split("_")[1], player);
@@ -5599,11 +5606,6 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
     }
 
-    public static void resolveStellar(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        StellarConverter.secondHalfOfStellar(game, buttonID.split("_")[1], event);
-        deleteMessage(event);
-    }
-
     public static String getUnitHolderRep(UnitHolder unitHolder, Tile tile, Game game) {
         String name = unitHolder.getName();
         if ("space".equalsIgnoreCase(name)) {
@@ -5970,6 +5972,7 @@ public class ButtonHelper {
         return playerButtons;
     }
 
+    @ButtonHandler("resolveMaw")
     public static void resolveMaw(Game game, Player player, ButtonInteractionEvent event) {
         player.removeRelic("mawofworlds");
         player.removeExhaustedRelic("mawofworlds");
@@ -5978,13 +5981,12 @@ public class ButtonHelper {
         }
         game.setComponentAction(true);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " purged Maw Of Worlds.");
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(),
-            player.getRepresentation() + " Use the button to get a tech", Buttons.GET_A_FREE_TECH);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " purged Maw Of Worlds.");
+        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation() + " Use the button to get a tech", Buttons.GET_A_FREE_TECH);
         deleteMessage(event);
     }
 
+    @ButtonHandler("endTurnWhenAllReactedTo_")
     public static void endTurnWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String sc = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -6018,6 +6020,7 @@ public class ButtonHelper {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("resolveTwilightMirror")
     public static void resolveTwilightMirror(Game game, Player player, ButtonInteractionEvent event) {
         player.removeRelic("twilight_mirror");
         player.removeExhaustedRelic("twilight_mirror");
@@ -6034,6 +6037,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
+    @ButtonHandler("resolveCrownOfE")
     public static void resolveCrownOfE(Game game, Player player, ButtonInteractionEvent event) {
         if (player.hasRelic("absol_emphidia")) {
             player.removeRelic("absol_emphidia");
@@ -6353,6 +6357,7 @@ public class ButtonHelper {
             .sum();
     }
 
+    @ButtonHandler("diplo_")
     public static void resolveDiploPrimary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String type = buttonID.split("_")[2];
@@ -6505,6 +6510,7 @@ public class ButtonHelper {
             List.of(codex1, codex2, codex3));
     }
 
+    @ButtonHandler("sarMechStep1_")
     public static void resolveSARMechStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String tilePos = buttonID.split("_")[1];
         String warfareOrNot = buttonID.split("_")[2];
@@ -6521,6 +6527,7 @@ public class ButtonHelper {
         deleteTheOneButton(event);
     }
 
+    @ButtonHandler("sarMechStep2_")
     public static void resolveSARMechStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String warfareOrNot = buttonID.split("_")[2];

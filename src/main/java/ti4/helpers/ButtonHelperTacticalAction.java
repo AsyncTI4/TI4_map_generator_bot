@@ -328,8 +328,7 @@ public class ButtonHelperTacticalAction {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void buildWithTacticalAction(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void buildWithTacticalAction(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("tacticalActionBuild_", "");
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
             "tacticalAction", "place");
@@ -475,8 +474,8 @@ public class ButtonHelperTacticalAction {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void finishMovingFromOneTile(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("doneWithOneSystem_")
+    public static void finishMovingFromOneTile(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("doneWithOneSystem_", "");
         Tile tile = game.getTileByPosition(pos);
         int distance = CheckDistance.getDistanceBetweenTwoTiles(game, player, pos, game.getActiveSystem(), true);
@@ -490,8 +489,7 @@ public class ButtonHelperTacticalAction {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void selectTileToMoveFrom(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void selectTileToMoveFrom(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("tacticalMoveFrom_", "");
         List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), "Move");
         game.resetCurrentMovedUnitsFrom1System();

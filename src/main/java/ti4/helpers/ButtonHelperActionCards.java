@@ -199,8 +199,8 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static void resolveScuttleStart(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("startToScuttleAUnit_")
+    public static void resolveScuttleStart(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
         List<Button> buttons = getTilesToScuttle(player, game, event, tgAlready);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
@@ -208,8 +208,8 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("startToLuckyShotAUnit_")
     public static void resolveLuckyShotStart(Player player, Game game, ButtonInteractionEvent event) {
-
         List<Button> buttons = getTilesToLuckyShot(player, game, event);
         if (buttons.size() == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged()
@@ -220,8 +220,8 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveLuckyShotRemoval(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("luckyShotOn_")
+    public static void resolveLuckyShotRemoval(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         String color = buttonID.split("_")[3];
@@ -244,8 +244,8 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveScuttleEnd(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("endScuttle_")
+    public static void resolveScuttleEnd(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " TGs increased by " + tgAlready + " (" + player.getTg() + "->"
@@ -256,8 +256,8 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveScuttleTileSelection(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("scuttleIn_")
+    public static void resolveScuttleTileSelection(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         int tgAlready = Integer.parseInt(buttonID.split("_")[2]);
@@ -267,8 +267,8 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveLuckyShotTileSelection(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("luckyShotIn_")
+    public static void resolveLuckyShotTileSelection(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = getUnitsToLuckyShot(player, game, event, tile);
@@ -277,8 +277,8 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveScuttleRemoval(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("scuttleOn_")
+    public static void resolveScuttleRemoval(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         int tgAlready = Integer.parseInt(buttonID.split("_")[3]);
@@ -456,6 +456,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    @ButtonHandler("divertFunding@")
     public static void divertFunding(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String techOut = buttonID.split("@")[1];
         player.removeTech(techOut);
@@ -466,6 +467,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("forwardSupplyBaseStep2_")
     public static void resolveForwardSupplyBaseStep2(Player hacan, Game game, ButtonInteractionEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
@@ -600,8 +602,7 @@ public class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveUprisingStep1")
-    public static void resolveUprisingStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveUprisingStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -644,8 +645,7 @@ public class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveSignalJammingStep1")
-    public static void resolveSignalJammingStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveSignalJammingStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -983,8 +983,7 @@ public class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveSalvageStep1")
-    public static void resolveSalvageStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveSalvageStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -1004,8 +1003,7 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " tell the bot who you're playing Salvage on", buttons);
     }
 
-    public static void resolveInsubStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveInsubStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         p2.setTacticalCC(p2.getTacticalCC() - 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1017,8 +1015,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveDiplomaticPressureStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveDiplomaticPressureStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message = p2.getRepresentationUnfogged()
@@ -1046,8 +1043,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveSalvageStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveSalvageStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int comm = p2.getCommodities();
         p2.setCommodities(0);
@@ -1082,8 +1078,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveReparationsStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveReparationsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1321,8 +1316,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveCrippleStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveCrippleStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
@@ -1334,8 +1328,7 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " select the planet you want to cripple", buttons);
     }
 
-    public static void resolveInfiltrateStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveInfiltrateStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
@@ -1478,8 +1471,7 @@ public class ButtonHelperActionCards {
         }
     }
 
-    public static void resolveDecoyOperationStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveDecoyOperationStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uH : tile.getUnitHolders().values()) {
@@ -1495,8 +1487,7 @@ public class ButtonHelperActionCards {
             buttons);
     }
 
-    public static void resolveDecoyOperationStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveDecoyOperationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         List<Button> buttons = ButtonHelper.getButtonsForMovingGroundForcesToAPlanet(game, planet, player);
         ButtonHelper.deleteMessage(event);
@@ -1505,8 +1496,7 @@ public class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveEmergencyRepairs_")
-    public static void resolveEmergencyRepairs(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveEmergencyRepairs(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile.removeAllUnitDamage(player.getColor());
         ButtonHelper.deleteMessage(event);
@@ -1515,8 +1505,7 @@ public class ButtonHelperActionCards {
     }
 
     @ButtonHandler("resolveTacticalBombardmentStep1")
-    public static void resolveTacticalBombardmentStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveTacticalBombardmentStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = getTacticalBombardmentButtons(game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -1524,8 +1513,7 @@ public class ButtonHelperActionCards {
             buttons);
     }
 
-    public static void resolveTacticalBombardmentStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveTacticalBombardmentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             if (uH instanceof Planet) {
@@ -1547,8 +1535,7 @@ public class ButtonHelperActionCards {
             player.getFactionEmoji() + " exhausted all enemy planets in " + tile.getRepresentation());
     }
 
-    public static void resolveUnstableStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveUnstableStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
@@ -1562,8 +1549,7 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " select the planet you want to exhaust", buttons);
     }
 
-    public static void resolveUnstableStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveUnstableStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1607,8 +1593,7 @@ public class ButtonHelperActionCards {
                 + " was exhausted and " + amountToKill + " infantry were destroyed.");
     }
 
-    public static void resolveSeizeArtifactStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveSeizeArtifactStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String fragID = buttonID.split("_")[2];
         ButtonHelper.deleteMessage(event);
@@ -1620,8 +1605,7 @@ public class ButtonHelperActionCards {
             p2.getRepresentationUnfogged() + " your fragment " + fragID + " was seized.");
     }
 
-    public static void resolveUprisingStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveUprisingStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1640,8 +1624,7 @@ public class ButtonHelperActionCards {
             p2.getRepresentationUnfogged() + " your planet " + planetRep + " was exhausted.");
     }
 
-    public static void resolvePlagueStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolvePlagueStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1737,8 +1720,7 @@ public class ButtonHelperActionCards {
                 + hits + " fighter" + (hits == 1 ? "" : "s") + ".");
     }
 
-    public static void resolveCrippleStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveCrippleStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1764,8 +1746,7 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveReparationsStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveReparationsStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1918,6 +1899,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.split("_")[1];
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());

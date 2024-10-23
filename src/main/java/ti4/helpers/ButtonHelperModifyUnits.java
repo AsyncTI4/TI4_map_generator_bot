@@ -739,6 +739,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("removeThisTypeOfUnit_")
     public static void removeThisTypeOfUnit(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String unit = buttonID.split("_")[1].toLowerCase().replace(" ", "").replace("'", "");
@@ -973,6 +974,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("startDevotion_")
     public static void startDevotion(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
@@ -981,6 +983,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
+    @ButtonHandler("resolveDevote_")
     public static void resolveDevote(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
@@ -1548,6 +1551,7 @@ public class ButtonHelperModifyUnits {
         }
     }
 
+    @ButtonHandler("placeOneNDone_")
     public static void placeUnitAndDeleteButton(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("placeOneNDone_", "");
         String skipbuild = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
@@ -1783,6 +1787,7 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    @ButtonHandler("assCannonNDihmohn_")
     public static void resolveAssaultCannonNDihmohnCommander(String buttonID, ButtonInteractionEvent event,
         Player player, Game game) {
         String cause = buttonID.split("_")[1];
@@ -2020,6 +2025,7 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    @ButtonHandler("assignHits_")
     public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("assignHits_", "");
@@ -2247,6 +2253,7 @@ public class ButtonHelperModifyUnits {
 
     }
 
+    @ButtonHandler("repairDamage_")
     public static void repairDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String rest;
         rest = buttonID.replace("repairDamage_", "");
@@ -2285,6 +2292,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
     }
 
+    @ButtonHandler("assignDamage_")
     public static void assignDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String rest;
         rest = buttonID.replace("assignDamage_", "");

@@ -10,12 +10,14 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperRelics {
 
+    @ButtonHandler("jrResolution_")
     public static void jrResolution(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         String faction2 = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction2);
@@ -31,9 +33,9 @@ public class ButtonHelperRelics {
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
             ButtonHelper.deleteMessage(event);
         }
-
     }
 
+    @ButtonHandler("prophetsTears_")
     public static void prophetsTears(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         player.addExhaustedRelic("prophetstears");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

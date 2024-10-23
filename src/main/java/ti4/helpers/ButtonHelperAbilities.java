@@ -231,6 +231,7 @@ public class ButtonHelperAbilities {
         }
     }
 
+    @ButtonHandler("autoneticMemoryDecline_")
     public static void autoneticMemoryDecline(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         event.getMessage().delete().queue();
@@ -251,6 +252,7 @@ public class ButtonHelperAbilities {
         return trapNames;
     }
 
+    @ButtonHandler("resolveGrace_")
     public static void resolveGrace(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String msg = player.getFactionEmoji() + " is resolving the Grace ability";
         int scPlayed = Integer.parseInt(buttonID.split("_")[1]);
@@ -483,8 +485,8 @@ public class ButtonHelperAbilities {
         }
     }
 
-    public static void autoneticMemoryStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("autoneticMemoryStep2_")
+    public static void autoneticMemoryStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         event.getMessage().delete().queue();
         int count = Integer.parseInt(buttonID.split("_")[1]);
         game.drawActionCard(player.getUserID(), count - 1);
@@ -580,6 +582,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannel(myko.getCorrectChannel(), msg.toString());
     }
 
+    @ButtonHandler("pillage_")
     public static void pillage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("pillage_", "");
         String colorPlayer = buttonID.split("_")[0];
@@ -654,8 +657,7 @@ public class ButtonHelperAbilities {
     }
 
     @ButtonHandler("getDiplomatsButtons")
-    public static void resolveGetDiplomatButtons(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    public static void resolveGetDiplomatButtons(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         ButtonHelper.deleteTheOneButton(event);
         String message = player.getRepresentation() + " select the planet you would like to exhaust";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, getDiplomatButtons(game, player));
@@ -695,8 +697,8 @@ public class ButtonHelperAbilities {
         }
     }
 
-    public static void resolveDiplomatExhaust(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    @ButtonHandler("exhaustViaDiplomats_")
+    public static void resolveDiplomatExhaust(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
         String message = player.getFactionEmoji() + " exhausted the unowned planet "
             + Helper.getPlanetRepresentation(planet, game) + " using the diplomats ability";
@@ -759,16 +761,15 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static void orbitalMechDrop(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    @ButtonHandler("orbitalMechDrop_")
+    public static void orbitalMechDrop(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "1 mech " + planet, game);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false) + " dropped a mech on " + Helper.getPlanetRepresentation(planet, game) + " for the cost of 3 resources");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false) + " dropped a mech on " + Helper.getPlanetRepresentation(planet, game) + " for the cost of " + Emojis.Resources_3);
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
         Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            "Use Buttons to Pay For The Mech", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to Pay For The Mech", buttons);
         event.getMessage().delete().queue();
 
     }
@@ -989,8 +990,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveOlradinPreserveStep2(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    public static void resolveOlradinPreserveStep2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String type = buttonID.split("_")[1];
         player.setHasUsedEnvironmentPreserveAbility(true);
         StringBuilder sb = new StringBuilder();
@@ -1070,6 +1070,7 @@ public class ButtonHelperAbilities {
         return false;
     }
 
+    @ButtonHandler("meteorSlings_")
     public static void meteorSlings(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String msg = player.getRepresentation() + " cancelled one bombardment hit to place one infantry on " + Helper.getPlanetRepresentation(planet, game);
@@ -1306,6 +1307,7 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
+    @ButtonHandler("moult_")
     public static void resolveMoult(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         ButtonHelper.deleteTheOneButton(event);
         String pos = buttonID.split("_")[1];
@@ -1335,8 +1337,7 @@ public class ButtonHelperAbilities {
     }
 
     @ButtonHandler("contagion_")
-    public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
         String amount = "1";
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
@@ -1373,8 +1374,8 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static void resolveInitialIndoctrinationQuestion(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("initialIndoctrination_")
+    public static void resolveInitialIndoctrinationQuestion(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         List<Button> options = new ArrayList<>();
         options.add(Buttons.green("indoctrinate_" + planet + "_infantry", "Indoctrinate to place 1 infantry"));
@@ -1384,6 +1385,7 @@ public class ButtonHelperAbilities {
             player.getRepresentationUnfogged() + " use buttons to resolve indoctrination", options);
     }
 
+    @ButtonHandler("indoctrinate_")
     public static void resolveFollowUpIndoctrinationQuestion(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
@@ -1399,7 +1401,7 @@ public class ButtonHelperAbilities {
             }
         }
         List<Button> options = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        CommanderUnlockCheck.checkPlayer(player, game, "yin", event);
+        CommanderUnlockCheck.checkPlayer(player, "yin");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                 + Helper.getPlanetRepresentation(planet, game) + " using indoctrination");
@@ -1409,6 +1411,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("distant_suns_")
     public static void distantSuns(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String bID = buttonID.replace("distant_suns_", "");
         String[] info = bID.split("_");
@@ -1426,6 +1429,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("deep_mining_")
     public static void deepMining(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String bID = buttonID.replace("deep_mining_", "");
         String[] info = bID.split("_");
@@ -1436,9 +1440,7 @@ public class ButtonHelperAbilities {
             new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
                 player, true, game, 1, false);
         } else {
-            message = player.getFactionEmoji() + " used their Deep Mining ability to gain 1TG (TGs went from "
-                + player.getTg() + "-> " + (player.getTg() + 1) + ")";
-            player.setTg(player.getTg() + 1);
+            message = player.getFactionEmoji() + " used their Deep Mining ability to gain 1TG " + player.gainTG(1);
             ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
             ButtonHelperAbilities.pillageCheck(player, game);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);

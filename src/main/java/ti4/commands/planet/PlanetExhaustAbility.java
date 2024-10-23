@@ -18,6 +18,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TransactionHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -145,6 +146,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         return buttons;
     }
 
+    @ButtonHandler("newPrism@")
     public static void newPrismPart2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String techOut = buttonID.split("@")[1];
         player.removeTech(techOut);

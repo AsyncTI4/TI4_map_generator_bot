@@ -28,6 +28,7 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
+import ti4.commands.special.NovaSeed;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
@@ -937,6 +938,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
+    @ButtonHandler("saarHeroResolution_")
     public static void resolveSaarHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
@@ -972,6 +974,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("arboHeroBuild_")
     public static void resolveArboHeroBuild(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -1075,6 +1078,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("purgeTech_")
     public static void purgeTech(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String techID = buttonID.replace("purgeTech_", "");
         player.purgeTech(techID);
@@ -1083,6 +1087,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("nekroHeroStep2_")
     public static void resolveNekroHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         Planet unitHolder = game.getPlanetsInfo().get(planet);
@@ -1499,6 +1504,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("cymiaeHeroStep1_")
     public static void resolveCymiaeHeroStart(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String num = buttonID.split("_")[1];
@@ -1515,6 +1521,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("cymiaeHeroStep2_")
     public static void resolveCymiaeHeroStep2(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String acID = buttonID.replace("cymiaeHeroStep2_", "");
@@ -1536,6 +1543,7 @@ public class ButtonHelperHeroes {
             buttons);
     }
 
+    @ButtonHandler("cymiaeHeroStep3_")
     public static void resolveCymiaeHeroStep3(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
@@ -1668,6 +1676,7 @@ public class ButtonHelperHeroes {
         return Helper.getTechButtons(techs, player, tech);
     }
 
+    @ButtonHandler("jnHeroSwapOut_")
     public static void resolveAJolNarSwapStep1(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = getJolNarHeroSwapInOptions(player, game, buttonID);
         String message = player.getRepresentationUnfogged() + " select the tech you would like to acquire";
@@ -1675,6 +1684,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("swapTechs_")
     public static void resolveAJolNarSwapStep2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String techOut = buttonID.split("__")[1];
         String techIn = buttonID.split("__")[2];
@@ -1900,6 +1910,7 @@ public class ButtonHelperHeroes {
         }
     }
 
+    @ButtonHandler("winnuHero_")
     public static void resolveWinnuHeroSC(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         Integer sc = Integer.parseInt(buttonID.split("_")[1]);
@@ -1932,6 +1943,7 @@ public class ButtonHelperHeroes {
         }
     }
 
+    @ButtonHandler("yssarilHeroRejection_")
     public static void yssarilHeroRejection(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
         Player notYssaril = game.getPlayerFromColorOrFaction(playerFaction);
@@ -1945,6 +1957,7 @@ public class ButtonHelperHeroes {
 
     }
 
+    @ButtonHandler("mykoheroSteal_")
     public static void resolveMykoHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String hero = buttonID.split("_")[1];
         HeroPlay.playHero(event, game, player, player.unsafeGetLeader("mykomentorihero"));
@@ -2023,6 +2036,7 @@ public class ButtonHelperHeroes {
         return scButtons;
     }
 
+    @ButtonHandler("yssarilHeroInitialOffering_")
     public static void yssarilHeroInitialOffering(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String buttonLabel = event.getButton().getLabel();
         List<Button> acButtons = new ArrayList<>();
