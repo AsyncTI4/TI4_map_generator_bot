@@ -212,6 +212,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             buttons);
     }
 
+    @ButtonHandler("armsDealStep2_")
     public static void resolveArmsDealStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -225,6 +226,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("ancientTradeRoutesStep2_")
     public static void resolveAncientTradeRoutesStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -398,13 +400,14 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of **Brutal Occupation**", buttons);
     }
 
+    @ButtonHandler("resolveShrapnelTurrets_")
     public static void resolveShrapnelTurrets(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue("ShrapnelTurretsFaction", player.getFaction());
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`");
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();

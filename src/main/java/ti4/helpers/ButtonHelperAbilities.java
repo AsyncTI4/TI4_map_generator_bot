@@ -1234,6 +1234,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("mitoMechPlacement_")
     public static void resolveMitosisMechPlacement(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         String uH = buttonID.split("_")[2];
@@ -1251,8 +1252,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getXxchaPeaceAccordsButtons(Game game, Player player,
-        GenericInteractionCreateEvent event, String finChecker) {
+    public static List<Button> getXxchaPeaceAccordsButtons(Game game, Player player, GenericInteractionCreateEvent event, String finChecker) {
         List<String> planetsChecked = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {
@@ -1275,8 +1275,7 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
-    public static List<Button> getKyroContagionButtons(Game game, Player player,
-        GenericInteractionCreateEvent event, String finChecker) {
+    public static List<Button> getKyroContagionButtons(Game game, Player player, GenericInteractionCreateEvent event, String finChecker) {
         List<String> planetsChecked = new ArrayList<>();
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanetsAllianceMode()) {

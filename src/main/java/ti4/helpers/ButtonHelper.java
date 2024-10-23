@@ -234,8 +234,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("statusInfRevival_")
-    public static void placeInfantryFromRevival(Game game, ButtonInteractionEvent event, Player player,
-        String buttonID) {
+    public static void placeInfantryFromRevival(Game game, ButtonInteractionEvent event, Player player, String buttonID) {
         String planet = buttonID.split("_")[1];
         String amount;
         if (StringUtils.countMatches(buttonID, "_") > 1) {
@@ -1868,8 +1867,7 @@ public class ButtonHelper {
         return planetsWithSleepers;
     }
 
-    public static void resolveTitanShenanigansOnActivation(Player player, Game game, Tile tile,
-        ButtonInteractionEvent event) {
+    public static void resolveTitanShenanigansOnActivation(Player player, Game game, Tile tile, ButtonInteractionEvent event) {
         List<Button> buttons = getButtonsForTurningPDSIntoFS(player, game, tile);
         if (buttons.size() > 1) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -1943,8 +1941,7 @@ public class ButtonHelper {
         return tilesWithCC;
     }
 
-    public static void resolveRemovingYourCC(Player player, Game game, GenericInteractionCreateEvent event,
-        String buttonID) {
+    public static void resolveRemovingYourCC(Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
         buttonID = buttonID.replace("removeCCFromBoard_", "");
         String whatIsItFor = buttonID.split("_")[0];
         String pos = buttonID.split("_")[1];
@@ -1998,8 +1995,7 @@ public class ButtonHelper {
         }
     }
 
-    public static void resolveMahactMechAbilityUse(Player mahact, Player target, Game game, Tile tile,
-        ButtonInteractionEvent event) {
+    public static void resolveMahactMechAbilityUse(Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
         mahact.removeMahactCC(target.getColor());
         if (!game.isNaaluAgent()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
@@ -2036,8 +2032,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void resolveNullificationFieldUse(Player mahact, Player target, Game game, Tile tile,
-        ButtonInteractionEvent event) {
+    public static void resolveNullificationFieldUse(Player mahact, Player target, Game game, Tile tile, ButtonInteractionEvent event) {
         mahact.setStrategicCC(mahact.getStrategicCC() - 1);
         mahact.exhaustTech("nf");
         ButtonHelperCommanders.resolveMuaatCommanderCheck(mahact, game, event,
@@ -2817,6 +2812,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("buttonID.startsWith")
     public static void resolveSpecialRex(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
@@ -2843,8 +2839,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("echoPlaceFrontier_")
-    public static void resolveEchoPlaceFrontier(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveEchoPlaceFrontier(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         AddToken.addToken(event, tile, Constants.FRONTIER, game);
@@ -3461,8 +3456,8 @@ public class ButtonHelper {
         }
     }
 
-    public static void sendTradeHolderSomething(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("sendTradeHolder_")
+    public static void sendTradeHolderSomething(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String tgOrDebt = buttonID.split("_")[1];
         Player tradeHolder = null;
         for (Player p2 : game.getRealPlayers()) {
@@ -3768,8 +3763,7 @@ public class ButtonHelper {
             "Choose to either add units (build) or remove them", buttons);
     }
 
-    public static void resolveCombatRoll(Player player, Game game, GenericInteractionCreateEvent event,
-        String buttonID) {
+    public static void resolveCombatRoll(Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
         String[] idInfo = buttonID.split("_");
         String pos = idInfo[1];
         String unitHolderName = idInfo[2];
@@ -4158,8 +4152,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static String putInfWithMechsForStarforge(String pos, String successMessage, Game game, Player player,
-        ButtonInteractionEvent event) {
+    public static String putInfWithMechsForStarforge(String pos, String successMessage, Game game, Player player, ButtonInteractionEvent event) {
         Set<String> tiles = FoWHelper.getAdjacentTiles(game, pos, player, true);
         tiles.add(pos);
         StringBuilder successMessageBuilder = new StringBuilder(successMessage);
@@ -4237,8 +4230,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler("transitDiodes_")
-    public static void resolveTransitDiodesStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveTransitDiodesStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = getButtonsForMovingGroundForcesToAPlanet(game, buttonID.split("_")[1], player);
         deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -5194,6 +5186,7 @@ public class ButtonHelper {
             buttons);
     }
 
+    @ButtonHandler("cutTape_")
     public static void cutTape(Game game, String buttonID, ButtonInteractionEvent event) {
         String poID = buttonID.replace("cutTape_", "");
         int location = 1;
@@ -5250,6 +5243,7 @@ public class ButtonHelper {
             buttons);
     }
 
+    @ButtonHandler("setupHomebrew_")
     public static void setUpHomebrew(Game game, ButtonInteractionEvent event, String buttonID) {
         deleteTheOneButton(event);
         String type = buttonID.split("_")[1];
@@ -5413,8 +5407,7 @@ public class ButtonHelper {
             newButtons);
     }
 
-    public static void resolveSetupStep2(Player player, Game game, GenericInteractionCreateEvent event,
-        String buttonID) {
+    public static void resolveSetupStep2(Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
         if (event instanceof ButtonInteractionEvent) {
@@ -6078,6 +6071,7 @@ public class ButtonHelper {
         return false;
     }
 
+    @ButtonHandler("resolvePreassignment_")
     public static void resolvePreAssignment(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String messageID = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " successfully preset " + messageID;
@@ -6119,8 +6113,8 @@ public class ButtonHelper {
         }
     }
 
-    public static void resolveRemovalOfPreAssignment(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("removePreset_")
+    public static void resolveRemovalOfPreAssignment(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String messageID = buttonID.split("_")[1];
         String msg = player.getFactionEmoji() + " successfully removed the preset for " + messageID;
         String part2 = player.getFaction();

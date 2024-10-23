@@ -1252,6 +1252,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("place_")
     public static void genericPlaceUnit(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("place_", "");
         String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));

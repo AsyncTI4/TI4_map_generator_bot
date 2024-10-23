@@ -773,6 +773,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
+    @ButtonHandler("freeSystemsHeroPlanet_")
     public static void freeSystemsHeroPlanet(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String planet = buttonID.split("_")[1];

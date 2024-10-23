@@ -31,6 +31,7 @@ import ti4.model.UnitModel;
 
 public class ButtonHelperTacticalAction {
 
+    @ButtonHandler("unitTactical")
     public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String remove = "Move";
@@ -328,6 +329,7 @@ public class ButtonHelperTacticalAction {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("tacticalActionBuild_")
     public static void buildWithTacticalAction(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("tacticalActionBuild_", "");
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
@@ -489,6 +491,7 @@ public class ButtonHelperTacticalAction {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("tacticalMoveFrom_")
     public static void selectTileToMoveFrom(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("tacticalMoveFrom_", "");
         List<Button> systemButtons = getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), "Move");
@@ -547,6 +550,7 @@ public class ButtonHelperTacticalAction {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
+    @ButtonHandler("getTilesThisFarAway_")
     public static void getTilesThisFarAway(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int desiredDistance = Integer.parseInt(buttonID.split("_")[1]);
         Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
@@ -569,6 +573,7 @@ public class ButtonHelperTacticalAction {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("ringTile_")
     public static void selectActiveSystem(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("ringTile_", "");
         game.setActiveSystem(pos);

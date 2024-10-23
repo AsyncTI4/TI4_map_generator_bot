@@ -200,6 +200,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.starChartStep1(game, player, buttonID.split("_")[1]);
     }
 
+    @ButtonHandler("genericRemove_")
     public static void genericRemove(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("genericRemove_", "");
         game.resetCurrentMovedUnitsFrom1System();
@@ -211,12 +212,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("doActivation_")
     public static void doActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("doActivation_", "");
         ButtonHelper.resolveOnActivationEnemyAbilities(game, game.getTileByPosition(pos), player, false, event);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("getACFrom_")
     public static void getACFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace("getACFrom_", "");
         Player victim = game.getPlayerFromColorOrFaction(faction);
@@ -226,6 +229,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("ring_")
     public static void ring(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         List<Button> ringButtons = ButtonHelper.getTileInARing(player, game, buttonID, event);
         String num = buttonID.replace("ring_", "");
@@ -265,18 +269,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
+    @ButtonHandler("garboziaAbilityExhaust_")
     public static void garboziaAbilityExhaust(ButtonInteractionEvent event, Player player, Game game) {
         String planet = "garbozia";
         player.exhaustPlanetAbility(planet);
         new ExplorePlanet().explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
     }
 
+    @ButtonHandler("planetAbilityExhaust_")
     public static void planetAbilityExhaust(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("planetAbilityExhaust_", "");
         PlanetExhaustAbility.doAction(event, player, planet, game, true);
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("genericBuild_")
     public static void genericBuild(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("genericBuild_", "");
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "genericBuild", "place");
@@ -285,6 +292,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("genericModify_")
     public static void genericModify(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("genericModify_", "");
         Tile tile = game.getTileByPosition(pos);
@@ -292,6 +300,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("getModifyTiles")
     public static void getModifyTiles(Player player, Game game) {
         List<Button> buttons = ButtonHelper.getTilesToModify(player, game);
         String message = player.getRepresentation() + " Use the buttons to select the tile in which you wish to modify units. ";
@@ -2126,57 +2135,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next person to vote.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), voteMessage2, voteActionRow);
         ButtonHelper.deleteMessage(event);
-    }
-
-    public static void scPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String num = buttonID.replace("scPick_", "");
-        int scpick = Integer.parseInt(num);
-        if (game.getStoredValue("Public Disgrace") != null
-            && game.getStoredValue("Public Disgrace").contains("_" + scpick)
-            && (game.getStoredValue("Public Disgrace Only").isEmpty() || game.getStoredValue("Public Disgrace Only").contains(player.getFaction()))) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
-                    continue;
-                }
-                if (game.getStoredValue("Public Disgrace").contains(p2.getFaction())
-                    && p2.getActionCards().containsKey("disgrace")) {
-                    PlayAC.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
-                    game.setStoredValue("Public Disgrace", "");
-                    Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-                    int scNumber = scpick;
-                    Integer tgCount = scTradeGoods.get(scNumber);
-                    String msg = player.getRepresentationUnfogged() +
-                        "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
-
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getRepresentation()
-                            + " you have been Public Disgrace'd because someone preset it to occur when the number " + scpick
-                            + " was chosen. If this is a mistake or the Public Disgrace is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
-                    return;
-                }
-            }
-        }
-        if (game.getStoredValue("deflectedSC").equalsIgnoreCase(num)) {
-            if (player.getStrategicCC() < 1) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " You cant pick this SC because it has the deflection ability on it and you have no strat CC to spend");
-                return;
-            } else {
-                player.setStrategicCC(player.getStrategicCC() - 1);
-                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " spent 1 strat CC due to deflection");
-            }
-        }
-
-        if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
-            SCPick.secondHalfOfSCPickWhenChecksNBalances(event, player, game, scpick);
-        } else {
-            boolean pickSuccessful = Stats.secondHalfOfPickSC(event, game, player, scpick);
-            if (pickSuccessful) {
-                SCPick.secondHalfOfSCPick(event, player, game, scpick);
-                ButtonHelper.deleteMessage(event);
-            }
-        }
     }
 
     public static void reinforcementsCCPlacement(GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {

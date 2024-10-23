@@ -162,8 +162,7 @@ public class ButtonHelperFactionSpecific {
             player.getRepresentationUnfogged() + " Tell the bot where you want to place someone's CC", buttons);
     }
 
-    public static void resolveEdynAgendaStuffStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveEdynAgendaStuffStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         String pos = buttonID.split("_")[1];
         for (Player p2 : game.getRealPlayers()) {
@@ -185,8 +184,7 @@ public class ButtonHelperFactionSpecific {
             buttons);
     }
 
-    public static void resolveEdynAgendaStuffStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveEdynAgendaStuffStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
@@ -361,6 +359,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
+    @ButtonHandler("mahactStealCC_")
     public static void mahactStealCC(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String color = buttonID.replace("mahactStealCC_", "");
         String ident = player.getRepresentation(true, false);
@@ -373,7 +372,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ident + " already had a " + color + " CC in their fleet pool");
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "mahact", event);
+        CommanderUnlockCheck.checkPlayer(player, "mahact");
 
         if (ButtonHelper.isLawInPlay(game, "regulations")
             && (player.getFleetCC() + player.getMahactCC().size()) > 4) {
@@ -384,6 +383,7 @@ public class ButtonHelperFactionSpecific {
 
     }
 
+    @ButtonHandler("nekroStealTech_")
     public static void nekroStealTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String trueIdentity = player.getRepresentation();
         String faction = buttonID.replace("nekroStealTech_", "");
@@ -406,7 +406,6 @@ public class ButtonHelperFactionSpecific {
             }
             ButtonHelper.deleteTheOneButton(event);
         }
-
     }
 
     public static void handleTitansConstructionMechDeployStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
@@ -444,8 +443,7 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
-    public static void resolveStymiePlayerStep1(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveStymiePlayerStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player activePlayer = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String msg = player.getRepresentationUnfogged() + " choose the system in which you wish to stymie";
         List<Button> buttons = new ArrayList<>();
@@ -461,8 +459,7 @@ public class ButtonHelperFactionSpecific {
         PlayPN.resolvePNPlay("stymie", player, game, event);
     }
 
-    public static void resolveStymiePlayerStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveStymiePlayerStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
@@ -637,8 +634,8 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static void returnFightersToSpace(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("returnFFToSpace_")
+    public static void returnFightersToSpace(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -759,8 +756,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("tnelisDeploy_")
-    public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void tnelisDeploy(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet),
             "1 mech " + planet, game);
@@ -779,8 +775,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("raghsCallStepOne_")
-    public static void resolveRaghsCallStepOne(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveRaghsCallStepOne(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];
         PlayPN.resolvePNPlay("ragh", player, game, event);
         List<Button> buttons = new ArrayList<>();
@@ -798,8 +793,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("hacanMechTradeStepOne_")
-    public static void resolveHacanMechTradeStepOne(Player hacan, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveHacanMechTradeStepOne(Player hacan, Game game, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];
         String receiverFaction = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
@@ -816,8 +810,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("productionBiomes_")
-    public static void resolveProductionBiomesStep2(Player hacan, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveProductionBiomesStep2(Player hacan, Game game, ButtonInteractionEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -976,8 +969,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("raghsCallStepTwo_")
-    public static void resolveRaghsCallStepTwo(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveRaghsCallStepTwo(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];
         String newPlanet = buttonID.split("_")[2];
         Player saar = game.getPNOwner("ragh");
@@ -1009,8 +1001,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     @ButtonHandler("hacanMechTradeStepTwo_")
-    public static void resolveHacanMechTradeStepTwo(Player hacan, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveHacanMechTradeStepTwo(Player hacan, Game game, ButtonInteractionEvent event, String buttonID) {
         String origPlanet = buttonID.split("_")[1];
         String receiverFaction = buttonID.split("_")[2];
         String newPlanet = buttonID.split("_")[3];
@@ -2466,8 +2457,7 @@ public class ButtonHelperFactionSpecific {
                 + origATS + "->" + player.getAtsCount() + ")");
     }
 
-    public static void resolveRohDhnaIndustrious(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveRohDhnaIndustrious(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String tilePos = buttonID.split("_")[1];
         String toRemove = buttonID.split("_")[2];
         String planet = toRemove.split(" ")[1];
@@ -2514,8 +2504,7 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
-    public static void resolveRohDhnaRecycle(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveRohDhnaRecycle(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String unitName = buttonID.split("_")[1];
         new RemoveUnits().unitParsing(event, player.getColor(),
             game.getTileByPosition(game.getActiveSystem()), "1 " + unitName, game);

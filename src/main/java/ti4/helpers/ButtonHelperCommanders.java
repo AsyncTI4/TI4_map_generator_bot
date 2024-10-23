@@ -89,6 +89,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
+    @ButtonHandler("mentakCommander_")
     public static void mentakCommander(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String color = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(color);
@@ -106,6 +107,7 @@ public class ButtonHelperCommanders {
 
     }
 
+    @ButtonHandler("arboCommanderBuild_")
     public static void arboCommanderBuild(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("arboCommanderBuild_", "");
         List<Button> buttons;
@@ -115,8 +117,7 @@ public class ButtonHelperCommanders {
         }
         buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "arboCommander",
             "placeOneNDone_dontskiparboCommander");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
-            + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
+        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. " + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
 
@@ -193,8 +194,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("yinCommanderRemoval_")
-    public static void resolveYinCommanderRemoval(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveYinCommanderRemoval(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String unitHName = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
@@ -360,8 +360,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("placeGhostCommanderFF_")
-    public static void resolveGhostCommanderPlacement(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveGhostCommanderPlacement(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", game);
@@ -369,8 +368,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("placeKhraskCommanderInf_")
-    public static void resolveKhraskCommanderPlacement(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveKhraskCommanderPlacement(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "inf", game);
@@ -478,8 +476,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("utilizeSolCommander_")
-    public static void resolveSolCommander(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveSolCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileFromPlanet(planet);
@@ -489,6 +486,7 @@ public class ButtonHelperCommanders {
                 + Helper.getPlanetRepresentation(planet, game) + " using Claire Gibson, the Sol Commander.");
     }
 
+    @ButtonHandler("yssarilcommander_")
     public static void yssarilCommander(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("yssarilcommander_", "");
         String enemyFaction = buttonID.split("_")[1];

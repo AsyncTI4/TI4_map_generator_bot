@@ -711,26 +711,28 @@ public class ButtonHelperActionCards {
             buttons);
     }
 
+    @ButtonHandler("resolveEBSStep1_")
     public static void resolveEBSStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue("EBSFaction", player.getFaction());
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_spacecannonoffence");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`");
         }
         game.setStoredValue("EBSFaction", "");
 
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveBlitz_")
     public static void resolveBlitz(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue("BlitzFaction", player.getFaction());
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_bombardment");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`");
         }
         game.setStoredValue("BlitzFaction", "");
         ButtonHelper.deleteMessage(event);

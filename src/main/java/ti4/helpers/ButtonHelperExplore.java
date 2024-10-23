@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -17,6 +18,7 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperExplore {
 
+    @ButtonHandler("exploreFront_")
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
         new ExploreFrontier().expFront(event, game.getTileByPosition(pos), game, player);
@@ -43,6 +45,7 @@ public class ButtonHelperExplore {
 
     }
 
+    @ButtonHandler("freelancersBuild_")
     public static void freelancersBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("freelancersBuild_", "");
         List<Button> buttons;
@@ -50,15 +53,14 @@ public class ButtonHelperExplore {
         if (tile == null) {
             tile = game.getTileByPosition(planet);
         }
-        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "freelancers",
-            "placeOneNDone_dontskipfreelancers");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
-            + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
+        buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "freelancers", "placeOneNDone_dontskipfreelancers");
+        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. " + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
 
     }
 
+    @ButtonHandler("purge_Frags_")
     public static void purgeFrags(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String typeNAmount = buttonID.replace("purge_Frags_", "");
         String type = typeNAmount.split("_")[0];

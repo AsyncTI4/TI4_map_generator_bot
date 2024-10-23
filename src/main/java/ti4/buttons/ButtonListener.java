@@ -141,7 +141,6 @@ public class ButtonListener extends ListenerAdapter {
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {
 
-
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
             UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
@@ -160,104 +159,24 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
             UnfiledButtonHandlers.strategicAction(event, player, buttonID, game, mainGameChannel);
-
-
-
-
-
-
-        } else if (buttonID.startsWith("placeOneNDone_")) {
-            ButtonHelperModifyUnits.placeUnitAndDeleteButton(buttonID, event, game, player);
-        } else if (buttonID.startsWith("mitoMechPlacement_")) {
-            ButtonHelperAbilities.resolveMitosisMechPlacement(buttonID, event, game, player);
-        } else if (buttonID.startsWith("sendTradeHolder_")) {
-            ButtonHelper.sendTradeHolderSomething(player, game, buttonID, event);
-        } else if (buttonID.startsWith("place_")) {
-            ButtonHelperModifyUnits.genericPlaceUnit(buttonID, event, game, player);
-        } else if (buttonID.startsWith("yssarilcommander_")) {
-            ButtonHelperCommanders.yssarilCommander(buttonID, event, game, player);
-        } else if (buttonID.startsWith("setupHomebrew_")) {
-            ButtonHelper.setUpHomebrew(game, event, buttonID);
-        } else if (buttonID.startsWith("exploreFront_")) {
-            ButtonHelperExplore.exploreFront(game, player, event, buttonID);
-        } else if (buttonID.startsWith("nekroStealTech_")) {
-            ButtonHelperFactionSpecific.nekroStealTech(game, player, event, buttonID);
-        } else if (buttonID.startsWith("mentakCommander_")) {
-            ButtonHelperCommanders.mentakCommander(player, game, event, buttonID);
-        } else if (buttonID.startsWith("mahactStealCC_")) {
-            ButtonHelperFactionSpecific.mahactStealCC(game, player, event, buttonID);
-        } else if (buttonID.startsWith("returnFFToSpace_")) {
-            ButtonHelperFactionSpecific.returnFightersToSpace(player, game, event, buttonID);
-        } else if (buttonID.startsWith("cutTape_")) {
-            ButtonHelper.cutTape(game, buttonID, event);
-        } else if (buttonID.startsWith("ancientTradeRoutesStep2_")) {
-            ButtonHelperActionCardsWillHomebrew.resolveAncientTradeRoutesStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("armsDealStep2_")) {
-            ButtonHelperActionCardsWillHomebrew.resolveArmsDealStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("defenseInstallationStep2_")) {
-            ButtonHelperActionCardsWillHomebrew.resolveDefenseInstallationStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("freelancersBuild_")) {
-            ButtonHelperExplore.freelancersBuild(game, player, event, buttonID);
-        } else if (buttonID.startsWith("arboCommanderBuild_")) {
-            ButtonHelperCommanders.arboCommanderBuild(player, game, event, buttonID);
-        } else if (buttonID.startsWith("tacticalActionBuild_")) {
-            ButtonHelperTacticalAction.buildWithTacticalAction(player, game, event, buttonID);
-        } else if (buttonID.startsWith("getModifyTiles")) {
-            UnfiledButtonHandlers.getModifyTiles(player, game);
-        } else if (buttonID.startsWith("genericModify_")) {
-            UnfiledButtonHandlers.genericModify(event, player, buttonID, game);
-        } else if (buttonID.startsWith("genericBuild_")) {
-            UnfiledButtonHandlers.genericBuild(event, player, buttonID, game);
         } else if (buttonID.startsWith("getSwapButtons_")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Swap", ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, game, true));
-        } else if (buttonID.startsWith("planetAbilityExhaust_")) {
-            UnfiledButtonHandlers.planetAbilityExhaust(event, player, buttonID, game);
-        } else if (buttonID.startsWith("garboziaAbilityExhaust_")) {
-            UnfiledButtonHandlers.garboziaAbilityExhaust(event, player, game);
-        } else if (buttonID.startsWith("checksNBalancesPt2_")) {
-            SCPick.resolvePt2ChecksNBalances(event, player, game, buttonID);
-        } else if (buttonID.startsWith("freeSystemsHeroPlanet_")) {
-            ButtonHelperHeroes.freeSystemsHeroPlanet(buttonID, event, game, player);
-        } else if (buttonID.startsWith("scPick_")) {
-            UnfiledButtonHandlers.scPick(event, game, player, buttonID);
         } else if (buttonID.startsWith("milty_")) {
             game.getMiltyDraftManager().doMiltyPick(event, game, buttonID, player);
         } else if (buttonID.startsWith("showMiltyDraft")) {
             game.getMiltyDraftManager().repostDraftInformation(game);
         } else if (nullable != null && buttonID.startsWith("miltyFactionInfo_")) {
             UnfiledButtonHandlers.miltyFactionInfo(player, buttonID, game);
-        } else if (buttonID.startsWith("ring_")) {
-            UnfiledButtonHandlers.ring(event, player, buttonID, game);
-        } else if (buttonID.startsWith("getACFrom_")) {
-            UnfiledButtonHandlers.getACFrom(event, player, buttonID, game);
-        } else if (buttonID.startsWith("steal2tg_")) {
-            new TrapReveal().steal2Tg(player, game, event, buttonID);
-        } else if (buttonID.startsWith("steal3comm_")) {
-            new TrapReveal().steal3Comm(player, game, event, buttonID);
-        } else if (buttonID.startsWith("specialRex_")) {
-            ButtonHelper.resolveSpecialRex(player, game, buttonID, event);
-        } else if (buttonID.startsWith("doActivation_")) {
-            UnfiledButtonHandlers.doActivation(event, player, buttonID, game);
-        } else if (buttonID.startsWith("getTilesThisFarAway_")) {
-            ButtonHelperTacticalAction.getTilesThisFarAway(player, game, event, buttonID);
-        } else if (buttonID.startsWith("ringTile_")) {
-            ButtonHelperTacticalAction.selectActiveSystem(player, game, event, buttonID);
-        } else if (buttonID.startsWith("genericRemove_")) {
-            UnfiledButtonHandlers.genericRemove(event, player, buttonID, game);
-        } else if (buttonID.startsWith("tacticalMoveFrom_")) {
-            ButtonHelperTacticalAction.selectTileToMoveFrom(player, game, event, buttonID);
-        } else if (buttonID.startsWith("resolvePreassignment_")) {
-            ButtonHelper.resolvePreAssignment(player, game, event, buttonID);
-        } else if (buttonID.startsWith("removePreset_")) {
-            ButtonHelper.resolveRemovalOfPreAssignment(player, game, event, buttonID);
-        } else if (buttonID.startsWith("purge_Frags_")) {
-            ButtonHelperExplore.purgeFrags(game, player, event, buttonID);
-        } else if (buttonID.startsWith("resolveEBSStep1_")) {
-            ButtonHelperActionCards.resolveEBSStep1(player, game, event, buttonID);
-        } else if (buttonID.startsWith("resolveBlitz_")) {
-            ButtonHelperActionCards.resolveBlitz(player, game, event, buttonID);
-        } else if (buttonID.startsWith("resolveShrapnelTurrets_")) {// resolveShrapnelTurrets_
-            ButtonHelperActionCardsWillHomebrew.resolveShrapnelTurrets(player, game, event, buttonID);
+
+
+
+
+
+
+
+
+
+
         } else if (buttonID.startsWith("unitTactical")) {
             ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, game, player);
         } else if (buttonID.startsWith("naaluHeroInitiation")) {
