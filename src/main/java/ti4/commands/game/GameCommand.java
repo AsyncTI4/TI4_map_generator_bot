@@ -50,27 +50,29 @@ public class GameCommand implements Command {
         }
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        if (game == null)
-            return;
+        if (game == null) return;
         if (!undoCommand) {
             GameSaveLoadManager.saveMap(game, event);
         }
-        CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(game, event);
-        if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
-            && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
-            && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)
-            && !Constants.OBSERVER.equalsIgnoreCase(subcommandName)) {
-            fileFuture.thenAccept(fileUpload -> {
+
+        // Post Map Image Unless Command is x
+        if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) &&
+            !Constants.PING.equalsIgnoreCase(subcommandName) &&
+            !Constants.SET_DECK.equalsIgnoreCase(subcommandName) &&
+            !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName) &&
+            !Constants.OBSERVER.equalsIgnoreCase(subcommandName) &&
+            !Constants.OPTIONS.equalsIgnoreCase(subcommandName)) {
+
+            MapGenerator.saveImage(game, event).thenAccept(fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {
-                    Button linkToWebsite = Button.link(
-                        "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
+                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
                     buttons.add(linkToWebsite);
                     buttons.add(Buttons.green("gameInfoButtons", "Player Info"));
                 }
                 buttons.add(Buttons.green("cardsInfo", "Cards Info"));
                 buttons.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                buttons.add(Buttons.gray("showGameAgain", "Show Game"));
+                buttons.add(Buttons.gray("showGameAgain", "Show Game (Refresh Map)"));
                 MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, "", buttons);
             });
         }
@@ -104,6 +106,7 @@ public class GameCommand implements Command {
         subcommands.add(new Swap());
         subcommands.add(new Observer());
         subcommands.add(new Tags());
+        subcommands.add(new GameOptions());
         // subcommands.add(new ReverseSpeakerOrder());
         return subcommands;
     }

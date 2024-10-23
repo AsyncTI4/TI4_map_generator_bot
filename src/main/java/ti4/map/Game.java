@@ -195,6 +195,8 @@ public class Game extends GameProperties {
         // OTHER
         setEvents(new ArrayList<>()); // ignis_aurora
         addCustomPO(Constants.CUSTODIAN, 1);
+        setUpPeakableObjectives(5, 1);
+        setUpPeakableObjectives(5, 2);
     }
 
     public void fixScrewedSOs() {

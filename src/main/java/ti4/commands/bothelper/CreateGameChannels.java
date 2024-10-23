@@ -2,6 +2,7 @@ package ti4.commands.bothelper;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -11,6 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,21 +28,27 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
+import okhttp3.internal.ws.RealWebSocket.Message;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.commands.game.GameCreate;
 import ti4.commands.help.NewPlayerInfo;
+import ti4.commands.map.AddTileList;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -47,6 +57,8 @@ import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.TIGLHelper;
+import ti4.listeners.annotations.ButtonHandler;
+import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -256,47 +268,22 @@ public class CreateGameChannels extends BothelperSubcommandData {
             MessageHelper.sendMessageToChannel(newGame.getMainGameChannel(), "You will need to make your own bot-map-updates thread. Ping bothelper if you don't know how");
         }
 
-        introductionToTableTalkChannel(newGame);
-        introductionToActionsChannel(newGame);
-        sendMessageAboutAggressionMetas(newGame);
-
         // Create Cards Info Threads
         for (Player player : newGame.getPlayers().values()) {
             player.createCardsInfoThreadChannelsIfRequired();
         }
 
-        Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
-        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to set up a Milty Draft?", miltyButton);
-
-        List<Button> homebrewButtons = new ArrayList<>();
-        homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
-        homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
-
-        List<Button> factionReactButtons = new ArrayList<>();
-        factionReactButtons.add(Buttons.green("enableAidReacts", "Yes, Enable Faction Reactions"));
-        factionReactButtons.add(Buttons.red("deleteButtons", "No Faction Reactions"));
-        MessageHelper.sendMessageToChannel(actionsChannel, "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember your faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under `/custom customization`", factionReactButtons);
-
-        List<Button> hexBorderButtons = new ArrayList<>();
-        hexBorderButtons.add(Buttons.green("showHexBorders_dash", "Dashed line"));
-        hexBorderButtons.add(Buttons.blue("showHexBorders_solid", "Solid line"));
-        hexBorderButtons.add(Buttons.red("showHexBorders_off", "Off (default)"));
-        MessageHelper.sendMessageToChannel(actionsChannel, "Show borders around systems with player's ships, either a dashed line or a solid line. You can also control this setting with `/custom customization`", hexBorderButtons);
-
-        MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the AsyncTI4 code of conduct, which is described here: https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006");
-
+        // Report Channel Creation back to Launch channel
         String message = "Role and Channels have been set up:\n> " +
             role.getName() + "\n> " +
             chatChannel.getAsMention() + "\n> " +
             actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        newGame.setUpPeakableObjectives(5, 1);
-        newGame.setUpPeakableObjectives(5, 2);
-
         GameSaveLoadManager.saveMap(newGame, event);
         GameCreate.reportNewGameCreated(newGame);
+
+        presentSetupToPlayers(newGame);
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread && thread.getParentChannel().getName().equals("making-new-games")) {
@@ -312,6 +299,25 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
             manager.queue();
         }
+    }
+
+    private static void presentSetupToPlayers(Game game) {
+        introductionToTableTalkChannel(game);
+        introductionToActionsChannel(game);
+        sendMessageAboutAggressionMetas(game);
+
+        MessageChannel actionsChannel = game.getActionsChannel();
+
+        Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
+        Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
+        MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "How would you like to set up the players and map?", List.of(miltyButton, addMapString));
+
+        Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
+        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
+
+        offerGameHomebrewButtons(actionsChannel);
+
+        MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
     }
 
     private static void introductionToBotMapUpdatesThread(Game game) {
@@ -664,8 +670,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // Derive a category name logically
-        int maxGamesPerCategory = Math.max(1, Math.min(25,
-            GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+        int maxGamesPerCategory = Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
         int upperBound = lowerBound + maxGamesPerCategory - 1;
@@ -716,5 +721,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .filter(role -> role.getName().equalsIgnoreCase(name))
             .findFirst()
             .orElse(null);
+    }
+
+    @ButtonHandler("offerGameHomebrewButtons")
+    public static void offerGameHomebrewButtons(MessageChannel channel) {
+        List<Button> homebrewButtons = new ArrayList<>();
+        homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
+        homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
+        MessageHelper.sendMessageToChannel(channel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
     }
 }

@@ -167,6 +167,7 @@ public class SCPlay extends PlayerSubcommandData {
                 continue;
             }
             player2.removeFollowedSC(scToPlay);
+            player2.getCardsInfoThread(); // force thread to open if closed
         }
 
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
