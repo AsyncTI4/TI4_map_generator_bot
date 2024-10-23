@@ -824,7 +824,7 @@ public class MapGenerator {
                         } else {
                             superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
-                                game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
+                                // game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
                                 // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
@@ -3354,7 +3354,7 @@ public class MapGenerator {
                     int fontYoffset = (scsize / 2) + 25;
                     superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     if (scModel != null) {
-                        game.addWebsiteOverlay("strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        game.addWebsiteOverlay(player, "strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
                         // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
                     }
                     point.translate(scsize, 0);
