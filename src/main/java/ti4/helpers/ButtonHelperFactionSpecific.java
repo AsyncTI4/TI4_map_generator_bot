@@ -690,7 +690,8 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
-    public static void rollAmbush(Player player, Game game, Tile tile, ButtonInteractionEvent event) {
+    public static void rollAmbush(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get("space");
         int numCruisers = Math.min(2, space.getUnitCount(UnitType.Cruiser, player.getColor()));
         int remaining = 2 - numCruisers;
@@ -1262,6 +1263,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("dihmohnfs_")
     public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4. They cannot produce ships if enemy ships are in the system. ");
         String pos = buttonID.replace("dihmohnfs_", "");
@@ -2243,6 +2245,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("creussIFFStart_")
     public static void resolveCreussIFFStart(Game game, @NotNull Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(game, player, type);

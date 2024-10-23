@@ -541,6 +541,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
+    @ButtonHandler("attachAttachment_")
     public static void resolveAttachAttachment(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
@@ -584,6 +585,7 @@ public class ButtonHelperHeroes {
         return buttons;
     }
 
+    @ButtonHandler("findAttachmentInDeck_")
     public static void findAttachmentInDeck(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
@@ -642,6 +644,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, buttons);
     }
 
+    @ButtonHandler("florzenHeroStep2_")
     public static void resolveFlorzenHeroStep2(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];
@@ -659,8 +662,9 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveTnelisHeroAttach(Player tnelis, Game game, String soID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("tnelisHeroAttach_")
+    public static void resolveTnelisHeroAttach(Player tnelis, Game game, String buttonID, ButtonInteractionEvent event) {
+        String soID = buttonID.split("_")[1];
         Map<String, Integer> customPOs = new HashMap<>(game.getRevealedPublicObjectives());
         for (String customPO : customPOs.keySet()) {
             if (customPO.contains("Tnelis Hero")) {
@@ -1554,6 +1558,7 @@ public class ButtonHelperHeroes {
         }
     }
 
+    @ButtonHandler("yinHeroInfantry_")
     public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planetNInf = buttonID.replace("yinHeroInfantry_", "");
         String planet = planetNInf.split("_")[0];
@@ -2082,6 +2087,7 @@ public class ButtonHelperHeroes {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which player owns the planet you want to land on", buttons);
     }
 
+    @ButtonHandler("yinHeroTarget_")
     public static void yinHeroTarget(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String faction = buttonID.replace("yinHeroTarget_", "");
         List<Button> buttons = new ArrayList<>();
@@ -2095,6 +2101,7 @@ public class ButtonHelperHeroes {
         }
     }
 
+    @ButtonHandler("yinHeroPlanet_")
     public static void yinHeroPlanet(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String planet = buttonID.replace("yinHeroPlanet_", "");
         if (planet.equalsIgnoreCase("lockedmallice")) {

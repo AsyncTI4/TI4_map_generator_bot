@@ -50,6 +50,7 @@ import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
+import ti4.commands.game.Swap;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
@@ -1445,6 +1446,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.resolveNullificationFieldUse(player, attacker, game, tile, event);
     }
 
+    @ButtonHandler("mahactMechHit_")
     public static void mahactMechHit(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.split("_")[1];
         String color = buttonID.split("_")[2];
@@ -1453,12 +1455,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.resolveMahactMechAbilityUse(player, attacker, game, tile, event);
     }
 
-    public static void getPsychoButtons(Player player, Game game) {
+    @ButtonHandler("getPsychoButtons")
+    public static void offerPsychoButtons(Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " use buttons to get 1TG per planet exhausted.",
+            player.getRepresentationUnfogged() + " use buttons to gain " + Emojis.tg + " per planet exhausted.",
             ButtonHelper.getPsychoTechPlanets(game, player));
     }
 
+    @ButtonHandler("getAgentSelection_")
     public static void getAgentSelection(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         ButtonHelper.deleteTheOneButton(event);
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID.split("_")[1]);
@@ -1630,6 +1634,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
+    @ButtonHandler(Constants.AC_PLAY_FROM_HAND)
     public static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) { //TODO: bake this into /ac play
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel = game.getMainGameChannel();
@@ -3941,5 +3946,17 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         StartPhase.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("dsdihmy_")
+    public static void dsDihmhonYellowTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelper.deleteMessage(event);
+        ButtonHelperFactionSpecific.resolveImpressmentPrograms(buttonID, event, game, player);
+    }
+
+    @ButtonHandler("swapToFaction_")
+    public static void swapToFaction(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String faction = buttonID.replace("swapToFaction_", "");
+        Swap.secondHalfOfSwap(game, player, game.getPlayerFromColorOrFaction(faction), event.getUser(), event);
     }
 }

@@ -1056,6 +1056,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("hitOpponent_")
     public static void resolveGettingHit(Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
@@ -1122,6 +1123,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("retreatGroundUnits_")
     public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("retreatGroundUnits_", "").replace("'", "");

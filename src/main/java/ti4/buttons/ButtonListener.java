@@ -17,26 +17,14 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.DiscardSO;
-import ti4.commands.cardsso.SOInfo;
 import ti4.commands.ds.TrapReveal;
-import ti4.commands.franken.FrankenApplicator;
 import ti4.commands.game.CreateGameButton;
-import ti4.commands.game.Swap;
-import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.planet.PlanetInfo;
-import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.UnitInfo;
 import ti4.commands.relic.RelicDraw;
-import ti4.commands.relic.RelicInfo;
 import ti4.commands.search.SearchMyGames;
-import ti4.commands.special.NaaluCommander;
 import ti4.commands.status.ListPlayerInfoButton;
-import ti4.commands.tech.TechInfo;
-import ti4.commands.uncategorized.CardsInfo;
-import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -151,94 +139,16 @@ public class ButtonListener extends ListenerAdapter {
         if (handleKnownButtons(context)) return;
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
-        if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
-            UnfiledButtonHandlers.acPlayFromHand(event, buttonID, game, player);
+        if (false) {
+
+
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
             UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             UnfiledButtonHandlers.soScoreFromHand(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
-        } else if (buttonID.startsWith("dihmohnfs_")) {
-            ButtonHelperFactionSpecific.resolveDihmohnFlagship(buttonID, event, game, player);
-        } else if (buttonID.startsWith("dsdihmy_")) {
-            ButtonHelper.deleteMessage(event);
-            ButtonHelperFactionSpecific.resolveImpressmentPrograms(buttonID, event, game, player);
-        } else if (buttonID.startsWith("swapToFaction_")) {
-            String faction = buttonID.replace("swapToFaction_", "");
-            Swap.secondHalfOfSwap(game, player, game.getPlayerFromColorOrFaction(faction), event.getUser(), event);
-        } else if (buttonID.startsWith("yinHeroInfantry_")) {
-            ButtonHelperHeroes.lastStepOfYinHero(buttonID, event, game, player);
-        } else if (buttonID.startsWith("drawSpecificSO_")) {
-            DiscardSO.drawSpecificSO(event, player, buttonID.split("_")[1], game);
-        } else if (buttonID.startsWith("tnelisHeroAttach_")) {
-            ButtonHelperHeroes.resolveTnelisHeroAttach(player, game, buttonID.split("_")[1], event);
-        } else if (buttonID.startsWith("arcExp_")) {
-            ButtonHelperActionCards.resolveArcExpButtons(game, player, buttonID, event);
-        } else if (buttonID.startsWith("rollForAmbush_")) {
-            ButtonHelperFactionSpecific.rollAmbush(player, game, game.getTileByPosition(buttonID.split("_")[1]), event);
-        } else if (buttonID.startsWith("creussIFFStart_")) {
-            ButtonHelperFactionSpecific.resolveCreussIFFStart(game, player, buttonID, event);
-        } else if (buttonID.startsWith("acToSendTo_")) {
-            ButtonHelperHeroes.lastStepOfYinHero(buttonID, event, game, player);
-        } else if (buttonID.startsWith("yinHeroPlanet_")) {
-            ButtonHelperHeroes.yinHeroPlanet(event, buttonID, game, player);
-        } else if (buttonID.startsWith("yinHeroTarget_")) {
-            ButtonHelperHeroes.yinHeroTarget(event, buttonID, game, player);
-        } else if (buttonID.startsWith("getAgentSelection_")) {
-            UnfiledButtonHandlers.getAgentSelection(event, buttonID, game, player);
-        } else if (buttonID.startsWith("hacanAgentRefresh_")) {
-            ButtonHelperAgents.hacanAgentRefresh(buttonID, event, game, player);
-        } else if (buttonID.startsWith("cheiranAgentStep2_")) {
-            ButtonHelperAgents.resolveCheiranAgentStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("freeSystemsAgentStep2_")) {
-            ButtonHelperAgents.resolveFreeSystemsAgentStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("florzenAgentStep2_")) {
-            ButtonHelperAgents.resolveFlorzenAgentStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("florzenHeroStep2_")) {
-            ButtonHelperHeroes.resolveFlorzenHeroStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("florzenAgentStep3_")) {
-            ButtonHelperAgents.resolveFlorzenAgentStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("attachAttachment_")) {
-            ButtonHelperHeroes.resolveAttachAttachment(player, game, buttonID, event);
-        } else if (buttonID.startsWith("findAttachmentInDeck_")) {
-            ButtonHelperHeroes.findAttachmentInDeck(player, game, buttonID, event);
-        } else if (buttonID.startsWith("cheiranAgentStep3_")) {
-            ButtonHelperAgents.resolveCheiranAgentStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("celdauriAgentStep3_")) {
-            ButtonHelperAgents.resolveCeldauriAgentStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("kolleccAgentResStep2_")) {
-            ButtonHelperAgents.kolleccAgentResStep2(buttonID, event, game, player);
-        } else if (buttonID.startsWith("hitOpponent_")) {
-            ButtonHelperModifyUnits.resolveGettingHit(game, event, buttonID);
-        } else if (buttonID.startsWith("getPsychoButtons")) {
-            UnfiledButtonHandlers.getPsychoButtons(player, game);
-        } else if (buttonID.startsWith("retreatGroundUnits_")) {
-            ButtonHelperModifyUnits.retreatGroundUnits(buttonID, event, game, player);
-        } else if (buttonID.startsWith("resolveShipOrder_")) {
-            ButtonHelperAbilities.resolveAxisOrderExhaust(player, game, event, buttonID);
-        } else if (buttonID.startsWith("buyAxisOrder_")) {
-            ButtonHelperAbilities.resolveAxisOrderBuy(player, game, event, buttonID);
-        } else if (buttonID.startsWith("bindingDebtsRes_")) {
-            ButtonHelperAbilities.bindingDebtRes(game, player, event, buttonID);
-        } else if (buttonID.startsWith("mercenariesStep1_")) {
-            ButtonHelperAbilities.mercenariesStep1(game, player, event, buttonID);
-        } else if (buttonID.startsWith("mercenariesStep2_")) {
-            ButtonHelperAbilities.mercenariesStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("mercenariesStep3_")) {
-            ButtonHelperAbilities.mercenariesStep3(game, player, event, buttonID);
-        } else if (buttonID.startsWith("mercenariesStep4_")) {
-            ButtonHelperAbilities.mercenariesStep4(game, player, event, buttonID);
-        } else if (buttonID.startsWith("rallyToTheCauseStep2_")) {
-            ButtonHelperAbilities.rallyToTheCauseStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("startRallyToTheCause")) {
-            ButtonHelperAbilities.startRallyToTheCause(game, player, event);
-        } else if (buttonID.startsWith("startFacsimile_")) {
-            ButtonHelperAbilities.startFacsimile(game, player, event, buttonID);
-        } else if (buttonID.startsWith("facsimileStep2_")) {
-            ButtonHelperAbilities.resolveFacsimileStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("naaluCommander")) {
-            new NaaluCommander().secondHalfOfNaaluCommander(event, game, player);
-        } else if (buttonID.startsWith("mahactMechHit_")) {
-            UnfiledButtonHandlers.mahactMechHit(event, player, buttonID, game);
+
+
+
         } else if (buttonID.startsWith("nullificationField_")) {
             UnfiledButtonHandlers.nullificationField(event, player, buttonID, game);
         } else if (buttonID.startsWith("benedictionStep1_")) {

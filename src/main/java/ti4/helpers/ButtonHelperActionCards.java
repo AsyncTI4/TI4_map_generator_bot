@@ -414,6 +414,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    @ButtonHandler("arcExp_")
     public static void resolveArcExpButtons(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.replace("arcExp_", "");
         StringBuilder sb = new StringBuilder();
@@ -430,7 +431,7 @@ public class ButtonHelperActionCards {
         }
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
-        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+        CommanderUnlockCheck.checkPlayer(player, "kollecc");
 
         ButtonHelper.deleteMessage(event);
     }
