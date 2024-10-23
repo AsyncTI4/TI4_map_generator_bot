@@ -2458,13 +2458,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("enableAidReacts")
-    public static void enableAidReact(ButtonInteractionEvent event, Game game) {
-        game.setBotFactionReacts(true);
-        ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Faction reaction icons have been enabled");
-    }
-
     @ButtonHandler("purgeHacanHero")
     public static void purgeHacanHero(ButtonInteractionEvent event, Player player) {
         Leader playerLeader = player.unsafeGetLeader("hacanhero");
