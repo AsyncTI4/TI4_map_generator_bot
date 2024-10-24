@@ -189,6 +189,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "covert_operation",
+    "name": "Covert Operation",
+    "phase": "Action",
+    "window": "After you move ships into the active system",
+    "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
+    "flavorText": "The sensors of the lead ship erupted with damage alerts as a fleet of unmarked ships poured from the wormhole, raining destruction on the unsuspecting convoy.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "data_archive",
     "name": "Data Archive",
     "phase": "Agenda",
@@ -969,15 +978,6 @@
     "window": "After you activate a system",
     "text": "During this tactical action, apply +1 to the capacity value of each of your ships that have a capacity value.",
     "flavorText": "The cargo ships blasted out of the planet's gravity field. Vast space and time lay before them. For all, it meant the promise of new life; for some, it would mean death.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "stealth_mission",
-    "name": "Stealth Mission",
-    "phase": "Action",
-    "window": "After you move ships into the active system",
-    "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
-    "flavorText": "The sensors of the lead ship erupted with damage alerts as a fleet of unmarked ships poured from the wormhole, raining destruction on the unsuspecting convoy.",
     "source": "action_deck_2"
   },
   {
