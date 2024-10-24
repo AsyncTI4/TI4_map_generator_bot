@@ -496,9 +496,9 @@ public class ButtonHelper {
         List<Button> goAgainButtons = new ArrayList<>();
         Button button = Buttons.gray("transactWith_" + p2.getColor(), "Send something else to player?");
         Button done = Buttons.gray("finishTransaction_" + p2.getColor(), "Done With This Transaction");
-        String ident = getIdentOrColor(p1, game);
+        String ident = p1.getFactionEmojiOrColor();
         String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, game) + " to "
-            + getIdentOrColor(p2, game);
+            + p2.getFactionEmojiOrColor();
         goAgainButtons.add(button);
         goAgainButtons.add(done);
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect something in return"));
@@ -531,8 +531,8 @@ public class ButtonHelper {
         List<Button> goAgainButtons = new ArrayList<>();
         Button button = Buttons.gray("transactWith_" + p2.getColor(), "Send something else to player?");
         Button done = Buttons.gray("finishTransaction_" + p2.getColor(), "Done With This Transaction");
-        String ident = getIdentOrColor(p1, game);
-        String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, game) + " to " + getIdentOrColor(p2, game);
+        String ident = p1.getFactionEmojiOrColor();
+        String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(dmzPlanet, game) + " to " + p2.getFactionEmojiOrColor();
         goAgainButtons.add(button);
         goAgainButtons.add(done);
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect something in return"));
@@ -590,7 +590,7 @@ public class ButtonHelper {
     @ButtonHandler("forceARefresh_")
     public static void forceARefresh(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String msg = player.getFactionEmoji() + " forced " + getIdentOrColor(p2, game) + " to refresh";
+        String msg = player.getFactionEmoji() + " forced " + p2.getFactionEmojiOrColor() + " to refresh";
         String msg2 = p2.getRepresentationUnfogged() + " the trade holder has forced you to refresh";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg2);
@@ -1947,7 +1947,7 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
-        String ident = getIdentOrColor(player, game);
+        String ident = player.getFactionEmojiOrColor();
         String msg = ident + " removed CC from " + tileRep;
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
@@ -4304,27 +4304,7 @@ public class ButtonHelper {
         return tile.getUnitHolders().get(AliasHandler.resolvePlanet(planetName.toLowerCase()));
     }
 
-    /**
-     * @deprecated just use {@link Player#getFactionEmoji()} instead
-     */
-    @Deprecated
-    public static String getIdent(Player player) {
-        return player.getFactionEmoji();
-    }
-
-    /**
-     * @deprecated just use {@link Player#getFactionEmojiOrColor()} instead
-     */
-    @Deprecated
-    public static String getIdentOrColor(Player player, Game game) {
-        if (game.isFowMode()) {
-            return StringUtils.capitalize(player.getColor());
-        }
-        return player.getFactionEmoji();
-    }
-
-    public static String buildMessageFromDisplacedUnits(Game game, boolean landing, Player player,
-        String moveOrRemove, Tile tile) {
+    public static String buildMessageFromDisplacedUnits(Game game, boolean landing, Player player, String moveOrRemove, Tile tile) {
         String message;
         Map<String, Integer> displacedUnits = game.getCurrentMovedUnitsFrom1System();
         String prefix = " > " + player.getFactionEmoji();
@@ -6563,16 +6543,16 @@ public class ButtonHelper {
         if (p2.hasAbility("scheming")) {
             game.drawActionCard(p2.getUserID());
             game.drawActionCard(p2.getUserID());
-            message = getIdent(p2) + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons";
+            message = p2.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 p2.getRepresentationUnfogged() + " use buttons to discard",
                 ACInfo.getDiscardActionCardButtons(game, p2, false));
         } else if (p2.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
-            message = getIdent(p2) + " Triggered Autonetic Memory Option";
+            message = p2.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(p2.getUserID());
-            message = getIdent(p2) + " Drew 1 AC";
+            message = p2.getFactionEmoji() + " Drew 1 AC";
             ACInfo.sendActionCardInfo(game, p2, event);
         }
         return message;

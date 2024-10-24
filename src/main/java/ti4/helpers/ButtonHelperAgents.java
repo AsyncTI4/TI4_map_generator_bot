@@ -1627,7 +1627,7 @@ public class ButtonHelperAgents {
         bentor.addFragment(frag);
         ExploreModel cardInfo = Mapper.getExplore(frag);
         String msg = player.getFactionEmojiOrColor() + " lost a " + cardInfo.getName() + " to "
-            + ButtonHelper.getIdentOrColor(bentor, game) + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + bentor.getFactionEmojiOrColor() + " due to " + (bentor.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Queen Lucreia, the Kortali" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode() && bentor != player) {

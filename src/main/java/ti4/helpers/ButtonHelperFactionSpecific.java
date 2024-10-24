@@ -1143,7 +1143,7 @@ public class ButtonHelperFactionSpecific {
                         amount + " " + unit, game);
                     MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
                         cabal.getRepresentationUnfogged() + " released " + amount + " "
-                            + ButtonHelper.getIdentOrColor(blockader, game) + " " + unit
+                            + blockader.getFactionEmojiOrColor() + " " + unit
                             + " from prison due to blockade");
                     if (cabal != blockader) {
                         MessageHelper.sendMessageToChannel(blockader.getCorrectChannel(),
