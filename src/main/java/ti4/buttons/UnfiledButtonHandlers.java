@@ -1178,7 +1178,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)
     public static void sc3AssignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
-        faction = buttonID.replace("assignSpeaker_", "");
+        faction = faction.replace("assignSpeaker_", "");
         game.setStoredValue("hasntSetSpeaker", "");
         if (game != null) {
             for (Player player_ : game.getPlayers().values()) {
