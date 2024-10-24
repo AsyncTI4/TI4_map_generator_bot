@@ -513,15 +513,6 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "last_minute_deliberation",
-    "name": "Last Minute Deliberation",
-    "phase": "Agenda",
-    "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Ready up to 3 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
-    "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
-    "source": "action_deck_2"
-  },
-  {
     "alias": "lazax_cache",
     "name": "Lazax Cache",
     "phase": "Action",
@@ -981,6 +972,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "stealth_mission",
+    "name": "Stealth Mission",
+    "phase": "Action",
+    "window": "After you move ships into the active system",
+    "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
+    "flavorText": "The sensors of the lead ship erupted with damage alerts as a fleet of unmarked ships poured from the wormhole, raining destruction on the unsuspecting convoy.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "stolen_prototype",
     "name": "Stolen Prototype",
     "phase": "Action",
@@ -1012,8 +1012,8 @@
     "name": "Syndicate",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal 3 cards from the top of the action card deck. Give 1 of those cards to up to 3 different players and discard the rest. During this turn, you can exchange action cards as part of transactions with those players. [Note: When giving away the action cards, you may choose yourself as 1 of the recipients.]",
-    "flavorText": "\"What if I'm not ready, Harka?\" the operative asked, looking away. Harka squeezed her hand. \"The Keleres chose me to lead because my crews have never failed a job. Now, I've chosen you. Believe in me, who believes in you.\"",
+    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player draws 1 of those cards of your choice. During this turn, you can exchange action cards as part of transactions.",
+    "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
     "source": "action_deck_2"
   },
   {

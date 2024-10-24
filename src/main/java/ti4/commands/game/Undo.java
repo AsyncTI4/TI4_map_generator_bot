@@ -69,10 +69,10 @@ public class Undo extends GameSubcommandData {
         }
         String intToUndoBackTo = gameToUndoBackTo.replace(game.getName() + "_", "").replace(".txt", "");
 
-        Integer gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo);
+        int gameToUndoBackToNumber = Integer.parseInt(intToUndoBackTo);
 
         Map<String, Game> undoFiles = getAllUndoSavedGames(game);
-        Integer maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(game.getName() + "_", "").replace(".txt", ""))
+        int maxSaveNumber = undoFiles.keySet().stream().map(s -> s.replace(game.getName() + "_", "").replace(".txt", ""))
             .mapToInt(Integer::parseInt).max().orElseThrow(NoSuchElementException::new);
 
         String undoFileToRestorePath = game.getName() + "_" + gameToUndoBackToNumber + ".txt";
