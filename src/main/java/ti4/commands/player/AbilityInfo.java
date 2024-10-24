@@ -11,6 +11,7 @@ import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -34,6 +35,7 @@ public class AbilityInfo extends PlayerSubcommandData {
         sendAbilityInfo(game, player, event);
     }
 
+    @ButtonHandler("refreshAbilityInfo")
     public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);

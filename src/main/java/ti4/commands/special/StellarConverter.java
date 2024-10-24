@@ -3,6 +3,7 @@ package ti4.commands.special;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -15,6 +16,7 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -52,6 +54,12 @@ public class StellarConverter extends SpecialSubcommandData {
         secondHalfOfStellar(game, planetName, event);
     }
 
+    @ButtonHandler("stellarConvert_")
+    public static void resolveStellar(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        secondHalfOfStellar(game, buttonID.split("_")[1], event);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static void secondHalfOfStellar(Game game, String planetName, GenericInteractionCreateEvent event) {
 
         Tile tile = game.getTileFromPlanet(planetName);
@@ -65,8 +73,7 @@ public class StellarConverter extends SpecialSubcommandData {
             return;
         }
 
-        String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" :
-            "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
+        String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
         postTileInDisasterWatch(game, tile, 1, "Moments before disaster in game " + game.getName());
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 

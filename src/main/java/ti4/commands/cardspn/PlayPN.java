@@ -7,6 +7,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -19,8 +20,10 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.ComponentActionHelper;
@@ -28,10 +31,12 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 
 public class PlayPN extends PNCardsSubcommandData {
@@ -383,6 +388,38 @@ public class PlayPN extends PNCardsSubcommandData {
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");
+        }
+    }
+
+    @ButtonHandler("resolvePNPlay_")
+    public static void resolvePNPlay(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String pnID = buttonID.replace("resolvePNPlay_", "");
+
+        if (pnID.contains("ra_")) {
+            String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
+            TechnologyModel techModel = Mapper.getTech(tech);
+            pnID = pnID.replace("_" + tech, "");
+            String message = player.getFactionEmojiOrColor() + " Acquired The Tech " + techModel.getRepresentation(false) + " via Research Agreement";
+            player.addTech(tech);
+            String key = "RAForRound" + game.getRound() + player.getFaction();
+            if (game.getStoredValue(key).isEmpty()) {
+                game.setStoredValue(key, tech);
+            } else {
+                game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
+            }
+            ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
+            CommanderUnlockCheck.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
+        resolvePNPlay(pnID, player, game, event);
+        if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
+            ButtonHelper.deleteMessage(event);
+        }
+
+        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
+        if (posssibleCombatMod != null) {
+            player.addNewTempCombatMod(posssibleCombatMod);
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");
         }
     }
 }
