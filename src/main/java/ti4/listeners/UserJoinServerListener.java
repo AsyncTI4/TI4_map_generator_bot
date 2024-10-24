@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import lombok.NonNull;
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
@@ -38,7 +39,7 @@ public class UserJoinServerListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+    public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
         try {
             checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
@@ -48,7 +49,7 @@ public class UserJoinServerListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMemberRemove(@NonNull GuildMemberRemoveEvent event) {
+    public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
         try {
             event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
