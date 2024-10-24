@@ -51,8 +51,8 @@ public abstract class TechAddRemove extends TechSubcommandData {
         parseParameter(event, player, event.getOption(Constants.TECH3));
         parseParameter(event, player, event.getOption(Constants.TECH4));
 
-        CommanderUnlockCheck.checkPlayer(player, game, "nekro", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "jolnar", event);
+        CommanderUnlockCheck.checkPlayer(player, "nekro", "jolnar");
+
     }
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping techOption) {

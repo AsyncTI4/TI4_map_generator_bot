@@ -1,16 +1,13 @@
 package ti4.buttons;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +16,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -31,7 +27,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.PutAgendaBottom;
 import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
@@ -40,15 +35,12 @@ import ti4.commands.cardsac.DrawAC;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.PlayPN;
-import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.combat.StartCombat;
-import ti4.commands.ds.ZelianHero;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExplorePlanet;
 import ti4.commands.explore.ExploreSubcommandData;
-import ti4.commands.game.GameEnd;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -56,20 +48,16 @@ import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.Pass;
-import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
-import ti4.commands.player.Stats;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.FighterConscription;
-import ti4.commands.special.NovaSeed;
 import ti4.commands.special.RiseOfMessiah;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
-import ti4.commands.tech.TechExhaust;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
@@ -95,13 +83,10 @@ import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PlayerTitleHelper;
-import ti4.helpers.Storage;
-import ti4.helpers.TransactionHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -1193,7 +1178,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)
     public static void sc3AssignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
-        faction = buttonID.replace("assignSpeaker_", "");
+        faction = faction.replace("assignSpeaker_", "");
         game.setStoredValue("hasntSetSpeaker", "");
         if (game != null) {
             for (Player player_ : game.getPlayers().values()) {
@@ -2628,10 +2613,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             game.drawActionCard(player.getUserID());
             game.drawActionCard(player.getUserID());
-            if (player.getLeaderIDs().contains("yssarilcommander")
-                && !player.hasLeaderUnlocked("yssarilcommander")) {
-                CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, "yssaril");
             ACInfo.sendActionCardInfo(game, player, event);
             message = "Drew 2 ACs With Scheming. Please Discard 1 AC.";
         }
@@ -2652,10 +2634,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
         } else {
             game.drawActionCard(player.getUserID());
-            if (player.getLeaderIDs().contains("yssarilcommander")
-                && !player.hasLeaderUnlocked("yssarilcommander")) {
-                CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
-            }
+            CommanderUnlockCheck.checkPlayer(player, "yssaril");
             ACInfo.sendActionCardInfo(game, player, event);
             message = "Drew 1 AC";
         }

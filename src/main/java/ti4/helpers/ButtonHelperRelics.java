@@ -59,7 +59,7 @@ public class ButtonHelperRelics {
                 message = player.getFactionEmoji() + " Drew 1 AC";
                 ACInfo.sendActionCardInfo(game, player, event);
             }
-            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
+            CommanderUnlockCheck.checkPlayer(player, "yssaril");
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.checkACLimit(game, event, player);

@@ -80,6 +80,6 @@ public class TrapToken extends DiscordantStarsSubcommandData {
         player.setTrapCard(trap);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " put a trap on the planet " + Helper.getPlanetRepresentation(planetName, game));
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " set the trap " + ButtonHelperAbilities.translateNameIntoTrapIDOrReverse(trap) + " on the planet " + Helper.getPlanetRepresentation(planetName, game));
-        CommanderUnlockCheck.checkPlayer(player, game, "lizho", event);
+        CommanderUnlockCheck.checkPlayer(player, "lizho");
     }
 }

@@ -1,18 +1,19 @@
 package ti4.commands.cardspn;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.*;
 
 public class ShowAllPN extends PNCardsSubcommandData {
     public ShowAllPN() {
@@ -54,7 +55,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Collections.shuffle(promissoryNotes);
         int index = 1;
         for (String id : promissoryNotes) {
-            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName() + " (original owner " + ButtonHelper.getIdentOrColor(game.getPNOwner(id), game) + ")").append("\n");
+            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName() + " (original owner " + game.getPNOwner(id).getFactionEmojiOrColor() + ")").append("\n");
             index++;
         }
 
