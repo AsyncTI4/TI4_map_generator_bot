@@ -15,35 +15,17 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.ds.TrapReveal;
-import ti4.commands.game.CreateGameButton;
-import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.player.SCPick;
 import ti4.commands.player.UnitInfo;
-import ti4.commands.relic.RelicDraw;
 import ti4.commands.search.SearchMyGames;
-import ti4.commands.status.ListPlayerInfoButton;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
-import ti4.helpers.ButtonHelperActionCardsWillHomebrew;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
-import ti4.helpers.ButtonHelperExplore;
-import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ButtonHelperModifyUnits;
-import ti4.helpers.ButtonHelperRelics;
-import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.ButtonHelperStats;
-import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.FrankenDraftHelper;
-import ti4.helpers.TransactionHelper;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.context.ButtonContext;
@@ -136,7 +118,7 @@ public class ButtonListener extends ListenerAdapter {
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {
-
+            // Don't add anymore if/else startWith statements - use @ButtonHandler
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
             UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
@@ -163,9 +145,10 @@ public class ButtonListener extends ListenerAdapter {
             AgendaHelper.resolveAgenda(game, buttonID, event, mainGameChannel);
         } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
             game.initializeMiltySettings().parseButtonInput(event);
-
+            // Don't add anymore if/else startWith statements - use @ButtonHandler
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
+                // Don't add anymore cases - use @ButtonHandler
                 case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
                 case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
                 case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
@@ -185,9 +168,8 @@ public class ButtonListener extends ListenerAdapter {
                 case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
                 case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, false);
                 case Constants.REFRESH_ALL_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, true);
-                case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, false);
-                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event,  false, Set.of(Constants.UNIT), "inf");
-                case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, true);
+                // Don't add anymore cases - use @ButtonHandler
+                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event, false, Set.of(Constants.UNIT), "inf");
                 case "play_when" -> UnfiledButtonHandlers.playWhen(event, game, mainGameChannel);
                 case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
                 case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
@@ -211,6 +193,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "checkTechSkipView" -> ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
                 case "checkAttachmView" -> ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
                 case "checkShiplessView" -> ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
+                // Don't add anymore cases - use @ButtonHandler
                 default -> MessageHelper.sendMessageToEventChannel(event, "Button " + ButtonHelper.getButtonRepresentation(event.getButton()) + " pressed. This button does not do anything.");
             }
         }

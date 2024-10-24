@@ -4531,7 +4531,7 @@ public class ButtonHelper {
         }
     }
 
-@ButtonHandler("flipIonStorm_")
+    @ButtonHandler("flipIonStorm_")
     public static void flipIonStorm(Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         Tile tile = game.getTileByPosition(pos);
@@ -6398,16 +6398,24 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
-        ButtonHelper.acquireATech(
-            player, game, event, sc,
+    @ButtonHandler("acquireATechWithSC")
+    public static void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event) {
+        acquireATechWithResources(player, game, event, true);
+    }
+
+    @ButtonHandler("acquireATech")
+    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event) {
+        acquireATechWithResources(player, game, event, false);
+    }
+
+    public static void acquireATechWithResources(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
+        acquireATech(player, game, event, sc,
             Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
             "res");
     }
 
     public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final String payType) {
-        ButtonHelper.acquireATech(
-            player, game, event, sc,
+        acquireATech(player, game, event, sc,
             Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
             payType);
     }
