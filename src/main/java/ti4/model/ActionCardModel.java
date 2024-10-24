@@ -45,6 +45,10 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
         return Emojis.ActionCard + "__**" + name + "**__ *(" + phase + " Phase)*";
     }
 
+    public String getRepresentationJustText() {
+        return "*" + getWindow() + ":* " + getText();
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false, false);
     }

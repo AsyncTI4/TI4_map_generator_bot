@@ -89,6 +89,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
     }
 
+    @ButtonHandler("mentakCommander_")
     public static void mentakCommander(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String color = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(color);
@@ -106,6 +107,7 @@ public class ButtonHelperCommanders {
 
     }
 
+    @ButtonHandler("arboCommanderBuild_")
     public static void arboCommanderBuild(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.replace("arboCommanderBuild_", "");
         List<Button> buttons;
@@ -115,37 +117,31 @@ public class ButtonHelperCommanders {
         }
         buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "arboCommander",
             "placeOneNDone_dontskiparboCommander");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. "
-            + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
+        String message = player.getRepresentation() + " Use the buttons to produce 1 unit. " + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
 
     }
 
+    @ButtonHandler("olradinCommanderStep2_")
     public static void olradinCommanderStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.split("_")[1];
-        int oldTg = player.getTg();
-        int count = 0;
-        Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        count = Math.max(p.getInfluence(), p.getResources());
-        player.setTg(oldTg + count);
-        PlanetExhaust.doAction(player, planet, game);
+        String planetID = buttonID.split("_")[1];
+        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+        int count = Math.max(planet.getInfluence(), planet.getResources());
+        PlanetExhaust.doAction(player, planetID, game);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, count);
-        String msg = player.getRepresentationUnfogged() + " used Knak Halfear , the Olradin Commander, to exhaust "
-            + Helper.getPlanetRepresentation(planet, game) + " and gain " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->"
-            + player.getTg() + ")";
+        String msg = player.getRepresentationUnfogged() + " used Knak Halfear, the Olradin Commander, to exhaust "
+            + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + " and gain " + count + "TG" + (count == 1 ? "" : "s") + " " + player.gainTG(count);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         event.getMessage().delete().queue();
     }
 
-    public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("cymiaeCommanderRes_")
+    public static void cymiaeCommanderRes(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String msg = player.getFactionEmoji() + " will discard 1 AC to move or place 1 mech on "
-            + Helper.getPlanetRepresentation(planet, game);
-        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet,
-            game);
+        String msg = player.getFactionEmoji() + " will discard 1 " + Emojis.ActionCard + " AC to move or place 1 " + Emojis.mech + "mech on " + Helper.getPlanetRepresentation(planet, game);
+        new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "mech " + planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
@@ -198,8 +194,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("yinCommanderRemoval_")
-    public static void resolveYinCommanderRemoval(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveYinCommanderRemoval(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String unitHName = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
@@ -214,19 +209,20 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("resolveMykoCommander")
     public static void mykoCommanderUsage(Player player, Game game, ButtonInteractionEvent event) {
-        String msg = player.getFactionEmoji() + " spent 1";
+        String msg = player.getFactionEmoji() + " spent 1 ";
         if (player.getCommodities() > 0) {
-            msg = msg + " commodity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
+            msg += Emojis.comm + " commodity (" + player.getCommodities() + "->" + (player.getCommodities() - 1) + ") ";
             player.setCommodities(player.getCommodities() - 1);
         } else {
-            msg = msg + "TG (" + player.getTg() + "->" + (player.getTg() - 1) + ") ";
-            player.setTg(player.getTg() - 1);
+            msg += Emojis.tg + "TG (" + player.gainTG(-1) + ") ";
         }
-        msg = msg + " to cancel one hit";
+        msg += " to cancel one hit";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
+    @ButtonHandler("ravenMigration")
     public static void handleRavenCommander(ButtonContext context) {
         Game game = context.getGame();
         Player player = context.getPlayer();
@@ -334,38 +330,29 @@ public class ButtonHelperCommanders {
         }
     }
 
-    public static void titansCommanderUsage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        int cTG = player.getTg();
-        int fTG = cTG + 1;
-        player.setTg(fTG);
+    @ButtonHandler("titansCommanderUsage")
+    public static void titansCommanderUsage(ButtonInteractionEvent event, Game game, Player player) {
+        String msg = player.getFactionEmojiOrColor() + " Automatically used Tungstantus, the Ul commander, to gain 1" + Emojis.tg + "TG " + player.gainTG(1) + ".";
+        if (Helper.getPlayerFromAbility(game, "pillage") != null) {
+            msg += "\nThis tg can be spent before " + Emojis.Mentak + "**Pillage** resolves, since it is a when.";
+        }
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
-        String msg = " Automatically used Tungstantus, the Ul commander, to gain 1 TG (" + cTG + "->" + fTG + "). ";
-        if (Helper.getPlayerFromAbility(game, "pillage") != null) {
-            msg = msg + "This tg can be spent before pillage resolves, since it is a when.";
-        }
         player.addSpentThing(msg);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + msg);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }
 
-    public static void resolveLetnevCommanderCheck(Player player, Game game,
-        GenericInteractionCreateEvent event) {
+    public static void resolveLetnevCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                int old = player.getTg();
-                int newTg = player.getTg() + 1;
-                player.setTg(player.getTg() + 1);
-                String mMessage = player.getRepresentationUnfogged()
-                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1TG has been added automatically (" + old
-                    + "->" + newTg + ").";
+                String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, 1TG has been added automatically (" + player.gainTG(1) + ").";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
             } else {
-                String mMessage = player.getRepresentationUnfogged()
-                    + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
+                String mMessage = player.getRepresentationUnfogged() + " Since you have Rear Admiral Farran, the Letnev commander, unlocked, you may gain 1TG, but you are in pillage range, so this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG"));
+                buttons.add(Buttons.green("gain1tgFromLetnevCommander", "Gain 1TG", Emojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage, buttons);
             }
@@ -373,8 +360,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("placeGhostCommanderFF_")
-    public static void resolveGhostCommanderPlacement(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveGhostCommanderPlacement(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "fighter", game);
@@ -382,8 +368,7 @@ public class ButtonHelperCommanders {
     }
 
     @ButtonHandler("placeKhraskCommanderInf_")
-    public static void resolveKhraskCommanderPlacement(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    public static void resolveKhraskCommanderPlacement(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         new AddUnits().unitParsing(event, player.getColor(), tile, "inf", game);
@@ -490,8 +475,8 @@ public class ButtonHelperCommanders {
         }
     }
 
-    public static void resolveSolCommander(Player player, Game game, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("utilizeSolCommander_")
+    public static void resolveSolCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileFromPlanet(planet);
@@ -501,6 +486,7 @@ public class ButtonHelperCommanders {
                 + Helper.getPlanetRepresentation(planet, game) + " using Claire Gibson, the Sol Commander.");
     }
 
+    @ButtonHandler("yssarilcommander_")
     public static void yssarilCommander(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("yssarilcommander_", "");
         String enemyFaction = buttonID.split("_")[1];
@@ -529,12 +515,15 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
-    public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event, Boolean unleash) {
+    @ButtonHandler("pay1tgforKeleres")
+    public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event) {
+        boolean unleash = ThreadLocalRandom.current().nextInt(20) == 0;
         CommanderUnlockCheck.checkPlayer(player, "keleres");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + player.gainTG(-1));
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("sardakkcommander_")
     public static void resolveSardakkCommander(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String mechorInf = buttonID.split("_")[1];
         String planet1 = buttonID.split("_")[2];
