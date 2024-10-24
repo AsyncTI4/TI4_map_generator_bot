@@ -6408,19 +6408,24 @@ public class ButtonHelper {
         acquireATechWithResources(player, game, event, false);
     }
 
-    public static void acquireATechWithResources(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
+    private static void acquireATechWithResources(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         acquireATech(player, game, event, sc,
             Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
             "res");
     }
 
-    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final String payType) {
+    @ButtonHandler("acquireAUnitTechWithInf")
+    public static void acquireAUnitTechWithInf(Player player, Game game, ButtonInteractionEvent event) {
+        acquireATech(player, game, event, false, Set.of(Constants.UNIT), "inf");
+    }
+
+    private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final String payType) {
         acquireATech(player, game, event, sc,
             Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
             payType);
     }
 
-    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes, final String payType) {
+    private static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes, final String payType) {
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
         if (sc) {
@@ -6475,8 +6480,7 @@ public class ButtonHelper {
         };
     }
 
-    public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName,
-        @Nullable List<Button> buttons) {
+    public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName, @Nullable List<Button> buttons) {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         String threadName = game.getName() + "-round-" + game.getRound() + "-" + stratName;
         for (ThreadChannel threadChannel_ : threadChannels) {

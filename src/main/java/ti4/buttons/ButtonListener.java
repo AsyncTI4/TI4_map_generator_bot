@@ -56,6 +56,8 @@ public class ButtonListener extends ListenerAdapter {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
             return;
         }
+
+        // Only defer if button does not spawn a Modal
         if (!event.getButton().getId().endsWith("~MDL")) {
             event.deferEdit().queue();
         }
@@ -113,7 +115,7 @@ public class ButtonListener extends ListenerAdapter {
         // hacking
         Player nullable = player; // why?
 
-        // Check the list of buttons first
+        // Check the list of ButtonHandlers first
         if (handleKnownButtons(context)) return;
 
         // TODO Convert all else..if..startsWith to use @ButtonHandler
@@ -149,7 +151,6 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
                 // Don't add anymore cases - use @ButtonHandler
-                case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
                 case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
                 case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
                 case "gain_1_comms" -> ButtonHelperStats.gainComms(event, game, player, 1, true);
@@ -165,11 +166,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "convert_3_comms" -> ButtonHelperStats.convertComms(event, game, player, 3);
                 case "convert_4_comms" -> ButtonHelperStats.convertComms(event, game, player, 4);
                 case "convert_2_comms_stay" -> ButtonHelperStats.convertComms(event, game, player, 2, false);
-                case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
-                case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, false);
-                case Constants.REFRESH_ALL_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, true);
                 // Don't add anymore cases - use @ButtonHandler
-                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event, false, Set.of(Constants.UNIT), "inf");
                 case "play_when" -> UnfiledButtonHandlers.playWhen(event, game, mainGameChannel);
                 case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
                 case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
@@ -179,8 +176,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
                 case "pass_on_abilities" -> ButtonHelper.addReaction(event, false, false, " Is " + event.getButton().getLabel(), "");
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);
-                case "pay1tgforKeleres" -> ButtonHelperCommanders.pay1tgToUnlockKeleres(player, game, event, false);
-                case "pay1tgforKeleresU" -> ButtonHelperCommanders.pay1tgToUnlockKeleres(player, game, event, true);
                 case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmojiOrColor() + " officially declines to fire PDS");
                 case "searchMyGames" -> SearchMyGames.searchGames(event.getUser(), event, false, false, false, true, false, true, false, false);
                 case "checkWHView" -> ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);

@@ -515,7 +515,9 @@ public class ButtonHelperCommanders {
         event.getMessage().delete().queue();
     }
 
-    public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event, Boolean unleash) {
+    @ButtonHandler("pay1tgforKeleres")
+    public static void pay1tgToUnlockKeleres(Player player, Game game, ButtonInteractionEvent event) {
+        boolean unleash = ThreadLocalRandom.current().nextInt(20) == 0;
         CommanderUnlockCheck.checkPlayer(player, "keleres");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " paid 1TG to " + (unleash ? "unleash" : "unlock") + " Suffi An, the Keleres commander " + player.gainTG(-1));
         event.getMessage().delete().queue();

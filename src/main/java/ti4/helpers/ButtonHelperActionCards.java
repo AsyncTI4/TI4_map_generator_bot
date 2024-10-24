@@ -666,8 +666,12 @@ public class ButtonHelperActionCards {
             buttons);
     }
 
-    public static void resolveSeizeArtifactStep1(Player player, Game game, ButtonInteractionEvent event,
-        String kolleccTech) {
+    @ButtonHandler("resolveSeizeArtifactStep1")
+    public static void resolveSeizeArtifactStep1(Player player, Game game, ButtonInteractionEvent event) {
+        resolveSeizeArtifactStep1(player, game, event, "no");
+    }
+
+    public static void resolveSeizeArtifactStep1(Player player, Game game, ButtonInteractionEvent event, String kolleccTech) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
