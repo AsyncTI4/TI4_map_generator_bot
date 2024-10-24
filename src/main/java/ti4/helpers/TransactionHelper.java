@@ -1226,6 +1226,12 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
+    @ButtonHandler("send_")
+    public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static List<Button> getStuffToTransButtonsOld(Game game, Player p1, Player p2) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> stuffToTransButtons = new ArrayList<>();
@@ -1289,6 +1295,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
+    @ButtonHandler("rescindOffer_")
     public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 != null) {
@@ -1299,6 +1306,7 @@ public class TransactionHelper {
         }
     }
 
+    @ButtonHandler("rejectOffer_")
     public static void rejectOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p1 != null) {
@@ -1307,6 +1315,7 @@ public class TransactionHelper {
         }
     }
 
+    @ButtonHandler("acceptOffer_")
     public static void acceptOffer(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (buttonID.split("_").length > 2) {
@@ -1342,6 +1351,24 @@ public class TransactionHelper {
                 + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to "
                 + player.getFactionEmojiOrColor();
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    @ButtonHandler("transactWith_")
+    @ButtonHandler("resetOffer_")
+    public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 != null) {
+            player.clearTransactionItemsWithPlayer(p2);
+            List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, player, p2);
+            if (!game.isFowMode() && game.isNewTransactionMethod()) {
+                buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
+            }
+            String message = player.getRepresentation() + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            TransactionHelper.checkTransactionLegality(game, player, p2);
             ButtonHelper.deleteMessage(event);
         }
     }

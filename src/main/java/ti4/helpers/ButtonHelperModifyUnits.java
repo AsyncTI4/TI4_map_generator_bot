@@ -1751,6 +1751,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("spaceUnits_")
     public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("spaceUnits_", "");

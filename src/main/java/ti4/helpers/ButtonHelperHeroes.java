@@ -377,6 +377,7 @@ public class ButtonHelperHeroes {
             player.getCorrectChannel(), revealMsg2, relicButtons);
     }
 
+    @ButtonHandler("relicSwapStep1")
     public static void resolveRelicSwapStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String fanctionNRelic = buttonID.replace("relicSwapStep1_", "");
         ButtonHelper.deleteTheOneButton(event);
@@ -397,6 +398,7 @@ public class ButtonHelperHeroes {
             player.getCorrectChannel(), revealMsg, relicButtons);
     }
 
+    @ButtonHandler("relicSwapStep2")
     public static void resolveRelicSwapStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteMessage(event);
         String faction = buttonID.split(";")[1];

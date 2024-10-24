@@ -121,22 +121,6 @@ import ti4.model.TemporaryCombatModifierModel;
  */
 public class UnfiledButtonHandlers { // TODO: move all of these methods to a better location, closer to the orignal button call and/or other related code
 
-    public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String faction = buttonID.split("_")[1];
-        Player p2 = game.getPlayerFromColorOrFaction(faction);
-        if (p2 != null) {
-            player.clearTransactionItemsWithPlayer(p2);
-            List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, player, p2);
-            if (!game.isFowMode() && game.isNewTransactionMethod()) {
-                buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
-            }
-            String message = player.getRepresentation() + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-            TransactionHelper.checkTransactionLegality(game, player, p2);
-            ButtonHelper.deleteMessage(event);
-        }
-    }
-
     @ButtonHandler("purgeKortaliHero_")
     public static void purgeKortaliHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Leader playerLeader = player.unsafeGetLeader("kortalihero");
@@ -2142,6 +2126,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("reinforcements_cc_placement_")
     public static void reinforcementsCCPlacement(GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
         String planet = buttonID.replace("reinforcements_cc_placement_", "");
         String tileID = AliasHandler.resolveTile(planet.toLowerCase());
@@ -2162,6 +2147,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("placeHolderOfConInSystem_")
     public static void placeHolderOfConInSystem(GenericInteractionCreateEvent event, Game game, Player player, String buttonID) {
         String planet = buttonID.replace("placeHolderOfConInSystem_", "");
         String tileID = AliasHandler.resolveTile(planet.toLowerCase());
@@ -2512,6 +2498,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
     }
 
+    @ButtonHandler("resetSpend_")
     public static void resetSpend_(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Helper.refreshPlanetsOnTheRespend(player, game);
         String whatIsItFor = "both";
@@ -3479,230 +3466,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("retrieveAgenda_")
     public static void retrieveAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String agendaID = buttonID.substring(buttonID.indexOf("_") + 1);
         DrawAgenda.drawSpecificAgenda(agendaID, game, player);
         ButtonHelper.deleteTheOneButton(event);
-    }
-
-    public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static void resolvePNPlay(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pnID = buttonID.replace("resolvePNPlay_", "");
-
-        if (pnID.contains("ra_")) {
-            String tech = AliasHandler.resolveTech(pnID.replace("ra_", ""));
-            TechnologyModel techModel = Mapper.getTech(tech);
-            pnID = pnID.replace("_" + tech, "");
-            String message = player.getFactionEmojiOrColor() + " Acquired The Tech " + techModel.getRepresentation(false) + " via Research Agreement";
-            player.addTech(tech);
-            String key = "RAForRound" + game.getRound() + player.getFaction();
-            if (game.getStoredValue(key).isEmpty()) {
-                game.setStoredValue(key, tech);
-            } else {
-                game.setStoredValue(key, game.getStoredValue(key) + "." + tech);
-            }
-            ButtonHelperCommanders.resolveNekroCommanderCheck(player, tech, game);
-            CommanderUnlockCheck.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        }
-        PlayPN.resolvePNPlay(pnID, player, game, event);
-        if (!"bmfNotHand".equalsIgnoreCase(pnID)) {
-            ButtonHelper.deleteMessage(event);
-        }
-
-        var posssibleCombatMod = CombatTempModHelper.GetPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
-        if (posssibleCombatMod != null) {
-            player.addNewTempCombatMod(posssibleCombatMod);
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the combat roll button.");
-        }
-    }
-
-    public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game) {
-        String planet = buttonID.replace("nanoforgePlanet_", "");
-        Planet planetReal = game.getPlanetsInfo().get(planet);
-        planetReal.addToken("attachment_nanoforge.png");
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
-        ButtonHelper.deleteMessage(event);
-    }
-
-    public static void play_after(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String riderName = buttonID.replace("play_after_", "");
-        List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
-        List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-        MessageChannel mainGameChannel = game.getMainGameChannel();
-        String pnKey = "fin";
-
-        if ("Keleres Rider".equalsIgnoreCase(riderName) || "Edyn Rider".equalsIgnoreCase(riderName) || "Kyro Rider".equalsIgnoreCase(riderName)) {
-            if ("Keleres Rider".equalsIgnoreCase(riderName)) {
-                for (String pn : player.getPromissoryNotes().keySet()) {
-                    if (pn.contains("rider")) {
-                        pnKey = pn;
-                    }
-                }
-                if ("fin".equalsIgnoreCase(pnKey)) {
-                    MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You don't have a Keleres Rider");
-                    return;
-                }
-                if (player.getFaction().contains("keleres")) {
-                    MessageHelper.sendMessageToChannel(mainGameChannel, player.getRepresentation() + " You cannot play your own promissory note");
-                    return;
-                }
-            } else if ("Edyn Rider".equalsIgnoreCase(riderName)) {
-                for (String pn : player.getPromissoryNotes().keySet()) {
-                    if (pn.contains("dspnedyn")) {
-                        pnKey = pn;
-                    }
-                }
-                if ("fin".equalsIgnoreCase(pnKey)) {
-                    MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Edyn Rider");
-                    return;
-                }
-            } else if ("Kyro Rider".equalsIgnoreCase(riderName)) {
-                for (String pn : player.getPromissoryNotes().keySet()) {
-                    if (pn.contains("dspnkyro")) {
-                        pnKey = pn;
-                    }
-                }
-                if ("fin".equalsIgnoreCase(pnKey)) {
-                    MessageHelper.sendMessageToChannel(mainGameChannel, "You don't have a Kyro Rider");
-                    return;
-                }
-            }
-
-            ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
-            PlayPN.resolvePNPlay(pnKey, player, game, event);
-        } else {
-            ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
-
-            if (riderName.contains("Unity Algorithm")) {
-                player.exhaustTech("dsedyng");
-            }
-            if ("conspirators".equalsIgnoreCase(riderName)) {
-                game.setStoredValue("conspiratorsFaction", player.getFaction());
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " The conspirators ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
-                if (!game.isFowMode()) {
-                    ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
-                }
-            } else {
-                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
-                    "Please select your rider target",
-                    game, player, riderButtons);
-                if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
-                    Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
-                    if (playerLeader != null) {
-                        StringBuilder message = new StringBuilder(player.getRepresentation());
-                        message.append(" played ");
-                        message.append(Helper.getLeaderFullRepresentation(playerLeader));
-                        boolean purged = player.removeLeader(playerLeader);
-                        if (purged) {
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
-                        } else {
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Odlynn Myrr, the Keleres (Xxcha) hero, was not purged - something went wrong.");
-                        }
-                    }
-                }
-            }
-            MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", game, afterButtons, "after");
-        }
-        // "dspnedyn"
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("ultimateUndo")
-    public static void ultimateUndo(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game.getSavedButtons().size() > 0 && !game.getPhaseOfGame().contains("status")) {
-            String buttonString = game.getSavedButtons().get(0);
-            if (game.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
-                boolean showGame = false;
-                for (String buttonString2 : game.getSavedButtons()) {
-                    if (buttonString2.contains("Show Game")) {
-                        showGame = true;
-                        break;
-                    }
-                }
-                if (player != game.getPlayerFromColorOrFaction(buttonString.split(";")[0])
-                    && !showGame) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "You were not the player who pressed the latest button. Use /game undo if you truly want to undo "
-                            + game.getLatestCommand());
-                    return;
-                }
-            }
-        }
-
-        GameSaveLoadManager.undo(game, event);
-        if ("action".equalsIgnoreCase(game.getPhaseOfGame())
-            || "agendaVoting".equalsIgnoreCase(game.getPhaseOfGame())) {
-            if (!event.getMessage().getContentRaw().contains(player.getFinsFactionCheckerPrefix())) {
-                boolean dontDelete = false;
-                for (ActionRow row : event.getMessage().getActionRows()) {
-                    List<ItemComponent> buttonRow = row.getComponents();
-                    for (ItemComponent item : buttonRow) {
-                        if (item instanceof Button butt) {
-                            if (butt.getId().contains("doneLanding")
-                                || butt.getId().contains("concludeMove")) {
-                                dontDelete = true;
-                                break;
-                            }
-                        }
-                    }
-
-                }
-                if (!dontDelete) {
-                    ButtonHelper.deleteMessage(event);
-                }
-            }
-        }
-    }
-
-    public static void ultimateUndo_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.getSavedButtons().isEmpty()) {
-            String buttonString = game.getSavedButtons().get(0);
-            String colorOrFaction = buttonString.split(";")[0];
-            Player p = game.getPlayerFromColorOrFaction(colorOrFaction);
-            if (p != null && player != p && !colorOrFaction.equals("null")) {
-                // if the last button was pressed by a non-faction player, allow anyone to undo
-                // it
-                String msg = "You were not the player who pressed the latest button. Use /game undo if you truly want to undo "
-                    + game.getLatestCommand();
-                MessageHelper.sendMessageToChannel(event.getChannel(), msg);
-                return;
-            }
-        }
-        String highestNumBefore = buttonID.split("_")[1];
-        File mapUndoDirectory = Storage.getMapUndoDirectory();
-        if (!mapUndoDirectory.exists()) {
-            return;
-        }
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-        if (mapUndoFiles != null && mapUndoFiles.length > 0) {
-            List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-                .map(fileName -> fileName.replace(Constants.TXT, ""))
-                .map(Integer::parseInt).toList();
-            int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-            if (highestNumBefore.equalsIgnoreCase((maxNumber) + "")) {
-                ButtonHelper.deleteMessage(event);
-            }
-        }
-
-        GameSaveLoadManager.undo(game, event);
-
-        String msg = "You undid something, the details of which can be found in the undo-log thread";
-        List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
-        for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {
-                msg += ": " + threadChannel_.getJumpUrl();
-            }
-        }
-        event.getHook().sendMessage(msg).setEphemeral(true).queue();
     }
 
     @ButtonHandler("comm_for_AC")

@@ -757,6 +757,7 @@ public class ButtonHelperAbilities {
         return planetButtons;
     }
 
+    @ButtonHandler("putSleeperOnPlanet_")
     public static void putSleeperOn(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("putSleeperOnPlanet_", "");
         String planet = buttonID;
@@ -1145,6 +1146,7 @@ public class ButtonHelperAbilities {
         return techToGain;
     }
 
+    @ButtonHandler("removeSleeperFromPlanet_")
     public static void removeSleeper(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("removeSleeperFromPlanet_", "");
         String planet = buttonID;
@@ -1154,6 +1156,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("replaceSleeperWith_")
     public static void replaceSleeperWith(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         buttonID = buttonID.replace("replaceSleeperWith_", "");
         String planetName = buttonID.split("_")[1];

@@ -12,6 +12,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -84,6 +85,16 @@ public class ButtonHelperRelics {
             }
             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
         }
+    }
+
+    @ButtonHandler("nanoforgePlanet_")
+    public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game) {
+        String planet = buttonID.replace("nanoforgePlanet_", "");
+        Planet planetReal = game.getPlanetsInfo().get(planet);
+        planetReal.addToken("attachment_nanoforge.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
+        ButtonHelper.deleteMessage(event);
     }
 
 }

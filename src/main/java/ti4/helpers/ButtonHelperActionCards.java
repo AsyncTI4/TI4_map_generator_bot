@@ -1570,6 +1570,7 @@ public class ButtonHelperActionCards {
             player.getRepresentationUnfogged() + " select the planet you want to exhaust", buttons);
     }
 
+    @ButtonHandler("unstableStep3_")
     public static void resolveUnstableStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];

@@ -4498,6 +4498,7 @@ public class ButtonHelper {
         }
     }
 
+    @ButtonHandler("addIonStorm_")
     public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         Tile tile = game.getTileByPosition(pos);
@@ -4530,6 +4531,7 @@ public class ButtonHelper {
         }
     }
 
+@ButtonHandler("flipIonStorm_")
     public static void flipIonStorm(Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         Tile tile = game.getTileByPosition(pos);
