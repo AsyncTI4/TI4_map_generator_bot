@@ -775,7 +775,7 @@ public class ButtonHelper {
         }
 
         ACInfo.sendActionCardInfo(game, player, event);
-        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
+        CommanderUnlockCheck.checkPlayer(player, "yssaril");
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
@@ -2682,7 +2682,7 @@ public class ButtonHelper {
             }
         }
         if (numOfCapitalShips > 8 && !fleetSupplyViolated) {
-            CommanderUnlockCheck.checkPlayer(player, game, "letnev", event);
+            CommanderUnlockCheck.checkPlayer(player, "letnev");
         }
         if (player.hasAbility("flotilla")) {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
@@ -4151,9 +4151,7 @@ public class ButtonHelper {
         }
         Button concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done landing troops");
         buttons.add(concludeMove);
-        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "empyrean", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "ghost", event);
+        CommanderUnlockCheck.checkPlayer(player, "naaz", "empyrean", "ghost");
 
         return buttons;
     }

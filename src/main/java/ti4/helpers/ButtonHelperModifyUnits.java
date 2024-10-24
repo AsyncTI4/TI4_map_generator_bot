@@ -998,7 +998,7 @@ public class ButtonHelperModifyUnits {
         String devoteOrNo = buttonID.split("_")[3];
         if (devoteOrNo.equalsIgnoreCase("devote")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
-            CommanderUnlockCheck.checkPlayer(player, game, "yin", event);
+            CommanderUnlockCheck.checkPlayer(player, "yin");
         }
     }
 
