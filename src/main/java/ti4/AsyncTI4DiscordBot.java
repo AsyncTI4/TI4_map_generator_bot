@@ -139,6 +139,7 @@ public class AsyncTI4DiscordBot {
 
         jda.addEventListener(
             new MessageListener(),
+            new SlashCommandListener(),
             ButtonListener.getInstance(),
             ModalListener.getInstance(),
             new SelectionMenuListener(),
