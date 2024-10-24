@@ -1012,7 +1012,7 @@ public class ButtonHelperAbilities {
             game.purgeExplore(cardID);
         }
 
-        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+        CommanderUnlockCheck.checkPlayer(player, "kollecc");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
         event.getMessage().delete().queue();

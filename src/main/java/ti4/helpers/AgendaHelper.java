@@ -401,13 +401,13 @@ public class AgendaHelper {
                     player2.setStrategicCC(2);
                     player2.setFleetCC(3);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Set " + ButtonHelper.getIdentOrColor(player2, game) + " CCs to 3/3/2");
+                        "Set " + player2.getFactionEmojiOrColor() + " CCs to 3/3/2");
                     ButtonHelper.checkFleetInEveryTile(player2, game, event);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
                     RelicDraw.drawRelicAndNotify(player2, event, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Drew relic for " + ButtonHelper.getIdentOrColor(player2, game));
+                        "Drew relic for " + player2.getFactionEmojiOrColor());
                 }
                 if ("execution".equalsIgnoreCase(agID)) {
                     String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda.";
@@ -879,7 +879,7 @@ public class AgendaHelper {
                                 ACInfo.sendActionCardInfo(game, playerWL, event);
                             }
                         }
-                        CommanderUnlockCheck.checkPlayer(playerWL, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(playerWL, "yssaril");
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -907,7 +907,7 @@ public class AgendaHelper {
                             }
                         }
 
-                        CommanderUnlockCheck.checkPlayer(playerWL, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(playerWL, "yssaril");
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     for (Player p2 : getLosingVoters(winner, game)) {
