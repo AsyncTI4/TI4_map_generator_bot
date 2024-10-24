@@ -320,6 +320,7 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged() + " tell the bot whose planet you want to put a trap on", buttons);
     }
 
+    @ButtonHandler("setTrapStep2_")
     public static void setTrapStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
@@ -331,6 +332,7 @@ public class ButtonHelperAbilities {
             player.getRepresentationUnfogged() + " select the planet you want to put a trap on", buttons);
     }
 
+    @ButtonHandler("setTrapStep3_")
     public static void setTrapStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         List<Button> availableTraps = new ArrayList<>();
@@ -365,22 +367,25 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, availableTraps);
     }
 
+    @ButtonHandler("revealTrapStep2_")
     public static void revealTrapStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String trap = buttonID.split("_")[1];
         trap = translateNameIntoTrapIDOrReverse(trap);
         String planet = player.getTrapCardsPlanets().get(trap);
-        new TrapReveal().revealTrapForPlanet(event, game, planet, trap, player, true);
+        TrapReveal.revealTrapForPlanet(event, game, planet, trap, player, true);
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("removeTrapStep2_")
     public static void removeTrapStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String trap = buttonID.split("_")[1];
         trap = translateNameIntoTrapIDOrReverse(trap);
         String planet = player.getTrapCardsPlanets().get(trap);
-        new TrapReveal().revealTrapForPlanet(event, game, planet, trap, player, false);
+        TrapReveal.revealTrapForPlanet(event, game, planet, trap, player, false);
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("setTrapStep4_")
     public static void setTrapStep4(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String trap = translateNameIntoTrapIDOrReverse(buttonID.split("_")[2]);
@@ -974,6 +979,7 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
+    @ButtonHandler("olradinConnectStep2_")
     public static void resolveOlradinConnectStep2(Player player, Game game, String buttonID,
         ButtonInteractionEvent event) {
         String planet1 = buttonID.split("_")[1];
@@ -990,6 +996,7 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("olradinPreserveStep2_")
     public static void resolveOlradinPreserveStep2(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String type = buttonID.split("_")[1];
         player.setHasUsedEnvironmentPreserveAbility(true);

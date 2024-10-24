@@ -282,6 +282,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             buttons);
     }
 
+    @ButtonHandler("strandedShipStep2_")
     public static void resolveStrandedShipStep2(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);

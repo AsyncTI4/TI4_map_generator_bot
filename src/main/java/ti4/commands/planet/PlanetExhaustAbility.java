@@ -177,6 +177,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who you want to force into giving you a PN or AC", buttons);
     }
 
+    @ButtonHandler("prismStep2_")
     public static void resolvePrismStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
@@ -186,11 +187,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " chose " + ButtonHelper.getIdentOrColor(p2, game) + " as the target of the prism ability. The target has been sent buttons to resolve.");
+            player.getFactionEmoji() + " chose " + p2.getFactionEmojiOrColor() + " as the target of the prism ability. The target has been sent buttons to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentationUnfogged() + " you have had the Prism ability hit you. Please tell the bot if you wish to send an AC or a PN", buttons);
     }
 
+    @ButtonHandler("prismStep3_")
     public static void resolvePrismStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons;

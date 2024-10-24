@@ -401,7 +401,8 @@ public class ButtonHelperSCs {
     }
 
     @ButtonHandler("construction_")
-    public static void construction(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    public static void construction(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {

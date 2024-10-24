@@ -74,7 +74,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         revealTrapForPlanet(event, game, planetName, stringTrapID, player, true);
     }
 
-    public void revealTrapForPlanet(GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player, boolean reveal) {
+    public static void revealTrapForPlanet(GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player, boolean reveal) {
         if (player.getTrapCardsPlanets().containsValue(planetName) || planetName == null) {
             Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
@@ -109,8 +109,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                 }
                                 if (p2.getPlanets().contains(planet)) {
                                     List<Button> buttons = new ArrayList<>();
-                                    buttons.add(Buttons.green("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + ButtonHelper.getIdentOrColor(p2, game)));
-                                    buttons.add(Buttons.blue("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    buttons.add(Buttons.green("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + p2.getFactionEmojiOrColor()));
+                                    buttons.add(Buttons.blue("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + p2.getFactionEmojiOrColor()));
                                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " use buttons to resolve",
                                         buttons);
                                 }

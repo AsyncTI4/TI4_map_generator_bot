@@ -137,6 +137,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
+    @ButtonHandler("purgeKortaliHero_")
     public static void purgeKortaliHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Leader playerLeader = player.unsafeGetLeader("kortalihero");
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
@@ -152,6 +153,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelperHeroes.offerStealRelicButtons(game, player, buttonID, event);
     }
 
+    @ButtonHandler("declareUse_")
     public static void declareUse(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String msg = player.getFactionEmojiOrColor() + " is using " + buttonID.split("_")[1];
         if (msg.contains("Vaylerian")) {
@@ -180,11 +182,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("unlockCommander_")
     public static void unlockCommander(ButtonInteractionEvent event, Player player, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
         CommanderUnlockCheck.checkPlayer(player, buttonID.split("_")[1]);
     }
 
+    @ButtonHandler("fogAllianceAgentStep3_")
     public static void fogAllianceAgentStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
         ButtonHelperHeroes.argentHeroStep3(game, player, event, buttonID);
@@ -195,6 +199,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         event.getMessage().reply(game.getPing() + " someone has requested that everyone resolve this SC before play continues. Please do so as soon as you can. The active player should not take an action until this is done").queue();
     }
 
+    @ButtonHandler("starChartsStep1_")
     public static void starChartsStep1(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
         ButtonHelper.starChartStep1(game, player, buttonID.split("_")[1]);

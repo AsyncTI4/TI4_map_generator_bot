@@ -659,10 +659,11 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
     }
 
+    @ButtonHandler("showDeck_")
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
-            case "ac" -> ShowDiscardActionCards.showDiscard(game, event);
+            case "ac" -> ShowDiscardActionCards.showDiscard(game, event, false);
             case "agenda" -> ShowDiscardedAgendas.showDiscards(game, event);
             case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
@@ -689,8 +690,8 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void resolveShowFullTextDeckChoice(Game game, ButtonInteractionEvent event, String buttonID,
-        Player player) {
+    @ButtonHandler("showTextOfDeck_")
+    public static void resolveShowFullTextDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String type = buttonID.split("_")[1];
         List<String> types = new ArrayList<>();
         if ("all".equalsIgnoreCase(type)) {
@@ -1169,8 +1170,7 @@ public class ButtonHelper {
         return buttons;
     }
 
-    public static void sendAllTechsNTechSkipPlanetsToReady(Game game, GenericInteractionCreateEvent event,
-        Player player, boolean absol) {
+    public static void sendAllTechsNTechSkipPlanetsToReady(Game game, GenericInteractionCreateEvent event, Player player, boolean absol) {
         List<Button> buttons = new ArrayList<>();
         for (String tech : player.getExhaustedTechs()) {
             buttons.add(Buttons.green("biostimsReady_tech_" + tech, "Ready " + Mapper.getTechs().get(tech).getName()));
@@ -2979,6 +2979,7 @@ public class ButtonHelper {
             + tile.getName() + ". Will this tile be adjacent to 1 other tile or 2?", buttons);
     }
 
+    @ButtonHandler("detTileAdditionStep2_")
     public static void detTileAdditionStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         deleteMessage(event);
@@ -2994,6 +2995,7 @@ public class ButtonHelper {
             player.getRepresentation() + " choose an edge tile that the new tile will be adjacent too", buttons);
     }
 
+    @ButtonHandler("detTileAdditionStep3_")
     public static void detTileAdditionStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         deleteMessage(event);
         String newTileID = buttonID.split("_")[1];
@@ -3016,6 +3018,7 @@ public class ButtonHelper {
             player.getRepresentation() + " select the tile position where the tile should go", buttons);
     }
 
+    @ButtonHandler("detTileAdditionStep4_")
     public static void detTileAdditionStep4(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         deleteMessage(event);
         String newTileID = buttonID.split("_")[1];
@@ -3042,6 +3045,7 @@ public class ButtonHelper {
             player.getRepresentation() + " choose an edge tile that the new tile will be adjacent too", buttons);
     }
 
+    @ButtonHandler("starChartsStep2_")
     public static void starChartStep2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         deleteMessage(event);
@@ -3059,6 +3063,7 @@ public class ButtonHelper {
             player.getRepresentation() + " choose another tile that the new tile will be adjacent too", buttons);
     }
 
+    @ButtonHandler("starChartsStep3_")
     public static void starChartStep3(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         deleteMessage(event);
         String newTileID = buttonID.split("_")[1];
@@ -3571,6 +3576,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("addAbsolOrbital_")
     public static void addAbsolOrbital(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder uH = tile.getUnitHolders().get(buttonID.split("_")[2]);
@@ -4690,6 +4696,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("startThalnos_")
     public static void resolveThalnosStart(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         game.resetThalnosUnits();
@@ -4714,6 +4721,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("setForThalnos_")
     public static void resolveSetForThalnos(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String unitHolderName = game.getStoredValue("thalnosInitialHolder");
@@ -4753,6 +4761,7 @@ public class ButtonHelper {
             .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
+    @ButtonHandler("rollThalnos_")
     public static void resolveRollForThalnos(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
         String unitHolderName = buttonID.split("_")[2];
@@ -5375,6 +5384,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("setupStep1_")
     public static void resolveSetupStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (game.isTestBetaFeaturesMode()) {
             SelectFaction.offerFactionSelectionMenu(event);
@@ -5401,12 +5411,11 @@ public class ButtonHelper {
                 newButtons.add(buttons.get(x));
             }
         }
-        newButtons.add(Buttons.gray("setupStep2_" + userId + "_" + (maxBefore + numberOfHomes) + "!",
-            "Get more factions"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction",
-            newButtons);
+        newButtons.add(Buttons.gray("setupStep2_" + userId + "_" + (maxBefore + numberOfHomes) + "!", "Get more factions"));
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction", newButtons);
     }
 
+    @ButtonHandler("setupStep2_")
     public static void resolveSetupStep2(Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
@@ -5472,6 +5481,7 @@ public class ButtonHelper {
         return buttons;
     }
 
+    @ButtonHandler("setupStep3_")
     public static void resolveSetupStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
@@ -5521,6 +5531,8 @@ public class ButtonHelper {
 
     }
 
+    @ButtonHandler("setupStep4_")
+    @ButtonHandler("setupStep5_")
     public static void resolveSetupStep4And5(Game game, ButtonInteractionEvent event, String buttonID) {
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];

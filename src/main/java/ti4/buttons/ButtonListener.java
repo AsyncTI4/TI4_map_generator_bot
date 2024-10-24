@@ -167,6 +167,10 @@ public class ButtonListener extends ListenerAdapter {
             game.getMiltyDraftManager().repostDraftInformation(game);
         } else if (nullable != null && buttonID.startsWith("miltyFactionInfo_")) {
             UnfiledButtonHandlers.miltyFactionInfo(player, buttonID, game);
+        } else if (buttonID.startsWith("agendaResolution_")) {
+            AgendaHelper.resolveAgenda(game, buttonID, event, mainGameChannel);
+        } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
+            game.initializeMiltySettings().parseButtonInput(event);
 
 
 
@@ -175,198 +179,11 @@ public class ButtonListener extends ListenerAdapter {
 
 
 
+  
 
 
-        } else if (buttonID.startsWith("unitTactical")) {
-            ButtonHelperTacticalAction.movingUnitsInTacticalAction(buttonID, event, game, player);
-        } else if (buttonID.startsWith("naaluHeroInitiation")) {
-            ButtonHelperHeroes.resolveNaaluHeroInitiation(player, game, event);
-        } else if (buttonID.startsWith("kyroHeroInitiation")) {
-            ButtonHelperHeroes.resolveKyroHeroInitiation(player, game, event);
-        } else if (buttonID.startsWith("starChartsStep1_")) {
-            UnfiledButtonHandlers.starChartsStep1(event, player, buttonID, game);
-        } else if (buttonID.startsWith("starChartsStep2_")) {
-            ButtonHelper.starChartStep2(game, player, buttonID, event);
-        } else if (buttonID.startsWith("starChartsStep3_")) {
-            ButtonHelper.starChartStep3(game, player, buttonID, event);
-        } else if (buttonID.startsWith("detTileAdditionStep2_")) {
-            ButtonHelper.detTileAdditionStep2(game, player, buttonID, event);
-        } else if (buttonID.startsWith("detTileAdditionStep3_")) {
-            ButtonHelper.detTileAdditionStep3(game, player, buttonID, event);
-        } else if (buttonID.startsWith("detTileAdditionStep4_")) {
-            ButtonHelper.detTileAdditionStep4(game, player, buttonID, event);
-        } else if (buttonID.startsWith("naaluHeroSend")) {
-            ButtonHelperHeroes.resolveNaaluHeroSend(player, game, buttonID, event);
-        } else if (buttonID.startsWith("landUnits_")) {
-            ButtonHelperModifyUnits.landingUnits(buttonID, event, game, player);
-        } else if (buttonID.startsWith("reparationsStep2_")) {
-            ButtonHelperActionCards.resolveReparationsStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("seizeArtifactStep2_")) {
-            ButtonHelperActionCards.resolveSeizeArtifactStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("diplomaticPressureStep2_")) {
-            ButtonHelperActionCards.resolveDiplomaticPressureStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("decoyOperationStep2_")) {
-            ButtonHelperActionCards.resolveDecoyOperationStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("resolveDecoyOperationStep1_")) {
-            ButtonHelperActionCards.resolveDecoyOperationStep1(player, game, event, buttonID);
-        } else if (buttonID.startsWith("seizeArtifactStep3_")) {
-            ButtonHelperActionCards.resolveSeizeArtifactStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("reparationsStep3_")) {
-            ButtonHelperActionCards.resolveReparationsStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("uprisingStep2_")) {
-            ButtonHelperActionCards.resolveUprisingStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("addAbsolOrbital_")) {
-            ButtonHelper.addAbsolOrbital(game, player, event, buttonID);
-        } else if (buttonID.startsWith("argentHeroStep2_")) {
-            ButtonHelperHeroes.argentHeroStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("fogAllianceAgentStep2_")) {
-            ButtonHelperAgents.fogAllianceAgentStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("fogAllianceAgentStep3_")) {
-            UnfiledButtonHandlers.fogAllianceAgentStep3(event, player, buttonID, game);
-        } else if (buttonID.startsWith("argentHeroStep3_")) {
-            ButtonHelperHeroes.argentHeroStep3(game, player, event, buttonID);
-        } else if (buttonID.startsWith("argentHeroStep4_")) {
-            ButtonHelperHeroes.argentHeroStep4(game, player, event, buttonID);
-        } else if (buttonID.startsWith("khraskHeroStep2_")) {
-            ButtonHelperHeroes.resolveKhraskHeroStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("khraskHeroStep3Exhaust_")) {
-            ButtonHelperHeroes.resolveKhraskHeroStep3Exhaust(player, game, event, buttonID);
-        } else if (buttonID.startsWith("khraskHeroStep4Exhaust_")) {
-            ButtonHelperHeroes.resolveKhraskHeroStep4Exhaust(player, game, event, buttonID);
-        } else if (buttonID.startsWith("khraskHeroStep3Ready_")) {
-            ButtonHelperHeroes.resolveKhraskHeroStep3Ready(player, game, event, buttonID);
-        } else if (buttonID.startsWith("khraskHeroStep4Ready_")) {
-            ButtonHelperHeroes.resolveKhraskHeroStep4Ready(player, game, event, buttonID);
-        } else if (buttonID.startsWith("drawRelicAtPosition_")) {
-            RelicDraw.resolveDrawRelicAtPosition(player, event, game, buttonID);
-        } else if (buttonID.startsWith("setTrapStep2_")) {
-            ButtonHelperAbilities.setTrapStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("removeTrapStep2_")) {
-            ButtonHelperAbilities.removeTrapStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("revealTrapStep2_")) {
-            ButtonHelperAbilities.revealTrapStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("setTrapStep3_")) {
-            ButtonHelperAbilities.setTrapStep3(game, player, event, buttonID);
-        } else if (buttonID.startsWith("setTrapStep4_")) {
-            ButtonHelperAbilities.setTrapStep4(game, player, event, buttonID);
-        } else if (buttonID.startsWith("lanefirATS_")) {
-            ButtonHelperFactionSpecific.resolveLanefirATS(player, event, buttonID);
-        } else if (buttonID.startsWith("rohdhnaIndustrious_")) {
-            ButtonHelperFactionSpecific.resolveRohDhnaIndustrious(game, player, event, buttonID);
-        } else if (buttonID.startsWith("rohdhnaRecycle_")) {
-            ButtonHelperFactionSpecific.resolveRohDhnaRecycle(game, player, event, buttonID);
-        } else if (buttonID.startsWith("stymiePlayerStep1_")) {
-            ButtonHelperFactionSpecific.resolveStymiePlayerStep1(game, player, event, buttonID);
-        } else if (buttonID.startsWith("stymiePlayerStep2_")) {
-            ButtonHelperFactionSpecific.resolveStymiePlayerStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("prismStep2_")) {
-            PlanetExhaustAbility.resolvePrismStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("prismStep3_")) {
-            PlanetExhaustAbility.resolvePrismStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("showDeck_")) {
-            ButtonHelper.resolveDeckChoice(game, event, buttonID, player);
-        } else if (buttonID.startsWith("unlockCommander_")) {
-            UnfiledButtonHandlers.unlockCommander(event, player, buttonID);
-        } else if (buttonID.startsWith("setForThalnos_")) {
-            ButtonHelper.resolveSetForThalnos(player, game, buttonID, event);
-        } else if (buttonID.startsWith("rollThalnos_")) {
-            ButtonHelper.resolveRollForThalnos(player, game, buttonID, event);
-        } else if (buttonID.startsWith("startThalnos_")) {
-            ButtonHelper.resolveThalnosStart(player, game, buttonID, event);
-        } else if (buttonID.startsWith("showTextOfDeck_")) {
-            ButtonHelper.resolveShowFullTextDeckChoice(game, event, buttonID, player);
-        } else if (buttonID.startsWith("assRepsStep2_")) {
-            ButtonHelperActionCards.resolveAssRepsStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("setupStep1_")) {
-            ButtonHelper.resolveSetupStep1(player, game, event, buttonID);
-        } else if (buttonID.startsWith("setupStep2_")) {
-            ButtonHelper.resolveSetupStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("setupStep3_")) {
-            ButtonHelper.resolveSetupStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("setupStep4_")) {
-            ButtonHelper.resolveSetupStep4And5(game, event, buttonID);
-        } else if (buttonID.startsWith("setupStep5_")) {
-            ButtonHelper.resolveSetupStep4And5(game, event, buttonID);
-        } else if (buttonID.startsWith("signalJammingStep2_")) {
-            ButtonHelperActionCards.resolveSignalJammingStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("xxchaAgentRemoveInfantry_")) {
-            ButtonHelperAgents.resolveXxchaAgentInfantryRemoval(player, game, event, buttonID);
-        } else if (buttonID.startsWith("signalJammingStep3_")) {
-            ButtonHelperActionCards.resolveSignalJammingStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("edynAgendaStuffStep2_")) {
-            ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("edynAgendaStuffStep3_")) {
-            ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("signalJammingStep4_")) {
-            ButtonHelperActionCards.resolveSignalJammingStep4(player, game, event, buttonID);
-        } else if (buttonID.startsWith("reactorMeltdownStep2_")) {
-            ButtonHelperActionCards.resolveReactorMeltdownStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("declareUse_")) {
-            UnfiledButtonHandlers.declareUse(event, player, buttonID, game);
-        } else if (buttonID.startsWith("spyStep2_")) {
-            ButtonHelperActionCards.resolveSpyStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("olradinConnectStep2_")) {
-            ButtonHelperAbilities.resolveOlradinConnectStep2(player, game, buttonID, event);
-        } else if (buttonID.startsWith("olradinPreserveStep2_")) {
-            ButtonHelperAbilities.resolveOlradinPreserveStep2(buttonID, event, game, player);
-        } else if (buttonID.startsWith("insubStep2_")) {
-            ButtonHelperActionCards.resolveInsubStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("absStep2_")) {
-            ButtonHelperActionCards.resolveABSStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("ghostShipStep2_")) {
-            ButtonHelperActionCards.resolveGhostShipStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("strandedShipStep2_")) {
-            ButtonHelperActionCardsWillHomebrew.resolveStrandedShipStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("tacticalBombardmentStep2_")) {
-            ButtonHelperActionCards.resolveTacticalBombardmentStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("probeStep2_")) {
-            ButtonHelperActionCards.resolveProbeStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("salvageStep2_")) {
-            ButtonHelperActionCards.resolveSalvageStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("salvageOps_")) {
-            ButtonHelperFactionSpecific.resolveSalvageOps(player, event, buttonID, game);
-        } else if (buttonID.startsWith("psStep2_")) {
-            ButtonHelperActionCards.resolvePSStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("plagueStep2_")) {
-            ButtonHelperActionCards.resolvePlagueStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("micrometeoroidStormStep2_")) {
-            ButtonHelperActionCards.resolveMicrometeoroidStormStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("crippleStep2_")) {
-            ButtonHelperActionCards.resolveCrippleStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("infiltrateStep2_")) {
-            ButtonHelperActionCards.resolveInfiltrateStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("spyStep3_")) {
-            ButtonHelperActionCards.resolveSpyStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("plagueStep3_")) {
-            ButtonHelperActionCards.resolvePlagueStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("micrometeoroidStormStep3_")) {
-            ButtonHelperActionCards.resolveMicrometeoroidStormStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("crippleStep3_")) {
-            ButtonHelperActionCards.resolveCrippleStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("infiltrateStep3_")) {
-            ButtonHelperActionCards.resolveInfiltrateStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("reactorMeltdownStep3_")) {
-            ButtonHelperActionCards.resolveReactorMeltdownStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("uprisingStep3_")) {
-            ButtonHelperActionCards.resolveUprisingStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("axisHeroStep3_")) {
-            ButtonHelperHeroes.resolveAxisHeroStep3(player, game, event, buttonID);
-        } else if (buttonID.startsWith("axisHeroStep2_")) {
-            ButtonHelperHeroes.resolveAxisHeroStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("purgeKortaliHero_")) {
-            UnfiledButtonHandlers.purgeKortaliHero(event, player, buttonID, game);
-        } else if (buttonID.startsWith("purgeCeldauriHero_")) {
-            ButtonHelperHeroes.purgeCeldauriHero(player, game, event, buttonID);
-        } else if (buttonID.startsWith("purgeMentakHero_")) {
-            ButtonHelperHeroes.purgeMentakHero(player, game, event, buttonID);
-        } else if (buttonID.startsWith("asnStep2_")) {
-            ButtonHelperFactionSpecific.resolveASNStep2(game, player, buttonID, event);
-        } else if (buttonID.startsWith("unstableStep2_")) {// "titansConstructionMechDeployStep2_"
-            ButtonHelperActionCards.resolveUnstableStep2(player, game, event, buttonID);
-        } else if (buttonID.startsWith("titansConstructionMechDeployStep2_")) {
-            ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep2(game, player, event, buttonID);
-        } else if (buttonID.startsWith("titansConstructionMechDeployStep1")) {
-            ButtonHelperFactionSpecific.handleTitansConstructionMechDeployStep1(game, player, event, messageID);
+
+
         } else if (buttonID.startsWith("unstableStep3_")) {
             ButtonHelperActionCards.resolveUnstableStep3(player, game, event, buttonID);
         } else if (buttonID.startsWith("spaceUnits_")) {
@@ -435,10 +252,6 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperHeroes.resolveRelicSwapStep1(player, game, event, buttonID);
         } else if (buttonID.startsWith("retrieveAgenda_")) {
             UnfiledButtonHandlers.retrieveAgenda(event, player, buttonID, game);
-        } else if (buttonID.startsWith("agendaResolution_")) {
-            AgendaHelper.resolveAgenda(game, buttonID, event, mainGameChannel);
-        } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
-            game.initializeMiltySettings().parseButtonInput(event);
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
                 case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");

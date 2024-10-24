@@ -46,12 +46,12 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
-import ti4.model.LeaderModel;
 import ti4.model.PlanetModel;
 import ti4.model.UnitModel;
 
 public class ButtonHelperAgents {
 
+    @ButtonHandler("xxchaAgentRemoveInfantry_")
     public static void resolveXxchaAgentInfantryRemoval(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
@@ -88,7 +88,7 @@ public class ButtonHelperAgents {
                 List<Button> buttons = new ArrayList<>();
                 String msg = cabal.getRepresentationUnfogged() + " you have the ability to use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + " The Stillness of Stars, the Vuil'raith" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
-                    + ButtonHelper.getIdentOrColor(p2, game) + " who has "
+                    + p2.getFactionEmojiOrColor() + " who has "
                     + p2.getCommoditiesTotal() + " commodities";
                 buttons.add(Buttons.green("exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(),
                     "Use Vuil'raith Agent"));
@@ -304,7 +304,7 @@ public class ButtonHelperAgents {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String msg2 = player.getFactionEmojiOrColor() + " selected "
-            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + p2.getFactionEmojiOrColor() + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Nekro Malleon, the Nekro" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         String message = p2.getRepresentationUnfogged() + " increased your TGs by 2 " + p2.gainTG(2)
@@ -341,7 +341,7 @@ public class ButtonHelperAgents {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         String msg2 = player.getFactionEmojiOrColor() + " selected "
-            + ButtonHelper.getIdentOrColor(p2, game) + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            + p2.getFactionEmojiOrColor() + " as user of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Captain Dust, the Kollecc" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg2);
         List<Button> buttons = getKolleccAgentButtons(game, p2);
@@ -474,7 +474,7 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                p2.getFactionEmojiOrColor() + " gained 1AC from using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         }
         ButtonHelper.deleteMessage(event);
@@ -533,7 +533,7 @@ public class ButtonHelperAgents {
                     + oldTg + "->" + p2.getTg() + ").");
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    ButtonHelper.getIdentOrColor(p2, game) + " gained 2TGs due to agent usage.");
+                    p2.getFactionEmojiOrColor() + " gained 2TGs due to agent usage.");
             }
             ButtonHelperAbilities.pillageCheck(p2, game);
             resolveArtunoCheck(p2, game, 2);
@@ -548,7 +548,7 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
                 if (game.isFowMode()) {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        ButtonHelper.getIdentOrColor(p2, game) + " gained 1AC due to agent usage.");
+                        p2.getFactionEmojiOrColor() + " gained 1AC due to agent usage.");
                 }
             } else {
                 message = trueIdentity + " select the faction on which you wish to use " + ssruuClever + "Yvin Korduul, the Vaylerian" + ssruuSlash + " agent.";
@@ -757,7 +757,7 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdentOrColor(p2, game) + " will receive " + ssruuClever + "Evelyn Delouis, the Sol" + ssruuSlash + " agent, on their next roll.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), p2.getFactionEmojiOrColor() + " will receive " + ssruuClever + "Evelyn Delouis, the Sol" + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("solagent", p2.getFaction());
         }
         if ("letnevagent".equalsIgnoreCase(agent)) {
@@ -765,7 +765,7 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ButtonHelper.getIdentOrColor(p2, game) + " will receive " + ssruuClever + "Viscount Unlenn, the Letnev" + ssruuSlash + " agent, on their next roll.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), p2.getFactionEmojiOrColor() + " will receive " + ssruuClever + "Viscount Unlenn, the Letnev" + ssruuSlash + " agent, on their next roll.");
             game.setCurrentReacts("letnevagent", p2.getFaction());
         }
 
@@ -1854,9 +1854,9 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
     }
 
+    @ButtonHandler("fogAllianceAgentStep2_")
     public static void fogAllianceAgentStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String msg = player.getRepresentationUnfogged()
-            + " use buttons to select the system you want to move ships to";
+        String msg = player.getRepresentationUnfogged() + " use buttons to select the system you want to move ships to";
         List<Button> buttons = new ArrayList<>();
         String ogTile = buttonID.split("_")[1];
         for (Tile tile : game.getTileMap().values()) {
