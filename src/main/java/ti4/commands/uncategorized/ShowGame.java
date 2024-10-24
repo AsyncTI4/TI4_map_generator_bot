@@ -18,6 +18,7 @@ import ti4.commands.Command;
 import ti4.generator.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
@@ -87,16 +88,19 @@ public class ShowGame implements Command {
         simpleShowGame(game, event, displayType);
     }
 
+    @ButtonHandler("showGameAgain")
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
         simpleShowGame(game, event, DisplayType.all);
     }
 
+    @ButtonHandler("showMap")
     public static void showMap(Game game, ButtonInteractionEvent event) {
         MapGenerator.saveImage(game, DisplayType.map, event).thenAccept(fileUpload -> {
             MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
         });
     }
 
+    @ButtonHandler("showPlayerAreas")
     public static void showPlayArea(Game game, ButtonInteractionEvent event) {
         MapGenerator.saveImage(game, DisplayType.stats, event).thenAccept(fileUpload -> {
             MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);

@@ -1,6 +1,6 @@
 package ti4.commands.game;
 
-import static ti4.helpers.StringHelper.*;
+import static ti4.helpers.StringHelper.ordinal;
 
 import java.io.File;
 import java.text.NumberFormat;
@@ -24,10 +24,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.special.Rematch;
 import ti4.commands.statistics.GameStatisticFilterer;
 import ti4.commands.statistics.GameStats;
 import ti4.generator.MapGenerator;
@@ -41,6 +43,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.WebHelper;
 import ti4.helpers.async.RoundSummaryHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -80,6 +83,12 @@ public class GameEnd extends GameSubcommandData {
         boolean archiveChannels = event.getOption(Constants.ARCHIVE_CHANNELS, true, OptionMapping::getAsBoolean);
         boolean rematch = event.getOption(Constants.REMATCH, false, OptionMapping::getAsBoolean);
         secondHalfOfGameEnd(event, game, publish, archiveChannels, rematch);
+    }
+
+    @ButtonHandler("gameEnd")
+    public static void gameEnd(ButtonInteractionEvent event, Game game) {
+        GameEnd.secondHalfOfGameEnd(event, game, true, true, false);
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void secondHalfOfGameEnd(GenericInteractionCreateEvent event, Game game, boolean publish, boolean archiveChannels, boolean rematch) {
@@ -193,7 +202,7 @@ public class GameEnd extends GameSubcommandData {
         }
 
         if (rematch) {
-            ButtonHelper.secondHalfOfRematch(event, game);
+            Rematch.secondHalfOfRematch(event, game);
         }
     }
 

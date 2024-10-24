@@ -13,6 +13,7 @@ import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -39,7 +40,7 @@ public class RelicInfo extends RelicSubcommandData implements InfoThreadCommand 
         }
         sendRelicInfo(game, player, event);
     }
-
+    @ButtonHandler(Constants.REFRESH_RELIC_INFO)
     public static void sendRelicInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);

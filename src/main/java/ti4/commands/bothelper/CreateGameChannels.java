@@ -337,7 +337,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
-        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + game.getName());
+        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://www.AsyncTI4.com/game/" + game.getName());
     }
 
     private static void sendMessageAboutAggressionMetas(Game game) {

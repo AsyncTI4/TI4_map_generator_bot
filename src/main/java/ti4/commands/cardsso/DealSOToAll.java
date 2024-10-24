@@ -5,14 +5,17 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -63,5 +66,11 @@ public class DealSOToAll extends SOCardsSubcommandData {
             //     game.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
             Helper.setOrder(game);
         }
+    }
+
+    @ButtonHandler("deal2SOToAll")
+    public static void deal2SOToAll(ButtonInteractionEvent event, Game game) {
+        dealSOToAll(event, 2, game);
+        ButtonHelper.deleteMessage(event);
     }
 }

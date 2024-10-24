@@ -19,6 +19,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tech.GetTechButton;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -28,7 +29,9 @@ import ti4.model.StrategyCardModel;
 
 public class ButtonHelperSCs {
 
-    public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("diploRefresh2")
+    public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -79,8 +82,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-        boolean used = addUsedSCPlayer(messageID, game, player, event, "");
+    @ButtonHandler("nekroFollowTech")
+    public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok7technology")) {
@@ -123,7 +127,8 @@ public class ButtonHelperSCs {
         }
     }
 
-    public static void scoreImperial(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("score_imperial")
+    public static void scoreImperial(Game game, Player player, ButtonInteractionEvent event) {
         if (player == null || game == null) {
             return;
         }
@@ -132,7 +137,7 @@ public class ButtonHelperSCs {
                 "Only the player who controls Mecatol Rex may score the Imperial point.");
             return;
         }
-        boolean used = addUsedSCPlayer(messageID + "score_imperial", game, player, event,
+        boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player, event,
             " scored Imperial");
         if (used) {
             return;
@@ -141,8 +146,10 @@ public class ButtonHelperSCs {
         ScorePublic.scorePO(event, player.getCorrectChannel(), game, player, 0);
     }
 
-    public static void followTrade(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-        boolean used = addUsedSCPlayer(messageID, game, player, event, "");
+    @ButtonHandler("sc_trade_follow")
+    @ButtonHandler("sc_follow_trade")
+    public static void followTrade(Game game, Player player, ButtonInteractionEvent event) {
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player, event, "");
         if (used) {
             return;
         }
@@ -172,7 +179,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void scDrawSO(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("sc_draw_so")
+    public static void scDrawSO(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -237,8 +246,9 @@ public class ButtonHelperSCs {
         ButtonHelper.addReaction(event, false, false, message, "");
     }
 
-    public static void refresh(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-        boolean used = addUsedSCPlayer(messageID, game, player, event, "Replenish");
+    @ButtonHandler("sc_refresh")
+    public static void refresh(Game game, Player player, ButtonInteractionEvent event) {
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player, event, "Replenish");
         if (used) {
             return;
         }
@@ -265,8 +275,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-
+    @ButtonHandler("sc_refresh_and_wash")
+    public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         if (player.hasAbility("military_industrial_complex")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
                 + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
@@ -348,7 +359,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void warfareBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("warfareBuild")
+    public static void warfareBuild(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         List<Button> buttons;
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
@@ -399,7 +412,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void construction(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("construction_")
+    public static void construction(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -434,6 +449,7 @@ public class ButtonHelperSCs {
 
     }
 
+    @ButtonHandler("leadershipGenerateCCButtons")
     public static void leadershipGenerateCCButtons(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         int leadershipInitiative = 1;
         StrategyCardModel scModel = null;
@@ -493,42 +509,42 @@ public class ButtonHelperSCs {
         return contains;
     }
 
+    @ButtonHandler("scepterE_follow_")
+    @ButtonHandler("mahactA_follow_")
     public static void mahactAndScepterFollow(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
-        boolean setstatus = true;
-        int scnum = 1;
+        String lastChar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
+        boolean setStatus = true;
+        int scNum = 1;
         try {
-            scnum = Integer.parseInt(StringUtils.substringAfterLast(buttonID, "_"));
+            scNum = Integer.parseInt(StringUtils.substringAfterLast(buttonID, "_"));
         } catch (NumberFormatException e) {
             try {
-                scnum = Integer.parseInt(lastchar);
+                scNum = Integer.parseInt(lastChar);
             } catch (NumberFormatException e2) {
-                setstatus = false;
+                setStatus = false;
             }
         }
-        if (setstatus) {
-            if (!player.getFollowedSCs().contains(scnum)) {
-                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scnum, game, event);
+        if (setStatus) {
+            if (!player.getFollowedSCs().contains(scNum)) {
+                ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
             }
-            player.addFollowedSC(scnum, event);
+            player.addFollowedSC(scNum, event);
         }
-        MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scnum);
+        MessageChannel channel = ButtonHelper.getSCFollowChannel(game, player, scNum);
         if (buttonID.contains("mahact")) {
             MessageHelper.sendMessageToChannel(channel,
                 player.getFactionEmojiOrColor() + " exhausted " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow " + Helper.getSCName(scnum, game));
+                    + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " Agent, to follow " + Helper.getSCName(scNum, game));
             Leader playerLeader = player.unsafeGetLeader("mahactagent");
             if (playerLeader != null) {
                 playerLeader.setExhausted(true);
                 for (Player p2 : game.getPlayers().values()) {
                     for (Integer sc2 : p2.getSCs()) {
-                        if (sc2 == scnum) {
+                        if (sc2 == scNum) {
                             List<Button> buttonsToRemoveCC = new ArrayList<>();
-                            String finChecker = "FFCC_" + player.getFaction() + "_";
                             for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, game, event)) {
                                 buttonsToRemoveCC.add(Buttons.green(
-                                    finChecker + "removeCCFromBoard_mahactAgent" + p2.getFaction() + "_"
-                                        + tile.getPosition(),
+                                    player.getFinsFactionCheckerPrefix() + "removeCCFromBoard_mahactAgent" + p2.getFaction() + "_" + tile.getPosition(),
                                     tile.getRepresentationForButtons(game, player)));
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel,
@@ -539,7 +555,7 @@ public class ButtonHelperSCs {
             }
         } else {
             MessageHelper.sendMessageToChannel(channel,
-                player.getRepresentationUnfogged() + " exhausted Scepter of Silly Spelling to follow " + Helper.getSCName(scnum, game));
+                player.getRepresentationUnfogged() + " exhausted Scepter of Silly Spelling to follow " + Helper.getSCName(scNum, game));
             player.addExhaustedRelic("emelpar");
         }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
@@ -553,7 +569,9 @@ public class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void scNoFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("sc_no_follow_")
+    public static void scNoFollow(Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
@@ -598,7 +616,9 @@ public class ButtonHelperSCs {
         }
     }
 
-    public static void scFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("sc_follow_")
+    public static void scFollow(Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
@@ -649,8 +669,9 @@ public class ButtonHelperSCs {
         return message;
     }
 
-    public static void scACDraw(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-
+    @ButtonHandler("sc_ac_draw")
+    public static void scACDraw(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         boolean used2 = addUsedSCPlayer(messageID + "ac", game, player, event, "");
         if (used2) {
             return;

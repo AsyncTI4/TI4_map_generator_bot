@@ -28,6 +28,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -45,6 +46,12 @@ public class TechExhaust extends TechAddRemove {
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         exhaustTechAndResolve(event, getActiveGame(), player, techID);
         checkAndApplyCombatMods(event, player, techID);
+    }
+
+    @ButtonHandler("exhaustTech_")
+    public static void exhaustTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String tech = buttonID.replace("exhaustTech_", "");
+        exhaustTechAndResolve(event, game, player, tech);
     }
 
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {

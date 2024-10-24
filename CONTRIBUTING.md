@@ -9,6 +9,7 @@
 - [Adding Homebrew Content](#adding-homebrew-content)
 - [Testing your Changes](#testing-your-changes)
   - [VSCode Test](#vscode-test)
+- [Helpful Tips for Debugging](#helpful-tips-for-debugging)
   
 # Setup a Test Server
 
@@ -98,7 +99,7 @@ Bot should now be running and able to receive commands on your test server!
 
 # Adding New Buttons
 
-Don't add anything to ButtonListener.java! The if/elseif chain and select case method is deprecated. Use the @ButtonHandler annotation on your resolver method, ideally nearby where you sent/created the button!
+Don't add anything to ButtonListener.java! The if/elseif startsWith chain and select case method are deprecated. Use the @ButtonHandler annotation on your resolver method, ideally nearby where you sent/created the button!
 
 # Adding Homebrew Content
 
@@ -123,3 +124,8 @@ To run Java tests in VSCode - make sure you add a test configuration your .vscod
 ]
 ```
 
+# Helpful Tips for Debugging
+
+- You can use `/game swap` to switch seats with another player (a bot) in the game
+- You can use `/bothelper list_buttons` to find the buttonIDs in that message, which you can use to search the repo for the code that created that button
+- You can spoof a button with a specific buttonID with `/button spoof_id:{spoofedID}`

@@ -27,6 +27,7 @@ import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -738,6 +739,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("removeThisTypeOfUnit_")
     public static void removeThisTypeOfUnit(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String unit = buttonID.split("_")[1].toLowerCase().replace(" ", "").replace("'", "");
@@ -877,11 +879,11 @@ public class ButtonHelperModifyUnits {
         }
         Button concludeMove = Buttons.gray(finChecker + "deleteButtons", "Done Retreating troops");
         buttons.add(concludeMove);
-        CommanderUnlockCheck.checkPlayer(player, game, "naaz", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "empyrean", event);
+        CommanderUnlockCheck.checkPlayer(player, "naaz", "empyrean");
         return buttons;
     }
 
+    @ButtonHandler("doneLanding")
     public static void finishLanding(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         if (!event.getMessage().getContentRaw().contains("Moved all units to the space area.")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
@@ -972,6 +974,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("startDevotion_")
     public static void startDevotion(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
@@ -980,6 +983,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
     }
 
+    @ButtonHandler("resolveDevote_")
     public static void resolveDevote(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
@@ -1055,6 +1059,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("hitOpponent_")
     public static void resolveGettingHit(Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
@@ -1121,6 +1126,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("retreatGroundUnits_")
     public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("retreatGroundUnits_", "").replace("'", "");
@@ -1246,6 +1252,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("place_")
     public static void genericPlaceUnit(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("place_", "");
         String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
@@ -1501,21 +1508,13 @@ public class ButtonHelperModifyUnits {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
                 Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
-        CommanderUnlockCheck.checkPlayer(player, "mentak");
-        CommanderUnlockCheck.checkPlayer(player, "l1z1x");
-        CommanderUnlockCheck.checkPlayer(player, "tnelis");
-        CommanderUnlockCheck.checkPlayer(player, "cymiae");
-        CommanderUnlockCheck.checkPlayer(player, "kyro");
-        CommanderUnlockCheck.checkPlayer(player, "ghemina");
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheck.checkPlayer(player, "muaat");
         }
-        CommanderUnlockCheck.checkPlayer(player, "argent");
-
-        CommanderUnlockCheck.checkPlayer(player, "naaz");
-        CommanderUnlockCheck.checkPlayer(player, "arborec");
+        CommanderUnlockCheck.checkPlayer(player, "mentak", "l1z1x", "tnelis", "cymiae", "kyro", "ghemina", "argent", "naaz", "arborec");
     }
 
+    @ButtonHandler("cloakedFleets_")
     public static void resolveCloakedFleets(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String unit = buttonID.split("_")[2];
@@ -1530,6 +1529,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("kolleccMechCapture_")
     public static void resolveKolleccMechCapture(String buttonID, ButtonInteractionEvent event, Game game,
         Player player) {
         String unit = buttonID.split("_")[2];
@@ -1552,6 +1552,7 @@ public class ButtonHelperModifyUnits {
         }
     }
 
+    @ButtonHandler("placeOneNDone_")
     public static void placeUnitAndDeleteButton(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("placeOneNDone_", "");
         String skipbuild = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
@@ -1750,6 +1751,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("spaceUnits_")
     public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("spaceUnits_", "");
@@ -1787,6 +1789,7 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    @ButtonHandler("assCannonNDihmohn_")
     public static void resolveAssaultCannonNDihmohnCommander(String buttonID, ButtonInteractionEvent event,
         Player player, Game game) {
         String cause = buttonID.split("_")[1];
@@ -1828,6 +1831,7 @@ public class ButtonHelperModifyUnits {
 
     }
 
+    @ButtonHandler("landUnits_")
     public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("landUnits_", "");
@@ -1897,6 +1901,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.editMessageWithButtons(event, oldMessage, systemButtons);
     }
 
+    @ButtonHandler("domnaStepOne_")
     public static void offerDomnaStep2Buttons(ButtonInteractionEvent event, Game game, Player player,
         String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -1916,6 +1921,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("domnaStepTwo_")
     public static void offerDomnaStep3Buttons(ButtonInteractionEvent event, Game game, Player player,
         String buttonID) {
         String pos1 = buttonID.split("_")[1];
@@ -1935,6 +1941,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("domnaStepThree_")
     public static void resolveDomnaStep3Buttons(ButtonInteractionEvent event, Game game, Player player,
         String buttonID) {
         String pos1 = buttonID.split("_")[1];
@@ -1951,6 +1958,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("combatDrones")
     public static void offerCombatDroneButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff;
@@ -1971,6 +1979,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("offerMirvedaCommander")
     public static void offerMirvedaCommanderButtons(ButtonInteractionEvent event, Game game, Player player) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numinf;
@@ -1991,6 +2000,7 @@ public class ButtonHelperModifyUnits {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("resolveMirvedaCommander_")
     public static void resolvingMirvedaCommander(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff = Integer.parseInt(buttonID.split("_")[1]);
@@ -2004,6 +2014,7 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    @ButtonHandler("combatDroneConvert_")
     public static void resolvingCombatDrones(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         int numff = Integer.parseInt(buttonID.split("_")[1]);
@@ -2017,6 +2028,7 @@ public class ButtonHelperModifyUnits {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
+    @ButtonHandler("assignHits_")
     public static void assignHits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
         String rest = buttonID.replace("assignHits_", "");
@@ -2244,6 +2256,7 @@ public class ButtonHelperModifyUnits {
 
     }
 
+    @ButtonHandler("repairDamage_")
     public static void repairDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String rest;
         rest = buttonID.replace("repairDamage_", "");
@@ -2282,6 +2295,7 @@ public class ButtonHelperModifyUnits {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
     }
 
+    @ButtonHandler("assignDamage_")
     public static void assignDamage(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String rest;
         rest = buttonID.replace("assignDamage_", "");

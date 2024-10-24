@@ -18,6 +18,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TransactionHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -145,6 +146,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         return buttons;
     }
 
+    @ButtonHandler("newPrism@")
     public static void newPrismPart2(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String techOut = buttonID.split("@")[1];
         player.removeTech(techOut);
@@ -175,6 +177,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who you want to force into giving you a PN or AC", buttons);
     }
 
+    @ButtonHandler("prismStep2_")
     public static void resolvePrismStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
@@ -184,11 +187,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " chose " + ButtonHelper.getIdentOrColor(p2, game) + " as the target of the prism ability. The target has been sent buttons to resolve.");
+            player.getFactionEmoji() + " chose " + p2.getFactionEmojiOrColor() + " as the target of the prism ability. The target has been sent buttons to resolve.");
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentationUnfogged() + " you have had the Prism ability hit you. Please tell the bot if you wish to send an AC or a PN", buttons);
     }
 
+    @ButtonHandler("prismStep3_")
     public static void resolvePrismStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons;
