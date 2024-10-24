@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.AsyncTI4DiscordBot;
-import ti4.MessageListener;
+import ti4.SlashCommandListener;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -45,7 +45,7 @@ public abstract class ListenerContext {
         this.componentID = this.origComponentID = compID;
 
         String userID = event.getUser().getId();
-        MessageListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, getContextType(), getSubCommand());
 
         // Find game
         String gameName = event.getChannel().getName();
