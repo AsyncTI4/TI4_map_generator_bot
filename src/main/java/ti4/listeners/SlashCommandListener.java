@@ -1,4 +1,4 @@
-package ti4;
+package ti4.listeners;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
