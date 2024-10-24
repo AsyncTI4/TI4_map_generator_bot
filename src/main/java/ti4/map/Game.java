@@ -934,7 +934,7 @@ public class Game extends GameProperties {
         Date newTime = new Date();
         String factionsInCombat = getStoredValue("factionsInCombat");
         Player prevPlayer = getActivePlayer();
-        String prevFaction = prevPlayer.getFaction() == null ? "jazzwuzhere" : prevPlayer.getFaction();
+        String prevFaction = prevPlayer == null ? "jazzwuzhere&p1too" : prevPlayer.getFaction();
         if (prevPlayer != null && !factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
             long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
             prevPlayer.updateTurnStats(elapsedTime);
