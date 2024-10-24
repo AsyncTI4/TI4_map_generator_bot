@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import lombok.NonNull;
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
@@ -31,7 +32,7 @@ public class ModalListener extends ListenerAdapter {
     }
 
     @Override
-    public void onModalInteraction(@NonNull ModalInteractionEvent event) {
+    public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
             return;
@@ -70,7 +71,7 @@ public class ModalListener extends ListenerAdapter {
         return false;
     }
 
-    private void resolveModalInteractionEvent(@NonNull ModalContext context) {
+    private void resolveModalInteractionEvent(@Nonnull ModalContext context) {
         String modalID = context.getModalID();
         Game game = context.getGame();
 
