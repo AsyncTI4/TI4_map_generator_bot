@@ -28,7 +28,6 @@ import ti4.commands.planet.PlanetAdd;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.ClearDebt;
 import ti4.commands.player.SCPlay;
-import ti4.commands.special.NovaSeed;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
