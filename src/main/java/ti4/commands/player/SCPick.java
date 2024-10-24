@@ -216,7 +216,7 @@ public class SCPick extends PlayerSubcommandData {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
+            CommanderUnlockCheck.checkPlayer(player, "hacan");
             ButtonHelperAbilities.pillageCheck(player, game);
             game.setScTradeGood(scPicked, 0);
             if (scPicked == 2 && game.isRedTapeMode()) {

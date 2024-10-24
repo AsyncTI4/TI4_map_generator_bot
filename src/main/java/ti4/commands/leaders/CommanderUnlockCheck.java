@@ -28,14 +28,6 @@ public class CommanderUnlockCheck {
     }
 
     /**
-     * @deprecated event and game aren't required but I'm too lazy to figure out the regex replace for it right now
-     */
-    @Deprecated
-    public static void checkPlayer(Player player, Game game, String factionToCheck, GenericInteractionCreateEvent event) {
-        checkPlayer(player, factionToCheck);
-    }
-
-    /**
      * @param player - the {@link Player} to check
      * @param factionsToCheck - the faction IDs of the leader to check the unlock conditions of e.g. "sol" will check for "solcommander"
      */

@@ -879,7 +879,7 @@ public class AgendaHelper {
                                 ACInfo.sendActionCardInfo(game, playerWL, event);
                             }
                         }
-                        CommanderUnlockCheck.checkPlayer(playerWL, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(playerWL, "yssaril");
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -907,7 +907,7 @@ public class AgendaHelper {
                             }
                         }
 
-                        CommanderUnlockCheck.checkPlayer(playerWL, game, "yssaril", event);
+                        CommanderUnlockCheck.checkPlayer(playerWL, "yssaril");
                         ButtonHelper.checkACLimit(game, event, playerWL);
                     }
                     for (Player p2 : getLosingVoters(winner, game)) {
