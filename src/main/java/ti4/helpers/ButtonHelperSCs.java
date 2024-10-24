@@ -29,7 +29,9 @@ import ti4.model.StrategyCardModel;
 
 public class ButtonHelperSCs {
 
-    public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("diploRefresh2")
+    public static void diploRefresh2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -80,8 +82,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-        boolean used = addUsedSCPlayer(messageID, game, player, event, "");
+    @ButtonHandler("nekroFollowTech")
+    public static void nekroFollowTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok7technology")) {
@@ -124,7 +127,8 @@ public class ButtonHelperSCs {
         }
     }
 
-    public static void scoreImperial(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("score_imperial")
+    public static void scoreImperial(Game game, Player player, ButtonInteractionEvent event) {
         if (player == null || game == null) {
             return;
         }
@@ -133,7 +137,7 @@ public class ButtonHelperSCs {
                 "Only the player who controls Mecatol Rex may score the Imperial point.");
             return;
         }
-        boolean used = addUsedSCPlayer(messageID + "score_imperial", game, player, event,
+        boolean used = addUsedSCPlayer(event.getMessageId() + "score_imperial", game, player, event,
             " scored Imperial");
         if (used) {
             return;
@@ -142,8 +146,10 @@ public class ButtonHelperSCs {
         ScorePublic.scorePO(event, player.getCorrectChannel(), game, player, 0);
     }
 
-    public static void followTrade(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-        boolean used = addUsedSCPlayer(messageID, game, player, event, "");
+    @ButtonHandler("sc_trade_follow")
+    @ButtonHandler("sc_follow_trade")
+    public static void followTrade(Game game, Player player, ButtonInteractionEvent event) {
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player, event, "");
         if (used) {
             return;
         }
@@ -173,7 +179,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void scDrawSO(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("sc_draw_so")
+    public static void scDrawSO(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -238,8 +246,9 @@ public class ButtonHelperSCs {
         ButtonHelper.addReaction(event, false, false, message, "");
     }
 
-    public static void refresh(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-        boolean used = addUsedSCPlayer(messageID, game, player, event, "Replenish");
+    @ButtonHandler("sc_refresh")
+    public static void refresh(Game game, Player player, ButtonInteractionEvent event) {
+        boolean used = addUsedSCPlayer(event.getMessageId(), game, player, event, "Replenish");
         if (used) {
             return;
         }
@@ -266,8 +275,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-
+    @ButtonHandler("sc_refresh_and_wash")
+    public static void refreshAndWash(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         if (player.hasAbility("military_industrial_complex")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
                 + " since you cannot send players commodities due to your faction ability, washing here seems likely an error. Nothing has been processed as a result. Try a different route if this correction is wrong");
@@ -349,7 +359,9 @@ public class ButtonHelperSCs {
 
     }
 
-    public static void warfareBuild(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
+    @ButtonHandler("warfareBuild")
+    public static void warfareBuild(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         List<Button> buttons;
         boolean used = addUsedSCPlayer(messageID, game, player, event, "");
         StrategyCardModel scModel = null;
@@ -557,7 +569,9 @@ public class ButtonHelperSCs {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void scNoFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("sc_no_follow_")
+    public static void scNoFollow(Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
@@ -602,7 +616,9 @@ public class ButtonHelperSCs {
         }
     }
 
-    public static void scFollow(String messageID, Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("sc_follow_")
+    public static void scFollow(Game game, Player player, @NotNull ButtonInteractionEvent event, String buttonID) {
+        String messageID = event.getMessageId();
         String lastchar = StringUtils.right(event.getButton().getLabel(), 2).replace("#", "");
         int scNum = 1;
         boolean setStatus = true;
@@ -653,8 +669,9 @@ public class ButtonHelperSCs {
         return message;
     }
 
-    public static void scACDraw(Game game, Player player, ButtonInteractionEvent event, String buttonID, String messageID) {
-
+    @ButtonHandler("sc_ac_draw")
+    public static void scACDraw(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
         boolean used2 = addUsedSCPlayer(messageID + "ac", game, player, event, "");
         if (used2) {
             return;

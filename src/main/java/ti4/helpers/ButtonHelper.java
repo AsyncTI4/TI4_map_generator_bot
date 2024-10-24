@@ -6396,21 +6396,21 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, String messageID, boolean sc) {
+    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc) {
         ButtonHelper.acquireATech(
-            player, game, event, messageID, sc,
+            player, game, event, sc,
             Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
             "res");
     }
 
-    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, String messageID, boolean sc, final String payType) {
+    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final String payType) {
         ButtonHelper.acquireATech(
-            player, game, event, messageID, sc,
+            player, game, event, sc,
             Set.of(Constants.PROPULSION, Constants.BIOTIC, Constants.CYBERNETIC, Constants.WARFARE, Constants.UNIT),
             payType);
     }
 
-    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, String messageID, boolean sc, final Set<String> techTypes, final String payType) {
+    public static void acquireATech(Player player, Game game, ButtonInteractionEvent event, boolean sc, final Set<String> techTypes, final String payType) {
         String finsFactionCheckerPrefix = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
         if (sc) {

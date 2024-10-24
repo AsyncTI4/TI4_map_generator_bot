@@ -123,7 +123,6 @@ public class ButtonListener extends ListenerAdapter {
         ButtonInteractionEvent event = context.getEvent();
         Player player = context.getPlayer();
         String buttonID = context.getButtonID();
-        String messageID = context.getMessageID();
         Game game = context.getGame();
         MessageChannel privateChannel = context.getPrivateChannel();
         MessageChannel mainGameChannel = context.getMainGameChannel();
@@ -131,9 +130,6 @@ public class ButtonListener extends ListenerAdapter {
 
         // hacking
         Player nullable = player; // why?
-
-        // Setup some additional helper values for buttons
-        String finsFactionCheckerPrefix = nullable == null ? "FFCC_nullPlayer_" : nullable.getFinsFactionCheckerPrefix();
 
         // Check the list of buttons first
         if (handleKnownButtons(context)) return;
@@ -147,10 +143,6 @@ public class ButtonListener extends ListenerAdapter {
             UnfiledButtonHandlers.soScoreFromHand(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
             UnfiledButtonHandlers.poScoring(event, player, buttonID, game, privateChannel);
-        } else if (buttonID.startsWith("sc_follow_")) {
-            ButtonHelperSCs.scFollow(messageID, game, player, event, buttonID);
-        } else if (buttonID.startsWith("sc_no_follow_")) {
-            ButtonHelperSCs.scNoFollow(messageID, game, player, event, buttonID);
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ButtonHelper.addReaction(event, false, false, null, "");
         } else if (buttonID.startsWith("movedNExplored_")) {
@@ -257,9 +249,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "resolveSeizeArtifactStep1" -> ButtonHelperActionCards.resolveSeizeArtifactStep1(player, game, event, "no");
                 case "refreshInfoButtons" -> MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
                 case "factionEmbedRefresh" -> MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
-                case "warfareBuild" -> ButtonHelperSCs.warfareBuild(game, player, event, buttonID, messageID);
-                case "diploRefresh2" -> ButtonHelperSCs.diploRefresh2(game, player, event, buttonID, messageID);
-                case "sc_ac_draw" -> ButtonHelperSCs.scACDraw(game, player, event, buttonID, messageID);
                 case "gain_1_comms" -> ButtonHelperStats.gainComms(event, game, player, 1, true);
                 case "gain_2_comms" -> ButtonHelperStats.gainComms(event, game, player, 2, true);
                 case "gain_3_comms" -> ButtonHelperStats.gainComms(event, game, player, 3, true);
@@ -276,15 +265,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "refreshPNInfo" -> PNInfo.sendPromissoryNoteInfo(game, player, true, event);
                 case Constants.REFRESH_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, false);
                 case Constants.REFRESH_ALL_UNIT_INFO -> UnitInfo.sendUnitInfo(game, player, event, true);
-                case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, messageID, false);
-                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event, messageID, false, Set.of(Constants.UNIT), "inf");
-                case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, messageID, true);
-                case "nekroFollowTech" -> ButtonHelperSCs.nekroFollowTech(game, player, event, buttonID, messageID);
-                case "sc_draw_so" -> ButtonHelperSCs.scDrawSO(game, player, event, buttonID, messageID);
-                case "sc_trade_follow", "sc_follow_trade" -> ButtonHelperSCs.followTrade(game, player, event, buttonID, messageID);
-                case "sc_refresh" -> ButtonHelperSCs.refresh(game, player, event, buttonID, messageID);
-                case "sc_refresh_and_wash" -> ButtonHelperSCs.refreshAndWash(game, player, event, buttonID, messageID);
-                case "score_imperial" -> ButtonHelperSCs.scoreImperial(game, player, event, buttonID, messageID);
+                case "acquireATech" -> ButtonHelper.acquireATech(player, game, event, false);
+                case "acquireAUnitTechWithInf" -> ButtonHelper.acquireATech(player, game, event,  false, Set.of(Constants.UNIT), "inf");
+                case "acquireATechWithSC" -> ButtonHelper.acquireATech(player, game, event, true);
                 case "play_when" -> UnfiledButtonHandlers.playWhen(event, game, mainGameChannel);
                 case "gain_1_tg" -> UnfiledButtonHandlers.gain1TG(event, player, game, mainGameChannel);
                 case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
