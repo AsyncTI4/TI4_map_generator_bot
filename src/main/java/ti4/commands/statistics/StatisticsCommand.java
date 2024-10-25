@@ -70,6 +70,7 @@ public class StatisticsCommand implements Command {
         subcommands.add(new GameWinsWithOtherFactions());
         subcommands.add(new StellarConverter());
         subcommands.add(new ListTitlesGiven());
+        subcommands.add(new ExportToCSV());
 
         return subcommands;
     }
