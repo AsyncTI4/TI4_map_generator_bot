@@ -22,6 +22,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.search.SearchMyGames;
 import ti4.helpers.Constants;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
@@ -107,16 +108,16 @@ public class CreateGameButton extends GameSubcommandData {
         }
     }
 
+    @ButtonHandler("createGameChannels")
     public static void decodeButtonMsg(ButtonInteractionEvent event) {
-        event.getChannel().sendMessage(event.getUser().getEffectiveName() + " pressed the [Create Game] button")
-            .queue();
+        MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
+
         Member member = event.getMember();
         boolean isAdmin = false;
         Game mapreference = GameManager.getInstance().getGame("finreference");
 
         if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
         if (member != null) {

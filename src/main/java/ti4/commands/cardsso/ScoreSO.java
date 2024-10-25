@@ -141,7 +141,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         SOInfo.sendSecretObjectiveInfo(game, player);
         Helper.checkIfHeroUnlocked(game, player);
-        CommanderUnlockCheck.checkPlayer(player, game, "nomad", event);
+        CommanderUnlockCheck.checkPlayer(player, "nomad");
         Helper.checkEndGame(game, player);
     }
 }

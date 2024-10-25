@@ -22,6 +22,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -67,6 +68,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
         sendCardsInfo(game, player, event);
     }
 
+    @ButtonHandler("cardsInfo")
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         if (player == null)
             return;

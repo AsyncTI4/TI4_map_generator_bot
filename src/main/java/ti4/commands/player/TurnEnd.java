@@ -8,10 +8,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -38,11 +40,13 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
@@ -75,6 +79,19 @@ public class TurnEnd extends PlayerSubcommandData {
 
         pingNextPlayer(event, game, mainPlayer);
         mainPlayer.resetOlradinPolicyFlags();
+    }
+
+    @ButtonHandler("turnEnd")
+    public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {
+        if (game.isFowMode() && !player.isActivePlayer()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
+            return;
+        }
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        TurnEnd.pingNextPlayer(event, game, player);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+
+        ButtonHelper.updateMap(game, event, "End of Turn " + player.getTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
     }
 
     public static Player findNextUnpassedPlayer(Game game, Player currentPlayer) {
@@ -110,8 +127,7 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setStoredValue("endTurnWhenSCFinished", "");
         game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "sol", event);
-        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -171,7 +187,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
-        CommanderUnlockCheck.checkPlayer(nextPlayer, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(nextPlayer, "sol");
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);

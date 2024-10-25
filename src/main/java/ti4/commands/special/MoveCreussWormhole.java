@@ -68,7 +68,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());
-        CommanderUnlockCheck.checkPlayer(player, game, "ghost", event);
+        CommanderUnlockCheck.checkPlayer(player, "ghost");
     }
 
     private boolean isValidCreussWormhole(String tokenName) {

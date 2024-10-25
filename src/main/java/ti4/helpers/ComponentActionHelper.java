@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -580,7 +579,7 @@ public class ComponentActionHelper {
 
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
-            case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, relicID, event);
+            case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(player, game, event);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelper.offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);

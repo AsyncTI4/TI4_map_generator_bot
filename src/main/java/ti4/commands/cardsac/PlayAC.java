@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -630,10 +629,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
                 MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 if (player.getLeaderIDs().contains("kelerescommander") && !player.hasLeaderUnlocked("kelerescommander")) {
-                    boolean unleash = ThreadLocalRandom.current().nextInt(20) == 0;
-                    String message2 = player.getRepresentationUnfogged() + " you may " + (unleash ? "unleash" : "unlock") + " Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
+                    String message2 = player.getRepresentationUnfogged() + " you may unlock Suffi An, your commander, by paying 1TG (if the AC isn't Sabo'd).";
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.green("pay1tgforKeleres" + (unleash ? "U" : ""), "Pay 1TG to " + (unleash ? "Unleash" : "Unlock") + " Suffi An"));
+                    buttons2.add(Buttons.green("pay1tgforKeleres", "Pay 1TG to Unlock Suffi An", Emojis.MentakAgent));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message2, buttons2);
                 }

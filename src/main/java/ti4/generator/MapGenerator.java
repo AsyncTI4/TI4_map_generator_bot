@@ -92,6 +92,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
+
 public class MapGenerator {
 
     public static final int DELTA_Y = 26;
@@ -459,27 +461,26 @@ public class MapGenerator {
     }
 
     public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix) {
-        return uploadToDiscord(imageToUpload, filenamePrefix, false);
-    }
-
-    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix, boolean saveLocalCopy) {
         if (imageToUpload == null) return null;
 
-        if (saveLocalCopy) {
+        String saveLocalFormat = System.getenv("SAVE_LOCAL_FORMAT");
+        if (saveLocalFormat != null) {
             try {
-                File file = new File(filenamePrefix + ".webp");
-                ImageIO.write(imageToUpload, "webp", file);
+                File file = new File(filenamePrefix + "." + saveLocalFormat);
+                ImageIO.write(imageToUpload, saveLocalFormat, file);
             } catch (IOException e) {
-                BotLogger.log("Could not create File for " + filenamePrefix + ".webp", e);
+                BotLogger.log("Could not create File for " + filenamePrefix + "." + saveLocalFormat, e);
             }
         }
 
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            BufferedImage bufferedImage = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
-            bufferedImage.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
-            ImageIO.write(bufferedImage, "webp", out);
-            String fileName = filenamePrefix + "_" + getTimeStamp() + ".webp";
+            BufferedImage mapWithoutTransparentBackground = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
+            mapWithoutTransparentBackground.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
+            // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
+            String format = "jpg";
+            String fileName = filenamePrefix + "_" + getTimeStamp() + "." + format;
+            writeCompressedFormat(mapWithoutTransparentBackground, out, format, 0.2f);
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
@@ -823,7 +824,7 @@ public class MapGenerator {
                         } else {
                             superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
-                                game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
+                                // game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
                                 // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
@@ -909,13 +910,6 @@ public class MapGenerator {
                     g2.rotate(-Math.PI / 4);
                     g2.setFont(Storage.getFont20());
                     superDrawString(g2, "ELIMINATED", 0, 0, EliminatedColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
-                    g2.setTransform(transform);
-                } else if (player.isDummy()) {
-                    AffineTransform transform = g2.getTransform();
-                    g2.translate(x + 47 - 3, y + 47 - 6);
-                    g2.rotate(-Math.PI / 4);
-                    g2.setFont(Storage.getFont20());
-                    superDrawString(g2, "DUMMY", 0, 0, DummyColor, HorizontalAlign.Center, VerticalAlign.Center, stroke4, Color.BLACK);
                     g2.setTransform(transform);
                 } else if (player.isPassed()) {
                     AffineTransform transform = g2.getTransform();
@@ -1663,7 +1657,6 @@ public class MapGenerator {
         g2.setStroke(stroke2);
         boolean addedAbilities = false;
         for (String abilityID : player.getAbilities()) {
-
             String abilityFileName = null;
             switch (abilityID) {
                 case "grace" -> abilityFileName = "pa_ds_edyn_grace";
@@ -1688,13 +1681,13 @@ public class MapGenerator {
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
-            } else if (game.isFrankenGame()) {
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "ability", abilityID);
+            } else if (game.isFrankenGame()) { // TODO: or game.showAbilitiesOnMap bool = true
                 AbilityModel abilityModel = Mapper.getAbility(abilityID);
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
                 g2.setFont(Storage.getFont16());
                 drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
-                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "ability", abilityID);
             }
 
             deltaX += 48;
@@ -2754,7 +2747,7 @@ public class MapGenerator {
         int height = g.getFontMetrics().getAscent() - g.getFontMetrics().getDescent();
         if (verticalAlignment != null) {
             switch (verticalAlignment) {
-                case Center -> y += height / 2.0;
+                case Center -> y += height / 2;
                 case Top -> y += height;
                 case Bottom -> {
                 }
@@ -3224,10 +3217,10 @@ public class MapGenerator {
         // Otherwise, cache it
         Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides, style.equals("solid"));
         Collections.sort(openSides);
-        String key = color.getName() + "-HexBorder-" + style;
+        StringBuilder key = new StringBuilder(color.getName() + "-HexBorder-" + style);
         for (int x : openSides)
-            key += "_" + x;
-        return ImageHelper.createOrLoadCalculatedImage(key, loader);
+            key.append("_").append(x);
+        return ImageHelper.createOrLoadCalculatedImage(key.toString(), loader);
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
@@ -3361,7 +3354,7 @@ public class MapGenerator {
                     int fontYoffset = (scsize / 2) + 25;
                     superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     if (scModel != null) {
-                        game.addWebsiteOverlay("strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        game.addWebsiteOverlay(player, "strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
                         // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
                     }
                     point.translate(scsize, 0);
