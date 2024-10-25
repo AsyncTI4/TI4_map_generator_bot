@@ -194,7 +194,7 @@
     "phase": "Action",
     "window": "After you move ships into the active system",
     "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
-    "flavorText": "The sensors of the lead ship erupted with damage alerts as a fleet of unmarked ships poured from the wormhole, raining destruction on the unsuspecting convoy.",
+    "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
     "source": "action_deck_2"
   },
   {
@@ -1031,7 +1031,7 @@
     "phase": "Any",
     "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
     "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
-    "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
+    "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
     "source": "action_deck_2"
   },
   {
