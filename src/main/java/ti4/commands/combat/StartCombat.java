@@ -1026,24 +1026,28 @@ public class StartCombat extends CombatSubcommandData {
     }
 
     private static String getSpaceCombatIntroMessage() {
-        String sb = "## Steps for Space Combat:\n" +
-                "> 1. End of movement abilities (Foresight, Stymie, etc.)\n" +
-                "> 2. Firing of PDS\n" +
-                "> 3. Start of Combat (Skilled Retreat, Morale Boost, etc.)\n" +
-                "> 4. Anti-Fighter Barrage\n" +
-                "> 5. Declare Retreats (including Rout)\n" +
-                "> 6. Roll Dice!\n";
+        String sb = """
+                ## Steps for Space Combat:
+                > 1. End of movement abilities (Foresight, Stymie, etc.)
+                > 2. Firing of PDS
+                > 3. Start of Combat (Skilled Retreat, Morale Boost, etc.)
+                > 4. Anti-Fighter Barrage
+                > 5. Declare Retreats (including Rout)
+                > 6. Roll Dice!
+                """;
         return sb;
     }
 
     private static String getGroundCombatIntroMessage() {
-        String sb = "## Steps for Invasion:\n" +
-                "> 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)\n" +
-                "> 2. Bombardment\n" +
-                "> 3. Commit Ground Forces\n" +
-                "> 4. After commit window (Parley, Ghost Squad, etc.)\n" +
-                "> 5. Start of Combat (Morale Boost, etc.)\n" +
-                "> 6. Roll Dice!\n";
+        String sb = """
+                ## Steps for Invasion:
+                > 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)
+                > 2. Bombardment
+                > 3. Commit Ground Forces
+                > 4. After commit window (Parley, Ghost Squad, etc.)
+                > 5. Start of Combat (Morale Boost, etc.)
+                > 6. Roll Dice!
+                """;
         return sb;
     }
 }

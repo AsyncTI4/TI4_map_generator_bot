@@ -90,12 +90,12 @@ public class StartPhase extends GameSubcommandData {
                             summary.append(player.getFactionEmoji()).append(": ").append(game.getStoredValue("endofround" + x + player.getFaction())).append("\n");
                         }
                     }
-                    if (summary.length() > 0) {
+                    if (!summary.isEmpty()) {
                         summary.insert(0, "**__Round " + x + " Summary__**\n");
                         endOfGameSummary.append(summary);
                     }
                 }
-                if (endOfGameSummary.length() > 0) {
+                if (!endOfGameSummary.isEmpty()) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), endOfGameSummary.toString());
                 }
             }
@@ -364,7 +364,7 @@ public class StartPhase extends GameSubcommandData {
                         preferences.append(old).append("; ");
                     }
                 }
-                if (preferences.length() > 0) {
+                if (!preferences.isEmpty()) {
                     preferences = new StringBuilder(preferences.substring(0, preferences.length() - 2));
                     preferences = new StringBuilder(player.getRepresentation() + " this is a reminder that at the start of the game, your fellow players stated a preference for the following environments:\n" +
                             preferences + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play");

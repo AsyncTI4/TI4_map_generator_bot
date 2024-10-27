@@ -524,7 +524,7 @@ public class ButtonHelperAbilities {
         if (!game.getStoredValue("OmenDice").isEmpty()) {
             omenDice = game.getStoredValue("OmenDice");
             omenDice = omenDice + "_" + omenDie;
-            game.setStoredValue("OmenDice", "" + omenDice);
+            game.setStoredValue("OmenDice", omenDice);
         } else {
             game.setStoredValue("OmenDice", "" + omenDie);
         }
@@ -536,7 +536,7 @@ public class ButtonHelperAbilities {
             omenDice = game.getStoredValue("OmenDice");
             omenDice = omenDice.replaceFirst("" + omenDie, "");
             omenDice = omenDice.replace("__", "_");
-            game.setStoredValue("OmenDice", "" + omenDice);
+            game.setStoredValue("OmenDice", omenDice);
         }
     }
 
@@ -1071,9 +1071,7 @@ public class ButtonHelperAbilities {
         if (Helper.getPlayerFromAbility(game, "pillage") != null && !Helper
             .getPlayerFromAbility(game, "pillage").getFaction().equalsIgnoreCase(player.getFaction())) {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");
-            if (tg > 2 && player.getNeighbouringPlayers().contains(pillager)) {
-                return true;
-            }
+            return tg > 2 && player.getNeighbouringPlayers().contains(pillager);
         }
         return false;
     }
@@ -1184,12 +1182,11 @@ public class ButtonHelperAbilities {
                 continue;
             ButtonHelperStats.gainTGs(event, game, player, 1, true);
             ButtonHelperStats.replenishComms(event, game, player, true);
-            StringBuilder sb = new StringBuilder(player.getRepresentationUnfogged());
-            sb.append(" your **Council Patronage** ability was triggered. Your ").append(Emojis.comm);
-            sb.append(" commodities have been replenished and you have gained 1 ").append(Emojis.getTGorNomadCoinEmoji(game));
-            sb.append(" trade good (").append(player.getTg() - 1).append(" -> ").append(player.getTg()).append(")");
+            String sb = player.getRepresentationUnfogged() + " your **Council Patronage** ability was triggered. Your " + Emojis.comm +
+                    " commodities have been replenished and you have gained 1 " + Emojis.getTGorNomadCoinEmoji(game) +
+                    " trade good (" + (player.getTg() - 1) + " -> " + player.getTg() + ")";
 
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
         }
     }
 
@@ -1269,8 +1266,8 @@ public class ButtonHelperAbilities {
             Tile tile = game.getTileFromPlanet(planet);
             for (String pos2 : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
                 Tile tile2 = game.getTileByPosition(pos2);
-                for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = (Planet) planetUnit2;
+                for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
+                    Planet planetReal2 = planetUnit2;
                     String planet2 = planetReal2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!player.getPlanetsAllianceMode().contains(planet2) && !planetRepresentation2.contains("Mecatol")
@@ -1293,8 +1290,8 @@ public class ButtonHelperAbilities {
             for (String pos2 : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player,
                 false)) {
                 Tile tile2 = game.getTileByPosition(pos2);
-                for (UnitHolder planetUnit2 : tile2.getPlanetUnitHolders()) {
-                    Planet planetReal2 = (Planet) planetUnit2;
+                for (Planet planetUnit2 : tile2.getPlanetUnitHolders()) {
+                    Planet planetReal2 = planetUnit2;
                     String planet2 = planetReal2.getName();
                     String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                     if (!planetsChecked.contains(planet2)) {
@@ -1303,8 +1300,8 @@ public class ButtonHelperAbilities {
                     }
                 }
             }
-            for (UnitHolder planetUnit2 : tile.getPlanetUnitHolders()) {
-                Planet planetReal2 = (Planet) planetUnit2;
+            for (Planet planetUnit2 : tile.getPlanetUnitHolders()) {
+                Planet planetReal2 = planetUnit2;
                 String planet2 = planetReal2.getName();
                 String planetRepresentation2 = Helper.getPlanetRepresentation(planet2, game);
                 if (!planetsChecked.contains(planet2)) {

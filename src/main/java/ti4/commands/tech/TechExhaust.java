@@ -355,7 +355,7 @@ public class TechExhaust extends TechAddRemove {
 
     public static void deleteTheOneButtonIfButtonEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ButtonHelper.deleteTheOneButton((ButtonInteractionEvent) event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 }

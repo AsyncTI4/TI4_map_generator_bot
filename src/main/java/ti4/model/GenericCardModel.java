@@ -51,7 +51,6 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
     public String cardTypeEmoji() {
         return switch (cardType) {
             case trap -> Emojis.lizho;
-            default -> "";
         };
     }
 

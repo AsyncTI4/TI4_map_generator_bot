@@ -322,10 +322,6 @@ public class ButtonHelperSCs {
                         p2.getRepresentationUnfogged() + " " + washedCommsPower
                             + " of your commodities got washed in the process of washing "
                             + player.getFactionEmojiOrColor());
-                    ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
-                        player.getCommoditiesTotal());
-                    ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, player,
-                        p2.getCommoditiesTotal());
                 } else {
                     p2.setTg(p2.getTg() + p2.getCommodities());
                     p2.setCommodities(0);
@@ -334,11 +330,11 @@ public class ButtonHelperSCs {
                         p2.getRepresentationUnfogged()
                             + " your commodities got washed in the process of washing "
                             + player.getFactionEmojiOrColor());
-                    ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
-                        player.getCommoditiesTotal());
-                    ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, player,
-                        p2.getCommoditiesTotal());
                 }
+                ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
+                    player.getCommoditiesTotal());
+                ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, player,
+                    p2.getCommoditiesTotal());
             } else {
                 if (p2.getSCs().contains(tradeInitiative)) {
                     ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,

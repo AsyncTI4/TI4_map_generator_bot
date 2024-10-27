@@ -69,11 +69,10 @@ public class NovaSeed extends SpecialSubcommandData {
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         game.setTile(novaTile);
 
-        StringBuilder message2 = new StringBuilder();
-        message2.append(tile.getRepresentation());
-        message2.append(" has been nova seeded by ");
-        message2.append(player.getRepresentation());
-        StellarConverter.postTileInDisasterWatch(game, novaTile, 1, message2.toString());
+        String message2 = tile.getRepresentation() +
+                " has been nova seeded by " +
+                player.getRepresentation();
+        StellarConverter.postTileInDisasterWatch(game, novaTile, 1, message2);
 
         if (player.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = player.getLeader("muaathero").orElse(null);

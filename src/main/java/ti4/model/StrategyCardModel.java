@@ -105,9 +105,7 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAutoCompleteName() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(initiative).append(" ").append(name).append(" (").append(id).append(") [").append(source.toString()).append("]");
-        return sb.toString();
+        return initiative + " " + name + " (" + id + ") [" + source.toString() + "]";
     }
 
     @Override

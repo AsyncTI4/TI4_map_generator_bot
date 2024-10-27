@@ -52,7 +52,7 @@ public class CheckAllDistance extends SpecialSubcommandData {
             Map<String, Integer> distances = CheckDistance.getTileDistances(game, player, pos, maxDistance, true);
             String row = distances.entrySet().stream()
                 .filter(dist -> positions.contains(dist.getKey()))
-                .sorted(Comparator.comparing(Entry::getKey))
+                .sorted(Entry.comparingByKey())
                 .map(entry -> entry.getValue() == null ? "99" : Integer.toString(entry.getValue()))
                 .reduce(pos, (a, b) -> a + "," + b);
             data.add(row);

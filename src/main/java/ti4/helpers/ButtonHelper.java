@@ -1413,11 +1413,11 @@ public class ButtonHelper {
     public static int getNumberOfUncontrolledNonLegendaryPlanets(Game game) {
         int count = 0;
         for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder plan : tile.getPlanetUnitHolders()) {
+            for (Planet plan : tile.getPlanetUnitHolders()) {
                 if (plan.getName().contains("mallice")) {
                     continue;
                 }
-                Planet planet = (Planet) plan;
+                Planet planet = plan;
                 if (planet.isLegendary()) {
                     continue;
                 }
@@ -2201,7 +2201,7 @@ public class ButtonHelper {
 
     @ButtonHandler("deleteMessage_") // deleteMessage_{Optional String to send to the event channel after}
     public static void deleteMessage(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage();
             bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             bevent.getButton();
@@ -2214,7 +2214,7 @@ public class ButtonHelper {
 
     @ButtonHandler("editMessage_") // editMessage_{Optional String to edit the message to}
     public static void editMessage(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage();
             bevent.getButton();
             String message = bevent.getButton().getId().replace("editMessage_", "");
@@ -2235,14 +2235,14 @@ public class ButtonHelper {
     }
 
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             bevent.getMessage();
             deleteTheOneButton(bevent, bevent.getButton().getId(), true);
         }
     }
 
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             boolean containsRealButton = false;
             List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
             List<Button> newButtons = new ArrayList<>();
@@ -2333,9 +2333,9 @@ public class ButtonHelper {
     }
 
     public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
-        MessageChannel channel = game.getMainGameChannel();
+        TextChannel channel = game.getMainGameChannel();
         Helper.checkThreadLimitAndArchive(game.getGuild());
-        TextChannel textChannel = (TextChannel) channel;
+        TextChannel textChannel = channel;
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
@@ -3443,8 +3443,8 @@ public class ButtonHelper {
                 List<Button> buttons = new ArrayList<>();
                 for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
-                    for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
-                        Planet planetReal = (Planet) uH;
+                    for (Planet uH : tile2.getPlanetUnitHolders()) {
+                        Planet planetReal = uH;
                         String planet = planetReal.getName();
                         if (planetReal.getOriginalPlanetType() != null
                             && player.getPlanetsAllianceMode().contains(planet)) {

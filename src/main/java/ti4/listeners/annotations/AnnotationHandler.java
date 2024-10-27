@@ -155,7 +155,7 @@ public class AnnotationHandler {
             } catch (InvocationTargetException e) {
                 BotLogger.log("Error within button handler:", e.getCause());
             } catch (Exception e) {
-                List<String> paramTypes = Arrays.asList(method.getParameters()).stream().map(param -> param.getType().getSimpleName()).toList();
+                List<String> paramTypes = Arrays.stream(method.getParameters()).map(param -> param.getType().getSimpleName()).toList();
                 List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
 
                 String methodName = method.getDeclaringClass().getSimpleName() + "." + method.getName();

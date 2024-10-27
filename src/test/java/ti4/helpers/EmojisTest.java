@@ -19,7 +19,7 @@ public class EmojisTest extends BaseTi4Test {
     void testEmojis() {
         beforeAll();
 
-        List<String> emojiEnumNames = Arrays.asList(TI4Emoji.values()).stream().map(Enum::name).toList();
+        List<String> emojiEnumNames = Arrays.stream(TI4Emoji.values()).map(Enum::name).toList();
         List<String> emojiFileNames = Emojis.enumerateEmojiFilesRecursive(Storage.getAppEmojiDirectory()).stream()
             .map(f -> f.getName().replace(".png", "").replace(".jpg", "").replace(".gif", "")).toList();
 

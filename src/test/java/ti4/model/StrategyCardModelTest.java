@@ -17,7 +17,7 @@ public class StrategyCardModelTest extends BaseTi4Test {
     }
 
     private static boolean validateBotSCAutomationID(StrategyCardModel scModel) {
-        if (Mapper.getStrategyCards().keySet().contains(scModel.getBotSCAutomationID()))
+        if (Mapper.getStrategyCards().containsKey(scModel.getBotSCAutomationID()))
             return true;
         System.out.println("SCSet **" + scModel.getName() + "** failed validation due to invalid BotSCAutomationID: `" + scModel.getBotSCAutomationID() + "`");
         return false;

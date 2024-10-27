@@ -210,7 +210,6 @@ public class Undo extends GameSubcommandData {
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
         return Arrays.stream(mapUndoFiles).map(Storage::getMapUndoStorage)
-            .sorted(Comparator.comparing(File::getName).reversed())
             .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadMap));
     }
 }

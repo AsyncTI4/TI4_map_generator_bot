@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import ti4.generator.TileHelper;
@@ -83,7 +84,7 @@ public class JimboConst {
         hyperlaneTiles = allTilesSorted.stream().filter(t -> t.getName() != null && t.getName().equalsIgnoreCase("hyperlane")).toList();
         draftTiles = allTilesSorted.stream().filter(TileHelper::isDraftTile).toList();
         otherTiles = new ArrayList<>();
-        List<TileModel> ignore = List.of(blueTiles, redTiles, greenTiles, hyperlaneTiles, draftTiles).stream().flatMap(Collection::stream).toList();
+        List<TileModel> ignore = Stream.of(blueTiles, redTiles, greenTiles, hyperlaneTiles, draftTiles).flatMap(Collection::stream).toList();
         allTilesSorted.stream().filter(t -> !ignore.contains(t))
             .filter(t -> t.getSource() == ComponentSource.fow)
             .forEach(otherTiles::add);

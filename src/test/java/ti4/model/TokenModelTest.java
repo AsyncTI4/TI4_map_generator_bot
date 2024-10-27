@@ -47,6 +47,6 @@ public class TokenModelTest extends BaseTi4Test {
     }
 
     private static boolean tokenIsTokenModel(String token) {
-        return Mapper.getTokens2().stream().filter(tok -> tok.getAlias().equalsIgnoreCase(token)).findAny().isPresent();
+        return Mapper.getTokens2().stream().anyMatch(tok -> tok.getAlias().equalsIgnoreCase(token));
     }
 }

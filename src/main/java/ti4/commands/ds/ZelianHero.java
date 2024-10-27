@@ -77,7 +77,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
 
         //Gain TGs equal to the sum of the resource values of the planets in the system
         int resourcesSum = 0;
-        List<Planet> planetsInSystem = tile.getPlanetUnitHolders().stream().map(uh -> uh).toList();
+        List<Planet> planetsInSystem = tile.getPlanetUnitHolders().stream().toList();
         for (Planet p : planetsInSystem) {
             resourcesSum += p.getResources();
         }
