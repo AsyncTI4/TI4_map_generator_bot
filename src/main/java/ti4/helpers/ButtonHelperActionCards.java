@@ -392,7 +392,7 @@ public class ButtonHelperActionCards {
         player.setFleetCC(player.getFleetCC() + 2);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
-        if (game.getLaws().keySet().contains("regulations") && player.getFleetCC() > 4) {
+        if (game.getLaws().containsKey("regulations") && player.getFleetCC() > 4) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is Fleet Regulations in place, which is limiting fleet pool to 4");
         }
     }
@@ -884,7 +884,7 @@ public class ButtonHelperActionCards {
                 && !game.isHomebrewSCMode()) {
                 button = Buttons.gray("psStep2_" + sc, label).withEmoji(scEmoji);
             } else {
-                button = Buttons.gray("psStep2_" + sc, "" + sc + " " + label);
+                button = Buttons.gray("psStep2_" + sc, sc + " " + label);
             }
             buttons.add(button);
         }
@@ -1038,7 +1038,7 @@ public class ButtonHelperActionCards {
     public static void resolveABSStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String planet : p2.getPlanetsAllianceMode()) {
-            Planet p = (Planet) game.getPlanetsInfo().get(planet);
+            Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getPlanetTypes().contains("cultural")) {
                 p2.exhaustPlanet(planet);
             }
@@ -1393,7 +1393,7 @@ public class ButtonHelperActionCards {
                     && !game.isHomebrewSCMode()) {
                     button = Buttons.gray("resolvePreassignment_Coup_" + sc, label).withEmoji(scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, "" + sc + " " + label);
+                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
             }
@@ -1485,7 +1485,7 @@ public class ButtonHelperActionCards {
                     && !game.isHomebrewSCMode()) {
                     button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, label).withEmoji(scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, "" + sc + " " + label);
+                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
             }

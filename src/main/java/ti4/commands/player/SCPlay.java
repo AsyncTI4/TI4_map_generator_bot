@@ -149,7 +149,7 @@ public class SCPlay extends PlayerSubcommandData {
                 }
             }
         }
-        if (gamePing.length() > 0) {
+        if (!gamePing.isEmpty()) {
             message.append(gamePing).append("\n");
         }
         message.append("Indicate your choice by pressing a button below");

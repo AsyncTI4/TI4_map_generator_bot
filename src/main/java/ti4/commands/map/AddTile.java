@@ -33,7 +33,7 @@ public class AddTile extends AddRemoveTile {
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (String mecatol : Constants.MECATOLS) {
                 UnitHolder unitHolder = unitHolders.get(mecatol);
-                if (unitHolder != null && unitHolder instanceof Planet && mecatol.equals(unitHolder.getName())) {
+                if (unitHolder instanceof Planet && mecatol.equals(unitHolder.getName())) {
                     unitHolder.addToken(Constants.CUSTODIAN_TOKEN_PNG);
                 }
             }

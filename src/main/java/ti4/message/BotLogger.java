@@ -287,7 +287,7 @@ public class BotLogger {
     }
 
     private static boolean ignoredError(Throwable error) {
-        if (error != null && error instanceof ErrorResponseException restError) {
+        if (error instanceof ErrorResponseException restError) {
             // This is an "unknown message" error. Typically caused by the bot trying to delete or edit
             // a message that has already been deleted. We don't generally care about these
             return restError.getErrorCode() == 10008;

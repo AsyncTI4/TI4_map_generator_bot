@@ -383,7 +383,7 @@ public class CombatRoll extends CombatSubcommandData {
 
             List<Button> buttons = new ArrayList<>();
 
-            buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s") + ""));
+            buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_bombardment", "Assign Hit" + (h == 1 ? "" : "s")));
 
             String msg2 = " you may use this button to assign " + (h == 1 ? "the bombardment hit" : "bombardment hits") + ".";
             boolean someone = false;
@@ -406,7 +406,7 @@ public class CombatRoll extends CombatSubcommandData {
             }
 
         }
-        if (rollType == CombatRollType.bombardment && h > 0 && (player.hasAbility("meteor_slings") || player.getPromissoryNotes().keySet().contains("dspnkhra"))) {
+        if (rollType == CombatRollType.bombardment && h > 0 && (player.hasAbility("meteor_slings") || player.getPromissoryNotes().containsKey("dspnkhra"))) {
             List<Button> buttons = new ArrayList<>();
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + uH.getName(), "Infantry on " + Helper.getPlanetRepresentation(uH.getName(), game)));

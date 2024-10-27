@@ -360,7 +360,7 @@ public class CombatHelper {
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
             .map(UnitModel::getBaseType)
-            .collect(Collectors.toList());
+            .toList();
         List<String> missing = unitsByAsyncId.keySet().stream()
             .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
             .collect(Collectors.toList());
@@ -585,7 +585,7 @@ public class CombatHelper {
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {
             result = result + "\n" + player.getFactionEmoji() + " You have Shard Volley and thus should produce an additional hit to the ones rolled above.";
         }
-        if (extra.length() > 0) {
+        if (!extra.isEmpty()) {
             result = result + "\n\n" + extra;
         }
         if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {

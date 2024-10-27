@@ -814,7 +814,6 @@ public class AgendaHelper {
                         message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
                         for (Player p2 : getWinningVoters(winner, game)) {
                             if (p2 == playerWL) {
-                                continue;
                             } else {
                                 MessageHelper.sendMessageToChannel(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() + "a PN", ButtonHelper.getForcedPNSendButtons(game, p2, playerWL));
                             }

@@ -2229,7 +2229,7 @@ public class Game extends GameProperties {
         List<String> acsToShuffle = discardActionCards.keySet().stream().toList();
         getActionCards().addAll(acsToShuffle);
         Collections.shuffle(getActionCards());
-        acsToShuffle.stream().forEach(ac -> discardActionCards.remove(ac)); //clear out the shuffled back cards
+        acsToShuffle.forEach(ac -> discardActionCards.remove(ac)); //clear out the shuffled back cards
         String msg = "#" + getPing() + " shuffling the discarded ACs into the action card deck because the action card deck ran out of cards";
         MessageHelper.sendMessageToChannel(getMainGameChannel(), msg);
     }

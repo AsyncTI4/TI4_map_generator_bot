@@ -63,7 +63,7 @@ public class JimboHandlers {
         }
 
         List<Button> buttons = JimboButtons.getMenuButtons(menu);
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             MessageHelper.editMessageWithButtons(bevent, message, buttons);
         } else { // Post for the first time
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
@@ -289,7 +289,7 @@ public class JimboHandlers {
                 output.addAll(JimboConst.hyperlanesByRotation.get(tileNum));
             }
             case "draft" -> {
-                tileNum = tileNum < -1 ? -1 : (tileNum > 12 ? 12 : tileNum);
+                tileNum = tileNum < -1 ? -1 : (Math.min(tileNum, 12));
                 output.addAll(JimboConst.draftTilesByNumber.get(tileNum));
             }
             case "other" -> output.addAll(JimboConst.otherTiles);

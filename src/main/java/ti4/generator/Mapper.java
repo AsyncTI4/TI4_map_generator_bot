@@ -152,7 +152,7 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws Exception {
+    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
         objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest classes
 
