@@ -30,8 +30,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import ti4.autocomplete.AutoCompleteListener;
-import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
@@ -93,8 +91,13 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
+import ti4.listeners.AutoCompleteListener;
+import ti4.listeners.ButtonListener;
+import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
+import ti4.listeners.SlashCommandListener;
+import ti4.listeners.UserJoinServerListener;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -139,6 +142,7 @@ public class AsyncTI4DiscordBot {
 
         jda.addEventListener(
             new MessageListener(),
+            new SlashCommandListener(),
             ButtonListener.getInstance(),
             ModalListener.getInstance(),
             new SelectionMenuListener(),

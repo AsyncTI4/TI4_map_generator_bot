@@ -14,7 +14,7 @@ public class AddTile extends AddRemoveTile {
     public AddTile() {
         super(Constants.ADD_TILE, "Add tile to map");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name", true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map", true));
     }
 
     @Override

@@ -22,7 +22,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.MessageListener;
 import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
@@ -38,6 +37,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -78,7 +78,7 @@ public class AutoCompleteProvider {
         //if (factionOrColorOption != null) showAllChoicesInGame = true;
 
         String userID = event.getUser().getId();
-        MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         Player player = null;
         if (game != null) {
@@ -393,7 +393,7 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
-                MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
+                SlashCommandListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
                 Map<String, String> planets = Mapper.getPlanetRepresentations();

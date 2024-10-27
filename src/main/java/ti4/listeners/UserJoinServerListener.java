@@ -1,10 +1,11 @@
-package ti4;
+package ti4.listeners;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import lombok.NonNull;
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -29,12 +31,15 @@ public class UserJoinServerListener extends ListenerAdapter {
     private static boolean validateEvent(GenericGuildEvent event) {
         String eventGuild = event.getGuild().getId();
         List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
-        // Do not process these events in guilds that we aren't initialized in
-        return asyncGuilds.contains(eventGuild);
+        if (!asyncGuilds.contains(eventGuild)) {
+            // Do not process these events in guilds that we aren't initialized in
+            return false;
+        }
+        return true;
     }
 
     @Override
-    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+    public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
         try {
             checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
@@ -44,7 +49,7 @@ public class UserJoinServerListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMemberRemove(@NonNull GuildMemberRemoveEvent event) {
+    public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
         try {
             event.getGuild().retrieveAuditLogs().queueAfter(1, TimeUnit.SECONDS, (logs) -> {
@@ -74,7 +79,9 @@ public class UserJoinServerListener extends ListenerAdapter {
                 Helper.fixGameChannelPermissions(guild, game);
                 ThreadChannel mapThread = game.getBotMapUpdatesThread();
                 if (mapThread != null && !mapThread.isLocked()) {
-                    mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
+                    mapThread.getManager().setArchived(false).queue(success -> {
+                        mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS);
+                    }, BotLogger::catchRestError);
                 }
                 Player player = game.getPlayer(user.getId());
                 if (player != null && ButtonHelper.isPlayerNew(game, player)) {
@@ -136,16 +143,16 @@ public class UserJoinServerListener extends ListenerAdapter {
             }
         }
         if (!gamesQuit.isEmpty()) {
-            StringBuilder msg = new StringBuilder("User " + user.getName() + " has left the server " + guild.getName() + " with the following in-progress games:");
+            String msg = "User " + user.getName() + " has left the server " + guild.getName() + " with the following in-progress games:";
             for (Game g : gamesQuit) {
                 String gameMessage = "Attention " + g.getPing() + ": " + user.getName();
                 if (voluntary) gameMessage += " has left the server.\n> If this was not a mistake, you may make ";
                 if (!voluntary) gameMessage += " was removed from the server.\n> Make ";
                 gameMessage += "a post in https://discord.com/channels/943410040369479690/1176191865188536500 to get a replacement player";
                 MessageHelper.sendMessageToChannel(g.getTableTalkChannel(), gameMessage);
-                msg.append("\n> ").append(g.getName()).append(" -> Link:").append(g.getTableTalkChannel().getJumpUrl());
+                msg += "\n> " + g.getName() + " -> Link:" + g.getTableTalkChannel().getJumpUrl();
             }
-            reportUserLeftServer(msg.toString());
+            reportUserLeftServer(msg);
 
             String inviteBack = Helper.getGuildInviteURL(guild, 1);
             String primaryInvite = Helper.getGuildInviteURL(AsyncTI4DiscordBot.guildPrimary, 1, true);

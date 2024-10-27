@@ -1589,11 +1589,17 @@ public class AgendaHelper {
                         }
                         exhaustForVotes(event, nextInLine, game, "exhaustForVotes_" + thing, true);
                     }
+                    if (game.isFowMode()) {
+                        MessageHelper.sendMessageToChannel(nextInLine.getPrivateChannel(),
+                            getSummaryOfVotes(game, true) + "\n ");
+                    }
                     MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
                     AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
                     return;
                 }
                 if (game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(nextInLine.getPrivateChannel(),
+                        getSummaryOfVotes(game, true) + "\n ");
                     MessageHelper.sendPrivateMessageToPlayer(nextInLine, game, skippedMessage);
                 } else {
                     MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
