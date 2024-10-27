@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,6 +18,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -113,7 +112,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (unpassedPlayers.isEmpty()) {
             return null;
         } else {
-            return unpassedPlayers.get(0);
+            return unpassedPlayers.getFirst();
         }
     }
 
@@ -170,7 +169,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (!game.isFowMode()) {
             String lastTransaction = game.getLatestTransactionMsg();
             try {
-                if (lastTransaction != null && !"".equals(lastTransaction)) {
+                if (lastTransaction != null && !lastTransaction.isEmpty()) {
                     game.setLatestTransactionMsg("");
                     game.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
                     });
@@ -295,7 +294,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
-            && ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).size() > 0) {
+            && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).isEmpty()) {
             poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
         }
         poButtons.removeIf(Objects::isNull);
@@ -393,17 +392,17 @@ public class TurnEnd extends PlayerSubcommandData {
             }
 
             String message2a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following public objectives: ";
-            String message2b = "none";
+            StringBuilder message2b = new StringBuilder("none");
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
                 List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(obbie, game, player);
                     if (playerProgress >= threshold) {
-                        if (message2b.equalsIgnoreCase("none")) {
-                            message2b = Mapper.getPublicObjective(obbie).getName();
+                        if (message2b.toString().equalsIgnoreCase("none")) {
+                            message2b = new StringBuilder(Mapper.getPublicObjective(obbie).getName());
                         } else {
-                            message2b = message2b + ", " + Mapper.getPublicObjective(obbie).getName();
+                            message2b.append(", ").append(Mapper.getPublicObjective(obbie).getName());
                         }
                     }
                 }
@@ -412,15 +411,15 @@ public class TurnEnd extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
             }
             int count = 0;
-            String message3a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:";
+            StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoButton.getObjectiveThreshold(soID, game) > 0 && ListPlayerInfoButton.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoButton.getObjectiveThreshold(soID, game) - 1) && !soID.equalsIgnoreCase("dp")) {
-                    message3a = message3a + " " + Mapper.getSecretObjective(soID).getName();
+                    message3a.append(" ").append(Mapper.getSecretObjective(soID).getName());
                     count++;
                 }
             }
             if (count > 0 && player.isRealPlayer()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
             }
 
         }

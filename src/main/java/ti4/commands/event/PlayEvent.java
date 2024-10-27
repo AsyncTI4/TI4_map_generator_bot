@@ -1,12 +1,13 @@
 package ti4.commands.event;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -52,7 +53,7 @@ public class PlayEvent extends EventSubcommandData {
         }
 
         final int numericID = eventNumericalID;
-        String eventID = player.getEvents().entrySet().stream().filter(e -> numericID == e.getValue()).map(e -> e.getKey()).findFirst().orElse(null);
+        String eventID = player.getEvents().entrySet().stream().filter(e -> numericID == e.getValue()).map(Map.Entry::getKey).findFirst().orElse(null);
         EventModel eventModel = Mapper.getEvent(eventID);
         if (eventModel == null) {
             MessageHelper.sendMessageToEventChannel(event, "Event ID `" + eventID + "` could not be found");

@@ -174,20 +174,20 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithEmbedsAndFactionReact(mainGameChannel, sb.toString(), game, player, Collections.singletonList(acEmbed), buttons, true);
             } else {
                 MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, sb.toString(), acEmbed);
-                String noSabosMessage = "> " + Helper.noSaboReason(game, player);
+                StringBuilder noSabosMessage = new StringBuilder("> " + Helper.noSaboReason(game, player));
                 boolean it = false, watcher = false;
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
                     if (game.isFowMode() || (!it && p.hasTechReady("it"))) {
-                        noSabosMessage += "\n> A player may have access to " + Emojis.Xxcha + "**Instinct Training**, watch out";
+                        noSabosMessage.append("\n> A player may have access to " + Emojis.Xxcha + "**Instinct Training**, watch out");
                         it = true;
                     }
                     if (game.isFowMode() || (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage += "\n> A player may have access to " + Emojis.Empyrean + Emojis.mech + "**Watcher**, watch out";
+                        noSabosMessage.append("\n> A player may have access to " + Emojis.Empyrean + Emojis.mech + "**Watcher**, watch out");
                         watcher = true;
                     }
                 }
-                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage);
+                MessageHelper.sendMessageToChannel(mainGameChannel, noSabosMessage.toString());
             }
             MessageChannel channel2 = player.getCorrectChannel();
             if (actionCardTitle.contains("Manipulate Investments")) {
@@ -232,7 +232,7 @@ public class PlayAC extends ACCardsSubcommandData {
             if (actionCardTitle.contains("Planetary Rigs")) {
                 List<Button> acbuttons = ButtonHelperHeroes.getAttachmentSearchButtons(game, player);
                 String msg = player.getRepresentation() + " After checking for Sabos, first declare what planet you mean to put an attachment on, then hit the button to resolve.";
-                if (acbuttons.size() == 0) {
+                if (acbuttons.isEmpty()) {
                     msg = player.getRepresentation() + " there were no attachments found in the applicable exploration decks.";
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg, acbuttons);
@@ -666,8 +666,8 @@ public class PlayAC extends ACCardsSubcommandData {
 
             String reverseEngineerID = "reverse_engineer";
             if (player.getActionCards().containsKey(reverseEngineerID)) {
-                String msg = player.getRepresentationUnfogged() + " you can use Reverse Engineer on ";
-                if (actionCards.size() > 1) msg += "one of the following cards:";
+                StringBuilder msg = new StringBuilder(player.getRepresentationUnfogged() + " you can use Reverse Engineer on ");
+                if (actionCards.size() > 1) msg.append("one of the following cards:");
 
                 List<Button> reverseButtons = new ArrayList<>();
                 String reversePrefix = Constants.AC_PLAY_FROM_HAND + player.getActionCards().get(reverseEngineerID) + "_reverse_";
@@ -681,12 +681,12 @@ public class PlayAC extends ACCardsSubcommandData {
                     String id = reversePrefix + model.getName();
                     String label = "Reverse Engineer " + model.getName();
                     reverseButtons.add(Buttons.green(id, label, Emojis.ActionCard));
-                    if (actionCards.size() == 1) msg += model.getName() + ".";
+                    if (actionCards.size() == 1) msg.append(model.getName()).append(".");
                 }
 
                 if (!reverseButtons.isEmpty()) {
                     reverseButtons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, reverseButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg.toString(), reverseButtons);
                 }
             }
         }

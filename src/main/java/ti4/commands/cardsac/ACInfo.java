@@ -110,7 +110,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         sb.append("_ _\n");
 
         // ACTION CARDS
-        sb.append("**Action Cards (" + player.getAc() + "/" + ButtonHelper.getACLimit(game, player) + "):**").append("\n");
+        sb.append("**Action Cards (").append(player.getAc()).append("/").append(ButtonHelper.getACLimit(game, player)).append("):**").append("\n");
         int index = 1;
 
         Map<String, Integer> actionCards = player.getActionCards();

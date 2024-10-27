@@ -97,7 +97,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                     game.revealAgenda(false);
                     MessageHelper.sendMessageToChannel(channel, game.getPing() + " Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
-                if (agendaTarget.toLowerCase().contains("elect law") && game.getLaws().size() < 1) {
+                if (agendaTarget.toLowerCase().contains("elect law") && game.getLaws().isEmpty()) {
                     game.revealAgenda(false);
                     MessageHelper.sendMessageToChannel(channel,
                         game.getPing() + " an elect law agenda revealed underneath Covert Legislation while there were no laws in play, discarding it.");
@@ -109,7 +109,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                 agendaName = agendaDetails.getName();
                 game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
                 notEmergency = !"Emergency Session".equalsIgnoreCase(agendaName);
-                if (agendaTarget.toLowerCase().contains("elect law") && game.getLaws().size() < 1) {
+                if (agendaTarget.toLowerCase().contains("elect law") && game.getLaws().isEmpty()) {
                     notEmergency = false;
                 }
                 if (notEmergency) {
@@ -123,14 +123,13 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                     if (speaker != null) {
                         Map.Entry<String, Integer> entry = game.drawAgenda();
                         if (entry != null) {
-                            StringBuilder sb = new StringBuilder();
-                            sb.append("-----------\n");
-                            sb.append("Game: ").append(game.getName()).append("\n");
-                            sb.append(speaker.getRepresentationUnfogged()).append("\n");
-                            sb.append("Drawn Agendas:\n");
-                            sb.append(1).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
-                            sb.append("\n");
-                            MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(), sb.toString());
+                            String sb = "-----------\n" +
+                                    "Game: " + game.getName() + "\n" +
+                                    speaker.getRepresentationUnfogged() + "\n" +
+                                    "Drawn Agendas:\n" +
+                                    1 + ". " + Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()) +
+                                    "\n";
+                            MessageHelper.sendMessageToChannel(speaker.getCardsInfoThread(), sb);
                         }
                     }
                 }
@@ -175,23 +174,23 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                 "# " + game.getPing() + " the agenda target is " + agendaTarget + ". Sent the agenda to the speakers cards info");
         }
         for (Player player : game.getRealPlayers()) {
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0) {
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && !ButtonHelperCommanders.resolveFlorzenCommander(player, game).isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you have Florzen commander and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {
-            String summary = "The scored secrets so far are:\n";
+            StringBuilder summary = new StringBuilder("The scored secrets so far are:\n");
             for (Player p2 : game.getRealPlayers()) {
                 for (String soID : p2.getSecretsScored().keySet()) {
                     SecretObjectiveModel so = Mapper.getSecretObjective(soID);
                     if (so != null) {
-                        summary = summary + so.getName() + ": " + so.getText() + "\n";
+                        summary.append(so.getName()).append(": ").append(so.getText()).append("\n");
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(channel, summary);
+            MessageHelper.sendMessageToChannel(channel, summary.toString());
         }
     }
 }

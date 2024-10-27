@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -26,6 +22,9 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.PutAgendaBottom;
 import ti4.commands.agenda.PutAgendaTop;
@@ -459,8 +458,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getFaction() + " used X-89 Bacterial Weapon to remove all ground forces on " + planet);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        Map<UnitKey, Integer> units = new HashMap<>();
-        units.putAll(uH.getUnits());
+        Map<UnitKey, Integer> units = new HashMap<>(uH.getUnits());
         for (UnitKey unit : units.keySet()) {
             if (unit.getUnitType() == UnitType.Mech || unit.getUnitType() == UnitType.Infantry) {
                 uH.removeUnit(unit, units.get(unit));
@@ -719,7 +717,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (whatIsItFor.contains("tech") && player.hasAbility("ancient_knowledge")) {
             String planet = planetName;
             if ((Mapper.getPlanet(planet).getTechSpecialties() != null
-                && Mapper.getPlanet(planet).getTechSpecialties().size() > 0)
+                && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty())
                 || ButtonHelper.checkForTechSkips(game, planet)) {
                 String msg = player.getRepresentation()
                     + " due to your ancient knowledge ability, you may be eligible to receive a tech here if you exhausted this planet ("
@@ -742,7 +740,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
             }
-            if (buttonRow.size() > 0) {
+            if (!buttonRow.isEmpty()) {
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
@@ -860,7 +858,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
             }
-            if (buttonRow.size() > 0) {
+            if (!buttonRow.isEmpty()) {
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
@@ -870,7 +868,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             totalVotesSoFar = player.getFactionEmojiOrColor() + " Readied " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
         }
-        if (actionRow2.size() > 0) {
+        if (!actionRow2.isEmpty()) {
             event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
         }
     }
@@ -1045,7 +1043,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
             StringBuilder sb = new StringBuilder();
             sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
-            ExploreModel exp = Mapper.getExplore(deck.get(0));
+            ExploreModel exp = Mapper.getExplore(deck.getFirst());
             sb.append(exp.textRepresentation());
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
         }
@@ -1741,7 +1739,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
                 if (tile != null && player.hasAbility("rally_to_the_cause")
                     && player.getHomeSystemTile() == tile
-                    && ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).size() > 0) {
+                    && !ButtonHelperAbilities.getTilesToRallyToTheCause(game, player).isEmpty()) {
                     String msg = player.getRepresentation()
                         + " due to your Rally to the Cause ability, if you just produced a ship in your HS, you may produce up to 2 ships in a system that contains a planet with a trait but no legendary planets and no opponent units. Press button to resolve";
                     List<Button> buttons2 = new ArrayList<>();
@@ -2045,7 +2043,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getRound() < 4) {
                     buttons.add(drawStage1);
                 }
-                if (game.getRound() > 2 || game.getPublicObjectives1Peakable().size() == 0) {
+                if (game.getRound() > 2 || game.getPublicObjectives1Peakable().isEmpty()) {
                     if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                         buttons.add(draw2Stage2);
                     } else {
@@ -2092,7 +2090,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "Relic deck is empty");
             return;
         }
-        String relicID = relicDeck.get(0);
+        String relicID = relicDeck.getFirst();
         RelicModel relicModel = Mapper.getRelic(relicID);
         String rsb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, rsb);
@@ -2339,7 +2337,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(game)) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event,
                 "vaylerianhero");
-            if (buttons.size() > 0) {
+            if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     "Use buttons to remove a token from the board", buttons);
             }

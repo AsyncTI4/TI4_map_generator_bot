@@ -132,7 +132,7 @@ public class Info extends GameSubcommandData {
         if (game.isFowMode()) {
             sb.append("FoW Options:");
             for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
-                sb.append(" " + entry.getKey() + ":" + entry.getValue());
+                sb.append(" ").append(entry.getKey()).append(":").append(entry.getValue());
             }
             sb.append(NEW_LINE);
         }

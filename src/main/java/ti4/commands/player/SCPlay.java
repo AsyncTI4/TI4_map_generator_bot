@@ -27,6 +27,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
+import ti4.helpers.CryypterHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -35,7 +36,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
-import ti4.helpers.CryypterHelper;
 
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
@@ -131,25 +131,25 @@ public class SCPlay extends PlayerSubcommandData {
         }
         message.append(".\n\n");
 
-        String gamePing = game.getPing();
+        StringBuilder gamePing = new StringBuilder(game.getPing());
         List<Player> playersToFollow = game.getRealPlayers();
         if (!"All".equals(scModel.getGroup().orElse("")) && (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two"))) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
-            num = num.substring(num.length() - 1, num.length());
-            gamePing = "";
+            num = num.substring(num.length() - 1);
+            gamePing = new StringBuilder();
             for (Player p2 : game.getRealPlayers()) {
                 for (Integer sc : p2.getSCs()) {
                     String num2 = sc + "";
-                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    num2 = num2.substring(num2.length() - 1);
                     if (num2.equalsIgnoreCase(num) || num.equalsIgnoreCase("0") || num2.equalsIgnoreCase("0")) {
-                        gamePing = gamePing + p2.getRepresentation() + " ";
+                        gamePing.append(p2.getRepresentation()).append(" ");
                         playersToFollow.add(p2);
                     }
                 }
             }
         }
-        if (!gamePing.isEmpty()) {
+        if (gamePing.length() > 0) {
             message.append(gamePing).append("\n");
         }
         message.append("Indicate your choice by pressing a button below");
@@ -260,21 +260,21 @@ public class SCPlay extends PlayerSubcommandData {
 
                     // Trade Neighbour Message
                     if (scModel.usesAutomationForSCID("pok5trade")) {
-                        String neighborsMsg = "NOT neighbors with the trade holder:";
+                        StringBuilder neighborsMsg = new StringBuilder("NOT neighbors with the trade holder:");
                         for (Player p2 : game.getRealPlayers()) {
                             if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
+                                neighborsMsg.append(" ").append(p2.getFactionEmoji());
                             }
                         }
-                        String neighborsMsg2 = "Neighbors with the trade holder:";
+                        StringBuilder neighborsMsg2 = new StringBuilder("Neighbors with the trade holder:");
                         for (Player p2 : game.getRealPlayers()) {
                             if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
+                                neighborsMsg2.append(" ").append(p2.getFactionEmoji());
                             }
                         }
                         if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
-                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg);
-                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2);
+                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg.toString());
+                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2.toString());
                         }
                     }
 
@@ -361,15 +361,15 @@ public class SCPlay extends PlayerSubcommandData {
                 Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");
                 empNMahButtons.add(deleteB);
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
-                    empNMahButtons.add(0, emelpar);
+                    empNMahButtons.addFirst(emelpar);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with the Scepter of Emelpar.",
                         empNMahButtons);
                 }
-                if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, game, event).size() > 0 && !winnuHero) {
+                if (player3.hasUnexhaustedLeader("mahactagent") && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty() && !winnuHero) {
                     Button mahactA = Buttons.red("mahactA_follow_" + scToPlay,
                         "Use Mahact Agent", Emojis.Mahact);
-                    empNMahButtons.add(0, mahactA);
+                    empNMahButtons.addFirst(mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
                         player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",

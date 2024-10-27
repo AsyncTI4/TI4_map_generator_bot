@@ -149,7 +149,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 } else {
                     PlanetModel planetInfo = Mapper.getPlanet(planetID);
                     if (Optional.ofNullable(planetInfo).isPresent()) {
-                        if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0
+                        if (!Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).isEmpty()
                             || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
                             if ((attachment.equals(Constants.WARFARE) ||
                                 attachment.equals(Constants.PROPULSION) ||

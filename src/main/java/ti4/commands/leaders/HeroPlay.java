@@ -309,7 +309,7 @@ public class HeroPlay extends LeaderAction {
                 for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(game)) {
                     List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event,
                         "kjalHero_" + tile.getPosition());
-                    if (buttons.size() > 0) {
+                    if (!buttons.isEmpty()) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             "Use buttons to remove token from "
                                 + tile.getRepresentationForButtons(game, player) + " or an adjacent tile",
@@ -332,7 +332,7 @@ public class HeroPlay extends LeaderAction {
                     game.setStoredValue("vaylerianHeroActive", "true");
                 }
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
-                if (removeCCs.size() > 0) {
+                if (!removeCCs.isEmpty()) {
                     for (int x = 0; x < ButtonHelperAgents.getGloryTokenTiles(game).size(); x++) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Use buttons to remove a token from the board", removeCCs);
                     }
@@ -356,8 +356,7 @@ public class HeroPlay extends LeaderAction {
                 game.setComponentAction(true);
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
                     for (int x = 0; x < ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2); x++) {
-                        if (ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game)
-                            .size() > 0) {
+                        if (!ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game).isEmpty()) {
                             String msg = player.getRepresentationUnfogged()
                                 + " you may retrieve a unit upgrade tech from players with branch offices, one for each branch office. Here is the possible techs from "
                                 + p2.getFactionEmojiOrColor();

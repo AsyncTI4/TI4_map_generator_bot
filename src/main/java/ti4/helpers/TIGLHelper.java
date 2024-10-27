@@ -1,20 +1,18 @@
 package ti4.helpers;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -88,7 +86,7 @@ public class TIGLHelper {
             if (roles.isEmpty()) {
                 return null;
             }
-            return roles.get(0);
+            return roles.getFirst();
         }
 
         public TIGLRank getNextRank() {
@@ -216,7 +214,7 @@ public class TIGLHelper {
         }
         return hubMember.getRoles().stream()
             .filter(r -> getAllTIGLRoles().contains(r))
-            .map(r -> getTIGLRankFromRole(r))
+            .map(TIGLHelper::getTIGLRankFromRole)
             .filter(Objects::nonNull)
             .sorted(Comparator.comparing(TIGLRank::getIndex))
             .toList();
@@ -227,7 +225,7 @@ public class TIGLHelper {
         if (ranks.isEmpty()) {
             return TIGLRank.UNRANKED;
         }
-        return ranks.get(ranks.size() - 1);
+        return ranks.getLast();
     }
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
@@ -299,7 +297,7 @@ public class TIGLHelper {
         } else if (channels.size() > 1) {
             BotLogger.log("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
         }
-        return channels.get(0);
+        return channels.getFirst();
     }
 
     private static ThreadChannel getTIGLAdminThread() {

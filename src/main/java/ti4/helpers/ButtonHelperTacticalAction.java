@@ -469,7 +469,7 @@ public class ButtonHelperTacticalAction {
         CommanderUnlockCheck.checkPlayer(player, "mortheus");
         CommanderUnlockCheck.checkAllPlayersInGame(game, "empyrean");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        if (needPDSCheck && !game.isL1Hero() && playersWithPds2.size() > 0) {
+        if (needPDSCheck && !game.isL1Hero() && !playersWithPds2.isEmpty()) {
             StartCombat.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game,
                 player, tile);
         }
@@ -529,8 +529,7 @@ public class ButtonHelperTacticalAction {
 
     public static void alternateWayOfOfferingTiles(Player player, Game game) {
         Map<String, Integer> distances = CheckDistance.getTileDistancesRelativeToAllYourUnlockedTiles(game, player);
-        List<String> initialOffering = new ArrayList<>();
-        initialOffering.addAll(CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 0));
+        List<String> initialOffering = new ArrayList<>(CheckDistance.getAllTilesACertainDistanceAway(game, player, distances, 0));
         int maxDistance = 0;
         List<Button> buttons = new ArrayList<>();
         String message = "Doing a tactical action. Please select the tile you want to activate. Right now showing tiles ";
@@ -613,10 +612,10 @@ public class ButtonHelperTacticalAction {
         }
 
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, pos);
-        if (!game.isFowMode() && playersWithPds2.size() > 0 && !game.isL1Hero()) {
+        if (!game.isFowMode() && !playersWithPds2.isEmpty() && !game.isL1Hero()) {
             StringBuilder pdsMessage = new StringBuilder(player.getRepresentationUnfogged()
                 + " the selected system is in range of space cannon units owned by");
-            if (playersWithPds2.size() != 1 || playersWithPds2.get(0) != player) {
+            if (playersWithPds2.size() != 1 || playersWithPds2.getFirst() != player) {
                 for (Player playerWithPds : playersWithPds2) {
                     pdsMessage.append(" ").append(playerWithPds.getRepresentation());
                 }
@@ -664,7 +663,7 @@ public class ButtonHelperTacticalAction {
         }
         if (player.hasRelic("absol_plenaryorbital") && !tile.isHomeSystem() && !tile.isMecatol() && !player.hasUnit("plenaryorbital")) {
             List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(game, player);
-            if (buttons4.size() > 0) {
+            if (!buttons4.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     "You can place down the plenary orbital",
                     buttons4);
@@ -793,7 +792,7 @@ public class ButtonHelperTacticalAction {
                 buttons.add(validTile2);
             }
         }
-        if (displacedUnits.keySet().size() > 0) {
+        if (!displacedUnits.keySet().isEmpty()) {
             Button validTile2 = Buttons.green(finChecker + "unitTactical" + moveOrRemove + "_" + tile.getPosition() + "_reverseAll", "Undo all");
             buttons.add(validTile2);
         }

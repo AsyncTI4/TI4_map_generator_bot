@@ -1,7 +1,5 @@
 package ti4.commands.game;
 
-import static ti4.helpers.StringHelper.ordinal;
-
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -11,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -28,6 +24,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.special.Rematch;
 import ti4.commands.statistics.GameStatisticFilterer;
@@ -50,6 +47,8 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import static ti4.helpers.StringHelper.ordinal;
 
 public class GameEnd extends GameSubcommandData {
 
@@ -113,7 +112,7 @@ public class GameEnd extends GameSubcommandData {
 
         // DELETE THE ROLE
         if (deleteRole && archiveChannels && !rematch) {
-            Role gameRole = gameRoles.get(0);
+            Role gameRole = gameRoles.getFirst();
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
             gameRole.delete().queue();
@@ -121,7 +120,7 @@ public class GameEnd extends GameSubcommandData {
             if (game.isFowMode()) {
                 List<Role> gmRoles = event.getGuild().getRolesByName(game.getName() + " GM", true);
                 if (!gmRoles.isEmpty()) {
-                    gmRoles.get(0).delete().queue();
+                    gmRoles.getFirst().delete().queue();
                 }
             }
         }
@@ -129,7 +128,7 @@ public class GameEnd extends GameSubcommandData {
         gameEndStuff(game, event, publish);
         // MOVE CHANNELS TO IN-LIMBO
         List<Category> limbos = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true);
-        Category inLimboCategory = limbos.isEmpty() ? null : limbos.get(0);
+        Category inLimboCategory = limbos.isEmpty() ? null : limbos.getFirst();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
         if (inLimboCategory != null && archiveChannels && !rematch) {
@@ -151,10 +150,9 @@ public class GameEnd extends GameSubcommandData {
 
         //DELETE FOW CHANNELS
         if (game.isFowMode() && archiveChannels && !rematch) {
-            Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).get(0);
+            Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).getFirst();
             if (fogCategory != null) {
-                List<TextChannel> channels = new ArrayList<>();
-                channels.addAll(fogCategory.getTextChannels());
+                List<TextChannel> channels = new ArrayList<>(fogCategory.getTextChannels());
                 //Delay deletion so end of game messages have time to go through
                 for (TextChannel channel : channels) {
                     channel.delete().queueAfter(2, TimeUnit.SECONDS);
@@ -181,7 +179,7 @@ public class GameEnd extends GameSubcommandData {
 
         // GET BOTHELPER LOUNGE
         List<TextChannel> bothelperLoungeChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);
-        TextChannel bothelperLoungeChannel = bothelperLoungeChannels.size() > 0 ? bothelperLoungeChannels.get(0) : null;
+        TextChannel bothelperLoungeChannel = !bothelperLoungeChannels.isEmpty() ? bothelperLoungeChannels.getFirst() : null;
         if (bothelperLoungeChannel != null) {
             // POST GAME END TO BOTHELPER LOUNGE GAME STARTS & ENDS THREAD
             List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
@@ -266,23 +264,23 @@ public class GameEnd extends GameSubcommandData {
     }
 
     private static void sendRoundSummariesToThread(ThreadChannel t, Game game) {
-        String endOfGameSummary = "";
+        StringBuilder endOfGameSummary = new StringBuilder();
 
         for (int x = 1; x < game.getRound() + 1; x++) {
-            String summary = "";
+            StringBuilder summary = new StringBuilder();
             for (Player player : game.getPlayers().values()) {
                 String summaryKey = RoundSummaryHelper.resolveRoundSummaryKey(player, String.valueOf(x));
                 if (!game.getStoredValue(summaryKey).isEmpty()) {
-                    summary += RoundSummaryHelper.resolvePlayerEmoji(player) + ": " + game.getStoredValue(summaryKey) + "\n";
+                    summary.append(RoundSummaryHelper.resolvePlayerEmoji(player)).append(": ").append(game.getStoredValue(summaryKey)).append("\n");
                 }
             }
-            if (!summary.isEmpty()) {
-                summary = "**__Round " + x + " Secret Summary__**\n" + summary;
-                endOfGameSummary = endOfGameSummary + summary;
+            if (summary.length() > 0) {
+                summary.insert(0, "**__Round " + x + " Secret Summary__**\n");
+                endOfGameSummary.append(summary);
             }
         }
-        if (!endOfGameSummary.isEmpty()) {
-            MessageHelper.sendMessageToChannel(t, endOfGameSummary);
+        if (endOfGameSummary.length() > 0) {
+            MessageHelper.sendMessageToChannel(t, endOfGameSummary.toString());
         }
     }
 
@@ -307,7 +305,7 @@ public class GameEnd extends GameSubcommandData {
             Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
             textChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true);
         }
-        return textChannels.isEmpty() ? null : textChannels.get(0);
+        return textChannels.isEmpty() ? null : textChannels.getFirst();
     }
 
     private static void appendUserName(StringBuilder sb, Player player, GenericInteractionCreateEvent event) {
@@ -380,10 +378,10 @@ public class GameEnd extends GameSubcommandData {
                 double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
                 String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
                 sb.append("Out of ").append(gamesWithWinnerCount).append(" similar games (").append(game.getVp()).append("VP, ")
-                    .append(playerCount).append("P)")
-                    .append(", this path has been seen ")
-                    .append(winningPathCount - 1)
-                    .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of " + winningPathCounts.size() + " paths) at ")
+                        .append(playerCount).append("P)")
+                        .append(", this path has been seen ")
+                        .append(winningPathCount - 1)
+                        .append(" times before. It's the ").append(winningPathCommonality).append(" most common path (out of ").append(winningPathCounts.size()).append(" paths) at ")
                     .append(formatPercent(winningPathPercent)).append(" of games.").append("\n");
                 if (winningPathCount == 1) {
                     sb.append("🥳__**An async first! May your victory live on for all to see!**__🥳").append("\n");
@@ -449,7 +447,7 @@ public class GameEnd extends GameSubcommandData {
     }
 
     public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
-        Category inLimboCategory = guild.getCategoriesByName("The in-limbo PBD Archive", true).get(0);
+        Category inLimboCategory = guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {
             BotLogger.log(
                 "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "

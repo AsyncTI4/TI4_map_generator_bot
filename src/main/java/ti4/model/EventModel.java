@@ -104,7 +104,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
-        if (getText().length() > 0) {
+        if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }

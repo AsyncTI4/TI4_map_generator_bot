@@ -47,7 +47,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
-        String topCard = deck.get(0);
+        String topCard = deck.getFirst();
         ExploreModel explore = Mapper.getExplore(topCard);
         sb.append(explore.textRepresentation());
 

@@ -1,18 +1,18 @@
 package ti4.commands.uncategorized;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.Guild;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -20,7 +20,7 @@ import ti4.message.MessageHelper;
 public class ServerPromote implements Command {
 
     public static final String DEV_CHANNEL = "947520255826198549";
-    public static final Map<String, String> Servers = new HashMap<String, String>() {
+    public static final Map<String, String> Servers = new HashMap<>() {
         {
             put("943410040369479690", "Async Hub");
             put("1176104225932058694", "War Sun Tzu");
@@ -47,7 +47,7 @@ public class ServerPromote implements Command {
             put("1220415693837832212", "Emoji Farm 17");
         }
     };
-    public static final Map<String, String> Ranks = new HashMap<String, String>() {
+    public static final Map<String, String> Ranks = new HashMap<>() {
         {
             put("943596173896323072", "Admin");
             put("947648366056185897", "Developer");
@@ -81,7 +81,7 @@ public class ServerPromote implements Command {
         }
 
         if (!Servers.get(target_opt.getAsString()).startsWith("Emoji Farm")) {
-            if (rank_opt == null || rank_opt.getAsString().equals("")) {
+            if (rank_opt == null || rank_opt.getAsString().isEmpty()) {
                 MessageHelper.replyToMessage(event, "Rank required (for non Emoji Farm servers).");
                 return false;
             }
@@ -124,7 +124,7 @@ public class ServerPromote implements Command {
 
         String target = target_opt.getAsString();
         String rank = rank_opt == null ? "" : rank_opt.getAsString();
-        Boolean demote = demote_opt == null ? false : demote_opt.getAsBoolean();
+        boolean demote = demote_opt != null && demote_opt.getAsBoolean();
         User user = event.getUser();
 
         MessageHelper.replyToMessage(event, (demote ? "Demoting" : "Promoting") + " " + user.getEffectiveName() + "; rank " + Ranks.get(rank));

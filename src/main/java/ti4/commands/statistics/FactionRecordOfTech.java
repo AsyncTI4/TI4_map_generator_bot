@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -83,7 +84,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Techs Researched By " + factionM.getFactionName() + " (From " + gamesThatHadThem + " Games)**__\n");
+        sb.append("## __**Techs Researched By ").append(factionM.getFactionName()).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Entry<String, Integer>> comparator = (o1, o2) -> {
@@ -100,7 +101,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
 
                 sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
                 sb.append("` ").append(techResearched.getKey());
-                sb.append(": " + techResearched.getValue());
+                sb.append(": ").append(techResearched.getValue());
                 sb.append("\n");
                 index.getAndIncrement();
             });

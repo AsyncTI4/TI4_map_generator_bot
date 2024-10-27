@@ -12,8 +12,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.commands.map.AddTile;
 import ti4.commands.map.AddTileList;
 import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.MiltyDraftSlice;
 import ti4.commands.milty.MiltyDraftManager.PlayerDraft;
+import ti4.commands.milty.MiltyDraftSlice;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.map.Game;
@@ -59,7 +59,7 @@ public class MapTemplateHelper {
             tileId = templateTile.getStaticTileId();
         } else if (templateTile.getPlayerNumber() != null) {
             PlayerDraft player = draft.stream()
-                .filter(p -> p.getPosition() == templateTile.getPlayerNumber())
+                .filter(p -> p.getPosition().equals(templateTile.getPlayerNumber()))
                 .findFirst().orElse(null);
             if (player == null) {
                 throw new Exception("Something went wrong, could not find player at speaker order: " + templateTile.getPlayerNumber());
@@ -84,7 +84,7 @@ public class MapTemplateHelper {
     public static String getPlayerHomeSystemLocation(PlayerDraft pd, String mapTemplate) {
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
         for (MapTemplateTile t : template.getTemplateTiles()) {
-            if (t.getPlayerNumber() != null && t.getPlayerNumber() == pd.getPosition()) {
+            if (t.getPlayerNumber() != null && t.getPlayerNumber().equals(pd.getPosition())) {
                 if (pd.getFaction() != null && t.getHome() != null && t.getHome()) {
                     return t.getPos();
                 }
@@ -96,7 +96,7 @@ public class MapTemplateHelper {
     public static void buildPartialMapFromMiltyData(Game game, GenericInteractionCreateEvent event, String mapTemplate) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         MapTemplateModel template = Mapper.getMapTemplate(mapTemplate);
-        List<Player> players = manager.getPlayers().stream().map(p -> game.getPlayer(p)).toList();
+        List<Player> players = manager.getPlayers().stream().map(game::getPlayer).toList();
 
         List<String> backupColors = Arrays.asList("red", "blue", "yellow", "emerald", "lavender", "petrol", "chocolate",
             "ethereal", "forest", "gold", "green", "grey", "navy", "spring", "teal", "black", "lightgrey", "rainbow",
@@ -110,7 +110,7 @@ public class MapTemplateHelper {
             MiltyDraftSlice slice = draft.getSlice();
             for (MapTemplateTile tile : template.getTemplateTiles()) {
                 Tile gameTile = game.getTileByPosition(tile.getPos());
-                if (tile.getPos() != null && tile.getPlayerNumber() != null && tile.getPlayerNumber() == playerNum) {
+                if (tile.getPos() != null && tile.getPlayerNumber() != null && tile.getPlayerNumber().equals(playerNum)) {
                     if (gameTile != null && !TileHelper.isDraftTile(gameTile.getTileModel())) continue; //already set
 
                     if (slice != null && tile.getMiltyTileIndex() != null) {
@@ -133,13 +133,11 @@ public class MapTemplateHelper {
                     if (tile.getStaticTileId() != null)
                         tileID = tile.getStaticTileId();
                     else if (tile.getPlayerNumber() != null) {
-                        if (tile.getPlayerNumber() != null) {
-                            String color = backupColors.get(tile.getPlayerNumber());
-                            if (tile.getMiltyTileIndex() != null) {
-                                tileID = color + (tile.getMiltyTileIndex() + 1);
-                            } else if (tile.getHome() != null) {
-                                tileID = color + "blank";
-                            }
+                        String color = backupColors.get(tile.getPlayerNumber());
+                        if (tile.getMiltyTileIndex() != null) {
+                            tileID = color + (tile.getMiltyTileIndex() + 1);
+                        } else if (tile.getHome() != null) {
+                            tileID = color + "blank";
                         }
                     }
                     if (tileID != null) {

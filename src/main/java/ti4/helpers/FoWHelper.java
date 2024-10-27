@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -19,6 +17,8 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.combat.StartCombat;
 import ti4.generator.Mapper;
@@ -200,11 +200,8 @@ public class FoWHelper {
 	public static boolean hasHomeSystemInView(@NotNull Game game, @NotNull Player player,
 		@NotNull Player viewingPlayer) {
 		Tile tile = player.getHomeSystemTile();
-		if (tile != null && !tile.hasFog(viewingPlayer)) {
-			return true;
-		}
-		return false;
-	}
+        return tile != null && !tile.hasFog(viewingPlayer);
+    }
 
 	private static boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
 		boolean hasPromInPA = false;
@@ -265,11 +262,11 @@ public class FoWHelper {
 
 		if (player != null && game.playerHasLeaderUnlockedOrAlliance(player, "ghoticommander")
 			&& player == game.getActivePlayer() && !game.getActiveSystem().isEmpty()
-			&& game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().size() == 0) {
+			&& game.getTileByPosition(game.getActiveSystem()).getPlanetUnitHolders().isEmpty()) {
 			Collection<Tile> tileList = game.getTileMap().values();
 			List<String> frontierTileList = Mapper.getFrontierTileIds();
 			for (Tile tile : tileList) {
-				if (tile.getPlanetUnitHolders().size() == 0 && (tile.getUnitHolders().size() == 2
+				if (tile.getPlanetUnitHolders().isEmpty() && (tile.getUnitHolders().size() == 2
 					|| frontierTileList.contains(tile.getTileID()))) {
 					adjacentPositions.add(tile.getPosition());
 				}
@@ -927,13 +924,13 @@ public class FoWHelper {
 
 	public static void sanityCheckFowReacts() {
 		List<String> badEmojis = new ArrayList<>(Emojis.symbols).stream()
-			.map(emoji -> Emoji.fromFormatted(emoji))
+			.map(Emoji::fromFormatted)
 			.map(emoji -> (emoji instanceof CustomEmoji c) ? c : null)
-			.filter(e -> e != null)
+			.filter(Objects::nonNull)
 			.filter(e -> AsyncTI4DiscordBot.jda.getEmojiById(e.getId()) == null)
 			.map(emoji -> emoji.getName() + " " + emoji.getId())
 			.toList();
-		if (badEmojis.size() > 0) {
+		if (!badEmojis.isEmpty()) {
 			StringBuilder sb = new StringBuilder(Constants.jazzPing());
 			sb.append(" Bad emojis are being used for FOW reacts:\n");
 			for (String err : badEmojis) {

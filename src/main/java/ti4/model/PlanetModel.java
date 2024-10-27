@@ -1,20 +1,18 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.awt.Color;
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
@@ -70,8 +68,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (planetType != null) {
             return planetType;
         }
-        if (getPlanetTypes().size() > 0) {
-            return getPlanetTypes().get(0);
+        if (!getPlanetTypes().isEmpty()) {
+            return getPlanetTypes().getFirst();
         }
         return PlanetTypeModel.PlanetType.NONE;
     }
@@ -135,10 +133,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (StringUtils.isBlank(getLegendaryAbilityText())) return null; //no ability text, no embed
 
         EmbedBuilder eb = new EmbedBuilder();
-        StringBuilder sb = new StringBuilder();
 
-        sb.append(Emojis.LegendaryPlanet).append("__").append(getLegendaryAbilityName()).append("__");
-        eb.setTitle(sb.toString());
+        eb.setTitle(Emojis.LegendaryPlanet + "__" + getLegendaryAbilityName() + "__");
         eb.setColor(Color.black);
 
         eb.setDescription(getLegendaryAbilityText());

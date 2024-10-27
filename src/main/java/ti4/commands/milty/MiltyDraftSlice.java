@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 
 @Data
@@ -24,27 +23,27 @@ public class MiltyDraftSlice {
 
     @JsonIgnore
     public int getOptimalRes() {
-        return tiles.stream().map(MiltyDraftTile::getMilty_res).reduce(0, (x, y) -> x + y);
+        return tiles.stream().map(MiltyDraftTile::getMilty_res).reduce(0, Integer::sum);
     }
 
     @JsonIgnore
     public int getOptimalInf() {
-        return tiles.stream().map(MiltyDraftTile::getMilty_inf).reduce(0, (x, y) -> x + y);
+        return tiles.stream().map(MiltyDraftTile::getMilty_inf).reduce(0, Integer::sum);
     }
 
     @JsonIgnore
     public int getOptimalFlex() {
-        return tiles.stream().map(MiltyDraftTile::getMilty_flex).reduce(0, (x, y) -> x + y);
+        return tiles.stream().map(MiltyDraftTile::getMilty_flex).reduce(0, Integer::sum);
     }
 
     @JsonIgnore
     public int getTotalRes() {
-        return tiles.stream().map(MiltyDraftTile::getResources).reduce(0, (x, y) -> x + y);
+        return tiles.stream().map(MiltyDraftTile::getResources).reduce(0, Integer::sum);
     }
 
     @JsonIgnore
     public int getTotalInf() {
-        return tiles.stream().map(MiltyDraftTile::getInfluence).reduce(0, (x, y) -> x + y);
+        return tiles.stream().map(MiltyDraftTile::getInfluence).reduce(0, Integer::sum);
     }
 
     public String ttsString() {

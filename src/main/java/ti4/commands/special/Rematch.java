@@ -149,9 +149,7 @@ public class Rematch extends SpecialSubcommandData {
         // CREATE ACTIONS CHANNEL AND CLEAR PINS
         String newBotThreadName = newName + Constants.BOT_CHANNEL_SUFFIX;
         newGame.setMainChannelID(actionsChannel.getId());
-        actionsChannel.retrievePinnedMessages().queue(msgs -> {
-            msgs.forEach(msg -> msg.unpin().queue());
-        }, BotLogger::catchRestError);
+        actionsChannel.retrievePinnedMessages().queue(msgs -> msgs.forEach(msg -> msg.unpin().queue()), BotLogger::catchRestError);
 
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)

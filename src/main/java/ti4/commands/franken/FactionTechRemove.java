@@ -37,9 +37,8 @@ public class FactionTechRemove extends FactionTechAddRemove {
             if (techModel.isUnitUpgrade()) {
                 UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
                 player.removeOwnedUnitByID(unitModel.getAlias()); // remove the upgraded/base unit
-                unitModel.getUpgradesFromUnitId().ifPresent(upgradesFromUnitId -> {
-                    player.removeOwnedUnitByID(upgradesFromUnitId); // remove the base/un-upgraded unit
-                });
+                // remove the base/un-upgraded unit
+                unitModel.getUpgradesFromUnitId().ifPresent(player::removeOwnedUnitByID);
                 player.addOwnedUnitByID(unitModel.getBaseType()); // add the base unit back
             }
         }

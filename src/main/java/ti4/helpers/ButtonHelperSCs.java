@@ -5,14 +5,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -195,9 +194,7 @@ public class ButtonHelperSCs {
         if (!player.getFollowedSCs().contains(scModel.getInitiative())) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
         }
-        if (!game.getPhaseOfGame().contains("agenda") && !used && scModel != null && scModel.usesAutomationForSCID("pok8imperial")
-            && !player.getFollowedSCs().contains(scModel.getInitiative())
-            && game.getPlayedSCs().contains(scModel.getInitiative())) {
+        if (!game.getPhaseOfGame().contains("agenda") && !used && scModel.usesAutomationForSCID("pok8imperial") && !player.getFollowedSCs().contains(scModel.getInitiative()) && game.getPlayedSCs().contains(scModel.getInitiative())) {
             int scNum = scModel.getInitiative();
             player.addFollowedSC(scNum, event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);

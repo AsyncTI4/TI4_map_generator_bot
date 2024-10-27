@@ -7,14 +7,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -185,8 +184,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (game.getTechnologyDeckID().contains("absol")) {
-            List<String> techs = new ArrayList<>();
-            techs.addAll(player.getTechs());
+            List<String> techs = new ArrayList<>(player.getTechs());
             for (String tech : techs) {
                 if (!tech.contains("absol") && Mapper.getTech("absol_" + tech) != null) {
                     if (!player.hasTech("absol_" + tech)) {

@@ -59,8 +59,8 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
-import ti4.model.TokenModel;
 import ti4.model.TileModel;
+import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 
@@ -204,7 +204,7 @@ public class Mapper {
         String mostRecentObject = "none";
         try {
             List<ColorModel> colorsToCreate = getColors();
-            List<T> newObjects = new ArrayList<T>();
+            List<T> newObjects = new ArrayList<>();
             for (T obj : objectMap.values()) {
                 mostRecentObject = obj.getAlias();
                 if (obj.isColorable()) {
@@ -599,7 +599,7 @@ public class Mapper {
         } else {
             sb.append(agenda.getTarget()).append(";");
             sb.append(agenda.getText1());
-            if (agenda.getText2().length() > 0) {
+            if (!agenda.getText2().isEmpty()) {
                 sb.append(";").append(agenda.getText2());
             }
         }
@@ -779,7 +779,7 @@ public class Mapper {
         if (templates.isEmpty()) {
             return null;
         } else if (templates.size() == 1) {
-            mapTemplate = templates.get(0);
+            mapTemplate = templates.getFirst();
         } else {
             String defaultMapTemplate = switch (players) {
                 case 3 -> "3pHyperlanes";
@@ -791,7 +791,7 @@ public class Mapper {
                 default -> null;
             };
             if (defaultMapTemplate == null) {
-                mapTemplate = templates.get(0); // just get whatever template lol
+                mapTemplate = templates.getFirst(); // just get whatever template lol
             } else {
                 for (MapTemplateModel model : templates) {
                     if (model.getAlias().equals(defaultMapTemplate)) {

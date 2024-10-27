@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
@@ -452,7 +451,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
 
@@ -462,7 +461,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
             }
@@ -756,7 +755,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -766,7 +765,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_starCharts_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -995,7 +994,7 @@ public class TransactionHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
-                    if (p1.getPromissoryNotes().keySet().contains(amountToTrans)) {
+                    if (p1.getPromissoryNotes().containsKey(amountToTrans)) {
                         id = amountToTrans;
                     }
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
@@ -1098,7 +1097,7 @@ public class TransactionHelper {
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationUnfogged()).append(" this is a friendly reminder that you ");
         if (!canTheseTwoTransact(game, player, player2)) {
-            sb.append("are not neighbors with " + player2.getRepresentation(false, false));
+            sb.append("are not neighbors with ").append(player2.getRepresentation(false, false));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
         if (player.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -1168,7 +1167,7 @@ public class TransactionHelper {
                 "Wash Both Players Comms");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getPlayersShipOrders(p1).size() > 0) {
+        if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
             Button transact = Buttons.gray("newTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction(),
                 "Axis Orders");
             stuffToTransButtons.add(transact);
@@ -1188,17 +1187,17 @@ public class TransactionHelper {
                 "Promissory Notes");
             stuffToTransButtons.add(transact);
         }
-        if (p1.getFragments().size() > 0) {
+        if (!p1.getFragments().isEmpty()) {
             Button transact = Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(),
                 "Fragments");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             Button transact = Button
                 .success("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
             Button transact = Buttons.green("newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
         }
@@ -1256,7 +1255,7 @@ public class TransactionHelper {
                 "Wash Both Players Comms");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getPlayersShipOrders(p1).size() > 0) {
+        if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
             Button transact = Buttons.gray(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders");
             stuffToTransButtons.add(transact);
         }
@@ -1272,15 +1271,15 @@ public class TransactionHelper {
             Button transact = Buttons.green(finChecker + "transact_PNs_" + p2.getFaction(), "Promissory Notes");
             stuffToTransButtons.add(transact);
         }
-        if (p1.getFragments().size() > 0) {
+        if (!p1.getFragments().isEmpty()) {
             Button transact = Buttons.green(finChecker + "transact_Frags_" + p2.getFaction(), "Fragments");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             Button transact = Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
             Button transact = Button
                 .success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);

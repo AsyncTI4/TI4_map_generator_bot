@@ -42,11 +42,11 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String text = "";
+        StringBuilder text = new StringBuilder();
         for (int x = 1; x < 7; x++) {
-            text = text + getSCPick(event, x);
+            text.append(getSCPick(event, x));
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "SC Pick Record", text);
+        MessageHelper.sendMessageToThread(event.getChannel(), "SC Pick Record", text.toString());
     }
 
     private String getSCPick(SlashCommandInteractionEvent event, int round) {
@@ -96,7 +96,7 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**SCs Picked By " + factionM.getFactionName() + " In Round #" + round + " (From " + gamesThatHadThem + " Games)**__\n");
+        sb.append("## __**SCs Picked By ").append(factionM.getFactionName()).append(" In Round #").append(round).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Entry<String, Integer>> comparator = (o1, o2) -> {
@@ -113,9 +113,9 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
 
                 sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
                 sb.append("` ").append(techResearched.getKey());
-                sb.append(": " + techResearched.getValue());
+                sb.append(": ").append(techResearched.getValue());
                 if (round == 1) {
-                    sb.append(" (Took Custodians a total of  " + custodians.getOrDefault(techResearched.getKey(), 0) + " times)");
+                    sb.append(" (Took Custodians a total of  ").append(custodians.getOrDefault(techResearched.getKey(), 0)).append(" times)");
                 }
                 sb.append("\n");
                 index.getAndIncrement();

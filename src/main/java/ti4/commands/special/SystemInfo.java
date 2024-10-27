@@ -160,7 +160,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         continue;
                     }
                     List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
-                    if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                    if (!players.isEmpty() && !player.getAllianceMembers().contains(players.get(0).getFaction()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         Player player2 = players.get(0);
                         if (player2 == player) {
                             player2 = players.get(1);

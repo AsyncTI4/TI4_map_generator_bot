@@ -750,7 +750,7 @@ public class MapGenerator {
                 if (convertToGeneric) {
                     continue;
                 }
-                if ((game.isMinorFactionsMode() || (player != null && player.getFaction() != null && player.getFaction().equalsIgnoreCase("neutral"))) && player.isDummy()) {
+                if ((game.isMinorFactionsMode() || player.getFaction() != null && player.getFaction().equalsIgnoreCase("neutral")) && player.isDummy()) {
                     continue;
                 }
 
@@ -955,7 +955,7 @@ public class MapGenerator {
                 if (!game.isFowMode()) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.RED);
-                    if (player.getNeighbouringPlayers().size() == 0) {
+                    if (player.getNeighbouringPlayers().isEmpty()) {
                         graphics.drawString("No Neighbors", x + 9 + xSpacer, y + 125 + yDelta);
                         xSpacer = xSpacer + 115;
                     } else {
@@ -1189,7 +1189,7 @@ public class MapGenerator {
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             xDeltaSecondRowFromRightSide += 40;
-            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
+            yPlayAreaSecondRow += alphaOnMap || betaOnMap ? 38 : 19;
         }
 
         if (!betaOnMap) {
@@ -1205,7 +1205,7 @@ public class MapGenerator {
                 graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             }
             xDeltaSecondRowFromRightSide += 40;
-            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
+            yPlayAreaSecondRow += alphaOnMap || gammaOnMap ? 38 : 19;
         }
 
         if (!alphaOnMap) {
@@ -1221,7 +1221,7 @@ public class MapGenerator {
                 graphics.drawImage(doubleWormholeImage, width - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             }
             xDeltaSecondRowFromRightSide += 40;
-            yPlayAreaSecondRow += (alphaOnMap || betaOnMap || gammaOnMap) ? 38 : 19;
+            yPlayAreaSecondRow += betaOnMap || gammaOnMap ? 38 : 19;
         }
 
         xDeltaSecondRowFromRightSide -= (alphaOnMap && betaOnMap && gammaOnMap ? 0 : 40);
@@ -1230,7 +1230,7 @@ public class MapGenerator {
 
     private int omenDice(Player player, int x, int y) {
         int deltaX = 0;
-        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(game).size() > 0) {
+        if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
 
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setStroke(stroke2);
@@ -1740,7 +1740,7 @@ public class MapGenerator {
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(unitKey));
                 BufferedImage decal = null;
-                if (player != null) decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
+                decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
                 for (int i = 0; i < numInReinforcements; i++) {
                     Point position = reinforcementsPosition.getPosition(unitID);
                     graphics.drawImage(image, x + position.x, y + position.y, null);
@@ -2381,8 +2381,14 @@ public class MapGenerator {
 
             int types = 0;
             String techIcon = "";
-            if (techInformation.isPropulsionTech() && types++ < 2) techIcon += "propulsion";
-            if (techInformation.isCyberneticTech() && types++ < 2) techIcon += "cybernetic";
+            if (techInformation.isPropulsionTech()) {
+                types++;
+                techIcon += "propulsion";
+            }
+            if (techInformation.isCyberneticTech()) {
+                types++;
+                techIcon += "cybernetic";
+            }
             if (techInformation.isBioticTech() && types++ < 2) techIcon += "biotic";
             if (techInformation.isWarfareTech() && types++ < 2) techIcon += "warfare";
 
@@ -2732,7 +2738,6 @@ public class MapGenerator {
     private static void superDrawString(Graphics2D g, String txt, int x, int y, Color textColor, HorizontalAlign horizontalAlignment, VerticalAlign verticalAlignment, Stroke outlineSize, Color outlineColor) {
         boolean debugPosition = false;
         if (txt == null) return;
-        if (debugPosition) drawCrosshair(g, x, y); // debug
 
         int width = g.getFontMetrics().stringWidth(txt);
         if (horizontalAlignment != null) {
@@ -2759,7 +2764,6 @@ public class MapGenerator {
             outlineColor = Color.BLACK;
             textColor = Color.WHITE;
         }
-        if (debugPosition) g.drawRect(x, y - height, width, height); // debug
         if (outlineSize == null || outlineColor == null) {
             g.drawString(txt, x, y);
         } else {
@@ -3438,7 +3442,7 @@ public class MapGenerator {
                 String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
                 BufferedImage bufferedImage = ImageHelper.read(relicFile);
                 if (offBoardHighlighting >= 1) {
-                    bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / (offBoardHighlighting + (hasNanoForge ? 1 : 0)) / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                    bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / (offBoardHighlighting + 1) / bufferedImage.getWidth() / bufferedImage.getHeight()));
                     graphics.drawImage(bufferedImage,
                         miscTile.x + (345 - bufferedImage.getWidth()) / 2 + 30,
                         miscTile.y + (300 - bufferedImage.getHeight()) / 2 + 30 + (player.isSpeaker() ? 30 : 0),
@@ -3570,7 +3574,7 @@ public class MapGenerator {
                 offBoardHighlighting += unitNum;
             }
         } else if (displayType == DisplayType.traits) {
-            List<String> traitFiles = new ArrayList<String>();
+            List<String> traitFiles = new ArrayList<>();
             for (String planet : player.getPlanets()) {
                 PlanetModel custodiaVigilia = Mapper.getPlanet(planet);
                 if (game.getTileFromPlanet(planet) == null) {
@@ -3578,16 +3582,16 @@ public class MapGenerator {
                     String traitFile = "";
                     List<String> traits = planetReal.getPlanetType();
 
-                    if (planetReal.getOriginalPlanetType().equals("faction") && traits.size() == 0) {
+                    if (planetReal.getOriginalPlanetType().equals("faction") && traits.isEmpty()) {
                         if (custodiaVigilia.getFactionHomeworld() == null) {
                             traitFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
                         } else {
                             traitFile = ResourceHelper.getInstance().getFactionFile(custodiaVigilia.getFactionHomeworld() + ".png");
                         }
                     } else if (traits.size() == 1) {
-                        String t = planetReal.getPlanetType().get(0);
+                        String t = planetReal.getPlanetType().getFirst();
                         traitFile = ResourceHelper.getInstance().getGeneralFile(("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
-                    } else if (traits.size() == 0) {
+                    } else if (traits.isEmpty()) {
                     } else {
                         String t = "";
                         t += traits.contains("cultural") ? "C" : "";
@@ -3613,7 +3617,7 @@ public class MapGenerator {
                         null);
                 }
             } else if (offBoardHighlighting == 1) {
-                BufferedImage bufferedImage = ImageHelper.read(traitFiles.get(0));
+                BufferedImage bufferedImage = ImageHelper.read(traitFiles.getFirst());
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
                     miscTile.x + (345 - bufferedImage.getWidth()) / 2,
@@ -3621,7 +3625,7 @@ public class MapGenerator {
                     null);
             }
         } else if (displayType == DisplayType.techskips) {
-            List<String> techFiles = new ArrayList<String>();
+            List<String> techFiles = new ArrayList<>();
             for (String planet : player.getPlanets()) {
                 PlanetModel custodiaVigilia = Mapper.getPlanet(planet);
                 if (game.getTileFromPlanet(planet) == null) {
@@ -3629,7 +3633,7 @@ public class MapGenerator {
                     List<String> skips = planetReal.getTechSpeciality();
                     skips.removeAll(Collections.singleton(null));
                     skips.removeAll(Collections.singleton(""));
-                    if (skips.size() == 0) {
+                    if (skips.isEmpty()) {
                         continue;
                     }
                     for (String skip : skips) {
@@ -3663,7 +3667,7 @@ public class MapGenerator {
                         null);
                 }
             } else if (offBoardHighlighting == 1) {
-                BufferedImage bufferedImage = ImageHelper.read(techFiles.get(0));
+                BufferedImage bufferedImage = ImageHelper.read(techFiles.getFirst());
                 bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                 graphics.drawImage(bufferedImage,
                     miscTile.x + (345 - bufferedImage.getWidth()) / 2,
@@ -3679,7 +3683,7 @@ public class MapGenerator {
                     List<String> attach = new ArrayList<>(planetReal.getAttachments());
                     attach.removeAll(Collections.singleton(null));
                     attach.removeAll(Collections.singleton(""));
-                    if (attach.size() == 0) {
+                    if (attach.isEmpty()) {
                         continue;
                     }
                     attachFiles.put(planet, ResourceHelper.getInstance().getGeneralFile("misc_chevrons_basic.png"));
@@ -4300,7 +4304,7 @@ public class MapGenerator {
         if (player.isSearchWarrant()) {
             graphics.setColor(Color.LIGHT_GRAY);
             Map<String, Integer> revealedSecrets = new LinkedHashMap<>(secrets);
-            y = displaySecretObjectives(y, x, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0, customPublicVP);
+            y = displaySecretObjectives(y, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, customPublicVP);
         }
         Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
@@ -4315,7 +4319,7 @@ public class MapGenerator {
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);
-        y = displaySecretObjectives(y, x, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret, 1, customPublicVP);
+        y = displaySecretObjectives(y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret, customPublicVP);
         if (player.isSearchWarrant()) {
             return secretsScored.keySet().size() + player.getSecrets().keySet().size();
         }
@@ -4324,18 +4328,16 @@ public class MapGenerator {
 
     private int displaySecretObjectives(
         int y,
-        int x,
         Map<String, List<String>> scoredPublicObjectives,
         Map<String, Integer> revealedPublicObjectives,
         Map<String, Player> players,
         Map<String, String> publicObjectivesState,
         Set<String> po,
-        Integer objectiveWorth,
         Map<String, Integer> customPublicVP) {
 
         Set<String> keysToRemove = new HashSet<>();
         for (Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
-            x = 50;
+            int x = 50;
 
             String key = revealed.getKey();
             if (!po.contains(key)) {
@@ -4348,7 +4350,7 @@ public class MapGenerator {
             }
             keysToRemove.add(key);
             if (customPublicVP != null) {
-                objectiveWorth = customPublicVP.get(key);
+                Integer objectiveWorth = customPublicVP.get(key);
                 if (objectiveWorth == null) {
                     objectiveWorth = 1;
                 }
@@ -4655,14 +4657,12 @@ public class MapGenerator {
                     tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
                 }
 
-                if ("large".equals(game.getTextSize())) {
-                    tileGraphics.setFont(Storage.getFont40());
-                } else if ("medium".equals(game.getTextSize())) {
-                    tileGraphics.setFont(Storage.getFont30());
-                } else if ("tiny".equals(game.getTextSize())) {
-                    tileGraphics.setFont(Storage.getFont12());
-                } else { // "small"
-                    tileGraphics.setFont(Storage.getFont20());
+                switch (game.getTextSize()) {
+                    case "large" -> tileGraphics.setFont(Storage.getFont40());
+                    case "medium" -> tileGraphics.setFont(Storage.getFont30());
+                    case "tiny" -> tileGraphics.setFont(Storage.getFont12());
+                    case null, default ->  // "small"
+                            tileGraphics.setFont(Storage.getFont20());
                 }
 
                 if (isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer)) {
@@ -5044,7 +5044,7 @@ public class MapGenerator {
 
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
-                boolean isEmpty = tile.getPlanetUnitHolders().size() == 0;
+                boolean isEmpty = tile.getPlanetUnitHolders().isEmpty();
 
                 if (!isEmpty) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
@@ -5077,11 +5077,11 @@ public class MapGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
                 String tilePos = tile.getPosition();
-                HashMap<Player, List<Integer>> pdsDice = new HashMap<Player, List<Integer>>();
+                HashMap<Player, List<Integer>> pdsDice = new HashMap<>();
 
                 for (Player player : game.getRealPlayers()) {
-                    List<Integer> diceCount = new ArrayList<Integer>();
-                    List<Integer> diceCountMirveda = new ArrayList<Integer>();
+                    List<Integer> diceCount = new ArrayList<>();
+                    List<Integer> diceCountMirveda = new ArrayList<>();
                     int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
 
                     if (player.hasAbility("starfall_gunnery")) {
@@ -5132,24 +5132,24 @@ public class MapGenerator {
                         }
                     }
 
-                    if (diceCountMirveda.size() > 0) {
+                    if (!diceCountMirveda.isEmpty()) {
                         Collections.sort(diceCountMirveda);
-                        diceCount.add(diceCountMirveda.get(0));
+                        diceCount.add(diceCountMirveda.getFirst());
                     }
 
-                    if (diceCount.size() > 0) {
+                    if (!diceCount.isEmpty()) {
                         Collections.sort(diceCount);
                         if (player.getTechs().contains("ps")) {
-                            diceCount.add(0, diceCount.get(0));
+                            diceCount.addFirst(diceCount.getFirst());
                         }
                         if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
-                            diceCount.add(0, diceCount.get(0));
+                            diceCount.addFirst(diceCount.getFirst());
                         }
                         pdsDice.put(player, diceCount);
                     }
                 }
 
-                if (pdsDice.size() == 0) {
+                if (pdsDice.isEmpty()) {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
                 } else {
@@ -5158,30 +5158,29 @@ public class MapGenerator {
                     float scale = pdsDice.size() >= 3 ? 6.0f / pdsDice.size() : 3.0f;
 
                     Font bigFont = Storage.getFont64();
-                    Font smallFont = Storage.getFont32();
-                    switch (pdsDice.size()) {
-                        case 1:
-                        case 2:
+                    Storage.getFont32();
+                    Font smallFont = switch (pdsDice.size()) {
+                        case 1, 2 -> {
                             bigFont = Storage.getFont64();
-                            smallFont = Storage.getFont32();
-                            break;
-                        case 3:
+                            yield Storage.getFont32();
+                        }
+                        case 3 -> {
                             bigFont = Storage.getFont40();
-                            smallFont = Storage.getFont20();
-                            break;
-                        case 4:
+                            yield Storage.getFont20();
+                        }
+                        case 4 -> {
                             bigFont = Storage.getFont32();
-                            smallFont = Storage.getFont16();
-                            break;
-                        case 5:
+                            yield Storage.getFont16();
+                        }
+                        case 5 -> {
                             bigFont = Storage.getFont24();
-                            smallFont = Storage.getFont12();
-                            break;
-                        default:
+                            yield Storage.getFont12();
+                        }
+                        default -> {
                             bigFont = Storage.getFont16();
-                            smallFont = Storage.getFont8();
-                            break;
-                    }
+                            yield Storage.getFont8();
+                        }
+                    };
 
                     x += (345 - 73 * scale) / 2;
                     y += (300 - pdsDice.size() * 48 * scale) / 2;
@@ -5208,24 +5207,24 @@ public class MapGenerator {
                             new Rectangle(Math.round(x + 6 * scale), Math.round(y + 12 * scale + 24 * scale * 2 / 3), Math.round(61 * scale / 2), Math.round(24 * scale / 3)),
                             smallFont);
                         if (numberOfDice >= 5) {
-                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 3).stream().map(i -> i.toString()).collect(Collectors.joining(",")) + ",",
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
-                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream().map(i -> i.toString()).collect(Collectors.joining(",")) + ",",
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale + 36 * scale / 3), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
-                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(2 * numberOfDice / 3, numberOfDice).stream().map(i -> i.toString()).collect(Collectors.joining(",")),
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(2 * numberOfDice / 3, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale + 36 * scale * 2 / 3), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
                         } else if (numberOfDice >= 3) {
-                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 2).stream().map(i -> i.toString()).collect(Collectors.joining(",")) + ",",
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 2).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 12 * scale), Math.round(73 * scale / 2), Math.round(24 * scale / 2)),
                                 smallFont);
-                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 2, numberOfDice).stream().map(i -> i.toString()).collect(Collectors.joining(",")),
+                            drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 2, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 12 * scale + 24 * scale / 2), Math.round(73 * scale / 2), Math.round(24 * scale / 2)),
                                 smallFont);
                         } else {
-                            drawCenteredString(tileGraphics, pdsDice.get(player).stream().map(i -> i.toString()).collect(Collectors.joining(",")),
+                            drawCenteredString(tileGraphics, pdsDice.get(player).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), y, Math.round(73 * scale / 2), Math.round(48 * scale)),
                                 smallFont);
                         }
@@ -5252,7 +5251,7 @@ public class MapGenerator {
                 for (Planet planet : tile.getPlanetUnitHolders()) {
                     String traitFile = "";
                     List<String> traits = planet.getPlanetType();
-                    if (traits.size() == 0) {
+                    if (traits.isEmpty()) {
                         traits.add(planet.getOriginalPlanetType());
                     }
 
@@ -5261,9 +5260,9 @@ public class MapGenerator {
                     } else if (planet.getOriginalPlanetType().equals("faction")) {
                         traitFile = ResourceHelper.getInstance().getFactionFile(Mapper.getPlanet(planet.getName()).getFactionHomeworld() + ".png");
                     } else if (traits.size() == 1) {
-                        String t = planet.getPlanetType().get(0);
+                        String t = planet.getPlanetType().getFirst();
                         traitFile = ResourceHelper.getInstance().getGeneralFile(("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
-                    } else if (traits.size() == 0) {
+                    } else if (traits.isEmpty()) {
                     } else {
                         String t = "";
                         t += traits.contains("cultural") ? "C" : "";
@@ -5276,7 +5275,7 @@ public class MapGenerator {
                         }
                     }
 
-                    if (!traitFile.equals("")) {
+                    if (!traitFile.isEmpty()) {
                         BufferedImage bufferedImage = ImageHelper.read(traitFile);
                         bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(9200.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
                         int w = bufferedImage.getWidth();
@@ -5356,23 +5355,13 @@ public class MapGenerator {
                     int count = 0;
 
                     for (String skip : skips) {
-                        String skipFile;
-                        switch (skip.toLowerCase()) {
-                            case "biotic":
-                                skipFile = ResourceHelper.getInstance().getGeneralFile("Biotic light.png");
-                                break;
-                            case "cybernetic":
-                                skipFile = ResourceHelper.getInstance().getGeneralFile("Cybernetic light.png");
-                                break;
-                            case "propulsion":
-                                skipFile = ResourceHelper.getInstance().getGeneralFile("Propulsion_light.png");
-                                break;
-                            case "warfare":
-                                skipFile = ResourceHelper.getInstance().getGeneralFile("Warfare_light.png");
-                                break;
-                            default:
-                                skipFile = ResourceHelper.getInstance().getGeneralFile("Generic_Technology.png");
-                        }
+                        String skipFile = switch (skip.toLowerCase()) {
+                            case "biotic" -> ResourceHelper.getInstance().getGeneralFile("Biotic light.png");
+                            case "cybernetic" -> ResourceHelper.getInstance().getGeneralFile("Cybernetic light.png");
+                            case "propulsion" -> ResourceHelper.getInstance().getGeneralFile("Propulsion_light.png");
+                            case "warfare" -> ResourceHelper.getInstance().getGeneralFile("Warfare_light.png");
+                            default -> ResourceHelper.getInstance().getGeneralFile("Generic_Technology.png");
+                        };
 
                         BufferedImage bufferedImage = ImageHelper.read(skipFile);
                         bufferedImage = ImageHelper.scale(bufferedImage, (float) Math.sqrt(9200.0f / bufferedImage.getWidth() / bufferedImage.getHeight() / Math.sqrt(1.0f * number)));
@@ -5447,7 +5436,7 @@ public class MapGenerator {
                 }
                 boolean anyAttachments = false;
                 for (Planet planet : tile.getPlanetUnitHolders()) {
-                    List<String> attachments = new ArrayList<String>(planet.getAttachments());
+                    List<String> attachments = new ArrayList<>(planet.getAttachments());
                     attachments.removeAll(Collections.singleton(null));
                     attachments.removeAll(Collections.singleton(""));
                     int number = attachments.size();
@@ -5738,16 +5727,10 @@ public class MapGenerator {
             return o1.compareTo(o2);
         });
         if (game.isShowBubbles() && unitHolder instanceof Planet planetHolder && shouldPlanetHaveShield(unitHolder, game)) {
-            String tokenPath;
-            switch (planetHolder.getContrastColor()) {
-                case "orange":
-                    tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
-                    break;
-                case "blue":
-                default:
-                    tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
-                    break;
-            }
+            String tokenPath = switch (planetHolder.getContrastColor()) {
+                case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
+                default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
+            };
             float scale = 0.95f;
             List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
@@ -5984,8 +5967,8 @@ public class MapGenerator {
         int deltaX = 80;
         int deltaY = 0;
         float mirageDragRatio = 2.0f / 3;
-        int mirageDragX = Math.round((345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
-        int mirageDragY = Math.round((3 * 300 / 4 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragX = Math.round(((float) 345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragY = Math.round(((float) (3 * 300) / 4 + TILE_PADDING) * (1 - mirageDragRatio));
         boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage")) && (tile.getPlanetUnitHolders().size() != 3 + 1);
         List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
@@ -6082,8 +6065,8 @@ public class MapGenerator {
         }
 
         float mirageDragRatio = 2.0f / 3;
-        int mirageDragX = Math.round((345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
-        int mirageDragY = Math.round((3 * 300 / 4 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragX = Math.round(((float) 345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
+        int mirageDragY = Math.round(((float) (3 * 300) / 4 + TILE_PADDING) * (1 - mirageDragRatio));
         boolean hasMirage = false;
         if (isSpace) {
             Set<String> tokenList = unitHolder.getTokenList();

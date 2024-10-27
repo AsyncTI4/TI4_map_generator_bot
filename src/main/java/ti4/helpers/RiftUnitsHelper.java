@@ -120,14 +120,14 @@ public class RiftUnitsHelper {
                 if (buttonIndex > -1) {
                     buttonRow.remove(buttonIndex);
                 }
-                if (buttonRow.size() > 0) {
+                if (!buttonRow.isEmpty()) {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
             if ("".equalsIgnoreCase(exhaustedMessage)) {
                 exhaustedMessage = "Rift";
             }
-            if (actionRow2.size() > 0) {
+            if (!actionRow2.isEmpty()) {
                 event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
             } else {
                 ButtonHelper.deleteMessage(event);

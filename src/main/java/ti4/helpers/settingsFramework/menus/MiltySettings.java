@@ -25,16 +25,16 @@ public class MiltySettings extends SettingsMenu {
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings
-    private ChoiceSetting<DraftingMode> draftMode;
+    private final ChoiceSetting<DraftingMode> draftMode;
 
     // Categories
-    private GameSettings gameSettings;
-    private SliceGenerationSettings sliceSettings;
-    private PlayerFactionSettings playerSettings;
-    private SourceSettings sourceSettings;
+    private final GameSettings gameSettings;
+    private final SliceGenerationSettings sliceSettings;
+    private final PlayerFactionSettings playerSettings;
+    private final SourceSettings sourceSettings;
     // Bonus Attributes
     @JsonIgnore
-    private Game game;
+    private final Game game;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization

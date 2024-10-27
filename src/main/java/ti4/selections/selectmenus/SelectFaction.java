@@ -3,6 +3,7 @@ package ti4.selections.selectmenus;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -44,8 +45,8 @@ public class SelectFaction implements Selection {
             return;
         }
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().get(0).getLabel());
-        String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().get(0);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You selected: " + event.getSelectedOptions().getFirst().getLabel());
+        String fakeButtonID = selectionID + "_" + event.getUser().getId() + "_" + event.getValues().getFirst();
         ButtonHelper.resolveSetupStep2(player, game, event, fakeButtonID);
     }
 

@@ -1,13 +1,10 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -15,6 +12,10 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ColorModelTest extends BaseTi4Test {
     @Test
@@ -40,8 +41,7 @@ public class ColorModelTest extends BaseTi4Test {
     private static boolean isDefault(String emoji) {
         if (emoji == null) return true;
         if (Emojis.GoodDogs.contains(emoji)) return true;
-        if (!emoji.contains("<")) return true;
-        return false;
+        return !emoji.contains("<");
     }
 
     private static void checkEmojisConfig(ColorModel color) {
@@ -57,16 +57,16 @@ public class ColorModelTest extends BaseTi4Test {
         String r2 = Emojis.getColorEmoji(color.getName());
         String r3 = Emojis.getColorEmojiWithName(color.getAlias());
         String r4 = Emojis.getColorEmojiWithName(color.getName());
-        assertTrue(!isDefault(r1), color.getAlias() + " is missing configuration in `Emojis::getColorEmoji.");
-        assertTrue(!isDefault(r2), color.getName() + " is missing configuration in `Emojis::getColorEmoji.");
-        assertTrue(!isDefault(r3), color.getAlias() + " is missing configuration in `Emojis::getColorEmojiWithName.");
-        assertTrue(!isDefault(r4), color.getName() + " is missing configuration in `Emojis::getColorEmojiWithName.");
+        assertFalse(isDefault(r1), color.getAlias() + " is missing configuration in `Emojis::getColorEmoji.");
+        assertFalse(isDefault(r2), color.getName() + " is missing configuration in `Emojis::getColorEmoji.");
+        assertFalse(isDefault(r3), color.getAlias() + " is missing configuration in `Emojis::getColorEmojiWithName.");
+        assertFalse(isDefault(r4), color.getName() + " is missing configuration in `Emojis::getColorEmojiWithName.");
     }
 
     private static String unitPath(UnitKey uk, boolean eyes) {
         String fileName = uk.getFileName(eyes);
         String path = ResourceHelper.getInstance().getResourceFromFolder("units/", fileName, "");
-        assertTrue(path != null, "Could not find unit file: " + fileName);
+        assertNotNull(path, "Could not find unit file: " + fileName);
         return path;
     }
 
@@ -93,7 +93,7 @@ public class ColorModelTest extends BaseTi4Test {
             Mapper.getSweepID(color.getAlias()));
         for (String id : tokenIDs) {
             String path = Mapper.getCCPath(id);
-            assertTrue(path != null, "Could not find token file: " + id);
+            assertNotNull(path, "Could not find token file: " + id);
         }
     }
 }

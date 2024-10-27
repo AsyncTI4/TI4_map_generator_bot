@@ -38,8 +38,8 @@ public class ShowGameAsPlayer extends FOWSubcommandData {
         ShowGame.simpleShowGame(game, new SlashCommandCustomUserWrapper(event, showMapAsPlayer.getUser()));
     }
 
-    public class SlashCommandCustomUserWrapper extends SlashCommandInteractionEvent {
-        private User overriddenUser;
+    public static class SlashCommandCustomUserWrapper extends SlashCommandInteractionEvent {
+        private final User overriddenUser;
         
         public SlashCommandCustomUserWrapper(SlashCommandInteractionEvent event, User overriddenUser) {
             super(event.getJDA(), event.getResponseNumber(), event.getInteraction());

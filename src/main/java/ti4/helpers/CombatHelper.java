@@ -365,10 +365,10 @@ public class CombatHelper {
             .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
             .collect(Collectors.toList());
 
-        if (dupes.size() > 0) {
+        if (!dupes.isEmpty()) {
             CombatMessageHelper.displayDuplicateUnits(event, missing);
         }
-        if (missing.size() > 0) {
+        if (!missing.isEmpty()) {
             CombatMessageHelper.displayMissingUnits(event, missing);
         }
     }
@@ -383,8 +383,8 @@ public class CombatHelper {
             .map(Optional::get)
             .toList();
 
-        if (opponents.size() >= 1) {
-            opponent = opponents.get(0);
+        if (!opponents.isEmpty()) {
+            opponent = opponents.getFirst();
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
@@ -423,7 +423,7 @@ public class CombatHelper {
         List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
         int totalMisses = 0;
         UnitHolder space = activeSystem.getUnitHolders().get("space");
-        String extra = "";
+        StringBuilder extra = new StringBuilder();
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
@@ -486,7 +486,7 @@ public class CombatHelper {
             totalMisses = totalMisses + misses;
 
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + (misses == 1 ? "" : "s") + " due to " + (misses == 1 ? "a Thalnos miss" : "Thalnos misses");
+                extra.append(player.getFactionEmoji()).append(" destroyed ").append(misses).append(" of their own ").append(unit.getName()).append(misses == 1 ? "" : "s").append(" due to ").append(misses == 1 ? "a Thalnos miss" : "Thalnos misses");
                 for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
@@ -540,7 +540,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + " due to Ta Zern, the Jol-Nar Commander:\n " + unitRoll2);
+                resultBuilder.append("Rerolling ").append(numMisses).append(" miss").append(numMisses == 1 ? "" : "es").append(" due to Ta Zern, the Jol-Nar Commander:\n ").append(unitRoll2);
             }
 
             if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround && numMisses > 0) {
@@ -550,7 +550,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Munitions rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + ": " + unitRoll2);
+                resultBuilder.append("Munitions rerolling ").append(numMisses).append(" miss").append(numMisses == 1 ? "" : "es").append(": ").append(unitRoll2);
             }
 
             int argentInfKills = 0;
@@ -585,7 +585,7 @@ public class CombatHelper {
         if (totalHits > 0 && CombatRollType.bombardment == rollType && player.hasTech("dszelir")) {
             result = result + "\n" + player.getFactionEmoji() + " You have Shard Volley and thus should produce an additional hit to the ones rolled above.";
         }
-        if (!extra.isEmpty()) {
+        if (extra.length() > 0) {
             result = result + "\n\n" + extra;
         }
         if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {

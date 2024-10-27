@@ -64,7 +64,7 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
         aclist.forEach(ac -> {
             String name = Mapper.getActionCard(ac.getKey()).getName();
             if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
-            cardsByName.get(name).add(0, ac);
+            cardsByName.get(name).addFirst(ac);
         });
         List<Entry<String, List<Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
         Collections.reverse(entries);
@@ -112,7 +112,7 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
         aclist.forEach(ac -> {
             String name = Mapper.getActionCard(ac.getKey()).getName();
             if (!cardsByName.containsKey(name)) cardsByName.put(name, new ArrayList<>());
-            cardsByName.get(name).add(0, ac);
+            cardsByName.get(name).addFirst(ac);
         });
         List<Entry<String, List<Entry<String, Integer>>>> entries = new ArrayList<>(cardsByName.entrySet());
         Collections.reverse(entries);
@@ -126,7 +126,7 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
             sb.append("\n").append(index).append(". ");
             sb.append(Emojis.ActionCard.repeat(ids.size()));
             sb.append(" **").append(acEntryList.getKey()).append("** - ");
-            sb.append(Mapper.getActionCard(acEntryList.getValue().get(0).getKey()).getRepresentationJustText());
+            sb.append(Mapper.getActionCard(acEntryList.getValue().getFirst().getKey()).getRepresentationJustText());
             index++;
         }
         return sb.toString();

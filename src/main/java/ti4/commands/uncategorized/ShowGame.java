@@ -95,34 +95,20 @@ public class ShowGame implements Command {
 
     @ButtonHandler("showMap")
     public static void showMap(Game game, ButtonInteractionEvent event) {
-        MapGenerator.saveImage(game, DisplayType.map, event).thenAccept(fileUpload -> {
-            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
-        });
+        MapGenerator.saveImage(game, DisplayType.map, event).thenAccept(fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     @ButtonHandler("showPlayerAreas")
     public static void showPlayArea(Game game, ButtonInteractionEvent event) {
-        MapGenerator.saveImage(game, DisplayType.stats, event).thenAccept(fileUpload -> {
-            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
-        });
+        MapGenerator.saveImage(game, DisplayType.stats, event).thenAccept(fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     public static boolean includeButtons(DisplayType displayType) {
-        switch (displayType) {
-            case wormholes:
-            case anomalies:
-            case legendaries:
-            case empties:
-            case aetherstream:
-            case spacecannon:
-            case traits:
-            case techskips:
-            case attachments:
-            case shipless:
-                return false;
-            default:
-                return true;
-        }
+        return switch (displayType) {
+            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
+                 shipless -> false;
+            default -> true;
+        };
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {

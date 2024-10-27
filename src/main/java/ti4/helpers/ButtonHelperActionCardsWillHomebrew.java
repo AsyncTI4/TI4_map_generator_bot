@@ -242,7 +242,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         StringBuilder sb = new StringBuilder();
         for (String type : types) {
             List<String> deck = game.getExploreDeck(type);
-            String cardID = deck.get(0);
+            String cardID = deck.getFirst();
 
             ExploreModel card = Mapper.getExplore(cardID);
             String cardType = card.getResolution();

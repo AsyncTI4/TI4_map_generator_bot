@@ -26,7 +26,7 @@ public class RemoveTile extends AddRemoveTile {
 
     @Override
     protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
-        String positionOption = event.getOptions().get(0).getAsString();
+        String positionOption = event.getOptions().getFirst().getAsString();
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
         Game userActiveGame = gameManager.getUserActiveGame(userID);

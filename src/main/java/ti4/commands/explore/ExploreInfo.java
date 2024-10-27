@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -112,7 +113,7 @@ public class ExploreInfo extends ExploreSubcommandData {
             List<String> ids = entry.getValue().stream().map(ExploreModel::getId).toList();
 
             if (showFullText) {
-                sb.append("> ").append(exploreName).append("\n").append(entry.getValue().get(0).getText()).append(" [").append(String.join(", ", ids)).append("]");
+                sb.append("> ").append(exploreName).append("\n").append(entry.getValue().getFirst().getText()).append(" [").append(String.join(", ", ids)).append("]");
             } else {
                 sb.append("> ").append(exploreName).append(" [").append(String.join(", ", ids)).append("]");
             }

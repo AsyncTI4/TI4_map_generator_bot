@@ -71,7 +71,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
                     MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
                     return;
                 }
-                doAction(player, possibleTechs.get(0), event);
+                doAction(player, possibleTechs.getFirst(), event);
 
             }
         }
