@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -18,6 +16,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PlayPN;
@@ -400,7 +400,7 @@ public class ButtonHelperFactionSpecific {
             if (p2.getPromissoryNotesInPlayArea().contains("antivirus")) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     trueIdentity + " the other player has antivirus, so you cannot gain tech from this combat.");
-            } else if (buttons.size() > 0 && p2 != null) {
+            } else if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     trueIdentity + " get enemy tech using the buttons", buttons);
             } else {
@@ -555,7 +555,7 @@ public class ButtonHelperFactionSpecific {
         }
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+            if (Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()) {
                 techs.add(Buttons.green("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay", Mapper.getTech(tech).getName()));
             }
         }
@@ -576,7 +576,7 @@ public class ButtonHelperFactionSpecific {
         techToGain.add("ps");
         List<Button> techs = new ArrayList<>();
         for (String tech : techToGain) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+            if (Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()) {
                 techs.add(Buttons.green(
                     player.getFinsFactionCheckerPrefix() + "getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                     Mapper.getTech(tech).getName()));
@@ -956,7 +956,7 @@ public class ButtonHelperFactionSpecific {
         if ("qdn".equalsIgnoreCase(type)) {
             ButtonHelperAbilities.pillageCheck(player2, game);
             MessageHelper.sendMessageToChannel(player2.getCorrectChannel(),
-                player2.getFactionEmoji() + " gained " + Emojis.tg(3) + " from QDN " + player2.gainTG(3) + "");
+                player2.getFactionEmoji() + " gained " + Emojis.tg(3) + " from QDN " + player2.gainTG(3));
         }
 
         int player1SC = Integer.parseInt(buttonID.split("_")[4]);
@@ -1448,7 +1448,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveResearchAgreementCheck(Player player, String tech, Game game) {
         if (game.getPNOwner("ra") != null && game.getPNOwner("ra") == player) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))) {
+            if (Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
                         continue;
@@ -1501,7 +1501,7 @@ public class ButtonHelperFactionSpecific {
 
         // Cards Info Message
         String message = "__**Look at Top of " + traitNameWithEmoji + " Deck**__\n";
-        String topCard = deck.get(0);
+        String topCard = deck.getFirst();
         game.setStoredValue("lastExpLookedAt" + player.getFaction() + deckType, topCard);
         ExploreModel explore = Mapper.getExplore(topCard);
         MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message, explore.getRepresentationEmbed());
@@ -1509,7 +1509,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void resolveExpDiscard(Player player, Game game, ButtonInteractionEvent event, String deckType) {
         List<String> deck = game.getExploreDeck(deckType);
-        String topCard = deck.get(0);
+        String topCard = deck.getFirst();
         ExploreModel top = Mapper.getExplore(topCard);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " Discarded the top of the " + deckType + " deck. The discarded card was " + top.getName());
         game.discardExplore(topCard);
@@ -1525,7 +1525,7 @@ public class ButtonHelperFactionSpecific {
             List<String> deck = game.getExploreDeck(deckType);
             String msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
-                .equalsIgnoreCase(deck.get(0))) {
+                .equalsIgnoreCase(deck.getFirst())) {
                 msg2 = msg2 + " (Same as last time)";
             }
             Button transact1 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_industrial", msg2);
@@ -1533,7 +1533,7 @@ public class ButtonHelperFactionSpecific {
             deck = game.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
-                .equalsIgnoreCase(deck.get(0))) {
+                .equalsIgnoreCase(deck.getFirst())) {
                 msg2 = msg2 + " (Same as last time)";
             }
             Button transact2 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_hazardous", msg2);
@@ -1541,7 +1541,7 @@ public class ButtonHelperFactionSpecific {
             deck = game.getExploreDeck(deckType);
             msg2 = StringUtils.capitalize(deckType);
             if (game.getStoredValue("lastExpLookedAt" + player.getFaction() + deckType)
-                .equalsIgnoreCase(deck.get(0))) {
+                .equalsIgnoreCase(deck.getFirst())) {
                 msg2 = msg2 + " (Same as last time)";
             }
             Button transact3 = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveExp_Look_cultural", msg2);
@@ -1755,7 +1755,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears");
             return List.of();
         }
-        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.get(0).getPosition(), player, false);
+        Set<String> adjTiles = FoWHelper.getAdjacentTiles(game, tiles.getFirst().getPosition(), player, false);
         for (Tile tile : tiles) {
             adjTiles.addAll(FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false));
         }
@@ -1817,7 +1817,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = unitHolder;
             boolean oneOfThree = planetReal != null
                 && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
@@ -1834,7 +1834,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = unitHolder;
             boolean oneOfThree = planetReal != null
                 && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
@@ -1851,7 +1851,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = unitHolder;
             boolean oneOfThree = planetReal != null
                 && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
@@ -1888,7 +1888,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = unitHolder;
             boolean oneOfThree = planetReal != null && planetReal.getOriginalPlanetType() != null
                 && ("industrial".equalsIgnoreCase(planetReal.getOriginalPlanetType())
                     || "cultural".equalsIgnoreCase(planetReal.getOriginalPlanetType())
@@ -1920,7 +1920,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
+            Planet planetReal = unitHolder;
             boolean oneOfThree = planetReal != null
                 && List.of("industrial", "cultural", "hazardous").contains(planetReal.getOriginalPlanetType());
             if (oneOfThree || extraAllowedPlanets.contains(planet.toLowerCase())) {
@@ -1996,7 +1996,7 @@ public class ButtonHelperFactionSpecific {
     public static void terraformPlanet(Player player, String buttonID, ButtonInteractionEvent event, Game game) {
         String planet = buttonID.replace("terraformPlanet_", "");
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = (Planet) unitHolder;
+        Planet planetReal = unitHolder;
         planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached terraform to " + Helper.getPlanetRepresentation(planet, game));
@@ -2009,7 +2009,7 @@ public class ButtonHelperFactionSpecific {
     public static void automatonsPlanet(String buttonID, ButtonInteractionEvent event, Game game) {
         String planet = buttonID.replace("automatonsPlanet_", "");
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = (Planet) unitHolder;
+        Planet planetReal = unitHolder;
         planetReal.addToken("attachment_automatons.png");
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached automatons to " + Helper.getPlanetRepresentation(planet, game));
@@ -2020,7 +2020,7 @@ public class ButtonHelperFactionSpecific {
     public static void bentorPNPlanet(String buttonID, ButtonInteractionEvent event, Game game) {
         String planet = buttonID.replace("bentorPNPlanet_", "");
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = (Planet) unitHolder;
+        Planet planetReal = unitHolder;
         planetReal.addToken("attachment_encryptionkey.png");
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached encryption key to " + Helper.getPlanetRepresentation(planet, game));
@@ -2031,7 +2031,7 @@ public class ButtonHelperFactionSpecific {
     public static void gledgeBasePlanet(String buttonID, ButtonInteractionEvent event, Game game) {
         String planet = buttonID.replace("gledgeBasePlanet_", "");
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = (Planet) unitHolder;
+        Planet planetReal = unitHolder;
         planetReal.addToken("attachment_gledgebase.png");
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Attached gledge base to " + Helper.getPlanetRepresentation(planet, game));
@@ -2044,7 +2044,7 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
         String pnID = buttonID.split("_")[2];
         Planet unitHolder = game.getPlanetsInfo().get(planet);
-        Planet planetReal = (Planet) unitHolder;
+        Planet planetReal = unitHolder;
         switch (pnID) {
             case "dspnveld1" -> planetReal.addToken("attachment_veldyrtaxhaven.png");
             case "dspnveld2" -> planetReal.addToken("attachment_veldyrbroadcasthub.png");
@@ -2492,7 +2492,7 @@ public class ButtonHelperFactionSpecific {
         Map<UnitKey, Integer> units = game.getTileByPosition(game.getActiveSystem()).getUnitHolders()
             .get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
-            if (unit.getColor() == player.getColor() && (unit.getUnitType() == UnitType.Cruiser
+            if (Objects.equals(unit.getColor(), player.getColor()) && (unit.getUnitType() == UnitType.Cruiser
                 || unit.getUnitType() == UnitType.Carrier || unit.getUnitType() == UnitType.Dreadnought)) {
                 // if unit is not in the list, add it
                 if (!availableUnits.contains(unit)) {

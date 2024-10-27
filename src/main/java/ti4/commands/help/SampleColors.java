@@ -41,8 +41,8 @@ public class SampleColors extends HelpSubcommandData {
         BasicStroke stroke = new BasicStroke(2.0f);
 
         OptionMapping input = event.getOption(Constants.HUE);
-        List<String> hues = new ArrayList<String>();
-        if (input == null || input.getAsString().equals("ALL") || input.getAsString().equals("")) {
+        List<String> hues = new ArrayList<>();
+        if (input == null || input.getAsString().equals("ALL") || input.getAsString().isEmpty()) {
             hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK");
         } else {
             SPACING = 12;
@@ -111,8 +111,8 @@ public class SampleColors extends HelpSubcommandData {
             return;
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.get(0) : "ALL"))
-            .setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.get(0) : "ALL the") + " units.");
+        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : "ALL"))
+            .setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }
 }

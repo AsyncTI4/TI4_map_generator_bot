@@ -13,7 +13,7 @@ import ti4.helpers.Units.UnitKey;
  * a map key. This reverts them to their original Java object form by deserializing the string.
  */
 public class UnitKeyMapKeyDeserializer extends KeyDeserializer {
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {

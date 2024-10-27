@@ -382,7 +382,7 @@
     "name": "Final Mission",
     "phase": "Action",
     "window": "After you and your opponent make combat rolls",
-    "text": "Destroy 1 of your damaged units to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
+    "text": "Destroy 1 of your damaged units that is participating in this combat to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
@@ -985,7 +985,7 @@
     "name": "Stolen Prototype",
     "phase": "Action",
     "window": "After you destroy 1 of another player's units",
-    "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
+    "text": "Research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
     "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only after they cleared the blast radius did he loosen his grip on the stolen schematics.",
     "source": "action_deck_2"
   },

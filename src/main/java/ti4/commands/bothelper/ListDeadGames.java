@@ -41,17 +41,17 @@ public class ListDeadGames extends BothelperSubcommandData {
             long milliSinceLastTurnChange = new Date().getTime()
                 - game.getLastActivePlayerChange().getTime();
 
-            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000l) {
+            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000L) {
                 continue;
             }
             boolean warned = false;
-            if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000l) {
+            if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
                 if (game.getActionsChannel() != null && !game.getActionsChannel().getName().equalsIgnoreCase(game.getName() + "-actions")) {
                     continue;
                 }
 
                 if (game.getActionsChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getActionsChannel().getParentCategory()) && game.getActionsChannel().getParentCategory() != null && !game.getActionsChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
-                    sb.append(game.getActionsChannel().getJumpUrl() + "\n");
+                    sb.append(game.getActionsChannel().getJumpUrl()).append("\n");
                     channelCount++;
                     if (delete) {
                         game.getActionsChannel().delete().queue();
@@ -62,7 +62,7 @@ public class ListDeadGames extends BothelperSubcommandData {
                 }
                 if (game.getTableTalkChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getTableTalkChannel().getParentCategory()) && !game.getTableTalkChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
                     if (game.getTableTalkChannel().getName().contains(game.getName() + "-")) {
-                        sb.append(game.getTableTalkChannel().getJumpUrl() + "\n");
+                        sb.append(game.getTableTalkChannel().getJumpUrl()).append("\n");
                         channelCount++;
                         if (delete) {
                             game.getTableTalkChannel().delete().queue();
@@ -79,7 +79,7 @@ public class ListDeadGames extends BothelperSubcommandData {
                     Role r = null;
                     for (Role role : guild.getRoles()) {
                         if (game.getName().equals(role.getName().toLowerCase())) {
-                            sb2.append(role.getName() + "\n");
+                            sb2.append(role.getName()).append("\n");
                             r = role;
                             roleCount++;
                             break;
@@ -92,8 +92,8 @@ public class ListDeadGames extends BothelperSubcommandData {
             }
 
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString() + "Channel Count = " + channelCount);
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb2.toString() + "Role Count =" + roleCount);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb + "Channel Count = " + channelCount);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb2 + "Role Count =" + roleCount);
     }
 
 }

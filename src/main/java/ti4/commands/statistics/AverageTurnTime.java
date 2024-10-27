@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -114,7 +114,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
             int turnCount = playerTurnTimes.get(user.getId()).getKey();
             long totalMillis = playerTurnTimes.get(user.getId()).getValue();
 
-            if (user == null || turnCount == 0 || totalMillis == 0) continue;
+            if (turnCount == 0 || totalMillis == 0) continue;
 
             long averageTurnTime = totalMillis / turnCount;
 

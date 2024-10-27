@@ -153,7 +153,7 @@ public class ButtonHelperCommanders {
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             return;
         }
-        String summary = player.getRepresentation() + " you could potentially use Brother Omar, the Yin Commander, to sacrifice 1 infantry and ignore the prerequisites for these techs (the bot did not check if you have the prerequisites otherwise):\n";
+        StringBuilder summary = new StringBuilder(player.getRepresentation() + " you could potentially use Brother Omar, the Yin Commander, to sacrifice 1 infantry and ignore the prerequisites for these techs (the bot did not check if you have the prerequisites otherwise):\n");
         List<String> techsSummed = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             for (String tech : p2.getTechs()) {
@@ -163,12 +163,12 @@ public class ButtonHelperCommanders {
                         continue;
                     }
                     techsSummed.add(tech);
-                    summary = summary + model.getRepresentation(false) + "\n";
+                    summary.append(model.getRepresentation(false)).append("\n");
                 }
             }
         }
-        if (techsSummed.size() > 0) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary);
+        if (!techsSummed.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), summary.toString());
         }
 
     }
@@ -437,7 +437,7 @@ public class ButtonHelperCommanders {
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game game) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")) {
-            if ("".equals(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse(""))
+            if (Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()
                 || !player.hasAbility("technological_singularity")) {
                 List<Button> buttons = new ArrayList<>();
                 if (player.hasAbility("scheming")) {
@@ -457,7 +457,7 @@ public class ButtonHelperCommanders {
                         if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
                             continue;
                         }
-                        if (!"".equals(Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse(""))) {
+                        if (!Mapper.getTech(AliasHandler.resolveTech(nekroTech)).getFaction().orElse("").isEmpty()) {
                             count = count + 1;
                         }
 

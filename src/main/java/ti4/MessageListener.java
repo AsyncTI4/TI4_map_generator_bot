@@ -12,9 +12,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -31,6 +28,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
@@ -188,11 +187,9 @@ public class MessageListener extends ListenerAdapter {
             (Constants.COMBAT.equals(eventName) && Constants.COMBAT_ROLL.equals(subCommandName));
         if (!gameExists && channel instanceof ThreadChannel && isThreadEnabledSubcommand) {
             IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
-            if (parentChannel != null) {
-                channelName = parentChannel.getName();
-                gameID = StringUtils.substringBefore(channelName, "-");
-                gameExists = mapList.contains(gameID);
-            }
+            channelName = parentChannel.getName();
+            gameID = StringUtils.substringBefore(channelName, "-");
+            gameExists = mapList.contains(gameID);
         }
 
         boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME)
@@ -266,13 +263,13 @@ public class MessageListener extends ListenerAdapter {
         // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
         if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
             List<Message.Attachment> attachments = event.getMessage().getAttachments();
-            if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.get(0).getFileExtension())) { // write to
+            if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.getFirst().getFileExtension())) { // write to
                                                                                                             // file
                 String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
                 String fileName = "ttpgexport_" + currentDateTime + ".json";
                 String filePath = Storage.getTTPGExportDirectory() + "/" + fileName;
                 File file = new File(filePath);
-                CompletableFuture<File> future = attachments.get(0).getProxy().downloadToFile(file);
+                CompletableFuture<File> future = attachments.getFirst().getProxy().downloadToFile(file);
                 future.exceptionally(error -> { // handle possible errors
                     error.printStackTrace();
                     return null;
@@ -291,8 +288,7 @@ public class MessageListener extends ListenerAdapter {
 
         if (timeSinceLast > tenMin) {
             mapreference.setLastTimeGamesChecked(new Date());
-            List<String> storedValues = new ArrayList<>();
-            storedValues.addAll(mapreference.getMessagesThatICheckedForAllReacts().keySet());
+            List<String> storedValues = new ArrayList<>(mapreference.getMessagesThatICheckedForAllReacts().keySet());
             for (String value : storedValues) {
                 if (value.startsWith("gameCreator")) {
                     mapreference.removeStoredValue(value);
@@ -331,7 +327,7 @@ public class MessageListener extends ListenerAdapter {
                                             StringBuilder sb = new StringBuilder();
                                             Player p2 = player;
                                             sb.append(p2.getRepresentationUnfogged());
-                                            sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
+                                            sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it has been half the alloted time and you haven't reacted. Please do so, or after another half you will be marked as not following.");
                                             if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                                                 sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                                             }

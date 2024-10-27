@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -16,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -46,12 +45,11 @@ public class DrawAgenda extends AgendaSubcommandData {
     }
 
     public static void drawAgenda(int count, boolean fromBottom, Game game, @NotNull Player player, boolean discard) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged()).append(" here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have drawn:");
+        String sb = player.getRepresentationUnfogged() + " here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have drawn:";
         Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);
         if (realPlayer == null || game == null) return;
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, sb);
         for (int i = 0; i < count; i++) {
             Map.Entry<String, Integer> entry = fromBottom ? game.drawBottomAgenda() : game.drawAgenda();
             if (entry != null) {
@@ -66,12 +64,11 @@ public class DrawAgenda extends AgendaSubcommandData {
     }
 
     public static void drawSpecificAgenda(String agendaID, Game game, @NotNull Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged()).append(" here is the agenda you have drawn:");
+        String sb = player.getRepresentationUnfogged() + " here is the agenda you have drawn:";
         Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);
         if (realPlayer == null || game == null) return;
 
-        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, sb);
 
         Map.Entry<String, Integer> entry = game.drawSpecificAgenda(agendaID);
         if (entry != null) {

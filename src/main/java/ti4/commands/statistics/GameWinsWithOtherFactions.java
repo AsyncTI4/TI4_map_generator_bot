@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -75,6 +74,7 @@ public class GameWinsWithOtherFactions extends StatisticsSubcommandData {
             for (String faction : reqFactions) {
                 if (!factions.contains(faction)) {
                     count = false;
+                    break;
                 }
             }
             if (!count) {

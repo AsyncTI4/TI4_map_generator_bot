@@ -12,14 +12,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -35,6 +33,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -100,7 +100,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 MessageHelper.sendMessageToEventChannel(event, "Category not found");
                 return;
             } else {
-                categoryChannel = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false).get(0);
+                categoryChannel = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false).getFirst();
             }
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
             categoryChannelName = getCategoryNameForGame(gameName);
@@ -331,11 +331,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static void sendMessageAboutAggressionMetas(Game game) {
-        String aggressionMsg = "Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta."
-            + " Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line"
-            + ". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
-            + "\n- No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2."
-            + "\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
+        String aggressionMsg = """
+                Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
+                 Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
+                .\s
+                The conflict metas are loosely classified as the following:\s
+                - Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four "slice" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one.\
+
+                - No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2.\
+
+                - Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system.\s""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("anonDeclare_Friendly", "Friendly"));
         buttons.add(Buttons.blue("anonDeclare_No Strong Preference", "No Strong Preference"));
@@ -417,7 +422,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 missingMembers.add(member);
             }
         }
-        if (missingMembers.size() > 0) {
+        if (!missingMembers.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             sb.append(
                 "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
@@ -680,7 +685,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         List<Category> categories = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryName, false);
         if (!categories.isEmpty()) {
-            String message = categories.stream().map(c -> c.getAsMention()).collect(Collectors.joining("\n"));
+            String message = categories.stream().map(Channel::getAsMention).collect(Collectors.joining("\n"));
             BotLogger.log("Game Channel Creation - Category Already Exists:\n" + message);
             return categories.getFirst();
         }

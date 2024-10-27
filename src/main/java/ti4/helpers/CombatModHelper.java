@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.generator.Mapper;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -169,7 +168,7 @@ public class CombatModHelper {
             if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity,
                 game)) {
                 modifiers.add(
-                    new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().get(0).getMessage()));
+                    new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().getFirst().getMessage()));
             }
         }
         Set<NamedCombatModifierModel> set = new HashSet<>(modifiers);
@@ -224,7 +223,7 @@ public class CombatModHelper {
             }
             case Constants.MOD_OPPONENT_FRAG -> {
                 if (opponent != null) {
-                    meetsCondition = opponent.getFragments().size() > 0;
+                    meetsCondition = !opponent.getFragments().isEmpty();
                 }
             }
             case Constants.MOD_OPPONENT_STOLEN_TECH -> {
@@ -264,11 +263,11 @@ public class CombatModHelper {
             }
             case Constants.MOD_HAS_FRAGILE -> meetsCondition = player.getAbilities().contains("fragile");
             case Constants.MOD_OPPONENT_NO_CC_FLEET -> meetsCondition = !player.getMahactCC().contains(opponent.getColor());
-            case "next_to_structure" -> meetsCondition = (ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile).size() > 0 || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
+            case "next_to_structure" -> meetsCondition = (!ButtonHelperAgents.getAdjacentTilesWithStructuresInThem(player, game, tile).isEmpty() || ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile));
             case Constants.MOD_UNITS_TWO_MATCHING_NOT_FF -> {
                 meetsCondition = false;
                 if (unitsByQuantity.entrySet().size() == 1) {
-                    Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
+                    Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
                     meetsCondition = unitByQuantity.getValue() == 2
                         && !"ff".equals(unitByQuantity.getKey().getAsyncId());
                 }
@@ -385,7 +384,7 @@ public class CombatModHelper {
         Game game, List<UnitModel> opponentUnitsInCombat, UnitModel origUnit, Tile activeSystem) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
-        Long scalingCount = (long) 0;
+        long scalingCount = 0;
         if (mod.getValueScalingMultiplier() != null) {
             multiplier = mod.getValueScalingMultiplier();
         }
@@ -405,7 +404,7 @@ public class CombatModHelper {
                         scalingCount += 1;
                     }
                 }
-                case Constants.LAW -> scalingCount = (long) game.getLaws().size();
+                case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {
                         var customPublicVPList = game.getCustomPublicVP();
@@ -427,7 +426,7 @@ public class CombatModHelper {
                     .filter(TechnologyModel::isUnitUpgrade)
                     .count();
                 case Constants.MOD_DESTROYERS -> {
-                    scalingCount = (long) ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
+                    scalingCount = ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "destroyer", false);
                 }
                 case Constants.MOD_OPPONENT_NON_FIGHTER_SHIP -> {
                     scalingCount += ButtonHelper.checkNumberNonFighterShips(opponent, game, activeSystem);
@@ -453,7 +452,7 @@ public class CombatModHelper {
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeSystem.getUnitHolders()
                         .get("space");
-                    if (origUnit.getIsGroundForce() && activeSystem.getPlanetUnitHolders().size() > 0) {
+                    if (origUnit.getIsGroundForce() && !activeSystem.getPlanetUnitHolders().isEmpty()) {
                         for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
                             if (planet.getUnitCount(Mapper.getUnitKey(AliasHandler.resolveUnit(origUnit.getBaseType()), player.getColorID()).getUnitType(), player) > 0) {
                                 space = planet;
@@ -489,7 +488,7 @@ public class CombatModHelper {
                 default -> {
                 }
             }
-            value = value * multiplier * scalingCount.doubleValue();
+            value = value * multiplier * (double) scalingCount;
         }
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesn't return 2.5 etc
         return (int) value;

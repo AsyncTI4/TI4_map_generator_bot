@@ -3,9 +3,6 @@ package ti4.commands.combat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -18,6 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
@@ -96,9 +95,9 @@ public class StartCombat extends CombatSubcommandData {
         // players)]
         Player player1 = game.getActivePlayer();
         if (player1 == null)
-            player1 = playersForCombat.get(0);
+            player1 = playersForCombat.getFirst();
         playersForCombat.remove(player1);
-        Player player2 = playersForCombat.get(0);
+        Player player2 = playersForCombat.getFirst();
 
         findOrCreateCombatThread(game, event.getChannel(), player1, player2, tile, event, combatType, "space");
     }
@@ -321,7 +320,7 @@ public class StartCombat extends CombatSubcommandData {
                     autoButtons.add(automate);
                 }
             }
-            if (autoButtons.size() > 0) {
+            if (!autoButtons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(threadChannel, "You may automate the entire combat if neither side has action cards or fancy tricks. Press this button to do so, and it will ask your opponent to confirm. Note that PDS fire and BOMBARDMENT are NOT part of combat and will not be automated.", autoButtons);
             }
         }
@@ -351,9 +350,7 @@ public class StartCombat extends CombatSubcommandData {
         channel.sendMessage("Spectate Combat in this thread:").queue(m -> {
             ThreadChannelAction threadChannel = ((TextChannel) channel).createThreadChannel(threadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
-            threadChannel.queue(tc -> {
-                initializeSpectatorThread(tc, game, player, tile, event, systemWithContext, spaceOrGround);
-            });
+            threadChannel.queue(tc -> initializeSpectatorThread(tc, game, player, tile, event, systemWithContext, spaceOrGround));
         });
     }
 
@@ -380,10 +377,10 @@ public class StartCombat extends CombatSubcommandData {
             pdsMessage.append("In fog, it is the Players' responsibility to check for PDS2\n");
         }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
-        if (playersWithPds2.size() < 1) {
+        if (playersWithPds2.isEmpty()) {
             return;
         }
-        if (!game.isFowMode() && playersWithPds2.size() > 0) {
+        if (!game.isFowMode() && !playersWithPds2.isEmpty()) {
             pdsMessage.append("These players have space cannon offense coverage in this system:\n");
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append("> ").append(playerWithPds.getRepresentation()).append("\n");
@@ -427,24 +424,24 @@ public class StartCombat extends CombatSubcommandData {
                     + "if you win the combat, you have the opportunity to use the Reprocessor Alpha (the Cymiae flagship) to force the other player to send you a random action card. It will send buttons to the other player to confirm.",
                     buttons);
             }
-            if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().keySet().contains("uf")
+            if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().containsKey("uf")
                 && tile.getUnitHolders().get("space").getUnitCount(UnitType.Flagship, player.getColor()) > 0) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     msg + " this is a reminder that if you win the combat, you may score Unveil Flagship.");
             }
-            if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().keySet().contains("dtgs")
+            if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().containsKey("dtgs")
                 && (tile.getUnitHolders().get("space").getUnitCount(UnitType.Flagship, otherPlayer.getColor()) > 0
                     || tile.getUnitHolders().get("space").getUnitCount(UnitType.Warsun,
                         otherPlayer.getColor()) > 0)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
                     + " this is a reminder that you could potentially score Destroy Their Greatest Ship in this combat.");
             }
-            if (player.getSecretsUnscored().keySet().contains("sar")
+            if (player.getSecretsUnscored().containsKey("sar")
                 && otherPlayer.getTotalVictoryPoints() == game.getHighestScore()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     msg + " this is a reminder that you could potentially score Spark a Rebellion in this combat.");
             }
-            if (player.getSecretsUnscored().keySet().contains("btv") && tile.isAnomaly(game)) {
+            if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     msg + " this is a reminder that you could potentially score Brave the Void in this combat.");
             }
@@ -736,18 +733,18 @@ public class StartCombat extends CombatSubcommandData {
         }
 
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !game.isFowMode() && isGroundCombat
-            && p1.getFragments().size() > 0) {
+            && !p1.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "exhaustAgent_kortaliagent_" + p1.getColor(), "Use Kortali Agent", Emojis.kortali));
         }
-        if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && p2.getFragments().size() > 0) {
+        if (p1.hasUnexhaustedLeader("kortaliagent") && isGroundCombat && !p2.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "exhaustAgent_kortaliagent_" + p2.getColor(), "Use Kortali Agent", Emojis.kortali));
         }
 
         if ((p2.hasAbility("glory")) && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+            if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Buttons.gray(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)", Emojis.kjalengard));
             } else {
                 buttons.add(Buttons.gray(finChecker + "moveGloryStart_" + pos, "Move Glory Token (Upon Win)", Emojis.kjalengard));
@@ -758,7 +755,7 @@ public class StartCombat extends CombatSubcommandData {
         }
         if (p1.hasAbility("glory") && ButtonHelperAgents.getGloryTokenTiles(game).size() < 3) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            if (ButtonHelperAgents.getGloryTokensLeft(game).size() > 0) {
+            if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Buttons.gray(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)", Emojis.kjalengard));
             } else {
                 buttons.add(Buttons.gray(finChecker + "moveGloryStart_" + pos, "Move Glory Token (Upon Win)", Emojis.kjalengard));
@@ -788,19 +785,12 @@ public class StartCombat extends CombatSubcommandData {
             buttons.add(Buttons.gray(finChecker + "offerNecrophage", "Necrophage").withEmoji(Emoji.fromFormatted(Emojis.getEmojiFromDiscord("mykomentori"))));
         }
 
-        boolean hasDevotionShips = false;
-        if (space != null && (space.getUnitCount(UnitType.Destroyer, p2) > 0 || space.getUnitCount(UnitType.Cruiser, p2) > 0)) {
-            hasDevotionShips = true;
-        }
+        boolean hasDevotionShips = space != null && (space.getUnitCount(UnitType.Destroyer, p2) > 0 || space.getUnitCount(UnitType.Cruiser, p2) > 0);
         if (p2.hasAbility("devotion") && !game.isFowMode() && isSpaceCombat && hasDevotionShips) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "startDevotion_" + tile.getPosition(), "Devotion", Emojis.Yin));
         }
-        if (space != null && (space.getUnitCount(UnitType.Destroyer, p1) > 0 || space.getUnitCount(UnitType.Cruiser, p1) > 0)) {
-            hasDevotionShips = true;
-        } else {
-            hasDevotionShips = false;
-        }
+        hasDevotionShips = space != null && (space.getUnitCount(UnitType.Destroyer, p1) > 0 || space.getUnitCount(UnitType.Cruiser, p1) > 0);
         if (p1.hasAbility("devotion") && isSpaceCombat && hasDevotionShips) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "startDevotion_" + tile.getPosition(), "Devotion", Emojis.Yin));
@@ -1012,7 +1002,7 @@ public class StartCombat extends CombatSubcommandData {
             } else {
                 if (!isSpaceCombat && !"space".equalsIgnoreCase(nameOfHolder)) {
                     buttons.add(Buttons.gray("combatRoll_" + pos + "_" + unitH.getName(),
-                        "Roll Ground Combat for " + nameOfHolder + ""));
+                        "Roll Ground Combat for " + nameOfHolder));
                     Player nonActive = p1;
                     if (p1 == game.getActivePlayer()) {
                         nonActive = p2;
@@ -1036,26 +1026,24 @@ public class StartCombat extends CombatSubcommandData {
     }
 
     private static String getSpaceCombatIntroMessage() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("## Steps for Space Combat:\n");
-        sb.append("> 1. End of movement abilities (Foresight, Stymie, etc.)\n");
-        sb.append("> 2. Firing of PDS\n");
-        sb.append("> 3. Start of Combat (Skilled Retreat, Morale Boost, etc.)\n");
-        sb.append("> 4. Anti-Fighter Barrage\n");
-        sb.append("> 5. Declare Retreats (including Rout)\n");
-        sb.append("> 6. Roll Dice!\n");
-        return sb.toString();
+        String sb = "## Steps for Space Combat:\n" +
+                "> 1. End of movement abilities (Foresight, Stymie, etc.)\n" +
+                "> 2. Firing of PDS\n" +
+                "> 3. Start of Combat (Skilled Retreat, Morale Boost, etc.)\n" +
+                "> 4. Anti-Fighter Barrage\n" +
+                "> 5. Declare Retreats (including Rout)\n" +
+                "> 6. Roll Dice!\n";
+        return sb;
     }
 
     private static String getGroundCombatIntroMessage() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("## Steps for Invasion:\n");
-        sb.append("> 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)\n");
-        sb.append("> 2. Bombardment\n");
-        sb.append("> 3. Commit Ground Forces\n");
-        sb.append("> 4. After commit window (Parley, Ghost Squad, etc.)\n");
-        sb.append("> 5. Start of Combat (Morale Boost, etc.)\n");
-        sb.append("> 6. Roll Dice!\n");
-        return sb.toString();
+        String sb = "## Steps for Invasion:\n" +
+                "> 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)\n" +
+                "> 2. Bombardment\n" +
+                "> 3. Commit Ground Forces\n" +
+                "> 4. After commit window (Parley, Ghost Squad, etc.)\n" +
+                "> 5. Start of Combat (Morale Boost, etc.)\n" +
+                "> 6. Roll Dice!\n";
+        return sb;
     }
 }

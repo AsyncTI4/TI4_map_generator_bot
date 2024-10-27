@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +81,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         // Footer
         StringBuilder footer = new StringBuilder();
         if (includeID) {
-            footer.append("ID: " + getAlias() + "  Source: " + getSource());
+            footer.append("ID: ").append(getAlias()).append("  Source: ").append(getSource());
         }
         if (isFakeRelic()) footer.append("\nNOTE: NOT ACTUALLY A RELIC");
         if (!footer.isEmpty()) eb.setFooter(footer.toString());

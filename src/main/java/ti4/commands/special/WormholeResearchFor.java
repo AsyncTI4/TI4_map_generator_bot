@@ -2,6 +2,7 @@ package ti4.commands.special;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.buttons.Buttons;
@@ -47,16 +48,16 @@ public class WormholeResearchFor extends SpecialSubcommandData {
             ButtonHelper.checkFleetInEveryTile(p2, game, event);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Removed all ships from alphas/betas\nYou may use the button to get your tech.", List.of(Buttons.GET_A_TECH));
-        String msg = " may research tech due to Wormhole Research.";
+        StringBuilder msg = new StringBuilder(" may research tech due to Wormhole Research.");
         if (game.isFowMode()) {
             for (Player p2 : players) {
                 MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), p2.getRepresentation() + msg);
             }
         } else {
             for (Player p2 : players) {
-                msg = p2.getRepresentation() + msg;
+                msg.insert(0, p2.getRepresentation());
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg);
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msg.toString());
         }
     }
 

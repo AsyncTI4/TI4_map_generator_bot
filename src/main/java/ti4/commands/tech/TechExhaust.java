@@ -172,8 +172,7 @@ public class TechExhaust extends TechAddRemove {
                     + " use button to gain 1 CC or spend 1 strat CC to ready your agent", buttons);
             }
             case "aida", "sar", "htp", "absol_aida" -> {
-                if (event instanceof ButtonInteractionEvent) {
-                    ButtonInteractionEvent buttonEvent = (ButtonInteractionEvent) event;
+                if (event instanceof ButtonInteractionEvent buttonEvent) {
                     tech = tech.replace("absol_", "");
                     ButtonHelper.deleteTheOneButton(buttonEvent);
                     if (buttonEvent.getButton().getLabel().contains("(")) {

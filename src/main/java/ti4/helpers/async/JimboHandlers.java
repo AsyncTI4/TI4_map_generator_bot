@@ -266,12 +266,12 @@ public class JimboHandlers {
             String extra = ring == 0 ? " (Mecatol)" : "";
             List<String> positions = PositionMapper.getPositionsInRing(Integer.toString(ring), game);
             if (positions.size() == 1) {
-                rings.add(Buttons.green(buttonPrefix + "_tile" + positions.get(0), "Tile " + positions.get(0)));
-            } else if (positions.size() > 0) {
+                rings.add(Buttons.green(buttonPrefix + "_tile" + positions.getFirst(), "Tile " + positions.getFirst()));
+            } else if (!positions.isEmpty()) {
                 rings.add(Buttons.green(buttonPrefix + "_ring" + ring + "_page0", "Ring " + ring + extra));
             }
         }
-        if (PositionMapper.getPositionsInRing("corners", game).size() > 0) {
+        if (!PositionMapper.getPositionsInRing("corners", game).isEmpty()) {
             rings.add(Buttons.green(buttonPrefix + "_ringcorners_page0", "Corners"));
         }
         MessageHelper.editMessageWithButtons(event, msg, rings);

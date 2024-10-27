@@ -24,7 +24,7 @@ public class ObjectiveBox {
 	private static final Color Stage2HiddenColor = new Color(30, 60, 128);
 
 	private int x;
-	private int y;
+	private final int y;
 	private final int boxWidth;
 	private final int maxTextWidth;
 	private final int scoreTokenWidth;

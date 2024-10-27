@@ -1,6 +1,10 @@
 package ti4.commands.game;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -115,8 +119,7 @@ public class SetDeck extends GameSubcommandData {
                     game.setTechnologyDeckID(deckModel.getAlias());
                     if (deckModel.getAlias().contains("absol")) {
                         for (Player player : game.getRealPlayers()) {
-                            List<String> techs = new ArrayList<>();
-                            techs.addAll(player.getTechs());
+                            List<String> techs = new ArrayList<>(player.getTechs());
                             for (String tech : techs) {
                                 if (!tech.contains("absol") && Mapper.getTech("absol_" + tech) != null) {
                                     if (!player.hasTech("absol_" + tech)) {

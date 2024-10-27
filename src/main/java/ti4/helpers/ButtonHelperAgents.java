@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -18,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
@@ -164,12 +163,12 @@ public class ButtonHelperAgents {
                 "Unable to resolve player, please resolve manually.");
             return;
         }
-        Integer commodities = p2.getCommodities();
+        int commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + " a " + unit
                 + " of yours has been captured by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "The Stillness of Stars, the Vuil'raith" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent. "
-                + "Rejoice, for your " + commodities.toString() + " commodities been washed.");
+                + "Rejoice, for your " + commodities + " commodities been washed.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);
         ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, player, 1, unit, event, true);
@@ -252,7 +251,7 @@ public class ButtonHelperAgents {
             .of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship,
                 UnitType.Warsun, UnitType.Fighter)
             .map(UnitType::getValue).toList();
-        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
+        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
         for (String asyncID : allowedUnits) {
             UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
             if (ownedUnit != null && ownedUnit.getCost() <= removedUnit.getCost() + 2) {
@@ -573,7 +572,7 @@ public class ButtonHelperAgents {
                         + activePlayer.getFactionEmoji() + " commodities went from " + oldComms + " -> "
                         + newComms + ".");
             }
-            if (getGloryTokenTiles(game).size() > 0) {
+            if (!getGloryTokenTiles(game).isEmpty()) {
                 offerMoveGloryOptions(game, player, event);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -942,8 +941,7 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            List<Button> buttons = new ArrayList<>();
-            buttons.addAll(ButtonHelper.getDomnaStepOneTiles(p2, game));
+            List<Button> buttons = new ArrayList<>(ButtonHelper.getDomnaStepOneTiles(p2, game));
             message = p2.getRepresentationUnfogged()
                 + " use buttons to select which system the ship you just produced is in.. \n\n You need to tell the bot which system the unit was produced in first, after which it will give tiles to move it to. ";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message,
@@ -1110,12 +1108,12 @@ public class ButtonHelperAgents {
                 if (buttonIndex > -1 && !"nomadagentmercer".equalsIgnoreCase(agent)) {
                     buttonRow.remove(buttonIndex);
                 }
-                if (buttonRow.size() > 0) {
+                if (!buttonRow.isEmpty()) {
                     buttons = buttons + buttonRow.size();
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            if (actionRow2.size() > 0 && !exhaustedMessage.contains("select the user of the agent")
+            if (!actionRow2.isEmpty() && !exhaustedMessage.contains("select the user of the agent")
                 && !exhaustedMessage.contains("choose the target of your agent")) {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
                     buttonEvent.getMessage().delete().queue();
@@ -1320,8 +1318,7 @@ public class ButtonHelperAgents {
 
     public static List<Tile> getAdjacentTilesWithStructuresInThemAndNoCC(Player player, Game game, Tile origTile) {
         List<Tile> tiles = new ArrayList<>();
-        List<String> adjTiles = new ArrayList<>();
-        adjTiles.addAll(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
+        List<String> adjTiles = new ArrayList<>(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
         for (String posTile : adjTiles) {
             Tile adjTile = game.getTileByPosition(posTile);
             if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile) && !AddCC.hasCC(player, adjTile)) {
@@ -1333,8 +1330,7 @@ public class ButtonHelperAgents {
 
     public static List<Tile> getAdjacentTilesWithStructuresInThem(Player player, Game game, Tile origTile) {
         List<Tile> tiles = new ArrayList<>();
-        List<String> adjTiles = new ArrayList<>();
-        adjTiles.addAll(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
+        List<String> adjTiles = new ArrayList<>(FoWHelper.getAdjacentTiles(game, origTile.getPosition(), player, false));
         for (String posTile : adjTiles) {
             Tile adjTile = game.getTileByPosition(posTile);
             if (adjTile != null && doesTileHaveAStructureInIt(player, adjTile)) {
@@ -1394,7 +1390,7 @@ public class ButtonHelperAgents {
                     continue;
                 }
                 PlanetModel model = Mapper.getPlanet(planet);
-                if (model.getLegendaryAbilityText() != null && model.getLegendaryAbilityText().length() > 0) {
+                if (model.getLegendaryAbilityText() != null && !model.getLegendaryAbilityText().isEmpty()) {
                     legendaries.add(planet);
                 }
             }
@@ -1555,7 +1551,7 @@ public class ButtonHelperAgents {
         List<Tile> tiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (AddCC.hasCC(player, tile)) {
-                if (getAdjacentTilesWithStructuresInThemAndNoCC(player, game, tile).size() > 0) {
+                if (!getAdjacentTilesWithStructuresInThemAndNoCC(player, game, tile).isEmpty()) {
                     tiles.add(tile);
                 }
             }
@@ -1746,8 +1742,7 @@ public class ButtonHelperAgents {
         }
 
         int infAmount = p2.getCommoditiesTotal() - 1;
-        List<Button> buttons = new ArrayList<>();
-        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, infAmount + "gf", "placeOneNDone_skipbuild"));
+        List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, infAmount + "gf", "placeOneNDone_skipbuild"));
         String message = kyro.getRepresentationUnfogged() + "Use buttons to drop " + infAmount + " infantry on a planet";
         MessageHelper.sendMessageToChannelWithButtons(kyro.getCorrectChannel(), message, buttons);
     }
@@ -1928,11 +1923,11 @@ public class ButtonHelperAgents {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         List<String> gloryTokens = getGloryTokensLeft(game);
-        if (gloryTokens.size() < 1) {
+        if (gloryTokens.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " cannot place more glory, you've hit the limit");
             return;
         }
-        space.addToken(gloryTokens.get(0));
+        space.addToken(gloryTokens.getFirst());
 
         String msg = player.getFactionEmoji() + " added glory token to " + tile.getRepresentation();
         CommanderUnlockCheck.checkPlayer(player, "kjalengard");
@@ -1946,8 +1941,7 @@ public class ButtonHelperAgents {
         gloryTokens.add("token_ds_glory2.png");
         gloryTokens.add("token_ds_glory3.png");
         for (Tile tile : game.getTileMap().values()) {
-            List<String> gloryTokens2 = new ArrayList<>();
-            gloryTokens2.addAll(gloryTokens);
+            List<String> gloryTokens2 = new ArrayList<>(gloryTokens);
             for (String glory : gloryTokens2) {
                 if (tile.getUnitHolders().get("space").getTokenList().contains(glory)) {
                     gloryTokens.remove(glory);
@@ -2123,7 +2117,7 @@ public class ButtonHelperAgents {
                 + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.",
             buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
-        if (exhaustedMessage.length() < 1) {
+        if (exhaustedMessage.isEmpty()) {
             exhaustedMessage = "Combat";
         }
         List<ActionRow> actionRow2 = new ArrayList<>();
@@ -2133,7 +2127,7 @@ public class ButtonHelperAgents {
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
             }
-            if (buttonRow.size() > 0) {
+            if (!buttonRow.isEmpty()) {
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }

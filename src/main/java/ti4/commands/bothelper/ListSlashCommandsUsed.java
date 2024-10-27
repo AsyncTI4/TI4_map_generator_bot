@@ -107,7 +107,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         longMsg.append("\n The number of times an AC has been Sabo'd is also being tracked. The following is their recorded frequency \n");
         Map<String, Integer> sortedMapAscACs = sortByValue(actionCards, false);
         for (String command : sortedMapAscACs.keySet()) {
-            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of " + actionCardsPlayed.get(command) + " times played").append(" \n");
+            longMsg.append(command).append(": ").append(sortedMapAscACs.get(command)).append(" out of ").append(actionCardsPlayed.get(command)).append(" times played").append(" \n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }

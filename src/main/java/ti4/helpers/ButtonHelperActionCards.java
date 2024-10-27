@@ -211,7 +211,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("startToLuckyShotAUnit_")
     public static void resolveLuckyShotStart(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getTilesToLuckyShot(player, game, event);
-        if (buttons.size() == 0) {
+        if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged()
                 + " no systems to Lucky Shot in found. Remember you can't Lucky Shot yourself. Report bug if in error. If not an error, please take a different action");
         }
@@ -297,7 +297,7 @@ public class ButtonHelperActionCards {
             + player.getFactionEmoji();
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
+        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
         if (tgAlready > 0) {
             tgAlready = tgAlready + (int) removedUnit.getCost();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

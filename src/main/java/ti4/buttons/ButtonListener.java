@@ -139,7 +139,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (nullable != null && buttonID.startsWith("miltyFactionInfo_")) {
             UnfiledButtonHandlers.miltyFactionInfo(player, buttonID, game);
         } else if (buttonID.startsWith("agendaResolution_")) {
-            AgendaHelper.resolveAgenda(game, buttonID, event, mainGameChannel);
+            AgendaHelper.resolveAgenda(game, buttonID, event);
         } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
             game.initializeMiltySettings().parseButtonInput(event);
             // Don't add anymore if/else startWith statements - use @ButtonHandler

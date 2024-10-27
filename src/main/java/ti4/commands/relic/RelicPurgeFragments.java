@@ -52,7 +52,7 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 		}
 
 		while (fragmentsToPurge.size() > count) {
-			fragmentsToPurge.remove(0);
+			fragmentsToPurge.removeFirst();
 		}
 
 		while (fragmentsToPurge.size() < count) {
@@ -60,7 +60,7 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 				MessageHelper.sendMessageToEventChannel(event, "Not enough fragments. Note that default count is 3.");
 				return;
 			}
-			fragmentsToPurge.add(unknowns.remove(0));
+			fragmentsToPurge.add(unknowns.removeFirst());
 		}
 
 		for (String id : fragmentsToPurge) {

@@ -39,7 +39,7 @@ public class RevealStage1 extends StatusSubcommandData {
             // first do cleanup if necessary
             int playersWithSCs = 0;
             for (Player player : game.getRealPlayers()) {
-                if (player.getSCs() != null && player.getSCs().size() > 0 && !player.getSCs().contains(0)) {
+                if (player.getSCs() != null && !player.getSCs().isEmpty() && !player.getSCs().contains(0)) {
                     playersWithSCs++;
                 }
             }

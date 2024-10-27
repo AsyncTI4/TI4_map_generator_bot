@@ -2,6 +2,7 @@ package ti4.commands.status;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -45,8 +46,8 @@ public class POInfo extends StatusSubcommandData {
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {
                 List<Player> playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
-                    .map(player -> game.getPlayer(player))
-                    .filter(player -> player != null)
+                    .map(game::getPlayer)
+                    .filter(Objects::nonNull)
                     .filter(player -> !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
                     .toList();
 

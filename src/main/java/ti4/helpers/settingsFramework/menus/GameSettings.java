@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -28,11 +27,15 @@ public class GameSettings extends SettingsMenu {
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Submenus
-    private DeckSettings decks;
+    private final DeckSettings decks;
     // Settings
-    private IntegerSetting pointTotal, stage1s, stage2s, secrets;
-    private BooleanSetting tigl, alliance;
-    private ChoiceSetting<MapTemplateModel> mapTemplate;
+    private final IntegerSetting pointTotal;
+    private final IntegerSetting stage1s;
+    private final IntegerSetting stage2s;
+    private final IntegerSetting secrets;
+    private final BooleanSetting tigl;
+    private final BooleanSetting alliance;
+    private final ChoiceSetting<MapTemplateModel> mapTemplate;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -88,7 +91,7 @@ public class GameSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     protected List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
         ls.add(pointTotal);
         ls.add(stage1s);
         ls.add(stage2s);

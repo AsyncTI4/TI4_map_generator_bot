@@ -27,7 +27,7 @@ public class GameCreate extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
+        String mapName = event.getOptions().getFirst().getAsString().toLowerCase();
         Member member = event.getMember();
 
         String regex = "^[a-zA-Z0-9]+$";

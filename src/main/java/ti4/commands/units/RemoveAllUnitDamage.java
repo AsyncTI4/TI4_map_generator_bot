@@ -31,8 +31,4 @@ public class RemoveAllUnitDamage extends RemoveAllUnits {
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true)));
     }
 
-    @Override
-    protected String getActionDescription() {
-        return "";
-    }
 }

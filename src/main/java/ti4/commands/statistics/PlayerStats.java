@@ -66,7 +66,7 @@ public class PlayerStats extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Game Count:**__").append("\n");
-        if (entries.size() == 0) {
+        if (entries.isEmpty()) {
             sb.append("No players found for the given filters!");
         }
         for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {
@@ -119,7 +119,7 @@ public class PlayerStats extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Win Percent:**__").append("\n");
-        if (entries.size() == 0) {
+        if (entries.isEmpty()) {
             sb.append("No players found for the given filters!");
         }
         for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {

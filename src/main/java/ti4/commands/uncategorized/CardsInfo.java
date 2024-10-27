@@ -83,10 +83,12 @@ public class CardsInfo implements Command, InfoThreadCommand {
         PNInfo.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game,
-            "You may whisper to people from here by starting a message with to[color] or to[faction]." +
-                "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme"
-                +
-                "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]");
+                """
+                        You may whisper to people from here by starting a message with to[color] or to[faction].\
+
+                        You may schedule a message to yourself (delivered at start of your next turn) by starting a message with tofutureme\
+
+                        You may schedule a message to others (delivered at start of their next turn) by starting a message with tofuture[color] or tofuture[faction]""");
 
     }
 
@@ -212,7 +214,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
                 "Use Ghoti Agent", Emojis.ghoti);
             buttons.add(hacanButton);
         }
-        if (player.getNomboxTile().getUnitHolders().get("space").getUnits().size() > 0) {
+        if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
             Button release = Buttons.gray("getReleaseButtons", "Release captured units", Emojis.Cabal);
             buttons.add(release);
         }
@@ -257,7 +259,7 @@ public class CardsInfo implements Command, InfoThreadCommand {
             buttons.add(Buttons.gray("removeTrapStep1", "Remove a Trap"));
         }
 
-        if (player.hasAbility("divination") && ButtonHelperAbilities.getAllOmenDie(game).size() > 0) {
+        if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
             for (int omenDie : ButtonHelperAbilities.getAllOmenDie(game)) {
                 omenDice.append(" ").append(omenDie);
