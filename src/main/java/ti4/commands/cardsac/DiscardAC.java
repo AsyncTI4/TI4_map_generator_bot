@@ -19,13 +19,14 @@ public class DiscardAC extends ACCardsSubcommandData {
     public DiscardAC() {
         super(Constants.DISCARD_AC, "Discard an Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -53,7 +54,7 @@ public class DiscardAC extends ACCardsSubcommandData {
             }
         }
 
-        if (acID == null || game.discardActionCard(player.getUserID(), acNumericalID)) {
+        if (acID == null || !game.discardActionCard(player.getUserID(), acNumericalID)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Card ID found, please retry: " + acID);
             return;
         }
