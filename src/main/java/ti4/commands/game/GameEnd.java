@@ -170,7 +170,6 @@ public class GameEnd extends GameSubcommandData {
         if (actionsChannel != null) {
             for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
                 if (threadChannel.getName().contains("Cards Info")) {
-                    continue;
                 } else {
                     threadChannel.getManager().setArchived(true).queue();
                 }
@@ -274,12 +273,12 @@ public class GameEnd extends GameSubcommandData {
                     summary.append(RoundSummaryHelper.resolvePlayerEmoji(player)).append(": ").append(game.getStoredValue(summaryKey)).append("\n");
                 }
             }
-            if (summary.length() > 0) {
+            if (!summary.isEmpty()) {
                 summary.insert(0, "**__Round " + x + " Secret Summary__**\n");
                 endOfGameSummary.append(summary);
             }
         }
-        if (endOfGameSummary.length() > 0) {
+        if (!endOfGameSummary.isEmpty()) {
             MessageHelper.sendMessageToChannel(t, endOfGameSummary.toString());
         }
     }

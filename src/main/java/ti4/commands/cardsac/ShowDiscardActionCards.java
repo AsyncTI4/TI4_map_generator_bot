@@ -93,7 +93,7 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
         int pad = cardsByName.size() > 99 ? 4 : (cardsByName.size() > 9 ? 3 : 2);
 
         List<Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());
-        displayOrder.sort(Comparator.comparing(Entry::getKey));
+        displayOrder.sort(Entry.comparingByKey());
         for (Entry<String, List<String>> acEntryList : displayOrder) {
             sb.append("\n").append(index).append(". ");
             sb.append(Emojis.ActionCard.repeat(acEntryList.getValue().size()));

@@ -162,7 +162,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         StringBuilder sb = new StringBuilder();
         if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
         sb.append(Emojis.PN);
-        sb.append(" ").append(getName()).append("");
+        sb.append(" ").append(getName());
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             sb.append(" (");
             if (color.equals("<color>")) {

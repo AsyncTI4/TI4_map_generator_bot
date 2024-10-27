@@ -1798,7 +1798,7 @@ public class Helper {
         if (warfareNOtherstuff.contains("integrated")) {
             planetInteg = warfareNOtherstuff.replace("integrated", "");
             UnitHolder plan = ButtonHelper.getUnitHolderFromPlanetName(planetInteg, game);
-            if (plan != null && plan instanceof Planet planetUh) {
+            if (plan instanceof Planet planetUh) {
                 resourcelimit = planetUh.getResources();
             }
         }
@@ -2817,7 +2817,7 @@ public class Helper {
 
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
-        if (defaultChannel == null || !(defaultChannel instanceof TextChannel tc)) {
+        if (!(defaultChannel instanceof TextChannel tc)) {
             BotLogger.log("Default channel is not available or is not a text channel on " + guild.getName());
         } else {
             return tc.createInvite()

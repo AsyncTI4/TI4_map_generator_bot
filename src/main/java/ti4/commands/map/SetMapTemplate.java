@@ -36,7 +36,7 @@ public class SetMapTemplate extends MapSubcommandData {
             return;
         }
 
-        if (transform && true) {
+        if (transform) {
             // check if map templates are compatable
             MessageHelper.sendMessageToEventChannel(event, "New map template (" + mapTemplate + ") is not compatable with the old map template (" + game.getMapTemplateID() + ")");
             return;

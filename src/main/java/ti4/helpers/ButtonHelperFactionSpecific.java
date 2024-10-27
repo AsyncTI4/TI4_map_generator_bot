@@ -1691,11 +1691,7 @@ public class ButtonHelperFactionSpecific {
 
             new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount + " " + unit, game);
         }
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
-        } else {
-            MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
-        }
+        MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
 
     }
 

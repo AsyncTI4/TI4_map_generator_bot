@@ -46,7 +46,7 @@ public class MiltySettings extends SettingsMenu {
         // Initialize default values
         draftMode = new ChoiceSetting<>("DraftType", "Draft Type", "milty");
         draftMode.setEmoji(Emojis.sliceA);
-        draftMode.setAllValues(Arrays.asList(DraftingMode.values()).stream().collect(Collectors.toMap(DraftingMode::toString, x -> x)));
+        draftMode.setAllValues(Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
         draftMode.setShow(DraftingMode::toString);
 
         // Get the correct JSON node for initialization if applicable.

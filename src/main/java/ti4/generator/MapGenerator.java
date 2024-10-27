@@ -1370,10 +1370,10 @@ public class MapGenerator {
         List<String> fakeRelics = relics.stream()
             .filter(relic -> Mapper.getRelic(relic).isFakeRelic())
             .filter(relic -> !relic.contains("axisorder"))
-            .collect(Collectors.toList());
+            .toList();
         List<String> axisOrderRelics = player.getRelics().stream()
             .filter(relic -> relic.contains("axisorder"))
-            .collect(Collectors.toList());
+            .toList();
 
         relics.removeAll(fakeRelics);
         relics.removeAll(axisOrderRelics);
@@ -4803,19 +4803,16 @@ public class MapGenerator {
                     }
                     List<String> problematicTiles = List.of("25", "26", "64"); // quann, lodor, atlas
                     BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 64, 64);
+                    int xMod;
+                    int yMod = -290;
                     if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
-                        int xMod = -15;
-                        int yMod = -290;
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 29, TILE_PADDING + tilePositionPoint.y + yMod - 4, null);
-                        tileGraphics.setFont(Storage.getFont35());
-                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25, TILE_PADDING + tilePositionPoint.y + yMod + 40);
+                        xMod = -15;
                     } else {
-                        int xMod = -155;
-                        int yMod = -290;
-                        tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 29, TILE_PADDING + tilePositionPoint.y + yMod - 4, null);
-                        tileGraphics.setFont(Storage.getFont35());
-                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25, TILE_PADDING + tilePositionPoint.y + yMod + 40);
+                        xMod = -155;
                     }
+                    tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 29, TILE_PADDING + tilePositionPoint.y + yMod - 4, null);
+                    tileGraphics.setFont(Storage.getFont35());
+                    tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25, TILE_PADDING + tilePositionPoint.y + yMod + 40);
                 }
 
                 if (spaceUnitHolder != null) {
@@ -5875,15 +5872,9 @@ public class MapGenerator {
                 if (tokenPath.contains(Constants.WORLD_DESTROYED) ||
                     tokenPath.contains(Constants.CONSULATE_TOKEN) ||
                     tokenPath.contains(Constants.GLEDGE_CORE) || tokenPath.contains("freepeople")) {
-                    if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
-                        tileGraphics.drawImage(tokenImage,
-                            TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
-                            TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
-                    } else {
-                        tileGraphics.drawImage(tokenImage,
-                            TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
-                            TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
-                    }
+                    tileGraphics.drawImage(tokenImage,
+                        TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2),
+                        TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
                 } else if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     float scale = 0.3f;
                     List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");

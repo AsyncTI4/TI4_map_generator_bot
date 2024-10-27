@@ -29,9 +29,9 @@ public class POInfo extends StatusSubcommandData {
         Game game = getActiveGame();
         Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
-        List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.entrySet().stream()
-            .filter(id -> Mapper.isValidPublicObjective(id.getKey()))
-            .map(id -> Mapper.getPublicObjective(id.getKey()))
+        List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.keySet().stream()
+            .filter(Mapper::isValidPublicObjective)
+            .map(Mapper::getPublicObjective)
             .toList();
 
         Player currentPlayer = game.getPlayer(getUser().getId());
