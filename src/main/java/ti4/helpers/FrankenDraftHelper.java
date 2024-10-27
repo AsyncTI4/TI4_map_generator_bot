@@ -32,7 +32,7 @@ public class FrankenDraftHelper {
     public static List<Button> getSelectionButtons(List<DraftItem> draftables, Player player) {
         List<Button> buttons = new ArrayList<>();
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
-        DraftItem.Category lastCategory = draftables.get(0).ItemCategory;
+        DraftItem.Category lastCategory = draftables.getFirst().ItemCategory;
         int categoryCounter = 0;
         for (DraftItem item : draftables) {
             if (item.ItemCategory != lastCategory) {

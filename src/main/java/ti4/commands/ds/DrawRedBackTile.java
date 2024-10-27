@@ -3,6 +3,7 @@ package ti4.commands.ds;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -96,7 +97,7 @@ public class DrawRedBackTile extends DiscordantStarsSubcommandData {
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
         if (ids.size() == 1) {
-            ButtonHelper.detTileAdditionStep1(game, player, ids.get(0));
+            ButtonHelper.detTileAdditionStep1(game, player, ids.getFirst());
         }
     }
 

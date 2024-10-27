@@ -55,7 +55,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Collections.shuffle(promissoryNotes);
         int index = 1;
         for (String id : promissoryNotes) {
-            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName() + " (original owner " + game.getPNOwner(id).getFactionEmojiOrColor() + ")").append("\n");
+            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id).getName()).append(" (original owner ").append(game.getPNOwner(id).getFactionEmojiOrColor()).append(")").append("\n");
             index++;
         }
 

@@ -155,7 +155,7 @@ public class CommanderUnlockCheck {
                 }
             }
             case "edyn" -> {
-                if (game.getLaws().size() > 0) {
+                if (!game.getLaws().isEmpty()) {
                     shouldBeUnlocked = true;
                 }
             }

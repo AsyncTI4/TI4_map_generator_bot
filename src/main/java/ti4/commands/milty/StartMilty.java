@@ -29,6 +29,7 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 
@@ -195,7 +196,7 @@ public class StartMilty extends MiltySubcommandData {
             .filter(f -> specs.factionSources.contains(f.getSource()))
             .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
             .filter(f -> !f.getAlias().contains("keleres") || f.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
-            .map(f -> f.getAlias()).toList());
+            .map(FactionModel::getAlias).toList());
         List<String> factionDraft = createFactionDraft(specs.numFactions, unbannedFactions, specs.priorityFactions);
         draftManager.setFactionDraft(factionDraft);
 
@@ -319,8 +320,8 @@ public class StartMilty extends MiltySubcommandData {
         List<MiltyDraftTile> blue = draftManager.getBlue();
         List<MiltyDraftTile> red = draftManager.getRed();
 
-        long quitDiff = 60l * 1000l * 1000l * 1000l;
-        long minAttempts = 1000000l;
+        long quitDiff = 60L * 1000L * 1000L * 1000L;
+        long minAttempts = 1000000L;
         long startTime = System.nanoTime();
         while (!slicesCreated) {
             long elapTime = System.nanoTime() - startTime;
@@ -353,8 +354,10 @@ public class StartMilty extends MiltySubcommandData {
                         tryagain = false;
                         for (int x : ints)
                             for (int y : ints)
-                                if (x != y && adjMatrix.get(x).get(y))
+                                if (x != y && adjMatrix.get(x).get(y)) {
                                     tryagain = true;
+                                    break;
+                                }
                         if (tryagain) {
                             Collections.rotate(tiles, 1);
                             if (turns == 0) Collections.shuffle(tiles);
@@ -378,9 +381,9 @@ public class StartMilty extends MiltySubcommandData {
                 }
 
                 // if the slice has 2 alphas, or 2 betas, throw it out
-                int alphaWHs = (int) miltyDraftSlice.getTiles().stream().filter(tile -> tile.isHasAlphaWH()).count();
-                int betaWHs = (int) miltyDraftSlice.getTiles().stream().filter(tile -> tile.isHasBetaWH()).count();
-                int otherWHs = (int) miltyDraftSlice.getTiles().stream().filter(tile -> tile.isHasOtherWH()).count();
+                int alphaWHs = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isHasAlphaWH).count();
+                int betaWHs = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isHasBetaWH).count();
+                int otherWHs = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isHasOtherWH).count();
                 if (alphaWHs > 1) {
                     addReason.apply("alpha");
                     break;
@@ -391,7 +394,7 @@ public class StartMilty extends MiltySubcommandData {
                 }
                 whs += alphaWHs + betaWHs + otherWHs;
 
-                int sliceLegends = (int) miltyDraftSlice.getTiles().stream().filter(t -> t.isLegendary()).count();
+                int sliceLegends = (int) miltyDraftSlice.getTiles().stream().filter(MiltyDraftTile::isLegendary).count();
                 if (sliceLegends > 1) {
                     addReason.apply("legend");
                     break;
@@ -420,12 +423,12 @@ public class StartMilty extends MiltySubcommandData {
 
         long elapsed = System.nanoTime() - startTime;
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
-        if (!slicesCreated || elapsed >= 10000000000l || debug) {
+        if (!slicesCreated || elapsed >= 10000000000L || debug) {
             StringBuilder sb = new StringBuilder();
             sb.append("Milty draft took a while... jazz, take a look:\n");
-            sb.append("`        Elapsed time:` " + Helper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
-            sb.append("`           Quit time:` " + Helper.getTimeRepresentationNanoSeconds(quitDiff)).append("\n");
-            sb.append("`    Number of cycles:` " + i).append("\n");
+            sb.append("`        Elapsed time:` ").append(Helper.getTimeRepresentationNanoSeconds(elapsed)).append("\n");
+            sb.append("`           Quit time:` ").append(Helper.getTimeRepresentationNanoSeconds(quitDiff)).append("\n");
+            sb.append("`    Number of cycles:` ").append(i).append("\n");
             for (Entry<String, Integer> reason : reasons.entrySet()) {
                 sb.append("`").append(Helper.leftpad(reason.getKey(), 15)).append(" fail:` ").append(reason.getValue()).append("\n");
             }
@@ -440,7 +443,7 @@ public class StartMilty extends MiltySubcommandData {
         List<MapTemplateModel> validTemplates = Mapper.getMapTemplatesForPlayerCount(players);
         MapTemplateModel defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
 
-        if (validTemplates.size() == 0) {
+        if (validTemplates.isEmpty()) {
             String msg = "Milty draft in this bot does not know about any map layouts that support " + players + " player" + (players == 1 ? "" : "s") + " yet.";
             MessageHelper.sendMessageToChannel(event.getChannel(), msg);
             return null;

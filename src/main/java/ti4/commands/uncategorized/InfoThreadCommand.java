@@ -13,9 +13,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public interface InfoThreadCommand {
-    public abstract String getActionID();
+    String getActionID();
 
-    default public boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
+    default boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
 
         if (event.getName().equals(actionID)) {
             String userID = event.getUser().getId();

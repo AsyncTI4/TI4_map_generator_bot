@@ -194,7 +194,7 @@
     "phase": "Action",
     "window": "After you move ships into the active system",
     "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
-    "flavorText": "The sensors of the lead ship erupted with damage alerts as a fleet of unmarked ships poured from the wormhole, raining destruction on the unsuspecting convoy.",
+    "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
     "source": "action_deck_2"
   },
   {
@@ -382,7 +382,7 @@
     "name": "Final Mission",
     "phase": "Action",
     "window": "After you and your opponent make combat rolls",
-    "text": "Destroy 1 of your damaged units to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
+    "text": "Destroy 1 of your damaged units that is participating in this combat to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
@@ -985,7 +985,7 @@
     "name": "Stolen Prototype",
     "phase": "Action",
     "window": "After you destroy 1 of another player's units",
-    "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
+    "text": "Research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
     "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only after they cleared the blast radius did he loosen his grip on the stolen schematics.",
     "source": "action_deck_2"
   },
@@ -1031,7 +1031,7 @@
     "phase": "Any",
     "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
     "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
-    "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
+    "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
     "source": "action_deck_2"
   },
   {

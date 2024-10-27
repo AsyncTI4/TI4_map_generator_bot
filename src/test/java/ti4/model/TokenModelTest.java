@@ -1,7 +1,5 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,9 +8,11 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
-
 import ti4.generator.Mapper;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TokenModelTest extends BaseTi4Test {
     private static String error(TokenModel token, String descr) {
@@ -23,10 +23,10 @@ public class TokenModelTest extends BaseTi4Test {
     void testTokens() {
         beforeAll();
         List<TokenModel> tokens = new ArrayList<>(Mapper.getTokens2());
-        assertTrue(tokens.size() > 0, "Did not import any tokens");
+        assertFalse(tokens.isEmpty(), "Did not import any tokens");
 
         Map<String, Predicate<TokenModel>> validators = new LinkedHashMap<>();
-        validators.put("E1", t -> t.isValid());
+        validators.put("E1", TokenModel::isValid);
         validators.put("E2", TokenModelTest::tokenExistsElsewhere);
         validators.put("E3", TokenModelTest::tokenComplete);
 
@@ -39,15 +39,11 @@ public class TokenModelTest extends BaseTi4Test {
     }
 
     private static boolean tokenExistsElsewhere(TokenModel token) {
-        if (Mapper.getTokens().contains(token.getAlias()))
-            return true;
-        return false;
+        return Mapper.getTokens().contains(token.getAlias());
     }
 
     private static boolean tokenComplete(TokenModel token) {
-        if (Mapper.getTokens().contains(token.getAlias()))
-            return true;
-        return false;
+        return Mapper.getTokens().contains(token.getAlias());
     }
 
     private static boolean tokenIsTokenModel(String token) {

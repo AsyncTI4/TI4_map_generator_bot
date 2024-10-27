@@ -125,7 +125,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         int index = 1;
 
         //SCORED SECRET OBJECTIVES
-        sb.append("**Scored Secret Objectives (" + player.getSoScored() + "/" + player.getMaxSOCount() + "):**").append("\n");
+        sb.append("**Scored Secret Objectives (").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("):**").append("\n");
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -149,7 +149,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
 
                     if (ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) > 0) {
                         sb.append(getSecretObjectiveRepresentationNoNewLine(so.getKey()));
-                        sb.append(" (" + ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) + ")\n");
+                        sb.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game)).append(")\n");
                     } else {
                         sb.append(getSecretObjectiveRepresentation(so.getKey()));
                     }

@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import ti4.generator.Mapper;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
@@ -27,9 +26,10 @@ public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private BooleanSetting presetDraftOrder;
+    private final BooleanSetting presetDraftOrder;
     private ListSetting<Player> gamePlayers;
-    private ListSetting<FactionModel> banFactions, priFactions;
+    private final ListSetting<FactionModel> banFactions;
+    private final ListSetting<FactionModel> priFactions;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -85,7 +85,7 @@ public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
         ls.add(gamePlayers);
         ls.add(presetDraftOrder);
         ls.add(banFactions);
@@ -100,7 +100,7 @@ public class PlayerFactionSettings extends SettingsMenu {
             Map<String, FactionModel> allFactions = Mapper.getFactions().stream()
                 .filter(model -> sources.contains(model.getSource()))
                 .filter(model -> !model.getAlias().contains("keleres") || model.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
-                .collect(Collectors.toMap(f -> f.getAlias(), f -> f));
+                .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
             banFactions.setAllValues(allFactions);
             priFactions.setAllValues(allFactions);
 

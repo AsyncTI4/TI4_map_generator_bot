@@ -3,11 +3,10 @@ package ti4.commands.tech;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.TurnStart;
@@ -80,8 +79,8 @@ public class GetTechButton extends TechSubcommandData {
                 List<Button> buttons;
                 Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
                 if (player.hasAbility("mobile_command")
-                    && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).size() > 0) {
-                    tile = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).get(0);
+                    && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).isEmpty()) {
+                    tile = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).getFirst();
                 }
                 if (tile == null) {
                     tile = player.getHomeSystemTile();
@@ -126,7 +125,7 @@ public class GetTechButton extends TechSubcommandData {
             && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
             if (!game.isFowMode()) {
                 try {
-                    if (game.getLatestTransactionMsg() != null && !"".equals(game.getLatestTransactionMsg())) {
+                    if (game.getLatestTransactionMsg() != null && !game.getLatestTransactionMsg().isEmpty()) {
                         game.getMainGameChannel().deleteMessageById(game.getLatestTransactionMsg()).queue();
                         game.setLatestTransactionMsg("");
                     }
@@ -134,7 +133,7 @@ public class GetTechButton extends TechSubcommandData {
                     // Block of code to handle errors
                 }
             }
-            String text = "" + player.getRepresentationUnfogged() + " UP NEXT";
+            String text = player.getRepresentationUnfogged() + " UP NEXT";
             String buttonText = "Use buttons to do your turn. ";
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
@@ -185,46 +184,46 @@ public class GetTechButton extends TechSubcommandData {
             || !game.getStoredValue("TechSummaryRound" + game.getRound()).isEmpty() || game.isHomebrewSCMode()) {
             return;
         }
-        String msg = "**__Tech Summary For Round " + game.getRound() + "__**\n";
+        StringBuilder msg = new StringBuilder("**__Tech Summary For Round " + game.getRound() + "__**\n");
         for (Player player : game.getRealPlayers()) {
             if (!player.hasFollowedSC(7)) {
                 return;
             }
             String key = "TechForRound" + game.getRound() + player.getFaction();
-            msg = msg + player.getFactionEmoji() + ":";
+            msg.append(player.getFactionEmoji()).append(":");
             String key2 = "RAForRound" + game.getRound() + player.getFaction();
             if (!game.getStoredValue(key2).isEmpty()) {
-                msg += "(From RA: ";
+                msg.append("(From RA: ");
                 if (game.getStoredValue(key2).contains(".")) {
                     for (String tech : game.getStoredValue(key2).split("\\.")) {
-                        msg += " " + Mapper.getTech(tech).getNameRepresentation();
+                        msg.append(" ").append(Mapper.getTech(tech).getNameRepresentation());
                     }
 
                 } else {
-                    msg += " " + Mapper.getTech(game.getStoredValue(key2)).getNameRepresentation();
+                    msg.append(" ").append(Mapper.getTech(game.getStoredValue(key2)).getNameRepresentation());
                 }
-                msg += ")";
+                msg.append(")");
             }
             if (!game.getStoredValue(key).isEmpty()) {
                 if (game.getStoredValue(key).contains(".")) {
                     String tech1 = StringUtils.substringBefore(game.getStoredValue(key), ".");
                     String tech2 = StringUtils.substringAfter(game.getStoredValue(key), ".");
-                    msg += " " + Mapper.getTech(tech1).getNameRepresentation();
+                    msg.append(" ").append(Mapper.getTech(tech1).getNameRepresentation());
                     for (String tech2Plus : tech2.split("\\.")) {
-                        msg += "and " + Mapper.getTech(tech2Plus).getNameRepresentation();
+                        msg.append("and ").append(Mapper.getTech(tech2Plus).getNameRepresentation());
                     }
 
                 } else {
-                    msg += " " + Mapper.getTech(game.getStoredValue(key)).getNameRepresentation();
+                    msg.append(" ").append(Mapper.getTech(game.getStoredValue(key)).getNameRepresentation());
                 }
-                msg += "\n";
+                msg.append("\n");
             } else {
-                msg += " Did not follow for tech\n";
+                msg.append(" Did not follow for tech\n");
             }
         }
         String key2 = "TechForRound" + game.getRound() + "Counter";
         if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg);
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());
             game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
         } else {
             if (game.getStoredValue(key2).isEmpty()) {

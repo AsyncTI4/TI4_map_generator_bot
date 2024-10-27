@@ -1,5 +1,9 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
@@ -7,10 +11,6 @@ import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class AgentDraftItem extends DraftItem {
     public AgentDraftItem(String itemId) {
@@ -63,9 +63,7 @@ public class AgentDraftItem extends DraftItem {
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> agents = faction.getLeaders();
-            agents.removeIf((String leader) -> {
-                return !"agent".equals(allLeaders.get(leader).getType());
-            });
+            agents.removeIf((String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
                 allItems.add(DraftItem.Generate(Category.AGENT, agent));
             }

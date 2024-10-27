@@ -3,6 +3,7 @@ package ti4.commands.cardsso;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -35,7 +36,7 @@ public class ShowRandomSO extends SOCardsSubcommandData {
             return;
         }
         Collections.shuffle(secrets);
-        String soID = secrets.get(0);
+        String soID = secrets.getFirst();
 
         String sb = "Game: " + game.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +

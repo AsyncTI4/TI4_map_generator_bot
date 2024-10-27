@@ -113,8 +113,8 @@ public class Undo extends GameSubcommandData {
 
     @ButtonHandler("ultimateUndo")
     public static void ultimateUndo(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (game.getSavedButtons().size() > 0 && !game.getPhaseOfGame().contains("status")) {
-            String buttonString = game.getSavedButtons().get(0);
+        if (!game.getSavedButtons().isEmpty() && !game.getPhaseOfGame().contains("status")) {
+            String buttonString = game.getSavedButtons().getFirst();
             if (game.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
                 boolean showGame = false;
                 for (String buttonString2 : game.getSavedButtons()) {
@@ -161,7 +161,7 @@ public class Undo extends GameSubcommandData {
     @ButtonHandler("ultimateUndo_")
     public static void ultimateUndo_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!game.getSavedButtons().isEmpty()) {
-            String buttonString = game.getSavedButtons().get(0);
+            String buttonString = game.getSavedButtons().getFirst();
             String colorOrFaction = buttonString.split(";")[0];
             Player p = game.getPlayerFromColorOrFaction(colorOrFaction);
             if (p != null && player != p && !colorOrFaction.equals("null")) {
@@ -194,14 +194,14 @@ public class Undo extends GameSubcommandData {
 
         GameSaveLoadManager.undo(game, event);
 
-        String msg = "You undid something, the details of which can be found in the undo-log thread";
+        StringBuilder msg = new StringBuilder("You undid something, the details of which can be found in the undo-log thread");
         List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(game.getName() + "-undo-log")) {
-                msg += ": " + threadChannel_.getJumpUrl();
+                msg.append(": ").append(threadChannel_.getJumpUrl());
             }
         }
-        event.getHook().sendMessage(msg).setEphemeral(true).queue();
+        event.getHook().sendMessage(msg.toString()).setEphemeral(true).queue();
     }
 
     public static Map<String, Game> getAllUndoSavedGames(Game game) {

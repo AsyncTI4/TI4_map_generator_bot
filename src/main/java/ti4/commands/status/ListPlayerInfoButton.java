@@ -118,8 +118,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         messageEmbeds.add(Mapper.getRelic(relic).getRepresentationEmbed());
                     }
                     for (String planet : p2.getPlanets()) {
-                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
-                            + "\n");
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)).append("\n");
                     }
                     for (String tech : p2.getTechs()) {
                         messageEmbeds.add(Mapper.getTech(tech).getRepresentationEmbed());
@@ -155,8 +154,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 }
                 case "planet" -> {
                     for (String planet : p2.getPlanets()) {
-                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)
-                            + "\n");
+                        sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game)).append("\n");
                     }
                 }
                 case "pn" -> {
@@ -272,36 +270,36 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
     public static void displayerScoringProgression(Game game, boolean onlyThisGameObj,
         MessageChannel channel, String stage1sOrTwos) {
-        String msg = "";
+        StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
-                    msg = msg + representScoring(game, id, x) + "\n";
+                    msg.append(representScoring(game, id, x)).append("\n");
                     x++;
                 }
             }
             for (String id : game.getSoToPoList()) {
-                msg = msg + representScoring(game, id, x, true) + "\n";
+                msg.append(representScoring(game, id, x, true)).append("\n");
                 x++;
             }
-            msg = msg + representSecrets(game) + "\n";
-            msg = msg + representSupports(game) + "\n";
-            msg = msg + representTotalVPs(game) + "\n";
+            msg.append(representSecrets(game)).append("\n");
+            msg.append(representSupports(game)).append("\n");
+            msg.append(representTotalVPs(game)).append("\n");
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id).getSource() == ComponentSource.pok
                     || Mapper.getPublicObjective(id).getSource() == ComponentSource.base) {
                     if (stage1sOrTwos.equalsIgnoreCase("" + Mapper.getPublicObjective(id).getPoints())
                         || stage1sOrTwos.equalsIgnoreCase("both")) {
-                        msg = msg + representScoring(game, id, x) + "\n";
+                        msg.append(representScoring(game, id, x)).append("\n");
                         x++;
                     }
 
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(channel, msg);
+        MessageHelper.sendMessageToChannel(channel, msg.toString());
     }
 
     public static String representScoring(Game game, String objID, int x) {
@@ -309,72 +307,71 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static String representScoring(Game game, String objID, int x, boolean secret) {
-        String representation = "";
+        StringBuilder representation = new StringBuilder();
         if (secret) {
-            representation = x + ". " + SOInfo.getSecretObjectiveRepresentation(objID) + "> ";
+            representation = new StringBuilder(x + ". " + SOInfo.getSecretObjectiveRepresentation(objID) + "> ");
         } else {
             PublicObjectiveModel model = Mapper.getPublicObjective(objID);
             if (x > 0) {
-                representation = x + ". " + model.getRepresentation() + "\n> ";
+                representation = new StringBuilder(x + ". " + model.getRepresentation() + "\n> ");
             } else {
-                representation = model.getRepresentation() + "\n> ";
+                representation = new StringBuilder(model.getRepresentation() + "\n> ");
             }
         }
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation = representation + player.getFactionEmoji() + ": ";
+                representation.append(player.getFactionEmoji()).append(": ");
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
-                        representation = representation + "✅  ";
+                        representation.append("✅  ");
                     } else {
                         if (ListPlayerInfoButton.getObjectiveThreshold(objID, game) > 0) {
-                            representation = representation + " (" + ListPlayerInfoButton.getPlayerProgressOnObjective(objID, game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(objID, game) + ")  ";
+                            representation.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(objID, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(objID, game)).append(")  ");
                         } else {
-                            representation = representation + "0/1  ";
+                            representation.append("0/1  ");
                         }
                     }
                 } else {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
                         && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
-                        representation = representation + "✅  ";
+                        representation.append("✅  ");
                     } else {
-                        representation = representation + getPlayerProgressOnObjective(objID, game, player) + "/"
-                            + getObjectiveThreshold(objID, game) + "  ";
+                        representation.append(getPlayerProgressOnObjective(objID, game, player)).append("/").append(getObjectiveThreshold(objID, game)).append("  ");
                     }
                 }
             }
         }
-        return representation;
+        return representation.toString();
     }
 
     public static String representSecrets(Game game) {
-        String representation = "__**Scored Secrets**__\n> ";
+        StringBuilder representation = new StringBuilder("__**Scored Secrets**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation = representation + player.getFactionEmoji() + ": " + player.getSoScored() + "/" + player.getMaxSOCount() + "  ";
+                representation.append(player.getFactionEmoji()).append(": ").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("  ");
             }
         }
-        return representation;
+        return representation.toString();
     }
 
     public static String representSupports(Game game) {
-        String representation = "__**Support VPs**__\n> ";
+        StringBuilder representation = new StringBuilder("__**Support VPs**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation = representation + player.getFactionEmoji() + ": " + player.getSupportForTheThroneVictoryPoints() + "/1  ";
+                representation.append(player.getFactionEmoji()).append(": ").append(player.getSupportForTheThroneVictoryPoints()).append("/1  ");
             }
         }
-        return representation;
+        return representation.toString();
     }
 
     public static String representTotalVPs(Game game) {
-        String representation = "__**Total VPs**__\n> ";
+        StringBuilder representation = new StringBuilder("__**Total VPs**__\n> ");
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
-                representation = representation + player.getFactionEmoji() + ": " + player.getTotalVictoryPoints() + "/" + game.getVp() + "  ";
+                representation.append(player.getFactionEmoji()).append(": ").append(player.getTotalVictoryPoints()).append("/").append(game.getVp()).append("  ");
             }
         }
-        return representation;
+        return representation.toString();
     }
 
     public static int getPlayerProgressOnObjective(String objID, Game game, Player player) {
@@ -622,7 +619,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         if (p2 == player) {
                             continue;
                         }
-                        if (tile != null && FoWHelper.playerHasPlanetsInSystem(p2, tile)) {
+                        if (FoWHelper.playerHasPlanetsInSystem(p2, tile)) {
                             count++;
                             break;
                         }
@@ -704,7 +701,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "ose" -> {
                 Tile mecatol = game.getMecatolTile();
                 boolean controlsMecatol = player.getPlanets().stream()
-                    .anyMatch(p -> Constants.MECATOLS.contains(p));
+                    .anyMatch(Constants.MECATOLS::contains);
                 if (mecatol == null || !FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {
@@ -756,7 +753,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     if ("vax".equalsIgnoreCase(nekroTech) || "vay".equalsIgnoreCase(nekroTech)) {
                         continue;
                     }
-                    if (!"".equals(Mapper.getTech(nekroTech).getFaction().orElse(""))) {
+                    if (!Mapper.getTech(nekroTech).getFaction().orElse("").isEmpty()) {
                         count = count + 1;
                     }
 

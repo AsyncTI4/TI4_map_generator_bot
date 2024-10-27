@@ -16,12 +16,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -35,6 +29,11 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -92,9 +91,8 @@ public class AgendaHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveAgenda(Game game, String buttonID, ButtonInteractionEvent event,
-        MessageChannel actionsChannel) {
-        actionsChannel = game.getMainGameChannel();
+    public static void resolveAgenda(Game game, String buttonID, ButtonInteractionEvent event) {
+        MessageChannel actionsChannel = game.getMainGameChannel();
         String winner = buttonID.substring(buttonID.indexOf("_") + 1);
         String agendaid = game.getCurrentAgendaInfo().split("_")[2];
         int aID;
@@ -219,8 +217,7 @@ public class AgendaHelper {
                 if ("defense_act".equalsIgnoreCase(agID)) {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Player player : game.getRealPlayers()) {
-                            if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)
-                                .size() > 0) {
+                            if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds).isEmpty()) {
                                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                     player.getRepresentation() + " remove 1 PDS", ButtonHelperModifyUnits
                                         .getRemoveThisTypeOfUnitButton(player, game, "pds"));
@@ -380,7 +377,7 @@ public class AgendaHelper {
 
                 }
             }
-            if (game.getLaws().size() > 0) {
+            if (!game.getLaws().isEmpty()) {
                 CommanderUnlockCheck.checkAllPlayersInGame(game, "edyn");
             }
         } else {
@@ -808,7 +805,7 @@ public class AgendaHelper {
                 }
                 message.append("Custom PO 'Seed' has been added.\n");
                 if (winOrLose.size() == 1) {
-                    Player playerWL = winOrLose.get(0);
+                    Player playerWL = winOrLose.getFirst();
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
                     message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
                     Helper.checkEndGame(game, playerWL);
@@ -940,7 +937,7 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     game.getPing() + " Set all players' trade goods to " + finalTG + ".");
                 if (!comrades.isEmpty() && !AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).isEmpty() && !game.isFowMode()) {
-                    TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
+                    TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
                     for (Player playerB : comrades) {
                         MessageHelper.sendMessageToChannel(watchParty,
                             "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate " + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
@@ -1067,7 +1064,7 @@ public class AgendaHelper {
     private static String watchPartyPing(Game game) {
         List<Role> roles = AsyncTI4DiscordBot.guildPrimary.getRolesByName("Ixthian Watch Party", true);
         if (!game.isFowMode() && !roles.isEmpty()) {
-            return roles.get(0).getAsMention();
+            return roles.getFirst().getAsMention();
         }
         return null;
     }
@@ -1075,8 +1072,8 @@ public class AgendaHelper {
     @Nullable
     private static TextChannel watchPartyChannel(Game game) {
         List<TextChannel> channels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("ixthian-watch-party", true);
-        if (!game.isFowMode() && channels.size() > 0) {
-            return channels.get(0);
+        if (!game.isFowMode() && !channels.isEmpty()) {
+            return channels.getFirst();
         }
         return null;
     }
@@ -1360,7 +1357,7 @@ public class AgendaHelper {
                 messageWhensBuilder.insert(0, player.getRepresentationUnfogged());
             }
             messageWhens = messageWhensBuilder.toString();
-            if (missingPlayersWhens.size() > 0) {
+            if (!missingPlayersWhens.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageWhens);
             }
 
@@ -1369,7 +1366,7 @@ public class AgendaHelper {
                 messageAftersBuilder.insert(0, player.getRepresentationUnfogged());
             }
             messageAfters = messageAftersBuilder.toString();
-            if (missingPlayersAfters.size() > 0) {
+            if (!missingPlayersAfters.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageAfters);
             }
         }
@@ -1440,7 +1437,7 @@ public class AgendaHelper {
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
             }
-            if (buttonRow.size() > 0) {
+            if (!buttonRow.isEmpty()) {
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
@@ -1459,7 +1456,7 @@ public class AgendaHelper {
                     + totalVotesSoFar.substring(totalVotesSoFar.indexOf("\n"))
                     + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             }
-            if (actionRow2.size() > 0) {
+            if (!actionRow2.isEmpty()) {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
             }
             // addReaction(event, true, false,"Exhausted
@@ -1476,7 +1473,7 @@ public class AgendaHelper {
                 totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(":") + 2) + totalVotes
                     + totalVotesSoFar.substring(totalVotesSoFar.indexOf("\n"));
             }
-            if (actionRow2.size() > 0) {
+            if (!actionRow2.isEmpty()) {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
             }
             if (buttonID.contains("everything")) {
@@ -1651,7 +1648,7 @@ public class AgendaHelper {
                     if (game.getPlayer(game.getSpeaker()) != null) {
                         speaker = game.getPlayers().get(game.getSpeaker());
                     } else {
-                        speaker = game.getRealPlayers().get(0);
+                        speaker = game.getRealPlayers().getFirst();
                     }
                     List<Button> tiedWinners = new ArrayList<>();
                     if (!"".equalsIgnoreCase(winner)) {
@@ -1710,21 +1707,21 @@ public class AgendaHelper {
         boolean shenanigans = false;
         if (game.islandMode()) return;
 
-        if ((!game.isACInDiscard("Bribery") || !game.isACInDiscard("Deadly Plot")) && (losers.size() > 0 || game.isAbsolMode())) {
+        if ((!game.isACInDiscard("Bribery") || !game.isACInDiscard("Deadly Plot")) && (!losers.isEmpty() || game.isAbsolMode())) {
             StringBuilder message = new StringBuilder("You may hold while people resolve shenanigans. If it is not an important agenda, you are encouraged to move on and float the shenanigans.\n");
             Button noDeadly = Buttons.blue("generic_button_id_1", "No Deadly Plot");
             Button noBribery = Buttons.blue("generic_button_id_2", "No Bribery");
             List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
             if (!game.isFowMode()) {
                 if (!game.isACInDiscard("Deadly Plot")) {
-                    message.append("The following players (" + losers.size() + ") have the opportunity to play " + Emojis.ActionCard + "Deadly Plot:\n");
+                    message.append("The following players (").append(losers.size()).append(") have the opportunity to play ").append(Emojis.ActionCard).append("Deadly Plot:\n");
                 }
                 for (Player loser : losers) {
                     message.append("> ").append(loser.getRepresentationUnfogged()).append("\n");
                 }
                 message.append("Please confirm you will not be playing Bribery or Deadly Plot");
             } else {
-                message.append(losers.size() + " players have the opportunity to play " + Emojis.ActionCard + "Deadly Plot.\n");
+                message.append(losers.size()).append(" players have the opportunity to play ").append(Emojis.ActionCard).append("Deadly Plot.\n");
                 MessageHelper.privatelyPingPlayerList(losers, game, "Please respond to Bribery/Deadly Plot window");
             }
             MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(), message.toString(), game, deadlyActionRow, "shenanigans");
@@ -1772,7 +1769,7 @@ public class AgendaHelper {
                     }
                 }
                 String total = totalBuilder.toString();
-                if (total.length() > 0 && total.charAt(0) == ';') {
+                if (!total.isEmpty() && total.charAt(0) == ';') {
                     total = total.substring(1);
                 }
                 game.setCurrentAgendaVote(outcome, total);
@@ -1801,7 +1798,7 @@ public class AgendaHelper {
                     }
                 }
                 String total = totalBuilder.toString();
-                if (total.length() > 0 && total.charAt(0) == ';') {
+                if (!total.isEmpty() && total.charAt(0) == ';') {
                     total = total.substring(1);
                 }
                 game.setCurrentAgendaVote(outcome, total);
@@ -2681,7 +2678,7 @@ public class AgendaHelper {
             .filter(player -> player.getFaction() != null && player.hasAbility("zeal")).findFirst();
         if (argentPlayer.isPresent()) {
             orderList.remove(argentPlayer.orElse(null));
-            orderList.add(0, argentPlayer.get());
+            orderList.addFirst(argentPlayer.get());
         }
         String conspiratorsFaction = game.getStoredValue("conspiratorsFaction");
         if (!conspiratorsFaction.isEmpty()) {
@@ -2812,8 +2809,7 @@ public class AgendaHelper {
                 }
             }
             if (thing.contains("allPlanets")) {
-                List<String> unexhaustedPs = new ArrayList<>();
-                unexhaustedPs.addAll(player.getReadiedPlanets());
+                List<String> unexhaustedPs = new ArrayList<>(player.getReadiedPlanets());
                 for (String planet : unexhaustedPs) {
                     if (getSpecificPlanetsVoteWorth(player, game, planet) > 0) {
                         if (!finalRes) {

@@ -138,7 +138,7 @@ public class ComponentActionHelper {
                     }
 
                 } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
-                    && ButtonHelper.getTilesWithYourCC(p1, game, event).size() > 0) {
+                    && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
                     Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use " + leaderName, factionEmoji);
                     compButtons.add(lButton);
                 }
@@ -203,12 +203,12 @@ public class ComponentActionHelper {
 
         // Abilities
         if (p1.hasAbility("star_forge") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun).size() > 0) {
+            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun).isEmpty()) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", Emojis.Muaat);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("meditation") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
-            && p1.getExhaustedTechs().size() > 0) {
+            && !p1.getExhaustedTechs().isEmpty()) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_meditation", "Meditation", Emojis.kolume);
             compButtons.add(abilityButton);
         }
@@ -216,28 +216,28 @@ public class ComponentActionHelper {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", Emojis.Sol);
             compButtons.add(abilityButton);
         }
-        if (p1.hasUnit("lanefir_mech") && p1.getFragments().size() > 0
+        if (p1.hasUnit("lanefir_mech") && !p1.getFragments().isEmpty()
             && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_lanefirMech", "Purge 1 Fragment For Mech", Emojis.lanefir);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("mantle_cracking")
-            && ButtonHelperAbilities.getMantleCrackingButtons(p1, game).size() > 0) {
+            && !ButtonHelperAbilities.getMantleCrackingButtons(p1, game).isEmpty()) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_mantlecracking", "Mantle Crack", Emojis.gledge);
             compButtons.add(abilityButton);
         }
-        if (p1.hasAbility("stall_tactics") && p1.getActionCards().size() > 0) {
+        if (p1.hasAbility("stall_tactics") && !p1.getActionCards().isEmpty()) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_stallTactics", "Stall Tactics", Emojis.Yssaril);
             compButtons.add(abilityButton);
         }
-        if (p1.hasAbility("fabrication") && p1.getFragments().size() > 0) {
+        if (p1.hasAbility("fabrication") && !p1.getFragments().isEmpty()) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC", Emojis.Naaz);
             compButtons.add(abilityButton);
         }
 
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).size() > 0) {
+            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 strategy CC for 1 cruiser with The Inferno (Muaat Flagship)", Emojis.Muaat);
             compButtons.add(abilityButton);
         }
@@ -340,7 +340,7 @@ public class ComponentActionHelper {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event,
                         Emojis.Muaat + Emojis.flagship + "The Inferno");
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
-                    Tile tile = tiles.get(0);
+                    Tile tile = tiles.getFirst();
                     List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
                     new AddUnits().unitParsing(event, p1.getColor(), tile, "1 cruiser", game);
                     successMessage = successMessage + "Produced 1 " + Emojis.cruiser + " in tile "

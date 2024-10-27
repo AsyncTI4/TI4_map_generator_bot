@@ -30,14 +30,14 @@ public class ButtonHelperExplore {
             if (buttonIndex > -1) {
                 buttonRow.remove(buttonIndex);
             }
-            if (buttonRow.size() > 0) {
+            if (!buttonRow.isEmpty()) {
                 actionRow2.add(ActionRow.of(buttonRow));
             }
         }
-        if (exhaustedMessage == null || "".equalsIgnoreCase(exhaustedMessage)) {
+        if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Explore";
         }
-        if (actionRow2.size() > 0) {
+        if (!actionRow2.isEmpty()) {
             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
         } else {
             ButtonHelper.deleteMessage(event);
@@ -76,7 +76,7 @@ public class ButtonHelperExplore {
             ButtonHelper.deleteTheOneButton(event);
         }
         while (fragmentsToPurge.size() > count) {
-            fragmentsToPurge.remove(0);
+            fragmentsToPurge.removeFirst();
         }
 
         for (String fragid : fragmentsToPurge) {

@@ -74,7 +74,7 @@ public class ButtonHelperRelics {
                 if (buttonIndex > -1) {
                     buttonRow.remove(buttonIndex);
                 }
-                if (buttonRow.size() > 0) {
+                if (!buttonRow.isEmpty()) {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }

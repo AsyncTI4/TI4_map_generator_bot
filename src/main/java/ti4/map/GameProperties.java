@@ -90,7 +90,7 @@ public class GameProperties {
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private long autoPingSpacer;
-    private List<String> tags = new ArrayList<String>();
+    private List<String> tags = new ArrayList<>();
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete

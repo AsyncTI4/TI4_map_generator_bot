@@ -9,7 +9,7 @@ import ti4.model.Source.ComponentSource;
 @Data
 public class GenericCardModel implements ModelInterface, EmbeddableModel {
     public enum CardType {
-        trap;
+        trap
     }
 
     String alias;

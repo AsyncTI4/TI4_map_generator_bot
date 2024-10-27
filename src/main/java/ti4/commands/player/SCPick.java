@@ -65,7 +65,7 @@ public class SCPick extends PlayerSubcommandData {
         }
 
         Collection<Player> activePlayers = game.getRealPlayers();
-        if (activePlayers.size() == 0) {
+        if (activePlayers.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No active players found");
             return;
         }
@@ -189,7 +189,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
         }
-        if (buttons.size() == 0) {
+        if (buttons.isEmpty()) {
             buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
         }
 
@@ -248,7 +248,7 @@ public class SCPick extends PlayerSubcommandData {
         }
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, game, scpick);
-        if (buttons.size() == 0) {
+        if (buttons.isEmpty()) {
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : game.getRealPlayers()) {
                 scPickedList.addAll(player_.getSCs());
@@ -282,7 +282,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
             if (privatePlayer == null) {
-                privatePlayer = game.getRealPlayers().get(0);
+                privatePlayer = game.getRealPlayers().getFirst();
             }
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
@@ -396,7 +396,7 @@ public class SCPick extends PlayerSubcommandData {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = "" + privatePlayer.getRepresentationUnfogged() + " UP NEXT";
+                msgExtra = privatePlayer.getRepresentationUnfogged() + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -414,7 +414,7 @@ public class SCPick extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
                 if (privatePlayer.getStasisInfantry() > 0) {
-                    if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
+                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                             "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                             ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
@@ -446,7 +446,7 @@ public class SCPick extends PlayerSubcommandData {
                     MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
                         TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
                     if (privatePlayer.getStasisInfantry() > 0) {
-                        if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
+                        if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                                 "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                                 ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
