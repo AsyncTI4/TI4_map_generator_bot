@@ -427,6 +427,7 @@
                     "tactics": 0
                 },
                 "commodities": 0,
+                "maxCommodities": 3,
                 "custodiansPoints": 0,
                 "factionName": "The Naaz-Rokha Alliance",
                 "handSummary": {
@@ -438,7 +439,6 @@
                     "commander": "unlocked",
                     "hero": "locked"
                 },
-                "maxCommodities": 3,
                 "objectives": [],
                 "planetTotals": {
                     "influence": {
