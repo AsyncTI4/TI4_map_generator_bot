@@ -116,8 +116,8 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
                     cov = true;
 
                     Player speaker = null;
-                    if (game.getPlayer(game.getSpeaker()) != null) {
-                        speaker = game.getPlayers().get(game.getSpeaker());
+                    if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                        speaker = game.getPlayers().get(game.getSpeakerUserID());
                     }
 
                     if (speaker != null) {

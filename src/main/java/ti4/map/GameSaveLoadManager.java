@@ -380,7 +380,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", game.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.SPEAKER + " " + game.getSpeaker());
+        writer.write(Constants.SPEAKER + " " + game.getSpeakerUserID());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
@@ -1475,7 +1475,7 @@ public class GameSaveLoadManager {
                     }
                     game.setScTradeGoods(scTradeGoods);
                 }
-                case Constants.SPEAKER -> game.setSpeaker(info);
+                case Constants.SPEAKER -> game.setSpeakerUserID(info);
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {

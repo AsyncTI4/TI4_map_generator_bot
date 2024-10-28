@@ -2995,7 +2995,7 @@ public class Player {
 
     @JsonIgnore
     public boolean isSpeaker() {
-        return getGame().getSpeaker().equals(getUserID());
+        return getGame().getSpeakerUserID().equals(getUserID());
     }
 
     /**

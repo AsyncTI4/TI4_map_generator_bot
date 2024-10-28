@@ -836,6 +836,15 @@ public class Game extends GameProperties {
         return getPlayer(getActivePlayerID());
     }
 
+    @JsonIgnore
+    public Player getSpeaker() {
+        return getPlayer(getSpeakerUserID());
+    }
+
+    public void setSpeaker(Player speaker) {
+        setSpeakerUserID(speaker.getUserID());
+    }
+
     public Map<String, Integer> getCurrentMovedUnitsFrom1System() {
         return displacedUnitsFrom1System;
     }

@@ -118,7 +118,7 @@ public class GameProperties {
 
     // Discord Snowflakes
     private @ExportableField String guildID;
-    private String speaker = "";
+    private String speakerUserID = "";
     private String activePlayerID;
     private String launchPostThreadID;
     private @ExportableField String botMapUpdatesThreadID;

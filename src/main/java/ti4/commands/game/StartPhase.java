@@ -247,8 +247,8 @@ public class StartPhase extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player speaker;
-        if (game.getPlayer(game.getSpeaker()) != null) {
-            speaker = game.getPlayers().get(game.getSpeaker());
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed");
             return;
