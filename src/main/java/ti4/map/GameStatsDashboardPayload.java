@@ -14,11 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.message.BotLogger;
 
-public class StatsDashboardPayload {
+public class GameStatsDashboardPayload {
 
     private final Game game;
 
-    public StatsDashboardPayload(Game game) {
+    public GameStatsDashboardPayload(Game game) {
         this.game = game;
     }
 
@@ -28,7 +28,7 @@ public class StatsDashboardPayload {
         try {
             return mapper.writeValueAsString(this);
         } catch (Exception e) {
-            BotLogger.log("Could not get StatsDashboard JSON for Game ", e);
+            BotLogger.log("Could not get GameStatsDashboardPayload JSON for Game ", e);
             return null;
         }
     }
@@ -183,8 +183,10 @@ public class StatsDashboardPayload {
         return null;
     }
 
-    public List<Object> getPlayers() {
-        return Collections.emptyList();
+    public List<PlayerStatsDashboardPayload> getPlayers() {
+        return game.getRealAndEliminatedPlayers().stream()
+            .map(PlayerStatsDashboardPayload::new)
+            .toList();
     }
 
     public int getRound() {

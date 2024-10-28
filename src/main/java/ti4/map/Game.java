@@ -4241,7 +4241,7 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
-    public String getStatsDashboardJSON() {
-        return new StatsDashboardPayload(this).getJson();
+    public String getGameStatsDashboardJSON() {
+        return new GameStatsDashboardPayload(this).getJson();
     }
 }
