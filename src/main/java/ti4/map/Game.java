@@ -4239,4 +4239,9 @@ public class Game extends GameProperties {
     public void resetWebsiteOverlays() {
         setWebsiteOverlays(new HashMap<>());
     }
+
+    @JsonIgnore
+    public String getStatsDashboardJSON() {
+        return new StatsDashboardPayload(this).getJson();
+    }
 }
