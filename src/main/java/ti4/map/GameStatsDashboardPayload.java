@@ -84,6 +84,7 @@ public class GameStatsDashboardPayload {
 
     public String getHexSummary() {
         // 18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2; ......
+        // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ?? 
         // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
         return null;
     }
