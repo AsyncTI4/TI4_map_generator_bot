@@ -1,6 +1,7 @@
 package ti4.map;
 
 import org.junit.jupiter.api.Test;
+import ti4.helpers.Constants;
 
 import java.util.Map;
 import java.util.Set;
@@ -11,22 +12,29 @@ class GameTest {
 
     @Test
     void getActionPhaseTurnOrder() {
-        var game = new Game();
-        game.setPlayers(Map.of(
-                "test1", createPlayer("test1", Set.of(2, 5)),
-                "test2", createPlayer("test2", Set.of(8, 1)),
-                "test3", createPlayer("test3", Set.of(7, 3))
-        ));
-
-        assertThat(game.getActionPhaseTurnOrder("test1")).isEqualTo(1);
-        assertThat(game.getActionPhaseTurnOrder("test2")).isEqualTo(0);
-        assertThat(game.getActionPhaseTurnOrder("test3")).isEqualTo(2);
-        assertThat(game.getActionPhaseTurnOrder("test4")).isEqualTo(-1);
+        var game = createThreePlayerGame();
+        assertThat(game.getActionPhaseTurnOrder("hasThe2")).isEqualTo(2);
+        assertThat(game.getActionPhaseTurnOrder("hasThe1")).isEqualTo(1);
+        assertThat(game.getActionPhaseTurnOrder("naaluPnPlayer")).isEqualTo(0);
+        assertThat(game.getActionPhaseTurnOrder("doesNotExist")).isEqualTo(-1);
     }
 
-    private Player createPlayer(String userId, Set<Integer> strategyCards) {
-        var player = new Player();
-        player.setUserID(userId);
+    private Game createThreePlayerGame() {
+        var game = new Game();
+        game.setName("threePlayerGame");
+        var naaluPnPlayer = createPlayer("naaluPnPlayer", Set.of(7, 3), game.getName());
+        naaluPnPlayer.setPromissoryNotesInPlayArea(Constants.NAALU_PN);
+        game.setPlayers(Map.of(
+                "hasThe2", createPlayer("hasThe2", Set.of(2, 5), game.getName()),
+                "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game.getName()),
+                "naaluPnPlayer", naaluPnPlayer
+        ));
+        GameManager.getInstance().addGame(game);
+        return game;
+    }
+
+    private Player createPlayer(String userId, Set<Integer> strategyCards, String gameName) {
+        var player = new Player(userId, "", gameName);
         player.setSCs(strategyCards);
         return player;
     }

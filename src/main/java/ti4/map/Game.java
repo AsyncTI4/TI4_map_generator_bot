@@ -761,13 +761,20 @@ public class Game extends GameProperties {
     }
 
     public int getActionPhaseTurnOrder(String userId) {
-        return players.values().stream()
-                .filter(player -> !player.getSCs().isEmpty())
-                .map(player -> new ImmutablePair<>(player.getUserID(), Collections.min(player.getSCs())))
-                .sorted(Comparator.comparingInt(ImmutablePair::getRight))
-                .map(ImmutablePair::getLeft)
+        return getActionPhaseTurnOrder().stream()
+                .map(Player::getUserID)
                 .toList()
                 .indexOf(userId);
+    }
+
+    public List<Player> getActionPhaseTurnOrder() {
+        return players.values().stream()
+                .filter(player -> !player.getSCs().isEmpty())
+                .map(player -> new ImmutablePair<>(player, Collections.min(player.getSCs())))
+                .sorted((p1, p2) -> p1.getLeft().hasTheZeroToken() ? -1 : p2.getLeft().hasTheZeroToken() ? 1 :
+                        Integer.compare(p1.getRight(), p2.getRight()))
+                .map(ImmutablePair::getLeft)
+                .toList();
     }
 
     public DisplayType getDisplayTypeForced() {
