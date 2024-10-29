@@ -921,7 +921,7 @@ public class Game extends GameProperties {
         Date newTime = new Date();
         String factionsInCombat = getStoredValue("factionsInCombat");
         Player prevPlayer = getActivePlayer();
-        String prevFaction = (prevPlayer != null && prevPlayer.getFaction() != null)  ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
+        String prevFaction = (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
         if (prevPlayer != null && !factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
             long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
             prevPlayer.updateTurnStats(elapsedTime);
@@ -1046,7 +1046,7 @@ public class Game extends GameProperties {
                 ButtonHelperAgents.resolveArtunoCheck(player, this, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + "TGs"
-                        + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
+                    + " that would be placed on the SC " + sc + " have instead been given to the Kyro Hero player, as per Kyro Hero text");
             }
         }
         scTradeGoods.put(sc, tradeGoodCount);
@@ -3238,10 +3238,13 @@ public class Game extends GameProperties {
     public List<Player> getPlayersWithGMRole() {
         List<Role> roles = getGuild().getRolesByName(getName() + " GM", true);
         Role gmRole = roles.isEmpty() ? null : roles.getFirst();
-        return getPlayers().values().stream().filter(player -> {
-            Member user = getGuild().getMemberById(player.getUserID());
-            return user != null && user.getRoles().contains(gmRole);
-        }).collect(Collectors.toList());
+        List<Player> gmPlayers = getPlayers().values().stream()
+            .filter(player -> {
+                Member user = getGuild().getMemberById(player.getUserID());
+                return user != null && user.getRoles().contains(gmRole);
+            }).toList();
+        setFogOfWarGMIDs(gmPlayers.stream().map(Player::getUserID).toList()); // For @ExportableField (Website)
+        return gmPlayers;
     }
 
     @JsonIgnore
@@ -4230,4 +4233,5 @@ public class Game extends GameProperties {
     public void resetWebsiteOverlays() {
         setWebsiteOverlays(new HashMap<>());
     }
+
 }
