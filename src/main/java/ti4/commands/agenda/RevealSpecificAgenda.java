@@ -17,6 +17,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -51,7 +52,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
     }
 
     /**
-     * @deprecated This needs to be refactored to use RevealAgenda.java's version
+     * @deprecated This needs to be refactored to use {@link RevealAgenda#revealAgenda}'s version
      */
     @Deprecated
     public void revealAgenda(GenericInteractionCreateEvent event, Game game, MessageChannel channel, String agendaID) {
@@ -181,12 +182,12 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             }
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {
-            StringBuilder summary = new StringBuilder("The scored secrets so far are:\n");
+            StringBuilder summary = new StringBuilder("## Scored Secret Objectives:\n");
             for (Player p2 : game.getRealPlayers()) {
                 for (String soID : p2.getSecretsScored().keySet()) {
                     SecretObjectiveModel so = Mapper.getSecretObjective(soID);
                     if (so != null) {
-                        summary.append(so.getName()).append(": ").append(so.getText()).append("\n");
+                        summary.append("- ").append(Emojis.SecretObjective).append("__**").append(so.getName()).append("**__: ").append(so.getText()).append("\n");
                     }
                 }
             }
