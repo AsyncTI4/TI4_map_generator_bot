@@ -691,6 +691,7 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    @ButtonHandler("rollForAmbush_")
     public static void rollAmbush(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         UnitHolder space = tile.getUnitHolders().get("space");
