@@ -285,8 +285,7 @@
         ],
         "requirements": "RRRY",
         "source": "base",
-        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 6, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability.",
-        "imageURL": ""
+        "text": "Cost 12, Combat 3(x3), Move 2, Capacity 6, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability."
     },
     {
         "alias": "sd2",
@@ -296,8 +295,7 @@
         ],
         "requirements": "YY",
         "source": "base",
-        "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet. Up to 3 fighters in this system do not count against your ships' capacity. PRODUCTION X",
-        "imageURL": ""
+        "text": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet. Up to 3 fighters in this system do not count against your ships' capacity. PRODUCTION X"
     },
     {
         "alias": "lw2",
@@ -309,8 +307,7 @@
         "faction": "arborec",
         "baseUpgrade": "inf2",
         "source": "base",
-        "text": "Cost 1(x2), Combat 7, PRODUCTION 2. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
-        "imageURL": ""
+        "text": "Cost 1(x2), Combat 7, PRODUCTION 2. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home."
     },
     {
         "alias": "swa2",
@@ -322,8 +319,7 @@
         "faction": "argent",
         "baseUpgrade": "dd2",
         "source": "pok",
-        "text": "Cost 1, Combat 7, Move 2, Capacity 1, ANTI-FIGHTER BARRAGE 6(x3). When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system.",
-        "imageURL": ""
+        "text": "Cost 1, Combat 7, Move 2, Capacity 1, ANTI-FIGHTER BARRAGE 6(x3). When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system."
     },
     {
         "alias": "l4",
@@ -334,8 +330,7 @@
         "requirements": "Y",
         "faction": "letnev",
         "source": "base",
-        "text": "During an invasion, units cannot use Space Cannon against your units.",
-        "imageURL": ""
+        "text": "During an invasion, units cannot use Space Cannon against your units."
     },
     {
         "alias": "cm",
@@ -346,8 +341,7 @@
         "requirements": "B",
         "faction": "saar",
         "source": "base",
-        "text": "Other players cannot activate asteroid fields that contain 1 or more of your ships. At the start of your turn during the action phase, you may produce 1 unit in a system that contains at least 1 of your units that has Production.",
-        "imageURL": ""
+        "text": "Other players cannot activate asteroid fields that contain 1 or more of your ships. At the start of your turn during the action phase, you may produce 1 unit in a system that contains at least 1 of your units that has Production."
     },
     {
         "alias": "pws2",
@@ -359,8 +353,7 @@
         "faction": "muaat",
         "baseUpgrade": "ws",
         "source": "base",
-        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability.",
-        "imageURL": ""
+        "text": "Cost 10, Combat 3(x3), Move 3, Capacity 6, SUSTAIN DAMAGE, BOMBARDMENT 3(x3). Other players' units in this system lose their Planetary Shield Ability."
     },
     {
         "alias": "qdn",
@@ -371,8 +364,7 @@
         "requirements": "YYY",
         "faction": "hacan",
         "source": "base",
-        "text": "At the end of the strategy phase, you may spend 1 token from your strategy pool and give another player 3 of your trade goods.  If you do, give 1 of your strategy cards to that player and take 1 of their strategy cards.",
-        "imageURL": ""
+        "text": "At the end of the strategy phase, you may spend 1 token from your strategy pool and give another player 3 of your trade goods.  If you do, give 1 of your strategy cards to that player and take 1 of their strategy cards."
     },
     {
         "alias": "as",
@@ -383,8 +375,7 @@
         "requirements": "BB",
         "faction": "empyrean",
         "source": "pok",
-        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action.",
-        "imageURL": ""
+        "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action."
     },
     {
         "alias": "ac2",
@@ -396,8 +387,7 @@
         "faction": "sol",
         "baseUpgrade": "cv2",
         "source": "base",
-        "text": "Cost 3, Combat 9, Move 2, Capacity 8, SUSTAIN DAMAGE",
-        "imageURL": ""
+        "text": "Cost 3, Combat 9, Move 2, Capacity 8, SUSTAIN DAMAGE"
     },
     {
         "alias": "sdn2",
@@ -409,8 +399,7 @@
         "faction": "l1z1x",
         "baseUpgrade": "dn2",
         "source": "base",
-        "text": "Cost 4, Combat 4, Move 2, Capacity 2, SUSTAIN DAMAGE, BOMBARDMENT 4. \"Direct Hit\" cards are no longer effective against this type of ship.",
-        "imageURL": ""
+        "text": "Cost 4, Combat 4, Move 2, Capacity 2, SUSTAIN DAMAGE, BOMBARDMENT 4. \"Direct Hit\" cards are no longer effective against this type of ship."
     },
     {
         "alias": "cl2",
@@ -422,8 +411,7 @@
         "faction": "mahact",
         "baseUpgrade": "inf2",
         "source": "pok",
-        "text": "Cost 1(x2), Combat 7. After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
-        "imageURL": ""
+        "text": "Cost 1(x2), Combat 7. After this unit is destroyed, gain 1 commodity or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system."
     },
     {
         "alias": "mc",
@@ -434,8 +422,7 @@
         "requirements": "YYY",
         "faction": "mentak",
         "source": "base",
-        "text": "When you spend trade goods, each trade good is worth 2 resources or influence instead of 1.",
-        "imageURL": ""
+        "text": "When you spend trade goods, each trade good is worth 2 resources or influence instead of 1."
     },
     {
         "alias": "hcf2",
@@ -447,8 +434,7 @@
         "faction": "naalu",
         "baseUpgrade": "ff2",
         "source": "base",
-        "text": "Cost 1(x2), Combat 7, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
-        "imageURL": ""
+        "text": "Cost 1(x2), Combat 7, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool."
     },
     {
         "alias": "pfa",
@@ -459,8 +445,7 @@
         "requirements": "GGG",
         "faction": "naaz",
         "source": "pok",
-        "text": "After you explore a planet, ready that planet.",
-        "imageURL": ""
+        "text": "After you explore a planet, ready that planet."
     },
     {
         "alias": "vax",
@@ -470,8 +455,7 @@
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"X\" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token.",
-        "imageURL": ""
+        "text": "When you would gain another player's technology using 1 of your faction abilities, you may place the \"X\" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token."
     },
     {
         "alias": "m2",
@@ -482,8 +466,7 @@
         "requirements": "GBY",
         "faction": "nomad",
         "source": "pok",
-        "text": "Cost 8, Combat 5(x2), Move 2, Capacity 6, SUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3). You may treat this unit as if it were adjacent to systems that contain one or more of your mechs.",
-        "imageURL": ""
+        "text": "Cost 8, Combat 5(x2), Move 2, Capacity 6, SUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3). You may treat this unit as if it were adjacent to systems that contain one or more of your mechs."
     },
     {
         "alias": "exo2",
@@ -495,8 +478,7 @@
         "faction": "sardakk",
         "baseUpgrade": "dn2",
         "source": "base",
-        "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 4(x2), After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system. \"Direct Hit\" cards are no longer effective against this type of ship.",
-        "imageURL": ""
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 4(x2), After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system. \"Direct Hit\" cards are no longer effective against this type of ship."
     },
     {
         "alias": "se2",
@@ -508,8 +490,7 @@
         "faction": "titans",
         "baseUpgrade": "cr2",
         "source": "pok",
-        "text": "Cost 2, Combat 6, Move 3, Capacity 2, SUSTAIN DAMAGE",
-        "imageURL": ""
+        "text": "Cost 2, Combat 6, Move 3, Capacity 2, SUSTAIN DAMAGE"
     },
     {
         "alias": "cr2",
@@ -519,8 +500,7 @@
         ],
         "requirements": "GYR",
         "source": "base",
-        "text": "Cost 2, Combat 6, Move 3, Capacity 1",
-        "imageURL": ""
+        "text": "Cost 2, Combat 6, Move 3, Capacity 1"
     },
     {
         "alias": "scc",
@@ -531,8 +511,7 @@
         "requirements": "BB",
         "faction": "jolnar",
         "source": "base",
-        "text": "You may exhaust this card after you activate a system that contains 1 or more of your units; that system is adjacent to all other systems that contain 1 or more of your units during this activation.",
-        "imageURL": ""
+        "text": "You may exhaust this card after you activate a system that contains 1 or more of your units; that system is adjacent to all other systems that contain 1 or more of your units during this activation."
     },
     {
         "alias": "dt2",
@@ -543,8 +522,7 @@
         "requirements": "YY",
         "faction": "cabal",
         "source": "pok",
-        "text": "PRODUCTION 7. This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity.",
-        "imageURL": ""
+        "text": "PRODUCTION 7. This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity."
     },
     {
         "alias": "lgf",
@@ -555,8 +533,7 @@
         "requirements": "BB",
         "faction": "winnu",
         "source": "base",
-        "text": "During your tactical actions, if you do not control Mecatol Rex, treat its system as if it has both an α and β wormhole. ACTION: If you control Mecatol Rex, exhaust this card to place 1 infantry from your reinforcements on Mecatol Rex.",
-        "imageURL": ""
+        "text": "During your tactical actions, if you do not control Mecatol Rex, treat its system as if it has both an α and β wormhole. ACTION: If you control Mecatol Rex, exhaust this card to place 1 infantry from your reinforcements on Mecatol Rex."
     },
     {
         "alias": "it",
@@ -567,8 +544,7 @@
         "requirements": "G",
         "faction": "xxcha",
         "source": "base",
-        "text": "You may exhaust this card and spend 1 token from your strategy pool when another player plays an action card; cancel that action card.",
-        "imageURL": ""
+        "text": "You may exhaust this card and spend 1 token from your strategy pool when another player plays an action card; cancel that action card."
     },
     {
         "alias": "mi",
@@ -579,8 +555,7 @@
         "requirements": "GGG",
         "faction": "yssaril",
         "source": "base",
-        "text": "ACTION: Exhaust this card to look at another player's hand of action cards.  Choose 1 of those cards and add it to your hand.",
-        "imageURL": ""
+        "text": "ACTION: Exhaust this card to look at another player's hand of action cards.  Choose 1 of those cards and add it to your hand."
     },
     {
         "alias": "bio",
@@ -591,8 +566,7 @@
         "requirements": "GG",
         "faction": "arborec",
         "source": "base",
-        "text": "At the end of the status phase, you may remove any number of infantry from planets you control and place them on 1 or more planets you control in the same or adjacent systems.",
-        "imageURL": ""
+        "text": "At the end of the status phase, you may remove any number of infantry from planets you control and place them on 1 or more planets you control in the same or adjacent systems."
     },
     {
         "alias": "ah",
@@ -603,8 +577,7 @@
         "requirements": "Y",
         "faction": "argent",
         "source": "pok",
-        "text": "Other players cannot move ships through systems that contain your structures. Each planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit.",
-        "imageURL": ""
+        "text": "Other players cannot move ships through systems that contain your structures. Each planet that contains 1 or more of your structures gains the PRODUCTION 1 ability as if it were a unit."
     },
     {
         "alias": "nes",
@@ -615,8 +588,7 @@
         "requirements": "RR",
         "faction": "letnev",
         "source": "base",
-        "text": "When 1 of your units uses Sustain Damage, cancel 2 hits instead of 1.",
-        "imageURL": ""
+        "text": "When 1 of your units uses Sustain Damage, cancel 2 hits instead of 1."
     },
     {
         "alias": "ffac2",
@@ -628,8 +600,7 @@
         "faction": "saar",
         "baseUpgrade": "sd2",
         "source": "base",
-        "text": "Move 2, Capacity 5, PRODUCTION 7. This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
-        "imageURL": ""
+        "text": "Move 2, Capacity 5, PRODUCTION 7. This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed."
     },
     {
         "alias": "mr",
@@ -640,8 +611,7 @@
         "requirements": "RR",
         "faction": "muaat",
         "source": "base",
-        "text": "Your ships can move into supernovas. Each supernova that contains 1 or more of your units gains the PRODUCTION 5 ability as if it were 1 of your units.",
-        "imageURL": ""
+        "text": "Your ships can move into supernovas. Each supernova that contains 1 or more of your units gains the PRODUCTION 5 ability as if it were 1 of your units."
     },
     {
         "alias": "pm",
@@ -652,8 +622,7 @@
         "requirements": "GG",
         "faction": "hacan",
         "source": "base",
-        "text": "ACTION: Exhaust this card and spend 1 token from your strategy pool to gain 4 trade goods and choose 1 other player; that player gains 2 trade goods.",
-        "imageURL": ""
+        "text": "ACTION: Exhaust this card and spend 1 token from your strategy pool to gain 4 trade goods and choose 1 other player; that player gains 2 trade goods."
     },
     {
         "alias": "vw",
@@ -664,8 +633,7 @@
         "requirements": "G",
         "faction": "empyrean",
         "source": "pok",
-        "text": "After a player moves ships into a system that contains 1 or more of your units, they must give you 1 promissory note from their hand, if able.",
-        "imageURL": ""
+        "text": "After a player moves ships into a system that contains 1 or more of your units, they must give you 1 promissory note from their hand, if able."
     },
     {
         "alias": "so2",
@@ -677,8 +645,7 @@
         "faction": "sol",
         "baseUpgrade": "inf2",
         "source": "base",
-        "text": "Cost 1(x2), Combat 6. After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
-        "imageURL": ""
+        "text": "Cost 1(x2), Combat 6. After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home."
     },
     {
         "alias": "wg",
@@ -689,8 +656,7 @@
         "requirements": "BB",
         "faction": "ghost",
         "source": "base",
-        "text": "ACTION: Exhaust this card to place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships.",
-        "imageURL": ""
+        "text": "ACTION: Exhaust this card to place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships."
     },
     {
         "alias": "ds",
@@ -701,8 +667,7 @@
         "requirements": "R",
         "faction": "ghost",
         "source": "base",
-        "text": "At the start of space combat in a system that contains a wormhole and 1 or more of your ships, you may produce 1 hit and assign it to 1 of your opponent's ships.",
-        "imageURL": ""
+        "text": "At the start of space combat in a system that contains a wormhole and 1 or more of your ships, you may produce 1 hit and assign it to 1 of your opponent's ships."
     },
     {
         "alias": "is",
@@ -713,8 +678,7 @@
         "requirements": "YY",
         "faction": "l1z1x",
         "source": "base",
-        "text": "You may exhaust this card and spend 2 resources when you research a technology; ignore all of that technology's prerequisites.",
-        "imageURL": ""
+        "text": "You may exhaust this card and spend 2 resources when you research a technology; ignore all of that technology's prerequisites."
     },
     {
         "alias": "gr",
@@ -725,8 +689,7 @@
         "requirements": "G",
         "faction": "mahact",
         "source": "pok",
-        "text": "You may exhaust this card before a player casts votes; that player must cast at least 1 vote for an outcome of your choice or remove 1 token from their fleet pool and return it to their reinforcements.",
-        "imageURL": ""
+        "text": "You may exhaust this card before a player casts votes; that player must cast at least 1 vote for an outcome of your choice or remove 1 token from their fleet pool and return it to their reinforcements."
     },
     {
         "alias": "so",
@@ -737,8 +700,7 @@
         "requirements": "YY",
         "faction": "mentak",
         "source": "base",
-        "text": "After you win or lose a space combat, gain 1 trade good; if you won the combat, you may also produce 1 ship in that system of any ship type that was destroyed during the combat.",
-        "imageURL": ""
+        "text": "After you win or lose a space combat, gain 1 trade good; if you won the combat, you may also produce 1 ship in that system of any ship type that was destroyed during the combat."
     },
     {
         "alias": "ng",
@@ -749,8 +711,7 @@
         "requirements": "GGG",
         "faction": "naalu",
         "source": "base",
-        "text": "After another player activates a system that contains 1 or more of your ships, that player removes 1 token from their fleet pool and returns it to their reinforcements.",
-        "imageURL": ""
+        "text": "After another player activates a system that contains 1 or more of your ships, that player removes 1 token from their fleet pool and returns it to their reinforcements."
     },
     {
         "alias": "sc",
@@ -761,8 +722,7 @@
         "requirements": "R",
         "faction": "naaz",
         "source": "pok",
-        "text": "At the start of a combat round, you may exhaust this card to apply +1 to the result of each of your unit's combat rolls during this combat round.",
-        "imageURL": ""
+        "text": "At the start of a combat round, you may exhaust this card to apply +1 to the result of each of your unit's combat rolls during this combat round."
     },
     {
         "alias": "vay",
@@ -772,8 +732,7 @@
         ],
         "faction": "nekro",
         "source": "base",
-        "text": "When you would gain another players technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token.",
-        "imageURL": ""
+        "text": "When you would gain another players technology using 1 of your faction abilities, you may place the \"Y\" assimilator token on a faction technology owned by that player instead.  While that token is on a technology, this card gains that technology's text.  You cannot place an assimilator token on technology that already has an assimilator token."
     },
     {
         "alias": "tcs",
@@ -784,8 +743,7 @@
         "requirements": "Y",
         "faction": "nomad",
         "source": "pok",
-        "text": "After any player's agent becomes exhausted, you may exhaust this card to ready that agent; if you ready another player's agent, you may perform a transaction with that player.",
-        "imageURL": ""
+        "text": "After any player's agent becomes exhausted, you may exhaust this card to ready that agent; if you ready another player's agent, you may perform a transaction with that player."
     },
     {
         "alias": "vpw",
@@ -796,8 +754,7 @@
         "requirements": "RR",
         "faction": "sardakk",
         "source": "base",
-        "text": "After making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit.",
-        "imageURL": ""
+        "text": "After making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit."
     },
     {
         "alias": "ht2",
@@ -809,8 +766,7 @@
         "faction": "titans",
         "baseUpgrade": "pds2",
         "source": "pok",
-        "text": "Combat 6. This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems. PLANETARY SHIELD, SPACE CANNON 5, SUSTAIN DAMAGE, PRODUCTION 1",
-        "imageURL": ""
+        "text": "Combat 6. This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems. PLANETARY SHIELD, SPACE CANNON 5, SUSTAIN DAMAGE, PRODUCTION 1"
     },
     {
         "alias": "ers",
@@ -821,8 +777,7 @@
         "requirements": "YY",
         "faction": "jolnar",
         "source": "base",
-        "text": "After another player activates a system that contains 1 or more of your ships, gain 4 trade goods.",
-        "imageURL": ""
+        "text": "After another player activates a system that contains 1 or more of your ships, gain 4 trade goods."
     },
     {
         "alias": "dn2",
@@ -832,8 +787,7 @@
         ],
         "requirements": "BBY",
         "source": "base",
-        "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 5. \"Direct Hit\" cards are no longer effective against this type of ship.",
-        "imageURL": ""
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1, SUSTAIN DAMAGE, BOMBARDMENT 5. \"Direct Hit\" cards are no longer effective against this type of ship."
     },
     {
         "alias": "dd2",
@@ -843,8 +797,7 @@
         ],
         "requirements": "RR",
         "source": "base",
-        "text": "Cost 1, Combat 8, Move 2, ANTI-FIGHTER BARRAGE 6(x3)",
-        "imageURL": ""
+        "text": "Cost 1, Combat 8, Move 2, ANTI-FIGHTER BARRAGE 6(x3)"
     },
     {
         "alias": "pds2",
@@ -854,8 +807,7 @@
         ],
         "requirements": "RY",
         "source": "base",
-        "text": "PLANETARY SHIELD, DEEP SPACE CANNON 5",
-        "imageURL": ""
+        "text": "PLANETARY SHIELD, DEEP SPACE CANNON 5"
     },
     {
         "alias": "cv2",
@@ -865,8 +817,7 @@
         ],
         "requirements": "BB",
         "source": "base",
-        "text": "Cost 3, Combat 9, Move 2, Capacity 6",
-        "imageURL": ""
+        "text": "Cost 3, Combat 9, Move 2, Capacity 6"
     },
     {
         "alias": "ff2",
@@ -876,8 +827,7 @@
         ],
         "requirements": "GB",
         "source": "base",
-        "text": "Cost 1(x2), Combat 8, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
-        "imageURL": ""
+        "text": "Cost 1(x2), Combat 8, Move 2. This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
     },
     {
         "alias": "inf2",
@@ -887,8 +837,7 @@
         ],
         "requirements": "GG",
         "source": "base",
-        "text": "Cost 1(x2), Combat 7. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
-        "imageURL": ""
+        "text": "Cost 1(x2), Combat 7. After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home."
     },
     {
         "alias": "vtx",
@@ -899,8 +848,7 @@
         "requirements": "R",
         "faction": "cabal",
         "source": "pok",
-        "text": "ACTION: Exhaust this card to choose another player's non-structure unit in a system that is adjacent to 1 or more of your space docks. Capture 1 unit of that type from that player's reinforcements.",
-        "imageURL": ""
+        "text": "ACTION: Exhaust this card to choose another player's non-structure unit in a system that is adjacent to 1 or more of your space docks. Capture 1 unit of that type from that player's reinforcements."
     },
     {
         "alias": "htp",
@@ -911,8 +859,7 @@
         "requirements": "YY",
         "faction": "winnu",
         "source": "base",
-        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control until the end of your turn.",
-        "imageURL": ""
+        "text": "Exhaust this card when 1 or more of your units use PRODUCTION; swap the resource and influence values of 1 planet you control until the end of your turn."
     },
     {
         "alias": "nf",
@@ -923,8 +870,7 @@
         "requirements": "YY",
         "faction": "xxcha",
         "source": "base",
-        "text": "After another player activates a system that contains 1 or more of your ships, you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn.",
-        "imageURL": ""
+        "text": "After another player activates a system that contains 1 or more of your ships, you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn."
     },
     {
         "alias": "yso",
@@ -935,8 +881,7 @@
         "requirements": "GG",
         "faction": "yin",
         "source": "base",
-        "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.",
-        "imageURL": ""
+        "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships."
     },
     {
         "alias": "ic",
@@ -947,8 +892,7 @@
         "requirements": "YY",
         "faction": "yin",
         "source": "base",
-        "text": "At the start of a space combat, you may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit against your opponent's ships; that hit must be assigned by your opponent to 1 of their non-fighters ships if able.",
-        "imageURL": ""
+        "text": "At the start of a space combat, you may destroy 1 of your cruisers or destroyers in the active system to produce 1 hit against your opponent's ships; that hit must be assigned by your opponent to 1 of their non-fighters ships if able."
     },
     {
         "alias": "tp",
@@ -959,8 +903,7 @@
         "requirements": "G",
         "faction": "yssaril",
         "source": "base",
-        "text": "During your turn of the action phase, players that have passed cannot play action cards.",
-        "imageURL": ""
+        "text": "During your turn of the action phase, players that have passed cannot play action cards."
     },
     {
         "alias": "iihq",
@@ -971,8 +914,7 @@
         "requirements": "Y",
         "faction": "keleres",
         "source": "pok",
-        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system. Gain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\nLEGENDARY TEXT: While you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3. Gain 2 command tokens when another player scores Custodians VP using Imperial Primary.",
-        "imageURL": ""
+        "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system. Gain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\nLEGENDARY TEXT: While you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3. Gain 2 command tokens when another player scores Custodians VP using Imperial Primary."
     },
     {
         "alias": "asn",
@@ -983,7 +925,6 @@
         "requirements": "YY",
         "faction": "keleres",
         "source": "pok",
-        "text": "Whenever you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability.",
-        "imageURL": ""
+        "text": "Whenever you resolve one of your PRODUCTION abilities, you may resolve an additional one of your PRODUCTION abilities in any system; the additional use does not trigger this ability."
     }
 ]
