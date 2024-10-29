@@ -123,7 +123,7 @@ public class GameStatsDashboardPayload {
             objectives.put("Other", player.getPromissoryNotesOwned().stream()
                 .map(Mapper::getPromissoryNote)
                 .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-                .map(pn -> "Support for the Throne" + player.getColor())
+                .map(pn -> "Support for the Throne (" + player.getColor() + ")")
                 .toList());
         }
 

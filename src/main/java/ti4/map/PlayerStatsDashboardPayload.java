@@ -48,7 +48,12 @@ public class PlayerStatsDashboardPayload {
     }
 
     public List<String> getAlliances() {
-        return Collections.emptyList(); // TODO: list of colours
+        return player.getPromissoryNotesInPlayArea().stream()
+            .map(Mapper::getPromissoryNote)
+            .filter(pn -> "Alliance".equalsIgnoreCase(pn.getName()))
+            .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
+            .map(pn -> game.getPNOwner(pn.getAlias()).getColor())
+            .toList();
     }
 
     public String getColor() {
@@ -123,9 +128,10 @@ public class PlayerStatsDashboardPayload {
         player.getPromissoryNotesInPlayArea().stream()
             .map(Mapper::getPromissoryNote)
             .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-            .map(pn -> "Support for the Throne" + player.getColor())
+            .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
+            .map(pn -> "Support for the Throne (" + game.getPNOwner(pn.getAlias()).getColor() + ")")
             .forEach(objectives::add);
-            
+
         return objectives;
     }
 
