@@ -2405,7 +2405,7 @@ public class Player {
 
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
-        if (techID == null)
+        if (techID == null || techModel == null)
             return;
 
         if (techModel.isUnitUpgrade()) {

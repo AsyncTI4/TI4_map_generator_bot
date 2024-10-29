@@ -69,7 +69,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
                 if (player.getFaction().equalsIgnoreCase(faction)) {
                     gamesThatHadThem++;
                     for (String tech : player.getTechs()) {
-                        if (!factionM.getStartingTech().contains(tech)) {
+                        if (factionM.getStartingTech() != null && !factionM.getStartingTech().contains(tech)) {
                             String techName = Mapper.getTech(tech).getName();
                             if (techsResearched.containsKey(techName)) {
                                 techsResearched.put(techName, techsResearched.get(techName) + 1);
