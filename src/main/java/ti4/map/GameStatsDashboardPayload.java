@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.generator.Mapper;
 import ti4.message.BotLogger;
+import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 
 import java.sql.Timestamp;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class GameStatsDashboardPayload {
 
@@ -91,7 +93,16 @@ public class GameStatsDashboardPayload {
     }
 
     public List<String> getLaws() {
-        return Collections.emptyList(); // List.emptyList(); //list of laws in play by proper name
+        // TODO: The payload implies every agenda is sent over.
+        var lawsInPlay = game.getLaws().keySet().stream()
+                .map(Mapper::getAgenda)
+                .map(AgendaModel::getName)
+                .toList();
+        var agendasInDiscard = game.getDiscardAgendas().keySet().stream()
+                .map(Mapper::getAgenda)
+                .map(AgendaModel::getName)
+                .toList();
+        return Stream.concat(lawsInPlay.stream(), agendasInDiscard.stream()).toList();
     }
 
     public String getMapString() {

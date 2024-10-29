@@ -3,7 +3,9 @@ package ti4.map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.message.BotLogger;
+import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
@@ -36,7 +38,7 @@ public class PlayerStatsDashboardPayload {
     }
 
     public boolean isActive() {
-        return !player.isEliminated(); // TODO: verify what "active" actually means here
+        return player.getUserID().equals(game.getActivePlayerID()); // UNUSED, IGNORE
     }
 
     public List<String> getAlliances() {
@@ -84,7 +86,11 @@ public class PlayerStatsDashboardPayload {
     }
 
     public List<String> getLaws() {
-        return Collections.emptyList(); //TODO
+        return game.getLaws().keySet().stream()
+                .filter(lawId -> ButtonHelper.isPlayerElected(game, player, lawId))
+                .map(Mapper::getAgenda)
+                .map(AgendaModel::getName)
+                .toList();
     }
 
     public List<Leader> getLeaders() {
@@ -92,6 +98,10 @@ public class PlayerStatsDashboardPayload {
     }
 
     public List<String> getObjectives() {
+        //var scoredPublics = game.getScoredPublicObjectives();
+        //var scoredSecrets = player.getSecretsScored();
+        //"Support for the Throne (Green)"
+        //misc points like Shard?
         return Collections.emptyList(); //TODO
     }
 
@@ -159,7 +169,7 @@ public class PlayerStatsDashboardPayload {
     }
 
     public List<Object> getUnitModifiers() {
-        return Collections.emptyList(); //TODO maybe not? is this used?
+        return Collections.emptyList(); // UNUSED, IGNORE
     }
 
     public List<String> getUnitUpgrades() {

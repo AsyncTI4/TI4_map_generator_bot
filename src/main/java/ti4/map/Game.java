@@ -1827,7 +1827,6 @@ public class Game extends GameProperties {
             }
         }
         if (!id.isEmpty()) {
-
             Collection<Integer> values = laws.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
@@ -1851,7 +1850,6 @@ public class Game extends GameProperties {
     }
 
     public boolean reviseLaw(Integer idNumber, String optionalText) {
-
         String id = "";
         for (Entry<String, Integer> ac : laws.entrySet()) {
             if (ac.getValue().equals(idNumber)) {
