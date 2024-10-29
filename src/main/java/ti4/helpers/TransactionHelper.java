@@ -1,11 +1,5 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -28,6 +22,12 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TransactionHelper {
 
@@ -1072,7 +1072,7 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
-            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd1000")) {
+            if (game.getName().equalsIgnoreCase("pbd1000")) {
                 channel = game.getTableTalkChannel();
             }
             if (oldWay || (message2.toLowerCase().contains("alliance") || message2.toLowerCase().contains("support"))) {
