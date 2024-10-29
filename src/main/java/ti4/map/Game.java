@@ -1055,6 +1055,9 @@ public class Game extends GameProperties {
         publicObjectives2Peeked.remove(id);
     }
 
+    /**
+     * @return Map of (scInitiativeNum, tradeGoodCount)
+     */
     public Map<Integer, Integer> getScTradeGoods() {
         return scTradeGoods;
     }

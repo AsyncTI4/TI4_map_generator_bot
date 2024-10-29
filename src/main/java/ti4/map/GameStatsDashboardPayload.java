@@ -1,24 +1,26 @@
 package ti4.map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import software.amazon.awssdk.utils.StringUtils;
-import ti4.generator.Mapper;
-import ti4.message.BotLogger;
-import ti4.model.AgendaModel;
-import ti4.model.PublicObjectiveModel;
-
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import software.amazon.awssdk.utils.StringUtils;
+import ti4.generator.Mapper;
+import ti4.message.BotLogger;
+import ti4.model.AgendaModel;
+import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
 
 public class GameStatsDashboardPayload {
 
@@ -113,12 +115,10 @@ public class GameStatsDashboardPayload {
     public Map<String, List<String>> getObjectives() {
         Map<String, List<String>> objectives = new HashMap<>();
 
+        // Custom (Custodians/Agenda/Relic) // TODO: may need to split these out to match TTPG export
         objectives.put("Custom", new ArrayList<>(game.getCustomPublicVP().keySet()));
 
-        for (String customVPName : game.getCustomPublicVP().keySet()) {
-
-        }
-
+        // Other (Supports)
         for (Player player : game.getRealAndEliminatedPlayers()) {
             objectives.put("Other", player.getPromissoryNotesOwned().stream()
                 .map(Mapper::getPromissoryNote)
@@ -127,43 +127,29 @@ public class GameStatsDashboardPayload {
                 .toList());
         }
 
+        //Public I
         objectives.put("Public Objectives I",
             game.getPublicObjectives1().stream()
                 .map(Mapper::getPublicObjective)
                 .map(PublicObjectiveModel::getName).toList());
 
+        //Public II
         objectives.put("Public Objectives II",
             game.getPublicObjectives2().stream()
                 .map(Mapper::getPublicObjective)
                 .map(PublicObjectiveModel::getName).toList());
-        /*
-         * "objectives": {
-         * "Agenda": [],
-         * "Other": [
-         * "Support for the Throne (Blue)",
-         * "Support for the Throne (Red)",
-         * "Support for the Throne (Purple)",
-         * "Support for the Throne (Yellow)",
-         * "Support for the Throne (Green)"
-         * ],
-         * "Public Objectives I": [
-         * "Explore Deep Space",
-         * "Diversify Research",
-         * "Amass Wealth",
-         * "Raise a Fleet",
-         * "Develop Weaponry"
-         * ],
-         * "Public Objectives II": [],
-         * "Relics": [],
-         * "Secret Objectives": [
-         * "Adapt New Strategies",
-         * "Become a Martyr",
-         * "Hoard Raw Materials",
-         * "Master the Laws of Physics"
-         * ]
-         * }
-         */
-        return null;
+
+        //Secrets
+        List<String> secrets = new ArrayList<>();
+        for (Player player : game.getRealAndEliminatedPlayers()) {
+            secrets.addAll(player.getSecretsScored().keySet().stream()
+                .map(Mapper::getSecretObjective)
+                .map(SecretObjectiveModel::getName)
+                .toList());
+        }
+        objectives.put("Secret Objectives", secrets);
+
+        return objectives;
     }
 
     public String getPlatform() {
@@ -211,15 +197,13 @@ public class GameStatsDashboardPayload {
         return activePlayer.getColor();
     }
 
-    public List<Object> getUnpickedStrategyCards() { //TODO
-        /*
-         * "unpickedStrategyCards": {
-         * "Construction": 2,
-         * "Imperial": 0,
-         * "Politics": 1
-         * }
-         */
-        return Collections.emptyList();
+    public Map<String, Integer> getUnpickedStrategyCards() {
+        return game.getScTradeGoods().entrySet().stream()
+            .filter(e -> e.getValue() > 0) // TGs > 0
+            .map(e -> Map.entry(game.getStrategyCardModelByInitiative(e.getKey()), e.getValue())) // Optional(SCModel), TGs
+            .filter(e -> e.getKey().isPresent())
+            .map(e -> Map.entry(e.getKey().get().getName(), e.getValue())) // SCName, TGs
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 }
