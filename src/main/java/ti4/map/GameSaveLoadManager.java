@@ -767,6 +767,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
         }
 
+        // writer.write("historicalStatsDashboardJsons " + )
+        // writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 

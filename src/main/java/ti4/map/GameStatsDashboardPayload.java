@@ -5,14 +5,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
+import java.util.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.generator.Mapper;
 import ti4.message.BotLogger;
+import ti4.model.PublicObjectiveModel;
 
 public class GameStatsDashboardPayload {
 
@@ -31,6 +35,14 @@ public class GameStatsDashboardPayload {
             BotLogger.log("Could not get GameStatsDashboardPayload JSON for Game ", e);
             return null;
         }
+    }
+
+    public String getAsyncGameID() {
+        return game.getID();
+    }
+
+    public String getAsyncFunGameName() {
+        return game.getCustomName();
     }
 
     public String getActiveSystem() { //TODO: needs to be object returning planets list and tileID
@@ -70,8 +82,8 @@ public class GameStatsDashboardPayload {
         return null;
     }
 
-    public List<Object> getHistory() {
-        return Collections.emptyList();
+    public Map<Timestamp, GameStatsDashboardPayload> getHistory() {
+        return game.getHistoricalGameStatsDashboardPayloads();
     }
 
     public boolean isPoK() {
@@ -86,7 +98,32 @@ public class GameStatsDashboardPayload {
         return game.getMapString();
     }
 
-    public Object getObjectives() {
+    public Map<String, List<String>> getObjectives() {
+        Map<String, List<String>> objectives = new HashMap<>();
+
+        objectives.put("Custom", new ArrayList<>(game.getCustomPublicVP().keySet()));
+
+        for (String customVPName : game.getCustomPublicVP().keySet()) {
+
+        }
+
+        for (Player player : game.getRealAndEliminatedPlayers()) {
+            objectives.put("Other", player.getPromissoryNotesOwned().stream()
+                .map(Mapper::getPromissoryNote)
+                .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
+                .map(pn -> "Support for the Throne" + player.getColor())
+                .toList());
+        }
+
+        objectives.put("Public Objectives I",
+            game.getPublicObjectives1().stream()
+                .map(Mapper::getPublicObjective)
+                .map(PublicObjectiveModel::getName).toList());
+
+        objectives.put("Public Objectives II",
+            game.getPublicObjectives2().stream()
+                .map(Mapper::getPublicObjective)
+                .map(PublicObjectiveModel::getName).toList());
         /*
          * "objectives": {
          * "Agenda": [],

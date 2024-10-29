@@ -13,6 +13,7 @@ import ti4.message.BotLogger;
 import ti4.model.RelicModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 public class PlayerStatsDashboardPayload {
 
@@ -161,7 +162,10 @@ public class PlayerStatsDashboardPayload {
     }
 
     public List<String> getUnitUpgrades() {
-        return Collections.emptyList(); //TODO maybe not needed, getTechnologies is good?
+        return player.getUnitModels().stream()
+            .filter(u -> u.getRequiredTechId().isPresent()) // is a unit that requires a tech upgrade
+            .map(UnitModel::getBaseType)
+            .toList();
     }
 
 }
