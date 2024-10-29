@@ -69,9 +69,10 @@ public class GameStatsDashboardPayload {
     }
 
     public Map<String, Map<String, Boolean>> getConfig() {
+        boolean baseMagen = game.getRealAndEliminatedPlayers().stream().anyMatch(p -> p.hasTech("md_base"));
         return Map.of( //TODO: don't fake this
             "config", Map.of(
-                "baseMagen", false,
+                "baseMagen", baseMagen,
                 "codex1", true,
                 "codex2", true,
                 "codex3", true,
