@@ -47,7 +47,8 @@ public class GameStatsDashboardPayload {
         return game.getCustomName();
     }
 
-    public String getActiveSystem() { //TODO: needs to be object returning planets list and tileID
+    @JsonIgnore // not currently used for Dashboard
+    public String getActiveSystem() {
         /*
          * "activeSystem": {
          * "planets": [
@@ -65,17 +66,17 @@ public class GameStatsDashboardPayload {
         return tile.getTileID();
     }
 
-    public Object getConfig() {
-        /*
-         * "config": {
-         * "baseMagen": false,
-         * "codex1": true,
-         * "codex2": true,
-         * "codex3": true,
-         * "codex4": true
-         * }
-         */
-        return null;
+    public Map<String, Map<String, Boolean>> getConfig() {
+        return Map.of( //TODO: don't fake this
+            "config", Map.of(
+                "baseMagen", false,
+                "codex1", true,
+                "codex2", true,
+                "codex3", true,
+                "codex4", true,
+                "note_that_this_map_is_probably_not_accurate", true
+            /**/)
+        /**/);
     }
 
     public String getHexSummary() {
@@ -95,13 +96,13 @@ public class GameStatsDashboardPayload {
     public List<String> getLaws() {
         // TODO: The payload implies every agenda is sent over.
         var lawsInPlay = game.getLaws().keySet().stream()
-                .map(Mapper::getAgenda)
-                .map(AgendaModel::getName)
-                .toList();
+            .map(Mapper::getAgenda)
+            .map(AgendaModel::getName)
+            .toList();
         var agendasInDiscard = game.getDiscardAgendas().keySet().stream()
-                .map(Mapper::getAgenda)
-                .map(AgendaModel::getName)
-                .toList();
+            .map(Mapper::getAgenda)
+            .map(AgendaModel::getName)
+            .toList();
         return Stream.concat(lawsInPlay.stream(), agendasInDiscard.stream()).toList();
     }
 
@@ -169,71 +170,9 @@ public class GameStatsDashboardPayload {
         return "asyncti4";
     }
 
-    public Object getPlayerTimer() {
-        /*
-         * "playerTimer": {
-         * "blue": {
-         * "1": 513,
-         * "2": 372,
-         * "3": 515,
-         * "4": 1507,
-         * "5": 0,
-         * "6": 0,
-         * "7": 0
-         * },
-         * "green": {
-         * "1": 504,
-         * "2": 214,
-         * "3": 485,
-         * "4": 643,
-         * "5": 0,
-         * "6": 0,
-         * "7": 0
-         * },
-         * "pink": {
-         * "1": 324,
-         * "2": 854,
-         * "3": 1674,
-         * "4": 662,
-         * "5": 0,
-         * "6": 0,
-         * "7": 0
-         * },
-         * "purple": {
-         * "1": 874,
-         * "2": 297,
-         * "3": 679,
-         * "4": 1587,
-         * "5": 0,
-         * "6": 0,
-         * "7": 0
-         * },
-         * "red": {
-         * "1": 864,
-         * "2": 1503,
-         * "3": 1213,
-         * "4": 1442,
-         * "5": 0,
-         * "6": 0,
-         * "7": 0
-         * },
-         * "yellow": {
-         * "1": 502,
-         * "2": 1109,
-         * "3": 602,
-         * "4": 567,
-         * "5": 0,
-         * "6": 0,
-         * "7": 0
-         * }
-         * }
-         */
-        return null;
-    }
-
     public List<PlayerStatsDashboardPayload> getPlayers() {
         return game.getRealAndEliminatedPlayers().stream()
-            .map(player -> new PlayerStatsDashboardPayload(player, game))
+            .map(PlayerStatsDashboardPayload::new)
             .toList();
     }
 
@@ -262,19 +201,6 @@ public class GameStatsDashboardPayload {
         return game.getSpeaker().getColor();
     }
 
-    public Object getTimer() {
-        /*
-         * "timer": {
-         * "anchorSeconds": 26745,
-         * "anchorTimestamp": 1726447240,
-         * "countDown": -1,
-         * "direction": 1,
-         * "seconds": 26748
-         * }
-         */
-        return null;
-    }
-
     public Timestamp getTimestamp() {
         return Timestamp.from(Instant.now());
     }
@@ -285,7 +211,7 @@ public class GameStatsDashboardPayload {
         return activePlayer.getColor();
     }
 
-    public List<Object> getUnpickedStrategyCards() {
+    public List<Object> getUnpickedStrategyCards() { //TODO
         /*
          * "unpickedStrategyCards": {
          * "Construction": 2,
