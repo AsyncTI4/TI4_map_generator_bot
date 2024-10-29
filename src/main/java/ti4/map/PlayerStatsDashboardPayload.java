@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -102,11 +104,29 @@ public class PlayerStatsDashboardPayload {
     }
 
     public List<String> getObjectives() {
-        //var scoredPublics = game.getScoredPublicObjectives();
-        //var scoredSecrets = player.getSecretsScored();
-        //"Support for the Throne (Green)"
-        //misc points like Shard?
-        return Collections.emptyList(); //TODO
+
+        List<String> objectives = new ArrayList<>();
+        // Publics & Custom (Custodians, Relic, Agenda)
+        game.getScoredPublicObjectives().entrySet().stream()
+            .filter(e -> e.getValue().contains(player.getUserID())) // player has scored this
+            .map(Map.Entry::getKey)
+            .map(objID -> Mapper.isValidPublicObjective(objID) ? Mapper.getPublicObjective(objID).getName() : objID)
+            .forEach(objectives::add);
+
+        // Secrets
+        player.getSecretsScored().keySet().stream()
+            .map(Mapper::getSecretObjective)
+            .map(SecretObjectiveModel::getName)
+            .forEach(objectives::add);
+
+        // Supports
+        player.getPromissoryNotesInPlayArea().stream()
+            .map(Mapper::getPromissoryNote)
+            .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
+            .map(pn -> "Support for the Throne" + player.getColor())
+            .forEach(objectives::add);
+            
+        return objectives;
     }
 
     public Map<String, Object> getPlanetTotals() {
@@ -208,9 +228,9 @@ public class PlayerStatsDashboardPayload {
         return game.getActionPhaseTurnOrder(player.getUserID());
     }
 
-    @JsonIgnore
+    @JsonIgnore // Dashboard doesn't use this yet
     public List<Object> getUnitModifiers() {
-        return Collections.emptyList(); // UNUSED, IGNORE
+        return Collections.emptyList();
     }
 
     @JsonIgnore // Dashboard doesn't use this yet

@@ -1658,6 +1658,9 @@ public class Game extends GameProperties {
         soToPoList.remove(id);
     }
 
+    /**
+     * @return Map of (ObjectiveModelID or ProperName if Custom, List of ({@link Player#getUserID}))
+     */
     public Map<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
     }

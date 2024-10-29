@@ -1187,6 +1187,9 @@ public class Player {
         return Mapper.getSecretObjective(idToRemove);
     }
 
+    /**
+     * @return Map of (SecretObjectiveModel ID, Random Number ID)
+     */
     public Map<String, Integer> getSecretsScored() {
         return secretsScored;
     }
