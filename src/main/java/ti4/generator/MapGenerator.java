@@ -88,6 +88,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
+import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -4626,10 +4627,11 @@ public class MapGenerator {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                if (tile.isAnomaly(game)) {
+                ShipPosition shipPositionsType = TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType();
+                if (tile.isAnomaly(game) && shipPositionsType != null) {
                     BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     int offset = 0;
-                    switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase()) {
+                    switch (shipPositionsType.toString().toUpperCase()) {
                         case "TYPE09":
                         case "TYPE12":
                         case "TYPE15":
@@ -4727,7 +4729,7 @@ public class MapGenerator {
                 }
                 if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula()) {
                     BufferedImage nebulaBypass = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
-                    if (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().isSpiral()) {
+                    if (shipPositionsType != null && shipPositionsType.isSpiral()) {
                         switch (tile.getTileID()) {
                             case "51":
                                 tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 235, null);

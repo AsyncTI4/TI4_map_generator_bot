@@ -27,7 +27,8 @@
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/cruiser_2.jpg?raw=true"
     },
     {
         "id": "carrier",
@@ -58,7 +59,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/carrier_2.jpg?raw=true"
     },
     {
         "id": "destroyer",
@@ -91,7 +93,8 @@
         "combatDieCount": 1,
         "afbHitsOn": 6,
         "afbDieCount": 3,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/destroyer_2.jpg?raw=true"
     },
     {
         "id": "dreadnought",
@@ -131,7 +134,8 @@
         "sustainDamage": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/dreadnought_2.jpg?raw=true"
     },
     {
         "id": "fighter",
@@ -160,7 +164,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/fighter_2.jpg?raw=true"
     },
     {
         "id": "flagship",
@@ -204,7 +209,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/infantry_2.jpg?raw=true"
     },
     {
         "id": "pds",
@@ -230,7 +236,8 @@
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
         "planetaryShield": true,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/pds_2.jpg?raw=true"
     },
     {
         "id": "spacedock",
@@ -253,7 +260,8 @@
         "source": "base",
         "productionValue": "+4",
         "capacityValue": 3,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/space_dock_2.jpg?raw=true"
     },
     {
         "id": "warsun",
@@ -273,7 +281,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD."
+        "ability": "Other player's units in this system lose PLANETARY SHIELD.",
+        "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/war_sun.jpg?raw=true"
     },
     {
         "id": "mech",

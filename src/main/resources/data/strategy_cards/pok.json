@@ -12,7 +12,8 @@
         ],
         "imageFileName": "base_game_1",
         "colourHexCode": "#ec1c24",
-        "source": "base"
+        "source": "base",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/Leadership.webp"
     },
     {
         "id": "pok2diplomacy",
@@ -26,7 +27,8 @@
         ],
         "imageFileName": "pok_2",
         "colourHexCode": "#f69421",
-        "source": "codex1"
+        "source": "codex1",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/DiplomacyCodexOrdinian.webp"
     },
     {
         "id": "pok3politics",
@@ -42,7 +44,8 @@
         ],
         "imageFileName": "base_game_3",
         "colourHexCode": "#fff200",
-        "source": "base"
+        "source": "base",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/Politics.webp"
     },
     {
         "id": "pok4construction",
@@ -57,7 +60,8 @@
         ],
         "imageFileName": "pok_4",
         "colourHexCode": "#39b54a",
-        "source": "pok"
+        "source": "pok",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/ConstructionProphecyOfKings.webp"
     },
     {
         "id": "pok5trade",
@@ -73,7 +77,8 @@
         ],
         "imageFileName": "base_game_5",
         "colourHexCode": "#00a99d",
-        "source": "base"
+        "source": "base",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/Trade.webp"
     },
     {
         "id": "pok6warfare",
@@ -88,7 +93,8 @@
         ],
         "imageFileName": "base_game_6",
         "colourHexCode": "#008ed4",
-        "source": "base"
+        "source": "base",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/Warfare.webp"
     },
     {
         "id": "pok7technology",
@@ -103,7 +109,8 @@
         ],
         "imageFileName": "base_game_7",
         "colourHexCode": "#15489f",
-        "source": "base"
+        "source": "base",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/Technology.webp"
     },
     {
         "id": "pok8imperial",
@@ -118,6 +125,7 @@
         ],
         "imageFileName": "base_game_8",
         "colourHexCode": "#752b90",
-        "source": "base"
+        "source": "base",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/Imperial.webp"
     }
 ]
