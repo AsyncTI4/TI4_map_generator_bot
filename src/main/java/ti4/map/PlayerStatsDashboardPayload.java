@@ -1,13 +1,7 @@
 package ti4.map;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ti4.generator.Mapper;
 import ti4.message.BotLogger;
 import ti4.model.RelicModel;
@@ -15,12 +9,19 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 public class PlayerStatsDashboardPayload {
 
     private final Player player;
+    private final Game game;
 
-    public PlayerStatsDashboardPayload(Player player) {
+    public PlayerStatsDashboardPayload(Player player, Game game) {
         this.player = player;
+        this.game = game;
     }
 
     @JsonIgnore
@@ -54,8 +55,7 @@ public class PlayerStatsDashboardPayload {
         return Map.of(
             "fleet", player.getFleetCC(),
             "strategy", player.getStrategicCC(),
-            "tactics", player.getTacticalCC()
-        /**/);
+            "tactics", player.getTacticalCC());
     }
 
     public int getCommodities() {
@@ -67,7 +67,9 @@ public class PlayerStatsDashboardPayload {
     }
 
     public int getCustodianPoints() {
-        return -1; //TODO: get custodian points
+        return (int) game.getScoredPublicObjectives().entrySet().stream()
+                .filter(entry -> entry.getKey().toLowerCase().contains("custodian") && entry.getValue().contains(player.getUserID()))
+                .count();
     }
 
     public String getFactionName() {
@@ -78,8 +80,7 @@ public class PlayerStatsDashboardPayload {
         return Map.of(
             "Secret Objectives", player.getSecrets().size(),
             "Actions", player.getActionCards().size(), //TODO: add more card types? 
-            "Promissory", player.getPromissoryNotes().size()
-        /**/);
+            "Promissory", player.getPromissoryNotes().size());
     }
 
     public List<String> getLaws() {
@@ -154,7 +155,7 @@ public class PlayerStatsDashboardPayload {
     }
 
     public int getTurnOrder() {
-        return -1; //TODO
+        return game.getActionPhaseTurnOrder(player.getUserID());
     }
 
     public List<Object> getUnitModifiers() {

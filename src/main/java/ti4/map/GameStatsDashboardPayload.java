@@ -1,22 +1,22 @@
 package ti4.map;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Collections;
-import java.util.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.generator.Mapper;
 import ti4.message.BotLogger;
 import ti4.model.PublicObjectiveModel;
+
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GameStatsDashboardPayload {
 
@@ -222,7 +222,7 @@ public class GameStatsDashboardPayload {
 
     public List<PlayerStatsDashboardPayload> getPlayers() {
         return game.getRealAndEliminatedPlayers().stream()
-            .map(PlayerStatsDashboardPayload::new)
+            .map(player -> new PlayerStatsDashboardPayload(player, game))
             .toList();
     }
 
