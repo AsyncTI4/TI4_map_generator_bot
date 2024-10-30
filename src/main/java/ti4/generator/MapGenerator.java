@@ -2567,7 +2567,7 @@ public class MapGenerator {
                 }
             }
             // Unit Overlays
-            game.addWebsiteOverlay(player, "unit", unit.getId(), x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+            game.addWebsiteOverlay(player, "unit", unit.getId(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
             // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
         }
         graphics.setColor(Color.WHITE);
