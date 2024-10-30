@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -86,7 +86,8 @@ public class PlayerStatsDashboardPayload {
     }
 
     public String getFactionName() {
-        return player.getFactionModel().getFactionName();
+        var factionModel = player.getFactionModel();
+        return factionModel == null ? null : factionModel.getFactionName();
     }
 
     public Map<String, Integer> getHandSummary() {
@@ -109,7 +110,6 @@ public class PlayerStatsDashboardPayload {
     }
 
     public List<String> getObjectives() {
-
         List<String> objectives = new ArrayList<>();
         // Publics & Custom (Custodians, Relic, Agenda)
         game.getScoredPublicObjectives().entrySet().stream()
@@ -150,24 +150,28 @@ public class PlayerStatsDashboardPayload {
 
         // Legendary Count
         long legendaryCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(Planet::isLegendary)
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(Planet::isLegendary)
+                .count();
         planetTotals.put("legendary", legendaryCount);
 
         // Traits
         long culturalCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(p -> p.getPlanetTypes().contains("cultural"))
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getPlanetTypes().contains("cultural"))
+                .count();
         long hazardousCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(p -> p.getPlanetTypes().contains("hazardous"))
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getPlanetTypes().contains("hazardous"))
+                .count();
         long industrialCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(p -> p.getPlanetTypes().contains("industrial"))
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getPlanetTypes().contains("industrial"))
+                .count();
         planetTotals.put("traits", Map.of(
             "cultural", culturalCount,
             "hazardous", hazardousCount,
@@ -175,21 +179,25 @@ public class PlayerStatsDashboardPayload {
 
         // Techs
         long blueCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(p -> p.getTechSpecialities().contains("PROPULSION"))
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getTechSpecialities().contains("PROPULSION"))
+                .count();
         long redCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(p -> p.getTechSpecialities().contains("WARFARE"))
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getTechSpecialities().contains("WARFARE"))
+                .count();
         long greenCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(p -> p.getTechSpecialities().contains("BIOTIC"))
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getTechSpecialities().contains("BIOTIC"))
+                .count();
         long yellowCount = player.getPlanets().stream()
-            .map(pID -> game.getPlanetsInfo().get(pID))
-            .filter(p -> p.getTechSpecialities().contains("CYBERNETIC"))
-            .count();
+                .map(pID -> game.getPlanetsInfo().get(pID))
+                .filter(Objects::nonNull)
+                .filter(p -> p.getTechSpecialities().contains("CYBERNETIC"))
+                .count();
         planetTotals.put("techs", Map.of(
             "blue", blueCount,
             "green", redCount,
