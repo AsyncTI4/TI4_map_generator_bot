@@ -21,7 +21,7 @@ jobs:
         envs: AWS_KEY, AWS_SECRET
         script: |
           CONTAINER_ID=$(docker ps -q)
-          docker exec -it $CONTAINER_ID bash -c '
+          docker exec -i $CONTAINER_ID bash -c '
             for pid in /proc/[0-9]*; do
               if grep -q "java" "$pid/comm" 2>/dev/null; then
             echo "${pid##*/}"
