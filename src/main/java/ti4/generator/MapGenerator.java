@@ -590,7 +590,7 @@ public class MapGenerator {
 
         String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, player.getFaction() + player.getColor() + "banner").setDescription(descr);
+        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
     }
 
@@ -617,7 +617,7 @@ public class MapGenerator {
 
         superDrawString(bannerG, "Agenda #" + num, 55, 35, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
-        FileUpload fileUpload = uploadToDiscord(bannerImage, "agenda" + num + "banner");
+        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, "agenda" + num + "banner");
         MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload);
     }
 
@@ -636,7 +636,7 @@ public class MapGenerator {
         superDrawString(bannerG, roundText, 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
 
         String descr = "Start of " + phase + " phase, round " + round + ".";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, phase + round + "banner").setDescription(descr);
+        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, phase + round + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
     }
 
