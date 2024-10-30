@@ -1,7 +1,5 @@
 package ti4;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,11 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -28,8 +21,12 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
@@ -103,6 +100,8 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
@@ -130,24 +129,29 @@ public class AsyncTI4DiscordBot {
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-
-        jda = JDABuilder.createDefault(args[0])
-            .enableIntents(GatewayIntent.GUILD_MEMBERS)
-            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-            .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
-            .setMemberCachePolicy(MemberCachePolicy.ALL)
-            .setChunkingFilter(ChunkingFilter.ALL)
-            .setEnableShutdownHook(false)
-            .build();
+        jda = JDABuilder.createLight(args[0])
+                // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
+                // This is required to cache all members of a guild (including chunking)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                // This is a privileged gateway intent this is only used to enable access to the user content in messages
+                // (also including embeds/attachments/components).
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                // not 100 sure this is needed? It is for the Emoji cache below... but do we actually need that?
+                .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+                // not 100% sure this is needed?
+                .enableCache(CacheFlag.EMOJI, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ROLE_TAGS)
+                .setMemberCachePolicy(MemberCachePolicy.lru(500))
+                .setEnableShutdownHook(false)
+                .build();
 
         jda.addEventListener(
-            new MessageListener(),
-            new SlashCommandListener(),
-            ButtonListener.getInstance(),
-            ModalListener.getInstance(),
-            new SelectionMenuListener(),
-            new UserJoinServerListener(),
-            new AutoCompleteListener());
+                new MessageListener(),
+                new SlashCommandListener(),
+                ButtonListener.getInstance(),
+                ModalListener.getInstance(),
+                new SelectionMenuListener(),
+                new UserJoinServerListener(),
+                new AutoCompleteListener());
 
         try {
             jda.awaitReady();
