@@ -400,7 +400,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                     }
                     MessageHelper.sendMessageToChannel(introThread, message);
                     BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                    FileUpload fileUpload = MapGenerator.uploadToDiscord(colorsImage, "colors");
+                    FileUpload fileUpload = MapGenerator.createFileUpload(colorsImage, 1.0f, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
                     BotLogger.log("newPlayerIntro", e);

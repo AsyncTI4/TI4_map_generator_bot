@@ -1181,4 +1181,5 @@ public class Constants {
     public static final String VOTC_MODE = "votc_mode";
     public static final String OPTIONS = "options";
     public static final String SHOW_FULL_TEXT = "show_full_text";
+    public static final String FOW_GM_IDS = "fogOfWarGMIDs";
 }

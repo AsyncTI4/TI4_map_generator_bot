@@ -74,7 +74,7 @@ public class ComponentActionHelper {
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {
-            if (!leader.isExhausted() && !leader.isLocked()) {
+            if (!leader.isExhausted() && !leader.isLocked() && !leader.isActive()) {
                 String leaderID = leader.getId();
 
                 LeaderModel leaderModel = Mapper.getLeader(leaderID);

@@ -88,6 +88,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
+import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -266,8 +267,7 @@ public class MapGenerator {
     }
 
     public static void saveImageToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
-        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(),
-            Boolean.class, false)) {
+        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
             saveImage(game, null, event, false);
         }
     }
@@ -293,7 +293,7 @@ public class MapGenerator {
 
         drawGame(event);
         AsyncTI4DiscordBot.THREAD_POOL.submit(() -> sendToWebsite(event));
-        FileUpload fileUpload = uploadToDiscord();
+        FileUpload fileUpload = createFileUpload();
         logDebug(event);
         return fileUpload;
     }
@@ -437,30 +437,17 @@ public class MapGenerator {
         }
     }
 
-    private FileUpload uploadToDiscord() {
+    private FileUpload createFileUpload() {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
-        switch (displayType) {
-            case wormholes:
-            case anomalies:
-            case legendaries:
-            case empties:
-            case aetherstream:
-            case spacecannon:
-            case traits:
-            case techskips:
-            case attachments:
-            case shipless:
-            case landscape:
-        }
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, game.getName());
+        FileUpload fileUpload = createFileUpload(mainImage, .2f, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
     }
 
-    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix) {
+    public static FileUpload createFileUpload(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix) {
         if (imageToUpload == null) return null;
 
         String saveLocalFormat = System.getenv("SAVE_LOCAL_FORMAT");
@@ -480,7 +467,7 @@ public class MapGenerator {
             // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
             String format = "jpg";
             String fileName = filenamePrefix + "_" + getTimeStamp() + "." + format;
-            writeCompressedFormat(mapWithoutTransparentBackground, out, format, 0.2f);
+            writeCompressedFormat(mapWithoutTransparentBackground, out, format, compressionQuality);
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
@@ -602,7 +589,7 @@ public class MapGenerator {
 
         String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, player.getFaction() + player.getColor() + "banner").setDescription(descr);
+        FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
     }
 
@@ -629,7 +616,7 @@ public class MapGenerator {
 
         superDrawString(bannerG, "Agenda #" + num, 55, 35, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
-        FileUpload fileUpload = uploadToDiscord(bannerImage, "agenda" + num + "banner");
+        FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, "agenda" + num + "banner");
         MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload);
     }
 
@@ -648,7 +635,7 @@ public class MapGenerator {
         superDrawString(bannerG, roundText, 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
 
         String descr = "Start of " + phase + " phase, round " + round + ".";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, phase + round + "banner").setDescription(descr);
+        FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, phase + round + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
     }
 
@@ -2580,7 +2567,7 @@ public class MapGenerator {
                 }
             }
             // Unit Overlays
-            game.addWebsiteOverlay(player, "unit", unit.getId(), x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+            game.addWebsiteOverlay(player, "unit", unit.getId(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
             // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
         }
         graphics.setColor(Color.WHITE);
@@ -4626,10 +4613,11 @@ public class MapGenerator {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                if (tile.isAnomaly(game)) {
+                ShipPosition shipPositionsType = TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType();
+                if (tile.isAnomaly(game) && shipPositionsType != null) {
                     BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     int offset = 0;
-                    switch (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().toString().toUpperCase()) {
+                    switch (shipPositionsType.toString().toUpperCase()) {
                         case "TYPE09":
                         case "TYPE12":
                         case "TYPE15":
@@ -4727,7 +4715,7 @@ public class MapGenerator {
                 }
                 if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula()) {
                     BufferedImage nebulaBypass = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
-                    if (TileHelper.getAllTiles().get(tile.getTileID()).getShipPositionsType().isSpiral()) {
+                    if (shipPositionsType != null && shipPositionsType.isSpiral()) {
                         switch (tile.getTileID()) {
                             case "51":
                                 tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 235, null);

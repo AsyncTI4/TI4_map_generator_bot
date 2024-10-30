@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
+import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -265,12 +266,12 @@ public class RevealAgenda extends AgendaSubcommandData {
             game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, new Date().getTime() + "");
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {
-            StringBuilder summary = new StringBuilder("The scored secrets so far are:\n");
+            StringBuilder summary = new StringBuilder("## Scored Secret Objectives:\n");
             for (Player p2 : game.getRealPlayers()) {
                 for (String soID : p2.getSecretsScored().keySet()) {
                     SecretObjectiveModel so = Mapper.getSecretObjective(soID);
                     if (so != null) {
-                        summary.append(so.getName()).append(": ").append(so.getText()).append("\n");
+                        summary.append("- ").append(Emojis.SecretObjective).append("__**").append(so.getName()).append("**__: ").append(so.getText()).append("\n");
                     }
                 }
             }

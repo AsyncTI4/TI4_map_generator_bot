@@ -158,8 +158,7 @@ public class GameSaveLoadManager {
                         reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
                     }
                 }
-                case StringSelectInteractionEvent selectMenu ->
-                        reason = username + " used string selection: " + selectMenu.getComponentId();
+                case StringSelectInteractionEvent selectMenu -> reason = username + " used string selection: " + selectMenu.getComponentId();
                 case ModalInteractionEvent modal -> reason = username + " used modal: " + modal.getModalId();
                 default -> reason = "Last Command Unknown - No Event Provided";
             }
@@ -757,6 +756,10 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.IMAGE_GEN_COUNT + " " + game.getMapImageGenerationCount());
+        writer.write(System.lineSeparator());
+
+        game.getPlayersWithGMRole(); //init gmIds
+        writer.write(Constants.FOW_GM_IDS + " " + String.join(",", game.getFogOfWarGMIDs()));
         writer.write(System.lineSeparator());
 
         writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", game.getRunMigrations()));
@@ -2146,6 +2149,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.FOW_GM_IDS -> game.setFogOfWarGMIDs(Helper.getListFromCSV(info));
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
 

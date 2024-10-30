@@ -133,6 +133,7 @@ public class GameProperties {
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
     private String latestUpNextMsg = "";
+    private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below
     private @ExportableField String mapString;
