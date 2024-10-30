@@ -140,7 +140,7 @@ public class AsyncTI4DiscordBot {
                 .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
                 // not 100% sure this is needed?
                 .enableCache(CacheFlag.EMOJI, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ROLE_TAGS)
-                .setMemberCachePolicy(MemberCachePolicy.lru(250))
+                .setMemberCachePolicy(MemberCachePolicy.lru(200))
                 .setEnableShutdownHook(false)
                 .build();
 
