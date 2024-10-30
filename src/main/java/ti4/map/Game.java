@@ -396,6 +396,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public boolean hasWinner() {
+        return getWinner().isPresent();
+    }
+
+    @JsonIgnore
     public Optional<Player> getWinner() {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
