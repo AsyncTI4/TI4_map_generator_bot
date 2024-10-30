@@ -267,8 +267,7 @@ public class MapGenerator {
     }
 
     public static void saveImageToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
-        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(),
-            Boolean.class, false)) {
+        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
             saveImage(game, null, event, false);
         }
     }
@@ -294,7 +293,7 @@ public class MapGenerator {
 
         drawGame(event);
         AsyncTI4DiscordBot.THREAD_POOL.submit(() -> sendToWebsite(event));
-        FileUpload fileUpload = uploadToDiscord();
+        FileUpload fileUpload = createFileUpload();
         logDebug(event);
         return fileUpload;
     }
@@ -438,17 +437,17 @@ public class MapGenerator {
         }
     }
 
-    private FileUpload uploadToDiscord() {
+    private FileUpload createFileUpload() {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, .2f, game.getName());
+        FileUpload fileUpload = createFileUpload(mainImage, .2f, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
     }
 
-    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix) {
+    public static FileUpload createFileUpload(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix) {
         if (imageToUpload == null) return null;
 
         String saveLocalFormat = System.getenv("SAVE_LOCAL_FORMAT");
@@ -590,7 +589,7 @@ public class MapGenerator {
 
         String turnOrdinal = StringHelper.ordinal(player.getTurnCount());
         String descr = player.getFlexibleDisplayName() + "'s " + turnOrdinal + " turn";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
+        FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, player.getFaction() + player.getColor() + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(player.getCorrectChannel(), fileUpload);
     }
 
@@ -617,7 +616,7 @@ public class MapGenerator {
 
         superDrawString(bannerG, "Agenda #" + num, 55, 35, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Bottom, stroke2, Color.BLACK);
 
-        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, "agenda" + num + "banner");
+        FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, "agenda" + num + "banner");
         MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload);
     }
 
@@ -636,7 +635,7 @@ public class MapGenerator {
         superDrawString(bannerG, roundText, 255, 221, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Center, stroke6, Color.BLACK);
 
         String descr = "Start of " + phase + " phase, round " + round + ".";
-        FileUpload fileUpload = uploadToDiscord(bannerImage, 1.0f, phase + round + "banner").setDescription(descr);
+        FileUpload fileUpload = createFileUpload(bannerImage, 1.0f, phase + round + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
     }
 

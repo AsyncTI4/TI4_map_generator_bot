@@ -98,7 +98,7 @@ public class MiltyDraftHelper {
             desc.append(slice.ttsString());
         }
 
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(mainImage, 1.0f, game.getName() + "_miltydraft");
+        FileUpload fileUpload = MapGenerator.createFileUpload(mainImage, 1.0f, game.getName() + "_miltydraft");
         fileUpload.setDescription(desc.toString());
         return fileUpload;
     }
