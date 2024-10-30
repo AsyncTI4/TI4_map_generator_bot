@@ -21,8 +21,8 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -129,18 +129,20 @@ public class AsyncTI4DiscordBot {
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-        jda = JDABuilder.createLight(args[0])
+        jda = JDABuilder.createDefault(args[0])
                 // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
                 // This is required to cache all members of a guild (including chunking)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 // This is a privileged gateway intent this is only used to enable access to the user content in messages
                 // (also including embeds/attachments/components).
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // not 100 sure this is needed? It is for the Emoji cache below... but do we actually need that?
+                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
                 .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
-                // not 100% sure this is needed?
-                .enableCache(CacheFlag.EMOJI, CacheFlag.MEMBER_OVERRIDES, CacheFlag.ROLE_TAGS)
-                .setMemberCachePolicy(MemberCachePolicy.lru(200))
+                // It *appears* we need to pull all members or else the bot has trouble pinging players
+                // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
+                // and avoid loading every user at startup
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setChunkingFilter(ChunkingFilter.ALL)
                 .setEnableShutdownHook(false)
                 .build();
 
