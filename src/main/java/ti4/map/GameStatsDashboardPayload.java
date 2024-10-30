@@ -9,12 +9,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.generator.Mapper;
 import ti4.message.BotLogger;
@@ -129,17 +129,25 @@ public class GameStatsDashboardPayload {
                 .toList());
         }
 
+        var revealedPublics = game.getRevealedPublicObjectives().keySet().stream()
+                .map(Mapper::getPublicObjective)
+                .filter(Objects::nonNull)
+                .toList();
+
+
         //Public I
         objectives.put("Public Objectives I",
-            game.getPublicObjectives1().stream()
-                .map(Mapper::getPublicObjective)
-                .map(PublicObjectiveModel::getName).toList());
+                revealedPublics.stream()
+                        .filter(publicObjective -> publicObjective.getPoints() == 1)
+                        .map(PublicObjectiveModel::getName)
+                        .toList());
 
         //Public II
         objectives.put("Public Objectives II",
-            game.getPublicObjectives2().stream()
-                .map(Mapper::getPublicObjective)
-                .map(PublicObjectiveModel::getName).toList());
+                revealedPublics.stream()
+                        .filter(publicObjective -> publicObjective.getPoints() == 2)
+                        .map(PublicObjectiveModel::getName)
+                        .toList());
 
         //Secrets
         List<String> secrets = new ArrayList<>();
