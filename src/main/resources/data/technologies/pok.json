@@ -156,18 +156,18 @@
         ],
         "requirements": "R",
         "source": "base",
-        "text": "Base: You may exhaust this card at the start of a round of ground combat on a planet that contains 1 or more of your units that have Planetary Shield; your opponent cannot make combat rolls this combat round. Omega: At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces.",
+        "text": "You may exhaust this card at the start of a round of ground combat on a planet that contains 1 or more of your units that have Planetary Shield; your opponent cannot make combat rolls this combat round.",
         "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/magen_defense_grid.jpg?raw=true"
     },
     {
         "alias": "md",
-        "name": "Magen Defense Grid",
+        "name": "Magen Defense Grid Ω",
         "types": [
             "WARFARE"
         ],
         "requirements": "R",
-        "source": "base",
-        "text": "Base: You may exhaust this card at the start of a round of ground combat on a planet that contains 1 or more of your units that have Planetary Shield; your opponent cannot make combat rolls this combat round. Omega: At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces.",
+        "source": "codex1",
+        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces.",
         "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/red/magen_defense_grid.omega.jpg?raw=true"
     },
     {

@@ -52,8 +52,8 @@ public class DealSOToAll extends SOCardsSubcommandData {
             buttons.add(Buttons.green("startOfGameObjReveal", "Reveal Objectives and Start Strategy Phase"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Press this button after everyone has discarded", buttons);
             Player speaker = null;
-            if (game.getPlayer(game.getSpeaker()) != null) {
-                speaker = game.getPlayers().get(game.getSpeaker());
+            if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                speaker = game.getPlayers().get(game.getSpeakerUserID());
             }
             if (speaker == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),

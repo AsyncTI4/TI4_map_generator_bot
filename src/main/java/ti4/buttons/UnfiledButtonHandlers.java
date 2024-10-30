@@ -1160,7 +1160,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (game != null && !game.isFowMode()) {
             for (Player player_ : game.getPlayers().values()) {
                 if (player_.getFaction().equals(faction)) {
-                    game.setSpeaker(player_.getUserID());
+                    game.setSpeakerUserID(player_.getUserID());
                     String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     if (!game.isFowMode()) {
@@ -1181,7 +1181,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (game != null) {
             for (Player player_ : game.getPlayers().values()) {
                 if (player_.getFaction().equals(faction)) {
-                    game.setSpeaker(player_.getUserID());
+                    game.setSpeakerUserID(player_.getUserID());
                     String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     if (game.isFowMode() && player != player_) {
@@ -3347,7 +3347,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("rollIxthian")
     public static void rollIxthian(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (game.getSpeaker().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
+        if (game.getSpeakerUserID().equals(player.getUserID()) || "rollIxthianIgnoreSpeaker".equals(buttonID)) {
             AgendaHelper.rollIxthian(game, true);
         } else {
             Button ixthianButton = Buttons.green("rollIxthianIgnoreSpeaker", "Roll Ixthian Artifact", Emojis.Mecatol);
@@ -3516,8 +3516,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
 
         Player speaker = null;
-        if (game.getPlayer(game.getSpeaker()) != null) {
-            speaker = game.getPlayers().get(game.getSpeaker());
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
         }
         if (speaker == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please assign speaker before hitting this button.");

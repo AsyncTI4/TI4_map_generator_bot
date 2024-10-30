@@ -114,7 +114,7 @@ public class ApplyDraftBags extends FrankenSubcommandData {
                     .findFirst()
                     .get();
                 if (order.getSpeakerOrder() == 1) {
-                    game.setSpeaker(player.getUserID());
+                    game.setSpeakerUserID(player.getUserID());
                 }
                 return order.getSpeakerOrder();
             }))

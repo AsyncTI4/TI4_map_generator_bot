@@ -35,7 +35,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
-import ti4.helpers.TIGLHelper;
+import ti4.helpers.WebHelper;
 import ti4.listeners.UserJoinServerListener;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
@@ -66,7 +66,7 @@ public class StartPhase extends GameSubcommandData {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
-            case "P1Special" -> TIGLHelper.initializeTIGLGame(game);
+            case "P1Special" -> WebHelper.putStats();
             case "shuffleDecks" -> game.shuffleDecks();
             case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
@@ -247,8 +247,8 @@ public class StartPhase extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player speaker;
-        if (game.getPlayer(game.getSpeaker()) != null) {
-            speaker = game.getPlayers().get(game.getSpeaker());
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed");
             return;

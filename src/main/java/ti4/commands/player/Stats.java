@@ -196,7 +196,7 @@ public class Stats extends PlayerSubcommandData {
             StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionSpeaker));
             String value = optionSpeaker.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
-                game.setSpeaker(player.getUserID());
+                game.setSpeakerUserID(player.getUserID());
             } else {
                 message.append(", which is not a valid input. Please use one of: y/yes");
             }
@@ -290,7 +290,7 @@ public class Stats extends PlayerSubcommandData {
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
         sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
         sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-        sb.append("> Speaker: `").append(game.getSpeaker().equals(player.getUserID())).append("`\n");
+        sb.append("> Speaker: `").append(game.getSpeakerUserID().equals(player.getUserID())).append("`\n");
         sb.append("> Passed: `").append(player.isPassed()).append("`\n");
         sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
         sb.append("> Raw Faction Emoji: `").append(player.getFactionEmoji()).append("`\n");

@@ -203,7 +203,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (setSpeaker) {
-            game.setSpeaker(player.getUserID());
+            game.setSpeakerUserID(player.getUserID());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 

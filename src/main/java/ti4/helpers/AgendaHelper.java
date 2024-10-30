@@ -410,7 +410,7 @@ public class AgendaHelper {
                     String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda.";
                     new DiscardACRandom().discardRandomAC(event, game, player2, player2.getAc());
                     game.setStoredValue("PublicExecution", player2.getFaction());
-                    if (game.getSpeaker().equalsIgnoreCase(player2.getUserID())) {
+                    if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
                         message = message + " Also passed the speaker token.";
                         boolean foundSpeaker = false;
                         boolean assignedSpeaker = false;
@@ -419,7 +419,7 @@ public class AgendaHelper {
                                 break;
                             }
                             if (foundSpeaker) {
-                                game.setSpeaker(p4.getUserID());
+                                game.setSpeakerUserID(p4.getUserID());
                                 assignedSpeaker = true;
                                 break;
                             }
@@ -432,7 +432,7 @@ public class AgendaHelper {
                                 break;
                             }
                             if (foundSpeaker) {
-                                game.setSpeaker(p4.getUserID());
+                                game.setSpeakerUserID(p4.getUserID());
                                 assignedSpeaker = true;
                                 break;
                             }
@@ -810,7 +810,7 @@ public class AgendaHelper {
                     message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
                     Helper.checkEndGame(game, playerWL);
                     if ("for".equalsIgnoreCase(winner)) {
-                        game.setSpeaker(playerWL.getUserID());
+                        game.setSpeakerUserID(playerWL.getUserID());
                         message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
                         for (Player p2 : getWinningVoters(winner, game)) {
                             if (p2 == playerWL) {
@@ -1644,8 +1644,8 @@ public class AgendaHelper {
                     resolveTime = true;
                 } else {
                     Player speaker;
-                    if (game.getPlayer(game.getSpeaker()) != null) {
-                        speaker = game.getPlayers().get(game.getSpeaker());
+                    if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                        speaker = game.getPlayers().get(game.getSpeakerUserID());
                     } else {
                         speaker = game.getRealPlayers().getFirst();
                     }
@@ -2385,7 +2385,7 @@ public class AgendaHelper {
                                     ACInfo.getDiscardActionCardButtons(game, winningR, false));
                             }
 
-                            game.setSpeaker(winningR.getUserID());
+                            game.setSpeakerUserID(winningR.getUserID());
                             MessageHelper.sendMessageToChannel(channel,
                                 identity + " due to having a winning **Politics Rider**, you have been given " + amount + " Action Cards " + Emojis.ActionCard.repeat(amount) + " and the " + Emojis.SpeakerToken + " Speaker Token");
                         }
@@ -2647,7 +2647,7 @@ public class AgendaHelper {
         List<Player> orderList = new ArrayList<>(game.getPlayers().values().stream()
             .filter(Player::isRealPlayer)
             .toList());
-        String speakerName = game.getSpeaker();
+        String speakerName = game.getSpeakerUserID();
         Optional<Player> optSpeaker = orderList.stream()
             .filter(player -> player.getUserID().equals(speakerName))
             .findFirst();
@@ -2683,7 +2683,7 @@ public class AgendaHelper {
         if (!conspiratorsFaction.isEmpty()) {
             Player rhodun = game.getPlayerFromColorOrFaction(conspiratorsFaction);
             Optional<Player> speaker = orderList.stream()
-                .filter(player -> player.getFaction() != null && game.getSpeaker().equals(player.getUserID()))
+                .filter(player -> player.getFaction() != null && game.getSpeakerUserID().equals(player.getUserID()))
                 .findFirst();
             if (speaker.isPresent() && rhodun != null) {
                 orderList.remove(rhodun);
