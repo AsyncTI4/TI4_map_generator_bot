@@ -441,27 +441,19 @@ public class MapGenerator {
     private FileUpload uploadToDiscord() {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
-        switch (displayType) {
-            case wormholes:
-            case anomalies:
-            case legendaries:
-            case empties:
-            case aetherstream:
-            case spacecannon:
-            case traits:
-            case techskips:
-            case attachments:
-            case shipless:
-            case landscape:
-        }
+        float quality = switch (displayType) {
+            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
+                 shipless, landscape -> 1 / 4.0f;
+            default -> 1 / 6.0f;
+        };
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, game.getName());
+        FileUpload fileUpload = uploadToDiscord(mainImage, quality, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
     }
 
-    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, String filenamePrefix) {
+    public static FileUpload uploadToDiscord(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix) {
         if (imageToUpload == null) return null;
 
         String saveLocalFormat = System.getenv("SAVE_LOCAL_FORMAT");
@@ -481,7 +473,7 @@ public class MapGenerator {
             // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
             String format = "jpg";
             String fileName = filenamePrefix + "_" + getTimeStamp() + "." + format;
-            writeCompressedFormat(mapWithoutTransparentBackground, out, format, 0.2f);
+            writeCompressedFormat(mapWithoutTransparentBackground, out, format, compressionQuality);
             fileUpload = FileUpload.fromData(out.toByteArray(), fileName);
         } catch (IOException e) {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
