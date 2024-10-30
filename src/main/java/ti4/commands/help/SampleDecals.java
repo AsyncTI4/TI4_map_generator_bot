@@ -113,7 +113,7 @@ public class SampleDecals extends HelpSubcommandData {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, 1.0f,
+        FileUpload fileUpload = MapGenerator.createFileUpload(coloursImage, 1.0f,
                         "decal_sample_" + top + "_" + left)
             .setDescription("Decal samples for units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
