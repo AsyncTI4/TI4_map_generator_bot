@@ -111,7 +111,7 @@ public class SampleColors extends HelpSubcommandData {
             return;
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, 1.0f,
+        FileUpload fileUpload = MapGenerator.createFileUpload(coloursImage, 1.0f,
                         "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : "ALL"))
             .setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
