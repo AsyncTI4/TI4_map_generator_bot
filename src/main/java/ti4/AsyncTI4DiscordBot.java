@@ -143,6 +143,7 @@ public class AsyncTI4DiscordBot {
                 // and avoid loading every user at startup
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
+                // This allows us to use our own ShutdownHook, created below
                 .setEnableShutdownHook(false)
                 .build();
 

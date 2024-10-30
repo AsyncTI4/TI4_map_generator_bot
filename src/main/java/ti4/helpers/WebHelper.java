@@ -115,7 +115,9 @@ public class WebHelper {
             }
         }
 
-        BotLogger.log("# Statistics Upload\nOut of " + count + " eligible games, the statistics of only " + payloads.size() + " are being uploaded to the web server.\nBad Games:\n- " + StringUtils.join(badGames, "\n- "));
+        String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
+        if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
+        BotLogger.log(message);
 
         try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
             String json = mapper.writeValueAsString(payloads);
