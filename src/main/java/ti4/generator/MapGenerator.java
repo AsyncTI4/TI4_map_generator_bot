@@ -1104,7 +1104,7 @@ public class MapGenerator {
     }
 
     private int speakerToken(Player player, int xDeltaFromRightSide, int yPlayAreaSecondRow) {
-        if (player.getUserID().equals(game.getSpeaker())) {
+        if (player.getUserID().equals(game.getSpeakerUserID())) {
             xDeltaFromRightSide += 200;
             String speakerFile = ResourceHelper.getInstance().getTokenFile(Mapper.getTokenID(Constants.SPEAKER));
             if (speakerFile != null) {

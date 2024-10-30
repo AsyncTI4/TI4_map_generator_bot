@@ -5507,8 +5507,8 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[4];
         Player speaker = null;
         Player player = game.getPlayer(userId);
-        if (game.getPlayer(game.getSpeaker()) != null) {
-            speaker = game.getPlayers().get(game.getSpeaker());
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
         }
         if (game.getPlayerFromColorOrFaction(color) != null)
             color = player.getNextAvailableColour();
@@ -6569,7 +6569,7 @@ public class ButtonHelper {
     private static List<Button> getAssignSpeakerButtons(Game game) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
-            if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
+            if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeakerUserID())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
                     Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmoji());

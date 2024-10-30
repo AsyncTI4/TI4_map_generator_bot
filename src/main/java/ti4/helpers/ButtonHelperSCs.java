@@ -212,7 +212,7 @@ public class ButtonHelperSCs {
 
         Player imperialHolder = Helper.getPlayerWithThisSC(game, scModel.getInitiative());
         if (game.getPhaseOfGame().contains("agenda")) {
-            imperialHolder = game.getPlayer(game.getSpeaker());
+            imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
