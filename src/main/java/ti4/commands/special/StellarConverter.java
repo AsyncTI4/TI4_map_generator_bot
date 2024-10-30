@@ -1,8 +1,11 @@
 package ti4.commands.special;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -15,12 +18,12 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class StellarConverter extends SpecialSubcommandData {
 
@@ -52,6 +55,12 @@ public class StellarConverter extends SpecialSubcommandData {
         secondHalfOfStellar(game, planetName, event);
     }
 
+    @ButtonHandler("stellarConvert_")
+    public static void resolveStellar(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        secondHalfOfStellar(game, buttonID.split("_")[1], event);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static void secondHalfOfStellar(Game game, String planetName, GenericInteractionCreateEvent event) {
 
         Tile tile = game.getTileFromPlanet(planetName);
@@ -65,8 +74,7 @@ public class StellarConverter extends SpecialSubcommandData {
             return;
         }
 
-        String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" :
-            "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
+        String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
         postTileInDisasterWatch(game, tile, 1, "Moments before disaster in game " + game.getName());
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 
@@ -78,13 +86,10 @@ public class StellarConverter extends SpecialSubcommandData {
                 amountToKill = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
                 if (p2.hasInf2Tech()) {
                     ButtonHelper.resolveInfantryDeath(game, p2, amountToKill);
-                    boolean cabalMech = false;
-                    if (unitHolder.getUnitCount(UnitType.Mech,
-                        p2.getColor()) > 0
-                        && p2.hasUnit("cabal_mech")
-                        && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-                        cabalMech = true;
-                    }
+                    boolean cabalMech = unitHolder.getUnitCount(UnitType.Mech,
+                            p2.getColor()) > 0
+                            && p2.hasUnit("cabal_mech")
+                            && !ButtonHelper.isLawInPlay(game, "articles_war");
                     if (p2.hasAbility("amalgamation")
                         && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech)) {
                         ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, amountToKill, "infantry", event);
@@ -107,8 +112,8 @@ public class StellarConverter extends SpecialSubcommandData {
     }
 
     public static void postTileInDisasterWatch(Game game, Tile tile, Integer rings, String message) {
-        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).size() > 0 && !game.isFowMode()) {
-            TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).get(0);
+        if (!AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).isEmpty() && !game.isFowMode()) {
+            TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
             FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, rings, tile.getPosition(), null);
             MessageHelper.sendMessageWithFile(watchPary, systemWithContext, message, false);
         }

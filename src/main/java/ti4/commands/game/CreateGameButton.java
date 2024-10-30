@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -17,11 +15,13 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.search.SearchMyGames;
 import ti4.helpers.Constants;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
@@ -86,37 +86,35 @@ public class CreateGameButton extends GameSubcommandData {
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
         CreateGameChannels.inviteUsersToServer(guild, members, event.getMessageChannel());
 
-        String buttonMsg = "";
+        StringBuilder buttonMsg = new StringBuilder();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("createGameChannels", "Create Game"));
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
-        if (members.size() > 0) {
-            buttonMsg = "Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n";
+        if (!members.isEmpty()) {
+            buttonMsg = new StringBuilder("Game Fun Name: " + gameFunName.replace(":", "") + "\nPlayers:\n");
             int counter = 1;
             for (Member member : members) {
-                buttonMsg = buttonMsg + counter + ":" + member.getId() + ".("
-                    + member.getEffectiveName().replace(":", "")
-                    + ")\n";
+                buttonMsg.append(counter).append(":").append(member.getId()).append(".(").append(member.getEffectiveName().replace(":", "")).append(")\n");
                 counter++;
             }
-            buttonMsg = buttonMsg + "\n\n" + " Please hit this button after confirming that the members are the correct ones.";
-            MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg);
-            MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg, buttons);
+            buttonMsg.append("\n\n").append(" Please hit this button after confirming that the members are the correct ones.");
+            MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(buttonMsg.toString());
+            MessageHelper.sendMessageToChannel(event.getChannel(), buttonMsg.toString(), buttons);
             ActionRow actionRow = ActionRow.of(buttons);
             baseMessageObject.addComponents(actionRow);
         }
     }
 
+    @ButtonHandler("createGameChannels")
     public static void decodeButtonMsg(ButtonInteractionEvent event) {
-        event.getChannel().sendMessage(event.getUser().getEffectiveName() + " pressed the [Create Game] button")
-            .queue();
+        MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
+
         Member member = event.getMember();
         boolean isAdmin = false;
         Game mapreference = GameManager.getInstance().getGame("finreference");
 
         if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
         if (member != null) {

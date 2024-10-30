@@ -30,7 +30,7 @@ public class RelicLookAtTop extends RelicSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
             return;
         }
-        String relicID = relicDeck.get(0);
+        String relicID = relicDeck.getFirst();
         RelicModel relicModel = Mapper.getRelic(relicID);
         String sb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);

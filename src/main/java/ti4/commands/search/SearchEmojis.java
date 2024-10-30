@@ -1,8 +1,10 @@
 package ti4.commands.search;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -25,10 +27,10 @@ public class SearchEmojis extends SearchSubcommandData {
         boolean includeRAW = event.getOption(Constants.INCLUDE_RAW_STRING, false, OptionMapping::getAsBoolean);
 
         List<RichCustomEmoji> emojis = AsyncTI4DiscordBot.jda.getEmojis().stream()
-                .filter(e -> e.isAvailable())
+                .filter(RichCustomEmoji::isAvailable)
                 .filter(e -> e.getFormatted().toLowerCase().contains(searchString.toLowerCase()))
-                .sorted((e1, e2) -> e1.getName().compareTo(e2.getName()))
-                .sorted((e1, e2) -> e1.getGuild().getName().compareTo(e2.getGuild().getName()))
+                .sorted(Comparator.comparing(Emoji::getName))
+                .sorted(Comparator.comparing(e -> e.getGuild().getName()))
                 .toList();
 
         String message = emojis.stream().map(e -> getEmojiMessage(e, includeRAW)).collect(Collectors.joining("\n"));
@@ -43,9 +45,8 @@ public class SearchEmojis extends SearchSubcommandData {
 
     private static String getEmojiMessage(RichCustomEmoji emoji, boolean includeRAW) {
         if (!includeRAW) return "# " + emoji.getFormatted();
-        StringBuilder sb = new StringBuilder();
-        sb.append(emoji.getFormatted());
-        sb.append(" `").append(emoji.getFormatted()).append("`");
-        return sb.toString();
+        String sb = emoji.getFormatted() +
+                " `" + emoji.getFormatted() + "`";
+        return sb;
     }
 }

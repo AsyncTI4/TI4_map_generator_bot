@@ -4,17 +4,19 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
 import ti4.commands.special.StellarConverter;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -58,7 +60,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         secondHalfOfCelestialImpact(player, event, tile, game);
     }
 
-    public void secondHalfOfCelestialImpact(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
+    public static void secondHalfOfCelestialImpact(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
         String message1 = "Moments before disaster in game " + game.getName();
         StellarConverter.postTileInDisasterWatch(game, tile, 1, message1);
 
@@ -75,14 +77,13 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
 
         //Gain TGs equal to the sum of the resource values of the planets in the system
         int resourcesSum = 0;
-        List<Planet> planetsInSystem = tile.getPlanetUnitHolders().stream().map(uh -> (Planet) uh).toList();
+        List<Planet> planetsInSystem = tile.getPlanetUnitHolders().stream().toList();
         for (Planet p : planetsInSystem) {
             resourcesSum += p.getResources();
         }
-        StringBuilder tgGainMsg = new StringBuilder(player.getFactionEmoji());
-        tgGainMsg.append(" gained ").append(resourcesSum).append("TG" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (");
-        tgGainMsg.append(player.getTg()).append("->").append(player.getTg() + resourcesSum).append(").");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg.toString());
+        String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + "TG" + (resourcesSum == 1 ? "" : "s") + " from Celestial Impact (" +
+                player.getTg() + "->" + (player.getTg() + resourcesSum) + ").";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg);
         player.gainTG(resourcesSum);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, game, resourcesSum);
@@ -94,11 +95,10 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         game.setTile(asteroidTile);
 
         //After shot to disaster channel
-        StringBuilder message2 = new StringBuilder();
-        message2.append(tile.getRepresentation());
-        message2.append(" has been celestially impacted by ");
-        message2.append(player.getRepresentation());
-        StellarConverter.postTileInDisasterWatch(game, asteroidTile, 1, message2.toString());
+        String message2 = tile.getRepresentation() +
+                " has been celestially impacted by " +
+                player.getRepresentation();
+        StellarConverter.postTileInDisasterWatch(game, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {
             Leader playerLeader = player.getLeader("zelianhero").orElse(null);
@@ -110,5 +110,11 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Zelian R, the Zelian heRo, was not purged - something went wrong");
             }
         }
+    }
+
+    @ButtonHandler("celestialImpact_")
+    public static void celestialImpact(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        secondHalfOfCelestialImpact(player, event, game.getTileByPosition(buttonID.split("_")[1]), game);
+        ButtonHelper.deleteTheOneButton(event);
     }
 }

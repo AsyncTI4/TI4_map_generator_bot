@@ -1,0 +1,892 @@
+[
+    {
+        "activeSystem": {},
+        "config": {
+            "baseMagen": false,
+            "codex1": true,
+            "codex2": true,
+            "codex3": true,
+            "codex4": true
+        },
+        "hexSummary": "18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2;Bo;Bo,21-1-1Yc2fry;Y3i1ps*o,80-3+1*e,78+0+4*e,34+1+3Rcd4f2y;R5i;Ro,49+2+2*e,20+2+0Gd3f1hyt;G2i*x,68+2-2;Ki*d,22+1-3Kc;K2m1o*cf,48+0-4*e,69-1-3;Yip;Y3i,31-2+0Pd;P3i;Pm,35-2+2P2f;Pips*m;Pi*r,59-1+3Pcr;P4i1m,79-1+5*e,41+2+4*e,66+3+1G2cd4f1r;G3i1mp,32+3-1;Kp;Kp,39+2-4*e,77+1-5*e,25-1-5B2c7f;BimY2i,28-2-4;Bo;Bo,40-3-1*e,45-1+1*e,26-2+4Pdf;Pmo*jp,23+1+5;Ro,82-4-3B2d1h2y;B5i1o,57+3-3Kd3f2r1yt;K2i1s;K2i,6-3+3B2cd4f2y*a;P7i1mps,51+1-9;Bso,17+0-6*e,65-2-2Ycd2f1h;Y4i3m1p,53+3+3Rdh2r;G3im1sR3i,14-3-3P2c3d9f1hy;Pips;Ymp,1+0+6;Rps",
+        "history": [
+            {
+                "hexSummary": "18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2;Bo;Bo,21-1-1Yc2fry;Y3i1ps*o,80-3+1*e,78+0+4*e,34+1+3Rcd4f2y;R5i;Ro,49+2+2*e,20+2+0Gd3f1hyt;G2i*x,68+2-2;Ki*d,22+1-3Kc;K2m1o*cf,48+0-4*e,69-1-3;Yip;Y3i,31-2+0Pd;P3i;Pm,35-2+2P2f;Pips*m;Pi*r,59-1+3Pcr;P4i1m,79-1+5*e,41+2+4*e,66+3+1G2cd4f1r;G3i1mp,32+3-1;Kp;Kp,39+2-4*e,77+1-5*e,25-1-5B2c7f;BimY2i,28-2-4;Bo;Bo,40-3-1*e,45-1+1*e,26-2+4Pdf;Pmo*jp,23+1+5;Ro,82-4-3B2d1h2y;B5i1o,57+3-3Kd3f2r1yt;K2i1s;K2i,6-3+3B2cd4f2y*a;P7i1mps,51+1-9;Bso,17+0-6*e,65-2-2Ycd2f1h;Y4i3m1p,53+3+3Rdh2r;G3im1sR3i,14-3-3P2c3d9f1hy;Pips;Ymp,1+0+6;Rps",
+                "laws": [
+                    "Minister of Sciences",
+                    "Economic Equality",
+                    "Colonial Redistribution"
+                ],
+                "perf": {
+                    "fps": 9.017,
+                    "mean": 25.7,
+                    "median": null,
+                    "scrubbed": 110.891,
+                    "stdDev": 80.353
+                },
+                "players": [
+                    {
+                        "alliances": [],
+                        "color": "White",
+                        "colorActual": "Pink",
+                        "commodities": 0,
+                        "custodiansPoints": 0,
+                        "laws": [],
+                        "leaders": {
+                            "agent": "locked",
+                            "commander": "unlocked",
+                            "hero": "locked"
+                        },
+                        "objectives": [],
+                        "planetTotals": {
+                            "influence": {
+                                "avail": 2,
+                                "total": 15
+                            },
+                            "legendary": 1,
+                            "resources": {
+                                "avail": 0,
+                                "total": 16
+                            },
+                            "techs": {
+                                "blue": 0,
+                                "green": 2,
+                                "red": 0,
+                                "yellow": 0
+                            },
+                            "traits": {
+                                "cultural": 3,
+                                "hazardous": 0,
+                                "industrial": 3
+                            }
+                        },
+                        "relicCards": [
+                            "Nano-Forge",
+                            "Stellar Converter"
+                        ],
+                        "score": 0,
+                        "strategyCards": [
+                            "Warfare"
+                        ],
+                        "technologies": 4,
+                        "tradeGoods": 0
+                    },
+                    {
+                        "alliances": [
+                            "blue"
+                        ],
+                        "color": "Blue",
+                        "colorActual": "Blue",
+                        "commodities": 0,
+                        "custodiansPoints": 1,
+                        "laws": [],
+                        "leaders": {
+                            "agent": "unlocked",
+                            "commander": "unlocked",
+                            "hero": "unlocked"
+                        },
+                        "objectives": [
+                            "Adapt New Strategies",
+                            "Amass Wealth",
+                            "Explore Deep Space",
+                            "Support for the Throne (Green)"
+                        ],
+                        "planetTotals": {
+                            "influence": {
+                                "avail": 17,
+                                "total": 17
+                            },
+                            "legendary": 1,
+                            "resources": {
+                                "avail": 11,
+                                "total": 11
+                            },
+                            "techs": {
+                                "blue": 0,
+                                "green": 0,
+                                "red": 1,
+                                "yellow": 0
+                            },
+                            "traits": {
+                                "cultural": 2,
+                                "hazardous": 1,
+                                "industrial": 2
+                            }
+                        },
+                        "relicCards": [],
+                        "score": 5,
+                        "strategyCards": [
+                            "Trade"
+                        ],
+                        "technologies": 6,
+                        "tradeGoods": 3
+                    },
+                    {
+                        "alliances": [
+                            "green"
+                        ],
+                        "color": "Purple",
+                        "colorActual": "Yellow",
+                        "commodities": 0,
+                        "custodiansPoints": 0,
+                        "laws": [],
+                        "leaders": {
+                            "agent": "unlocked",
+                            "commander": "unlocked",
+                            "hero": "unlocked"
+                        },
+                        "objectives": [
+                            "Amass Wealth",
+                            "Become a Martyr",
+                            "Raise a Fleet"
+                        ],
+                        "planetTotals": {
+                            "influence": {
+                                "avail": 9,
+                                "total": 9
+                            },
+                            "legendary": 1,
+                            "resources": {
+                                "avail": 9,
+                                "total": 9
+                            },
+                            "techs": {
+                                "blue": 0,
+                                "green": 0,
+                                "red": 0,
+                                "yellow": 0
+                            },
+                            "traits": {
+                                "cultural": 2,
+                                "hazardous": 0,
+                                "industrial": 2
+                            }
+                        },
+                        "relicCards": [
+                            "The Obsidian"
+                        ],
+                        "score": 4,
+                        "strategyCards": [],
+                        "technologies": 5,
+                        "tradeGoods": 0
+                    },
+                    {
+                        "alliances": [
+                            "pink"
+                        ],
+                        "color": "Yellow",
+                        "colorActual": "Purple",
+                        "commodities": 0,
+                        "custodiansPoints": 0,
+                        "laws": [],
+                        "leaders": {
+                            "agent": "unlocked",
+                            "commander": "unlocked",
+                            "hero": "unlocked"
+                        },
+                        "objectives": [
+                            "Diversify Research",
+                            "Hoard Raw Materials",
+                            "Master the Laws of Physics",
+                            "Raise a Fleet"
+                        ],
+                        "planetTotals": {
+                            "influence": {
+                                "avail": 15,
+                                "total": 15
+                            },
+                            "legendary": 0,
+                            "resources": {
+                                "avail": 22,
+                                "total": 22
+                            },
+                            "techs": {
+                                "blue": 1,
+                                "green": 0,
+                                "red": 0,
+                                "yellow": 1
+                            },
+                            "traits": {
+                                "cultural": 1,
+                                "hazardous": 4,
+                                "industrial": 1
+                            }
+                        },
+                        "relicCards": [],
+                        "score": 7,
+                        "strategyCards": [
+                            "Leadership"
+                        ],
+                        "technologies": 12,
+                        "tradeGoods": 0
+                    },
+                    {
+                        "alliances": [
+                            "red"
+                        ],
+                        "color": "Red",
+                        "colorActual": "Red",
+                        "commodities": 0,
+                        "custodiansPoints": 0,
+                        "laws": [],
+                        "leaders": {
+                            "agent": "unlocked",
+                            "commander": "unlocked",
+                            "hero": "locked"
+                        },
+                        "objectives": [
+                            "Raise a Fleet"
+                        ],
+                        "planetTotals": {
+                            "influence": {
+                                "avail": 11,
+                                "total": 11
+                            },
+                            "legendary": 0,
+                            "resources": {
+                                "avail": 12,
+                                "total": 12
+                            },
+                            "techs": {
+                                "blue": 1,
+                                "green": 0,
+                                "red": 0,
+                                "yellow": 0
+                            },
+                            "traits": {
+                                "cultural": 2,
+                                "hazardous": 0,
+                                "industrial": 3
+                            }
+                        },
+                        "relicCards": [],
+                        "score": 2,
+                        "strategyCards": [
+                            "Technology"
+                        ],
+                        "technologies": 6,
+                        "tradeGoods": 2
+                    },
+                    {
+                        "alliances": [
+                            "yellow"
+                        ],
+                        "color": "Green",
+                        "colorActual": "Green",
+                        "commodities": 0,
+                        "custodiansPoints": 0,
+                        "laws": [],
+                        "leaders": {
+                            "agent": "locked",
+                            "commander": "locked",
+                            "hero": "locked"
+                        },
+                        "objectives": [
+                            "Amass Wealth"
+                        ],
+                        "planetTotals": {
+                            "influence": {
+                                "avail": 0,
+                                "total": 8
+                            },
+                            "legendary": 1,
+                            "resources": {
+                                "avail": 0,
+                                "total": 10
+                            },
+                            "techs": {
+                                "blue": 0,
+                                "green": 0,
+                                "red": 0,
+                                "yellow": 0
+                            },
+                            "traits": {
+                                "cultural": 0,
+                                "hazardous": 2,
+                                "industrial": 0
+                            }
+                        },
+                        "relicCards": [],
+                        "score": 2,
+                        "strategyCards": [
+                            "Diplomacy"
+                        ],
+                        "technologies": 5,
+                        "tradeGoods": 4
+                    }
+                ],
+                "round": 4,
+                "timestamp": 1726447244.626
+            }
+        ],
+        "isPoK": true,
+        "laws": [
+            "Minister of Sciences",
+            "Economic Equality",
+            "Colonial Redistribution"
+        ],
+        "mapString": "71 36 76 72 21 45 78 34 49 20 68 22 48 69 65 31 35 59 1 23 41 53 66 32 57 39 77 17 25 28 14 40 80 6 26 79",
+        "objectives": {
+            "Agenda": [],
+            "Other": [
+                "Support for the Throne (Blue)",
+                "Support for the Throne (Red)",
+                "Support for the Throne (Purple)",
+                "Support for the Throne (Yellow)",
+                "Support for the Throne (Green)"
+            ],
+            "Public Objectives I": [
+                "Explore Deep Space",
+                "Diversify Research",
+                "Amass Wealth",
+                "Raise a Fleet",
+                "Develop Weaponry"
+            ],
+            "Public Objectives II": [],
+            "Relics": [],
+            "Secret Objectives": [
+                "Adapt New Strategies",
+                "Become a Martyr",
+                "Hoard Raw Materials",
+                "Master the Laws of Physics"
+            ]
+        },
+        "perf": {
+            "fps": 9.017,
+            "mean": 25.7,
+            "median": null,
+            "scrubbed": 110.891,
+            "stdDev": 80.353
+        },
+        "platform": "ttpg",
+        "playerTimer": {
+            "blue": {
+                "1": 513,
+                "2": 372,
+                "3": 515,
+                "4": 1507,
+                "5": 0,
+                "6": 0,
+                "7": 0
+            },
+            "green": {
+                "1": 504,
+                "2": 214,
+                "3": 485,
+                "4": 643,
+                "5": 0,
+                "6": 0,
+                "7": 0
+            },
+            "pink": {
+                "1": 324,
+                "2": 854,
+                "3": 1674,
+                "4": 662,
+                "5": 0,
+                "6": 0,
+                "7": 0
+            },
+            "purple": {
+                "1": 874,
+                "2": 297,
+                "3": 679,
+                "4": 1587,
+                "5": 0,
+                "6": 0,
+                "7": 0
+            },
+            "red": {
+                "1": 864,
+                "2": 1503,
+                "3": 1213,
+                "4": 1442,
+                "5": 0,
+                "6": 0,
+                "7": 0
+            },
+            "yellow": {
+                "1": 502,
+                "2": 1109,
+                "3": 602,
+                "4": 567,
+                "5": 0,
+                "6": 0,
+                "7": 0
+            }
+        },
+        "players": [
+            {
+                "active": true,
+                "alliances": [],
+                "color": "White",
+                "colorActual": "Pink",
+                "commandTokens": {
+                    "fleet": 5,
+                    "strategy": 0,
+                    "tactics": 0
+                },
+                "commodities": 0,
+                "maxCommodities": 3,
+                "custodiansPoints": 0,
+                "factionName": "The Naaz-Rokha Alliance",
+                "handSummary": {
+                    "Secret Objectives": 1
+                },
+                "laws": [],
+                "leaders": {
+                    "agent": "locked",
+                    "commander": "unlocked",
+                    "hero": "locked"
+                },
+                "objectives": [],
+                "planetTotals": {
+                    "influence": {
+                        "avail": 2,
+                        "total": 15
+                    },
+                    "legendary": 1,
+                    "resources": {
+                        "avail": 0,
+                        "total": 16
+                    },
+                    "techs": {
+                        "blue": 0,
+                        "green": 2,
+                        "red": 0,
+                        "yellow": 0
+                    },
+                    "traits": {
+                        "cultural": 3,
+                        "hazardous": 0,
+                        "industrial": 3
+                    }
+                },
+                "relicCards": [
+                    "Nano-Forge",
+                    "Stellar Converter"
+                ],
+                "score": 0,
+                "strategyCards": [
+                    "Warfare"
+                ],
+                "technologies": [
+                    "Hyper Metabolism",
+                    "AI Development Algorithm",
+                    "Psychoarchaeology",
+                    "Cruiser II"
+                ],
+                "tradeGoods": 0,
+                "turnOrder": 3,
+                "unitModifiers": [
+                    {
+                        "localeName": "2ram",
+                        "name": "2RAM"
+                    }
+                ],
+                "unitUpgrades": [
+                    "cruiser"
+                ]
+            },
+            {
+                "active": true,
+                "alliances": [
+                    "blue"
+                ],
+                "color": "Blue",
+                "colorActual": "Blue",
+                "commandTokens": {
+                    "fleet": 6,
+                    "strategy": 1,
+                    "tactics": 0
+                },
+                "commodities": 0,
+                "custodiansPoints": 1,
+                "factionName": "The Ghosts of Creuss",
+                "handSummary": {
+                    "Actions": 2,
+                    "Secret Objectives": 1
+                },
+                "laws": [],
+                "leaders": {
+                    "agent": "unlocked",
+                    "commander": "unlocked",
+                    "hero": "unlocked"
+                },
+                "maxCommodities": 4,
+                "objectives": [
+                    "Adapt New Strategies",
+                    "Amass Wealth",
+                    "Explore Deep Space",
+                    "Support for the Throne (Green)"
+                ],
+                "planetTotals": {
+                    "influence": {
+                        "avail": 17,
+                        "total": 17
+                    },
+                    "legendary": 1,
+                    "resources": {
+                        "avail": 11,
+                        "total": 11
+                    },
+                    "techs": {
+                        "blue": 0,
+                        "green": 0,
+                        "red": 1,
+                        "yellow": 0
+                    },
+                    "traits": {
+                        "cultural": 2,
+                        "hazardous": 1,
+                        "industrial": 2
+                    }
+                },
+                "relicCards": [],
+                "score": 5,
+                "strategyCards": [
+                    "Trade"
+                ],
+                "technologies": [
+                    "Sling Relay",
+                    "Duranium Armor",
+                    "Wormhole Generator",
+                    "Gravity Drive",
+                    "Assault Cannon",
+                    "Dimensional Splicer"
+                ],
+                "tradeGoods": 3,
+                "turnOrder": 2,
+                "unitModifiers": [],
+                "unitUpgrades": []
+            },
+            {
+                "active": true,
+                "alliances": [
+                    "green"
+                ],
+                "color": "Purple",
+                "colorActual": "Yellow",
+                "commandTokens": {
+                    "fleet": 5,
+                    "strategy": 2,
+                    "tactics": 2
+                },
+                "commodities": 0,
+                "custodiansPoints": 0,
+                "factionName": "The Xxcha Kingdom",
+                "handSummary": {
+                    "Secret Objectives": 3
+                },
+                "laws": [],
+                "leaders": {
+                    "agent": "unlocked",
+                    "commander": "unlocked",
+                    "hero": "unlocked"
+                },
+                "maxCommodities": 4,
+                "objectives": [
+                    "Amass Wealth",
+                    "Become a Martyr",
+                    "Raise a Fleet"
+                ],
+                "planetTotals": {
+                    "influence": {
+                        "avail": 9,
+                        "total": 9
+                    },
+                    "legendary": 1,
+                    "resources": {
+                        "avail": 9,
+                        "total": 9
+                    },
+                    "techs": {
+                        "blue": 0,
+                        "green": 0,
+                        "red": 0,
+                        "yellow": 0
+                    },
+                    "traits": {
+                        "cultural": 2,
+                        "hazardous": 0,
+                        "industrial": 2
+                    }
+                },
+                "relicCards": [
+                    "The Obsidian"
+                ],
+                "score": 4,
+                "strategyCards": [],
+                "technologies": [
+                    "Self Assembly Routines",
+                    "Graviton Laser System",
+                    "Neural Motivator",
+                    "Plasma Scoring",
+                    "PDS II"
+                ],
+                "tradeGoods": 0,
+                "turnOrder": 5,
+                "unitModifiers": [
+                    {
+                        "localeName": "plasma_scoring",
+                        "name": "Plasma Scoring"
+                    }
+                ],
+                "unitUpgrades": [
+                    "pds"
+                ]
+            },
+            {
+                "active": true,
+                "alliances": [
+                    "pink"
+                ],
+                "color": "Yellow",
+                "colorActual": "Purple",
+                "commandTokens": {
+                    "fleet": 9,
+                    "strategy": 2,
+                    "tactics": 4
+                },
+                "commodities": 0,
+                "custodiansPoints": 0,
+                "factionName": "The L1Z1X Mindnet",
+                "handSummary": {
+                    "Actions": 3,
+                    "Promissory": 1
+                },
+                "laws": [],
+                "leaders": {
+                    "agent": "unlocked",
+                    "commander": "unlocked",
+                    "hero": "unlocked"
+                },
+                "maxCommodities": 2,
+                "objectives": [
+                    "Diversify Research",
+                    "Hoard Raw Materials",
+                    "Master the Laws of Physics",
+                    "Raise a Fleet"
+                ],
+                "planetTotals": {
+                    "influence": {
+                        "avail": 15,
+                        "total": 15
+                    },
+                    "legendary": 0,
+                    "resources": {
+                        "avail": 22,
+                        "total": 22
+                    },
+                    "techs": {
+                        "blue": 1,
+                        "green": 0,
+                        "red": 0,
+                        "yellow": 1
+                    },
+                    "traits": {
+                        "cultural": 1,
+                        "hazardous": 4,
+                        "industrial": 1
+                    }
+                },
+                "relicCards": [],
+                "score": 7,
+                "strategyCards": [
+                    "Leadership"
+                ],
+                "technologies": [
+                    "Hyper Metabolism",
+                    "X-89 Bacterial Weapon",
+                    "Inheritance Systems",
+                    "Sarween Tools",
+                    "Duranium Armor",
+                    "Super-Dreadnought II",
+                    "Bio-Stims",
+                    "Gravity Drive",
+                    "Fighter II",
+                    "Neural Motivator",
+                    "Plasma Scoring",
+                    "Carrier II"
+                ],
+                "tradeGoods": 0,
+                "turnOrder": 0,
+                "unitModifiers": [
+                    {
+                        "localeName": "2ram",
+                        "name": "2RAM"
+                    },
+                    {
+                        "localeName": "plasma_scoring",
+                        "name": "Plasma Scoring"
+                    }
+                ],
+                "unitUpgrades": [
+                    "carrier",
+                    "dreadnought",
+                    "fighter"
+                ]
+            },
+            {
+                "active": true,
+                "alliances": [
+                    "red"
+                ],
+                "color": "Red",
+                "colorActual": "Red",
+                "commandTokens": {
+                    "fleet": 5,
+                    "strategy": 1,
+                    "tactics": 0
+                },
+                "commodities": 0,
+                "custodiansPoints": 0,
+                "factionName": "The Federation of Sol",
+                "handSummary": {
+                    "Actions": 1,
+                    "Secret Objectives": 2
+                },
+                "laws": [],
+                "leaders": {
+                    "agent": "unlocked",
+                    "commander": "unlocked",
+                    "hero": "locked"
+                },
+                "maxCommodities": 4,
+                "objectives": [
+                    "Raise a Fleet"
+                ],
+                "planetTotals": {
+                    "influence": {
+                        "avail": 11,
+                        "total": 11
+                    },
+                    "legendary": 0,
+                    "resources": {
+                        "avail": 12,
+                        "total": 12
+                    },
+                    "techs": {
+                        "blue": 1,
+                        "green": 0,
+                        "red": 0,
+                        "yellow": 0
+                    },
+                    "traits": {
+                        "cultural": 2,
+                        "hazardous": 0,
+                        "industrial": 3
+                    }
+                },
+                "relicCards": [],
+                "score": 2,
+                "strategyCards": [
+                    "Technology"
+                ],
+                "technologies": [
+                    "Gravity Drive",
+                    "Fleet Logistics",
+                    "Scanlink Drone Network",
+                    "Advanced Carrier II",
+                    "Antimass Deflectors",
+                    "Neural Motivator"
+                ],
+                "tradeGoods": 2,
+                "turnOrder": 4,
+                "unitModifiers": [],
+                "unitUpgrades": [
+                    "carrier"
+                ]
+            },
+            {
+                "active": true,
+                "alliances": [
+                    "yellow"
+                ],
+                "color": "Green",
+                "colorActual": "Green",
+                "commandTokens": {
+                    "fleet": 5,
+                    "strategy": 0,
+                    "tactics": 0
+                },
+                "commodities": 0,
+                "custodiansPoints": 0,
+                "factionName": "The Nomad",
+                "handSummary": {
+                    "Actions": 4,
+                    "Secret Objectives": 2
+                },
+                "laws": [],
+                "leaders": {
+                    "agent": "locked",
+                    "commander": "locked",
+                    "hero": "locked"
+                },
+                "maxCommodities": 4,
+                "objectives": [
+                    "Amass Wealth"
+                ],
+                "planetTotals": {
+                    "influence": {
+                        "avail": 0,
+                        "total": 8
+                    },
+                    "legendary": 1,
+                    "resources": {
+                        "avail": 0,
+                        "total": 10
+                    },
+                    "techs": {
+                        "blue": 0,
+                        "green": 0,
+                        "red": 0,
+                        "yellow": 0
+                    },
+                    "traits": {
+                        "cultural": 0,
+                        "hazardous": 2,
+                        "industrial": 0
+                    }
+                },
+                "relicCards": [],
+                "score": 2,
+                "strategyCards": [
+                    "Diplomacy"
+                ],
+                "technologies": [
+                    "Memoria II",
+                    "Sarween Tools",
+                    "Neural Motivator",
+                    "Sling Relay",
+                    "Gravity Drive"
+                ],
+                "tradeGoods": 4,
+                "turnOrder": 1,
+                "unitModifiers": [],
+                "unitUpgrades": [
+                    "flagship"
+                ]
+            }
+        ],
+        "round": 4,
+        "scoreboard": 10,
+        "setupTimestamp": 1725155698.876,
+        "speaker": "Pink",
+        "timer": {
+            "anchorSeconds": 26745,
+            "anchorTimestamp": 1726447240,
+            "countDown": -1,
+            "direction": 1,
+            "seconds": 26748
+        },
+        "timestamp": 1726447244.626,
+        "turn": "Blue",
+        "unpickedStrategyCards": {
+            "Construction": 2,
+            "Imperial": 0,
+            "Politics": 1
+        },
+        "whispers": []
+    }
+]

@@ -2,6 +2,7 @@ package ti4.commands.status;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -28,9 +29,9 @@ public class POInfo extends StatusSubcommandData {
         Game game = getActiveGame();
         Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
-        List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.entrySet().stream()
-            .filter(id -> Mapper.isValidPublicObjective(id.getKey()))
-            .map(id -> Mapper.getPublicObjective(id.getKey()))
+        List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.keySet().stream()
+            .filter(Mapper::isValidPublicObjective)
+            .map(Mapper::getPublicObjective)
             .toList();
 
         Player currentPlayer = game.getPlayer(getUser().getId());
@@ -45,8 +46,8 @@ public class POInfo extends StatusSubcommandData {
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {
                 List<Player> playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
-                    .map(player -> game.getPlayer(player))
-                    .filter(player -> player != null)
+                    .map(game::getPlayer)
+                    .filter(Objects::nonNull)
                     .filter(player -> !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
                     .toList();
 

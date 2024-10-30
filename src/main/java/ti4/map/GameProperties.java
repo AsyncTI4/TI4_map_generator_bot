@@ -1,6 +1,8 @@
 package ti4.map;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +70,7 @@ public class GameProperties {
     private @ExportableField int mapImageGenerationCount;
     private @ExportableField int numberOfPurgedFragments;
     private @ExportableField int pingSystemCounter;
+    private Map<Timestamp, GameStatsDashboardPayload> historicalGameStatsDashboardPayloads = new LinkedHashMap<>();
 
     // Customization Flags/Settings
     private boolean botFactionReacts;
@@ -90,7 +93,7 @@ public class GameProperties {
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private long autoPingSpacer;
-    private List<String> tags = new ArrayList<String>();
+    private List<String> tags = new ArrayList<>();
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
@@ -118,7 +121,7 @@ public class GameProperties {
 
     // Discord Snowflakes
     private @ExportableField String guildID;
-    private String speaker = "";
+    private String speakerUserID = "";
     private String activePlayerID;
     private String launchPostThreadID;
     private @ExportableField String botMapUpdatesThreadID;
@@ -130,6 +133,7 @@ public class GameProperties {
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
     private String latestUpNextMsg = "";
+    private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below
     private @ExportableField String mapString;

@@ -233,7 +233,7 @@ public class PlayerPreferenceHelper {
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        String afkTimes = "" + player.getHoursThatPlayerIsAFK();
+        String afkTimes = player.getHoursThatPlayerIsAFK();
         for (Game game : mapList.values()) {
             if (!game.isHasEnded()) {
                 for (Player player2 : game.getRealPlayers()) {

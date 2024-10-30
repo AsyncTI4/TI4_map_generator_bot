@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.model.DeckModel;
 import ti4.model.Source.ComponentSource;
 
 public class SearchDecks extends SearchComponentModel {
@@ -27,7 +28,7 @@ public class SearchDecks extends SearchComponentModel {
 
         List<MessageEmbed> messageEmbeds = Mapper.getDecks().values().stream()
             .filter(model -> model.search(searchString, source))
-            .map(model -> model.getRepresentationEmbed())
+            .map(DeckModel::getRepresentationEmbed)
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }

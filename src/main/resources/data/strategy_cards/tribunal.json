@@ -6,6 +6,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tribunal_1",
+        "colourHexCode": "#ff1600",
         "source": "other"
     },
     {
@@ -15,6 +16,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tribunal_2",
+        "colourHexCode": "#ff6901",
         "source": "other"
     },
     {
@@ -23,7 +25,9 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok1leadership",
         "imageFileName": "tribunal_3",
+        "colourHexCode": "#ffc401",
         "source": "other"
     },
     {
@@ -32,7 +36,9 @@
         "name": "Politics",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok3politics",
         "imageFileName": "tribunal_4",
+        "colourHexCode": "#fcfc01",
         "source": "other"
     },
     {
@@ -41,7 +47,9 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "tribunal_5",
+        "colourHexCode": "#65d915",
         "source": "other"
     },
     {
@@ -50,7 +58,9 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "tribunal_6",
+        "colourHexCode": "#01bb5d",
         "source": "other"
     },
     {
@@ -60,6 +70,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tribunal_7",
+        "colourHexCode": "#02eaf4",
         "source": "other"
     },
     {
@@ -68,7 +79,9 @@
         "name": "Technology",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "tribunal_8",
+        "colourHexCode": "#015bbe",
         "source": "other"
     },
     {
@@ -78,6 +91,7 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "imageFileName": "tribunal_9",
+        "colourHexCode": "#3f05ab",
         "source": "other"
     },
     {
@@ -86,7 +100,9 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "tribunal_10",
+        "colourHexCode": "#942de3",
         "source": "other"
     }
 ]

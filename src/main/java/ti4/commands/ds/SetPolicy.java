@@ -19,14 +19,13 @@ import ti4.model.UnitModel;
 
 public class SetPolicy extends DiscordantStarsSubcommandData {
 
-    private List<Choice> people = CommandHelper.toChoices("Connect", "Control", "+", "-");
-    private List<Choice> environment = CommandHelper.toChoices("Preserve", "Plunder", "+", "-");
-    private List<Choice> economy = CommandHelper.toChoices("Empower", "Exploit", "+", "-");
-
     public SetPolicy() {
         super(Constants.SET_POLICY, "Set Policies for Olradin Faction Abilities to their + or - side");
+        List<Choice> people = CommandHelper.toChoices("Connect", "Control", "+", "-");
         addOptions(new OptionData(OptionType.STRING, Constants.SET_PEOPLE, "Policy: The People Choice - 'Connect (+)' or 'Control (-)'").addChoices(people));
+        List<Choice> environment = CommandHelper.toChoices("Preserve", "Plunder", "+", "-");
         addOptions(new OptionData(OptionType.STRING, Constants.SET_ENVIRONMENT, "Policy: The Environment Choice - 'Preserve (+)' or 'Plunder (-)'").addChoices(environment));
+        List<Choice> economy = CommandHelper.toChoices("Empower", "Exploit", "+", "-");
         addOptions(new OptionData(OptionType.STRING, Constants.SET_ECONOMY, "Policy: The Economy Choice - 'Empower (+)' or 'Exploit (-)'").addChoices(economy));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to set Olradin Policies").setAutoComplete(true));
     }

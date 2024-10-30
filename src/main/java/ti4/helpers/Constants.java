@@ -1179,4 +1179,7 @@ public class Constants {
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";
     public static final String VOTC_MODE = "votc_mode";
+    public static final String OPTIONS = "options";
+    public static final String SHOW_FULL_TEXT = "show_full_text";
+    public static final String FOW_GM_IDS = "fogOfWarGMIDs";
 }

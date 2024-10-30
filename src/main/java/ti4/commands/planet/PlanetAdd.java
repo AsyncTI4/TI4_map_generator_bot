@@ -3,12 +3,10 @@ package ti4.commands.planet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.UnlockLeader;
@@ -59,7 +57,7 @@ public class PlanetAdd extends PlanetAddRemove {
 
         List<String> mecatols = Constants.MECATOLS;
         if (mecatols.contains(planet) && player.hasTech("iihq")) {
-            Planet mecatolRex = (Planet) unitHolder;
+            Planet mecatolRex = unitHolder;
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             mecatolRex.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -104,8 +102,7 @@ public class PlanetAdd extends PlanetAddRemove {
                         alreadyOwned = true;
                     }
                     player_.removePlanet(planet);
-                    List<String> relics = new ArrayList<>();
-                    relics.addAll(player_.getRelics());
+                    List<String> relics = new ArrayList<>(player_.getRelics());
                     for (String relic : relics) {
                         if (relic.contains("shard")
                             && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
@@ -165,6 +162,7 @@ public class PlanetAdd extends PlanetAddRemove {
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!player.getPlanets().contains(uH.getName())) {
                     ownsThemAll = false;
+                    break;
                 }
             }
             if (ownsThemAll) {

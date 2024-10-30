@@ -64,8 +64,7 @@ public class CorrectFaction extends PlayerSubcommandData {
             }
         }
 
-        List<String> laws = new ArrayList<>();
-        laws.addAll(game.getLawsInfo().keySet());
+        List<String> laws = new ArrayList<>(game.getLawsInfo().keySet());
         for (String law : laws) {
             if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
                 game.reviseLaw(game.getLaws().get(law), newFaction);
@@ -88,8 +87,7 @@ public class CorrectFaction extends PlayerSubcommandData {
                 player.addFactionTech(tech);
             }
         }
-        List<String> techs = new ArrayList<>();
-        techs.addAll(player.getTechs());
+        List<String> techs = new ArrayList<>(player.getTechs());
         for (String tech : techs) {
             player.removeTech(tech);
             player.addTech(tech);

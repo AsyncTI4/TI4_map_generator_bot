@@ -21,13 +21,14 @@ public class DiscardACRandom extends ACCardsSubcommandData {
     public DiscardACRandom() {
         super(Constants.DISCARD_AC_RANDOM, "Discard a random Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to discard, default 1"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -56,11 +57,11 @@ public class DiscardACRandom extends ACCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("Player: ").append(player.getUserName()).append(" - ");
         sb.append("Discarded Action Card:").append("\n");
-        while (count > 0 && player.getActionCards().size() > 0) {
+        while (count > 0 && !player.getActionCards().isEmpty()) {
             Map<String, Integer> actionCards_ = player.getActionCards();
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
             Collections.shuffle(cards_);
-            String acID = cards_.get(0);
+            String acID = cards_.getFirst();
             boolean removed = game.discardActionCard(player.getUserID(), actionCards_.get(acID));
             if (!removed) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Cards found, please retry");

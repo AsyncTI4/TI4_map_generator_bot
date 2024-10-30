@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -58,6 +59,7 @@ public class RelicDraw extends RelicSubcommandData {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info.toString());
     }
 
+    @ButtonHandler("drawRelicAtPosition_")
     public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game game, String buttonID) {
         int position = Integer.parseInt(buttonID.split("_")[1]);
         if (player.getPromissoryNotes().containsKey("dspnflor") && game.getPNOwner("dspnflor") != player) {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -111,7 +110,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         sb.append("_ _\n");
 
         // ACTION CARDS
-        sb.append("**Action Cards (" + player.getAc() + "/" + ButtonHelper.getACLimit(game, player) + "):**").append("\n");
+        sb.append("**Action Cards (").append(player.getAc()).append("/").append(ButtonHelper.getACLimit(game, player)).append("):**").append("\n");
         int index = 1;
 
         Map<String, Integer> actionCards = player.getActionCards();

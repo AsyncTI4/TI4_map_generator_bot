@@ -1,7 +1,6 @@
 package ti4.commands.custom;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.map.Game;

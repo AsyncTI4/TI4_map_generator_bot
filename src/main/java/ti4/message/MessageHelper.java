@@ -14,11 +14,6 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -41,6 +36,10 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessagePollBuilder;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -114,7 +113,7 @@ public class MessageHelper {
 			}
 		}
 		File mapUndoDirectory = Storage.getMapUndoDirectory();
-		if (mapUndoDirectory != null && mapUndoDirectory.exists() && !undoPresent) {
+		if (mapUndoDirectory.exists() && !undoPresent) {
 			String mapName = game.getName();
 			String mapNameForUndoStart = mapName + "_";
 			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
@@ -192,13 +191,13 @@ public class MessageHelper {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players;
 			if ("when".equalsIgnoreCase(whenOrAfter)) {
-				if (game.getLatestWhenMsg() != null && !"".equals(game.getLatestWhenMsg())) {
+				if (game.getLatestWhenMsg() != null && !game.getLatestWhenMsg().isEmpty()) {
 					game.getMainGameChannel().deleteMessageById(game.getLatestWhenMsg()).queue();
 				}
 				game.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(game.getPlayersWhoHitPersistentNoWhen(), "_");
 			} else if ("after".equalsIgnoreCase(whenOrAfter)) {
-				if (game.getLatestAfterMsg() != null && !"".equals(game.getLatestAfterMsg())) {
+				if (game.getLatestAfterMsg() != null && !game.getLatestAfterMsg().isEmpty()) {
 					game.getMainGameChannel().deleteMessageById(game.getLatestAfterMsg()).queue(Consumers.nop(), BotLogger::catchRestError);
 				}
 				game.setLatestAfterMsg(msg.getId());
@@ -343,9 +342,7 @@ public class MessageHelper {
 			if (thread.isArchived() && !thread.isLocked()) {
 				String txt = messageText;
 				List<Button> butts = buttons;
-				thread.getManager().setArchived(false).queue((v) -> {
-					splitAndSentWithAction(txt, channel, restAction, embeds, butts);
-				}, BotLogger::catchRestError);
+				thread.getManager().setArchived(false).queue((v) -> splitAndSentWithAction(txt, channel, restAction, embeds, butts), BotLogger::catchRestError);
 				return;
 			} else if (thread.isLocked()) {
 				BotLogger.log("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
@@ -459,7 +456,7 @@ public class MessageHelper {
 	 * @return True if the message was send successfully, false otherwise
 	 */
 	public static boolean sendPrivateMessageToPlayer(Player player, Game game, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
-		if (messageText == null || messageText.length() == 0)
+		if (messageText == null || messageText.isEmpty())
 			return true; // blank message counts as a success
 		User user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
 		if (user == null) {
@@ -517,13 +514,8 @@ public class MessageHelper {
 
 		// GET CARDS INFO THREAD
 		ThreadChannel threadChannel = player.getCardsInfoThread();
-		if (threadChannel == null) {
-			BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player "
-				+ player.getUserName() + " in game " + game.getName());
-			return;
-		}
 
-		sendMessageToChannel(threadChannel, messageText);
+        sendMessageToChannel(threadChannel, messageText);
 	}
 
 	/**
@@ -718,9 +710,7 @@ public class MessageHelper {
 			Helper.checkThreadLimitAndArchive(channel.asGuildMessageChannel().getGuild());
 			channel.asTextChannel().createThreadChannel(threadName)
 				.setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-				.queueAfter(500, TimeUnit.MILLISECONDS, t -> {
-					sendMessageToChannelWithEmbedsAndButtons(t, null, embeds, null);
-				}, error -> BotLogger.log("Error creating thread channel: " + threadName + " in channel: " + channel.getAsMention(), error));
+				.queueAfter(500, TimeUnit.MILLISECONDS, t -> sendMessageToChannelWithEmbedsAndButtons(t, null, embeds, null), error -> BotLogger.log("Error creating thread channel: " + threadName + " in channel: " + channel.getAsMention(), error));
 		} else if (channel instanceof ThreadChannel) {
 			sendMessageToChannelWithEmbedsAndButtons(channel, null, embeds, null);
 		}
@@ -728,7 +718,7 @@ public class MessageHelper {
 
 	public static void sendMessageEmbedsToCardsInfoThread(Game game, Player player, String message, List<MessageEmbed> embeds) {
 		ThreadChannel channel = player.getCardsInfoThread();
-		if (channel == null || embeds == null || embeds.isEmpty()) {
+		if (embeds == null || embeds.isEmpty()) {
 			return;
 		}
 		sendMessageToChannelWithEmbedsAndButtons(channel, message, embeds, null);

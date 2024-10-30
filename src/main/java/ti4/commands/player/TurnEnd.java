@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -19,6 +18,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -38,11 +39,13 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
@@ -77,6 +80,19 @@ public class TurnEnd extends PlayerSubcommandData {
         mainPlayer.resetOlradinPolicyFlags();
     }
 
+    @ButtonHandler("turnEnd")
+    public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {
+        if (game.isFowMode() && !player.isActivePlayer()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
+            return;
+        }
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        TurnEnd.pingNextPlayer(event, game, player);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+
+        ButtonHelper.updateMap(game, event, "End of Turn " + player.getTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
+    }
+
     public static Player findNextUnpassedPlayer(Game game, Player currentPlayer) {
         int startingInitiative = game.getPlayersTurnSCInitiative(currentPlayer);
         //in a normal game, 8 is the maximum number, so we modulo on 9
@@ -96,7 +112,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (unpassedPlayers.isEmpty()) {
             return null;
         } else {
-            return unpassedPlayers.get(0);
+            return unpassedPlayers.getFirst();
         }
     }
 
@@ -110,8 +126,7 @@ public class TurnEnd extends PlayerSubcommandData {
         game.setStoredValue("endTurnWhenSCFinished", "");
         game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "sol", event);
-        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -154,7 +169,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (!game.isFowMode()) {
             String lastTransaction = game.getLatestTransactionMsg();
             try {
-                if (lastTransaction != null && !"".equals(lastTransaction)) {
+                if (lastTransaction != null && !lastTransaction.isEmpty()) {
                     game.setLatestTransactionMsg("");
                     game.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
                     });
@@ -171,7 +186,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
-        CommanderUnlockCheck.checkPlayer(nextPlayer, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(nextPlayer, "sol");
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);
@@ -279,7 +294,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
-            && ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).size() > 0) {
+            && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).isEmpty()) {
             poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
         }
         poButtons.removeIf(Objects::isNull);
@@ -377,17 +392,17 @@ public class TurnEnd extends PlayerSubcommandData {
             }
 
             String message2a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following public objectives: ";
-            String message2b = "none";
+            StringBuilder message2b = new StringBuilder("none");
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
                 List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(obbie, game, player);
                     if (playerProgress >= threshold) {
-                        if (message2b.equalsIgnoreCase("none")) {
-                            message2b = Mapper.getPublicObjective(obbie).getName();
+                        if (message2b.toString().equalsIgnoreCase("none")) {
+                            message2b = new StringBuilder(Mapper.getPublicObjective(obbie).getName());
                         } else {
-                            message2b = message2b + ", " + Mapper.getPublicObjective(obbie).getName();
+                            message2b.append(", ").append(Mapper.getPublicObjective(obbie).getName());
                         }
                     }
                 }
@@ -396,15 +411,15 @@ public class TurnEnd extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
             }
             int count = 0;
-            String message3a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:";
+            StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoButton.getObjectiveThreshold(soID, game) > 0 && ListPlayerInfoButton.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoButton.getObjectiveThreshold(soID, game) - 1) && !soID.equalsIgnoreCase("dp")) {
-                    message3a = message3a + " " + Mapper.getSecretObjective(soID).getName();
+                    message3a.append(" ").append(Mapper.getSecretObjective(soID).getName());
                     count++;
                 }
             }
             if (count > 0 && player.isRealPlayer()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
             }
 
         }

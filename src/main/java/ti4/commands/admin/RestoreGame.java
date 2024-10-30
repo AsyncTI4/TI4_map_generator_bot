@@ -42,9 +42,7 @@ public class RestoreGame extends AdminSubcommandData {
         File gameFile = Storage.getMapImageStorage(attachment.getFileName());
         try {
             gameFile = attachment.getProxy().downloadToFile(gameFile).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
