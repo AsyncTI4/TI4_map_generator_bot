@@ -441,13 +441,8 @@ public class MapGenerator {
     private FileUpload uploadToDiscord() {
         if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
-        float quality = switch (displayType) {
-            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
-                 shipless, landscape -> 1 / 4.0f;
-            default -> 1 / 6.0f;
-        };
 
-        FileUpload fileUpload = uploadToDiscord(mainImage, quality, game.getName());
+        FileUpload fileUpload = uploadToDiscord(mainImage, .2f, game.getName());
 
         if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
         return fileUpload;
