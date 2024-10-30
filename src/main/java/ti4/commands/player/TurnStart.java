@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -62,9 +61,8 @@ public class TurnStart extends PlayerSubcommandData {
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setWhetherPlayerShouldBeTenMinReminded(false);
         player.setTurnCount(player.getTurnCount() + 1);
-        CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
-        Map<String, String> maps = new HashMap<>();
-        maps.putAll(game.getMessagesThatICheckedForAllReacts());
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
             if (id.contains("combatRoundTracker")) {
                 game.removeStoredValue(id);
@@ -91,7 +89,7 @@ public class TurnStart extends PlayerSubcommandData {
                 goingToPass = true;
             }
         }
-        String text = "" + player.getRepresentationUnfogged() + " UP NEXT (Turn #" + player.getTurnCount() + ")";
+        String text = player.getRepresentationUnfogged() + " UP NEXT (Turn #" + player.getTurnCount() + ")";
         String buttonText = "Use buttons to do your turn. ";
         if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
             buttonText = buttonText + "Your SC number is #" + player.getSCs().toArray()[0];
@@ -122,7 +120,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             Player privatePlayer = player;
             if (privatePlayer.getStasisInfantry() > 0) {
-                if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                         "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
@@ -155,7 +153,7 @@ public class TurnStart extends PlayerSubcommandData {
             }
             Player privatePlayer = player;
             if (privatePlayer.getStasisInfantry() > 0) {
-                if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
+                if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
                         "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
@@ -238,10 +236,10 @@ public class TurnStart extends PlayerSubcommandData {
         for (int sc : game.getPlayedSCsInOrder(player)) {
             if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two")) {
                 String num = sc + "";
-                num = num.substring(num.length() - 1, num.length());
+                num = num.substring(num.length() - 1);
                 for (Integer sc2 : player.getSCs()) {
                     String num2 = sc2 + "";
-                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    num2 = num2.substring(num2.length() - 1);
                     if (!num2.equalsIgnoreCase(num) && !player.hasFollowedSC(sc)) {
                         player.addFollowedSC(sc);
                     }
@@ -311,7 +309,7 @@ public class TurnStart extends PlayerSubcommandData {
                     for (int sc : player.getSCs()) {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentationUnfogged());
-                        sb.append(" You are getting this ping because " + Helper.getSCName(sc, game) + " has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
+                        sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
                         if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
                             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
                         }
@@ -349,7 +347,7 @@ public class TurnStart extends PlayerSubcommandData {
                 startButtons.add(worm);
             }
             if (player.hasUnexhaustedLeader("florzenagent")
-                && ButtonHelperAgents.getAttachments(game, player).size() > 0) {
+                && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
                 startButtons.add(Buttons.green(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(), "Use Florzen Agent", Emojis.florzen));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
@@ -405,7 +403,7 @@ public class TurnStart extends PlayerSubcommandData {
                         }
                     }
                 } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
-                    && ButtonHelper.getTilesWithYourCC(p1, game, event).size() > 0) {
+                    && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
                     Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", factionEmoji);
                     startButtons.add(lButton);
                 }

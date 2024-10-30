@@ -15,15 +15,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.MessageListener;
 import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
@@ -39,6 +37,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -79,7 +78,7 @@ public class AutoCompleteProvider {
         //if (factionOrColorOption != null) showAllChoicesInGame = true;
 
         String userID = event.getUser().getId();
-        MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         Player player = null;
         if (game != null) {
@@ -159,7 +158,7 @@ public class AutoCompleteProvider {
             }
             case Constants.HUE -> {
                 String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
-                Map<String, String> values = new HashMap<String, String>() {
+                Map<String, String> values = new HashMap<>() {
                     {
                         put("RED", "Reds");
                         put("GRAY", "Grays");
@@ -184,7 +183,7 @@ public class AutoCompleteProvider {
             }
             case Constants.DECAL_HUE -> {
                 String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
-                Map<String, String> values = new HashMap<String, String>() {
+                Map<String, String> values = new HashMap<>() {
                     {
                         put("Pattern", "Pattern");
                         put("Icon", "Icon");
@@ -394,7 +393,7 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
-                MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
+                SlashCommandListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
                 Map<String, String> planets = Mapper.getPlanetRepresentations();
@@ -408,7 +407,7 @@ public class AutoCompleteProvider {
                             value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), game) + "/" + Helper.getPlanetInfluence(value.getKey(), game) + ")", value.getKey()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                } else if (game != null && game.isFowMode()) {
+                } else if (game != null) {
                     List<Command.Choice> options = planets.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
@@ -439,7 +438,7 @@ public class AutoCompleteProvider {
             case Constants.TTPG_FILE_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 File exportDirectory = Storage.getTTPGExportDirectory();
-                String dir = exportDirectory == null ? "/" : exportDirectory.getPath();
+                String dir = exportDirectory.getPath();
 
                 Set<String> fileSet = Stream.of(new File(dir).listFiles())
                     .filter(file -> !file.isDirectory())

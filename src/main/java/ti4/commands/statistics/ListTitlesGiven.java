@@ -62,7 +62,7 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
         }
         if (titleOnly) {
             Map<String, Integer> sortedMapAscPlayersNTitles = sortByValue(timesPersonHasGottenSpecificTitle, false);
-            longMsg.append("\nThe number of titles each person has for the title of " + specificTitle + ": \n");
+            longMsg.append("\nThe number of titles each person has for the title of ").append(specificTitle).append(": \n");
             for (String personNTitle : sortedMapAscPlayersNTitles.keySet()) {
                 if (!personNTitle.toLowerCase().contains(specificTitle.toLowerCase())) {
                     continue;

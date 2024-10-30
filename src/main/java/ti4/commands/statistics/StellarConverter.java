@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -41,7 +42,7 @@ public class StellarConverter extends StatisticsSubcommandData {
 
             if (worldsThisGame.size() == 1) {
                 count++;
-                String planet = worldsThisGame.get(0);
+                String planet = worldsThisGame.getFirst();
                 if (numberConverts.containsKey(planet)) {
                     numberConverts.put(planet, numberConverts.get(planet) + 1);
                 } else {

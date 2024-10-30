@@ -11,10 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.apache.commons.collections4.CollectionUtils;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
@@ -90,7 +88,7 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                .filter(file -> file.exists())
+                .filter(File::exists)
                 .filter(file -> !file.isDirectory())
                 .toList());
         }
@@ -136,8 +134,7 @@ public class TileHelper {
     }
 
     public static boolean isDraftTile(TileModel tile) {
-        if (tile.getImagePath().startsWith("draft_")) return true;
-        return false;
+        return tile.getImagePath().startsWith("draft_");
     }
 
     public static void addNewTileToList(TileModel tile) {

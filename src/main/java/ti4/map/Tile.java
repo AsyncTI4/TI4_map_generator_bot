@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,13 +13,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -545,10 +543,7 @@ public class Tile {
         if (Constants.MECATOL_SYSTEMS.contains(getTileID())) {
             return true;
         }
-        if (CollectionUtils.containsAny(unitHolders.keySet(), Constants.MECATOLS)) {
-            return true;
-        }
-        return false;
+        return CollectionUtils.containsAny(unitHolders.keySet(), Constants.MECATOLS);
     }
 
     @JsonIgnore
@@ -668,7 +663,7 @@ public class Tile {
             .map(Map.Entry::getKey)
             .map(player::getUnitFromUnitKey)
             .filter(Objects::nonNull)
-            .mapToInt(unit -> unit.getFleetSupplyBonus())
+            .mapToInt(UnitModel::getFleetSupplyBonus)
             .sum();
     }
 

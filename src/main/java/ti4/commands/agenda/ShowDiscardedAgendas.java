@@ -1,6 +1,8 @@
 package ti4.commands.agenda;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -22,16 +24,15 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
-        StringBuilder sb = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
-        sb.append("### __**Discarded Agendas:**__");
+        String sb = "### __**Discarded Agendas:**__";
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         List<MessageEmbed> agendaEmbeds = new ArrayList<>();
         for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
             agendaEmbeds.add(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
-            sb2.append(Mapper.getAgenda(entry.getKey()).getName() + " (ID: " + entry.getValue() + ")\n");
+            sb2.append(Mapper.getAgenda(entry.getKey()).getName()).append(" (ID: ").append(entry.getValue()).append(")\n");
         }
-        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb.toString(), agendaEmbeds);
+        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb, agendaEmbeds);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb2.toString());
     }
 }

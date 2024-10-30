@@ -15,10 +15,10 @@ import ti4.helpers.Units.UnitKey;
  * use the literal JSON string as the map key.
  */
 public class UnitKeyMapKeySerializer extends JsonSerializer<UnitKey> {
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void serialize(UnitKey value, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+    public void serialize(UnitKey value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         gen.writeFieldName(mapper.writeValueAsString(value));
     }
 }

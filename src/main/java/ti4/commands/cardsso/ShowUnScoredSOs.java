@@ -59,7 +59,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
                     sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                     sb.append("> ");
                     for (Player player : game.getRealPlayers()) {
-                        sb.append(player.getFactionEmoji() + ": " + ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(id, game) + " ");
+                        sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
                     }
                     sb.append("\n");
 
@@ -77,7 +77,7 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
                     sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
                     sb.append("> ");
                     for (Player player : game.getRealPlayers()) {
-                        sb.append(player.getFactionEmoji() + ": " + ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(id, game) + " ");
+                        sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
                     }
                     sb.append("\n");
 

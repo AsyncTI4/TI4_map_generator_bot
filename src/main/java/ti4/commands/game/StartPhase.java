@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.UserJoinServerListener;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PlayPN;
@@ -36,7 +35,8 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
-import ti4.helpers.TIGLHelper;
+import ti4.helpers.WebHelper;
+import ti4.listeners.UserJoinServerListener;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
@@ -66,7 +66,7 @@ public class StartPhase extends GameSubcommandData {
             case "strategy" -> startStrategyPhase(event, game);
             case "voting", "agendaVoting" -> AgendaHelper.startTheVoting(game);
             case "finSpecial" -> ButtonHelper.fixAllianceMembers(game);
-            case "P1Special" -> TIGLHelper.initializeTIGLGame(game);
+            case "P1Special" -> WebHelper.putStats();
             case "shuffleDecks" -> game.shuffleDecks();
             case "publicObj" -> ListPlayerInfoButton.displayerScoringProgression(game, true, event.getMessageChannel(), "both");
             case "publicObjAll" -> ListPlayerInfoButton.displayerScoringProgression(game, false, event.getMessageChannel(), "1");
@@ -81,22 +81,22 @@ public class StartPhase extends GameSubcommandData {
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
-                String endOfGameSummary = "";
+                StringBuilder endOfGameSummary = new StringBuilder();
 
                 for (int x = 1; x < game.getRound() + 1; x++) {
-                    String summary = "";
+                    StringBuilder summary = new StringBuilder();
                     for (Player player : game.getRealPlayers()) {
                         if (!game.getStoredValue("endofround" + x + player.getFaction()).isEmpty()) {
-                            summary = summary + player.getFactionEmoji() + ": " + game.getStoredValue("endofround" + x + player.getFaction()) + "\n";
+                            summary.append(player.getFactionEmoji()).append(": ").append(game.getStoredValue("endofround" + x + player.getFaction())).append("\n");
                         }
                     }
                     if (!summary.isEmpty()) {
-                        summary = "**__Round " + x + " Summary__**\n" + summary;
-                        endOfGameSummary = endOfGameSummary + summary;
+                        summary.insert(0, "**__Round " + x + " Summary__**\n");
+                        endOfGameSummary.append(summary);
                     }
                 }
                 if (!endOfGameSummary.isEmpty()) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), endOfGameSummary);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), endOfGameSummary.toString());
                 }
             }
             case "statusHomework" -> startStatusHomework(event, game);
@@ -247,8 +247,8 @@ public class StartPhase extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player speaker;
-        if (game.getPlayer(game.getSpeaker()) != null) {
-            speaker = game.getPlayers().get(game.getSpeaker());
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed");
             return;
@@ -338,7 +338,7 @@ public class StartPhase extends GameSubcommandData {
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {
-            if (player.getSCs() != null && player.getSCs().size() > 0 && !player.getSCs().contains(0)) {
+            if (player.getSCs() != null && !player.getSCs().isEmpty() && !player.getSCs().contains(0)) {
                 playersWithSCs++;
             }
         }
@@ -354,21 +354,21 @@ public class StartPhase extends GameSubcommandData {
 
         for (Player player : game.getRealPlayers()) {
             if (game.getRound() < 4) {
-                String preferences = "";
+                StringBuilder preferences = new StringBuilder();
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
                         continue;
                     }
                     String old = game.getStoredValue(p2.getUserID() + "anonDeclare");
                     if (!old.isEmpty() && !old.toLowerCase().contains("strong")) {
-                        preferences = preferences + old + "; ";
+                        preferences.append(old).append("; ");
                     }
                 }
                 if (!preferences.isEmpty()) {
-                    preferences = preferences.substring(0, preferences.length() - 2);
-                    preferences = player.getRepresentation() + " this is a reminder that at the start of the game, your fellow players stated a preference for the following environments:\n" +
-                        preferences + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play";
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), preferences);
+                    preferences = new StringBuilder(preferences.substring(0, preferences.length() - 2));
+                    preferences = new StringBuilder(player.getRepresentation() + " this is a reminder that at the start of the game, your fellow players stated a preference for the following environments:\n" +
+                            preferences + "\nYou are under no special obligation to abide by that preference, but it may be a nice thing to keep in mind as you play");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), preferences.toString());
                 }
             }
 
@@ -511,7 +511,7 @@ public class StartPhase extends GameSubcommandData {
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
             if (privatePlayer == null)
                 return;
-            msgExtra = "" + privatePlayer.getRepresentationUnfogged() + " UP NEXT";
+            msgExtra = privatePlayer.getRepresentationUnfogged() + " UP NEXT";
             game.updateActivePlayer(privatePlayer);
 
             if (!allPicked) {
@@ -522,7 +522,7 @@ public class StartPhase extends GameSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
 
                 if (privatePlayer.getStasisInfantry() > 0) {
-                    if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
+                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(), "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
                         privatePlayer.setStasisInfantry(0);
@@ -546,7 +546,7 @@ public class StartPhase extends GameSubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.", TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
 
                 if (privatePlayer.getStasisInfantry() > 0) {
-                    if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
+                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(), "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.", ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
                         privatePlayer.setStasisInfantry(0);

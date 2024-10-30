@@ -132,7 +132,7 @@ public class Info extends GameSubcommandData {
         if (game.isFowMode()) {
             sb.append("FoW Options:");
             for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
-                sb.append(" " + entry.getKey() + ":" + entry.getValue());
+                sb.append(" ").append(entry.getKey()).append(":").append(entry.getValue());
             }
             sb.append(NEW_LINE);
         }
@@ -161,6 +161,7 @@ public class Info extends GameSubcommandData {
         sb.append("Current Phase: ").append(game.getPhaseOfGame()).append(NEW_LINE);
         sb.append("Game Player Count: ").append(game.getPlayerCountForMap()).append(NEW_LINE);
         sb.append("Game Real Player Count: ").append(game.getRealPlayers().size()).append(NEW_LINE);
+        sb.append("GMIDs: `").append(game.getFogOfWarGMIDs()).append("`\n");
         sb.append("SCs per player: ").append(game.getStrategyCardsPerPlayer()).append(NEW_LINE);
         sb.append("Map Images Generated: ").append(game.getMapImageGenerationCount()).append(NEW_LINE);
         sb.append("SC Trade Goods: `").append(game.getScTradeGoods()).append("`").append(NEW_LINE);

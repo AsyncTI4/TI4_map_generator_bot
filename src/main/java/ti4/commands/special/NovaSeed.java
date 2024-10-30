@@ -2,13 +2,16 @@ package ti4.commands.special;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -46,7 +49,7 @@ public class NovaSeed extends SpecialSubcommandData {
         secondHalfOfNovaSeed(player, event, tile, game);
     }
 
-    public void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
+    public static void secondHalfOfNovaSeed(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
         String message1 = "Moments before disaster in game " + game.getName();
         StellarConverter.postTileInDisasterWatch(game, tile, 1, message1);
 
@@ -66,11 +69,10 @@ public class NovaSeed extends SpecialSubcommandData {
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         game.setTile(novaTile);
 
-        StringBuilder message2 = new StringBuilder();
-        message2.append(tile.getRepresentation());
-        message2.append(" has been nova seeded by ");
-        message2.append(player.getRepresentation());
-        StellarConverter.postTileInDisasterWatch(game, novaTile, 1, message2.toString());
+        String message2 = tile.getRepresentation() +
+                " has been nova seeded by " +
+                player.getRepresentation();
+        StellarConverter.postTileInDisasterWatch(game, novaTile, 1, message2);
 
         if (player.hasLeaderUnlocked("muaathero")) {
             Leader playerLeader = player.getLeader("muaathero").orElse(null);
@@ -82,6 +84,12 @@ public class NovaSeed extends SpecialSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Adjudicator Ba'al, the Muaat hero, was not purged - something went wrong");
             }
         }
+    }
+
+    @ButtonHandler("novaSeed_")
+    public static void novaSeed(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        secondHalfOfNovaSeed(player, event, game.getTileByPosition(buttonID.split("_")[1]), game);
+        ButtonHelper.deleteTheOneButton(event);
     }
 
 }

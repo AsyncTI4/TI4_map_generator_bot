@@ -7,6 +7,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -32,7 +33,8 @@ public class NaaluCommander extends SpecialSubcommandData {
         secondHalfOfNaaluCommander(event, game, player);
     }
 
-    public void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
+    @ButtonHandler("naaluCommander")
+    public static void secondHalfOfNaaluCommander(GenericInteractionCreateEvent event, Game game, Player player) {
 
         if (!game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             MessageHelper.sendMessageToEventChannel(event, "Only players with access to M'aban, the Naalu Commander, unlocked may use this ability.");
@@ -73,8 +75,9 @@ public class NaaluCommander extends SpecialSubcommandData {
             sb.append(PNInfo.getPromissoryNoteCardInfo(game, player_, false, true));
         }
 
-        if (!game.isFowMode()) MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            player.getRepresentation() + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
+        if (!game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), player.getRepresentation() + " is using M'aban, the Naalu Commander, to look at the top & bottom agenda, and their neighbour's promissory notes.");
+        }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
     }
 

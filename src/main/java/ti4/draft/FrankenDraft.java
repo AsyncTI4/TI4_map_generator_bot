@@ -113,7 +113,7 @@ public class FrankenDraft extends BagDraft {
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
                     if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }

@@ -1,17 +1,11 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
@@ -28,6 +22,12 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TransactionHelper {
 
@@ -242,136 +242,149 @@ public class TransactionHelper {
         return trans.toString();
     }
 
+    private static final List<String> nothingMessages = Arrays.asList(
+        "Nothing But Respect And Good Will",
+        "Some Pocket Lint",
+        "Sunshine and Rainbows",
+        "A Sense of Pride and Accomplishment",
+        "A Crisp High Five",
+        "A Well Written Thank-You Note",
+        "Heartfelt Thanks",
+        "The Best Vibes",
+        "A Blessing",
+        "Good Karma",
+        "A Mewling Kitten",
+        "A Lost Virtual Puppy",
+        "A Fortune Cookie",
+        "A Firm Handshake",
+        "A Friendly Wave",
+        "Well Wishes",
+        "A Home-cooked Meal",
+        "$1000 In Monopoly Money",
+        "Forgiveness For Past Mistakes",
+        "A Lucky Rock",
+        "A Warm Cup of Tea",
+        "A Poorly Drawn But Deeply Meaningful Picture",
+        "An Unexpected Hug",
+        "A Magic Trick",
+        "A Pair of Comfy Socks",
+        "A Whiff of Fresh Cookies",
+        "A Charming Smile",
+        "A Promise to Call Later",
+        "A Supportive Cheer",
+        "A Playful Joke",
+        "A Chance to See A Beautiful Sunset",
+        "A Treasure Map",
+        "A Song",
+        "A Book Recommendation",
+        "A Cozy Blanket",
+        "A Cheery Greeting",
+        "A Bucket of Joy",
+        "A Gentle Reminder",
+        "A Heartwarming Story",
+        "A Whisper of Kindness",
+        "An Expired Gift Certificate",
+        "A Free Trial CD for AOL",
+        "Compost For Your Garden",
+        "A Tupperware Party Invitation",
+        "A Picture of a Sandwich",
+        "Thoughtful Advice About Your Current Situation",
+        "Zip; Zilch; Nada",
+        "Approximately " + String.format("%,d", 5 * ThreadLocalRandom.current().nextInt(200, 2000) + ThreadLocalRandom.current().nextInt(1, 5)) + " Unique Snow Globes",
+        "Forgiveness For Future Mistakes (Terms and Conditions Apply)",
+        "A Token Labelled \"Traid Gud\"",
+        "A Hill of Beans",
+        "This Small Portrait of Benjamin Franklin, Done in Oil Paints",
+        "Favourable Timing on Bureaucracy",
+        "A Comfortable Sinecure, When I'm Galactic Emperor",
+        "This Box of One Dozen Starving, Crazed Weasels",
+        "A jpeg Depicting a Cartoon Monkey",
+        "A Somewhat Rare Beanie Baby",
+        "Some Good News About Our Lord and Saviour, Harrugh Gefhara",
+        "No Spoilers for that TV Show You're Watching",
+        "Payment in Exposure",
+        "A VHS Recording of an Episode of _Bill Nye The Science Guy_",
+        "A Short But Comprehensive Lecture on Medieval Siege Weaponry",
+        "An _E.T. the Extra-Terrestrial_ Cartridge for the Atari 2600",
+        "A Nice Solid Thumbs Up",
+        "A Handful of Dog Treats",
+        "One (1) Peppercorn",
+        "Poutine",
+        "The Deputy Speakership",
+        "Half a Slice of Pizza, With or Without Pineapple",
+        "The Wi-Fi Password",
+        "A Second-Hand Toothbrush",
+        "A Lamp That Might Contain a Genie, But Probably Doesn't",
+        "An Acoustic Rendition of _Wonderwall_",
+        "As Many Spiders as You Desire",
+        "Fruit Salad (yummy, yummy)",
+        "One Chocolate Chip Muffin Amongst Eleven Raisin Muffins",
+        "Invoking the A̴̰̽̑ͅn̶͙͝ĉ̸̤̜̽i̶̯̯͋ě̶͓̜͑n̶̤̩̉t̸̯̎͊͜ ̷́ͅP̶̘̀a̸̧̔̅c̶̣̋̔t̷̺̪͛͋",
+        "Some Perfunctory Laughter at Your Next Attempt at a Joke",
+        "The Front Half of Our Pantomime Horse",
+        "~~False~~ Reassurances",
+        "A Big Mouth Billy Bass",
+        "More Cowbell",
+        "Some Subpar Macaroni Art",
+        "A Chocolate Teapot",
+        "Some Week-Old Sushi",
+        "My Second Finest Bottle of Wine Drink™",
+        "A Riddle, Wrapped in a Mystery, Inside an Enigma, Coated in Chocolate",
+        "A Brand-New Luxury Car, Missing Only Fuel, Tires and Car",
+        "Either \"Peace\" or \"Peas\"; the Ambassador Failed to Elaborate",
+        "A Year's Supply of Brussels Sprouts",
+        "A Nintendo Power Glove; ***Now You're Playing With Power***",
+        "A Wooden Spoon",
+        "An Ingot of Pyrite",
+        "A White Elephant",
+        "Ennui",
+        "A Smurf TV Tray",
+        "A Creepy Doll",
+        "A Ziploc Bag of Ranch Dressing",
+        "Nothing. And Furthermore, Carthage Must be Destroyed!",
+        "All of the Goulash",
+        "Waldo's Location",
+        "A Billet of Ea-nāṣir's Finest Copper",
+        "All the Silver in Fort Knox",
+        "A Controlling Share of The Bereg Jet Ski Company",
+        "A Handful of Specially Marked Cereal Boxtops",
+        "An Aperture Science Thing We Don't Know What It Does",
+        "Nothing, Because I'm a Cheapskate",
+        "A Brick, Delivery Speed TBD",
+        "An Inanimate Carbon Rod",
+        "A Set of Left-Handed Sarween Tools",
+        "A Bridge That's For Sale",
+        "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // To brighten your day, yes indeed!",
+        "The Chameleon's Dish",
+        "The Sound of One Hand Clapping",
+        "An Unpaired Sock",
+        "\"101 Ways To Make Toast\"",
+        "A Chess Set With 31 Missing Pieces",
+        "Your Horoscope Reading",
+        "Just Deserts",
+        "Surprise and Delight",
+        "`//Could somebody get ChatGPT to generate a few more messages - Dev`",
+        "Some Free Candy, From My Windowless Van");
+
     public static String getNothingMessage() {
         if (ThreadLocalRandom.current().nextInt(1000000) == 0) {
-            return "The joy of sharing a one in a million emptry transaction offer message";
+            return "The joy of sharing a one in a million empty transaction offer message";
         }
-        int result = ThreadLocalRandom.current().nextInt(1, 122);
-        return switch (result) {
-            case 1 -> "Nothing But Respect And Good Will";
-            case 2 -> "Some Pocket Lint";
-            case 3 -> "Sunshine and Rainbows";
-            case 4 -> "A Sense of Pride and Accomplishment";
-            case 5 -> "A Crisp High Five";
-            case 6 -> "A Well Written Thank-You Note";
-            case 7 -> "Heartfelt Thanks";
-            case 8 -> "The Best Vibes";
-            case 9 -> "A Blessing";
-            case 10 -> "Good Karma";
-            case 11 -> "A Mewling Kitten";
-            case 12 -> "A Lost Virtual Puppy";
-            case 13 -> "A Fortune Cookie";
-            case 14 -> "A Firm Handshake";
-            case 15 -> "A Friendly Wave";
-            case 16 -> "Well Wishes";
-            case 17 -> "A Home-cooked Meal";
-            case 18 -> "$1000 In Monopoly Money";
-            case 19 -> "Forgiveness For Past Mistakes";
-            case 20 -> "A Lucky Rock";
-            case 21 -> "A Warm Cup of Tea";
-            case 22 -> "A Poorly Drawn But Deeply Meaningful Picture";
-            case 23 -> "An Unexpected Hug";
-            case 24 -> "A Magic Trick";
-            case 25 -> "A Pair of Comfy Socks";
-            case 26 -> "A Whiff of Fresh Cookies";
-            case 27 -> "A Charming Smile";
-            case 28 -> "A Promise to Call Later";
-            case 29 -> "A Supportive Cheer";
-            case 30 -> "A Playful Joke";
-            case 31 -> "A Chance to See A Beautiful Sunset";
-            case 32 -> "A Treasure Map";
-            case 33 -> "A Song";
-            case 34 -> "A Book Recommendation";
-            case 35 -> "A Cozy Blanket";
-            case 36 -> "A Cheery Greeting";
-            case 37 -> "A Bucket of Joy";
-            case 38 -> "A Gentle Reminder";
-            case 39 -> "A Heartwarming Story";
-            case 40 -> "A Whisper of Kindness";
-            case 41 -> "An Expired Gift Certificate";
-            case 42 -> "A Free Trial CD for AOL";
-            case 43 -> "Compost For Your Garden";
-            case 44 -> "A Tupperware Party Invitation";
-            case 45 -> "A Picture of a Sandwich";
-            case 46 -> "Thoughtful Advice About Your Current Situation";
-            case 47 -> "Zip; Zilch; Nada";
-            case 48 -> "Approximately " + String.format("%,d", 5 * ThreadLocalRandom.current().nextInt(200, 2000) + ThreadLocalRandom.current().nextInt(1, 5)) + " Unique Snow Globes";
-            case 49 -> "Forgiveness For Future Mistakes (Terms and Conditions Apply)";
-            case 50 -> "A Token Labelled \"Traid Gud\"";
-            case 51 -> "A Hill of Beans";
-            case 52 -> "This Small Portrait of Benjamin Franklin, Done in Oil Paints";
-            case 53 -> "Favourable Timing on Bureaucracy";
-            case 54 -> "A Comfortable Sinecure, When I'm Galactic Emperor";
-            case 55 -> "This Box of One Dozen Starving, Crazed Weasels";
-            case 56 -> "A jpeg Depicting a Cartoon Monkey";
-            case 57 -> "A Somewhat Rare Beanie Baby";
-            case 58 -> "Some Good News About Our Lord and Saviour, Harrugh Gefhara";
-            case 59 -> "No Spoilers for that TV Show You're Watching";
-            case 60 -> "Payment in Exposure";
-            case 61 -> "A VHS Recording of an Episode of _Bill Nye The Science Guy_";
-            case 62 -> "A Short But Comprehensive Lecture on Medieval Siege Weaponry";
-            case 63 -> "An _E.T. the Extra-Terrestrial_ Cartridge for the Atari 2600";
-            case 64 -> "A Nice Solid Thumbs Up";
-            case 65 -> "A Handful of Dog Treats";
-            case 66 -> "One (1) Peppercorn";
-            case 67 -> "Poutine";
-            case 68 -> "The Deputy Speakership";
-            case 69 -> "Half a Slice of Pizza, With or Without Pineapple";
-            case 70 -> "The Wi-Fi Password";
-            case 71 -> "A Second-Hand Toothbrush";
-            case 72 -> "A Lamp That Might Contain a Genie, But Probably Doesn't";
-            case 73 -> "An Acoustic Rendition of _Wonderwall_";
-            case 74 -> "As Many Spiders as You Desire";
-            case 75 -> "Fruit Salad (yummy, yummy)";
-            case 76 -> "One Chocolate Chip Muffin Amongst Eleven Raisin Muffins";
-            case 77 -> "Invoking the A̴̰̽̑ͅn̶͙͝ĉ̸̤̜̽i̶̯̯͋ě̶͓̜͑n̶̤̩̉t̸̯̎͊͜ ̷́ͅP̶̘̀a̸̧̔̅c̶̣̋̔t̷̺̪͛͋";
-            case 78 -> "Some Perfunctory Laughter at Your Next Attempt at a Joke";
-            case 79 -> "The Front Half of Our Pantomime Horse";
-            case 80 -> "~~False~~ Reassurances";
-            case 81 -> "A Big Mouth Billy Bass";
-            case 82 -> "More Cowbell";
-            case 83 -> "Some Subpar Macaroni Art";
-            case 84 -> "A Chocolate Teapot";
-            case 85 -> "Some Week-Old Sushi";
-            case 86 -> "My Second Finest Bottle of Wine Drink™";
-            case 87 -> "A Riddle, Wrapped in a Mystery, Inside an Enigma, Coated in Chocolate";
-            case 88 -> "A Brand-New Luxury Car, Missing Only Fuel, Tires and Car";
-            case 89 -> "Either \"Peace\" or \"Peas\"; the Ambassador Failed to Elaborate";
-            case 90 -> "A Year's Supply of Brussels Sprouts";
-            case 91 -> "A Nintendo Power Glove; ***Now You're Playing With Power***";
-            case 92 -> "A Wooden Spoon";
-            case 93 -> "An Ingot of Pyrite";
-            case 94 -> "A White Elephant";
-            case 95 -> "Ennui";
-            case 96 -> "A Smurf TV Tray";
-            case 97 -> "A Creepy Doll";
-            case 98 -> "A Ziploc Bag of Ranch Dressing";
-            case 99 -> "Nothing. And Furthermore, Carthage Must be Destroyed!";
-            case 100 -> "All of the Goulash";
-            case 101 -> "Waldo's Location";
-            case 102 -> "A Billet of Ea-nāṣir's Finest Copper";
-            case 103 -> "All the Silver in Fort Knox";
-            case 104 -> "A Controlling Share of The Bereg Jet Ski Company";
-            case 105 -> "A Handful of Specially Marked Cereal Boxtops";
-            case 106 -> "An Aperture Science Thing We Don't Know What It Does";
-            case 107 -> "Nothing, Because I'm a Cheapskate";
-            case 108 -> "A Brick, Delivery Speed TBD";
-            case 109 -> "An Inanimate Carbon Rod";
-            case 110 -> "A Set of Left-Handed Sarween Tools";
-            case 111 -> "A Bridge That's For Sale";
-            case 112 -> "In return for this small, helpful deed // A limerick is what I shall cede // It won't cost me a dime // If I trade you this rhyme // To brighten your day, yes indeed!";
-            case 113 -> "The Chameleon's Dish";
-            case 114 -> "The Sound of One Hand Clapping";
-            case 115 -> "An Unpaired Sock";
-            case 116 -> "\"101 Ways To Make Toast\"";
-            case 117 -> "A Chess Set With 31 Missing Pieces";
-            case 118 -> "Your Horoscope Reading";
-            case 119 -> "Just Deserts";
-            case 120 -> "Surprise and Delight";
-            case 121 -> "`//Could somebody get ChatGPT to generate a few more messages - Dev`";
-            case 9999 -> "Some Free Candy, From My Windowless Van";
-            default -> "Nothing";
-        };
+
+        int result = ThreadLocalRandom.current().nextInt(0, nothingMessages.size() + 20);
+        try {
+            return nothingMessages.get(result);
+        } catch (Exception e) {
+            return "Nothing";
+        }
+    }
+
+    @ButtonHandler("transaction")
+    public static void transaction(Player player, Game game) {
+        List<Button> buttons;
+        buttons = TransactionHelper.getPlayersToTransact(game, player);
+        String message = player.getRepresentation() + " Use the buttons to select which player you wish to transact with";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
     @ButtonHandler("newTransact_")
@@ -438,7 +451,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
 
@@ -448,7 +461,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
             }
@@ -742,7 +755,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -752,7 +765,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_starCharts_" + p2.getFaction() + "_" + shipOrder,
-                        "" + Mapper.getRelic(shipOrder).getName());
+                            Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -860,7 +873,7 @@ public class TransactionHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, "hacan");
                 message2 = ident + " sent " + tgAmount + " TGs to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
@@ -884,7 +897,7 @@ public class TransactionHelper {
                     p2.setCommodities(targetTG);
                 }
 
-                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " Commodities to " + ident2;
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
@@ -914,8 +927,8 @@ public class TransactionHelper {
                 p2.setCommodities(newP2Comms);
                 p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
                 p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
-                CommanderUnlockCheck.checkPlayer(p2, game, "hacan", event);
-                CommanderUnlockCheck.checkPlayer(p1, game, "hacan", event);
+                CommanderUnlockCheck.checkPlayer(p2, "hacan");
+                CommanderUnlockCheck.checkPlayer(p1, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 // ButtonHelperAbilities.pillageCheck(p1, game);
@@ -935,7 +948,7 @@ public class TransactionHelper {
             case "SendDebt" -> {
                 message2 = ident + " sent " + amountToTrans + " debt tokens to " + ident2;
                 p2.addDebtTokens(p1.getColor(), Integer.parseInt(amountToTrans));
-                CommanderUnlockCheck.checkPlayer(p2, game, "vaden", event);
+                CommanderUnlockCheck.checkPlayer(p2, "vaden");
             }
             case "ClearDebt" -> {
                 message2 = ident + " cleared " + amountToTrans + " debt tokens of " + ident2;
@@ -981,7 +994,7 @@ public class TransactionHelper {
                 try {
                     pnIndex = Integer.parseInt(amountToTrans);
                 } catch (NumberFormatException e) {
-                    if (p1.getPromissoryNotes().keySet().contains(amountToTrans)) {
+                    if (p1.getPromissoryNotes().containsKey(amountToTrans)) {
                         id = amountToTrans;
                     }
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), "# " + p1.getRepresentation() + " heads up, a PN failed to send. This is likely due to you not having the PN to send. Maybe you already gave it to someone else and forgot?");
@@ -1059,7 +1072,7 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(p2.getPrivateChannel(), message2);
         } else {
             TextChannel channel = game.getMainGameChannel();
-            if (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd1000")) {
+            if (game.getName().equalsIgnoreCase("pbd1000")) {
                 channel = game.getTableTalkChannel();
             }
             if (oldWay || (message2.toLowerCase().contains("alliance") || message2.toLowerCase().contains("support"))) {
@@ -1084,7 +1097,7 @@ public class TransactionHelper {
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationUnfogged()).append(" this is a friendly reminder that you ");
         if (!canTheseTwoTransact(game, player, player2)) {
-            sb.append("are not neighbors with " + player2.getRepresentation(false, false));
+            sb.append("are not neighbors with ").append(player2.getRepresentation(false, false));
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
         if (player.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -1154,7 +1167,7 @@ public class TransactionHelper {
                 "Wash Both Players Comms");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getPlayersShipOrders(p1).size() > 0) {
+        if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
             Button transact = Buttons.gray("newTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction(),
                 "Axis Orders");
             stuffToTransButtons.add(transact);
@@ -1174,17 +1187,17 @@ public class TransactionHelper {
                 "Promissory Notes");
             stuffToTransButtons.add(transact);
         }
-        if (p1.getFragments().size() > 0) {
+        if (!p1.getFragments().isEmpty()) {
             Button transact = Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(),
                 "Fragments");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             Button transact = Button
                 .success("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
             Button transact = Buttons.green("newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
         }
@@ -1212,6 +1225,12 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
+    @ButtonHandler("send_")
+    public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static List<Button> getStuffToTransButtonsOld(Game game, Player p1, Player p2) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         List<Button> stuffToTransButtons = new ArrayList<>();
@@ -1236,7 +1255,7 @@ public class TransactionHelper {
                 "Wash Both Players Comms");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getPlayersShipOrders(p1).size() > 0) {
+        if (!ButtonHelper.getPlayersShipOrders(p1).isEmpty()) {
             Button transact = Buttons.gray(finChecker + "transact_shipOrders_" + p2.getFaction(), "Axis Orders");
             stuffToTransButtons.add(transact);
         }
@@ -1252,15 +1271,15 @@ public class TransactionHelper {
             Button transact = Buttons.green(finChecker + "transact_PNs_" + p2.getFaction(), "Promissory Notes");
             stuffToTransButtons.add(transact);
         }
-        if (p1.getFragments().size() > 0) {
+        if (!p1.getFragments().isEmpty()) {
             Button transact = Buttons.green(finChecker + "transact_Frags_" + p2.getFaction(), "Fragments");
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             Button transact = Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord("hacan")));
             stuffToTransButtons.add(transact);
         }
-        if (ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).size() > 0) {
+        if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
             Button transact = Button
                 .success(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets").withEmoji(Emoji.fromFormatted(Emojis.getFactionIconFromDiscord(p2.getFaction())));
             stuffToTransButtons.add(transact);
@@ -1275,6 +1294,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
+    @ButtonHandler("rescindOffer_")
     public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 != null) {
@@ -1285,6 +1305,7 @@ public class TransactionHelper {
         }
     }
 
+    @ButtonHandler("rejectOffer_")
     public static void rejectOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p1 != null) {
@@ -1293,6 +1314,7 @@ public class TransactionHelper {
         }
     }
 
+    @ButtonHandler("acceptOffer_")
     public static void acceptOffer(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (buttonID.split("_").length > 2) {
@@ -1307,5 +1329,46 @@ public class TransactionHelper {
         }
         TransactionHelper.acceptTransactionOffer(p1, player, game, event);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("finishTransaction_")
+    public static void finishTransaction(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String player2Color = buttonID.split("_")[1];
+        Player player2 = game.getPlayerFromColorOrFaction(player2Color);
+        ButtonHelperAbilities.pillageCheck(player, game);
+        ButtonHelperAbilities.pillageCheck(player2, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("demandSomething_")
+    public static void demandSomething(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String player2Color = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(player2Color);
+        if (p2 != null) {
+            List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, p2, player);
+            String message = p2.getRepresentation()
+                + " you have been given something on the condition that you give something in return. Hopefully the player explained what. If you don't hand it over, please return what they sent. Use buttons to send something to "
+                + player.getFactionEmojiOrColor();
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
+            ButtonHelper.deleteMessage(event);
+        }
+    }
+
+    @ButtonHandler("transactWith_")
+    @ButtonHandler("resetOffer_")
+    public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 != null) {
+            player.clearTransactionItemsWithPlayer(p2);
+            List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, player, p2);
+            if (!game.isFowMode() && game.isNewTransactionMethod()) {
+                buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
+            }
+            String message = player.getRepresentation() + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            TransactionHelper.checkTransactionLegality(game, player, p2);
+            ButtonHelper.deleteMessage(event);
+        }
     }
 }

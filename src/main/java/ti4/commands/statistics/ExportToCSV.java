@@ -26,6 +26,10 @@ public class ExportToCSV extends StatisticsSubcommandData {
             playerCount = event.getOption(GameStatisticFilterer.PLAYER_COUNT_FILTER).getAsInt();
         } catch (Exception e) {
         }
+        if (games.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
+            return;
+        }
 
         StringBuilder output = new StringBuilder(header(playerCount));
         for (Game game : games) {

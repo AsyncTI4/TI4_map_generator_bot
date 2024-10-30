@@ -16,12 +16,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
@@ -71,15 +70,15 @@ public class Emojis {
         // Delete emojis that have been removed and also out-of-date emojis
         if (!toDelete.isEmpty()) {
             BotLogger.logWithTimestamp("Deleting `" + toDelete.size() + "` emojis.");
-            toDelete.parallelStream().forEach(key -> deleteApplicationEmoji(key));
-            toDelete.forEach(key -> emojis.remove(key));
+            toDelete.parallelStream().forEach(Emojis::deleteApplicationEmoji);
+            toDelete.forEach(emojis::remove);
         }
 
         // (Re-)Upload emojis
         if (!toUpload.isEmpty()) {
             BotLogger.logWithTimestamp("Uploading `" + toUpload.size() + "` emojis.");
             Map<String, EmojiUnion> uploaded = toUpload.parallelStream()
-                .map(file -> createApplicationEmoji(file))
+                .map(Emojis::createApplicationEmoji)
                 .collect(Collectors.toConcurrentMap(e -> e.getName(), e -> e));
             emojis.putAll(uploaded);
         }
@@ -106,9 +105,7 @@ public class Emojis {
 
     private static boolean isIgnoredDirectory(File file) {
         List<String> names = List.of("New Server Pack");
-        if (names.contains(file.getName()))
-            return true;
-        return false;
+        return names.contains(file.getName());
     }
 
     private static EmojiUnion getApplicationEmoji(String name) {
@@ -1122,21 +1119,21 @@ public class Emojis {
         List<String> semLores = new ArrayList<>(SemLores);
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(semLores, seed);
-        return semLores.get(0);
+        return semLores.getFirst();
     }
 
     public static String getRandomGoodDog() {
         List<String> goodDogs = new ArrayList<>(GoodDogs);
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(goodDogs, seed);
-        return goodDogs.get(0);
+        return goodDogs.getFirst();
     }
 
     public static String getRandomGoodDog(String randomSeed) {
         List<String> goodDogs = new ArrayList<>(GoodDogs);
         Random seed = new Random(randomSeed.hashCode());
         Collections.shuffle(goodDogs, seed);
-        return goodDogs.get(0);
+        return goodDogs.getFirst();
     }
 
     @NotNull

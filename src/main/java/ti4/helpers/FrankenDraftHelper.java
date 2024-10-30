@@ -19,6 +19,7 @@ import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
@@ -31,7 +32,7 @@ public class FrankenDraftHelper {
     public static List<Button> getSelectionButtons(List<DraftItem> draftables, Player player) {
         List<Button> buttons = new ArrayList<>();
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
-        DraftItem.Category lastCategory = draftables.get(0).ItemCategory;
+        DraftItem.Category lastCategory = draftables.getFirst().ItemCategory;
         int categoryCounter = 0;
         for (DraftItem item : draftables) {
             if (item.ItemCategory != lastCategory) {
@@ -51,6 +52,7 @@ public class FrankenDraftHelper {
         return buttons;
     }
 
+    @ButtonHandler("frankenDraftAction")
     public static void resolveFrankenDraftAction(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String action = buttonID.split(";")[1];
         BagDraft draft = game.getActiveBagDraft();

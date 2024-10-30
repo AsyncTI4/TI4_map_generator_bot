@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameProperties;
 import ti4.message.MessageHelper;
 
 public class SearchMyTitles extends SearchSubcommandData {
@@ -33,7 +34,7 @@ public class SearchMyTitles extends SearchSubcommandData {
 
     public StringBuilder getPlayerTitles(String userID, String userName, boolean gamesIncluded) {
         Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
-        Predicate<Game> endedGamesFilter = game -> game.isHasEnded();
+        Predicate<Game> endedGamesFilter = GameProperties::isHasEnded;
         Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(endedGamesFilter);
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
@@ -45,7 +46,7 @@ public class SearchMyTitles extends SearchSubcommandData {
         HashMap<String, String> gameHist = new HashMap<>();
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
-        Map<String, Integer> titles = new HashMap<String, Integer>();
+        Map<String, Integer> titles = new HashMap<>();
         for (Game playerGame : games) {
             String singularGameTiles = playerGame.getStoredValue("TitlesFor" + userID);
             if (!singularGameTiles.isEmpty()) {
@@ -65,14 +66,14 @@ public class SearchMyTitles extends SearchSubcommandData {
         for (String title : titles.keySet()) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             if (gamesIncluded) {
-                sb.append("**" + title + "** x" + titles.get(title) + " (" + gameHist.get(title) + ")");
+                sb.append("**").append(title).append("** x").append(titles.get(title)).append(" (").append(gameHist.get(title)).append(")");
             } else {
-                sb.append("**" + title + "** x" + titles.get(title));
+                sb.append("**").append(title).append("** x").append(titles.get(title));
             }
             sb.append("\n");
             index++;
         }
-        if (titles.keySet().size() == 0) {
+        if (titles.keySet().isEmpty()) {
             sb = new StringBuilder("No titles yet");
         }
 

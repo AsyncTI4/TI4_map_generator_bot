@@ -28,7 +28,7 @@ public class Speaker extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        game.setSpeaker(player.getUserID());
+        game.setSpeakerUserID(player.getUserID());
         String msg = Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation();
         MessageHelper.sendMessageToEventChannel(event, msg);
     }

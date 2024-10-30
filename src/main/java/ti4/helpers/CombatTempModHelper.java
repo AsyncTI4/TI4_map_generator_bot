@@ -18,7 +18,7 @@ public class CombatTempModHelper {
     public static void InitializeNewTempMods(Player player, TileModel tile, UnitHolder holder) {
         List<TemporaryCombatModifierModel> unusedMods = player.getNewTempCombatModifiers();
         unusedMods = unusedMods.stream().filter(mod -> mod.getUseInTurn() == player.getNumberTurns())
-            .collect(Collectors.toList());
+            .toList();
         for (TemporaryCombatModifierModel mod : unusedMods) {
             mod.setUseInSystem(tile.getId());
             mod.setUseInUnitHolder(holder.getName());

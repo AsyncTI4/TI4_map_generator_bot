@@ -37,7 +37,7 @@ public class AnnotationHandler {
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
         boolean hasComponentID = false;
         List<Parameter> badParams = new ArrayList<>();
-        for (Parameter param : Arrays.asList(method.getParameters())) {
+        for (Parameter param : method.getParameters()) {
             // easy parameters
             if (param.getType().equals(contextClass)) continue;
             if (param.getType().equals(Game.class)) continue;
@@ -103,7 +103,7 @@ public class AnnotationHandler {
         return ctx -> {
             boolean hasComponentID = false;
             List<Object> args = new ArrayList<>();
-            for (Parameter param : Arrays.asList(method.getParameters())) {
+            for (Parameter param : method.getParameters()) {
                 if (param.getType().equals(contextClass)) args.add(ctx);
                 if (param.getType().equals(Game.class)) args.add(ctx.getGame());
                 if (param.getType().equals(Player.class)) args.add(ctx.getPlayer());
@@ -125,13 +125,13 @@ public class AnnotationHandler {
                     } else {
                         switch (name.value().toLowerCase()) {
                             case "componentid", "component" -> args.add(ctx.getComponentID());
-                            case "buttonId", "button" -> {
+                            case "buttonid", "button" -> {
                                 if (ctx instanceof ButtonContext bctx) args.add(bctx.getButtonID());
                             }
-                            case "modalId", "modal" -> {
+                            case "modalid", "modal" -> {
                                 if (ctx instanceof ModalContext mctx) args.add(mctx.getModalID());
                             }
-                            case "menuId", "menu" -> {
+                            case "menuid", "menu" -> {
                                 if (ctx instanceof SelectionMenuContext sctx) args.add(sctx.getMenuID());
                             }
                             case "messageid", "message" -> {
@@ -155,7 +155,7 @@ public class AnnotationHandler {
             } catch (InvocationTargetException e) {
                 BotLogger.log("Error within button handler:", e.getCause());
             } catch (Exception e) {
-                List<String> paramTypes = Arrays.asList(method.getParameters()).stream().map(param -> param.getType().getSimpleName()).toList();
+                List<String> paramTypes = Arrays.stream(method.getParameters()).map(param -> param.getType().getSimpleName()).toList();
                 List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
 
                 String methodName = method.getDeclaringClass().getSimpleName() + "." + method.getName();
@@ -203,10 +203,10 @@ public class AnnotationHandler {
             }
 
             for (Class<?> klass : classesToCheck(handlerClass)) {
-                for (Method method : Arrays.asList(klass.getDeclaredMethods())) {
+                for (Method method : klass.getDeclaredMethods()) {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
-                    if (handlers == null || handlers.isEmpty()) continue;
+                    if (handlers.isEmpty()) continue;
 
                     String methodName = klass.getName() + "." + method.getName();
                     if (!Modifier.isStatic(method.getModifiers())) {

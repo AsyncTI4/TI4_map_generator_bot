@@ -34,11 +34,11 @@ public class SampleDecals extends HelpSubcommandData {
             .collect(Collectors.toList());
 
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
-        if (input == null || input.getAsString().equals("ALL") || input.getAsString().equals("")) {
+        if (input == null || input.getAsString().equals("ALL") || input.getAsString().isEmpty()) {
         } else if (input.getAsString().equals("Other")) {
             List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
             decals = decals.stream()
-                .filter(decalID -> others.contains(decalID))
+                .filter(others::contains)
                 .collect(Collectors.toList());
         } else {
             decals = decals.stream()
@@ -46,7 +46,7 @@ public class SampleDecals extends HelpSubcommandData {
                 .collect(Collectors.toList());
         }
         Collections.sort(decals);
-        if (decals.size() == 0) {
+        if (decals.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No decals found. Something has probably gone wrong.");
             return;
         }
@@ -113,7 +113,8 @@ public class SampleDecals extends HelpSubcommandData {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, "decal_sample_" + top + "_" + left)
+        FileUpload fileUpload = MapGenerator.createFileUpload(coloursImage, 1.0f,
+                        "decal_sample_" + top + "_" + left)
             .setDescription("Decal samples for units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }

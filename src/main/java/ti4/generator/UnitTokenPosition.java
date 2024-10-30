@@ -67,11 +67,11 @@ public class UnitTokenPosition implements Serializable {
         if (points == null || points.isEmpty()) {
             return null;
         }
-        Point point = points.get(0);
+        Point point = points.getFirst();
         if (removeUnitCoordinate) {
-            points.remove(0);
+            points.removeFirst();
         } else if (points.size() > 1) {
-            points.remove(0);
+            points.removeFirst();
         }
         if (points.isEmpty()) {
             coordinateMap.remove(id);

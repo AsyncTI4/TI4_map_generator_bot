@@ -7,7 +7,10 @@ import java.util.Map;
 
 import ti4.commands.milty.MiltyDraftHelper;
 import ti4.commands.milty.MiltyDraftManager;
-import ti4.draft.items.*;
+import ti4.draft.items.BlueTileDraftItem;
+import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.RedTileDraftItem;
+import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
@@ -84,7 +87,7 @@ public class StandardBagDraft extends BagDraft {
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
                     if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
                         BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }

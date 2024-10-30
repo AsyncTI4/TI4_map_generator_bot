@@ -111,7 +111,9 @@ public class DiscardSO extends SOCardsSubcommandData {
 
     }
 
-    public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String soID, Game game) {
+    @ButtonHandler("drawSpecificSO_")
+    public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String soID = buttonID.split("_")[1];
         String publicMsg = game.getPing() + " this is a public notice that " + player.getFactionEmojiOrColor() + " is picking up a secret that they accidentally discarded.";
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(soID, player.getUserID());
         if (secrets == null) {

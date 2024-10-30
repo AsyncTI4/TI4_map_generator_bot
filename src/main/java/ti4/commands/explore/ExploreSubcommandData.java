@@ -149,7 +149,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 } else {
                     PlanetModel planetInfo = Mapper.getPlanet(planetID);
                     if (Optional.ofNullable(planetInfo).isPresent()) {
-                        if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0
+                        if (!Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).isEmpty()
                             || ButtonHelper.doesPlanetHaveAttachmentTechSkip(tile, planetID)) {
                             if ((attachment.equals(Constants.WARFARE) ||
                                 attachment.equals(Constants.PROPULSION) ||
@@ -459,7 +459,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
             case "frln1", "frln2", "frln3" -> {
-                message = player.getRepresentation() + " please resolve Freelancers:\n-# " + ButtonHelper.getListOfStuffAvailableToSpend(player, game, true);
+                message = player.getRepresentation() + " please resolve Freelancers:\n-# " + ButtonHelper.getListOfStuffAvailableToSpend(player, game, false);
                 Button gainTG = Buttons.green("freelancersBuild_" + planetID, "Produce 1 Unit");
                 List<Button> buttons = List.of(gainTG, decline);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -540,11 +540,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             List<Button> gainComm = new ArrayList<>();
             gainComm.add(Buttons.green("gain_1_comms", "Gain 1 Comm", Emojis.comm));
             gainComm.add(Buttons.red("deleteButtons", "Decline"));
-            StringBuilder sb = new StringBuilder();
-            sb.append(player.getFactionEmoji()).append(" may use their **Fortune Seekers** ability\n");
-            sb.append(player.getRepresentationUnfogged()).append(
-                " After resolving the explore, you may use this button to get your commodity from your fortune seekers ability.");
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), gainComm);
+            String sb = player.getFactionEmoji() + " may use their **Fortune Seekers** ability\n" +
+                    player.getRepresentationUnfogged() +
+                    " After resolving the explore, you may use this button to get your commodity from your fortune seekers ability.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb, gainComm);
             game.setStoredValue("fortuneSeekers", "Used");
         }
 

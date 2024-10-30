@@ -156,7 +156,7 @@ public class Stats extends PlayerSubcommandData {
                     player.getRepresentationUnfogged() + " you have the opportunity to buy axis orders",
                     ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            CommanderUnlockCheck.checkPlayer(player, game, "mykomentori", event);
+            CommanderUnlockCheck.checkPlayer(player, "mykomentori");
         }
 
         OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);
@@ -196,7 +196,7 @@ public class Stats extends PlayerSubcommandData {
             StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionSpeaker));
             String value = optionSpeaker.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
-                game.setSpeaker(player.getUserID());
+                game.setSpeakerUserID(player.getUserID());
             } else {
                 message.append(", which is not a valid input. Please use one of: y/yes");
             }
@@ -290,7 +290,7 @@ public class Stats extends PlayerSubcommandData {
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
         sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
         sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-        sb.append("> Speaker: `").append(game.getSpeaker().equals(player.getUserID())).append("`\n");
+        sb.append("> Speaker: `").append(game.getSpeakerUserID().equals(player.getUserID())).append("`\n");
         sb.append("> Passed: `").append(player.isPassed()).append("`\n");
         sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
         sb.append("> Raw Faction Emoji: `").append(player.getFactionEmoji()).append("`\n");
@@ -391,7 +391,7 @@ public class Stats extends PlayerSubcommandData {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
+            CommanderUnlockCheck.checkPlayer(player, "hacan");
             ButtonHelperAbilities.pillageCheck(player, game);
             if (scNumber == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {

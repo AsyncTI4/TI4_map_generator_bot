@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -49,7 +50,7 @@ public class SearchTiles extends SearchComponentModel {
                 .filter(tile -> tile.search(searchString, source))
                 .sorted(Comparator.comparing(TileModel::getId))
                 .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))
-                .forEach(e -> tileEmbeds.add(e));
+                .forEach(tileEmbeds::add);
         }
         //TODO: upload tiles as emojis and use the URL for the image instead of as an attachment - alternatively, use the github URL link
         MessageChannel channel = event.getMessageChannel();

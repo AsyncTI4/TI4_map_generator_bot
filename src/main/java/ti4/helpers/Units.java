@@ -166,7 +166,7 @@ public class Units {
         }
     }
 
-    private static final String unitRegex() {
+    private static String unitRegex() {
         return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
     }
 

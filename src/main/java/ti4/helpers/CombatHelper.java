@@ -12,12 +12,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.buttons.Buttons;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -356,15 +360,15 @@ public class CombatHelper {
         List<String> dupes = output.keySet().stream()
             .filter(unit -> !duplicates.add(unit.getAsyncId()))
             .map(UnitModel::getBaseType)
-            .collect(Collectors.toList());
+            .toList();
         List<String> missing = unitsByAsyncId.keySet().stream()
             .filter(unit -> player.getUnitsByAsyncID(unit.toLowerCase()).isEmpty())
             .collect(Collectors.toList());
 
-        if (dupes.size() > 0) {
+        if (!dupes.isEmpty()) {
             CombatMessageHelper.displayDuplicateUnits(event, missing);
         }
-        if (missing.size() > 0) {
+        if (!missing.isEmpty()) {
             CombatMessageHelper.displayMissingUnits(event, missing);
         }
     }
@@ -379,8 +383,8 @@ public class CombatHelper {
             .map(Optional::get)
             .toList();
 
-        if (opponents.size() >= 1) {
-            opponent = opponents.get(0);
+        if (!opponents.isEmpty()) {
+            opponent = opponents.getFirst();
         }
         if (opponents.size() > 1) {
             Optional<Player> activeOpponent = opponents.stream()
@@ -419,7 +423,7 @@ public class CombatHelper {
         List<UnitModel> opponentUnitsList = new ArrayList<>(opponentUnits.keySet());
         int totalMisses = 0;
         UnitHolder space = activeSystem.getUnitHolders().get("space");
-        String extra = "";
+        StringBuilder extra = new StringBuilder();
         for (Map.Entry<UnitModel, Integer> entry : playerUnits.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
@@ -482,7 +486,7 @@ public class CombatHelper {
             totalMisses = totalMisses + misses;
 
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                extra = extra + player.getFactionEmoji() + " destroyed " + misses + " of their own " + unit.getName() + (misses == 1 ? "" : "s") + " due to " + (misses == 1 ? "a Thalnos miss" : "Thalnos misses");
+                extra.append(player.getFactionEmoji()).append(" destroyed ").append(misses).append(" of their own ").append(unit.getName()).append(misses == 1 ? "" : "s").append(" due to ").append(misses == 1 ? "a Thalnos miss" : "Thalnos misses");
                 for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
@@ -536,7 +540,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + " due to Ta Zern, the Jol-Nar Commander:\n " + unitRoll2);
+                resultBuilder.append("Rerolling ").append(numMisses).append(" miss").append(numMisses == 1 ? "" : "es").append(" due to Ta Zern, the Jol-Nar Commander:\n ").append(unitRoll2);
             }
 
             if (game.getStoredValue("munitionsReserves").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround && numMisses > 0) {
@@ -546,7 +550,7 @@ public class CombatHelper {
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit, numRollsPerUnit, 0, resultRolls2, hitRolls2);
-                resultBuilder.append("Munitions rerolling " + numMisses + " miss" + (numMisses == 1 ? "" : "es") + ": " + unitRoll2);
+                resultBuilder.append("Munitions rerolling ").append(numMisses).append(" miss").append(numMisses == 1 ? "" : "es").append(": ").append(unitRoll2);
             }
 
             int argentInfKills = 0;
@@ -588,5 +592,33 @@ public class CombatHelper {
             game.setStoredValue("munitionsReserves", "");
         }
         return result;
+    }
+
+    @ButtonHandler("automateGroundCombat_")
+    public static void automateGroundCombat(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String faction1 = buttonID.split("_")[1];
+        String faction2 = buttonID.split("_")[2];
+        Player p1 = game.getPlayerFromColorOrFaction(faction1);
+        Player p2 = game.getPlayerFromColorOrFaction(faction2);
+        Player opponent = null;
+        String planet = buttonID.split("_")[3];
+        String confirmed = buttonID.split("_")[4];
+        if (player != p1 && player != p2) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This button is only for combat participants");
+            return;
+        }
+        if (player == p2) {
+            opponent = p1;
+        } else {
+            opponent = p2;
+        }
+        ButtonHelper.deleteTheOneButton(event);
+        if (opponent == null || opponent.isDummy() || confirmed.equalsIgnoreCase("confirmed")) {
+            ButtonHelperModifyUnits.autoMateGroundCombat(p1, p2, planet, game, event);
+        } else if (p1 != null && p2 != null) {
+            Button automate = Buttons.green(opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_"
+                + p1.getFaction() + "_" + p2.getFaction() + "_" + planet + "_confirmed", "Automate Combat");
+            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm:", automate);
+        }
     }
 }

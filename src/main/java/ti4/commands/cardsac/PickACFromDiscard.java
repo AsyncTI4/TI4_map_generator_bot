@@ -25,13 +25,14 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
     public PickACFromDiscard() {
         super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -72,6 +73,7 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         ACInfo.sendActionCardInfo(game, player);
     }
 
+    @ButtonHandler("codexCardPick_")
     public static void pickACardFromDiscardStep1(GenericInteractionCreateEvent event, Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String acStringID : game.getDiscardActionCards().keySet()) {

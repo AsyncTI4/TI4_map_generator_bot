@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -222,11 +221,11 @@ public class ConvertTTPGtoAsync {
 
             //PLAYER STRATEGY CARDS
             if (!ttpgPlayer.getStrategyCards().isEmpty()) {
-                String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
+                String ttpgSC = (String) ttpgPlayer.getStrategyCards().getFirst();
                 if (Objects.nonNull(ttpgSC)) asyncPlayer.addSC(Helper.getSCNumber(ttpgSC));
             }
             if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
-                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
+                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().getFirst();
                 if (Objects.nonNull(ttpgSCplayed)) asyncGame.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
             }
 
@@ -370,7 +369,7 @@ public class ConvertTTPGtoAsync {
         String[] hexSummary = ttpgMap.getHexSummary().split(",");
         for (String hex : hexSummary) {
             System.out.println("Hex: " + hex);
-            if (hex.length() > 0) {
+            if (!hex.isEmpty()) {
                 Tile tile = ConvertTTPGHexToAsyncTile(asyncGame, hex);
                 if (tile != null) {
                     asyncGame.setTile(tile);
@@ -682,7 +681,7 @@ public class ConvertTTPGtoAsync {
                     regionCount = Integer.valueOf(str);
 
                 } else if (Character.isLowerCase(chr) && validUnits.contains(str)) { // is a unit, control_token, or CC
-                    if (!"".equals(color)) { //color hasn't shown up yet, so probably just tokens in space, skip unit crap
+                    if (!color.isEmpty()) { //color hasn't shown up yet, so probably just tokens in space, skip unit crap
                         if ("t".equals(str)) { //CC
                             tile.addCC(Mapper.getCCID(color));
                         } else if ("o".equals(str)) { //control_token

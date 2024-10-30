@@ -74,7 +74,7 @@ public class AddToken extends AddRemoveToken {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
             OptionMapping option = null;
-            if (event != null && event instanceof SlashCommandInteractionEvent) {
+            if (event instanceof SlashCommandInteractionEvent) {
                 option = ((CommandInteractionPayload) event).getOption(Constants.PLANET);
             }
 

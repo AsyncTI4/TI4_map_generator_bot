@@ -19,6 +19,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -73,7 +74,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         revealTrapForPlanet(event, game, planetName, stringTrapID, player, true);
     }
 
-    public void revealTrapForPlanet(GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player, boolean reveal) {
+    public static void revealTrapForPlanet(GenericInteractionCreateEvent event, Game game, String planetName, String trap, Player player, boolean reveal) {
         if (player.getTrapCardsPlanets().containsValue(planetName) || planetName == null) {
             Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
             for (Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
@@ -108,8 +109,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                                 }
                                 if (p2.getPlanets().contains(planet)) {
                                     List<Button> buttons = new ArrayList<>();
-                                    buttons.add(Buttons.green("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + ButtonHelper.getIdentOrColor(p2, game)));
-                                    buttons.add(Buttons.blue("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + ButtonHelper.getIdentOrColor(p2, game)));
+                                    buttons.add(Buttons.green("steal2tg_" + p2.getFaction(), "Steal 2TGs from " + p2.getFactionEmojiOrColor()));
+                                    buttons.add(Buttons.blue("steal3comm_" + p2.getFaction(), "Steal 3 comms from " + p2.getFactionEmojiOrColor()));
                                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " use buttons to resolve",
                                         buttons);
                                 }
@@ -130,7 +131,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         }
     }
 
-    public void steal2Tg(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("steal2tg_")
+    public static void steal2Tg(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int count = Math.min(p2.getTg(), 2);
         p2.setTg(p2.getTg() - count);
@@ -142,7 +144,8 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
         ButtonHelper.deleteMessage(event);
     }
 
-    public void steal3Comm(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("steal3comm_")
+    public static void steal3Comm(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int count = Math.min(p2.getCommodities(), 3);
         p2.setCommodities(p2.getCommodities() - count);

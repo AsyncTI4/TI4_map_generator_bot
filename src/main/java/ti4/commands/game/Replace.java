@@ -91,7 +91,7 @@ public class Replace extends GameSubcommandData {
         Member removedMember = guild.getMemberById(removedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (removedMember != null && roles.size() == 1) {
-            guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
+            guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
         }
 
         //ADD ROLE
@@ -99,7 +99,7 @@ public class Replace extends GameSubcommandData {
         if (addedMember == null) return;
 
         if (roles.size() == 1) {
-            guild.addRoleToMember(addedMember, roles.get(0)).queue();
+            guild.addRoleToMember(addedMember, roles.getFirst()).queue();
         }
 
         String message;
@@ -128,8 +128,8 @@ public class Replace extends GameSubcommandData {
         player.setUserID(addedUser.getId());
         player.setTotalTurnTime(0);
         player.setNumberTurns(0);
-        if (removedPlayer.getUserID().equals(game.getSpeaker())) {
-            game.setSpeaker(addedUser.getId());
+        if (removedPlayer.getUserID().equals(game.getSpeakerUserID())) {
+            game.setSpeakerUserID(addedUser.getId());
         }
         if (removedPlayer.getUserID().equals(game.getActivePlayerID())) {
             // do not update stats for this action
@@ -139,14 +139,12 @@ public class Replace extends GameSubcommandData {
         Helper.fixGameChannelPermissions(event.getGuild(), game);
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
-            mapThread.getManager().setArchived(false).queue(success -> {
-                mapThread.addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS);
-            }, BotLogger::catchRestError);
+            mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
         }
         game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, player.getUserID());
 
         if (speaker) {
-            game.setSpeaker(player.getUserID());
+            game.setSpeakerUserID(player.getUserID());
         }
         GameSaveLoadManager.saveMap(game, event);
         GameSaveLoadManager.reload(game);

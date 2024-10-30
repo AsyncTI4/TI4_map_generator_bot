@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.map.Game;
@@ -26,20 +26,18 @@ public class CombatMessageHelper {
     public static void displayDuplicateUnits(GenericInteractionCreateEvent event, List<String> dupes) {
         if (dupes.isEmpty()) return;
         // Gracefully fail when units don't exist
-        StringBuilder error = new StringBuilder();
-        error.append("You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n");
-        error.append("> Duplicate units: ").append(dupes);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
+        String error = "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n" +
+                "> Duplicate units: " + dupes;
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
     }
 
     public static void displayMissingUnits(GenericInteractionCreateEvent event, List<String> missing) {
         if (missing.isEmpty()) return;
         // Gracefully fail when units don't exist
-        StringBuilder error = new StringBuilder();
-        error.append("You do not seem to own any of the following unit types, so they will be skipped.");
-        error.append(" Ping bothelper if this seems to be in error.\n");
-        error.append("> Unowned units: ").append(missing).append("\n");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error.toString());
+        String error = "You do not seem to own any of the following unit types, so they will be skipped." +
+                " Ping bothelper if this seems to be in error.\n" +
+                "> Unowned units: " + missing + "\n";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
     }
 
     public static String displayUnitRoll(UnitModel unit, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit) {
@@ -174,10 +172,10 @@ public class CombatMessageHelper {
                 combatTypeName = combatTypeName + " (Thalnos Reroll for Round #" + round + ")";
             } else {
                 combatTypeName = combatTypeName + " (Round #" + round + ")";
-                if (game.getStoredValue("solagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
+                if (game.getStoredValue("solagent").equalsIgnoreCase(player.getFaction())) {
                     game.setStoredValue("solagent", "");
                 }
-                if (game.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction()) && rollType == CombatRollType.combatround) {
+                if (game.getStoredValue("letnevagent").equalsIgnoreCase(player.getFaction())) {
                     game.setStoredValue("letnevagent", "");
                 }
             }

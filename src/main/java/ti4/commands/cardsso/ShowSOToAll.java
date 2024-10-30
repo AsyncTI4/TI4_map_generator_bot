@@ -53,10 +53,7 @@ public class ShowSOToAll extends SOCardsSubcommandData {
                 }
             }
         }
-        boolean onlyPhase = false;
-        if (event.getOption(Constants.ONLY_PHASE) != null && event.getOption(Constants.ONLY_PHASE).getAsBoolean()) {
-            onlyPhase = true;
-        }
+        boolean onlyPhase = event.getOption(Constants.ONLY_PHASE) != null && event.getOption(Constants.ONLY_PHASE).getAsBoolean();
         if (soID == null) {
             MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
             return;

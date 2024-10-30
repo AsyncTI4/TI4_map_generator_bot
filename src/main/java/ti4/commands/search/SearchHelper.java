@@ -11,7 +11,7 @@ public class SearchHelper {
         if (messageEmbeds.size() > 3) {
             String threadName = event.getCommandString();
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
-        } else if (messageEmbeds.size() > 0) {
+        } else if (!messageEmbeds.isEmpty()) {
             event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
         } else {
             event.getChannel().sendMessage("> No results found").queue();

@@ -53,8 +53,8 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
-import ti4.helpers.Units;
 import ti4.helpers.TIGLHelper.TIGLRank;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.json.ObjectMapperFactory;
@@ -146,23 +146,21 @@ public class GameSaveLoadManager {
         String reason = null;
         if (event != null) {
             String username = event.getUser().getName();
-            if (event instanceof SlashCommandInteractionEvent slash) {
-                reason = username + " used: " + slash.getCommandString();
-            } else if (event instanceof ButtonInteractionEvent button) {
-                boolean thread = button.getMessageChannel() instanceof ThreadChannel;
-                boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
-                boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
-                if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
-                    reason = username + " pressed button: [CLASSIFIED]";
-                } else {
-                    reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
+            switch (event) {
+                case SlashCommandInteractionEvent slash -> reason = username + " used: " + slash.getCommandString();
+                case ButtonInteractionEvent button -> {
+                    boolean thread = button.getMessageChannel() instanceof ThreadChannel;
+                    boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
+                    boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
+                    if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
+                        reason = username + " pressed button: [CLASSIFIED]";
+                    } else {
+                        reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
+                    }
                 }
-            } else if (event instanceof StringSelectInteractionEvent selectMenu) {
-                reason = username + " used string selection: " + selectMenu.getComponentId();
-            } else if (event instanceof ModalInteractionEvent modal) {
-                reason = username + " used modal: " + modal.getModalId();
-            } else {
-                reason = "Last Command Unknown - No Event Provided";
+                case StringSelectInteractionEvent selectMenu -> reason = username + " used string selection: " + selectMenu.getComponentId();
+                case ModalInteractionEvent modal -> reason = username + " used modal: " + modal.getModalId();
+                default -> reason = "Last Command Unknown - No Event Provided";
             }
         }
         saveMap(game, keepModifiedDate, reason);
@@ -381,7 +379,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", game.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.SPEAKER + " " + game.getSpeaker());
+        writer.write(Constants.SPEAKER + " " + game.getSpeakerUserID());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
@@ -760,13 +758,20 @@ public class GameSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + game.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
+        game.getPlayersWithGMRole(); //init gmIds
+        writer.write(Constants.FOW_GM_IDS + " " + String.join(",", game.getFogOfWarGMIDs()));
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", game.getRunMigrations()));
         writer.write(System.lineSeparator());
 
         if (game.getMinimumTIGLRankAtGameStart() != null) {
-            writer.write(Constants.TIGL_RANK + " " + game.getMinimumTIGLRankAtGameStart().toString());
+            writer.write(Constants.TIGL_RANK + " " + game.getMinimumTIGLRankAtGameStart());
             writer.write(System.lineSeparator());
         }
+
+        // writer.write("historicalStatsDashboardJsons " + )
+        // writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
@@ -1060,7 +1065,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             if (player.getPlayerTIGLRankAtGameStart() != null) {
-                writer.write(Constants.TIGL_RANK + " " + player.getPlayerTIGLRankAtGameStart().toString());
+                writer.write(Constants.TIGL_RANK + " " + player.getPlayerTIGLRankAtGameStart());
                 writer.write(System.lineSeparator());
             }
 
@@ -1476,7 +1481,7 @@ public class GameSaveLoadManager {
                     }
                     game.setScTradeGoods(scTradeGoods);
                 }
-                case Constants.SPEAKER -> game.setSpeaker(info);
+                case Constants.SPEAKER -> game.setSpeakerUserID(info);
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {
@@ -2144,6 +2149,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.FOW_GM_IDS -> game.setFogOfWarGMIDs(Helper.getListFromCSV(info));
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
 

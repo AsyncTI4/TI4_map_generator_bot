@@ -63,7 +63,7 @@ public class JimboHandlers {
         }
 
         List<Button> buttons = JimboButtons.getMenuButtons(menu);
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             MessageHelper.editMessageWithButtons(bevent, message, buttons);
         } else { // Post for the first time
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
@@ -266,12 +266,12 @@ public class JimboHandlers {
             String extra = ring == 0 ? " (Mecatol)" : "";
             List<String> positions = PositionMapper.getPositionsInRing(Integer.toString(ring), game);
             if (positions.size() == 1) {
-                rings.add(Buttons.green(buttonPrefix + "_tile" + positions.get(0), "Tile " + positions.get(0)));
-            } else if (positions.size() > 0) {
+                rings.add(Buttons.green(buttonPrefix + "_tile" + positions.getFirst(), "Tile " + positions.getFirst()));
+            } else if (!positions.isEmpty()) {
                 rings.add(Buttons.green(buttonPrefix + "_ring" + ring + "_page0", "Ring " + ring + extra));
             }
         }
-        if (PositionMapper.getPositionsInRing("corners", game).size() > 0) {
+        if (!PositionMapper.getPositionsInRing("corners", game).isEmpty()) {
             rings.add(Buttons.green(buttonPrefix + "_ringcorners_page0", "Corners"));
         }
         MessageHelper.editMessageWithButtons(event, msg, rings);
@@ -289,7 +289,7 @@ public class JimboHandlers {
                 output.addAll(JimboConst.hyperlanesByRotation.get(tileNum));
             }
             case "draft" -> {
-                tileNum = tileNum < -1 ? -1 : (tileNum > 12 ? 12 : tileNum);
+                tileNum = tileNum < -1 ? -1 : (Math.min(tileNum, 12));
                 output.addAll(JimboConst.draftTilesByNumber.get(tileNum));
             }
             case "other" -> output.addAll(JimboConst.otherTiles);

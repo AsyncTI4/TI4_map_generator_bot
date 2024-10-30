@@ -38,12 +38,11 @@ public class LifetimeRecord extends StatisticsSubcommandData {
                 break;
             }
         }
-        StringBuilder sb = new StringBuilder();
         DiceLuck luck = new DiceLuck();
         AverageTurnTime time = new AverageTurnTime();
-        sb.append(luck.getSelectUsersDiceLuck(members, luck.getAllPlayersDiceLuck(false)));
-        sb.append(time.getSelectUsersTurnTimes(members, time.getAllPlayersTurnTimes(false)));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        String sb = String.valueOf(luck.getSelectUsersDiceLuck(members, luck.getAllPlayersDiceLuck(false))) +
+                time.getSelectUsersTurnTimes(members, time.getAllPlayersTurnTimes(false));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
     }
 
 }

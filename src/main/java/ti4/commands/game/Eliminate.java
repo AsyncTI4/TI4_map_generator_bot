@@ -76,7 +76,7 @@ public class Eliminate extends AddRemovePlayer {
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
             if (player != null && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
-                if (player.getPlanetsAllianceMode().size() > 0) {
+                if (!player.getPlanetsAllianceMode().isEmpty()) {
                     Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
                     String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
                     if (bothelperRole != null) {
@@ -152,7 +152,7 @@ public class Eliminate extends AddRemovePlayer {
             Member removedMember = guild.getMemberById(player.getUserID());
             List<Role> roles = guild.getRolesByName(game.getName(), true);
             if (removedMember != null && roles.size() == 1) {
-                guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
+                guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
             }
             sb.append("Eliminated player: ").append(player.getUserName()).append(" from game: ").append(game.getName()).append("\n");
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

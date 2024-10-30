@@ -51,8 +51,8 @@ public class JimboImageHelper {
     }
 
     private static FileUpload layoutImagesAndUpload(List<BufferedImage> images) {
-        if (images.size() == 0) return null;
-        int size = images.stream().map(i -> i.getWidth()).max((a, b) -> a > b ? a : b).orElse(600);
+        if (images.isEmpty()) return null;
+        int size = images.stream().map(BufferedImage::getWidth).max((a, b) -> a > b ? a : b).orElse(600);
         int n = 5;
         int m = (images.size() + n - 1) / n;
         int i = 0;
@@ -65,6 +65,6 @@ public class JimboImageHelper {
             g2.drawImage(img, x * size + xoff, y * size, null);
             i++;
         }
-        return MapGenerator.uploadToDiscord(newImage, "jimboStuff");
+        return MapGenerator.createFileUpload(newImage, 1.0f, "jimboStuff");
     }
 }
