@@ -269,7 +269,7 @@ public class PlayerStatsDashboardPayload {
     @Data
     public static class LeaderPayload {
         private String hero;
-        private String commander = "locked";
+        private String commander;
     }
 
 }
