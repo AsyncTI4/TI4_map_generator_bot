@@ -138,8 +138,7 @@ public class PlayerStatsDashboardPayload {
         player.getPromissoryNotesInPlayArea().stream()
             .map(Mapper::getPromissoryNote)
             .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-            .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
-            .map(pn -> "Support for the Throne (" + game.getPNOwner(pn.getAlias()).getColor() + ")")
+            .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
             .forEach(objectives::add);
 
         return objectives;
