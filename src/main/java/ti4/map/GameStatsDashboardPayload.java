@@ -216,4 +216,8 @@ public class GameStatsDashboardPayload {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1));
     }
 
+    public String winner() {
+        return game.getWinner().isPresent() ? game.getWinner().get().getUserID() : null;
+    }
+
 }
