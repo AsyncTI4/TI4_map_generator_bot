@@ -2,11 +2,12 @@ package ti4.map;
 
 import java.awt.Point;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,12 @@ abstract public class UnitHolder {
     private final Point holderCenterPosition;
 
     // ID, Count
-    private final Map<UnitKey, Integer> units = new HashMap<>();
-    private final Map<UnitKey, Integer> unitsDamage = new HashMap<>();
+    private final Map<UnitKey, Integer> units = new LinkedHashMap<>();
+    private final Map<UnitKey, Integer> unitsDamage = new LinkedHashMap<>();
 
-    private final Set<String> ccList = new HashSet<>();
-    private final Set<String> controlList = new HashSet<>();
-    protected final Set<String> tokenList = new HashSet<>();
+    private final Set<String> ccList = new LinkedHashSet<>();
+    private final Set<String> controlList = new LinkedHashSet<>();
+    protected final Set<String> tokenList = new LinkedHashSet<>();
 
     public String getName() {
         return name;
