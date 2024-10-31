@@ -1,11 +1,13 @@
 package ti4.map;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.generator.Mapper;
@@ -51,14 +54,6 @@ public class GameStatsDashboardPayload {
 
     @JsonIgnore // not currently used for Dashboard
     public String getActiveSystem() {
-        /*
-         * "activeSystem": {
-         * "planets": [
-         * "Quann"
-         * ],
-         * "tile": 25
-         * }
-         */
         String activeSystemPosition = game.getActiveSystem();
         if (StringUtils.isEmpty(activeSystemPosition)) return null;
 
@@ -70,16 +65,14 @@ public class GameStatsDashboardPayload {
 
     public Map<String, Map<String, Boolean>> getConfig() {
         boolean baseMagen = game.getRealAndEliminatedPlayers().stream().anyMatch(p -> p.hasTech("md_base"));
-        return Map.of( //TODO: don't fake this
+        return Map.of(
             "config", Map.of(
                 "baseMagen", baseMagen,
-                "codex1", true,
-                "codex2", true,
-                "codex3", true,
-                "codex4", true,
-                "note_that_this_map_is_probably_not_accurate", true
-            /**/)
-        /**/);
+                "codex1", true, //TODO: don't fake this
+                "codex2", true, //TODO: don't fake this
+                "codex3", true, //TODO: don't fake this
+                "codex4", true, //TODO: don't fake this
+                "note_that_this_map_is_probably_not_accurate", true));
     }
 
     public String getHexSummary() {
@@ -93,12 +86,12 @@ public class GameStatsDashboardPayload {
         return game.getHistoricalGameStatsDashboardPayloads();
     }
 
+    @JsonProperty("isPoK")
     public boolean isPoK() {
-        return game.isProphecyOfKings();
+        return !game.isBaseGameMode();
     }
 
     public List<String> getLaws() {
-        // TODO: The payload implies every agenda is sent over.
         var lawsInPlay = game.getLaws().keySet().stream()
             .map(Mapper::getAgenda)
             .map(AgendaModel::getName)
@@ -117,7 +110,37 @@ public class GameStatsDashboardPayload {
     public Map<String, List<String>> getObjectives() {
         Map<String, List<String>> objectives = new HashMap<>();
 
-        // Custom (Custodians/Agenda/Relic) // TODO: may need to split these out to match TTPG export
+        // Relics
+        var relics = new ArrayList<String>();
+        game.getRealAndEliminatedPlayers().stream()
+                .map(Player::getRelics)
+                .flatMap(Collection::stream)
+                .filter(relic -> relic.toLowerCase().contains("shard") || relic.toLowerCase().contains("emphidia"))
+                .forEach(relics::add);
+        // some older games may have added these custom
+        game.getCustomPublicVP().keySet()
+                .forEach(customPublicVp -> {
+                    if (customPublicVp.toLowerCase().contains("shard")) {
+                        relics.add("Shard of the Throne");
+                    } else if (customPublicVp.toLowerCase().contains("emphidia")) {
+                        relics.add("The Crown of Emphidia");
+                    }});
+        objectives.put("Relics", relics);
+
+        // Agenda
+        var agendas = new ArrayList<String>();
+        game.getCustomPublicVP().keySet()
+                .forEach(customPublicVp -> {
+                    if (customPublicVp.toLowerCase().contains("political censure")) {
+                        agendas.add("Political Censure");
+                    } else if (customPublicVp.toLowerCase().contains("mutiny")) {
+                        agendas.add("Mutiny");
+                    } else if (customPublicVp.toLowerCase().contains("seed")) {
+                        agendas.add("Seed of an Empire");
+                    }});
+        objectives.put("Agenda", agendas);
+
+        // Custom (Unknown)
         objectives.put("Custom", new ArrayList<>(game.getCustomPublicVP().keySet()));
 
         // Other (Supports)
@@ -134,7 +157,6 @@ public class GameStatsDashboardPayload {
                 .filter(Objects::nonNull)
                 .toList();
 
-
         //Public I
         objectives.put("Public Objectives I",
                 revealedPublics.stream()
@@ -149,7 +171,7 @@ public class GameStatsDashboardPayload {
                         .map(PublicObjectiveModel::getName)
                         .toList());
 
-        //Secrets
+        // Secrets
         List<String> secrets = new ArrayList<>();
         for (Player player : game.getRealAndEliminatedPlayers()) {
             secrets.addAll(player.getSecretsScored().keySet().stream()
@@ -180,15 +202,13 @@ public class GameStatsDashboardPayload {
         return game.getVp();
     }
 
-    public Timestamp getSetupTimestamp() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd");
-        Date parsedDate;
+    public String getSetupTimestamp() {
         try {
-            parsedDate = dateFormat.parse(game.getCreationDate());
-            return new Timestamp(parsedDate.getTime());
-        } catch (ParseException e) {
-            BotLogger.log("Can't parse CreationDate: " + game.getCreationDate(), e);
-            return null;
+            var localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+            var epochSeconds = localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().getEpochSecond();
+            return Long.toString(epochSeconds);
+        } catch (DateTimeParseException e) {
+            return Long.toString(Instant.now().getEpochSecond());
         }
     }
 
