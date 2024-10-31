@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -105,8 +106,17 @@ public class PlayerStatsDashboardPayload {
             .toList();
     }
 
-    public List<Leader> getLeaders() {
-        return player.getLeaders();
+    public LeaderPayload getLeaders() {
+        var leaderPayload = new LeaderPayload();
+        player.getLeaders().stream()
+                .filter(leader -> leader.getId().contains("commander"))
+                .findAny()
+                .ifPresent(commander -> leaderPayload.setCommander(commander.isLocked() ? "locked" : "unlocked"));
+        player.getLeaders().stream()
+                .filter(leader -> leader.getId().contains("hero"))
+                .findAny()
+                .ifPresentOrElse(hero -> leaderPayload.setHero(hero.isLocked() ? "locked" : "unlocked"), () -> leaderPayload.setHero("purged"));
+        return leaderPayload;
     }
 
     public List<String> getObjectives() {
@@ -254,6 +264,12 @@ public class PlayerStatsDashboardPayload {
             .filter(u -> u.getRequiredTechId().isPresent()) // is a unit that requires a tech upgrade
             .map(UnitModel::getBaseType)
             .toList();
+    }
+
+    @Data
+    public static class LeaderPayload {
+        private String hero;
+        private String commander;
     }
 
 }
