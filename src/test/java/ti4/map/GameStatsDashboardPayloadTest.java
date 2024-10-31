@@ -8,22 +8,29 @@ class GameStatsDashboardPayloadTest {
 
     @Test
     void getSetupTime() {
-        var game = new Game();
+        var game = createGame();
         game.setCreationDate("2024.10.30");
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(setupTimestamp).isEqualTo(1730246400L);
+        assertThat(setupTimestamp).isEqualTo(1730248570L);
     }
 
     @Test
     void getSetupTimeHandlesException() {
-        var game = new Game();
+        var game = createGame();
         game.setCreationDate("2024-10-30");
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(setupTimestamp).isGreaterThan(1730246400L);
+        assertThat(String.valueOf(setupTimestamp)).endsWith("70");
+    }
+
+    private Game createGame() {
+        var game = new Game();
+        game.setName("pbd123");
+        game.setCustomName("pbd123-a-test-for-you-and-me");
+        return game;
     }
 
 }

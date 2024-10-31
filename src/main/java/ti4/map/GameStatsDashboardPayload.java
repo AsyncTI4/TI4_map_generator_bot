@@ -116,8 +116,9 @@ public class GameStatsDashboardPayload {
                 .map(Player::getRelics)
                 .flatMap(Collection::stream)
                 .forEach(customPublicVp -> {
-                    if (customPublicVp.equalsIgnoreCase("absol_shardofthethrone2")) {
-                        relics.add("Shard of the Throne 2 (Absol)");
+                    if (customPublicVp.startsWith("absol_shardofthethrone")) {
+                        var shardNumber = customPublicVp.charAt(customPublicVp.length() - 1);
+                        relics.add("Shard of the Throne " + shardNumber + " (Absol)");
                     } else if (customPublicVp.toLowerCase().contains("shard")) {
                         relics.add("Shard of the Throne");
                     }});
@@ -214,12 +215,18 @@ public class GameStatsDashboardPayload {
     }
 
     public long getSetupTimestamp() {
+        LocalDate localDate;
         try {
-            var localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-            return localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().getEpochSecond();
+            localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         } catch (DateTimeParseException e) {
-            return Instant.now().getEpochSecond();
+            localDate = LocalDate.now();
         }
+        int gameNameHash = Math.abs(game.getName().hashCode());
+        int hours = gameNameHash % 24;
+        int minutes = gameNameHash % 60;
+        int seconds = Math.abs(game.getCustomName().hashCode()) % 60;
+        var localDateTime = localDate.atTime(hours, minutes, seconds);
+        return localDateTime.atZone(ZoneId.of("UTC")).toInstant().getEpochSecond();
     }
 
     public String getSpeaker() {
