@@ -213,7 +213,7 @@ public class GameStatsDashboardPayload {
             .map(e -> Map.entry(game.getStrategyCardModelByInitiative(e.getKey()), e.getValue())) // Optional(SCModel), TGs
             .filter(e -> e.getKey().isPresent())
             .map(e -> Map.entry(e.getKey().get().getName(), e.getValue())) // SCName, TGs
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1));
     }
 
 }
