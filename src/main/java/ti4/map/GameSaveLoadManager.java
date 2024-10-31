@@ -567,6 +567,8 @@ public class GameSaveLoadManager {
 
         writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
         writer.write(System.lineSeparator());
+        writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
+        writer.write(System.lineSeparator());
         long time = keepModifiedDate ? game.getLastModifiedDate() : new Date().getTime();
         game.setLastModifiedDate(time);
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
@@ -2125,6 +2127,13 @@ public class GameSaveLoadManager {
                         game.setButtonPressCount(Integer.parseInt(info));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse button press count", exception);
+                    }
+                }
+                case Constants.STARTED_DATE -> {
+                    try {
+                        game.setStartedDate(Long.parseLong(info));
+                    } catch (Exception exception) {
+                        BotLogger.log("Could not parse started date", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {

@@ -3,6 +3,10 @@ package ti4;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -16,6 +20,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
@@ -71,6 +76,7 @@ public class DataMigrationManager {
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
             runMigration("resetMinorFactionCommanders_130624", DataMigrationManager::resetMinorFactionCommanders_130624);
             runMigration("removeBadCVToken_290624", DataMigrationManager::removeBadCVToken_290624);
+            runMigration("migrateCreationDate_311024", DataMigrationManager::migrateCreationDate_311024);
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
@@ -81,6 +87,26 @@ public class DataMigrationManager {
     public static Boolean migrateExampleMigration_241223(Game game) { // method_DDMMYY where DD = Day, MM = Month, YY = Year
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run so it doesnt re-run next time.
+        return false;
+    }
+
+    /// MIGRATION: Add game.startedDate (long)
+    public static Boolean migrateCreationDate_311024(Game game) {
+        if (game.getStartedDate() < 1) {
+            LocalDate localDate;
+            try {
+                localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+            } catch (DateTimeParseException e) {
+                localDate = LocalDate.now();
+            }
+            int gameNameHash = Math.abs(game.getName().hashCode());
+            int hours = gameNameHash % 24;
+            int minutes = gameNameHash % 60;
+            int seconds = Math.abs(game.getCustomName().hashCode()) % 60;
+            var localDateTime = localDate.atTime(hours, minutes, seconds);
+            game.setStartedDate(localDateTime.atZone(ZoneId.of("UTC")).toInstant().toEpochMilli());
+            return true;
+        }
         return false;
     }
 
