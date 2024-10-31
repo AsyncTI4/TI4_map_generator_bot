@@ -209,9 +209,10 @@ public class PlayerStatsDashboardPayload {
 
     public List<String> getRelicCards() {
         return player.getRelics().stream()
-            .map(Mapper::getRelic)
-            .map(RelicModel::getName)
-            .toList();
+                .map(Mapper::getRelic)
+                .filter(Objects::nonNull)
+                .map(RelicModel::getName)
+                .toList();
     }
 
     public int getScore() {
