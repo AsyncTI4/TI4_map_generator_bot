@@ -125,23 +125,41 @@ public class PlayerStatsDashboardPayload {
         List<String> objectives = new ArrayList<>();
         // Publics & Custom (Custodians, Relic, Agenda)
         game.getScoredPublicObjectives().entrySet().stream()
-            .filter(e -> e.getValue().contains(player.getUserID())) // player has scored this
-            .map(Map.Entry::getKey)
-            .map(objID -> Mapper.isValidPublicObjective(objID) ? Mapper.getPublicObjective(objID).getName() : objID)
-            .forEach(objectives::add);
+                .filter(e -> e.getValue().contains(player.getUserID())) // player has scored this
+                .map(Map.Entry::getKey)
+                .filter(objId -> !objId.contains("custodian")) // this is counted elsewhere
+                .map(objId -> {
+                    if (Mapper.isValidPublicObjective(objId)) {
+                        return Mapper.getPublicObjective(objId).getName();
+                    }
+                    if (objId.toLowerCase().contains("censure")) {
+                        return "Political Censure";
+                    }
+                    if (objId.toLowerCase().contains("mutiny")) {
+                        return "Mutiny";
+                    }
+                    if (objId.toLowerCase().contains("seed")) {
+                        return "Seed of an Empire";
+                    }
+                    if (objId.toLowerCase().contains("rider")) {
+                        return "Imperial Rider";
+                    }
+                    return objId;
+                })
+                .forEach(objectives::add);
 
         // Secrets
         player.getSecretsScored().keySet().stream()
-            .map(Mapper::getSecretObjective)
-            .map(SecretObjectiveModel::getName)
-            .forEach(objectives::add);
+                .map(Mapper::getSecretObjective)
+                .map(SecretObjectiveModel::getName)
+                .forEach(objectives::add);
 
         // Supports
         player.getPromissoryNotesInPlayArea().stream()
-            .map(Mapper::getPromissoryNote)
-            .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-            .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
-            .forEach(objectives::add);
+                .map(Mapper::getPromissoryNote)
+                .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
+                .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
+                .forEach(objectives::add);
 
         return objectives;
     }
