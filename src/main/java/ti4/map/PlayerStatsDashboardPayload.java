@@ -108,18 +108,14 @@ public class PlayerStatsDashboardPayload {
 
     public LeaderPayload getLeaders() {
         var leaderPayload = new LeaderPayload();
-        player.getLeaders().forEach(leader -> {
-            if (!leader.isLocked()) {
-                if (leader.getId().contains("commander")) {
-                    leaderPayload.setCommander("unlocked");
-                } else if (leader.getId().contains("hero")) {
-                    leaderPayload.setHero("unlocked");
-                }
-            }
-        });
-        if (leaderPayload.getHero() == null) {
-            leaderPayload.setHero("purged");
-        }
+        player.getLeaders().stream()
+                .filter(leader -> leader.getId().contains("commander"))
+                .findAny()
+                .ifPresent(commander -> leaderPayload.setCommander(commander.isLocked() ? "locked" : "unlocked"));
+        player.getLeaders().stream()
+                .filter(leader -> leader.getId().contains("hero"))
+                .findAny()
+                .ifPresentOrElse(hero -> leaderPayload.setHero(hero.isLocked() ? "locked" : "unlocked"), () -> leaderPayload.setHero("purged"));
         return leaderPayload;
     }
 
