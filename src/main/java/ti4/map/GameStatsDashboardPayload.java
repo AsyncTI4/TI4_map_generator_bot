@@ -148,13 +148,13 @@ public class GameStatsDashboardPayload {
         objectives.put("Custom", new ArrayList<>(game.getCustomPublicVP().keySet()));
 
         // Other (Supports)
-        for (Player player : game.getRealAndEliminatedPlayers()) {
-            objectives.put("Other", player.getPromissoryNotesOwned().stream()
-                .map(Mapper::getPromissoryNote)
-                .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-                .map(pn -> "Support for the Throne (" + player.getColor() + ")")
-                .toList());
-        }
+        objectives.put("Other", game.getPlayers().values().stream()
+                        .map(Player::getPromissoryNotesOwned)
+                        .flatMap(Collection::stream)
+                        .map(Mapper::getPromissoryNote)
+                        .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
+                        .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
+                        .toList());
 
         var revealedPublics = game.getRevealedPublicObjectives().keySet().stream()
                 .map(Mapper::getPublicObjective)
