@@ -115,12 +115,16 @@ public class GameStatsDashboardPayload {
         game.getRealAndEliminatedPlayers().stream()
                 .map(Player::getRelics)
                 .flatMap(Collection::stream)
-                .filter(relic -> relic.toLowerCase().contains("shard") || relic.toLowerCase().contains("emphidia"))
-                .forEach(relics::add);
+                .forEach(customPublicVp -> {
+                    if (customPublicVp.equalsIgnoreCase("absol_shardofthethrone2")) {
+                        relics.add("Shard of the Throne 2 (Absol)");
+                    } else if (customPublicVp.toLowerCase().contains("shard")) {
+                        relics.add("Shard of the Throne");
+                    }});
         // some older games may have added these custom
         game.getCustomPublicVP().keySet()
                 .forEach(customPublicVp -> {
-                    if (customPublicVp.toLowerCase().contains("shard")) {
+                    if (customPublicVp.toLowerCase().contains("shard") && !relics.contains("Shard of the Throne")) {
                         relics.add("Shard of the Throne");
                     } else if (customPublicVp.toLowerCase().contains("emphidia")) {
                         relics.add("The Crown of Emphidia");
@@ -202,13 +206,12 @@ public class GameStatsDashboardPayload {
         return game.getVp();
     }
 
-    public String getSetupTimestamp() {
+    public long getSetupTimestamp() {
         try {
             var localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-            var epochSeconds = localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().getEpochSecond();
-            return Long.toString(epochSeconds);
+            return localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().getEpochSecond();
         } catch (DateTimeParseException e) {
-            return Long.toString(Instant.now().getEpochSecond());
+            return Instant.now().getEpochSecond();
         }
     }
 
@@ -217,8 +220,12 @@ public class GameStatsDashboardPayload {
         return game.getSpeaker().getColor();
     }
 
-    public Timestamp getTimestamp() {
-        return Timestamp.from(Instant.now());
+    public long getTimestamp() {
+        try {
+            return Instant.ofEpochMilli(game.getLastModifiedDate()).getEpochSecond();
+        } catch (DateTimeParseException e) {
+            return Instant.now().getEpochSecond();
+        }
     }
 
     public String getTurn() {

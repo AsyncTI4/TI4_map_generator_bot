@@ -13,7 +13,7 @@ class GameStatsDashboardPayloadTest {
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(setupTimestamp).isEqualTo("1730246400");
+        assertThat(setupTimestamp).isEqualTo(1730246400L);
     }
 
     @Test
@@ -23,7 +23,7 @@ class GameStatsDashboardPayloadTest {
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(setupTimestamp).matches(str -> str.length() >= 10);
+        assertThat(setupTimestamp).isGreaterThan(1730246400L);
     }
 
 }
