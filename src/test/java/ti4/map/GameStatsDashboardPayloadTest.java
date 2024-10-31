@@ -13,7 +13,7 @@ class GameStatsDashboardPayloadTest {
 
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
-        assertThat(setupTimestamp).isEqualTo("1730260800");
+        assertThat(setupTimestamp).isEqualTo("1730246400");
     }
 
     @Test

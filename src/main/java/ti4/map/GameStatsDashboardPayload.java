@@ -1,9 +1,11 @@
 package ti4.map;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -202,10 +204,10 @@ public class GameStatsDashboardPayload {
 
     public String getSetupTimestamp() {
         try {
-            var date = new SimpleDateFormat("yyyy.MM.dd").parse(game.getCreationDate());
-            var epochSeconds = date.toInstant().getEpochSecond();
+            var localDate = LocalDate.parse(game.getCreationDate(), DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+            var epochSeconds = localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().getEpochSecond();
             return Long.toString(epochSeconds);
-        } catch (ParseException e) {
+        } catch (DateTimeParseException e) {
             return Long.toString(Instant.now().getEpochSecond());
         }
     }
