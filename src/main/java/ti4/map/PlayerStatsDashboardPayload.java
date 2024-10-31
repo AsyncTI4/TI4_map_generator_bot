@@ -1,12 +1,14 @@
 package ti4.map;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -205,31 +207,32 @@ public class PlayerStatsDashboardPayload {
             "industrial", industrialCount));
 
         // Techs
-        long blueCount = player.getPlanets().stream()
+        AtomicInteger blueCount = new AtomicInteger();
+        AtomicInteger yellowCount = new AtomicInteger();
+        AtomicInteger greenCount = new AtomicInteger();
+        AtomicInteger redCount = new AtomicInteger();
+        player.getPlanets().stream()
                 .map(pID -> game.getPlanetsInfo().get(pID))
                 .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("PROPULSION"))
-                .count();
-        long redCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("WARFARE"))
-                .count();
-        long greenCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("BIOTIC"))
-                .count();
-        long yellowCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("CYBERNETIC"))
-                .count();
+                .map(Planet::getTechSpecialities)
+                .flatMap(Collection::stream)
+                .map(String::toLowerCase)
+                .forEach(speciality -> {
+                    if (speciality.equalsIgnoreCase("propulsion")) {
+                        blueCount.getAndIncrement();
+                    } else if (speciality.equalsIgnoreCase("cybernetic")) {
+                        yellowCount.getAndIncrement();
+                    } else if (speciality.equalsIgnoreCase("biotic")) {
+                        greenCount.getAndIncrement();
+                    } else if (speciality.equalsIgnoreCase("warfare")) {
+                        redCount.getAndIncrement();
+                    }
+                });
         planetTotals.put("techs", Map.of(
-            "blue", blueCount,
-            "green", redCount,
-            "red", greenCount,
-            "yellow", yellowCount));
+            "blue", blueCount.get(),
+            "green", redCount.get(),
+            "red", greenCount.get(),
+            "yellow", yellowCount.get()));
 
         return planetTotals;
     }
