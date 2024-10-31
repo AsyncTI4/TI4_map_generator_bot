@@ -135,7 +135,7 @@ public class GameStatsDashboardPayload {
         var agendas = new ArrayList<String>();
         game.getCustomPublicVP().keySet()
                 .forEach(customPublicVp -> {
-                    if (customPublicVp.toLowerCase().contains("political censure")) {
+                    if (customPublicVp.toLowerCase().contains("censure")) {
                         agendas.add("Political Censure");
                     } else if (customPublicVp.toLowerCase().contains("mutiny")) {
                         agendas.add("Mutiny");
@@ -144,17 +144,24 @@ public class GameStatsDashboardPayload {
                     }});
         objectives.put("Agenda", agendas);
 
-        // Custom (Unknown)
+        // Custom
         objectives.put("Custom", new ArrayList<>(game.getCustomPublicVP().keySet()));
 
-        // Other (Supports)
-        objectives.put("Other", game.getPlayers().values().stream()
+        // Other (Supports + Imperial Rider)
+        var otherObjectives = new ArrayList<String>();
+        game.getPlayers().values().stream()
                         .map(Player::getPromissoryNotesOwned)
                         .flatMap(Collection::stream)
                         .map(Mapper::getPromissoryNote)
                         .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
                         .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
-                        .toList());
+                        .forEach(otherObjectives::add);
+        game.getCustomPublicVP().keySet()
+                .forEach(customPublicVp -> {
+                    if (customPublicVp.toLowerCase().contains("rider")) {
+                        otherObjectives.add("Imperial Rider");
+                    }});
+        objectives.put("Other", otherObjectives);
 
         var revealedPublics = game.getRevealedPublicObjectives().keySet().stream()
                 .map(Mapper::getPublicObjective)
