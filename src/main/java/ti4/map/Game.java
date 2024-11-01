@@ -231,6 +231,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
+        if (players.get(Constants.dicecordId) != null)
+            return players.get(Constants.dicecordId);
         addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
         Player neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
@@ -239,7 +241,6 @@ public class Game extends GameProperties {
         FactionModel setupInfo = neutral.getFactionSetupInfo();
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
-
         return neutral;
     }
 
@@ -3919,7 +3920,6 @@ public class Game extends GameProperties {
                         player = player_;
                         break;
                     }
-
                 }
                 if (Objects.equals(factionColor, player_.getFaction()) ||
                     Objects.equals(factionColor, player_.getColor()) ||

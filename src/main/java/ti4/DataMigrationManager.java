@@ -16,10 +16,13 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+
+import ti4.commands.player.ChangeColor;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -28,6 +31,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
@@ -71,6 +75,7 @@ public class DataMigrationManager {
             runMigration("migrateFrankenItems_111223", DataMigrationManager::migrateFrankenItems_111223);
             runMigration("resetMinorFactionCommanders_130624", DataMigrationManager::resetMinorFactionCommanders_130624);
             runMigration("removeBadCVToken_290624", DataMigrationManager::removeBadCVToken_290624);
+            runMigration("noMoreRiftset_311024", DataMigrationManager::noMoreRiftset_311024);
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
         }
@@ -584,6 +589,19 @@ public class DataMigrationManager {
         tokens.put("token_custodiavigilia_1.png", "attachment_custodiavigilia_1.png");
         tokens.put("token_custodiavigilia_2.png", "attachment_custodiavigilia_2.png");
         return replaceTokens(game, tokens);
+    }
+
+    public static boolean noMoreRiftset_311024(Game game) {
+        Player rift = game.getPlayerFromColorOrFaction("ero");
+        if (rift == null) return false;
+        if (rift.getUserID().equals(Constants.eronousId)) return false;
+
+        String newColor = rift.getNextAvailableColorIgnoreCurrent();
+        if (game.getPlayerFromColorOrFaction(newColor) != null) return false;
+        String oldColor = rift.getColor();
+        MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), rift.getRepresentation(false, false) + " has had their color changed to " + Emojis.getColorEmojiWithName(newColor));
+        ChangeColor.changePlayerColor(game, rift, oldColor, newColor);
+        return true;
     }
 
     private static void runMigration(String migrationName, Function<Game, Boolean> migrationMethod) {
