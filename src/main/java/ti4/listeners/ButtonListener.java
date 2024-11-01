@@ -65,7 +65,7 @@ public class ButtonListener extends ListenerAdapter {
             if (context.isValid()) {
                 resolveButtonInteractionEvent(context);
             }
-            //context.save(event);
+            context.save(event);
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
