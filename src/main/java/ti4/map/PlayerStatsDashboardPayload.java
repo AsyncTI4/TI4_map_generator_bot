@@ -1,15 +1,18 @@
 package ti4.map;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -105,32 +108,58 @@ public class PlayerStatsDashboardPayload {
             .toList();
     }
 
-    public List<Leader> getLeaders() {
-        return player.getLeaders();
+    public LeaderPayload getLeaders() {
+        var leaderPayload = new LeaderPayload();
+        player.getLeaders().stream()
+                .filter(leader -> leader.getId().contains("commander"))
+                .findAny()
+                .ifPresent(commander -> leaderPayload.setCommander(commander.isLocked() ? "locked" : "unlocked"));
+        player.getLeaders().stream()
+                .filter(leader -> leader.getId().contains("hero"))
+                .findAny()
+                .ifPresentOrElse(hero -> leaderPayload.setHero(hero.isLocked() ? "locked" : "unlocked"), () -> leaderPayload.setHero("purged"));
+        return leaderPayload;
     }
 
     public List<String> getObjectives() {
         List<String> objectives = new ArrayList<>();
         // Publics & Custom (Custodians, Relic, Agenda)
         game.getScoredPublicObjectives().entrySet().stream()
-            .filter(e -> e.getValue().contains(player.getUserID())) // player has scored this
-            .map(Map.Entry::getKey)
-            .map(objID -> Mapper.isValidPublicObjective(objID) ? Mapper.getPublicObjective(objID).getName() : objID)
-            .forEach(objectives::add);
+                .filter(e -> e.getValue().contains(player.getUserID())) // player has scored this
+                .map(Map.Entry::getKey)
+                .filter(objId -> !objId.contains("custodian")) // this is counted elsewhere
+                .map(objId -> {
+                    if (Mapper.isValidPublicObjective(objId)) {
+                        return Mapper.getPublicObjective(objId).getName();
+                    }
+                    if (objId.toLowerCase().contains("censure")) {
+                        return "Political Censure";
+                    }
+                    if (objId.toLowerCase().contains("mutiny")) {
+                        return "Mutiny";
+                    }
+                    if (objId.toLowerCase().contains("seed")) {
+                        return "Seed of an Empire";
+                    }
+                    if (objId.toLowerCase().contains("rider")) {
+                        return "Imperial Rider";
+                    }
+                    return objId;
+                })
+                .forEach(objectives::add);
 
         // Secrets
         player.getSecretsScored().keySet().stream()
-            .map(Mapper::getSecretObjective)
-            .map(SecretObjectiveModel::getName)
-            .forEach(objectives::add);
+                .map(Mapper::getSecretObjective)
+                .map(SecretObjectiveModel::getName)
+                .forEach(objectives::add);
 
         // Supports
         player.getPromissoryNotesInPlayArea().stream()
-            .map(Mapper::getPromissoryNote)
-            .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
-            .filter(pn -> game.getPNOwner(pn.getAlias()) != null)
-            .map(pn -> "Support for the Throne (" + game.getPNOwner(pn.getAlias()).getColor() + ")")
-            .forEach(objectives::add);
+                .map(Mapper::getPromissoryNote)
+                .filter(pn -> "Support for the Throne".equalsIgnoreCase(pn.getName()))
+                .map(pn -> "Support for the Throne (" + pn.getColor() + ")")
+                .forEach(objectives::add);
 
         return objectives;
     }
@@ -178,40 +207,42 @@ public class PlayerStatsDashboardPayload {
             "industrial", industrialCount));
 
         // Techs
-        long blueCount = player.getPlanets().stream()
+        AtomicInteger blueCount = new AtomicInteger();
+        AtomicInteger yellowCount = new AtomicInteger();
+        AtomicInteger greenCount = new AtomicInteger();
+        AtomicInteger redCount = new AtomicInteger();
+        player.getPlanets().stream()
                 .map(pID -> game.getPlanetsInfo().get(pID))
                 .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("PROPULSION"))
-                .count();
-        long redCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("WARFARE"))
-                .count();
-        long greenCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("BIOTIC"))
-                .count();
-        long yellowCount = player.getPlanets().stream()
-                .map(pID -> game.getPlanetsInfo().get(pID))
-                .filter(Objects::nonNull)
-                .filter(p -> p.getTechSpecialities().contains("CYBERNETIC"))
-                .count();
+                .map(Planet::getTechSpecialities)
+                .flatMap(Collection::stream)
+                .map(String::toLowerCase)
+                .forEach(speciality -> {
+                    if (speciality.equalsIgnoreCase("propulsion")) {
+                        blueCount.getAndIncrement();
+                    } else if (speciality.equalsIgnoreCase("cybernetic")) {
+                        yellowCount.getAndIncrement();
+                    } else if (speciality.equalsIgnoreCase("biotic")) {
+                        greenCount.getAndIncrement();
+                    } else if (speciality.equalsIgnoreCase("warfare")) {
+                        redCount.getAndIncrement();
+                    }
+                });
         planetTotals.put("techs", Map.of(
-            "blue", blueCount,
-            "green", redCount,
-            "red", greenCount,
-            "yellow", yellowCount));
+            "blue", blueCount.get(),
+            "green", redCount.get(),
+            "red", greenCount.get(),
+            "yellow", yellowCount.get()));
 
         return planetTotals;
     }
 
     public List<String> getRelicCards() {
         return player.getRelics().stream()
-            .map(Mapper::getRelic)
-            .map(RelicModel::getName)
-            .toList();
+                .map(Mapper::getRelic)
+                .filter(Objects::nonNull)
+                .map(RelicModel::getName)
+                .toList();
     }
 
     public int getScore() {
@@ -253,6 +284,12 @@ public class PlayerStatsDashboardPayload {
             .filter(u -> u.getRequiredTechId().isPresent()) // is a unit that requires a tech upgrade
             .map(UnitModel::getBaseType)
             .toList();
+    }
+
+    @Data
+    public static class LeaderPayload {
+        private String hero;
+        private String commander;
     }
 
 }
