@@ -1,5 +1,6 @@
 package ti4.commands.statistics;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,11 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
                 if (player.getFaction().equalsIgnoreCase(faction)) {
                     gamesThatHadThem++;
                     for (String tech : player.getTechs()) {
-                        if (factionM.getStartingTech() != null && !factionM.getStartingTech().contains(tech)) {
+                        List<String> startingTech = new ArrayList<>();
+                        if (factionM.getStartingTech() != null) {
+                            startingTech = factionM.getStartingTech();
+                        }
+                        if (startingTech != null && !startingTech.contains(tech)) {
                             String techName = Mapper.getTech(tech).getName();
                             if (techsResearched.containsKey(techName)) {
                                 techsResearched.put(techName, techsResearched.get(techName) + 1);

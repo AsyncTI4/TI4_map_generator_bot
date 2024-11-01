@@ -261,4 +261,8 @@ public class GameStatsDashboardPayload {
         return game.getWinner().isPresent() ? game.getWinner().get().getUserID() : null;
     }
 
+    public boolean isHomebrew() {
+        return game.hasHomebrew();
+    }
+
 }

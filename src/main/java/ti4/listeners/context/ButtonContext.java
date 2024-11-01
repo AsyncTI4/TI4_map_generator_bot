@@ -37,17 +37,19 @@ public class ButtonContext extends ListenerContext {
         // Proceed with additional button things
         this.messageID = event.getMessageId();
 
+        if (componentID.contains("deleteThisButton")) {
+            componentID = componentID.replace("deleteThisButton", "");
+            ButtonHelper.deleteTheOneButton(event);
+        }
+    }
+
+    public void save(ButtonInteractionEvent event) {
         boolean isUndo = componentID.contains("ultimateUndo");
         boolean isShow = "showGameAgain".equalsIgnoreCase(componentID);
         boolean isNoSabo = "no_sabotage".equalsIgnoreCase(componentID);
         if (game != null && !isUndo && !isShow && !isNoSabo) {
             ButtonHelper.saveButtons(event, game, player);
             GameSaveLoadManager.saveMap(game, event);
-        }
-
-        if (componentID.contains("deleteThisButton")) {
-            componentID = componentID.replace("deleteThisButton", "");
-            ButtonHelper.deleteTheOneButton(event);
         }
     }
 }
