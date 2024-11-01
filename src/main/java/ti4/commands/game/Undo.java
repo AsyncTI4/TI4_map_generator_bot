@@ -2,7 +2,6 @@ package ti4.commands.game;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -14,9 +13,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -89,8 +85,8 @@ public class Undo extends GameSubcommandData {
         }
 
         StringBuilder sb = new StringBuilder(
-            "Undoing Save #" + maxSaveNumber + " back to Save #" + gameToUndoBackToNumber + ":\n");
-        for (int i = maxSaveNumber; i >= gameToUndoBackToNumber; i--) {
+            "Undoing Save #" + maxSaveNumber + " back to before Save #" + gameToUndoBackToNumber + ":\n");
+        for (int i = maxSaveNumber; i > gameToUndoBackToNumber; i--) {
             String undoFile = game.getName() + "_" + i + ".txt";
             File undoFileToBeDeleted = new File(Storage.getMapUndoDirectory(), undoFile);
             if (undoFileToBeDeleted.exists()) {

@@ -43,13 +43,13 @@ public class ButtonContext extends ListenerContext {
         }
     }
 
-    // public void save(ButtonInteractionEvent event) {
-    //     boolean isUndo = componentID.contains("ultimateUndo");
-    //     boolean isShow = "showGameAgain".equalsIgnoreCase(componentID);
-    //     boolean isNoSabo = "no_sabotage".equalsIgnoreCase(componentID);
-    //     if (game != null && !isUndo && !isShow && !isNoSabo) {
-    //         ButtonHelper.saveButtons(event, game, player);
-    //         GameSaveLoadManager.saveMap(game, event);
-    //     }
-    // }
+    public void save(ButtonInteractionEvent event) {
+        boolean isUndo = componentID.contains("ultimateUndo");
+        boolean isShow = "showGameAgain".equalsIgnoreCase(componentID);
+        boolean isNoSabo = "no_sabotage".equalsIgnoreCase(componentID);
+        if (game != null && !isUndo && !isShow && !isNoSabo) {
+            ButtonHelper.saveButtons(event, game, player);
+            GameSaveLoadManager.saveMap(game, event);
+        }
+    }
 }

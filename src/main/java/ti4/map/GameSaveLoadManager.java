@@ -170,9 +170,7 @@ public class GameSaveLoadManager {
 
     public static void saveMap(Game game, boolean keepModifiedDate, String saveReason) {
         long saveStart = System.nanoTime();
-
         game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
-
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
@@ -203,7 +201,6 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
         txtTime += System.nanoTime() - txtStart;
-
         long undoStart = System.nanoTime();
         mapFile = Storage.getMapImageStorage(game.getName() + TXT);
         if (mapFile.exists()) {
@@ -247,32 +244,8 @@ public class GameSaveLoadManager {
                     File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
                     File mapUndoStorage2 = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                     CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                    Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
-                    mapUndoStorage2.delete();
+                    Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
                     Game loadedGame = loadMap(originalMapFile);
-                    if (loadedGame == null) throw new Exception("Failed to load undo copy");
-
-                    for (Player p1 : loadedGame.getRealPlayers()) {
-                        Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
-                        if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
-                            CardsInfo.sendCardsInfo(loadedGame, p1);
-                        }
-                    }
-                    GameManager.getInstance().deleteGame(game.getName());
-                    GameManager.getInstance().addGame(loadedGame);
-                    StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `")
-                        .append(maxNumber).append("` ");
-                    if (loadedGame.getSavedChannel() instanceof ThreadChannel
-                        && loadedGame.getSavedChannel().getName().contains("Cards Info")) {
-                        sb.append("[CLASSIFIED]");
-                    } else {
-                        sb.append(loadedGame.getLatestCommand());
-                    }
-                    if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-                    } else {
-                        ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
-                    }
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
                             && !game.getPhaseOfGame().contains("status")) {
@@ -287,6 +260,34 @@ public class GameSaveLoadManager {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "Had trouble getting the saved buttons, sorry");
                     }
+                    StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `")
+                        .append(maxNumber).append("` ");
+                    if (loadedGame.getSavedChannel() instanceof ThreadChannel
+                        && loadedGame.getSavedChannel().getName().contains("Cards Info")) {
+                        sb.append("[CLASSIFIED]");
+                    } else {
+                        sb.append(loadedGame.getLatestCommand());
+                    }
+                    Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
+                    mapUndoStorage2.delete();
+                    loadedGame = loadMap(originalMapFile);
+                    if (loadedGame == null) throw new Exception("Failed to load undo copy");
+
+                    for (Player p1 : loadedGame.getRealPlayers()) {
+                        Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
+                        if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
+                            CardsInfo.sendCardsInfo(loadedGame, p1);
+                        }
+                    }
+                    GameManager.getInstance().deleteGame(game.getName());
+                    GameManager.getInstance().addGame(loadedGame);
+
+                    if (game.isFowMode()) {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                    } else {
+                        ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
+                    }
+
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
