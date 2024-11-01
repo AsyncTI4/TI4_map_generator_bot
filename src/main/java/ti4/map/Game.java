@@ -4091,6 +4091,7 @@ public class Game extends GameProperties {
             || !checkAllTilesAreOfficial()
             || getFactions().stream()
                 .map(Mapper::getFaction)
+                .filter(Objects::nonNull)
                 .anyMatch(faction -> !faction.getSource().isOfficial())
             || Mapper.getLeaders().values().stream()
                 .filter(leader -> !leader.getSource().isOfficial())
