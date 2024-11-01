@@ -4069,8 +4069,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean hasHomebrew() {
-        return isExtraSecretMode()
-            || isHomebrew()
+        return isHomebrew()
+            || isExtraSecretMode()
             || isFowMode()
             || isAgeOfExplorationMode()
             || isMinorFactionsMode()
@@ -4089,11 +4089,11 @@ public class Game extends GameProperties {
             || isCommunityMode()
             || !checkAllDecksAreOfficial()
             || !checkAllTilesAreOfficial()
-            || Mapper.getFactions().stream()
-                .filter(faction -> !faction.getSource().isPok())
-                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
+            || getFactions().stream()
+                .map(Mapper::getFaction)
+                .anyMatch(faction -> !faction.getSource().isOfficial())
             || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isPok())
+                .filter(leader -> !leader.getSource().isOfficial())
                 .anyMatch(leader -> isLeaderInGame(leader.getID()))
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
