@@ -111,53 +111,6 @@ public class Undo extends GameSubcommandData {
         GameSaveLoadManager.undo(gameToRestore, event);
     }
 
-    @ButtonHandler("ultimateUndo")
-    public static void ultimateUndo(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        if (!game.getSavedButtons().isEmpty() && !game.getPhaseOfGame().contains("status")) {
-            String buttonString = game.getSavedButtons().getFirst();
-            if (game.getPlayerFromColorOrFaction(buttonString.split(";")[0]) != null) {
-                boolean showGame = false;
-                for (String buttonString2 : game.getSavedButtons()) {
-                    if (buttonString2.contains("Show Game")) {
-                        showGame = true;
-                        break;
-                    }
-                }
-                if (player != game.getPlayerFromColorOrFaction(buttonString.split(";")[0])
-                    && !showGame) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "You were not the player who pressed the latest button. Use /game undo if you truly want to undo "
-                            + game.getLatestCommand());
-                    return;
-                }
-            }
-        }
-
-        GameSaveLoadManager.undo(game, event);
-        if ("action".equalsIgnoreCase(game.getPhaseOfGame())
-            || "agendaVoting".equalsIgnoreCase(game.getPhaseOfGame())) {
-            if (!event.getMessage().getContentRaw().contains(player.getFinsFactionCheckerPrefix())) {
-                boolean dontDelete = false;
-                for (ActionRow row : event.getMessage().getActionRows()) {
-                    List<ItemComponent> buttonRow = row.getComponents();
-                    for (ItemComponent item : buttonRow) {
-                        if (item instanceof Button butt) {
-                            if (butt.getId().contains("doneLanding")
-                                || butt.getId().contains("concludeMove")) {
-                                dontDelete = true;
-                                break;
-                            }
-                        }
-                    }
-
-                }
-                if (!dontDelete) {
-                    ButtonHelper.deleteMessage(event);
-                }
-            }
-        }
-    }
-
     @ButtonHandler("ultimateUndo_")
     public static void ultimateUndo_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!game.getSavedButtons().isEmpty()) {
