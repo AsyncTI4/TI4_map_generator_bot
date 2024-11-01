@@ -1197,7 +1197,7 @@ public class GameSaveLoadManager {
                             BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                             return;
                         }
-                        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 60 || game.isCustodiansScored()) {
+                        if (file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 60 || game.isCustodiansScored()) {
                             GameManager.getInstance().addGame(game);
                         }
                     } catch (Exception e) {
