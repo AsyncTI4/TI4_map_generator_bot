@@ -1824,12 +1824,6 @@ public class Player {
         }
     }
 
-    public void changeColor(String color) {
-        if (!"null".equals(color)) {
-            this.color = AliasHandler.resolveColor(color);
-        }
-    }
-
     public void initPNs() {
         if (getGame() != null && color != null && faction != null && Mapper.isValidColor(color)
             && Mapper.isValidFaction(faction)) {
@@ -2973,6 +2967,11 @@ public class Player {
         if (getColor() != null && !getColor().equals("null")) {
             return getColor();
         }
+        return getNextAvailableColorIgnoreCurrent();
+    }
+
+    @JsonIgnore
+    public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
         String color = getPreferredColours().stream()
             .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))

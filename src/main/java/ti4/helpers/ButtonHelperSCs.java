@@ -261,10 +261,10 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
         }
         int tradeInitiative = scModel.getInitiative();
-        player.addFollowedSC(tradeInitiative, event);
         if (!player.getFollowedSCs().contains(tradeInitiative)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
+        player.addFollowedSC(tradeInitiative, event);
         ButtonHelper.addReaction(event, false, false, "Replenishing Commodities", "");
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
@@ -308,10 +308,10 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("trade").orElse(null);
         }
         int tradeInitiative = scModel.getInitiative();
-        player.addFollowedSC(tradeInitiative, event);
         if (!player.getFollowedSCs().contains(tradeInitiative)) {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, tradeInitiative, game, event);
         }
+        player.addFollowedSC(tradeInitiative, event);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(tradeInitiative) && p2.getCommodities() > 0) {
                 if (p2.getCommodities() > washedCommsPower) {

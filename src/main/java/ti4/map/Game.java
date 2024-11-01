@@ -1,6 +1,6 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
@@ -233,6 +233,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
+        if (players.get(Constants.dicecordId) != null)
+            return players.get(Constants.dicecordId);
         addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
         Player neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
@@ -241,7 +243,6 @@ public class Game extends GameProperties {
         FactionModel setupInfo = neutral.getFactionSetupInfo();
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
-
         return neutral;
     }
 
@@ -769,19 +770,18 @@ public class Game extends GameProperties {
 
     public int getActionPhaseTurnOrder(String userId) {
         return getActionPhaseTurnOrder().stream()
-                .map(Player::getUserID)
-                .toList()
-                .indexOf(userId);
+            .map(Player::getUserID)
+            .toList()
+            .indexOf(userId);
     }
 
     public List<Player> getActionPhaseTurnOrder() {
         return players.values().stream()
-                .filter(player -> !player.getSCs().isEmpty())
-                .map(player -> new ImmutablePair<>(player, Collections.min(player.getSCs())))
-                .sorted((p1, p2) -> p1.getLeft().hasTheZeroToken() ? -1 : p2.getLeft().hasTheZeroToken() ? 1 :
-                        Integer.compare(p1.getRight(), p2.getRight()))
-                .map(ImmutablePair::getLeft)
-                .toList();
+            .filter(player -> !player.getSCs().isEmpty())
+            .map(player -> new ImmutablePair<>(player, Collections.min(player.getSCs())))
+            .sorted((p1, p2) -> p1.getLeft().hasTheZeroToken() ? -1 : p2.getLeft().hasTheZeroToken() ? 1 : Integer.compare(p1.getRight(), p2.getRight()))
+            .map(ImmutablePair::getLeft)
+            .toList();
     }
 
     public DisplayType getDisplayTypeForced() {
@@ -1120,8 +1120,8 @@ public class Game extends GameProperties {
         if (!scTradeGoods.containsKey(sc)) {
             setScTradeGood(sc, 0);
             return true;
-        } else
-            return false;
+        }
+        return false;
     }
 
     public boolean removeSC(Integer sc) {
@@ -3921,7 +3921,6 @@ public class Game extends GameProperties {
                         player = player_;
                         break;
                     }
-
                 }
                 if (Objects.equals(factionColor, player_.getFaction()) ||
                     Objects.equals(factionColor, player_.getColor()) ||
@@ -4071,8 +4070,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean hasHomebrew() {
-        return isExtraSecretMode()
-            || isHomebrew()
+        return isHomebrew()
+            || isExtraSecretMode()
             || isFowMode()
             || isAgeOfExplorationMode()
             || isMinorFactionsMode()
@@ -4091,11 +4090,12 @@ public class Game extends GameProperties {
             || isCommunityMode()
             || !checkAllDecksAreOfficial()
             || !checkAllTilesAreOfficial()
-            || Mapper.getFactions().stream()
-                .filter(faction -> !faction.getSource().isPok())
-                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
+            || getFactions().stream()
+                .map(Mapper::getFaction)
+                .filter(Objects::nonNull)
+                .anyMatch(faction -> !faction.getSource().isOfficial())
             || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isPok())
+                .filter(leader -> !leader.getSource().isOfficial())
                 .anyMatch(leader -> isLeaderInGame(leader.getID()))
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))

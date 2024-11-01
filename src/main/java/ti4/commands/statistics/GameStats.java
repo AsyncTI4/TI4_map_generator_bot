@@ -1,5 +1,7 @@
 package ti4.commands.statistics;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,7 +24,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.generator.Mapper;
@@ -33,8 +36,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class GameStats extends StatisticsSubcommandData {
 
@@ -113,7 +114,7 @@ public class GameStats extends StatisticsSubcommandData {
         @Override
         public String toString() {
             return super.toString().toLowerCase();
-        } 
+        }
 
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
@@ -432,10 +433,10 @@ public class GameStats extends StatisticsSubcommandData {
             .sorted(Map.Entry.comparingByValue())
             .map(entry -> Map.entry(Mapper.getFaction(entry.getKey()), entry.getValue()))
             .forEach(entry -> sb.append("`")
-                    .append(StringUtils.leftPad(entry.getValue().toString(), 4))
-                    .append("x` ")
-                    .append(entry.getKey().getFactionEmoji()).append(" ")
-                    .append(entry.getKey().getFactionNameWithSourceEmoji()).append(" (Took Custodians a total of  ").append(custodians.getOrDefault(entry.getKey().getAlias(), 0)).append(" times, or ").append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue()).append(")")
+                .append(StringUtils.leftPad(entry.getValue().toString(), 4))
+                .append("x` ")
+                .append(entry.getKey().getFactionEmoji()).append(" ")
+                .append(entry.getKey().getFactionNameWithSourceEmoji()).append(" (Took Custodians a total of  ").append(custodians.getOrDefault(entry.getKey().getAlias(), 0)).append(" times, or ").append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue()).append(")")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
@@ -683,7 +684,7 @@ public class GameStats extends StatisticsSubcommandData {
         sb.append("Time Per Phase:").append("\n");
         timeCount.entrySet()
             .forEach(entry -> sb.append(entry.getKey()).append(": ")
-                    .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4)).append(" days (based on ").append(amountCount.get(entry.getKey())).append(" games)")
+                .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4)).append(" days (based on ").append(amountCount.get(entry.getKey())).append(" games)")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }
