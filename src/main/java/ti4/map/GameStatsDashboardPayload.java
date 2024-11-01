@@ -262,7 +262,7 @@ public class GameStatsDashboardPayload {
     }
 
     public boolean isHomebrew() {
-        return game.isHomebrew();
+        return game.hasHomebrew();
     }
 
 }
