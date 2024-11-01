@@ -1,11 +1,18 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
@@ -22,12 +29,6 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class TransactionHelper {
 
@@ -411,7 +412,7 @@ public class TransactionHelper {
         }
         switch (thingToTrans) {
             case "TGs" -> {
-                message = message + "Click the amount of TGs you would like to " + requestOrOffer;
+                message = message + " Click the amount of TGs you would like to " + requestOrOffer;
                 for (int x = 1; x < p1.getTg() + 1; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
@@ -419,7 +420,7 @@ public class TransactionHelper {
                 }
             }
             case "Comms" -> {
-                message = message + "Click the amount of commodities you would like to " + requestOrOffer;
+                message = message + " Click the amount of commodities you would like to " + requestOrOffer;
                 for (int x = 1; x < p1.getCommodities() + 1; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_Comms_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
@@ -428,7 +429,7 @@ public class TransactionHelper {
 
             }
             case "ClearDebt" -> {
-                message = message + "Click the amount of debt you would like to " + requestOrOffer + " cleared";
+                message = message + " Click the amount of debt you would like to " + requestOrOffer + " cleared";
                 for (int x = 1; x < p1.getDebtTokenCount(p2.getColor()) + 1; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_ClearDebt_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x,
@@ -438,7 +439,7 @@ public class TransactionHelper {
 
             }
             case "SendDebt" -> {
-                message = message + "Click the amount of debt you would like to " + requestOrOffer;
+                message = message + " Click the amount of debt you would like to " + requestOrOffer;
                 for (int x = 1; x < 6; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_SendDebt_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
@@ -447,26 +448,26 @@ public class TransactionHelper {
 
             }
             case "shipOrders" -> {
-                message = message + "Click the axis order you would like to " + requestOrOffer;
+                message = message + " Click the axis order you would like to " + requestOrOffer;
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_shipOrders_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
-                            Mapper.getRelic(shipOrder).getName());
+                        Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
 
             }
             case "starCharts" -> {
-                message = message + "Click the star chart you would like to " + requestOrOffer;
+                message = message + " Click the star chart you would like to " + requestOrOffer;
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
-                            Mapper.getRelic(shipOrder).getName());
+                        Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
             }
             case "Planets" -> {
-                message = message + "Click the planet you would like to " + requestOrOffer;
+                message = message + " Click the planet you would like to " + requestOrOffer;
                 for (String planet : p1.getPlanetsAllianceMode()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -481,7 +482,7 @@ public class TransactionHelper {
 
             }
             case "AlliancePlanets" -> {
-                message = message + "Click the planet you would like to " + requestOrOffer;
+                message = message + " Click the planet you would like to " + requestOrOffer;
                 for (String planet : p1.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -501,7 +502,7 @@ public class TransactionHelper {
             }
             case "ACs" -> {
                 if (requesting) {
-                    message = message + player.getRepresentation()
+                    message = message + player.getRepresentation(false, false)
                         + " Click the number of ACs you'd like to request. Since ACs are private info, you will have to use messages to explain what ACs you want, these buttons will just make sure that the player is offered buttons to send.";
                     int limit = Math.min(7, p2.getAc());
                     for (int x = 1; x < limit + 1; x++) {
@@ -511,7 +512,7 @@ public class TransactionHelper {
                         stuffToTransButtons.add(transact);
                     }
                 } else {
-                    message = message + player.getRepresentation()
+                    message = message + player.getRepresentation(false, false)
                         + " Click the GREEN button that indicates the AC you would like to " + requestOrOffer;
                     for (String acShortHand : p1.getActionCards().keySet()) {
                         Button transact = Buttons.green(
@@ -524,7 +525,7 @@ public class TransactionHelper {
             }
             case "PNs" -> {
                 if (requesting) {
-                    message = message + player.getRepresentation()
+                    message = message + player.getRepresentation(false, false)
                         + " Click the PN you'd like to request. Since PNs are private info, all of the player's starting PNs which are not in play areas are available, though the player may not currently hold all of these. Click TBD Note if you want someone else's PN, and it will give the player the option to send it.";
                     for (String pnShortHand : p1.getPromissoryNotesOwned()) {
                         if (ButtonHelper.anyoneHaveInPlayArea(game, pnShortHand)) {
@@ -545,7 +546,7 @@ public class TransactionHelper {
 
                     stuffToTransButtons.add(transact);
                 } else {
-                    message = message + p1.getRepresentationUnfogged() + " Click the PN you would like to "
+                    message = message + p1.getRepresentation(true, false) + " Click the PN you would like to "
                         + requestOrOffer;
                     for (String pnShortHand : p1.getPromissoryNotes().keySet()) {
                         if (p1.getPromissoryNotesInPlayArea().contains(pnShortHand)
@@ -563,7 +564,7 @@ public class TransactionHelper {
                     "Reminder that, unlike other things, you may only send a person 1 PN in a transaction.");
             }
             case "Frags" -> {
-                message = message + "Click the amount of fragments you would like to " + requestOrOffer;
+                message = message + " Click the amount of fragments you would like to " + requestOrOffer;
                 for (int x = 1; x < p1.getCrf() + 1; x++) {
                     Button transact = Buttons.blue(
                         "offerToTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction() + "_CRF" + x, "Cultural Fragments (x" + x + ")");
@@ -755,7 +756,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersShipOrders(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_shipOrders_" + p2.getFaction() + "_" + shipOrder,
-                            Mapper.getRelic(shipOrder).getName());
+                        Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -765,7 +766,7 @@ public class TransactionHelper {
                 for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
                         finChecker + "send_starCharts_" + p2.getFaction() + "_" + shipOrder,
-                            Mapper.getRelic(shipOrder).getName());
+                        Mapper.getRelic(shipOrder).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -1365,7 +1366,7 @@ public class TransactionHelper {
             if (!game.isFowMode() && game.isNewTransactionMethod()) {
                 buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
             }
-            String message = player.getRepresentation() + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
+            String message = player.getRepresentation(true, false) + " Use the buttons to select what you want to transact with " + p2.getRepresentation(false, false);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             TransactionHelper.checkTransactionLegality(game, player, p2);
             ButtonHelper.deleteMessage(event);
