@@ -50,7 +50,7 @@ public class ButtonListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
-            event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
+            event.reply("Please try again in a few minutes. The bot is rebooting.").setEphemeral(true).queue();
             return;
         }
 
@@ -65,6 +65,7 @@ public class ButtonListener extends ListenerAdapter {
             if (context.isValid()) {
                 resolveButtonInteractionEvent(context);
             }
+            context.save(event);
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
