@@ -82,7 +82,7 @@ public class ChangeColor extends PlayerSubcommandData {
             // Riftset is exclusive to eronous always
             case "ero" -> !player.getUserID().equals(Constants.eronousId);
             // Lightgray is exclusive to chassit if chassit is in the game
-            case "lgy" -> !player.getUserID().equals(Constants.chassitId) && !player.getGame().getPlayerIDs().contains(Constants.chassitId);
+            case "lgy" -> !player.getUserID().equals(Constants.chassitId) && player.getGame().getPlayerIDs().contains(Constants.chassitId);
             default -> false;
         };
     }
