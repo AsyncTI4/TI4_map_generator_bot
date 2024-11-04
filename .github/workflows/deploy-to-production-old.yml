@@ -1,6 +1,7 @@
 on:
-  push:
-    branches: [ "master" ]
+  workflow_dispatch:
+  # push: # disabled - can be deleted if we're good with the new one
+  #   branches: [ "master" ]
 name: BuildAndDeploy_Old
 concurrency:
   group: "Start Bot"
