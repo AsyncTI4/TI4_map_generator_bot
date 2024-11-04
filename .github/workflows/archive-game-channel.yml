@@ -2,10 +2,10 @@ on:
   workflow_dispatch:
   repository_dispatch:
       types: [archive_game_channel]
-name: ExportGameChannel
+name: Archive Game Channel
 jobs:
   build:
-    name: ExportGameChannel
+    name: Archive Game Channel
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands
