@@ -812,7 +812,7 @@ public class MapGenerator {
                             superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
                                 game.addWebsiteOverlay(player, "strategyCardPlayerArea", scModel.getId(), x + 110, y + 20, 25, 50);
-                                graphics.drawRect(x + 110, y + 20, 25, 50); // debug
+                                // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setFont(Storage.getFont40());
