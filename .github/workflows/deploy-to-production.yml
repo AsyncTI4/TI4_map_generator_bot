@@ -1,8 +1,7 @@
 on:
-  workflow_dispatch: #temp
-  # push:
-  #   branches: [ "master" ]
-name: BuildAndDeployWithSecrets
+  push:
+    branches: [ "master" ]
+name: BuildAndDeploy
 jobs:
   saveGamesBeforeDeploy:
     uses: ./.github/workflows/force-backup-of-savefiles.yml
