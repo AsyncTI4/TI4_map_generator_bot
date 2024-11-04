@@ -1,7 +1,7 @@
 on:
   push:
     branches: [ "master" ]
-name: BuildAndDeploy
+name: BuildAndDeploy_Old
 concurrency:
   group: "Start Bot"
 jobs:

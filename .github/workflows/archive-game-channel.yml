@@ -1,8 +1,7 @@
 on: 
-  workflow_dispatch:
   repository_dispatch:
       types: [archive_game_channel]
-name: Archive Game Channel
+name: ArchiveGameChannel
 jobs:
   build:
     name: Archive Game Channel
