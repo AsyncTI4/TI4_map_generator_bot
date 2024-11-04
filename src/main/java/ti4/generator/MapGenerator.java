@@ -2556,8 +2556,13 @@ public class MapGenerator {
             graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }
 
+        // Add the blank warsun if player has no warsun
+        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
+        if (player.getUnitsByAsyncID("warsun").isEmpty()) {
+            playerUnitModels.add(Mapper.getUnit("nowarsun"));
+        }
         // Add faction icons on top of upgraded or upgradable units
-        for (UnitModel unit : player.getUnitModels()) {
+        for (UnitModel unit : playerUnitModels) {
             Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
             if (unit.getFaction().isPresent()) {
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent() || unit.getUpgradesToUnitId().isPresent();
