@@ -264,6 +264,14 @@
         "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/space_dock_2.jpg?raw=true"
     },
     {
+        "id": "nowarsun",
+        "baseType": "warsun",
+        "asyncId": "ws",
+        "name": "Not a War Sun Yet",
+        "source": "base",
+        "imageURL": ""
+    },
+    {
         "id": "warsun",
         "baseType": "warsun",
         "asyncId": "ws",
