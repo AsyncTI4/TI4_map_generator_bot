@@ -36,6 +36,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
+import ti4.helpers.RepositoryDispatchEvent;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.WebHelper;
@@ -188,6 +189,14 @@ public class GameEnd extends GameSubcommandData {
                     MessageHelper.sendMessageToChannel(threadChannel_, "Game: **" + gameName + "** on server **" + game.getGuild().getName() + "** has concluded.");
                 }
             }
+        }
+
+        // Archive Game Channels
+        if (tableTalkChannel != null) {
+            new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", tableTalkChannel.getId())).sendEvent();
+        }
+        if (actionsChannel != null) {
+            new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", actionsChannel.getId())).sendEvent();
         }
 
         // send game json file to s3
