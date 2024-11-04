@@ -3,8 +3,6 @@ package ti4.helpers;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class RespositoryDispatchClientPayload {
     private final Map<String, String> records;
 
@@ -23,17 +21,16 @@ public class RespositoryDispatchClientPayload {
         records.put(key, value);
     }
 
-    @JsonProperty("client_payload")
     public Map<String, String> getRecords() {
         return records;
     }
 
     public boolean isValid() {
-        return records.isEmpty() && records.size() < 10;
+        return !records.isEmpty() && records.size() < 10;
     }
 
     public String toJson() {
-        return "{" + records.entrySet().stream()
+        return "\"client_payload\":{" + records.entrySet().stream()
             .map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"")
             .reduce((a, b) -> a + "," + b)
             .orElse("") + "}";

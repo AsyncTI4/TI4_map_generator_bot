@@ -1,64 +1,53 @@
 package ti4.helpers;
 
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import ti4.message.BotLogger;
 
 public class RepositoryDispatchEvent {
 
-    private static final String GITHUB_API_URL = "https://api.github.com/repos/AsyncTI4/TI4_map_genereator_bot/dispatches";
+    private static final String GITHUB_API_URL = "https://api.github.com/repos/AsyncTI4/TI4_map_generator_bot/dispatches";
+    private static final String REPO_DISPATCH_TOKEN = System.getenv("REPO_DISPATCH_TOKEN");
     private String eventType;
-    private String githubToken;
+    private RespositoryDispatchClientPayload payload;
 
     /**
+     * https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
+     * 
      * @param eventType - can be anything, as long as it's caught on github actions side
-     * @param githubToken - api key
-     *            https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
      */
-    public RepositoryDispatchEvent(String eventType, String githubToken) {
+    public RepositoryDispatchEvent(String eventType, Map<String, String> payloadMap) {
         this.eventType = eventType;
-        this.githubToken = githubToken;
+        this.payload = new RespositoryDispatchClientPayload(payloadMap);
     }
 
-    public void sendEvent() throws Exception {
-        sendEvent(null);
-    }
-
-    public void sendEvent(RespositoryDispatchClientPayload payload) throws Exception {
-        URL url = new URL(GITHUB_API_URL);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Authorization", "token " + githubToken);
-        connection.setRequestProperty("Accept", "application/vnd.github+json");
-        connection.setRequestProperty("Content-Type", "application/json; utf-8");
-        connection.setDoOutput(true);
-
-        String jsonInputString = "{\"event_type\":\"" + eventType + "\"}";
-
-        try (OutputStream os = connection.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
-        }
-
-        if (payload != null && payload.isValid()) {
-            String payloadJson = payload.toJson();
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = payloadJson.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
+    public void sendEvent() {
+        try {
+            OkHttpClient client = new OkHttpClient().newBuilder().build();
+            MediaType mediaType = MediaType.parse("application/json");
+            StringBuilder bodyJson = new StringBuilder("{\"event_type\":\"" + eventType + "\"");
+            if (payload != null && payload.isValid()) {
+                bodyJson.append(",").append(payload.toJson());
             }
+            bodyJson.append("}");
+            RequestBody body = RequestBody.create(bodyJson.toString(), mediaType);
+            Request request = new Request.Builder()
+                .url(GITHUB_API_URL)
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "Bearer " + REPO_DISPATCH_TOKEN)
+                .build();
+            Response response = client.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                BotLogger.log("RespositoryDisptachEvent error: " + response.body().string());
+            }
+        } catch (Exception e) {
+            BotLogger.log("RespositoryDisptachEvent error", e);
         }
-
-        int responseCode = connection.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
-            throw new RuntimeException("Failed : HTTP error code : " + responseCode);
-        }
-    }
-
-    public static void sendChannelBackupRequest(String channelID) { // TODO: move this wherever we want to do the thing, not here
-        RepositoryDispatchEvent event = new RepositoryDispatchEvent("archive_game_channel", System.getenv("GITHUB_TOKEN"));
-        RespositoryDispatchClientPayload payload = new RespositoryDispatchClientPayload(Map.of("channel_id", channelID));
-
     }
 }
