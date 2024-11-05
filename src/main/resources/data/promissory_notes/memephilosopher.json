@@ -1,0 +1,11 @@
+[
+    {
+        "alias": "nethariipn",
+        "name": "Netharii PN",
+        "faction": "netharii",
+        "playArea": false,
+        "attachment": false,
+        "source": "memephilosopher",
+        "text": "Play at the start of combat. Once during this combat, when a unit is destroyed, you may place it on your home system instead. At the end of the combat, return this card to the Netharii Keepers player."
+    }
+]
