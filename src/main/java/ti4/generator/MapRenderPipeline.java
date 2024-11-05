@@ -20,10 +20,11 @@ public class MapRenderPipeline {
 
     private final BlockingQueue<RenderEvent> gameRenderQueue = new LinkedBlockingQueue<>();
     private final Thread worker;
+    private boolean shutdown = false;
 
     private MapRenderPipeline() {
         worker = new Thread(() -> {
-            while (true) {
+            while (!shutdown && !gameRenderQueue.isEmpty()) {
                 try {
                     RenderEvent renderEvent = gameRenderQueue.take();
                     render(renderEvent);
@@ -42,8 +43,14 @@ public class MapRenderPipeline {
         instance.worker.start();
     }
 
-    public static void stop() {
-        instance.worker.interrupt();
+    public static void shutdown() {
+        instance.shutdown = true;
+        try {
+            instance.worker.join();
+        } catch (InterruptedException e) {
+            BotLogger.log("MapRenderPipeline shutdown interrupted.");
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static void render(RenderEvent renderEvent) {

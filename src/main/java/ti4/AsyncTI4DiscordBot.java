@@ -319,11 +319,8 @@ public class AsyncTI4DiscordBot {
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS");
+                MapRenderPipeline.shutdown();
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
-                //No Longer Necessary 
-                //BotLogger.logWithTimestamp("SAVING GAMES");
-                //GameSaveLoadManager.saveMaps();
-                //BotLogger.logWithTimestamp("GAMES HAVE BEEN SAVED");
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
