@@ -1,5 +1,16 @@
 package ti4.helpers;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import org.jetbrains.annotations.Nullable;
+import ti4.AsyncTI4DiscordBot;
+import ti4.generator.MapGenerator;
+import ti4.helpers.Emojis.TI4Emoji;
+import ti4.message.BotLogger;
+
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -20,17 +31,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
-import ti4.generator.MapGenerator;
-import ti4.helpers.Emojis.TI4Emoji;
-import ti4.message.BotLogger;
 
 public class ImageHelper {
 
@@ -293,5 +293,11 @@ public class ImageHelper {
             defaultWriteParam.setCompressionQuality(compressionQuality);
         }
         imageWriter.write(null, new IIOImage(image, null, null), defaultWriteParam);
+    }
+
+    public static BufferedImage redrawWithoutAlpha(BufferedImage image) {
+        var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        imageWithoutAlpha.createGraphics().drawImage(image, 0, 0, Color.BLACK, null);
+        return imageWithoutAlpha;
     }
 }
