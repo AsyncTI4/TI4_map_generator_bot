@@ -11,7 +11,8 @@
         "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/Cruiser.png?raw=true"
     },
     {
         "id": "cruiser2",
@@ -43,7 +44,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/Carrier.png?raw=true"
     },
     {
         "id": "carrier2",
@@ -76,7 +78,8 @@
         "combatDieCount": 1,
         "afbHitsOn": 9,
         "afbDieCount": 2,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/Destroyer.png?raw=true"
     },
     {
         "id": "destroyer2",
@@ -113,7 +116,8 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/Dreadnought.png?raw=true"
     },
     {
         "id": "dreadnought2",
@@ -148,7 +152,8 @@
         "cost": 0.5,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/Fighter.png?raw=true"
     },
     {
         "id": "fighter2",
@@ -181,7 +186,8 @@
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": ""
     },
     {
         "id": "infantry",
@@ -194,7 +200,8 @@
         "cost": 0.5,
         "combatHitsOn": 8,
         "combatDieCount": 1,
-        "isGroundForce": true
+        "isGroundForce": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/Infantry.png?raw=true"
     },
     {
         "id": "infantry2",
@@ -222,7 +229,8 @@
         "spaceCannonHitsOn": 6,
         "spaceCannonDieCount": 1,
         "planetaryShield": true,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/PDS.png?raw=true"
     },
     {
         "id": "pds2",
@@ -248,7 +256,8 @@
         "source": "base",
         "productionValue": "+2",
         "capacityValue": 3,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/SpaceDock.png?raw=true"
     },
     {
         "id": "spacedock2",
@@ -262,6 +271,14 @@
         "capacityValue": 3,
         "isStructure": true,
         "imageURL": "https://github.com/TI4-Online/TI4-TTPG/blob/main/prebuild/Textures/en/card/technology/unit_upgrade/space_dock_2.jpg?raw=true"
+    },
+    {
+        "id": "nowarsun",
+        "baseType": "warsun",
+        "asyncId": "ws",
+        "name": "Not a War Sun Yet",
+        "source": "base",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/data/rawCards/WarSun.png?raw=true"
     },
     {
         "id": "warsun",

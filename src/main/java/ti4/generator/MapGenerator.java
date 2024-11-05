@@ -811,7 +811,7 @@ public class MapGenerator {
                         } else {
                             superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
-                                // game.addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
+                                game.addWebsiteOverlay(player, "strategyCardPlayerArea", scModel.getId(), x + 110, y + 20, 25, 50);
                                 // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
@@ -2551,13 +2551,17 @@ public class MapGenerator {
             UnitModel unit = Mapper.getUnitModelByTechUpgrade("ws");
             Coord unitOffset = getUnitTechOffsets(unit.getAsyncId(), false);
             UnitKey unitKey = Mapper.getUnitKey(unit.getAsyncId(), player.getColor());
-            BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile(
-                "agenda_publicize_weapon_schematics" + (player.hasWarsunTech() ? getBlackWhiteFileSuffix(unitKey.getColorID()) : "_blk.png")));
+            BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + (player.hasWarsunTech() ? getBlackWhiteFileSuffix(unitKey.getColorID()) : "_blk.png")));
             graphics.drawImage(wsCrackImage, deltaX + x + unitOffset.x, y + unitOffset.y, null);
         }
 
+        // Add the blank warsun if player has no warsun
+        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
+        if (player.getUnitsByAsyncID("warsun").isEmpty()) {
+            playerUnitModels.add(Mapper.getUnit("nowarsun"));
+        }
         // Add faction icons on top of upgraded or upgradable units
-        for (UnitModel unit : player.getUnitModels()) {
+        for (UnitModel unit : playerUnitModels) {
             Coord unitFactionOffset = getUnitTechOffsets(unit.getAsyncId(), true);
             if (unit.getFaction().isPresent()) {
                 boolean unitHasUpgrade = unit.getUpgradesFromUnitId().isPresent() || unit.getUpgradesToUnitId().isPresent();
@@ -2877,7 +2881,7 @@ public class MapGenerator {
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 // graphics.drawRect(x, y + 24, textWidth, 64); // debug
-                game.addWebsiteOverlay("strategyCard", scModel.getId(), x, y + 24, textWidth, 60);
+                game.addWebsiteOverlay("strategyCardByScoretrack", scModel.getId(), x, y + 24, textWidth, 60);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
                     graphics.setFont(Storage.getFont24());
@@ -3345,7 +3349,7 @@ public class MapGenerator {
                     int fontYoffset = (scsize / 2) + 25;
                     superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     if (scModel != null) {
-                        game.addWebsiteOverlay(player, "strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        game.addWebsiteOverlay(player, "strategyCardNearMap", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
                         // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
                     }
                     point.translate(scsize, 0);
@@ -4649,8 +4653,8 @@ public class MapGenerator {
                     case "large" -> tileGraphics.setFont(Storage.getFont40());
                     case "medium" -> tileGraphics.setFont(Storage.getFont30());
                     case "tiny" -> tileGraphics.setFont(Storage.getFont12());
-                    case null, default ->  // "small"
-                            tileGraphics.setFont(Storage.getFont20());
+                    case null, default -> // "small"
+                        tileGraphics.setFont(Storage.getFont20());
                 }
 
                 if (isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer)) {
