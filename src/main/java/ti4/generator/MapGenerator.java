@@ -130,6 +130,7 @@ public class MapGenerator {
     private Player fowPlayer;
     private StopWatch debugAbsoluteStartTime;
     private StopWatch debugTileTime;
+    private StopWatch debugImageGraphicsTime;
     private StopWatch debugDrawTime;
     private StopWatch debugDiscordTime;
     private StopWatch debugWebsiteTime;
@@ -392,6 +393,7 @@ public class MapGenerator {
         String sb = " Total time (" + game.getName() + "):               " + Helper.getTimeRepresentationNanoSeconds(total) +
             "\n" + debugString(" Draw time:                          ", debugDrawTime.getNanoTime(), total) +
             "\n" + debugString("     Tile time (part of Draw):             ", debugTileTime.getNanoTime(), debugDrawTime.getNanoTime()) +
+            "\n" + debugString("     Graphics time (part of Draw):         ", debugImageGraphicsTime.getNanoTime(), debugDrawTime.getNanoTime()) +
             "\n" + debugString(" Discord time:                       ", debugDiscordTime.getNanoTime(), total) +
             "\n" + debugString(" Website time:                       ", debugWebsiteTime.getNanoTime(), total) +
             "\n";
@@ -433,8 +435,7 @@ public class MapGenerator {
 
         FileUpload fileUpload = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            BufferedImage mapWithoutTransparentBackground = new BufferedImage(imageToUpload.getWidth(), imageToUpload.getHeight(), BufferedImage.TYPE_INT_RGB);
-            mapWithoutTransparentBackground.createGraphics().drawImage(imageToUpload, 0, 0, Color.BLACK, null);
+            BufferedImage mapWithoutTransparentBackground = ImageHelper.redrawWithoutAlpha(imageToUpload);
             // TODO: Use webp one day, ImageHelper.writeWebpOrDefaultTo
             String format = "jpg";
             String fileName = filenamePrefix + "_" + getTimeStamp() + "." + format;
@@ -618,6 +619,12 @@ public class MapGenerator {
         setupTilesForDisplayTypeAllAndMap(tilesToDisplay);
         if (debug) debugTileTime.stop();
 
+        if (debug) debugImageGraphicsTime = StopWatch.createStarted();
+        drawImage();
+        if (debug) debugImageGraphicsTime.stop();
+    }
+
+    private void drawImage() {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         String timeStamp = getTimeStamp();
@@ -625,7 +632,7 @@ public class MapGenerator {
         int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
         int y = heightForGameInfo + 60;
         int x = landscapeShift + 10;
-        Coord coord = coord(x, y);
+        Coord coord;
 
         int deltaX = 0;
         List<Player> players = new ArrayList<>(game.getPlayers().values());
@@ -826,23 +833,23 @@ public class MapGenerator {
                         if (sc == ButtonHelper.getKyroHeroSC(game)) {
                             String kyroScNum = "" + (game.getSCList().size() + 1);
                             drawCenteredString(graphics, kyroScNum,
-                                new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                Storage.getFont32());
+                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                    Storage.getFont32());
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setColor(Color.RED);
                                 drawCenteredString(graphics, "X",
-                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                    Storage.getFont24());
+                                        new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                        Storage.getFont24());
                             }
                         } else {
                             drawCenteredString(graphics, scText,
-                                new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                Storage.getFont32());
+                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                    Storage.getFont32());
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setColor(Color.RED);
                                 drawCenteredString(graphics, "X",
-                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                    Storage.getFont24());
+                                        new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                        Storage.getFont24());
                             }
                         }
 
@@ -1066,7 +1073,6 @@ public class MapGenerator {
                 }
                 g2.drawRect(realX - 5, baseY, mapWidth - realX, y - baseY);
                 y += 15;
-
             }
         }
     }
