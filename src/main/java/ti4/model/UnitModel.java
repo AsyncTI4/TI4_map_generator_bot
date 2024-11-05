@@ -74,7 +74,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
             // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
             && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
-            && getEligiblePlanetTypes().stream().allMatch(type -> List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_SYSTEM").contains(type));
+            && getEligiblePlanetTypes().stream().allMatch(type -> List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY").contains(type));
     }
 
     public String getAlias() {
@@ -117,15 +117,16 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         String name = getName() == null ? "" : getName();
-        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
-        if (getSubtitle().isPresent()) eb.setDescription(getSubtitle().get());
+        StringBuilder title = new StringBuilder(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji());
+        eb.setTitle(title.toString(), null);
+        if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
         if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
-        if (getImageURL() != null) eb.setImage(getImageURL());
+        // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
@@ -372,6 +373,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             || getFaction().orElse("").toLowerCase().contains(searchString)
             || getId().toLowerCase().contains(searchString)
             || getBaseType().toLowerCase().contains(searchString)
+            || getSubtitle().orElse("").toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 
@@ -463,5 +465,13 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public List<String> getEligiblePlanetTypes() {
         return Optional.ofNullable(eligiblePlanetTypes).orElse(Collections.emptyList());
+    }
+
+    public String getEligiblePlanetEmojis() {
+        StringBuilder sb = new StringBuilder();
+        for (String type : getEligiblePlanetTypes()) {
+            sb.append(Emojis.getEmojiFromDiscord(type));
+        }
+        return sb.toString();
     }
 }

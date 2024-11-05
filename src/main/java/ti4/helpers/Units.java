@@ -88,7 +88,7 @@ public class Units {
     }
 
     public enum UnitType {
-        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), // ground based
+        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
         PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"); //relics
 
@@ -117,6 +117,7 @@ public class Units {
                 case "tyrantslament" -> "Tyrant's Lament";
                 case "cavalry" -> "The Cavalry";
                 case "lady" -> "The Lady";
+                case "monument" -> "Monument";
                 default -> null;
             };
         }
@@ -139,6 +140,7 @@ public class Units {
                 case "tyrantslament" -> "tyrantslament";
                 case "cavalry" -> "cavalry";
                 case "lady" -> "lady";
+                case "monument" -> "monument";
                 default -> null;
             };
         }
@@ -148,14 +150,17 @@ public class Units {
                 case "gf" -> Emojis.infantry;
                 case "mf" -> Emojis.mech;
                 case "pd" -> Emojis.pds;
-                case "sd", "csd", "plenaryorbital" -> Emojis.spacedock;
+                case "sd", "csd" -> Emojis.spacedock;
+                case "plenaryorbital" -> Emojis.PlenaryOrbital;
                 case "ff" -> Emojis.fighter;
                 case "dd" -> Emojis.destroyer;
                 case "ca" -> Emojis.cruiser;
                 case "cv" -> Emojis.carrier;
                 case "dn" -> Emojis.dreadnought;
-                case "fs", "tyrantslament", "lady", "cavalry" -> Emojis.flagship;
+                case "fs", "lady", "cavalry" -> Emojis.flagship;
+                case "tyrantslament" -> Emojis.TyrantsLament;
                 case "ws" -> Emojis.warsun;
+                case "monument" -> Emojis.Monument;
                 default -> null;
             };
         }
