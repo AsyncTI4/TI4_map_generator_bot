@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.units.AddRemoveUnits;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapRenderPipeline;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -77,8 +77,8 @@ public class ShowDistances implements Command {
         int maxDistance = event.getOption(Constants.MAX_DISTANCE, 10, OptionMapping::getAsInt);
         game.setTileDistances(CheckDistance.getTileDistances(game, player, tile.getPosition(), maxDistance, true));
 
-        MapGenerator.saveImage(game, DisplayType.map, event, true)
-            .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
+        MapRenderPipeline.render(game, event, DisplayType.map,
+                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

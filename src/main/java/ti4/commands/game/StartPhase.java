@@ -1,12 +1,5 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,6 +16,7 @@ import ti4.commands.status.Cleanup;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.MapGenerator;
+import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -47,6 +41,13 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 
 public class StartPhase extends GameSubcommandData {
     public StartPhase() {
@@ -347,8 +348,8 @@ public class StartPhase extends GameSubcommandData {
             new Cleanup().runStatusCleanup(game);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
-                DisplayType displayType = DisplayType.map;
-                MapGenerator.saveImage(game, displayType, event).thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
+                MapRenderPipeline.render(game, event, DisplayType.map,
+                        fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }
 

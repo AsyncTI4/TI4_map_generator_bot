@@ -1,15 +1,5 @@
 package ti4.commands.game;
 
-import java.io.File;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -29,7 +19,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.special.Rematch;
 import ti4.commands.statistics.GameStatisticFilterer;
 import ti4.commands.statistics.GameStats;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapRenderPipeline;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -48,6 +38,16 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import java.io.File;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static ti4.helpers.StringHelper.ordinal;
 
@@ -229,7 +229,7 @@ public class GameEnd extends GameSubcommandData {
         TextChannel summaryChannel = getGameSummaryChannel(game);
         if (!game.isFowMode()) {
             // SEND THE MAP IMAGE
-            MapGenerator.saveImage(game, DisplayType.all, event).thenAccept(fileUpload -> {
+            MapRenderPipeline.render(game, event, DisplayType.all, fileUpload -> {
                 MessageHelper.replyToMessage(event, fileUpload);
                 // CREATE POST
                 if (publish) {
