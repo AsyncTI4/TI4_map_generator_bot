@@ -30,7 +30,6 @@ public class MapRenderPipeline {
                     RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
                     if (renderEvent != null) {
                         render(renderEvent);
-                        System.gc();
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();

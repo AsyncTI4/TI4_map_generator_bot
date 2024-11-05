@@ -296,4 +296,10 @@ public class ImageHelper {
             imageWriter.dispose();
         }
     }
+
+    public static BufferedImage redrawWithoutAlpha(BufferedImage image) {
+        var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        imageWithoutAlpha.createGraphics().drawImage(image, 0, 0, Color.BLACK, null);
+        return imageWithoutAlpha;
+    }
 }

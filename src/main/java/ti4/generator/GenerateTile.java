@@ -1,8 +1,24 @@
 package ti4.generator;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ti4.generator.MapGenerator.TileStep;
+import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
+import ti4.helpers.ImageHelper;
+import ti4.helpers.Storage;
+import ti4.map.Game;
+import ti4.map.MapFileDeleter;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.message.BotLogger;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,25 +31,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import javax.imageio.ImageIO;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.generator.MapGenerator.TileStep;
-import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.helpers.Storage;
-import ti4.map.Game;
-import ti4.map.MapFileDeleter;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.message.BotLogger;
 
 public class GenerateTile {
     private Graphics graphics;
@@ -159,8 +156,7 @@ public class GenerateTile {
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + game.getName() + "_" + timeStamp + ".jpg";
         try (FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
-            BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
+            BufferedImage convertedImage = ImageHelper.redrawWithoutAlpha(mainImage);
             boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");
