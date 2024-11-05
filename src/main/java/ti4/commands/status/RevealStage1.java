@@ -1,11 +1,9 @@
 package ti4.commands.status;
 
-import java.util.List;
-import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -15,6 +13,9 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
+
+import java.util.List;
+import java.util.Map;
 
 public class RevealStage1 extends StatusSubcommandData {
 
@@ -39,7 +40,7 @@ public class RevealStage1 extends StatusSubcommandData {
             // first do cleanup if necessary
             int playersWithSCs = 0;
             for (Player player : game.getRealPlayers()) {
-                if (player.getSCs() != null && player.getSCs().size() > 0 && !player.getSCs().contains(0)) {
+                if (player.getSCs() != null && !player.getSCs().isEmpty() && !player.getSCs().contains(0)) {
                     playersWithSCs++;
                 }
             }
@@ -53,10 +54,8 @@ public class RevealStage1 extends StatusSubcommandData {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     game.getPing() + " **Status Cleanup Run!**");
                 if (!game.isFowMode()) {
-                    DisplayType displayType = DisplayType.map;
-                    MapGenerator.saveImage(game, displayType, event)
-                        .thenAccept(fileUpload -> MessageHelper
-                            .sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
+                    MapRenderPipeline.render(game, event, DisplayType.map,
+                                    fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
                 }
             }
         } else {

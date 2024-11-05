@@ -16,8 +16,10 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class DiscardSO extends SOCardsSubcommandData {
@@ -41,6 +43,33 @@ public class DiscardSO extends SOCardsSubcommandData {
             return;
         }
         discardSO(event, player, option.getAsInt(), game);
+    }
+
+    @ButtonHandler("SODISCARD_")
+    @ButtonHandler("discardSecret_")
+    private static void discardSecretButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String soID = buttonID.replace("SODISCARD_", "");
+        soID = soID.replace("discardSecret_", "");
+
+        boolean drawReplacement = false;
+        if (soID.endsWith("redraw")) {
+            soID = soID.replace("redraw", "");
+            drawReplacement = true;
+        }
+
+        try {
+            int soIndex = Integer.parseInt(soID);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " discarded an SO");
+            discardSO(event, player, soIndex, game);
+            if (drawReplacement) {
+                DrawSO.drawSO(event, game, player);
+            }
+        } catch (Exception e) {
+            BotLogger.log(event, "Could not parse SO ID: " + soID, e);
+            event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please discard manually.").queue();
+            return;
+        }
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Game game) {
@@ -82,8 +111,10 @@ public class DiscardSO extends SOCardsSubcommandData {
 
     }
 
-    public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String soID, Game game) {
-        String publicMsg = game.getPing() + " this is a public notice that " + ButtonHelper.getIdentOrColor(player, game) + " is picking up a secret that they accidentally discarded.";
+    @ButtonHandler("drawSpecificSO_")
+    public static void drawSpecificSO(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String soID = buttonID.split("_")[1];
+        String publicMsg = game.getPing() + " this is a public notice that " + player.getFactionEmojiOrColor() + " is picking up a secret that they accidentally discarded.";
         Map<String, Integer> secrets = game.drawSpecificSecretObjective(soID, player.getUserID());
         if (secrets == null) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "SO not retrieved, most likely because someone else has it in hand. Ping a bothelper to help.");

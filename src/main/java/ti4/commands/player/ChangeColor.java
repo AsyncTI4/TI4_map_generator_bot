@@ -67,17 +67,33 @@ public class ChangeColor extends PlayerSubcommandData {
             }
         }
 
+        if (colorIsExclusive(newColor, player)) {
+            MessageHelper.sendMessageToEventChannel(event, "You cannot use this color.");
+            return;
+        }
+
         String oldColor = player.getColor();
         changePlayerColor(game, player, oldColor, newColor);
     }
 
-    public void changePlayerColor(Game game, Player player, String oldColor, String newColor) {
+    public static boolean colorIsExclusive(String color, Player player) {
+        String colorID = Mapper.getColorID(color);
+        return switch (colorID) {
+            // Riftset is exclusive to eronous always
+            case "ero" -> !player.getUserID().equals(Constants.eronousId);
+            // Lightgray is exclusive to chassit if chassit is in the game
+            case "lgy" -> !player.getUserID().equals(Constants.chassitId) && player.getGame().getPlayerIDs().contains(Constants.chassitId);
+            default -> false;
+        };
+    }
+
+    public static void changePlayerColor(Game game, Player player, String oldColor, String newColor) {
         StringBuilder sb = new StringBuilder(player.getRepresentation(false, false));
         sb.append(" changed their color to ").append(Emojis.getColorEmojiWithName(newColor));
 
-        String oldColorKey = oldColor + "_";
-        String newColorKey = newColor + "_";
-        player.changeColor(newColor);
+        String oldColorKey = Mapper.getColorName(oldColor) + "_";
+        String newColorKey = Mapper.getColorName(newColor) + "_";
+        player.setColor(newColor);
         String oldColorID = Mapper.getColorID(oldColor);
         String newColorID = Mapper.getColorID(newColor);
 
@@ -148,7 +164,7 @@ public class ChangeColor extends PlayerSubcommandData {
             .forEach(uh -> replaceIDsOnUnitHolder(uh, oldColorID, newColorID));
     }
 
-    private void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {
+    private static void replaceIDsOnUnitHolder(UnitHolder unitHolder, String oldColorID, String newColorID) {
         String oldColorSuffix = "_" + oldColorID + ".";
         String newColorSuffix = "_" + newColorID + ".";
 

@@ -10,7 +10,11 @@ import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Emojis;
-import ti4.model.*;
+import ti4.model.DraftErrataModel;
+import ti4.model.PlanetModel;
+import ti4.model.PlanetTypeModel;
+import ti4.model.TechSpecialtyModel;
+import ti4.model.TileModel;
 
 public class BlueTileDraftItem extends DraftItem {
     public BlueTileDraftItem(String itemId) {
@@ -34,7 +38,7 @@ public class BlueTileDraftItem extends DraftItem {
             sb.append(", ");
         }
 
-        buildPlanetString(Mapper.getPlanet(planetIds.get(planetIds.size() - 1)), sb);
+        buildPlanetString(Mapper.getPlanet(planetIds.getLast()), sb);
 
         return sb.toString();
     }

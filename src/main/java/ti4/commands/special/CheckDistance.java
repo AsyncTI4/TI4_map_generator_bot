@@ -80,7 +80,7 @@ public class CheckDistance extends SpecialSubcommandData {
             }
         }
         for (Tile tile : originTiles) {
-            Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 8, true);
+            Map<String, Integer> someDistances = getTileDistances(game, player, tile.getPosition(), 15, true);
             for (String tilePos : someDistances.keySet()) {
                 if (AddCC.hasCC(player, game.getTileByPosition(tilePos))) {
                     continue;

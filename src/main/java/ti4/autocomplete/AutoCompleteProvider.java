@@ -3,6 +3,7 @@ package ti4.autocomplete;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -14,15 +15,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.MessageListener;
 import ti4.commands.franken.StartFrankenDraft.FrankenDraftMode;
 import ti4.commands.game.Undo;
 import ti4.commands.map.Preset;
@@ -38,6 +37,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
+import ti4.listeners.SlashCommandListener;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -45,10 +45,11 @@ import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
+import ti4.model.EmbeddableModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
-import ti4.model.LeaderModel;
 import ti4.model.MapTemplateModel;
+import ti4.model.ModelInterface;
 import ti4.model.PlanetTypeModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
@@ -77,7 +78,7 @@ public class AutoCompleteProvider {
         //if (factionOrColorOption != null) showAllChoicesInGame = true;
 
         String userID = event.getUser().getId();
-        MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         Player player = null;
         if (game != null) {
@@ -88,7 +89,6 @@ public class AutoCompleteProvider {
         // VERY SPECIFIC HANDLING OF OPTIONS
         switch (commandName) {
             case Constants.DEVELOPER -> resolveDeveloperCommandAutoComplete(event, subCommandName, optionName);
-            case Constants.DS_COMMAND -> resolveDiscordantStarsCommandAutoComplete(event, subCommandName, optionName);
             case Constants.SEARCH -> resolveSearchCommandAutoComplete(event, subCommandName, optionName);
             case Constants.CARDS_AC -> resolveActionCardAutoComplete(event, subCommandName, optionName, game);
             case Constants.FRANKEN -> resolveFrankenAutoComplete(event, subCommandName, optionName, game);
@@ -158,7 +158,7 @@ public class AutoCompleteProvider {
             }
             case Constants.HUE -> {
                 String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
-                Map<String, String> values = new HashMap<String, String>() {
+                Map<String, String> values = new HashMap<>() {
                     {
                         put("RED", "Reds");
                         put("GRAY", "Grays");
@@ -183,7 +183,7 @@ public class AutoCompleteProvider {
             }
             case Constants.DECAL_HUE -> {
                 String enteredValue = Objects.toString(event.getFocusedOption().getValue(), "").toLowerCase();
-                Map<String, String> values = new HashMap<String, String>() {
+                Map<String, String> values = new HashMap<>() {
                     {
                         put("Pattern", "Pattern");
                         put("Icon", "Icon");
@@ -296,31 +296,33 @@ public class AutoCompleteProvider {
             }
             case Constants.AGENDA_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                switch (subCommandName) {
-                    case Constants.REVEAL_SPECIFIC -> {
-                        List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
-                            .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
-                            .collect(Collectors.toList());
-                        event.replyChoices(options).queue();
-                    }
-                    case Constants.DISCARD_SPECIFIC_AGENDA -> {
-                        List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
-                            .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
-                            .collect(Collectors.toList());
-                        event.replyChoices(options).queue();
-                    }
-                    default -> {
-                        Map<String, String> agendas = Mapper.getAgendaJustNames(game);
-                        List<Command.Choice> options = agendas.entrySet().stream()
-                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                            .limit(25)
-                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                            .collect(Collectors.toList());
-                        event.replyChoices(options).queue();
+                if (subCommandName != null) {
+                    switch (subCommandName) {
+                        case Constants.REVEAL_SPECIFIC -> {
+                            List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
+                                .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .collect(Collectors.toList());
+                            event.replyChoices(options).queue();
+                        }
+                        case Constants.DISCARD_SPECIFIC_AGENDA -> {
+                            List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
+                                .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue) || value.getValue().getAlias().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue().getName() + " (" + value.getValue().getSource() + ")", value.getKey()))
+                                .collect(Collectors.toList());
+                            event.replyChoices(options).queue();
+                        }
+                        default -> {
+                            Map<String, String> agendas = Mapper.getAgendaJustNames(game);
+                            List<Command.Choice> options = agendas.entrySet().stream()
+                                .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                                .limit(25)
+                                .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                                .collect(Collectors.toList());
+                            event.replyChoices(options).queue();
+                        }
                     }
                 }
             }
@@ -391,7 +393,7 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
-                MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
+                SlashCommandListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
                 Map<String, String> planets = Mapper.getPlanetRepresentations();
@@ -405,7 +407,7 @@ public class AutoCompleteProvider {
                             value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), game) + "/" + Helper.getPlanetInfluence(value.getKey(), game) + ")", value.getKey()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                } else if (game != null && game.isFowMode()) {
+                } else if (game != null) {
                     List<Command.Choice> options = planets.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
@@ -436,7 +438,7 @@ public class AutoCompleteProvider {
             case Constants.TTPG_FILE_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 File exportDirectory = Storage.getTTPGExportDirectory();
-                String dir = exportDirectory == null ? "/" : exportDirectory.getPath();
+                String dir = exportDirectory.getPath();
 
                 Set<String> fileSet = Stream.of(new File(dir).listFiles())
                     .filter(file -> !file.isDirectory())
@@ -531,11 +533,11 @@ public class AutoCompleteProvider {
 
                 Map<String, AbilityModel> abilities = new HashMap<>();
                 try {
-                    if (player != null && event.getSubcommandName().equals(Constants.ABILITY_REMOVE)) {
+                    if (player != null && subCommandName != null && subCommandName.equals(Constants.ABILITY_REMOVE)) {
                         for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getAbilities().get(abilityID));
                         }
-                    } else if (player != null && event.getSubcommandName().equals(Constants.ABILITY_ADD)) {
+                    } else if (player != null && subCommandName != null && subCommandName.equals(Constants.ABILITY_ADD)) {
                         abilities = Mapper.getAbilities();
                         for (String abilityID : player.getAbilities()) {
                             abilities.remove(abilityID);
@@ -633,91 +635,59 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.SO_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> secretDecks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.SECRET_OBJECTIVE))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, secretDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.STAGE_1_PUBLIC_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> public1Decks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.STAGE_1_PUBLIC))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, public1Decks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.STAGE_2_PUBLIC_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> public2Decks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.STAGE_2_PUBLIC))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, public2Decks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.RELIC_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> relicDecks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.RELIC))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, relicDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.AGENDA_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> agendaDecks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.AGENDA))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, agendaDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.EVENT_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> eventDecks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.EVENT))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, eventDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.EXPLORATION_DECKS -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> exploreDecks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.EXPLORE))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, exploreDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.TECHNOLOGY_DECK -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, DeckModel> decks = Mapper.getDecks();
-                List<Command.Choice> options = decks.values().stream()
+                List<DeckModel> techDecks = Mapper.getDecks().values().stream()
                     .filter(deckModel -> deckModel.getType().equals(Constants.TECHNOLOGY))
-                    .filter(value -> value.getAlias().contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
-                    .limit(25)
-                    .collect(Collectors.toList());
+                    .toList();
+                List<Command.Choice> options = searchModels(event, techDecks, null);
                 event.replyChoices(options).queue();
             }
             case Constants.STRATEGY_CARD_SET -> {
@@ -925,219 +895,41 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveDiscordantStarsCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
-        if (subCommandName.equals(Constants.SET_POLICY)) {
-            switch (optionName) {
-                case Constants.SET_PEOPLE -> {
-                    String enteredValue = event.getFocusedOption().getValue();
-                    List<Command.Choice> options = Stream.of("Connect", "Control", "+", "-")
-                        .filter(value -> value.contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-                case Constants.SET_ENVIRONMENT -> {
-                    String enteredValue = event.getFocusedOption().getValue();
-                    List<Command.Choice> options = Stream.of("Preserve", "Plunder", "+", "-")
-                        .filter(value -> value.contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-                case Constants.SET_ECONOMY -> {
-                    String enteredValue = event.getFocusedOption().getValue();
-                    List<Command.Choice> options = Stream.of("Empower", "Exploit", "+", "-")
-                        .filter(value -> value.contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value, value))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-        }
+    private static <T extends ModelInterface & EmbeddableModel> List<Command.Choice> searchModels(CommandAutoCompleteInteractionEvent event, Collection<T> models, ComponentSource source) {
+        String enteredValue = event.getFocusedOption().getValue();
+        List<Command.Choice> options = models.stream()
+            .filter(model -> model.search(enteredValue, source))
+            .limit(25)
+            .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
+            .collect(Collectors.toList());
+        return options;
     }
 
     private static void resolveSearchCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
-        switch (subCommandName) {
-            case Constants.SEARCH_PLANETS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = TileHelper.getAllPlanets().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
+
+        if (optionName.equals(Constants.SEARCH)) {
+            List<Command.Choice> options = null;
+            switch (subCommandName) {
+                case Constants.SEARCH_PLANETS -> options = searchModels(event, TileHelper.getAllPlanets().values(), source);
+                case Constants.SEARCH_TILES -> options = searchModels(event, TileHelper.getAllTiles().values(), source);
+                case Constants.SEARCH_FACTIONS -> options = searchModels(event, Mapper.getFactions(), source);
+                case Constants.SEARCH_LEADERS -> options = searchModels(event, Mapper.getLeaders().values(), source);
+                case Constants.SEARCH_UNITS -> options = searchModels(event, Mapper.getUnits().values(), source);
+                case Constants.SEARCH_TECHS -> options = searchModels(event, Mapper.getTechs().values(), source);
+                case Constants.SEARCH_ABILITIES -> options = searchModels(event, Mapper.getAbilities().values(), source);
+                case Constants.SEARCH_EXPLORES -> options = searchModels(event, Mapper.getExplores().values(), source);
+                case Constants.SEARCH_RELICS -> options = searchModels(event, Mapper.getRelics().values(), source);
+                case Constants.SEARCH_AGENDAS -> options = searchModels(event, Mapper.getAgendas().values(), source);
+                case Constants.SEARCH_EVENTS -> options = searchModels(event, Mapper.getEvents().values(), source);
+                case Constants.SEARCH_ACTION_CARDS -> options = searchModels(event, Mapper.getActionCards().values(), source);
+                case Constants.SEARCH_SECRET_OBJECTIVES -> options = searchModels(event, Mapper.getSecretObjectives().values(), source);
+                case Constants.SEARCH_PUBLIC_OBJECTIVES -> options = searchModels(event, Mapper.getPublicObjectives().values(), source);
+                case Constants.SEARCH_PROMISSORY_NOTES -> options = searchModels(event, Mapper.getPromissoryNotes().values(), source);
+                case Constants.SEARCH_DECKS -> options = searchModels(event, Mapper.getDecks().values(), source);
             }
-            case Constants.SEARCH_TILES -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = TileHelper.getAllTiles().values().stream()
-                        .filter(value -> value.search(enteredValue, source))
-                        .limit(25)
-                        .map(value -> new Command.Choice("(" + value.getId() + ") " + value.getName(), value.getId()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_FACTIONS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getFactions().stream()
-                        .filter(entry -> entry.search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_LEADERS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getLeaders().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_UNITS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getUnits().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_TECHS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getTechs().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_ABILITIES -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getAbilities().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_EXPLORES -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getExplores().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_RELICS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getRelics().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_AGENDAS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getAgendas().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_EVENTS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getEvents().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_ACTION_CARDS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getActionCards().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_SECRET_OBJECTIVES -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getSecretObjectives().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_PUBLIC_OBJECTIVES -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getPublicObjectives().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_PROMISSORY_NOTES -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getPromissoryNotes().entrySet().stream()
-                        .filter(entry -> !entry.getValue().isDupe())
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
-            }
-            case Constants.SEARCH_DECKS -> {
-                if (optionName.equals(Constants.SEARCH)) {
-                    String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = Mapper.getDecks().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue, source))
-                        .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
+            if (options != null) {
+                event.replyChoices(options).queue();
             }
         }
     }
@@ -1148,12 +940,11 @@ public class AutoCompleteProvider {
                 switch (optionName) {
                     case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, TechnologyModel> techs = new HashMap<>(Mapper.getTechs());
-                        List<Command.Choice> options = techs.entrySet().stream()
-                            .filter(entry -> entry.getValue().getFaction().isPresent())
-                            .filter(entry -> entry.getValue().search(enteredValue))
+                        List<Command.Choice> options = Mapper.getTechs().values().stream()
+                            .filter(entry -> entry.getFaction().isPresent())
+                            .filter(entry -> entry.search(enteredValue))
                             .limit(25)
-                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                            .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
                             .collect(Collectors.toList());
                         event.replyChoices(options).queue();
                     }
@@ -1162,13 +953,7 @@ public class AutoCompleteProvider {
             case Constants.LEADER_ADD, Constants.LEADER_REMOVE -> {
                 switch (optionName) {
                     case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
-                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        Map<String, LeaderModel> techs = new HashMap<>(Mapper.getLeaders());
-                        List<Command.Choice> options = techs.entrySet().stream()
-                            .filter(entry -> entry.getValue().search(enteredValue))
-                            .limit(25)
-                            .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                            .collect(Collectors.toList());
+                        List<Command.Choice> options = searchModels(event, Mapper.getLeaders().values(), null);
                         event.replyChoices(options).queue();
                     }
                 }

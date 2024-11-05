@@ -1,24 +1,5 @@
 package ti4;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -30,8 +11,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import ti4.autocomplete.AutoCompleteListener;
-import ti4.buttons.ButtonListener;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
@@ -72,7 +55,6 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.tokens.RemoveToken;
 import ti4.commands.uncategorized.AllInfo;
 import ti4.commands.uncategorized.CardsInfo;
-import ti4.commands.uncategorized.DeleteGame;
 import ti4.commands.uncategorized.SelectionBoxDemo;
 import ti4.commands.uncategorized.ShowDistances;
 import ti4.commands.uncategorized.ShowGame;
@@ -85,6 +67,7 @@ import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
 import ti4.commands.user.UserSettingsManager;
+import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -94,20 +77,39 @@ import ti4.helpers.GlobalSettings;
 import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
+import ti4.listeners.AutoCompleteListener;
+import ti4.listeners.ButtonListener;
+import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
+import ti4.listeners.SlashCommandListener;
+import ti4.listeners.UserJoinServerListener;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import static org.reflections.scanners.Scanners.SubTypes;
+
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
-    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
 
     public static JDA jda;
     public static String userID;
@@ -128,18 +130,27 @@ public class AsyncTI4DiscordBot {
     public static void main(String[] args) {
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-
         jda = JDABuilder.createDefault(args[0])
+            // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
+            // This is required to cache all members of a guild (including chunking)
             .enableIntents(GatewayIntent.GUILD_MEMBERS)
+            // This is a privileged gateway intent this is only used to enable access to the user content in messages
+            // (also including embeds/attachments/components).
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-            .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+            // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+            .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+            // It *appears* we need to pull all members or else the bot has trouble pinging players
+            // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
+            // and avoid loading every user at startup
             .setMemberCachePolicy(MemberCachePolicy.ALL)
             .setChunkingFilter(ChunkingFilter.ALL)
+            // This allows us to use our own ShutdownHook, created below
             .setEnableShutdownHook(false)
             .build();
 
         jda.addEventListener(
             new MessageListener(),
+            new SlashCommandListener(),
             ButtonListener.getInstance(),
             ModalListener.getInstance(),
             new SelectionMenuListener(),
@@ -167,7 +178,6 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new ShowGame());
         commandManager.addCommand(new ShowDistances());
-        commandManager.addCommand(new DeleteGame());
         commandManager.addCommand(new AddCC());
         commandManager.addCommand(new RemoveCC());
         commandManager.addCommand(new RemoveAllCC());
@@ -184,8 +194,8 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new SearchCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new RelicCommand());
-        commandManager.addCommand(new AdminCommand());
 
+        commandManager.addCommand(new AdminCommand());
         commandManager.addCommand(new DeveloperCommand());
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
@@ -293,6 +303,9 @@ public class AsyncTI4DiscordBot {
         DataMigrationManager.runMigrations();
         BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
 
+        // START MAP GENERATION
+        MapRenderPipeline.start();
+
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
@@ -307,9 +320,8 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
-                BotLogger.logWithTimestamp("SAVING GAMES");
-                GameSaveLoadManager.saveMaps();
-                BotLogger.logWithTimestamp("GAMES HAVE BEEN SAVED");
+                MapRenderPipeline.shutdown();
+                BotLogger.logWithTimestamp("DONE RENDERING MAPS");
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
@@ -317,7 +329,6 @@ public class AsyncTI4DiscordBot {
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
-                //e.printStackTrace();
             }
         }));
     }
@@ -393,9 +404,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1250131684393881613")); // Async Senary (Tommer Hawk)
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
-        bothelperRoles.add(jda.getRoleById("1131925041219653714")); //Jonjo's Server
-        bothelperRoles.add(jda.getRoleById("1215450829096624129")); //Sigma's Server
-        bothelperRoles.add(jda.getRoleById("1225597399385374781")); //ForlornGeas's Server
+        bothelperRoles.add(jda.getRoleById("1225597399385374781")); // ForlornGeas's Server
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
         bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server
@@ -416,6 +425,10 @@ public class AsyncTI4DiscordBot {
             }
             return result;
         });
+    }
+
+    public static void runAsync(Runnable runnable) {
+        THREAD_POOL.submit(runnable);
     }
 
     public static List<Category> getAvailablePBDCategories() {

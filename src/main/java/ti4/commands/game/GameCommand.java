@@ -1,25 +1,23 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class GameCommand implements Command {
 
@@ -50,27 +48,29 @@ public class GameCommand implements Command {
         }
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        if (game == null)
-            return;
+        if (game == null) return;
         if (!undoCommand) {
             GameSaveLoadManager.saveMap(game, event);
         }
-        CompletableFuture<FileUpload> fileFuture = MapGenerator.saveImage(game, event);
-        if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) && !Constants.PING.equalsIgnoreCase(subcommandName)
-            && !Constants.SET_DECK.equalsIgnoreCase(subcommandName)
-            && !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName)
-            && !Constants.OBSERVER.equalsIgnoreCase(subcommandName)) {
-            fileFuture.thenAccept(fileUpload -> {
+
+        // Post Map Image Unless Command is x
+        if (!Constants.GAME_END.equalsIgnoreCase(subcommandName) &&
+            !Constants.PING.equalsIgnoreCase(subcommandName) &&
+            !Constants.SET_DECK.equalsIgnoreCase(subcommandName) &&
+            !Constants.CREATE_GAME_BUTTON.equalsIgnoreCase(subcommandName) &&
+            !Constants.OBSERVER.equalsIgnoreCase(subcommandName) &&
+            !Constants.OPTIONS.equalsIgnoreCase(subcommandName)) {
+
+            MapRenderPipeline.render(game, event, fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {
-                    Button linkToWebsite = Button.link(
-                        "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
+                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
                     buttons.add(linkToWebsite);
                     buttons.add(Buttons.green("gameInfoButtons", "Player Info"));
                 }
                 buttons.add(Buttons.green("cardsInfo", "Cards Info"));
                 buttons.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                buttons.add(Buttons.gray("showGameAgain", "Show Game"));
+                buttons.add(Buttons.gray("showGameAgain", "Show Game (Refresh Map)"));
                 MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, "", buttons);
             });
         }
@@ -104,6 +104,7 @@ public class GameCommand implements Command {
         subcommands.add(new Swap());
         subcommands.add(new Observer());
         subcommands.add(new Tags());
+        subcommands.add(new GameOptions());
         // subcommands.add(new ReverseSpeakerOrder());
         return subcommands;
     }

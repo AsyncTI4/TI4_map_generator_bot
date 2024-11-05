@@ -45,7 +45,7 @@ public class RelicSendFragments extends RelicSubcommandData {
 			return;
 		}
 		String trait = event.getOption(Constants.TRAIT, null, OptionMapping::getAsString);
-		int count = event.getOption(Constants.COUNT, 3, OptionMapping::getAsInt);
+		int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
 		ButtonHelperAbilities.pillageCheck(sender, game);
 		ButtonHelperAbilities.pillageCheck(receiver, game);
 		sendFrags(event, sender, receiver, trait, count, game);
@@ -88,8 +88,7 @@ public class RelicSendFragments extends RelicSubcommandData {
 		if (!game.isFowMode()) {
 			MessageHelper.sendMessageToChannel(receiver.getCorrectChannel(), message);
 		}
-		CommanderUnlockCheck.checkPlayer(receiver, game, "kollecc", event);
-		CommanderUnlockCheck.checkPlayer(receiver, game, "bentor", event);
+		CommanderUnlockCheck.checkPlayer(receiver, "kollecc", "bentor");
 
 		if (game.isFowMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
@@ -101,6 +100,6 @@ public class RelicSendFragments extends RelicSubcommandData {
 		}
 		TransactionHelper.checkTransactionLegality(game, sender, receiver);
 		Player player = receiver;
-		CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+		CommanderUnlockCheck.checkPlayer(player, "kollecc");
 	}
 }

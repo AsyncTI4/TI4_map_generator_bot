@@ -1,26 +1,24 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.awt.Color;
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
-import net.dv8tion.jda.api.entities.sticker.StickerUnion;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Emojis;
 import ti4.helpers.Stickers;
+import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
 
@@ -65,14 +63,22 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return getId();
     }
 
+    @Deprecated
     public PlanetTypeModel.PlanetType getPlanetType() {
         if (planetType != null) {
             return planetType;
         }
-        if (planetTypes.size() > 0) {
-            return planetTypes.get(0);
+        if (!getPlanetTypes().isEmpty()) {
+            return getPlanetTypes().getFirst();
         }
         return PlanetTypeModel.PlanetType.NONE;
+    }
+
+    public List<PlanetTypeModel.PlanetType> getPlanetTypes() {
+        List<PlanetType> types = new ArrayList<>();
+        if (planetTypes != null) types.addAll(planetTypes);
+        if (planetType != null) types.add(planetType);
+        return types;
     }
 
     @JsonIgnore
@@ -92,11 +98,13 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         sb.append(getEmoji()).append("__").append(getName()).append("__");
         eb.setTitle(sb.toString());
 
-        switch (getPlanetType()) {
-            case HAZARDOUS -> eb.setColor(Color.red);
-            case INDUSTRIAL -> eb.setColor(Color.green);
-            case CULTURAL -> eb.setColor(Color.blue);
-            default -> eb.setColor(Color.white);
+        if (getPlanetType() != null) {
+            switch (getPlanetType()) {
+                case HAZARDOUS -> eb.setColor(Color.red);
+                case INDUSTRIAL -> eb.setColor(Color.green);
+                case CULTURAL -> eb.setColor(Color.blue);
+                default -> eb.setColor(Color.white);
+            }
         }
 
         TileModel tile = TileHelper.getTile(getTileId());
@@ -125,10 +133,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (StringUtils.isBlank(getLegendaryAbilityText())) return null; //no ability text, no embed
 
         EmbedBuilder eb = new EmbedBuilder();
-        StringBuilder sb = new StringBuilder();
 
-        sb.append(Emojis.LegendaryPlanet).append("__").append(getLegendaryAbilityName()).append("__");
-        eb.setTitle(sb.toString());
+        eb.setTitle(Emojis.LegendaryPlanet + "__" + getLegendaryAbilityName() + "__");
         eb.setColor(Color.black);
 
         eb.setDescription(getLegendaryAbilityText());
@@ -215,8 +221,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getStickerOrEmojiURL() {
         long ident = Stickers.getPlanetSticker(getId());
-        if (ident == -1)
-        {
+        if (ident == -1) {
             return getEmojiURL();
         }
         return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();

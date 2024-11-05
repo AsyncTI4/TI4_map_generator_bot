@@ -1,11 +1,13 @@
 package ti4.commands.statistics;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,21 +22,12 @@ import ti4.model.FactionModel;
 
 public class FactionRecordOfTech extends StatisticsSubcommandData {
 
-    private static final String PLAYER_COUNT_FILTER = "player_count";
-    private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
-    private static final String GAME_TYPE_FILTER = "game_type";
-    private static final String FOG_FILTER = "is_fog";
-    private static final String HOMEBREW_FILTER = "has_homebrew";
     private static final String FACTION_WON_FILTER = "faction_won";
 
     public FactionRecordOfTech() {
         super(Constants.FACTION_RECORD_OF_TECH, "# of times a tech has been acquired by a faction");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want Tech History Of").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
-        addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
-        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
-        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
-        addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
+        addOptions(GameStatisticFilterer.gameStatsFilters());
         addOptions(new OptionData(OptionType.BOOLEAN, FACTION_WON_FILTER, "Only include games where the faction won"));
 
     }
@@ -46,8 +39,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
     }
 
     private String getTechResearched(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event.getOption(PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt), event.getOption(VICTORY_POINT_GOAL_FILTER, null, OptionMapping::getAsInt),
-            event.getOption(GAME_TYPE_FILTER, null, OptionMapping::getAsString), event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean), event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean), true);
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         String faction = event.getOption(Constants.FACTION, "eh", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
@@ -68,7 +60,11 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
                 if (player.getFaction().equalsIgnoreCase(faction)) {
                     gamesThatHadThem++;
                     for (String tech : player.getTechs()) {
-                        if (!factionM.getStartingTech().contains(tech)) {
+                        List<String> startingTech = new ArrayList<>();
+                        if (factionM.getStartingTech() != null) {
+                            startingTech = factionM.getStartingTech();
+                        }
+                        if (startingTech != null && !startingTech.contains(tech)) {
                             String techName = Mapper.getTech(tech).getName();
                             if (techsResearched.containsKey(techName)) {
                                 techsResearched.put(techName, techsResearched.get(techName) + 1);
@@ -83,7 +79,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**Techs Researched By " + factionM.getFactionName() + " (From " + gamesThatHadThem + " Games)**__\n");
+        sb.append("## __**Techs Researched By ").append(factionM.getFactionName()).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Entry<String, Integer>> comparator = (o1, o2) -> {
@@ -100,7 +96,7 @@ public class FactionRecordOfTech extends StatisticsSubcommandData {
 
                 sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
                 sb.append("` ").append(techResearched.getKey());
-                sb.append(": " + techResearched.getValue());
+                sb.append(": ").append(techResearched.getValue());
                 sb.append("\n");
                 index.getAndIncrement();
             });

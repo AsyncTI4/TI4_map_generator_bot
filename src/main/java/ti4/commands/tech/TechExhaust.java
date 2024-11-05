@@ -28,6 +28,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -45,6 +46,12 @@ public class TechExhaust extends TechAddRemove {
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
         exhaustTechAndResolve(event, getActiveGame(), player, techID);
         checkAndApplyCombatMods(event, player, techID);
+    }
+
+    @ButtonHandler("exhaustTech_")
+    public static void exhaustTech(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String tech = buttonID.replace("exhaustTech_", "");
+        exhaustTechAndResolve(event, game, player, tech);
     }
 
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
@@ -115,9 +122,7 @@ public class TechExhaust extends TechAddRemove {
             }
             case "absol_nm" -> { // Absol's Neural Motivator
                 deleteIfButtonEvent(event);
-                Button draw2ACButton = Button
-                    .secondary(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards")
-                    .withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                Button draw2ACButton = Buttons.gray(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards", Emojis.ActionCard);
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", draw2ACButton);
                 //sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -167,8 +172,7 @@ public class TechExhaust extends TechAddRemove {
                     + " use button to gain 1 CC or spend 1 strat CC to ready your agent", buttons);
             }
             case "aida", "sar", "htp", "absol_aida" -> {
-                if (event instanceof ButtonInteractionEvent) {
-                    ButtonInteractionEvent buttonEvent = (ButtonInteractionEvent) event;
+                if (event instanceof ButtonInteractionEvent buttonEvent) {
                     tech = tech.replace("absol_", "");
                     ButtonHelper.deleteTheOneButton(buttonEvent);
                     if (buttonEvent.getButton().getLabel().contains("(")) {
@@ -207,7 +211,7 @@ public class TechExhaust extends TechAddRemove {
                         buttons.add(button);
                     }
                 }
-                String message = player.getRepresentation(true, true) + " Select who you would like to Mageon.";
+                String message = player.getRepresentationUnfogged() + " Select who you would like to Mageon.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -215,7 +219,7 @@ public class TechExhaust extends TechAddRemove {
                 deleteIfButtonEvent(event);
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "sd",
                     "placeOneNDone_skipbuild");
-                String message = player.getRepresentation(true, true)
+                String message = player.getRepresentationUnfogged()
                     + " select the planet you would like to place or move a space dock to.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
@@ -229,28 +233,28 @@ public class TechExhaust extends TechAddRemove {
             }
             case "dskolug" -> {
                 deleteIfButtonEvent(event);
-                String message = player.getRepresentation(true, true) + " stalled using the Applied Biothermics tech.";
+                String message = player.getRepresentationUnfogged() + " stalled using the Applied Biothermics tech.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "vtx", "absol_vtx" -> { // Vortex
                 deleteIfButtonEvent(event);
                 List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, game, event);
-                String message = player.getRepresentation(true, true) + " Select what unit you would like to capture";
+                String message = player.getRepresentationUnfogged() + " Select what unit you would like to capture";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "wg" -> { // Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentation(true, true) + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "absol_wg" -> { // Absol's Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentation(true, true) + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -351,7 +355,7 @@ public class TechExhaust extends TechAddRemove {
 
     public static void deleteTheOneButtonIfButtonEvent(GenericInteractionCreateEvent event) {
         if (event instanceof ButtonInteractionEvent) {
-            ButtonHelper.deleteTheOneButton((ButtonInteractionEvent) event);
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 }

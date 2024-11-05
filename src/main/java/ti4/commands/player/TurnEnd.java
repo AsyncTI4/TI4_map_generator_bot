@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -39,11 +40,13 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
@@ -78,6 +81,19 @@ public class TurnEnd extends PlayerSubcommandData {
         mainPlayer.resetOlradinPolicyFlags();
     }
 
+    @ButtonHandler("turnEnd")
+    public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {
+        if (game.isFowMode() && !player.isActivePlayer()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You are not the active player. Force End Turn with /player turn_end.");
+            return;
+        }
+        CommanderUnlockCheck.checkPlayer(player, "hacan");
+        TurnEnd.pingNextPlayer(event, game, player);
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+
+        ButtonHelper.updateMap(game, event, "End of Turn " + player.getTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
+    }
+
     public static Player findNextUnpassedPlayer(Game game, Player currentPlayer) {
         int startingInitiative = game.getPlayersTurnSCInitiative(currentPlayer);
         //in a normal game, 8 is the maximum number, so we modulo on 9
@@ -97,7 +113,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (unpassedPlayers.isEmpty()) {
             return null;
         } else {
-            return unpassedPlayers.get(0);
+            return unpassedPlayers.getFirst();
         }
     }
 
@@ -106,13 +122,11 @@ public class TurnEnd extends PlayerSubcommandData {
     }
 
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
-        game.setTemporaryPingDisable(false);
         game.setStoredValue("lawsDisabled", "no");
         game.setStoredValue("endTurnWhenSCFinished", "");
         game.setStoredValue("fleetLogWhenSCFinished", "");
         mainPlayer.setWhetherPlayerShouldBeTenMinReminded(false);
-        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "sol", event);
-        CommanderUnlockCheck.checkPlayer(mainPlayer, game, "hacan", event);
+        CommanderUnlockCheck.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (player_ == player) {
@@ -155,7 +169,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (!game.isFowMode()) {
             String lastTransaction = game.getLatestTransactionMsg();
             try {
-                if (lastTransaction != null && !"".equals(lastTransaction)) {
+                if (lastTransaction != null && !lastTransaction.isEmpty()) {
                     game.setLatestTransactionMsg("");
                     game.getMainGameChannel().deleteMessageById(lastTransaction).queue(null, e -> {
                     });
@@ -172,7 +186,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
-        CommanderUnlockCheck.checkPlayer(nextPlayer, game, "sol", event);
+        CommanderUnlockCheck.checkPlayer(nextPlayer, "sol");
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 TurnStart.turnStart(event, game, nextPlayer);
@@ -219,10 +233,10 @@ public class TurnEnd extends PlayerSubcommandData {
                 Integer value = objective.getValue();
                 Button objectiveButton;
                 if (poStatus == 0) { //Stage 1 Objectives
-                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
+                    objectiveButton = Buttons.green(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, Emojis.Public1alt);
                     poButtons1.add(objectiveButton);
                 } else if (poStatus == 1) { //Stage 2 Objectives
-                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
+                    objectiveButton = Buttons.blue(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name, Emojis.Public2alt);
                     poButtons2.add(objectiveButton);
                 } else { //Other Objectives
                     objectiveButton = Buttons.gray(prefix + Constants.PO_SCORING + value, "(" + value + ") " + po_name);
@@ -236,7 +250,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.addAll(poButtonsCustom);
         for (Player player : game.getRealPlayers()) {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "edyncommander") && !game.isFowMode()) {
-                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO").withEmoji(Emoji.fromFormatted(Emojis.edyn)));
+                poButtons.add(Buttons.gray("edynCommanderSODraw", "Draw SO instead of Scoring PO", Emojis.edyn));
                 break;
             }
         }
@@ -266,7 +280,7 @@ public class TurnEnd extends PlayerSubcommandData {
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers()) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
+                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to pay off binding debts here. You may pay 1TG to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1TG"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -280,7 +294,7 @@ public class TurnEnd extends PlayerSubcommandData {
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
-            && ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).size() > 0) {
+            && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).isEmpty()) {
             poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
         }
         poButtons.removeIf(Objects::isNull);
@@ -313,7 +327,7 @@ public class TurnEnd extends PlayerSubcommandData {
                 }
                 player.setCommodities(player.getCommodities() + numScoredPos);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+                    player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " TG" + (numScoredSOs == 1 ? "" : "s") + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
         }
         // if(maxVP+4 > game.getVp()){
@@ -343,7 +357,7 @@ public class TurnEnd extends PlayerSubcommandData {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you may use the button to pay 3TGs and get a tech, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentationUnfogged() + " you may use the button to pay 3TGs and get a tech, using your Sentient Datapool technology.", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
@@ -378,17 +392,17 @@ public class TurnEnd extends PlayerSubcommandData {
             }
 
             String message2a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following public objectives: ";
-            String message2b = "none";
+            StringBuilder message2b = new StringBuilder("none");
             for (String obbie : game.getRevealedPublicObjectives().keySet()) {
                 List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(obbie, key -> new ArrayList<>());
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoButton.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(obbie, game, player);
                     if (playerProgress >= threshold) {
-                        if (message2b.equalsIgnoreCase("none")) {
-                            message2b = Mapper.getPublicObjective(obbie).getName();
+                        if (message2b.toString().equalsIgnoreCase("none")) {
+                            message2b = new StringBuilder(Mapper.getPublicObjective(obbie).getName());
                         } else {
-                            message2b = message2b + ", " + Mapper.getPublicObjective(obbie).getName();
+                            message2b.append(", ").append(Mapper.getPublicObjective(obbie).getName());
                         }
                     }
                 }
@@ -397,15 +411,15 @@ public class TurnEnd extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message2a + message2b);
             }
             int count = 0;
-            String message3a = player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:";
+            StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoButton.getObjectiveThreshold(soID, game) > 0 && ListPlayerInfoButton.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoButton.getObjectiveThreshold(soID, game) - 1) && !soID.equalsIgnoreCase("dp")) {
-                    message3a = message3a + " " + Mapper.getSecretObjective(soID).getName();
+                    message3a.append(" ").append(Mapper.getSecretObjective(soID).getName());
                     count++;
                 }
             }
             if (count > 0 && player.isRealPlayer()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
             }
 
         }
@@ -445,7 +459,7 @@ public class TurnEnd extends PlayerSubcommandData {
         }
         Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
         if (arborec != null) {
-            String mitosisMessage = arborec.getRepresentation(true, true) + " reminder to do mitosis!";
+            String mitosisMessage = arborec.getRepresentationUnfogged() + " reminder to do mitosis!";
             MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
         }
         Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");
@@ -462,7 +476,7 @@ public class TurnEnd extends PlayerSubcommandData {
                     if (unitHolder.getUnits() != null) {
                         if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                             unitHolder.addUnit(infKey, 1);
-                            String genesisMessage = solPlayer.getRepresentation(true, true)
+                            String genesisMessage = solPlayer.getRepresentationUnfogged()
                                 + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
                             if (game.isFowMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);

@@ -12,6 +12,7 @@ import ti4.commands.tech.TechRemove;
 import ti4.draft.DraftItem;
 import ti4.draft.items.CommoditiesDraftItem;
 import ti4.generator.Mapper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
@@ -19,6 +20,7 @@ import ti4.model.FactionModel;
 
 public class FrankenApplicator {
 
+    @ButtonHandler("frankenItemAdd")
     public static void resolveFrankenItemAddButton(ButtonInteractionEvent event, String buttonID, Player player) {
         String frankenItem = buttonID.replace("frankenItemAdd", "");
         DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
@@ -50,6 +52,7 @@ public class FrankenApplicator {
         }
     }
 
+    @ButtonHandler("frankenItemRemove")
     public static void resolveFrankenItemRemoveButton(ButtonInteractionEvent event, String buttonID, Player player) {
         String frankenItem = buttonID.replace("frankenItemRemove", "");
         DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
@@ -114,6 +117,7 @@ public class FrankenApplicator {
     private static void addStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {
         FactionModel faction = Mapper.getFaction(itemID);
         List<String> startingTech = faction.getStartingTech();
+        if (startingTech == null) return;
         for (String tech : startingTech) {
             TechAdd.addTech(event, player.getGame(), player, tech);
         }
@@ -122,6 +126,7 @@ public class FrankenApplicator {
     private static void removeStartingTech(GenericInteractionCreateEvent event, Player player, String itemID) {
         FactionModel faction = Mapper.getFaction(itemID);
         List<String> startingTech = faction.getStartingTech();
+        if (startingTech == null) return;
         for (String tech : startingTech) {
             TechRemove.removeTech(event, player, tech);
         }

@@ -21,37 +21,26 @@ import ti4.model.FactionModel;
 
 public class FactionRecordOfSCPick extends StatisticsSubcommandData {
 
-    private static final String PLAYER_COUNT_FILTER = "player_count";
-    private static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
-    private static final String GAME_TYPE_FILTER = "game_type";
-    private static final String FOG_FILTER = "is_fog";
-    private static final String HOMEBREW_FILTER = "has_homebrew";
     private static final String FACTION_WON_FILTER = "faction_won";
 
     public FactionRecordOfSCPick() {
         super(Constants.FACTION_RECORD_OF_SCPICK, "# of times an SC has been picked by a faction, by round");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction That You Want History Of").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, PLAYER_COUNT_FILTER, "Filter by player count, e.g. 3-8"));
-        addOptions(new OptionData(OptionType.INTEGER, VICTORY_POINT_GOAL_FILTER, "Filter by victory point goal, e.g. 10-14"));
-        addOptions(new OptionData(OptionType.STRING, GAME_TYPE_FILTER, "Filter by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
-        addOptions(new OptionData(OptionType.BOOLEAN, FOG_FILTER, "Filter by if the game is a fog game"));
-        addOptions(new OptionData(OptionType.BOOLEAN, HOMEBREW_FILTER, "Filter by if the game has any homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, FACTION_WON_FILTER, "Only include games where the faction won"));
-
+        addOptions(GameStatisticFilterer.gameStatsFilters());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String text = "";
+        StringBuilder text = new StringBuilder();
         for (int x = 1; x < 7; x++) {
-            text = text + getSCPick(event, x);
+            text.append(getSCPick(event, x));
         }
-        MessageHelper.sendMessageToThread(event.getChannel(), "SC Pick Record", text);
+        MessageHelper.sendMessageToThread(event.getChannel(), "SC Pick Record", text.toString());
     }
 
     private String getSCPick(SlashCommandInteractionEvent event, int round) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event.getOption(PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt), event.getOption(VICTORY_POINT_GOAL_FILTER, null, OptionMapping::getAsInt),
-            event.getOption(GAME_TYPE_FILTER, null, OptionMapping::getAsString), event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean), event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean), false);
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         String faction = event.getOption(Constants.FACTION, "eh", OptionMapping::getAsString);
         FactionModel factionM = Mapper.getFaction(faction);
         if (factionM == null) {
@@ -96,7 +85,7 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("## __**SCs Picked By " + factionM.getFactionName() + " In Round #" + round + " (From " + gamesThatHadThem + " Games)**__\n");
+        sb.append("## __**SCs Picked By ").append(factionM.getFactionName()).append(" In Round #").append(round).append(" (From ").append(gamesThatHadThem).append(" Games)**__\n");
 
         boolean sortOrderAscending = event.getOption("ascending", false, OptionMapping::getAsBoolean);
         Comparator<Entry<String, Integer>> comparator = (o1, o2) -> {
@@ -113,9 +102,9 @@ public class FactionRecordOfSCPick extends StatisticsSubcommandData {
 
                 sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
                 sb.append("` ").append(techResearched.getKey());
-                sb.append(": " + techResearched.getValue());
+                sb.append(": ").append(techResearched.getValue());
                 if (round == 1) {
-                    sb.append(" (Took Custodians a total of  " + custodians.getOrDefault(techResearched.getKey(), 0) + " times)");
+                    sb.append(" (Took Custodians a total of  ").append(custodians.getOrDefault(techResearched.getKey(), 0)).append(" times)");
                 }
                 sb.append("\n");
                 index.getAndIncrement();

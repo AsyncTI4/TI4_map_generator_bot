@@ -1,8 +1,12 @@
 package ti4.commands.statistics;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -10,6 +14,7 @@ import ti4.map.GameManager;
 public final class GameStatisticFilterer {
 
     public static final String PLAYER_COUNT_FILTER = "player_count";
+    public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
     public static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
     public static final String GAME_TYPE_FILTER = "game_type";
     public static final String FOG_FILTER = "is_fog";
@@ -19,20 +24,34 @@ public final class GameStatisticFilterer {
     private GameStatisticFilterer() {
     }
 
+    public static List<OptionData> gameStatsFilters() {
+        List<OptionData> filters = new ArrayList<>();
+        filters.add(new OptionData(OptionType.INTEGER, GameStatisticFilterer.PLAYER_COUNT_FILTER, "Filter games of player by player count, e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, GameStatisticFilterer.MIN_PLAYER_COUNT_FILTER, "Filter games of player by minimum player count, e.g. 3-8"));
+        filters.add(new OptionData(OptionType.INTEGER, GameStatisticFilterer.VICTORY_POINT_GOAL_FILTER, "Filter games of player by victory point goal, e.g. 10-14"));
+        filters.add(new OptionData(OptionType.STRING, GameStatisticFilterer.GAME_TYPE_FILTER, "Filter games of player by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.FOG_FILTER, "Filter games of player by if the game is a fog game"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HOMEBREW_FILTER, "Filter games of player by if the game has any homebrew"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HAS_WINNER_FILTER, "Filter games of player by if the game has a winner"));
+        return filters;
+    }
+
     public static List<Game> getFilteredGames(SlashCommandInteractionEvent event) {
         Integer playerCountFilter = event.getOption(PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt);
+        Integer minPlayerCountFilter = event.getOption(MIN_PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt);
         Integer victoryPointGoalFilter = event.getOption(VICTORY_POINT_GOAL_FILTER, null, OptionMapping::getAsInt);
         Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
         Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, true, OptionMapping::getAsBoolean);
         String gameTypeFilter = event.getOption(GAME_TYPE_FILTER, null, OptionMapping::getAsString);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
-        return getFilteredGames(playerCountFilter, victoryPointGoalFilter, gameTypeFilter, fogFilter, homebrewFilter, hasWinnerFilter);
+        return getFilteredGames(playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter, gameTypeFilter, fogFilter, homebrewFilter, hasWinnerFilter);
     }
 
-    public static List<Game> getFilteredGames(Integer playerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
+    public static List<Game> getFilteredGames(Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
         return GameManager.getInstance().getGameNameToGame().values().stream()
             .filter(GameStatisticFilterer::filterAbortedGames)
             .filter(game -> filterOnPlayerCount(playerCountFilter, game))
+            .filter(game -> filterOnMinPlayerCount(minPlayerCountFilter, game))
             .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
             .filter(game -> filterOnGameType(gameTypeFilter, game))
             .filter(game -> filterOnFogType(fogFilter, game))
@@ -128,7 +147,11 @@ public final class GameStatisticFilterer {
     }
 
     private static boolean filterOnPlayerCount(Integer playerCount, Game game) {
-        return playerCount == null || playerCount == game.getRealAndEliminatedAndDummyPlayers().size();
+        return playerCount == null || playerCount == game.getRealAndEliminatedPlayers().size();
+    }
+
+    private static boolean filterOnMinPlayerCount(Integer minPlayerCount, Game game) {
+        return minPlayerCount == null || minPlayerCount <= game.getRealAndEliminatedPlayers().size();
     }
 
 }

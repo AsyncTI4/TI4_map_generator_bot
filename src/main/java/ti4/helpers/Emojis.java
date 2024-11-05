@@ -16,12 +16,16 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jetbrains.annotations.NotNull;
-
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.message.BotLogger;
 
 public class Emojis {
     // APPLICATION EMOJIS
@@ -64,28 +68,44 @@ public class Emojis {
         }
 
         // Delete emojis that have been removed and also out-of-date emojis
-        toDelete.parallelStream().forEach(key -> deleteApplicationEmoji(key));
-        toDelete.forEach(key -> emojis.remove(key));
+        if (!toDelete.isEmpty()) {
+            BotLogger.logWithTimestamp("Deleting `" + toDelete.size() + "` emojis.");
+            toDelete.parallelStream().forEach(Emojis::deleteApplicationEmoji);
+            toDelete.forEach(emojis::remove);
+        }
 
         // (Re-)Upload emojis
-        Map<String, EmojiUnion> uploaded = toUpload.parallelStream()
-            .map(file -> createApplicationEmoji(file))
-            .collect(Collectors.toConcurrentMap(e -> e.getName(), e -> e));
-        emojis.putAll(uploaded);
+        if (!toUpload.isEmpty()) {
+            BotLogger.logWithTimestamp("Uploading `" + toUpload.size() + "` emojis.");
+            Map<String, EmojiUnion> uploaded = toUpload.parallelStream()
+                .map(Emojis::createApplicationEmoji)
+                .collect(Collectors.toConcurrentMap(e -> e.getName(), e -> e));
+            emojis.putAll(uploaded);
+        }
+
+        if (!toDelete.isEmpty() || !toUpload.isEmpty()) {
+            BotLogger.logWithTimestamp("Done updating emojis.");
+        }
     }
 
-    private static List<File> enumerateEmojiFilesRecursive(File folder) {
+    public static List<File> enumerateEmojiFilesRecursive(File folder) {
         List<File> filesAndDirectories = Arrays.asList(folder.listFiles());
         return filesAndDirectories.stream().flatMap(fileOrDir -> {
             if (fileOrDir == null) return null;
             if (isValidEmojiFile(fileOrDir)) return Stream.of(fileOrDir);
-            if (fileOrDir.isDirectory()) return enumerateEmojiFilesRecursive(fileOrDir).stream();
+            if (fileOrDir.isDirectory() && !isIgnoredDirectory(fileOrDir))
+                return enumerateEmojiFilesRecursive(fileOrDir).stream();
             return null;
         }).toList();
     }
 
     private static boolean isValidEmojiFile(File file) {
         return file.isFile() && (file.getName().endsWith(".png") || file.getName().endsWith(".jpg"));
+    }
+
+    private static boolean isIgnoredDirectory(File file) {
+        List<String> names = List.of("New Server Pack");
+        return names.contains(file.getName());
     }
 
     private static EmojiUnion getApplicationEmoji(String name) {
@@ -95,6 +115,7 @@ public class Emojis {
     }
 
     private static List<EmojiUnion> getAllApplicationEmojis() {
+        //AsyncTI4DiscordBot.jda.create
         return new ArrayList<>(); // TODO (Jazz): fill this in when we get the JDA update
     }
 
@@ -104,6 +125,68 @@ public class Emojis {
 
     private static EmojiUnion createApplicationEmoji(File emoji) {
         return null; // TODO (Jazz): fill this in when we get the JDA update
+    }
+
+    // src/main/resources/emojis
+    public enum TI4Emoji {
+        // ./factions
+        Arborec, Ghost, Hacan, Jolnar, L1Z1X, Letnev, Mentak, Muaat, Naalu, Nekro, Saar, Sardakk, Sol, Winnu, Xxcha, Yin, Yssaril, // ./base
+        Argent, Cabal, Empyrean, Mahact, Naaz, Nomad, Titans, // ./pok
+        augers, axis, bentor, blex, kyro, celdauri, cheiran, cymiae, dihmohn, edyn, florzen, freesystems, ghemina, ghoti, gledge, khrask, kjalengard, kollecc, // ./ds
+        kolume, kortali, lanefir, lizho, mirveda, mortheus, mykomentori, nivyn, nokar, olradin, rohdhna, tnelis, vaden, vaylerian, veldyr, zealots, zelian, // ./ds
+        Lazax, Neutral, RandomFaction, AdminsFaction, Qulane, echoes, enclave, raven, syndicate, terminator, // ./other
+
+        // Exploration / Traits
+        HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier,
+
+        // Normal Strategy Cards
+        SC1, SC1Back, SC2, SC2Back, SC3, SC3Back, SC4, SC4Back, SC5, SC5Back, SC6, SC6Back, SC7, SC7Back, SC8, SC8Back,
+
+        // Strat Card Pings, [EMOJI FARM 9]
+        sc_1_1, sc_1_2, sc_1_3, sc_1_4, sc_1_5, sc_1_6, //
+        sc_2_1, sc_2_2, sc_2_3, sc_2_4, sc_2_5, sc_2_6, //
+        sc_3_1, sc_3_2, sc_3_3, sc_3_4, sc_3_5, //
+        sc_4_1, sc_4_2, sc_4_3, sc_4_4, sc_4_5, sc_4_6, sc_4_7, //
+        sc_5_1, sc_5_2, sc_5_3, sc_5_4, //
+        sc_6_1, sc_6_2, sc_6_3, sc_6_4, sc_6_5, //
+        sc_7_1, sc_7_2, sc_7_3, sc_7_4, sc_7_5, sc_7_6, //
+        sc_8_1, sc_8_2, sc_8_3, sc_8_4, sc_8_5, //
+
+        // Other Cards
+        ActionCard, ActionCardAlt, Agenda, AgendaAlt, AgendaWhite, AgendaBlack, PN, PNALt, RelicCard, CulturalCard, HazardousCard, IndustrialCard, FrontierCard, EventCard,
+
+        // Colors
+        black, bloodred, blue, brown, chocolate, chrome, rainbow, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
+        lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
+        splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
+        splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow;
+
+        public Emoji asEmoji() {
+            String mention = toString();
+            if (mention.isBlank()) return null;
+            return Emoji.fromFormatted(mention);
+        }
+
+        public String toString() {
+            String emoji = getAppEmoji(name());
+            return emoji == null ? "" : emoji;
+        }
+    }
+
+    public static String getAppEmoji(String emojiName) {
+        // Check the application emojis first
+        if (emojis.containsKey(emojiName) && emojis.get(emojiName) instanceof CustomEmoji emoji) {
+            return emoji.getAsMention();
+        }
+
+        // Find Emoji in JDA
+        List<RichCustomEmoji> candidates = AsyncTI4DiscordBot.jda.getEmojisByName(emojiName, true);
+        for (RichCustomEmoji emoji : candidates) {
+            if (emoji == null) continue;
+            if (!emoji.isAvailable()) continue;
+            return emoji.getAsMention();
+        }
+        return getEmojiFromDiscord(emojiName);
     }
 
     // FACTIONS
@@ -695,58 +778,37 @@ public class Emojis {
     public static final List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor, SemLore);
 
     // EMOJI FARM 9 - SC COLORS
-    public static final String sc_1_1 = "<:sc_1_1:1164316518390190140>";
-    public static final String sc_1_2 = "<:sc_1_2:1164316520986464267>";
-    public static final String sc_1_3 = "<:sc_1_3:1164316522689339392>";
-    public static final String sc_1_4 = "<:sc_1_4:1164316525021380729>";
-    public static final String sc_1_5 = "<:sc_1_5:1164316526501965864>";
-    public static final String sc_1_6 = "<:sc_1_6:1164316528024494130>";
-    public static final String SC1Mention = sc_1_1 + sc_1_2 + sc_1_3 + sc_1_4 + sc_1_5 + sc_1_6;
-    public static final String sc_2_1 = "<:sc_2_1:1164316530025177108>";
-    public static final String sc_2_2 = "<:sc_2_2:1164316530926948383>";
-    public static final String sc_2_3 = "<:sc_2_3:1164316532533366935>";
-    public static final String sc_2_4 = "<:sc_2_4:1164316534982840422>";
-    public static final String sc_2_5 = "<:sc_2_5:1164316536266309684>";
-    public static final String sc_2_6 = "<:sc_2_6:1164316539789529108>";
-    public static final String SC2Mention = sc_2_1 + sc_2_2 + sc_2_3 + sc_2_4 + sc_2_5 + sc_2_6;
-    public static final String sc_3_1 = "<:sc_3_1:1164316650233942037>";
-    public static final String sc_3_2 = "<:sc_3_2:1164316651823579177>";
-    public static final String sc_3_3 = "<:sc_3_3:1164316653748764703>";
-    public static final String sc_3_4 = "<:sc_3_4:1164316654948323378>";
-    public static final String sc_3_5 = "<:sc_3_5:1164316657783689297>";
-    public static final String SC3Mention = sc_3_1 + sc_3_2 + sc_3_3 + sc_3_4 + sc_3_5;
-    public static final String sc_4_1 = "<:sc_4_1:1164316658970660998>";
-    public static final String sc_4_2 = "<:sc_4_2:1164316660358991893>";
-    public static final String sc_4_3 = "<:sc_4_3:1164316662510661715>";
-    public static final String sc_4_4 = "<:sc_4_4:1164316663857021039>";
-    public static final String sc_4_5 = "<:sc_4_5:1164335083440836708>";
-    public static final String sc_4_6 = "<:sc_4_6:1164335085902909440>";
-    public static final String sc_4_7 = "<:sc_4_7:1164316057448742995>";
-    public static final String SC4Mention = sc_4_1 + sc_4_2 + sc_4_3 + sc_4_4 + sc_4_5 + sc_4_6 + sc_4_7;
-    public static final String sc_5_1 = "<:sc_5_1:1164335087068926122>";
-    public static final String sc_5_2 = "<:sc_5_2:1164335088348168232>";
-    public static final String sc_5_3 = "<:sc_5_3:1164335090021716060>";
-    public static final String sc_5_4 = "<:sc_5_4:1164335091682648074>";
-    public static final String SC5Mention = sc_5_1 + sc_5_2 + sc_5_3 + sc_5_4;
-    public static final String sc_6_1 = "<:sc_6_1:1164335092739604632>";
-    public static final String sc_6_2 = "<:sc_6_2:1164335095352655882>";
-    public static final String sc_6_3 = "<:sc_6_3:1164335097307201617>";
-    public static final String sc_6_4 = "<:sc_6_4:1164335101111451648>";
-    public static final String sc_6_5 = "<:sc_6_5:1164335103191818300>";
-    public static final String SC6Mention = sc_6_1 + sc_6_2 + sc_6_3 + sc_6_4 + sc_6_5;
-    public static final String sc_7_1 = "<:sc_7_1:1164335106073296956>";
-    public static final String sc_7_2 = "<:sc_7_2:1164335107922989086>";
-    public static final String sc_7_3 = "<:sc_7_3:1164335364824113164>";
-    public static final String sc_7_4 = "<:sc_7_4:1164335111832096889>";
-    public static final String sc_7_5 = "<:sc_7_5:1164335367500071062>";
-    public static final String sc_7_6 = "<:sc_7_6:1164335116970098759>";
-    public static final String SC7Mention = sc_7_1 + sc_7_2 + sc_7_3 + sc_7_4 + sc_7_5 + sc_7_6;
-    public static final String sc_8_1 = "<:sc_8_1:1164335119046299748>";
-    public static final String sc_8_2 = "<:sc_8_2:1164335243688423454>";
-    public static final String sc_8_3 = "<:sc_8_3:1164335245210947644>";
-    public static final String sc_8_4 = "<:sc_8_4:1164335122355597402>";
-    public static final String sc_8_5 = "<:sc_8_5:1164335247429730365>";
-    public static final String SC8Mention = sc_8_1 + sc_8_2 + sc_8_3 + sc_8_4 + sc_8_5;
+    public static String SC1Mention() {
+        return TI4Emoji.sc_1_1.toString() + TI4Emoji.sc_1_2 + TI4Emoji.sc_1_3 + TI4Emoji.sc_1_4 + TI4Emoji.sc_1_5 + TI4Emoji.sc_1_6;
+    }
+
+    public static String SC2Mention() {
+        return TI4Emoji.sc_2_1.toString() + TI4Emoji.sc_2_2 + TI4Emoji.sc_2_3 + TI4Emoji.sc_2_4 + TI4Emoji.sc_2_5 + TI4Emoji.sc_2_6;
+    }
+
+    public static String SC3Mention() {
+        return TI4Emoji.sc_3_1.toString() + TI4Emoji.sc_3_2 + TI4Emoji.sc_3_3 + TI4Emoji.sc_3_4 + TI4Emoji.sc_3_5;
+    }
+
+    public static String SC4Mention() {
+        return TI4Emoji.sc_4_1.toString() + TI4Emoji.sc_4_2 + TI4Emoji.sc_4_3 + TI4Emoji.sc_4_4 + TI4Emoji.sc_4_5 + TI4Emoji.sc_4_6 + TI4Emoji.sc_4_7;
+    }
+
+    public static String SC5Mention() {
+        return TI4Emoji.sc_5_1.toString() + TI4Emoji.sc_5_2 + TI4Emoji.sc_5_3 + TI4Emoji.sc_5_4;
+    }
+
+    public static String SC6Mention() {
+        return TI4Emoji.sc_6_1.toString() + TI4Emoji.sc_6_2 + TI4Emoji.sc_6_3 + TI4Emoji.sc_6_4 + TI4Emoji.sc_6_5;
+    }
+
+    public static String SC7Mention() {
+        return TI4Emoji.sc_7_1.toString() + TI4Emoji.sc_7_2 + TI4Emoji.sc_7_3 + TI4Emoji.sc_7_4 + TI4Emoji.sc_7_5 + TI4Emoji.sc_7_6;
+    }
+
+    public static String SC8Mention() {
+        return TI4Emoji.sc_8_1.toString() + TI4Emoji.sc_8_2 + TI4Emoji.sc_8_3 + TI4Emoji.sc_8_4 + TI4Emoji.sc_8_5;
+    }
     // END EMOJI FARM 9
 
     // EMOJI FARM 10 - COLOR UNITS
@@ -796,10 +858,9 @@ public class Emojis {
     public static final String splitred = "<:splitred:1165037005479096370>";
     public static final String splittan = "<:splittan:1165037008666775572>";
     public static final String splitteal = "<:splitteal:1165037010910728242>";
-    public static final String splittorquoise = "<:splittorquoise:1165037013486022726>";
+    public static final String splitturquoise = "<:splittorquoise:1165037013486022726>";
     public static final String splityellow = "<:splityellow:1165037014995963965>";
     public static final String riftset = "<:riftset:1281263062715990057>";
-
     // END EMOJI FARM 10
 
     // ANOMOLIES
@@ -906,6 +967,9 @@ public class Emojis {
     public static final String raven = "<:raven:1189668203580887121>";
     public static final String syndicate = "<:syndicate:1189668205355073667>";
     public static final String terminator = "<:terminator:1189668214125363231>";
+
+    // MEMEPHILOSPHER
+    public static final String netharii = "<:netharii:1303204852532383804>";
 
     // DICE
     public static final String d10green_0 = "<:d10green_0:1180170565819039916>";
@@ -1034,12 +1098,12 @@ public class Emojis {
     public static final String StrategicAlliance = "<:StrategicAlliance:1225473614946500680>"; // Symbol for Holytispoon's Strategic Alliance
 
     // LIST OF SYMBOLS FOR FOG STUFF
-    public static final List<String> symbols = Arrays.asList(
+    public static final List<String> symbols = new ArrayList<>(Arrays.asList(
         warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
         CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
         tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, CyberneticTech,
         PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
-        BortWindow);
+        BortWindow));
 
     // private static List<String> testingEmoji =
     // Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
@@ -1058,21 +1122,21 @@ public class Emojis {
         List<String> semLores = new ArrayList<>(SemLores);
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(semLores, seed);
-        return semLores.get(0);
+        return semLores.getFirst();
     }
 
     public static String getRandomGoodDog() {
         List<String> goodDogs = new ArrayList<>(GoodDogs);
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(goodDogs, seed);
-        return goodDogs.get(0);
+        return goodDogs.getFirst();
     }
 
     public static String getRandomGoodDog(String randomSeed) {
         List<String> goodDogs = new ArrayList<>(GoodDogs);
         Random seed = new Random(randomSeed.hashCode());
         Collections.shuffle(goodDogs, seed);
-        return goodDogs.get(0);
+        return goodDogs.getFirst();
     }
 
     @NotNull
@@ -1085,11 +1149,11 @@ public class Emojis {
             case "argent" -> Argent;
             case "cabal" -> Cabal;
             case "empyrean" -> Empyrean;
-            case "ghost", "creuss" -> Ghost;
+            case "ghost" -> Ghost;
             case "hacan" -> Hacan;
             case "jolnar" -> Jolnar;
             case "l1z1x" -> L1Z1X;
-            case "letnev" -> Letnev;
+            case "barony", "letnev" -> Letnev;
             case "yssaril" -> Yssaril;
             case "mahact" -> Mahact;
             case "mentak" -> Mentak;
@@ -1171,6 +1235,8 @@ public class Emojis {
             case "raven" -> raven;
             case "syndicate" -> syndicate;
             case "terminator" -> terminator;
+
+            case "netharii" -> netharii;
 
             default -> getRandomizedEmoji(0, null);
         };
@@ -1469,7 +1535,7 @@ public class Emojis {
             case "splitlme", "splitlime" -> splitlime + "**SplitLime**";
             case "splittan" -> splittan + "**SplitTan**";
             case "splittea", "splitteal" -> splitteal + "**SplitTeal**";
-            case "splittqs", "splitturquoise" -> splittorquoise + "**SplitTurquoise**";
+            case "splittqs", "splitturquoise" -> splitturquoise + "**SplitTurquoise**";
             case "splitbld", "splitbloodred" -> splitbloodred + "**SplitBloodRed**";
             case "splitchk", "splitchocolate" -> splitchocolate + "**SplitChocolate**";
             case "spliteme", "splitemerald" -> splitemerald + "**SplitEmerald**";
@@ -1524,7 +1590,7 @@ public class Emojis {
             case "splitlme", "splitlime" -> splitlime;
             case "splittan" -> splittan;
             case "splittea", "splitteal" -> splitteal;
-            case "splittqs", "splitturquoise" -> splittorquoise;
+            case "splittqs", "splitturquoise" -> splitturquoise;
             case "splitbld", "splitbloodred" -> splitbloodred;
             case "splitchk", "splitchocolate" -> splitchocolate;
             case "spliteme", "splitemerald" -> splitemerald;

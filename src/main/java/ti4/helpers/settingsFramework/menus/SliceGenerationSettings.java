@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -17,7 +16,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-
 import ti4.buttons.Buttons;
 import ti4.commands.milty.MiltyDraftHelper;
 import ti4.commands.milty.MiltyDraftSlice;
@@ -35,10 +33,13 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private IntegerSetting numSlices, numFactions;
-    private BooleanSetting extraWorms;
-    private IntegerSetting minimumRes, minimumInf;
-    private IntegerRangeSetting totalValue, numLegends;
+    private final IntegerSetting numSlices;
+    private final IntegerSetting numFactions;
+    private final BooleanSetting extraWorms;
+    private final IntegerSetting minimumRes;
+    private final IntegerSetting minimumInf;
+    private final IntegerRangeSetting totalValue;
+    private final IntegerRangeSetting numLegends;
 
     // This is handled fully manually as there's a lot of validation to do
     private String presetSlices = null;
@@ -93,7 +94,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
         ls.add(numFactions);
         if (presetSlices != null) {
             return ls;
@@ -110,8 +111,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
-        List<Button> ls = new ArrayList<>();
-        ls.addAll(super.specialButtons());
+        List<Button> ls = new ArrayList<>(super.specialButtons());
         ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
         ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "richPreset", "Rich galaxy", Emoji.fromFormatted(Emojis.tg)));
         ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "poorPreset", "Poor galaxy", Emoji.fromFormatted(Emojis.comm)));
@@ -147,9 +147,9 @@ public class SliceGenerationSettings extends SettingsMenu {
             sb.append("\n");
         }
         if (presetSlices != null) sb.append("> Using preset slices: ").append(presetSlices).append("\n");
-        if (enabledSettings().size() > 0) sb.append("\n"); // extra line for formatting
+        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
 
-        if (categories().size() > 0) {
+        if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();
             for (SettingsMenu cat : categories()) {
                 catStrings.add(cat.shortSummaryString(false));
@@ -199,7 +199,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         List<String> slices = new ArrayList<>(List.of("27,73,47,44,26", "30,39,76,80,65", "79,37,50,71,66", "42,64,75,72,49", "34,41,70,78,25", "40,20,36,45,74"));
         Collections.shuffle(slices);
         for (int i = players; i < 6; i++)
-            slices.remove(0);
+            slices.removeFirst();
         String ttsString = String.join("|", slices);
         return setPresetSlices(ttsString);
     }

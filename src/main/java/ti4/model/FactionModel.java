@@ -1,15 +1,14 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
@@ -25,6 +24,8 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private int commodities;
     private List<String> factionTech;
     private List<String> startingTech;
+    private List<String> startingTechOptions;
+    private Integer startingTechAmount;
     private List<String> homePlanets;
     private List<String> abilities;
     private List<String> leaders;
@@ -42,7 +43,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && homeSystem != null
             && startingFleet != null
             && factionTech != null
-            && startingTech != null
+            && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
             && homePlanets != null
             && abilities != null
             && leaders != null
@@ -65,6 +66,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public List<String> getStartingTech() {
+        if (startingTech == null) return null;
         return new ArrayList<>(startingTech);
     }
 
@@ -108,8 +110,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(getFactionTitle());
 
         //DESCRIPTION
-        StringBuilder description = new StringBuilder();
-        eb.setDescription(description.toString());
+        eb.setDescription("");
 
         if (getFactionSheetFrontImageURL().isPresent()) eb.setImage(getFactionSheetFrontImageURL().get());
 
@@ -127,14 +128,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE - [FactionEmoji] Sardakk N'orr [SourceEmoji]
-        StringBuilder title = new StringBuilder();
-        title.append(getFactionEmoji()).append(" ").append(getFactionNameWithSourceEmoji());
-        eb.setTitle(title.toString());
+        eb.setTitle(getFactionEmoji() + " " + getFactionNameWithSourceEmoji());
 
         // DESCRIPTION - <Commodity><Commodity><Commodity>
-        StringBuilder desc = new StringBuilder();
-        desc.append("\n").append(StringUtils.repeat(Emojis.comm, getCommodities()));
-        eb.setDescription(desc.toString());
+        eb.setDescription("\n" + StringUtils.repeat(Emojis.comm, getCommodities()));
 
         // FIELDS
         // Abilities
@@ -192,7 +189,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.addField("__Leaders__", sb.toString(), false);
 
         sb = new StringBuilder();
-        sb.append(getStartingFleet() + "\n");
+        sb.append(getStartingFleet()).append("\n");
         eb.addField("__Starting Fleet__", sb.toString(), false);
 
         return eb.build();

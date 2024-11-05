@@ -3,7 +3,6 @@ package ti4.draft;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -63,11 +62,11 @@ public abstract class BagDraft {
 
     public void passBags() {
         List<Player> players = owner.getRealPlayers();
-        DraftBag firstPlayerBag = players.get(0).getCurrentDraftBag();
+        DraftBag firstPlayerBag = players.getFirst().getCurrentDraftBag();
         for (int i = 0; i < players.size() - 1; i++) {
             giveBagToPlayer(players.get(i + 1).getCurrentDraftBag(), players.get(i));
         }
-        giveBagToPlayer(firstPlayerBag, players.get(players.size() - 1));
+        giveBagToPlayer(firstPlayerBag, players.getLast());
     }
 
     public void giveBagToPlayer(DraftBag bag, Player player) {
@@ -81,7 +80,7 @@ public abstract class BagDraft {
         }
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
-            player.getRepresentation(true, true) + " you have been passed a new draft bag!",
+            player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
             Buttons.gray(FrankenDraftHelper.ActionName + "show_bag", "Click here to show your current bag"));
     }
 
@@ -100,7 +99,7 @@ public abstract class BagDraft {
 
     public void setPlayerReadyToPass(Player player, boolean ready) {
         if (ready && !player.isReadyToPassBag()) {
-            player.setReadyToPassBag(ready);
+            player.setReadyToPassBag(true);
             FrankenDraftHelper.updateDraftStatusMessage(owner);
         }
         player.setReadyToPassBag(ready);

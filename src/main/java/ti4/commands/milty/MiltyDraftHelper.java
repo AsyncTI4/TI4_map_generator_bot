@@ -1,10 +1,6 @@
 package ti4.commands.milty;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,7 +67,7 @@ public class MiltyDraftHelper {
         int deltaX = 0;
         int deltaY = 0;
 
-        String desc = "";
+        StringBuilder desc = new StringBuilder();
         for (MiltyDraftSlice slice : slices) {
             Player playerPicked = game.getPlayers().values().stream()
                 .filter(player -> manager.getPlayerDraft(player) != null)
@@ -98,12 +94,12 @@ public class MiltyDraftHelper {
                 deltaX = 0;
             }
 
-            if (!desc.isBlank()) desc += ";\n";
-            desc += slice.ttsString();
+            if (!desc.toString().isBlank()) desc.append(";\n");
+            desc.append(slice.ttsString());
         }
 
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(mainImage, 1.0f, game.getName() + "_miltydraft", false);
-        fileUpload.setDescription(desc);
+        FileUpload fileUpload = MapGenerator.createFileUpload(mainImage, 1.0f, game.getName() + "_miltydraft");
+        fileUpload.setDescription(desc.toString());
         return fileUpload;
     }
 
@@ -113,13 +109,13 @@ public class MiltyDraftHelper {
     private static BufferedImage partialSliceImage(MiltyDraftSlice slice, MapTemplateModel template, boolean taken) {
         List<Point> tilePositions = template.tileDisplayCoords();
         int imageSize = template.squareSliceImageSize();
-        Point hs = tilePositions.get(0);
+        Point hs = tilePositions.getFirst();
 
         List<String> tileStrings = new ArrayList<>();
         tileStrings.add(ResourceHelper.getInstance().getTileFile("00_green.png"));
         tileStrings.addAll(slice.getTiles().stream().map(t -> t.getTile().getTilePath()).toList());
 
-        String fow = slice.getTiles().get(0).getTile().getFowTilePath(null);
+        String fow = slice.getTiles().getFirst().getTile().getFowTilePath(null);
         BufferedImage fogFilter = ImageHelper.read(fow);
 
         BufferedImage sliceImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
@@ -209,7 +205,7 @@ public class MiltyDraftHelper {
     private static BufferedImage sliceImageWithPlayerInfo(MiltyDraftSlice slice, MiltyDraftManager manager, Player player) {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
         List<Point> tilePositions = mapTemplate.tileDisplayCoords();
-        Point hs = tilePositions.get(0);
+        Point hs = tilePositions.getFirst();
 
         BufferedImage sliceImage = partialSliceImage(slice, mapTemplate, player != null);
         Graphics graphics = sliceImage.getGraphics();
@@ -281,8 +277,7 @@ public class MiltyDraftHelper {
                 }
             }
 
-            boolean sourceAllowed = false;
-            if (sources.contains(tileModel.getSource())) sourceAllowed = true;
+            boolean sourceAllowed = sources.contains(tileModel.getSource());
 
             // leaving these as a stop-gap for now until I can verify all sources are setup
             if (tileID.length() <= 2) sourceAllowed = true;

@@ -1,10 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,6 +9,11 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class BothelperCommand implements Command {
 
@@ -78,7 +78,6 @@ public class BothelperCommand implements Command {
         subcommands.add(new JazzCommand());
         subcommands.add(new ListButtons());
         subcommands.add(new ListSlashCommandsUsed());
-        subcommands.add(new SendJsonToS3());
         subcommands.add(new ServerGameStats());
         subcommands.add(new ListDeadGames());
         subcommands.add(new RemoveTitle());

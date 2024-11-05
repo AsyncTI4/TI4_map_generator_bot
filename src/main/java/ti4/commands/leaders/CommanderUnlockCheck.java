@@ -1,6 +1,5 @@
 package ti4.commands.leaders;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -17,6 +16,7 @@ public class CommanderUnlockCheck {
 
     /**
      * Will run {@link CommanderUnlockCheck#checkPlayer()} on all players within the game
+     * 
      * @param game - the {@link Game} to check
      * @param factionToCheck - the factions of the leader to check the unlock conditions of
      */
@@ -24,14 +24,6 @@ public class CommanderUnlockCheck {
         for (Player player : game.getRealPlayers()) {
             checkPlayer(player, factionToCheck);
         }
-    }
-
-    /**
-     * @deprecated event and game aren't required but I'm too lazy to figure out the regex replace for it right now
-     */
-    @Deprecated
-    public static void checkPlayer(Player player, Game game, String factionToCheck, GenericInteractionCreateEvent event) {
-        checkPlayer(player, factionToCheck);
     }
 
     /**
@@ -163,7 +155,7 @@ public class CommanderUnlockCheck {
                 }
             }
             case "edyn" -> {
-                if (game.getLaws().size() > 0) {
+                if (!game.getLaws().isEmpty()) {
                     shouldBeUnlocked = true;
                 }
             }

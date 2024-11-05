@@ -1,19 +1,13 @@
 package ti4.helpers;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
-
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Rectangle;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,10 +20,16 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import javax.imageio.ImageIO;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.generator.MapGenerator;
+import ti4.helpers.Emojis.TI4Emoji;
 import ti4.message.BotLogger;
 
 public class ImageHelper {
@@ -71,14 +71,6 @@ public class ImageHelper {
     }
 
     @Nullable
-    public static BufferedImage readURL(String imageURL) {
-        if (imageURL == null) {
-            return null;
-        }
-        return getOrLoadExpiringImage(imageURL, k -> readImageURL(imageURL));
-    }
-
-    @Nullable
     public static BufferedImage readScaled(String filePath, float percent) {
         if (filePath == null) {
             return null;
@@ -107,6 +99,13 @@ public class ImageHelper {
             }
             return scale(image, width, height);
         });
+    }
+
+    @Nullable
+    public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
+        if (emoji.asEmoji() instanceof CustomEmoji e)
+            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
+        return null;
     }
 
     @Nullable
@@ -141,7 +140,7 @@ public class ImageHelper {
             return null;
         }
         return getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
-            BufferedImage image = readURL(imageURL);
+            BufferedImage image = readImageURL(imageURL);
             if (image == null) {
                 return null;
             }
@@ -221,7 +220,11 @@ public class ImageHelper {
         return null;
     }
 
+    @Nullable
     private static BufferedImage readImageURL(String imageURL) {
+        if (imageURL == null) {
+            return null;
+        }
         ImageIO.setUseCache(false);
         try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
             return readImage(inputStream);
@@ -268,5 +271,27 @@ public class ImageHelper {
 
     private static String formatPercent(double d) {
         return percentFormatter.get().format(d);
+    }
+
+    public static String writeWebpOrDefaultTo(BufferedImage image, ByteArrayOutputStream out, String defaultFormat) throws IOException {
+        // max webp dimensions are 16383 x 16383
+        if (image.getHeight() > 16383 || image.getWidth() > 16383) {
+            writeCompressedFormat(image, out, defaultFormat, 0.1f);
+            return defaultFormat;
+        } else {
+            ImageIO.write(image, "webp", out);
+            return "webp";
+        }
+    }
+
+    public static void writeCompressedFormat(BufferedImage image, ByteArrayOutputStream out, String format, float compressionQuality) throws IOException {
+        ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(format).next();
+        imageWriter.setOutput(ImageIO.createImageOutputStream(out));
+        ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
+        if (defaultWriteParam.canWriteCompressed()) {
+            defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            defaultWriteParam.setCompressionQuality(compressionQuality);
+        }
+        imageWriter.write(null, new IIOImage(image, null, null), defaultWriteParam);
     }
 }

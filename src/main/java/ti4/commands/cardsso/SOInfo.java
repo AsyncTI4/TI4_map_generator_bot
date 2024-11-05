@@ -3,10 +3,9 @@ package ti4.commands.cardsso;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import java.util.Map;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -18,6 +17,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -46,19 +46,20 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, SlashCommandInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used `" + event.getCommandString() + "`";
+        String headerText = player.getRepresentationUnfogged() + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation(true, true) + " used something";
+        String headerText = player.getRepresentationUnfogged() + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendSecretObjectiveInfo(game, player);
     }
 
+    @ButtonHandler("refreshSOInfo")
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
-        String headerText = player.getRepresentation(true, true) + " pressed button: " + event.getButton().getLabel();
+        String headerText = player.getRepresentationUnfogged() + " pressed button: " + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendSecretObjectiveInfo(game, player);
     }
@@ -124,7 +125,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         int index = 1;
 
         //SCORED SECRET OBJECTIVES
-        sb.append("**Scored Secret Objectives (" + player.getSoScored() + "/" + player.getMaxSOCount() + "):**").append("\n");
+        sb.append("**Scored Secret Objectives (").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("):**").append("\n");
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
@@ -148,7 +149,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
 
                     if (ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) > 0) {
                         sb.append(getSecretObjectiveRepresentationNoNewLine(so.getKey()));
-                        sb.append(" (" + ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game) + ")\n");
+                        sb.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(so.getKey(), game)).append(")\n");
                     } else {
                         sb.append(getSecretObjectiveRepresentation(so.getKey()));
                     }
@@ -168,7 +169,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName, Emojis.SecretObjective));
                 }
             }
         }
@@ -203,7 +204,7 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.red("SODISCARD_" + idValue + suffix, "(" + idValue + ") " + soName, Emojis.SecretObjective));
+                    soButtons.add(Buttons.red("discardSecret_" + idValue + suffix, "(" + idValue + ") " + soName, Emojis.SecretObjective));
                 }
             }
         }

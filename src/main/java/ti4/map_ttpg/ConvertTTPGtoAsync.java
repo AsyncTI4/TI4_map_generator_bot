@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -103,7 +102,7 @@ public class ConvertTTPGtoAsync {
 
     public static final Map<String, String> fakePlayers = new HashMap<>() {
         {
-            put(Constants.prisonerOneID, "PrisonerOne");
+            put(Constants.prisonerOneId, "PrisonerOne");
             put(Constants.tspId, "Holytispoon");
             put("947763140517560331", "TI4 Game Management");
             put("235148962103951360", "Carl-bot");
@@ -160,7 +159,7 @@ public class ConvertTTPGtoAsync {
         Mapper.init();
         Game asyncGame = new Game() {
             {
-                setOwnerID(Constants.prisonerOneID);
+                setOwnerID(Constants.prisonerOneId);
                 setOwnerName("PrisonerOne");
                 setPlayerCountForMap(ttpgMap.getPlayers().size());
                 setVp(ttpgMap.getScoreboard());
@@ -222,11 +221,11 @@ public class ConvertTTPGtoAsync {
 
             //PLAYER STRATEGY CARDS
             if (!ttpgPlayer.getStrategyCards().isEmpty()) {
-                String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
+                String ttpgSC = (String) ttpgPlayer.getStrategyCards().getFirst();
                 if (Objects.nonNull(ttpgSC)) asyncPlayer.addSC(Helper.getSCNumber(ttpgSC));
             }
             if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
-                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
+                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().getFirst();
                 if (Objects.nonNull(ttpgSCplayed)) asyncGame.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
             }
 
@@ -370,7 +369,7 @@ public class ConvertTTPGtoAsync {
         String[] hexSummary = ttpgMap.getHexSummary().split(",");
         for (String hex : hexSummary) {
             System.out.println("Hex: " + hex);
-            if (hex.length() > 0) {
+            if (!hex.isEmpty()) {
                 Tile tile = ConvertTTPGHexToAsyncTile(asyncGame, hex);
                 if (tile != null) {
                     asyncGame.setTile(tile);
@@ -654,7 +653,6 @@ public class ConvertTTPGtoAsync {
                         if (Constants.MIRAGE.equalsIgnoreCase(attachmentResolved)) {
                             Helper.addMirageToTile(tile);
                             tile.addToken(tokenFileName, Constants.SPACE);
-                            // asyncMap.clearPlanetsCache();
                         }
                     } else {
                         System.out.println("                character not recognized:  " + attachment);
@@ -683,7 +681,7 @@ public class ConvertTTPGtoAsync {
                     regionCount = Integer.valueOf(str);
 
                 } else if (Character.isLowerCase(chr) && validUnits.contains(str)) { // is a unit, control_token, or CC
-                    if (!"".equals(color)) { //color hasn't shown up yet, so probably just tokens in space, skip unit crap
+                    if (!color.isEmpty()) { //color hasn't shown up yet, so probably just tokens in space, skip unit crap
                         if ("t".equals(str)) { //CC
                             tile.addCC(Mapper.getCCID(color));
                         } else if ("o".equals(str)) { //control_token

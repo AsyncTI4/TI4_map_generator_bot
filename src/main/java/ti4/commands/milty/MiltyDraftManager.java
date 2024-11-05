@@ -8,15 +8,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -26,6 +23,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.map.AddTileList;
 import ti4.commands.player.Setup;
@@ -378,6 +377,8 @@ public class MiltyDraftManager {
         clearOldPing(game);
         setNextPlayerInDraft();
         if (draftIndex < draftOrder.size()) {
+            game.updateActivePlayer(getCurrentDraftPlayer(game));
+
             // Check if the next player only has one option to pick
             String fauxPlayerPick = null;
             Player nextDrafter = getCurrentDraftPlayer(game);
@@ -398,11 +399,12 @@ public class MiltyDraftManager {
         } else {
             MessageHelper.sendMessageToChannel(mainGameChannel, game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
             finishDraft(game, event);
+            game.updateActivePlayer(null);
         }
     }
 
     private String getAutoButtonID(Game game, Player player, List<Button> buttons) {
-        if (buttons.size() == 1) return buttons.get(0).getId().replaceFirst("milty_", "miltyAuto_");
+        if (buttons.size() == 1) return buttons.getFirst().getId().replaceFirst("milty_", "miltyAuto_");
         return null;
     }
 
@@ -424,12 +426,9 @@ public class MiltyDraftManager {
 
                 if (faction.startsWith("keleres")) {
                     keleresExists = true;
-                    Set<String> allowed = new HashSet<>();
-                    allowed.addAll(Set.of("mentak", "xxcha", "argent"));
+                    Set<String> allowed = new HashSet<>(Set.of("mentak", "xxcha", "argent"));
                     for (PlayerDraft pd : getDraft().values()) {
-                        if (allowed.contains(pd.faction)) {
-                            allowed.remove(pd.faction);
-                        }
+                        allowed.remove(pd.faction);
                     }
                     List<Button> buttons = new ArrayList<>();
                     String message = player.getPing() + " choose a flavor of keleres:";
@@ -446,20 +445,21 @@ public class MiltyDraftManager {
                     Setup.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
                 }
             }
+            game.setPhaseOfGame("playerSetup");
             AddTileList.finishSetup(game, event);
             if (keleresExists) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " be sure to wait for keleres to get set up before dealing out secrets.");
             }
         } catch (Exception e) {
-            String error = "Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ";
+            StringBuilder error = new StringBuilder("Something went wrong and the map could not be built automatically. Here are the slice strings if you want to try doing it manually: ");
             List<PlayerDraft> speakerOrdered = getDraft().values().stream()
                 .sorted(Comparator.comparing(PlayerDraft::getPosition))
                 .toList();
             int index = 1;
             for (PlayerDraft d : speakerOrdered) {
-                error += "\n" + index + ". " + d.getSlice().ttsString();
+                error.append("\n").append(index).append(". ").append(d.getSlice().ttsString());
             }
-            MessageHelper.sendMessageToChannel(mainGameChannel, error);
+            MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
             BotLogger.log(e.getMessage(), e);
         }
     }
@@ -507,9 +507,7 @@ public class MiltyDraftManager {
         String pingMsg = prevPingMessage;
         if (pingMsg == null) return;
         try {
-            game.getMainGameChannel().retrieveMessageById(pingMsg).queue(m -> {
-                m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-            }, BotLogger::catchRestError);
+            game.getMainGameChannel().retrieveMessageById(pingMsg).queue(m -> m.delete().queue(Consumers.nop(), BotLogger::catchRestError), BotLogger::catchRestError);
         } catch (Exception e) {
             BotLogger.log("Unable to clear out old buttons and messages.", e);
         }
@@ -551,7 +549,7 @@ public class MiltyDraftManager {
         for (MiltyDraftSlice slice : getSlices()) {
             if (isSliceTaken(slice.getName())) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getMiltyDraftEmoji(slice.getName()));
-            Button button = Buttons.green("milty_slice_" + slice.getName(), " ",  emoji.getFormatted());
+            Button button = Buttons.green("milty_slice_" + slice.getName(), " ", emoji.getFormatted());
             sliceButtons.add(button);
         }
         return sliceButtons;
@@ -578,7 +576,7 @@ public class MiltyDraftManager {
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
             Emoji emoji = Emoji.fromFormatted(Emojis.getSpeakerPickEmoji(speakerOrder));
-            Button button = Buttons.green("milty_order_" + speakerOrder, " ",  emoji.getFormatted());
+            Button button = Buttons.green("milty_order_" + speakerOrder, " ", emoji.getFormatted());
             orderButtons.add(button);
         }
         return orderButtons;
@@ -659,7 +657,7 @@ public class MiltyDraftManager {
         List<LayoutComponent> newComponents = new ArrayList<>();
         if (newButtons != null) {
             List<List<Button>> partitioned = new ArrayList<>(ListUtils.partition(newButtons, 5));
-            List<ActionRow> newRows = partitioned.stream().map(ls -> ActionRow.of(ls)).toList();
+            List<ActionRow> newRows = partitioned.stream().map(ActionRow::of).toList();
             newComponents.addAll(newRows);
         }
 
@@ -676,7 +674,7 @@ public class MiltyDraftManager {
     //SAVE AND LOAD
     public String superSaveMessage() {
         try {
-            String sliceStr = String.join(";", slices.stream().map(s -> s.ttsString()).toList());
+            String sliceStr = String.join(";", slices.stream().map(MiltyDraftSlice::ttsString).toList());
             String factionStr = String.join(",", factionDraft);
             String playerStr = String.join(",", players);
             String picksStr = String.join(";", players.stream().map(p -> getPlayerDraft(p).save()).toList());
@@ -776,7 +774,7 @@ public class MiltyDraftManager {
 
     private void loadSliceFromString(String str, int index) {
         List<String> tiles = Arrays.asList(str.split(","));
-        List<MiltyDraftTile> draftTiles = tiles.stream().map(t -> findTile(t)).toList();
+        List<MiltyDraftTile> draftTiles = tiles.stream().map(this::findTile).toList();
         MiltyDraftSlice slice = new MiltyDraftSlice();
         slice.setTiles(draftTiles);
         slice.setName(Character.toString(index - 1 + 'A'));
@@ -788,10 +786,9 @@ public class MiltyDraftManager {
         result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElse(null);
         if (result == null) {
             TileModel tileRequested = TileHelper.getTile(tileId);
-            Set<ComponentSource> currentsources = new HashSet<>(all.stream()
-                .map(t -> t.getTile().getTileModel().getSource())
-                .filter(x -> x != null)
-                .collect(Collectors.toSet()));
+            Set<ComponentSource> currentsources = all.stream()
+                    .map(t -> t.getTile().getTileModel().getSource())
+                    .filter(Objects::nonNull).collect(Collectors.toSet());
             if (tileRequested.getSource() != null) currentsources.add(tileRequested.getSource());
             if (tileId.matches("d\\d{1,3}")) currentsources.add(ComponentSource.uncharted_space);
             if (tileId.matches("e\\d{1,3}")) currentsources.add(ComponentSource.eronous);

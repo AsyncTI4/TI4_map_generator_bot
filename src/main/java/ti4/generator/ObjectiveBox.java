@@ -24,7 +24,7 @@ public class ObjectiveBox {
 	private static final Color Stage2HiddenColor = new Color(30, 60, 128);
 
 	private int x;
-	private int y;
+	private final int y;
 	private final int boxWidth;
 	private final int maxTextWidth;
 	private final int scoreTokenWidth;
@@ -42,6 +42,9 @@ public class ObjectiveBox {
 
 		graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
 		graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+		if (objective.revealed()) {
+			game.addWebsiteOverlay("objective", objective.key(), x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+		}
 
 		x += maxTextWidth + bufferBetweenTextAndTokens;
 		displayScoreMarkers(game, graphics, generator, objective);
@@ -84,7 +87,7 @@ public class ObjectiveBox {
 			for (String playerID : playerIDs) {
 				Player player = game.getPlayer(playerID);
 				if (player == null) continue;
-				
+
 				boolean convertToGeneric = generator.shouldConvertToGeneric(player);
 				String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 

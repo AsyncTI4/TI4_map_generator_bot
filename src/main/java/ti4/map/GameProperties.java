@@ -1,11 +1,15 @@
 package ti4.map;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
+import ti4.website.WebsiteOverlay;
 
 @Getter
 @Setter
@@ -23,6 +27,7 @@ public class GameProperties {
     private @ExportableField int strategyCardsPerPlayer = 1;
     private @ExportableField int round = 1;
     private @ExportableField int vp = 10;
+    private @ExportableField long startedDate;
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
@@ -57,12 +62,16 @@ public class GameProperties {
     private boolean justPlayedComponentAC;
     private boolean hasHackElectionBeenPlayed;
 
+    // Website Overlays
+    private Map<String, WebsiteOverlay> websiteOverlays; // ID, WebsiteOverlay
+
     // Aggregate Game Stats
     private @ExportableField int activationCount;
     private @ExportableField int buttonPressCount;
     private @ExportableField int mapImageGenerationCount;
     private @ExportableField int numberOfPurgedFragments;
     private @ExportableField int pingSystemCounter;
+    private Map<Timestamp, GameStatsDashboardPayload> historicalGameStatsDashboardPayloads = new LinkedHashMap<>();
 
     // Customization Flags/Settings
     private boolean botFactionReacts;
@@ -85,7 +94,7 @@ public class GameProperties {
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private long autoPingSpacer;
-    private List<String> tags = new ArrayList<String>();
+    private List<String> tags = new ArrayList<>();
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
@@ -108,12 +117,12 @@ public class GameProperties {
     private @ExportableField boolean spinMode;
     private @ExportableField boolean fastSCFollowMode;
     private @ExportableField boolean extraSecretMode;
-    private @ExportableField boolean cryypterMode;
+    private @ExportableField boolean votcMode;
     private @ExportableField boolean reverseSpeakerOrder;
 
     // Discord Snowflakes
     private @ExportableField String guildID;
-    private String speaker = "";
+    private String speakerUserID = "";
     private String activePlayerID;
     private String launchPostThreadID;
     private @ExportableField String botMapUpdatesThreadID;
@@ -125,6 +134,7 @@ public class GameProperties {
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
     private String latestUpNextMsg = "";
+    private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below
     private @ExportableField String mapString;
@@ -133,6 +143,10 @@ public class GameProperties {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private List<String> agendas;
-    private List<String> events;
+    private List<String> events; // ignis_aurora
 
+    // Misc Helpers
+    public String getID() {
+        return getName();
+    }
 }

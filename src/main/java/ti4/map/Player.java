@@ -15,17 +15,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -39,9 +34,14 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.commands.player.ChangeColor;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.user.UserSettings;
@@ -519,6 +519,11 @@ public class Player {
         return bagInfoThreadID;
     }
 
+    public String finChecker() {
+        return getFinsFactionCheckerPrefix();
+    }
+
+    @JsonIgnore
     public String getFinsFactionCheckerPrefix() {
         return "FFCC_" + getFaction() + "_";
     }
@@ -619,7 +624,7 @@ public class Player {
         try {
             String cardsInfoThreadID = getCardsInfoThreadID();
             boolean hasCardsInfoThreadId = cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !"null".equals(cardsInfoThreadID);
-            if (hasCardsInfoThreadId) {
+            if (cardsInfoThreadID != null && hasCardsInfoThreadId) {
                 ThreadChannel threadChannel = actionsChannel.getGuild().getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null)
                     return threadChannel;
@@ -852,6 +857,10 @@ public class Player {
         return promissoryNotes;
     }
 
+    public boolean hasPlayablePromissoryInHand(String pn) {
+        return getPromissoryNotes().containsKey(pn) && !getPromissoryNotesOwned().contains(pn);
+    }
+
     public List<String> getPromissoryNotesInPlayArea() {
         return promissoryNotesInPlayArea;
     }
@@ -864,10 +873,8 @@ public class Player {
             return true;
         } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
             return true;
-        } else if (getGame().getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction())) {
-            return true;
-        }
-        return false;
+        } else
+            return getGame().getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction());
     }
 
     public Set<String> getUnitsOwned() {
@@ -876,9 +883,9 @@ public class Player {
 
     @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
-        return unitsOwned.stream()
-            .filter(u -> Mapper.getUnit(u).getFaction().isPresent())
-            .collect(Collectors.toSet());
+        Set<String> specialUnits = unitsOwned.stream()
+            .filter(u -> Mapper.getUnit(u).getFaction().isPresent()).collect(Collectors.toSet());
+        return specialUnits;
     }
 
     public boolean hasUnit(String unit) {
@@ -944,18 +951,16 @@ public class Player {
             return null;
         }
         if (allUnits.size() == 1) {
-            return allUnits.get(0);
+            return allUnits.getFirst();
         }
-        allUnits.sort((d1, d2) -> GetUnitModelPriority(d2, unitHolder) - GetUnitModelPriority(d1, unitHolder));
+        allUnits.sort((d1, d2) -> getUnitModelPriority(d2, unitHolder) - getUnitModelPriority(d1, unitHolder));
 
-        return allUnits.get(0);
+        return allUnits.getFirst();
     }
 
-    private Integer GetUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
+    private Integer getUnitModelPriority(UnitModel unit, UnitHolder unitHolder) {
         int score = 0;
-
-        if (StringUtils.isNotBlank(unit.getFaction().orElse(""))
-            && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse("")))
+        if (StringUtils.isNotBlank(unit.getFaction().orElse("")) && StringUtils.isNotBlank(unit.getUpgradesFromUnitId().orElse("")))
             score += 4;
         if (StringUtils.isNotBlank(unit.getFaction().orElse("")))
             score += 3;
@@ -988,7 +993,7 @@ public class Player {
     }
 
     @JsonIgnore
-    public Map<String, Integer> getUnitsOwnedByBaseType() {
+    private Map<String, Integer> getUnitsOwnedByBaseType() {
         Map<String, Integer> unitCount = new HashMap<>();
         for (String unitID : getUnitsOwned()) {
             UnitModel unitModel = Mapper.getUnit(unitID);
@@ -1182,6 +1187,9 @@ public class Player {
         return Mapper.getSecretObjective(idToRemove);
     }
 
+    /**
+     * @return Map of (SecretObjectiveModel ID, Random Number ID)
+     */
     public Map<String, Integer> getSecretsScored() {
         return secretsScored;
     }
@@ -1427,14 +1435,36 @@ public class Player {
         initAbilities();
     }
 
+    /**
+     * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName]
+     */
     @JsonIgnore
     public String getRepresentation() {
         return getRepresentation(false, true);
     }
 
+    /**
+     * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name)
+     */
+    @JsonIgnore
+    public String getRepresentationUnfogged() {
+        return getRepresentation(true, true);
+    }
+
+    /**
+     * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] or for Fog of War: [ColorEmoji][ColorName] - won't ping player
+     */
     @JsonIgnore
     public String getRepresentationNoPing() {
         return getRepresentation(false, false);
+    }
+
+    /**
+     * @return [FactionEmoji][PlayerName][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name) - won't ping player
+     */
+    @JsonIgnore
+    public String getRepresentationUnfoggedNoPing() {
+        return getRepresentation(true, false);
     }
 
     @JsonIgnore
@@ -1512,9 +1542,9 @@ public class Player {
 
         StringBuilder sb = new StringBuilder(userById.getAsMention());
         switch (getUserID()) {
-            case "154000388121559040" -> sb.append(Emojis.BortWindow); // mysonisalsonamedbort
-            case "150809002974904321" -> sb.append(Emojis.SpoonAbides); // tispoon
-            case "228999251328368640" -> sb.append(Emojis.Scout); // Jazzx
+            case Constants.bortId -> sb.append(Emojis.BortWindow); // mysonisalsonamedbort
+            case Constants.tspId -> sb.append(Emojis.SpoonAbides); // tispoon
+            case Constants.jazzId -> sb.append(Emojis.Scout); // Jazzx
         }
         return sb.toString();
     }
@@ -1529,6 +1559,13 @@ public class Player {
             emoji = getFactionModel().getFactionEmoji();
         }
         return emoji != null ? emoji : Emojis.getFactionIconFromDiscord(faction);
+    }
+
+    @JsonIgnore
+    public String fogSafeEmoji() {
+        if (getGame() != null && getGame().isFowMode())
+            return Emojis.getColorEmoji(getColor());
+        return getFactionEmoji();
     }
 
     @JsonIgnore
@@ -1622,7 +1659,7 @@ public class Player {
     }
 
     public boolean isAFK() {
-        if (getHoursThatPlayerIsAFK().length() < 1) {
+        if (getHoursThatPlayerIsAFK().isEmpty()) {
             return false;
         }
         String[] hoursAFK = getHoursThatPlayerIsAFK().split(";");
@@ -1656,7 +1693,7 @@ public class Player {
 
     public Optional<Leader> getLeaderByID(String leaderID) {
         for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID)) {
+            if (leader.getId().equalsIgnoreCase(leaderID)) {
                 return Optional.of(leader);
             }
         }
@@ -1756,7 +1793,7 @@ public class Player {
     }
 
     public void addHourThatIsAFK(String hour) {
-        if (hoursThatPlayerIsAFK.length() < 1) {
+        if (hoursThatPlayerIsAFK.isEmpty()) {
             hoursThatPlayerIsAFK = hour;
         } else {
             hoursThatPlayerIsAFK = hoursThatPlayerIsAFK + ";" + hour;
@@ -1784,12 +1821,6 @@ public class Player {
     public void removeAllianceMember(String color) {
         if (!"null".equals(color)) {
             allianceMembers = allianceMembers.replace(color, "");
-        }
-    }
-
-    public void changeColor(String color) {
-        if (!"null".equals(color)) {
-            this.color = AliasHandler.resolveColor(color);
         }
     }
 
@@ -2048,7 +2079,6 @@ public class Player {
 
     public void setSCs(Set<Integer> SCs) {
         this.SCs = new LinkedHashSet<>(SCs);
-        this.SCs.remove(0); // TEMPORARY MIGRATION TO REMOVE 0 IF PLAYER HAS IT FROM OLD SAVES
     }
 
     public void addSC(int sc) {
@@ -2144,14 +2174,14 @@ public class Player {
         return techs.contains(techID);
     }
 
+    public boolean hasTechReady(String techID) {
+        return hasTech(techID) && !exhaustedTechs.contains(techID);
+    }
+
     public boolean controlsMecatol(boolean includeAlliance) {
         if (includeAlliance)
             return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
         return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);
-    }
-
-    public boolean hasTechReady(String techID) {
-        return hasTech(techID) && !exhaustedTechs.contains(techID);
     }
 
     public List<String> getPlanets() {
@@ -2326,7 +2356,7 @@ public class Player {
             exhaustPlanet("custodiavigilia");
 
             if (getPlanets().contains(Constants.MR)) {
-                Planet mecatolRex = (Planet) getGame().getPlanetsInfo().get(Constants.MR);
+                Planet mecatolRex = getGame().getPlanetsInfo().get(Constants.MR);
                 if (mecatolRex != null) {
                     PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
                     mecatolRex.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
@@ -2363,7 +2393,7 @@ public class Player {
         if ("iihq".equalsIgnoreCase(techID)) {
             removePlanet("custodiavigilia");
             if (getPlanets().contains(Constants.MR)) {
-                Planet mecatolRex = (Planet) getGame().getPlanetsInfo().get(Constants.MR);
+                Planet mecatolRex = getGame().getPlanetsInfo().get(Constants.MR);
                 if (mecatolRex != null) {
                     mecatolRex.setSpaceCannonDieCount(0);
                     mecatolRex.setSpaceCannonHitsOn(0);
@@ -2373,7 +2403,7 @@ public class Player {
 
         // Update Owned Units when Researching a Unit Upgrade
         TechnologyModel techModel = Mapper.getTech(techID);
-        if (techID == null)
+        if (techID == null || techModel == null)
             return;
 
         if (techModel.isUnitUpgrade()) {
@@ -2397,7 +2427,7 @@ public class Player {
                     .map(UnitModel::getId)
                     .filter(id -> id.contains(unitModel.getBaseType())).findFirst()
                     .orElse(replacementUnit);
-            } else if (relevantTechs.size() > 0) {
+            } else if (!relevantTechs.isEmpty()) {
                 // Ignore the case where there's multiple faction techs and also
                 replacementUnit = relevantTechs.stream().min(TechnologyModel::sortFactionTechsFirst)
                     .map(TechnologyModel::getAlias)
@@ -2527,7 +2557,7 @@ public class Player {
 
     public void addFogTile(String tileID, String position, String label) {
         fow_seenTiles.put(position, tileID);
-        if (label != null && !".".equals(label) && !"".equals(label)) {
+        if (label != null && !".".equals(label) && !label.isEmpty()) {
             fow_customLabels.put(position, label);
         }
     }
@@ -2826,6 +2856,10 @@ public class Player {
         return adjacentPlayers;
     }
 
+    public boolean isNeighboursWith(Player player) {
+        return getNeighbouringPlayers().contains(player);
+    }
+
     @JsonIgnore
     public int getNeighbourCount() {
         return getNeighbouringPlayers().size();
@@ -2933,10 +2967,17 @@ public class Player {
         if (getColor() != null && !getColor().equals("null")) {
             return getColor();
         }
+        return getNextAvailableColorIgnoreCurrent();
+    }
+
+    @JsonIgnore
+    public String getNextAvailableColorIgnoreCurrent() {
+        Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
         String color = getPreferredColours().stream()
             .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
+            .filter(c -> !ChangeColor.colorIsExclusive(c, this))
             .findFirst()
-            .orElse(getGame().getUnusedColors().stream().findFirst().map(ColorModel::getName).orElse(null));
+            .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
     }
 
@@ -2957,7 +2998,7 @@ public class Player {
 
     @JsonIgnore
     public boolean isSpeaker() {
-        return getGame().getSpeaker().equals(getUserID());
+        return getGame().getSpeakerUserID().equals(getUserID());
     }
 
     /**
@@ -2971,6 +3012,17 @@ public class Player {
         } else {
             return getGame().getMainGameChannel();
         }
+    }
+
+    public String bannerName() {
+        String name = Mapper.getFaction(getFaction()).getFactionName().toUpperCase();
+        if (name.contains("KELERES")) {
+            return "THE COUNCIL KELERES";
+        }
+        if (name.contains("FRANKEN") && getDisplayName() != null && !getDisplayName().isEmpty() && !getDisplayName().equalsIgnoreCase("null")) {
+            return getDisplayName().toUpperCase();
+        }
+        return name;
     }
 
     public String getFlexibleDisplayName() {
@@ -3001,10 +3053,9 @@ public class Player {
         // }
 
         // DESCRIPTION
-        StringBuilder desc = new StringBuilder();
-        desc.append(Emojis.getColorEmojiWithName(getColor()));
-        desc.append("\n").append(StringUtils.repeat(Emojis.comm, getCommoditiesTotal()));
-        eb.setDescription(desc.toString());
+        String desc = Emojis.getColorEmojiWithName(getColor()) +
+            "\n" + StringUtils.repeat(Emojis.comm, getCommoditiesTotal());
+        eb.setDescription(desc);
 
         // FIELDS
         // Abilities
@@ -3059,8 +3110,7 @@ public class Player {
         eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
 
         // FOOTER
-        StringBuilder foot = new StringBuilder();
-        eb.setFooter(foot.toString());
+        eb.setFooter("");
 
         eb.setColor(Mapper.getColor(color).primaryColor());
         return eb.build();
@@ -3083,7 +3133,7 @@ public class Player {
             if (ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship).isEmpty()) {
                 return null;
             }
-            return ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship).get(0);
+            return ButtonHelper.getTilesOfPlayersSpecificUnits(game, this, UnitType.Flagship).getFirst();
         }
         if (!faction.contains("franken") && game.getTile(AliasHandler.resolveTile(faction)) != null) {
             return game.getTile(AliasHandler.resolveTile(faction));
@@ -3112,5 +3162,17 @@ public class Player {
 
     public void checkCommanderUnlock(String factionToCheck) {
         CommanderUnlockCheck.checkPlayer(this, factionToCheck);
+    }
+
+    @JsonIgnore
+    public List<Player> getOtherRealPlayers() {
+        return getGame().getRealPlayers().stream()
+            .filter(p -> !p.equals(this))
+            .toList();
+    }
+
+    @JsonIgnore
+    public boolean isActivePlayer() {
+        return this.equals(getGame().getActivePlayer());
     }
 }

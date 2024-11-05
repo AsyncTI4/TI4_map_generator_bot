@@ -15,6 +15,7 @@ import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -40,6 +41,16 @@ public class UnitInfo extends PlayerSubcommandData {
         sendUnitInfo(game, player, event, showAllUnits);
     }
 
+    @ButtonHandler(Constants.REFRESH_UNIT_INFO)
+    public static void sendUnitInfoSpecial(Game game, Player player, GenericInteractionCreateEvent event) {
+        sendUnitInfo(game, player, event, false);
+    }
+
+    @ButtonHandler(Constants.REFRESH_ALL_UNIT_INFO)
+    public static void sendUnitInfoAll(Game game, Player player, GenericInteractionCreateEvent event) {
+        sendUnitInfo(game, player, event, true);
+    }
+
     public static void sendUnitInfo(Game game, Player player, GenericInteractionCreateEvent event, boolean showAllUnits) {
         String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
@@ -61,7 +72,7 @@ public class UnitInfo extends PlayerSubcommandData {
         return buttons;
     }
 
-    private static List<MessageEmbed> getUnitMessageEmbeds(Player player, boolean includeAllUnits) {
+    public static List<MessageEmbed> getUnitMessageEmbeds(Player player, boolean includeAllUnits) {
         List<MessageEmbed> messageEmbeds = new ArrayList<>();
 
         List<String> unitList = new ArrayList<>();

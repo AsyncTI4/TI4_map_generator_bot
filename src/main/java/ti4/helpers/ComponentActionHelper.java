@@ -5,7 +5,6 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -34,7 +33,7 @@ import ti4.model.TechnologyModel;
 
 public class ComponentActionHelper {
 
-     public static List<Button> getAllPossibleCompButtons(Game game, Player p1, GenericInteractionCreateEvent event) {
+    public static List<Button> getAllPossibleCompButtons(Game game, Player p1, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
         String prefix = "componentActionRes_";
         List<Button> compButtons = new ArrayList<>();
@@ -48,13 +47,12 @@ public class ComponentActionHelper {
             String techEmoji = techRep.getCondensedReqsEmojis(true);
             String techText = techRep.getText();
 
-            if (techText.contains("ACTION") ||
-                ((tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det")) && game.isAgeOfExplorationMode())) {
+            boolean detAgeOfExp = (tech.equalsIgnoreCase("det") || tech.equalsIgnoreCase("absol_det")) && game.isAgeOfExplorationMode();
+            if (techText.contains("ACTION") || detAgeOfExp) {
                 if ("lgf".equals(tech) && !p1.controlsMecatol(false)) {
                     continue;
                 }
-                Button tButton = Buttons.red(finChecker + "exhaustTech_" + tech, "Exhaust " + techName)
-                    .withEmoji(Emoji.fromFormatted(techEmoji));
+                Button tButton = Buttons.red(finChecker + "exhaustTech_" + tech, "Exhaust " + techName, techEmoji);
                 compButtons.add(tButton);
             }
         }
@@ -64,21 +62,19 @@ public class ComponentActionHelper {
         }
 
         // Legendary Planets
-        // 1721048219
-        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1721048723431L)) > 0) {
-            List<String> implementedLegendaryPlanets = List.of("prism");
-            for (String planet : implementedLegendaryPlanets) {
-                String prettyPlanet = Mapper.getPlanet(planet).getName();
-                if (p1.getPlanets().contains(planet) && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
-                    compButtons.add(Buttons.green(finChecker + "planetAbilityExhaust_" + planet,
-                        "Use " + prettyPlanet + " Ability"));
-                }
+        List<String> implementedLegendaryPlanets = new ArrayList<>();
+        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1721048723431L)) > 0)
+            implementedLegendaryPlanets.add("prism");
+        for (String planet : implementedLegendaryPlanets) {
+            String prettyPlanet = Mapper.getPlanet(planet).getName();
+            if (p1.getPlanets().contains(planet) && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
+                compButtons.add(Buttons.green(finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
             }
         }
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {
-            if (!leader.isExhausted() && !leader.isLocked()) {
+            if (!leader.isExhausted() && !leader.isLocked() && !leader.isActive()) {
                 String leaderID = leader.getId();
 
                 LeaderModel leaderModel = Mapper.getLeader(leaderID);
@@ -94,93 +90,63 @@ public class ComponentActionHelper {
                     if (leaderName.contains("Ssruu")) {
                         String led = "muaatagent";
                         if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Button
-                                .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Muaat Agent")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Muaat Agent", factionEmoji);
                             compButtons.add(lButton);
                         }
                         led = "naaluagent";
                         if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Button
-                                .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Naalu Agent")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Naalu Agent", factionEmoji);
                             compButtons.add(lButton);
                         }
                         led = "arborecagent";
                         if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Button
-                                .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Arborec Agent")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Arborec Agent", factionEmoji);
                             compButtons.add(lButton);
                         }
                         led = "bentoragent";
                         if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Button
-                                .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Bentor Agent")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Bentor Agent", factionEmoji);
                             compButtons.add(lButton);
                         }
                         led = "kolumeagent";
                         if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Button
-                                .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Kolume Agent")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Kolume Agent", factionEmoji);
                             compButtons.add(lButton);
                         }
 
                         led = "axisagent";
                         if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Button
-                                .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Axis Agent")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Axis Agent", factionEmoji);
                             compButtons.add(lButton);
                         }
                         led = "xxchaagent";
                         if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Button
-                                .secondary(finChecker + prefix + "leader_" + led,
-                                    "Use " + leaderName + " as Xxcha Agent")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Xxcha Agent", factionEmoji);
                             compButtons.add(lButton);
                         }
                         led = "yssarilagent";
-                        Button lButton = Button
-                            .secondary(finChecker + prefix + "leader_" + led,
-                                "Use " + leaderName + " as Unimplemented Component Agent")
-                            .withEmoji(Emoji.fromFormatted(factionEmoji));
+                        Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Unimplemented Component Agent", factionEmoji);
                         compButtons.add(lButton);
                         if (ButtonHelperFactionSpecific.doesAnyoneElseHaveJr(game, p1)) {
-                            Button jrButton = Button
-                                .secondary(finChecker + "yssarilAgentAsJr",
-                                    "Use " + leaderName + " as JR-XS455-O")
-                                .withEmoji(Emoji.fromFormatted(factionEmoji));
+                            Button jrButton = Buttons.gray(finChecker + "yssarilAgentAsJr", "Use " + leaderName + " as JR-XS455-O", factionEmoji);
                             compButtons.add(jrButton);
                         }
 
                     } else {
-                        Button lButton = Button
-                            .secondary(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName)
-                            .withEmoji(Emoji.fromFormatted(factionEmoji));
+                        Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, factionEmoji);
                         compButtons.add(lButton);
                     }
 
                 } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
-                    && ButtonHelper.getTilesWithYourCC(p1, game, event).size() > 0) {
-                    Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use " + leaderName)
-                        .withEmoji(Emoji.fromFormatted(factionEmoji));
+                    && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
+                    Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use " + leaderName, factionEmoji);
                     compButtons.add(lButton);
                 }
             }
         }
 
         // Relics
-        boolean dontEnigTwice = true;
+        boolean enigmaticSeen = false;
         for (String relic : p1.getRelics()) {
             RelicModel relicData = Mapper.getRelic(relic);
             if (relicData == null) {
@@ -192,24 +158,22 @@ public class ComponentActionHelper {
                 && (relicData.getText().contains("Action:") || relicData.getText().contains("ACTION:"))) {
                 Button rButton;
                 if (relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE)) {
-                    if (!dontEnigTwice) {
+                    if (enigmaticSeen) {
                         continue;
                     }
                     rButton = Buttons.red(finChecker + prefix + "relic_" + relic, "Purge Enigmatic Device");
-                    dontEnigTwice = false;
+                    enigmaticSeen = true;
                 } else {
-                    if ("titanprototype".equalsIgnoreCase(relic) || "absol_jr".equalsIgnoreCase(relic)) {
+                    List<String> exhaustRelics = List.of("titanprototype", "absol_jr");
+                    if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
-                            rButton = Buttons.blue(finChecker + prefix + "relic_" + relic,
-                                "Exhaust " + relicData.getName());
+                            rButton = Buttons.blue(finChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
                         } else {
                             continue;
                         }
-
                     } else {
                         rButton = Buttons.red(finChecker + prefix + "relic_" + relic, "Purge " + relicData.getName());
                     }
-
                 }
                 compButtons.add(rButton);
             }
@@ -231,7 +195,7 @@ public class ComponentActionHelper {
                 }
             }
             if (prom == null) {
-                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentation(true, true)
+                MessageHelper.sendMessageToChannel(p1.getCorrectChannel(), p1.getRepresentationUnfogged()
                     + " you have a null PN. Please use /pn purge after reporting it " + pn);
                 PNInfo.sendPromissoryNoteInfo(game, p1, false);
             }
@@ -239,52 +203,42 @@ public class ComponentActionHelper {
 
         // Abilities
         if (p1.hasAbility("star_forge") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun).size() > 0) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_starForge", "Starforge")
-                .withEmoji(Emoji.fromFormatted(Emojis.Muaat));
+            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun).isEmpty()) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_starForge", "Starforge", Emojis.Muaat);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("meditation") && (p1.getStrategicCC() > 0 || p1.hasRelicReady("emelpar"))
-            && p1.getExhaustedTechs().size() > 0) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_meditation", "Meditation")
-                .withEmoji(Emoji.fromFormatted(Emojis.kolume));
+            && !p1.getExhaustedTechs().isEmpty()) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_meditation", "Meditation", Emojis.kolume);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("orbital_drop") && p1.getStrategicCC() > 0) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop")
-                .withEmoji(Emoji.fromFormatted(Emojis.Sol));
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", Emojis.Sol);
             compButtons.add(abilityButton);
         }
-        if (p1.hasUnit("lanefir_mech") && p1.getFragments().size() > 0
+        if (p1.hasUnit("lanefir_mech") && !p1.getFragments().isEmpty()
             && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_lanefirMech", "Purge 1 Fragment For Mech")
-                .withEmoji(Emoji.fromFormatted(Emojis.lanefir));
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_lanefirMech", "Purge 1 Fragment For Mech", Emojis.lanefir);
             compButtons.add(abilityButton);
         }
         if (p1.hasAbility("mantle_cracking")
-            && ButtonHelperAbilities.getMantleCrackingButtons(p1, game).size() > 0) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_mantlecracking", "Mantle Crack")
-                .withEmoji(Emoji.fromFormatted(Emojis.gledge));
+            && !ButtonHelperAbilities.getMantleCrackingButtons(p1, game).isEmpty()) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_mantlecracking", "Mantle Crack", Emojis.gledge);
             compButtons.add(abilityButton);
         }
-        if (p1.hasAbility("stall_tactics") && p1.getActionCards().size() > 0) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_stallTactics", "Stall Tactics")
-                .withEmoji(Emoji.fromFormatted(Emojis.Yssaril));
+        if (p1.hasAbility("stall_tactics") && !p1.getActionCards().isEmpty()) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_stallTactics", "Stall Tactics", Emojis.Yssaril);
             compButtons.add(abilityButton);
         }
-        if (p1.hasAbility("fabrication") && p1.getFragments().size() > 0) {
-            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC")
-                .withEmoji(Emoji.fromFormatted(Emojis.Naaz));
+        if (p1.hasAbility("fabrication") && !p1.getFragments().isEmpty()) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 CC", Emojis.Naaz);
             compButtons.add(abilityButton);
         }
 
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
-            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).size() > 0) {
-            Button abilityButton = Button
-                .success(finChecker + prefix + "ability_muaatFS",
-                    "Spend 1 strategy CC for 1 cruiser with The Inferno (Muaat Flagship)")
-                .withEmoji(Emoji.fromFormatted(Emojis.Muaat));
+            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Spend 1 strategy CC for 1 cruiser with The Inferno (Muaat Flagship)", Emojis.Muaat);
             compButtons.add(abilityButton);
         }
 
@@ -335,17 +289,17 @@ public class ComponentActionHelper {
                     return;
                 }
                 if (buttonID.contains("agent")) {
-                    List<String> leadersThatNeedSpecialSelection = List.of("naaluagent", "muaatagent", "kolumeagent",
-                        "arborecagent", "bentoragent", "xxchaagent", "axisagent");
+                    List<String> leadersThatNeedSpecialSelection = List.of("naaluagent", "muaatagent", "kolumeagent", "arborecagent", "bentoragent", "xxchaagent", "axisagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
-                        String message = p1.getRepresentation(true, true)
-                            + " Use buttons to select the user of the agent";
+                        String message = p1.getRepresentationUnfogged() + " Use buttons to select the user of the agent";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
-                        ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null));
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
-                            ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1, p1.getFactionEmoji());
+                            ExhaustLeader.exhaustLeader(event, game, p1, p1.getLeader(buttonID).orElse(null));
+                            ButtonHelperAgents.exhaustAgent("fogallianceagent", event, game, p1);
+                        } else {
+                            ButtonHelperAgents.exhaustAgent(buttonID, event, game, p1);
                         }
                     }
                 } else if (buttonID.contains("hero")) {
@@ -386,7 +340,7 @@ public class ComponentActionHelper {
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event,
                         Emojis.Muaat + Emojis.flagship + "The Inferno");
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
-                    Tile tile = tiles.get(0);
+                    Tile tile = tiles.getFirst();
                     List<Button> buttons = TurnStart.getStartOfTurnButtons(p1, game, true, event);
                     new AddUnits().unitParsing(event, p1.getColor(), tile, "1 cruiser", game);
                     successMessage = successMessage + "Produced 1 " + Emojis.cruiser + " in tile "
@@ -458,7 +412,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
 
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
-                    String secretScoreMsg = "_ _\n" + p1.getRepresentation(true, true)
+                    String secretScoreMsg = "_ _\n" + p1.getRepresentationUnfogged()
                         + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ACInfo.getDiscardActionCardButtons(game, p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
@@ -593,7 +547,8 @@ public class ComponentActionHelper {
             return;
         }
         String purgeOrExhaust = "Purged";
-        if ("titanprototype".equalsIgnoreCase(relicID) || "absol_jr".equalsIgnoreCase(relicID)) { // EXHAUST THE RELIC
+        List<String> juniorRelics = List.of("titanprototype", "absol_jr");
+        if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC
             List<Button> buttons2 = AgendaHelper.getPlayerOutcomeButtons(game, null, "jrResolution", null);
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "Exhausted";
@@ -607,7 +562,7 @@ public class ComponentActionHelper {
                     buttons3.add(Buttons.green("exhaustTCS_" + relicID + "_" + player.getFaction(),
                         "Exhaust TCS to Ready " + relicID));
                     buttons3.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentation(true, true)
+                    String msg = p2.getRepresentationUnfogged()
                         + " you have the opportunity to exhaust your TCS tech to ready " + relicID
                         + " and potentially resolve a transaction.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
@@ -624,7 +579,7 @@ public class ComponentActionHelper {
 
         // SPECIFIC HANDLING //TODO: Move this shite to RelicPurge
         switch (relicID) {
-            case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, relicID, event);
+            case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(player, game, event);
             case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelper.offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);
@@ -646,14 +601,14 @@ public class ComponentActionHelper {
                 } else {
                     player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
-                message = player.getRepresentation(true, true) + " Your TGs increased from " + oldTg + " -> "
+                message = player.getRepresentationUnfogged() + " Your TGs increased from " + oldTg + " -> "
                     + player.getTg();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, game, player.getTg() - oldTg);
             }
             case "stellarconverter" -> {
-                message = player.getRepresentation(true, true) + " Select the planet you want to destroy";
+                message = player.getRepresentationUnfogged() + " Select the planet you want to destroy";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     ButtonHelper.getButtonsForStellar(player, game));
             }
@@ -668,8 +623,7 @@ public class ComponentActionHelper {
         }
     }
 
-    public static void serveNextComponentActionButtons(GenericInteractionCreateEvent event, Game game,
-        Player player) {
+    public static void serveNextComponentActionButtons(GenericInteractionCreateEvent event, Game game, Player player) {
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = TurnStart.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, systemButtons);

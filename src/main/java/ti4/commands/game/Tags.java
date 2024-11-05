@@ -35,7 +35,7 @@ public class Tags extends GameSubcommandData {
     @ButtonHandler("editTags~MDL")
     public static void handleEditTags(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String modalId = "editTags";
-        String currentTags = game.getTags().stream().collect(Collectors.joining(";"));
+        String currentTags = String.join(";", game.getTags());
         if (currentTags.isBlank()) currentTags = null;
 
         String fieldID = "tags";

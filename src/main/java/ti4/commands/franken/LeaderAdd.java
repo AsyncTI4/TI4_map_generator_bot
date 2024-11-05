@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
@@ -27,7 +28,7 @@ public class LeaderAdd extends LeaderAddRemove {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added leaders:\n");
         Boolean fakeCommanders = false;
         if (event instanceof SlashCommandInteractionEvent slash) {
-            fakeCommanders = slash.getOption(Constants.FAKE_COMMANDERS, om -> om.getAsBoolean());
+            fakeCommanders = slash.getOption(Constants.FAKE_COMMANDERS, OptionMapping::getAsBoolean);
         }
         for (String leaderID : leaderIDs) {
             sb.append(getAddLeaderText(player, leaderID));

@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.bothelper.CreateGameChannels;
+import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
@@ -74,7 +76,7 @@ public class Eliminate extends AddRemovePlayer {
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
             if (player != null && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
-                if (player.getPlanetsAllianceMode().size() > 0) {
+                if (!player.getPlanetsAllianceMode().isEmpty()) {
                     Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
                     String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
                     if (bothelperRole != null) {
@@ -121,6 +123,8 @@ public class Eliminate extends AddRemovePlayer {
                     String sb = "Player: " + player.getUserName() + " - " + "Discarded Action Card:" + "\n" + Mapper.getActionCard(ac.getKey()).getRepresentation() + "\n";
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb);
                 }
+                PlayAC.serveReverseEngineerButtons(game, player, new ArrayList<>(acs.keySet()));
+
                 //unscore all of a players SOs
                 acs = new LinkedHashMap<>(player.getSecretsScored());
                 for (int so : acs.values()) {
@@ -148,7 +152,7 @@ public class Eliminate extends AddRemovePlayer {
             Member removedMember = guild.getMemberById(player.getUserID());
             List<Role> roles = guild.getRolesByName(game.getName(), true);
             if (removedMember != null && roles.size() == 1) {
-                guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
+                guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();
             }
             sb.append("Eliminated player: ").append(player.getUserName()).append(" from game: ").append(game.getName()).append("\n");
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

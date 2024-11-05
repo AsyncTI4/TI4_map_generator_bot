@@ -15,6 +15,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -44,10 +45,15 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
     }
 
+    @ButtonHandler("refreshPNInfo")
+    public static void sendPromissoryNoteInfoLongForm(Game game, Player player) {
+        sendPromissoryNoteInfo(game, player, true);
+    }
+
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentation(true, true) + " Heads up, someone used some command";
+        String headerText = player.getRepresentationUnfogged() + " Heads up, someone used some command";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }
@@ -75,8 +81,7 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
                 transact = Buttons.green("resolvePNPlay_" + pnShortHand,
                     "Play " + owner.getColor() + " " + promissoryNote.getName());
             } else {
-                transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName())
-                    .withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
+                transact = Buttons.green("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(owner.getFactionEmoji()));
             }
             buttons.add(transact);
         }

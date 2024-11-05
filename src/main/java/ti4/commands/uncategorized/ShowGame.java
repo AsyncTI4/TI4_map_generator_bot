@@ -1,8 +1,5 @@
 package ti4.commands.uncategorized;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,12 +12,16 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShowGame implements Command {
 
@@ -69,13 +70,11 @@ public class ShowGame implements Command {
             String temp = statsOption.getAsString();
             if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                MapGenerator.saveImage(game, displayType, event)
-                    .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+                MapRenderPipeline.render(game, event, displayType,
+                                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
-            }
-            else {
-                for (DisplayType i: DisplayType.values())
-                {
+            } else {
+                for (DisplayType i : DisplayType.values()) {
                     if (temp.equals(i.getValue())) {
                         displayType = i;
                         break;
@@ -83,50 +82,38 @@ public class ShowGame implements Command {
                 }
             }
         }
-        if (displayType == null)
-        {
+        if (displayType == null) {
             displayType = DisplayType.all;
         }
         simpleShowGame(game, event, displayType);
     }
 
+    @ButtonHandler("showGameAgain")
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
         simpleShowGame(game, event, DisplayType.all);
     }
 
+    @ButtonHandler("showMap")
     public static void showMap(Game game, ButtonInteractionEvent event) {
-        MapGenerator.saveImage(game, DisplayType.map, event).thenAccept(fileUpload -> {
-            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
-        });
+        MapRenderPipeline.render(game, event, DisplayType.map, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
+    @ButtonHandler("showPlayerAreas")
     public static void showPlayArea(Game game, ButtonInteractionEvent event) {
-        MapGenerator.saveImage(game, DisplayType.stats, event).thenAccept(fileUpload -> {
-            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
-        });
+        MapRenderPipeline.render(game, event, DisplayType.stats, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     public static boolean includeButtons(DisplayType displayType) {
-        switch (displayType) {
-            case wormholes:
-            case anomalies:
-            case legendaries:
-            case empties:
-            case aetherstream:
-            case spacecannon:
-            case traits:
-            case techskips:
-            case attachments:
-            case shipless:
-                return false;
-        }
-        return true;
+        return switch (displayType) {
+            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
+                 shipless -> false;
+            default -> true;
+        };
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        MapGenerator.saveImage(game, displayType, event).thenAccept(fileUpload -> {
-            if (includeButtons(displayType))
-            {
+        MapRenderPipeline.render(game, event, displayType, fileUpload -> {
+            if (includeButtons(displayType)) {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {
                     Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
@@ -145,9 +132,7 @@ public class ShowGame implements Command {
                 }
 
                 MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
-            }
-            else
-            {
+            } else {
                 MessageChannel channel = event.getMessageChannel();
                 if (!game.isFowMode() && game.getActionsChannel() != null && game.getBotMapUpdatesThread() != null && channel.equals(game.getActionsChannel())) {
                     channel = game.getBotMapUpdatesThread();

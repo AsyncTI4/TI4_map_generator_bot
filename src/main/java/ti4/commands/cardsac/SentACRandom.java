@@ -57,7 +57,7 @@ public class SentACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Action Cards in hand");
         }
         Collections.shuffle(actionCards);
-        String acID = actionCards.get(0);
+        String acID = actionCards.getFirst();
         // FoW specific pinging
         if (game.isFowMode()) {
             FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);

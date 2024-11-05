@@ -60,6 +60,7 @@ import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TileModel;
+import ti4.model.TokenModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 
@@ -87,6 +88,7 @@ public class Mapper {
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, UnitModel> units = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
+    private static final Map<String, TokenModel> tokens2 = new HashMap<>();
     private static final Map<String, LeaderModel> leaders = new HashMap<>();
     private static final Map<String, StrategyCardSetModel> strategyCardSets = new HashMap<>();
     private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
@@ -126,6 +128,7 @@ public class Mapper {
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
+        importJsonObjectsFromFolder("tokens", tokens2, TokenModel.class);
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
         importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
@@ -149,7 +152,7 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws Exception {
+    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
         objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest classes
 
@@ -201,7 +204,7 @@ public class Mapper {
         String mostRecentObject = "none";
         try {
             List<ColorModel> colorsToCreate = getColors();
-            List<T> newObjects = new ArrayList<T>();
+            List<T> newObjects = new ArrayList<>();
             for (T obj : objectMap.values()) {
                 mostRecentObject = obj.getAlias();
                 if (obj.isColorable()) {
@@ -406,10 +409,6 @@ public class Mapper {
         return getTraps().get(plotID);
     }
 
-    // public static String getUnitID(String unitID, String color) {
-    //     return colors.getProperty(color) + "_" + unitID + ".png";
-    // }
-
     public static UnitKey getUnitKey(String unitID, String colorID) {
         if (!isValidAsyncUnitID(unitID)) return null;
         String actuallyColorID = getColorID(colorID) == null ? colorID : getColorID(colorID);
@@ -470,6 +469,10 @@ public class Mapper {
 
     public static List<String> getColorNames() {
         return new ArrayList<>(colors.values().stream().map(ColorModel::getName).toList());
+    }
+
+    public static List<TokenModel> getTokens2() {
+        return new ArrayList<>(tokens2.values());
     }
 
     public static List<String> getTokens() {
@@ -596,7 +599,7 @@ public class Mapper {
         } else {
             sb.append(agenda.getTarget()).append(";");
             sb.append(agenda.getText1());
-            if (agenda.getText2().length() > 0) {
+            if (!agenda.getText2().isEmpty()) {
                 sb.append(";").append(agenda.getText2());
             }
         }
@@ -776,7 +779,7 @@ public class Mapper {
         if (templates.isEmpty()) {
             return null;
         } else if (templates.size() == 1) {
-            mapTemplate = templates.get(0);
+            mapTemplate = templates.getFirst();
         } else {
             String defaultMapTemplate = switch (players) {
                 case 3 -> "3pHyperlanes";
@@ -788,7 +791,7 @@ public class Mapper {
                 default -> null;
             };
             if (defaultMapTemplate == null) {
-                mapTemplate = templates.get(0); // just get whatever template lol
+                mapTemplate = templates.getFirst(); // just get whatever template lol
             } else {
                 for (MapTemplateModel model : templates) {
                     if (model.getAlias().equals(defaultMapTemplate)) {
@@ -870,6 +873,10 @@ public class Mapper {
 
     public static DeckModel getDeck(String deckID) {
         return getDecks().get(deckID);
+    }
+
+    public static List<String> getShuffledDeck(String deckID) {
+        return getDeck(deckID).getNewShuffledDeck();
     }
 
     public static boolean isValidDeck(String deckID) {

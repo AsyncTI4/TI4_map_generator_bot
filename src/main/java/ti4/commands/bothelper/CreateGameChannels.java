@@ -12,14 +12,12 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -35,6 +33,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -48,6 +48,7 @@ import ti4.helpers.GlobalSettings.ImplementedSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.TIGLHelper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -99,7 +100,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 MessageHelper.sendMessageToEventChannel(event, "Category not found");
                 return;
             } else {
-                categoryChannel = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false).get(0);
+                categoryChannel = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryChannelName, false).getFirst();
             }
         } else { // CATEGORY WAS NOT PROVIDED, FIND OR CREATE ONE
             categoryChannelName = getCategoryNameForGame(gameName);
@@ -257,47 +258,22 @@ public class CreateGameChannels extends BothelperSubcommandData {
             MessageHelper.sendMessageToChannel(newGame.getMainGameChannel(), "You will need to make your own bot-map-updates thread. Ping bothelper if you don't know how");
         }
 
-        introductionToTableTalkChannel(newGame);
-        introductionToActionsChannel(newGame);
-        sendMessageAboutAggressionMetas(newGame);
-
         // Create Cards Info Threads
         for (Player player : newGame.getPlayers().values()) {
             player.createCardsInfoThreadChannelsIfRequired();
         }
 
-        Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
-        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to set up a Milty Draft?", miltyButton);
-
-        List<Button> homebrewButtons = new ArrayList<>();
-        homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
-        homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
-
-        List<Button> factionReactButtons = new ArrayList<>();
-        factionReactButtons.add(Buttons.green("enableAidReacts", "Yes, Enable Faction Reactions"));
-        factionReactButtons.add(Buttons.red("deleteButtons", "No Faction Reactions"));
-        MessageHelper.sendMessageToChannel(actionsChannel, "A frequently used aid is the bot reacting with your faction emoji when you speak, to help others remember your faction. You can enable that with this button. Other such customization options, or if you want to turn this off, are under `/custom customization`", factionReactButtons);
-
-        List<Button> hexBorderButtons = new ArrayList<>();
-        hexBorderButtons.add(Buttons.green("showHexBorders_dash", "Dashed line"));
-        hexBorderButtons.add(Buttons.blue("showHexBorders_solid", "Solid line"));
-        hexBorderButtons.add(Buttons.red("showHexBorders_off", "Off (default)"));
-        MessageHelper.sendMessageToChannel(actionsChannel, "Show borders around systems with player's ships, either a dashed line or a solid line. You can also control this setting with `/custom customization`", hexBorderButtons);
-
-        MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the AsyncTI4 code of conduct, which is described here: https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006");
-
+        // Report Channel Creation back to Launch channel
         String message = "Role and Channels have been set up:\n> " +
             role.getName() + "\n> " +
             chatChannel.getAsMention() + "\n> " +
             actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        newGame.setUpPeakableObjectives(5, 1);
-        newGame.setUpPeakableObjectives(5, 2);
-
         GameSaveLoadManager.saveMap(newGame, event);
         GameCreate.reportNewGameCreated(newGame);
+
+        presentSetupToPlayers(newGame);
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread && thread.getParentChannel().getName().equals("making-new-games")) {
@@ -313,6 +289,25 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
             manager.queue();
         }
+    }
+
+    private static void presentSetupToPlayers(Game game) {
+        introductionToTableTalkChannel(game);
+        introductionToActionsChannel(game);
+        sendMessageAboutAggressionMetas(game);
+
+        MessageChannel actionsChannel = game.getActionsChannel();
+
+        Button miltyButton = Buttons.green("miltySetup", "Start Milty Setup");
+        Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
+        MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "How would you like to set up the players and map?", List.of(miltyButton, addMapString));
+
+        Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
+        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
+
+        offerGameHomebrewButtons(actionsChannel);
+
+        MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
     }
 
     private static void introductionToBotMapUpdatesThread(Game game) {
@@ -332,15 +327,20 @@ public class CreateGameChannels extends BothelperSubcommandData {
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
-        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + game.getName());
+        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://www.AsyncTI4.com/game/" + game.getName());
     }
 
     private static void sendMessageAboutAggressionMetas(Game game) {
-        String aggressionMsg = "Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta."
-            + " Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line"
-            + ". \nThe conflict metas are loosely classified as the following: \n- Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four \"slice\" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one."
-            + "\n- No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2."
-            + "\n- Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system. ";
+        String aggressionMsg = """
+                Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
+                 Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
+                .\s
+                The conflict metas are loosely classified as the following:\s
+                - Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four "slice" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one.\
+
+                - No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2.\
+
+                - Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system.\s""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("anonDeclare_Friendly", "Friendly"));
         buttons.add(Buttons.blue("anonDeclare_No Strong Preference", "No Strong Preference"));
@@ -400,7 +400,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                     }
                     MessageHelper.sendMessageToChannel(introThread, message);
                     BufferedImage colorsImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile("Compiled_Async_colors.png"), 731, 593);
-                    FileUpload fileUpload = MapGenerator.uploadToDiscord(colorsImage, 1.0f, "colors");
+                    FileUpload fileUpload = MapGenerator.createFileUpload(colorsImage, 1.0f, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
                     BotLogger.log("newPlayerIntro", e);
@@ -422,7 +422,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 missingMembers.add(member);
             }
         }
-        if (missingMembers.size() > 0) {
+        if (!missingMembers.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             sb.append(
                 "### Sorry for the inconvenience!\nDue to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nPlease use the invite below to join our **");
@@ -665,8 +665,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // Derive a category name logically
-        int maxGamesPerCategory = Math.max(1, Math.min(25,
-            GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+        int maxGamesPerCategory = Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
         int gameNumberMod = gameNumber % maxGamesPerCategory;
         int lowerBound = gameNumber - gameNumberMod;
         int upperBound = lowerBound + maxGamesPerCategory - 1;
@@ -686,7 +685,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         List<Category> categories = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryName, false);
         if (!categories.isEmpty()) {
-            String message = categories.stream().map(c -> c.getAsMention()).collect(Collectors.joining("\n"));
+            String message = categories.stream().map(Channel::getAsMention).collect(Collectors.joining("\n"));
             BotLogger.log("Game Channel Creation - Category Already Exists:\n" + message);
             return categories.getFirst();
         }
@@ -717,5 +716,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .filter(role -> role.getName().equalsIgnoreCase(name))
             .findFirst()
             .orElse(null);
+    }
+
+    @ButtonHandler("offerGameHomebrewButtons")
+    public static void offerGameHomebrewButtons(MessageChannel channel) {
+        List<Button> homebrewButtons = new ArrayList<>();
+        homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
+        homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
+        MessageHelper.sendMessageToChannel(channel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
     }
 }

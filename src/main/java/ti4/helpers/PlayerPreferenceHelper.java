@@ -128,7 +128,7 @@ public class PlayerPreferenceHelper {
         buttons.add(Buttons.red("setAutoPassMedian_" + x, "Turn off (if already on)"));
         if (player2 == null) {
             for (Player player : game.getRealPlayers()) {
-                String message = player.getRepresentation(true, true)
+                String message = player.getRepresentationUnfogged()
                     + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs."
                     + " How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
                     + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with /player stats.";
@@ -136,7 +136,7 @@ public class PlayerPreferenceHelper {
             }
         } else {
             Player player = player2;
-            String message = player.getRepresentation(true, true)
+            String message = player.getRepresentationUnfogged()
                 + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs. "
                 + " How it works is you secretly set a median time (in hours) here, and then from now on when an AC is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
                 + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with /player stats.";
@@ -147,7 +147,7 @@ public class PlayerPreferenceHelper {
     public static void offerAFKTimeOptions(Game game, Player player) {
         List<Button> buttons = getSetAFKButtons(game);
         player.setHoursThatPlayerIsAFK("");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
             + " your afk times (if any) have been reset. Use buttons to select the hours (note they are in UTC) in which you're afk. If you select 8 for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
             buttons);
     }
@@ -163,7 +163,7 @@ public class PlayerPreferenceHelper {
 
     public static void offerDirectHitManagementOptions(Game game, Player player) {
         List<Button> buttons = getDirectHitManagementButtons(game, player);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation(true, true)
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
             + " select the units you would like to either risk or not risk Direct Hit. Upgraded dreadnoughts will automatically risk Direct Hits.  ",
             buttons);
     }
@@ -233,7 +233,7 @@ public class PlayerPreferenceHelper {
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
         Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        String afkTimes = "" + player.getHoursThatPlayerIsAFK();
+        String afkTimes = player.getHoursThatPlayerIsAFK();
         for (Game game : mapList.values()) {
             if (!game.isHasEnded()) {
                 for (Player player2 : game.getRealPlayers()) {

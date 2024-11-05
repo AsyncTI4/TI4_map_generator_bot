@@ -14,7 +14,6 @@ public class StrategyCardSetModelTest extends BaseTi4Test {
             assertTrue(scSetModel.isValid(), scSetModel.getAlias() + "'s data is invalid");
             assertTrue(validateSCIDs(scSetModel), scSetModel.getAlias() + " [" + scSetModel.getName() + "]: Invalid SC IDs");
             assertTrue(validateNoDuplicateInitiatives(scSetModel), scSetModel.getAlias() + " [" + scSetModel.getName() + "]: Duplicate Initiative Values");
-        
         }
     }
 
@@ -32,7 +31,6 @@ public class StrategyCardSetModelTest extends BaseTi4Test {
             .distinct()
             .count() == scSetModel.getScIDs().stream()
                 .map(Mapper::getStrategyCard)
-                .map(StrategyCardModel::getInitiative)
                 .count();
     }
 }

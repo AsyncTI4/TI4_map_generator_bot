@@ -189,6 +189,15 @@
     "source": "action_deck_2"
   },
   {
+    "alias": "covert_operation",
+    "name": "Covert Operation",
+    "phase": "Action",
+    "window": "After you move ships into the active system",
+    "text": "Remove up to 2 of your ships or ground forces from systems that do not contain 1 of your command tokens and place them in the space area of the active system.",
+    "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
+    "source": "action_deck_2"
+  },
+  {
     "alias": "data_archive",
     "name": "Data Archive",
     "phase": "Agenda",
@@ -201,8 +210,8 @@
     "alias": "decisive_victory",
     "name": "Decisive Victory",
     "phase": "Action",
-    "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
-    "text": "Remove your command token from the active system.",
+    "window": "When only you have ships in the space area of the active system at the end of the first round of a space combat",
+    "text": "Remove your command token from that system.",
     "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
   },
@@ -372,8 +381,8 @@
     "alias": "final_mission",
     "name": "Final Mission",
     "phase": "Action",
-    "window": "After you and your opponent make combat rolls",
-    "text": "Destroy 1 of your damaged units to choose any number of your opponent's dice. They reroll those dice; on a result of 1 or 2, you produce 1 additional hit instead.",
+    "window": "After 1 of your units is destroyed during combat",
+    "text": "Choose and destroy 1 of your opponent's units that has a cost equal to or lower than than your destroyed unit's cost.",
     "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
     "source": "action_deck_2"
   },
@@ -510,15 +519,6 @@
     "window": "After you gain a non-faction technology",
     "text": "Choose another player. That player gains that technology.",
     "flavorText": "Rin had received multiple warnings to avoid working with the Vuil'Raith. However, existential threats to the galaxy had never been enough to stifle her curiosity.",
-    "source": "action_deck_2"
-  },
-  {
-    "alias": "last_minute_deliberation",
-    "name": "Last Minute Deliberation",
-    "phase": "Agenda",
-    "window": "Before the \"Ready Planets\" step of the agenda phase",
-    "text": "Ready up to 3 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
-    "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
     "source": "action_deck_2"
   },
   {
@@ -850,7 +850,7 @@
     "name": "Short-lived Clone",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted, and is readied at the end of your turn.",
+    "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted. At the end of this turn, ready your chosen agent.",
     "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that spinner after all. This galaxy can barely handle one of me.\"",
     "source": "action_deck_2"
   },
@@ -985,7 +985,7 @@
     "name": "Stolen Prototype",
     "phase": "Action",
     "window": "After you destroy 1 of another player's units",
-    "text": "Spend 4 resources to research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
+    "text": "Research a unit upgrade technology of that unit's type; ignore 1 of that technology's prerequisites.",
     "flavorText": "Ssruu looked back from the pod as the infiltration team escaped the fiery inferno. Only after they cleared the blast radius did he loosen his grip on the stolen schematics.",
     "source": "action_deck_2"
   },
@@ -1012,8 +1012,8 @@
     "name": "Syndicate",
     "phase": "Action",
     "window": "Action",
-    "text": "Reveal 3 cards from the top of the action card deck. Give 1 of those cards to up to 3 different players and discard the rest. During this turn, you can exchange action cards as part of transactions with those players. [Note: When giving away the action cards, you may choose yourself as 1 of the recipients.]",
-    "flavorText": "\"What if I'm not ready, Harka?\" the operative asked, looking away. Harka squeezed her hand. \"The Keleres chose me to lead because my crews have never failed a job. Now, I've chosen you. Believe in me, who believes in you.\"",
+    "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player draws 1 of those cards of your choice. During this turn, you can exchange action cards as part of transactions.",
+    "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
     "source": "action_deck_2"
   },
   {
@@ -1031,7 +1031,7 @@
     "phase": "Any",
     "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
     "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
-    "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
+    "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
     "source": "action_deck_2"
   },
   {

@@ -14,6 +14,7 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.DiceHelper.Die;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -23,6 +24,7 @@ import ti4.model.ExploreModel;
 
 public class ButtonHelperActionCardsWillHomebrew {
 
+    @ButtonHandler("resolveDataArchive")
     public static void resolveDataArchive(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game, true);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + "Use buttons to explore planet #1", buttons);
@@ -36,6 +38,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("resolveDefenseInstallation")
     public static void resolveDefenseInstallation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
@@ -43,19 +46,21 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you wish to exhaust and put 1 PDS on",
+            player.getRepresentationUnfogged() + " select the planet you wish to exhaust and put 1 PDS on",
             buttons);
     }
 
+    @ButtonHandler("defenseInstallationStep2_")
     public static void resolveDefenseInstallationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), game.getTileFromPlanet(planet), "pds " + planet, game);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
+            player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game) + " and put 1 PDS on it");
     }
 
+    @ButtonHandler("resolveBoardingParty")
     public static void resolveBoardingParty(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         String type = "sling";
@@ -66,6 +71,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveMercenaryContract")
     public static void resolveMercenaryContract(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         String type = "sling";
@@ -77,6 +83,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveSisterShip")
     public static void resolveSisterShip(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
@@ -95,6 +102,7 @@ public class ButtonHelperActionCardsWillHomebrew {
             "Select which tile you would like to produce a ship in. The bot will not know that it is reduced cost and limited to a specific ship type, but you know that. ", buttons);
     }
 
+    @ButtonHandler("resolveChainReaction")
     public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         int hits = 1;
@@ -114,6 +122,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + "\n " + player.getRepresentation() + " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
+    @ButtonHandler("resolveFlawlessStrategy")
     public static void resolveFlawlessStrategy(Player player, ButtonInteractionEvent event) {
         List<Button> scButtons = new ArrayList<>();
         event.getMessage().delete().queue();
@@ -121,17 +130,14 @@ public class ButtonHelperActionCardsWillHomebrew {
             scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
         }
         if (player.getSCs().contains(3)) {
-            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards")
-                .withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+            scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", Emojis.ActionCard));
         }
         if (player.getSCs().contains(4)) {
-            scButtons.add(
-                Buttons.green("construction_spacedock", "Place 1 space dock").withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
-            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS").withEmoji(Emoji.fromFormatted(Emojis.pds)));
+            scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", Emojis.spacedock));
+            scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", Emojis.pds));
         }
         if (player.getSCs().contains(5)) {
-            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities")
-                .withEmoji(Emoji.fromFormatted(Emojis.comm)));
+            scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", Emojis.comm));
         }
         if (player.getSCs().contains(6)) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
@@ -140,14 +146,14 @@ public class ButtonHelperActionCardsWillHomebrew {
             scButtons.add(Buttons.GET_A_TECH);
         }
         if (player.getSCs().contains(8)) {
-            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective")
-                .withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+            scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", Emojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " use buttons to resolve", scButtons);
 
     }
 
+    @ButtonHandler("resolveRendezvousPoint")
     public static void resolveRendezvousPoint(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "rendezvous");
@@ -155,6 +161,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token from what was the active system when you played the card. Then end your turn after doing any end of turn abilities you wish to do.", buttons);
     }
 
+    @ButtonHandler("resolveAncientTradeRoutes")
     public static void resolveAncientTradeRoutes(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         player.setCommodities(player.getCommodities() + 2);
@@ -175,13 +182,14 @@ public class ButtonHelperActionCardsWillHomebrew {
         buttons.add(Buttons.red("deleteButtons", "Don't give comms"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to give 2 comms to",
+            player.getRepresentationUnfogged() + " tell the bot who you want to give 2 comms to",
             buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who else you want to give 2 comms to (different from the first time)",
+            player.getRepresentationUnfogged() + " tell the bot who else you want to give 2 comms to (different from the first time)",
             buttons);
     }
 
+    @ButtonHandler("resolveArmsDeal")
     public static void resolveArmsDeal(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
 
@@ -200,10 +208,11 @@ public class ButtonHelperActionCardsWillHomebrew {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
+            player.getRepresentationUnfogged() + " tell the bot which neighbor you want to get 1 cruiser and 1 destroyer",
             buttons);
     }
 
+    @ButtonHandler("armsDealStep2_")
     public static void resolveArmsDealStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
@@ -217,28 +226,30 @@ public class ButtonHelperActionCardsWillHomebrew {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("ancientTradeRoutesStep2_")
     public static void resolveAncientTradeRoutesStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to ancient trade routes and is neighbors with " + ButtonHelper.getIdentOrColor(player, game) + " for this turn");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji() + " gained 2 commodities due to ancient trade routes and is neighbors with " + player.getFactionEmojiOrColor() + " for this turn");
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("resolveTombRaiders")
     public static void resolveTombRaiders(Player player, Game game, ButtonInteractionEvent event) {
         List<String> types = new ArrayList<>(List.of("hazardous", "cultural", "industrial", "frontier"));
         StringBuilder sb = new StringBuilder();
         for (String type : types) {
             List<String> deck = game.getExploreDeck(type);
-            String cardID = deck.get(0);
+            String cardID = deck.getFirst();
 
             ExploreModel card = Mapper.getExplore(cardID);
             String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
                 cardID = game.drawExplore(type);
                 sb.append(Mapper.getExplore(cardID).getName()).append(System.lineSeparator());
-                sb.append(player.getRepresentation(true, true)).append(" Gained relic fragment\n");
+                sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             } else {
@@ -246,31 +257,32 @@ public class ButtonHelperActionCardsWillHomebrew {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
             }
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+        CommanderUnlockCheck.checkPlayer(player, "kollecc");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("breakthrough") // TODO: this might be annoying at some point in time
     public static void resolveBreakthrough(Player player, Game game, ButtonInteractionEvent event) {
         for (String planet : player.getPlanetsAllianceMode()) {
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 player.refreshPlanet(planet);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " readied every tech skip planet");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied every tech skip planet");
         event.getMessage().delete().queue();
-
     }
 
+    @ButtonHandler("strandedShipStep1")
     public static void resolveStrandedShipStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to place a Ghost Ship in",
+            player.getRepresentationUnfogged() + " tell the bot which tile you wish to place a Ghost Ship in",
             buttons);
     }
 
+    @ButtonHandler("strandedShipStep2_")
     public static void resolveStrandedShipStep2(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
@@ -282,14 +294,15 @@ public class ButtonHelperActionCardsWillHomebrew {
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
-        CommanderUnlockCheck.checkPlayer(p2, game, "empyrean", event);
+        CommanderUnlockCheck.checkPlayer(p2, "empyrean");
     }
 
+    @ButtonHandler("spatialCollapseStep1")
     public static void resolveSpatialCollapseStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getSpatialCollapseTilesStep1(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile with your ships you wish to swap with an adjacent system",
+            player.getRepresentationUnfogged() + " tell the bot which tile with your ships you wish to swap with an adjacent system",
             buttons);
     }
 
@@ -308,6 +321,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         return buttons;
     }
 
+    @ButtonHandler("spatialCollapseStep2_")
     public static void resolveSpatialCollapseStep2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String pos1 = buttonID.split("_")[1];
@@ -324,12 +338,13 @@ public class ButtonHelperActionCardsWillHomebrew {
 
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " Chose the tile you want to swap places with "
+            player.getRepresentationUnfogged() + " Chose the tile you want to swap places with "
                 + tile1.getRepresentationForButtons(game, player),
             buttons);
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("spatialCollapseStep3_")
     public static void resolveSpatialCollapseStep3(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String position = buttonID.split("_")[1];
@@ -342,7 +357,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         game.setTile(tile2);
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " Chose to swap "
+            player.getRepresentationUnfogged() + " Chose to swap "
                 + tile2.getRepresentationForButtons(game, player) + " with "
                 + tile.getRepresentationForButtons(game, player));
         event.getMessage().delete().queue();
@@ -359,6 +374,7 @@ public class ButtonHelperActionCardsWillHomebrew {
         return buttons;
     }
 
+    @ButtonHandler("sideProject")
     public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage;
         if (player.getStrategicCC() > 0) {
@@ -375,27 +391,30 @@ public class ButtonHelperActionCardsWillHomebrew {
         ButtonHelperFactionSpecific.offerWinnuStartingTech(player, game);
     }
 
+    @ButtonHandler("brutalOccupation")
     public static void resolveBrutalOccupationStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             buttons.add(Buttons.green("brutalOccupationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of brutal occupation", buttons);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " choose the target of **Brutal Occupation**", buttons);
     }
 
+    @ButtonHandler("resolveShrapnelTurrets_")
     public static void resolveShrapnelTurrets(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue("ShrapnelTurretsFaction", player.getFaction());
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`");
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("brutalOccupationStep2_")
     public static void resolveBrutalOccupationStep2(Player player, Game game, ButtonInteractionEvent event,
         String buttonID) {
         String planet = buttonID.split("_")[1];

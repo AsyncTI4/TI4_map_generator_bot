@@ -1,16 +1,18 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import ti4.model.ColorModel;
 
 public class ColourHelper {
 
     public static List<ColorModel> sortColours(String factionId, List<ColorModel> colours) {
-        List<ColorModel> newcolours = new ArrayList<ColorModel>(colours);
+        List<ColorModel> newcolours = new ArrayList<>(colours);
         // sort by name for deterministic sorting
-        newcolours.sort((c1, c2) -> c1.getAlias().compareTo(c2.getAlias()));
+        newcolours.sort(Comparator.comparing(ColorModel::getAlias));
         // sort by colour
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         // for each "page" of colours, randomise

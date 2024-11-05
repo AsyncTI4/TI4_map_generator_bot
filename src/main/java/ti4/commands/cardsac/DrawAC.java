@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -16,13 +17,14 @@ public class DrawAC extends ACCardsSubcommandData {
     public DrawAC() {
         super(Constants.DRAW_AC, "Draw Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1, max 10"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        player = Helper.getPlayer(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -40,23 +42,26 @@ public class DrawAC extends ACCardsSubcommandData {
         drawActionCards(game, player, count, false);
     }
 
-    public static void drawActionCards(Game game, Player player, int count, boolean addScheming) {
+    public static void drawActionCards(Game game, Player player, int count, boolean resolveAbilities) {
         if (count > 10) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
         String message = player.getRepresentation() + " Drew " + count + " AC";
-        if (addScheming && player.hasAbility("scheming")) {
-            message = "Drew [" + count + "+1=" + ++count + "] AC (Scheming)";
+        if (resolveAbilities && player.hasAbility("scheming")) {
+            message = player.getRepresentation() + " Drew [" + count + "+1=" + (count + 1) + "] AC (Scheming)";
+            count++;
         }
+        if (resolveAbilities && player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            return;
+        }
+        game.drawActionCard(player.getUserID(), count);
 
-        for (int i = 0; i < count; i++) {
-            game.drawActionCard(player.getUserID());
-        }
         ACInfo.sendActionCardInfo(game, player);
         ButtonHelper.checkACLimit(game, null, player);
-        if (addScheming && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(game, player, false);
-        CommanderUnlockCheck.checkPlayer(player, game, "yssaril", null);
+        if (resolveAbilities && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(game, player, false);
+        CommanderUnlockCheck.checkPlayer(player, "yssaril");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 }

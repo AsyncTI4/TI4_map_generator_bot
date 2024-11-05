@@ -10,12 +10,15 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ButtonHelperRelics {
 
+    @ButtonHandler("jrResolution_")
     public static void jrResolution(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         String faction2 = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction2);
@@ -27,13 +30,13 @@ public class ButtonHelperRelics {
             buttons.add(sdButton);
             buttons.add(pdsButton);
             buttons.add(tgButton);
-            String msg = p2.getRepresentation(true, true) + " Use buttons to decide what structure to build";
+            String msg = p2.getRepresentationUnfogged() + " Use buttons to decide what structure to build";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons);
             ButtonHelper.deleteMessage(event);
         }
-
     }
 
+    @ButtonHandler("prophetsTears_")
     public static void prophetsTears(Player player, String buttonID, Game game, ButtonInteractionEvent event) {
         player.addExhaustedRelic("prophetstears");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -46,7 +49,7 @@ public class ButtonHelperRelics {
                 message = player.getFactionEmoji()
                     + " Drew 2 ACs With Scheming. Please Discard 1 AC with the blue buttons";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentation(true, true) + " use buttons to discard",
+                    player.getRepresentationUnfogged() + " use buttons to discard",
                     ACInfo.getDiscardActionCardButtons(game, player, false));
             } else if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
@@ -56,7 +59,7 @@ public class ButtonHelperRelics {
                 message = player.getFactionEmoji() + " Drew 1 AC";
                 ACInfo.sendActionCardInfo(game, player, event);
             }
-            CommanderUnlockCheck.checkPlayer(player, game, "yssaril", event);
+            CommanderUnlockCheck.checkPlayer(player, "yssaril");
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
             ButtonHelper.checkACLimit(game, event, player);
@@ -71,7 +74,7 @@ public class ButtonHelperRelics {
                 if (buttonIndex > -1) {
                     buttonRow.remove(buttonIndex);
                 }
-                if (buttonRow.size() > 0) {
+                if (!buttonRow.isEmpty()) {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
@@ -82,6 +85,16 @@ public class ButtonHelperRelics {
             }
             event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
         }
+    }
+
+    @ButtonHandler("nanoforgePlanet_")
+    public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game) {
+        String planet = buttonID.replace("nanoforgePlanet_", "");
+        Planet planetReal = game.getPlanetsInfo().get(planet);
+        planetReal.addToken("attachment_nanoforge.png");
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
+        ButtonHelper.deleteMessage(event);
     }
 
 }

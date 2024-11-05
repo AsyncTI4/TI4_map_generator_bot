@@ -19,8 +19,8 @@ public class PlanetRemove extends PlanetAddRemove {
         Planet unitHolder = game.getPlanetsInfo().get(planet);
         removePlayerControlToken(player, unitHolder);
 
-        if (Constants.MR.equals(planet) && player.hasCustodiaVigilia()) {
-            Planet mecatolRex = (Planet) unitHolder;
+        if (Constants.MECATOLS.contains(planet) && player.hasCustodiaVigilia()) {
+            Planet mecatolRex = unitHolder;
             if (mecatolRex != null) {
                 mecatolRex.setSpaceCannonDieCount(0);
                 mecatolRex.setSpaceCannonHitsOn(0);

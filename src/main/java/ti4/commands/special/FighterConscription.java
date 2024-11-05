@@ -40,7 +40,7 @@ public class FighterConscription extends SpecialSubcommandData {
         doFfCon(event, player, game);
     }
 
-    public void doFfCon(GenericInteractionCreateEvent event, Player player, Game game) {
+    public static void doFfCon(GenericInteractionCreateEvent event, Player player, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
 
         List<Tile> tilesAffected = new ArrayList<>();
@@ -90,7 +90,7 @@ public class FighterConscription extends SpecialSubcommandData {
         }
 
         String msg = "Added " + tilesAffected.size() + " fighter" + (tilesAffected.size() == 1 ? "" : "s") + ".";
-        if (tilesAffected.size() > 0) {
+        if (!tilesAffected.isEmpty()) {
             msg += " Please check fleet size and capacity in each of the systems: ";
         }
         boolean first = true;

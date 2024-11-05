@@ -65,7 +65,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             }
             if (ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) > 0) {
                 message.append(SOInfo.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
-                message.append(" (" + ListPlayerInfoButton.getPlayerProgressOnObjective(entry.getKey(), game, player) + "/" + ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game) + ")\n");
+                message.append(" (").append(ListPlayerInfoButton.getPlayerProgressOnObjective(entry.getKey(), game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(entry.getKey(), game)).append(")\n");
             } else {
                 message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey()));
             }
@@ -79,15 +79,14 @@ public class ScoreSO extends SOCardsSubcommandData {
                     String soStringID = entry.getKey();
                     buttons.add(Buttons.green("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentation(true, true) + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
+                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored SO " + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
             if (entry.getKey().equalsIgnoreCase("dhw")) {
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
-                    List<String> fragmentsToPurge = new ArrayList<>();
                     List<String> playerFragments = player.getFragments();
-                    fragmentsToPurge.addAll(playerFragments);
+                    List<String> fragmentsToPurge = new ArrayList<>(playerFragments);
                     for (String fragid : fragmentsToPurge) {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
@@ -141,7 +140,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         SOInfo.sendSecretObjectiveInfo(game, player);
         Helper.checkIfHeroUnlocked(game, player);
-        CommanderUnlockCheck.checkPlayer(player, game, "nomad", event);
+        CommanderUnlockCheck.checkPlayer(player, "nomad");
         Helper.checkEndGame(game, player);
     }
 }

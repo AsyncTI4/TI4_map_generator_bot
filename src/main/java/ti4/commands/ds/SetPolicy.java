@@ -4,7 +4,9 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.CommandHelper;
 import ti4.commands.player.AbilityInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -19,9 +21,12 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
 
     public SetPolicy() {
         super(Constants.SET_POLICY, "Set Policies for Olradin Faction Abilities to their + or - side");
-        addOptions(new OptionData(OptionType.STRING, Constants.SET_PEOPLE, "Policy: The People Choice - 'Connect (+)' or 'Control (-)'").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.SET_ENVIRONMENT, "Policy: The Environment Choice - 'Preserve (+)' or 'Plunder (-)'").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.SET_ECONOMY, "Policy: The Economy Choice - 'Empower (+)' or 'Exploit (-)'").setAutoComplete(true));
+        List<Choice> people = CommandHelper.toChoices("Connect", "Control", "+", "-");
+        addOptions(new OptionData(OptionType.STRING, Constants.SET_PEOPLE, "Policy: The People Choice - 'Connect (+)' or 'Control (-)'").addChoices(people));
+        List<Choice> environment = CommandHelper.toChoices("Preserve", "Plunder", "+", "-");
+        addOptions(new OptionData(OptionType.STRING, Constants.SET_ENVIRONMENT, "Policy: The Environment Choice - 'Preserve (+)' or 'Plunder (-)'").addChoices(environment));
+        List<Choice> economy = CommandHelper.toChoices("Empower", "Exploit", "+", "-");
+        addOptions(new OptionData(OptionType.STRING, Constants.SET_ECONOMY, "Policy: The Economy Choice - 'Empower (+)' or 'Exploit (-)'").addChoices(economy));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to set Olradin Policies").setAutoComplete(true));
     }
 

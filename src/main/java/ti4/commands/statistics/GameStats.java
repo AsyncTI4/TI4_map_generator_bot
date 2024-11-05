@@ -114,7 +114,7 @@ public class GameStats extends StatisticsSubcommandData {
         @Override
         public String toString() {
             return super.toString().toLowerCase();
-        } 
+        }
 
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
@@ -175,8 +175,8 @@ public class GameStats extends StatisticsSubcommandData {
         for (String ket : topThousand.keySet()) {
             User user = AsyncTI4DiscordBot.jda.getUserById(Long.parseLong(ket));
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(user.getEffectiveName() + ": ");
-            sb.append(topThousand.get(ket) + " pings");
+            sb.append("` ").append(user.getEffectiveName()).append(": ");
+            sb.append(topThousand.get(ket)).append(" pings");
             sb.append("\n");
             index++;
         }
@@ -234,7 +234,7 @@ public class GameStats extends StatisticsSubcommandData {
         for (String ket : topThousand.keySet()) {
 
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket + ": ");
+            sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
             sb.append("\n");
             index++;
@@ -249,7 +249,7 @@ public class GameStats extends StatisticsSubcommandData {
         for (String ket : topThousand.keySet()) {
 
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket + ": ");
+            sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
             sb.append("\n");
             index++;
@@ -264,7 +264,7 @@ public class GameStats extends StatisticsSubcommandData {
         for (String ket : topThousand.keySet()) {
 
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
-            sb.append("` ").append(ket + ": ");
+            sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
             sb.append("\n");
             index++;
@@ -337,7 +337,7 @@ public class GameStats extends StatisticsSubcommandData {
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
-        return games.size() > 0;
+        return !games.isEmpty();
     }
 
     public static int numberOfPlayersUnfinishedGames(String userID) {
@@ -436,8 +436,7 @@ public class GameStats extends StatisticsSubcommandData {
                 .append(StringUtils.leftPad(entry.getValue().toString(), 4))
                 .append("x` ")
                 .append(entry.getKey().getFactionEmoji()).append(" ")
-                .append(entry.getKey().getFactionNameWithSourceEmoji())
-                .append(" (Took Custodians a total of  " + custodians.getOrDefault(entry.getKey().getAlias(), 0) + " times, or " + ((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue()) + ")")
+                .append(entry.getKey().getFactionNameWithSourceEmoji()).append(" (Took Custodians a total of  ").append(custodians.getOrDefault(entry.getKey().getAlias(), 0)).append(" times, or ").append((float) custodians.getOrDefault(entry.getKey().getAlias(), 0) / entry.getValue()).append(")")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Plays per Faction", sb.toString());
     }
@@ -590,7 +589,7 @@ public class GameStats extends StatisticsSubcommandData {
                 .append(entry.getKey().getFactionNameWithSourceEmoji())
                 .append("\n"));
 
-        sb2.append("All winners: " + factionWinsWithRelics.getOrDefault("allWinners", 0) + " wins with relics out of " + factionWinCount.getOrDefault("allWinners", 0) + " total wins");
+        sb2.append("All winners: ").append(factionWinsWithRelics.getOrDefault("allWinners", 0)).append(" wins with relics out of ").append(factionWinCount.getOrDefault("allWinners", 0)).append(" total wins");
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Winning Faction Relic Holding Percent", sb2.toString());
     }
 
@@ -622,7 +621,7 @@ public class GameStats extends StatisticsSubcommandData {
         final float millisecondsInADay = 24 * 60 * 60 * 1000; // milliseconds in a day  
 
         // Convert milliseconds to days  
-        float days = (float) milliseconds / millisecondsInADay;
+        float days = milliseconds / millisecondsInADay;
 
         // Format to 2 decimal points  
         DecimalFormat df = new DecimalFormat("#.00");
@@ -647,7 +646,7 @@ public class GameStats extends StatisticsSubcommandData {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
                     time1 = Long.parseLong(game.getStoredValue(key1));
                     time2 = Long.parseLong(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0L));
                 }
 
                 name = "Round " + x + " Status Phase";
@@ -657,7 +656,7 @@ public class GameStats extends StatisticsSubcommandData {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
                     time1 = Long.parseLong(game.getStoredValue(key1));
                     time2 = Long.parseLong(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0L));
                 }
 
                 name = "Round " + x + " Agenda  1";
@@ -667,7 +666,7 @@ public class GameStats extends StatisticsSubcommandData {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
                     time1 = Long.parseLong(game.getStoredValue(key1));
                     time2 = Long.parseLong(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0L));
                 }
 
                 name = "Round " + x + " Agenda  2";
@@ -677,16 +676,15 @@ public class GameStats extends StatisticsSubcommandData {
                     amountCount.put(name, 1 + amountCount.getOrDefault(name, 0));
                     time1 = Long.parseLong(game.getStoredValue(key1));
                     time2 = Long.parseLong(game.getStoredValue(key2));
-                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0l));
+                    timeCount.put(name, time2 - time1 + timeCount.getOrDefault(name, 0L));
                 }
             }
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Time Per Phase:").append("\n");
-        timeCount.entrySet().stream()
-            .forEach(entry -> sb.append(entry.getKey() + ": ")
-                .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4))
-                .append(" days (based on " + amountCount.get(entry.getKey()) + " games)")
+        timeCount.entrySet()
+            .forEach(entry -> sb.append(entry.getKey()).append(": ")
+                .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4)).append(" days (based on ").append(amountCount.get(entry.getKey())).append(" games)")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }

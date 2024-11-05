@@ -166,7 +166,7 @@ public class Units {
         }
     }
 
-    private static final String unitRegex() {
+    private static String unitRegex() {
         return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
     }
 
@@ -181,6 +181,10 @@ public class Units {
         UnitType u = findUnitType(unitType);
         if (colorID == null || u == null) return null;
         return new UnitKey(u, colorID);
+    }
+
+    public static UnitKey getUnitKey(UnitType unitType, String colorID) {
+        return new UnitKey(unitType, colorID);
     }
 
     @Nullable

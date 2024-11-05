@@ -130,7 +130,7 @@ public class Stats extends PlayerSubcommandData {
         if (optionMappings.isEmpty())
             return;
 
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(true, true) + " player stats changed:");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentationUnfogged() + " player stats changed:");
 
         OptionMapping optionTG = event.getOption(Constants.TG);
         if (optionTG != null) {
@@ -153,10 +153,10 @@ public class Stats extends PlayerSubcommandData {
             if (player.hasAbility("military_industrial_complex")
                 && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true) + " you have the opportunity to buy axis orders",
+                    player.getRepresentationUnfogged() + " you have the opportunity to buy axis orders",
                     ButtonHelperAbilities.getBuyableAxisOrders(player, game));
             }
-            CommanderUnlockCheck.checkPlayer(player, game, "mykomentori", event);
+            CommanderUnlockCheck.checkPlayer(player, "mykomentori");
         }
 
         OptionMapping optionMedian = event.getOption(Constants.AUTO_SABO_PASS_MEDIAN);
@@ -196,7 +196,7 @@ public class Stats extends PlayerSubcommandData {
             StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionSpeaker));
             String value = optionSpeaker.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
-                game.setSpeaker(player.getUserID());
+                game.setSpeakerUserID(player.getUserID());
             } else {
                 message.append(", which is not a valid input. Please use one of: y/yes");
             }
@@ -290,7 +290,7 @@ public class Stats extends PlayerSubcommandData {
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
         sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
         sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-        sb.append("> Speaker: `").append(game.getSpeaker().equals(player.getUserID())).append("`\n");
+        sb.append("> Speaker: `").append(game.getSpeakerUserID().equals(player.getUserID())).append("`\n");
         sb.append("> Passed: `").append(player.isPassed()).append("`\n");
         sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
         sb.append("> Raw Faction Emoji: `").append(player.getFactionEmoji()).append("`\n");
@@ -372,12 +372,12 @@ public class Stats extends PlayerSubcommandData {
 
         // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
         if (scModel.usesAutomationForSCID("pok5trade") && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
-            String message = player.getRepresentation(true, true) + " heads up, you just picked Trade but don't currently hold your Trade Agreement";
+            String message = player.getRepresentationUnfogged() + " heads up, you just picked Trade but don't currently hold your Trade Agreement";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
         }
 
         Integer tgCount = scTradeGoods.get(scNumber);
-        String msg = player.getRepresentation(true, true) +
+        String msg = player.getRepresentationUnfogged() +
             "\n> Picked: " + Helper.getSCRepresentation(game, scNumber);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
@@ -391,7 +391,7 @@ public class Stats extends PlayerSubcommandData {
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
-            CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
+            CommanderUnlockCheck.checkPlayer(player, "hacan");
             ButtonHelperAbilities.pillageCheck(player, game);
             if (scNumber == 2 && game.isRedTapeMode()) {
                 for (int x = 0; x < tgCount; x++) {

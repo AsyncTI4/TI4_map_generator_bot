@@ -29,8 +29,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -39,7 +42,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.draft.BagDraft;
@@ -53,8 +55,8 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
-import ti4.helpers.Units;
 import ti4.helpers.TIGLHelper.TIGLRank;
+import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.json.ObjectMapperFactory;
@@ -146,23 +148,21 @@ public class GameSaveLoadManager {
         String reason = null;
         if (event != null) {
             String username = event.getUser().getName();
-            if (event instanceof SlashCommandInteractionEvent slash) {
-                reason = username + " used: " + slash.getCommandString();
-            } else if (event instanceof ButtonInteractionEvent button) {
-                boolean thread = button.getMessageChannel() instanceof ThreadChannel;
-                boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
-                boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
-                if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
-                    reason = username + " pressed button: [CLASSIFIED]";
-                } else {
-                    reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
+            switch (event) {
+                case SlashCommandInteractionEvent slash -> reason = username + " used: " + slash.getCommandString();
+                case ButtonInteractionEvent button -> {
+                    boolean thread = button.getMessageChannel() instanceof ThreadChannel;
+                    boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
+                    boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
+                    if (cardThread || draftThread || game.isFowMode() || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
+                        reason = username + " pressed button: [CLASSIFIED]";
+                    } else {
+                        reason = username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
+                    }
                 }
-            } else if (event instanceof StringSelectInteractionEvent selectMenu) {
-                reason = username + " used string selection: " + selectMenu.getComponentId();
-            } else if (event instanceof ModalInteractionEvent modal) {
-                reason = username + " used modal: " + modal.getModalId();
-            } else {
-                reason = "Last Command Unknown - No Event Provided";
+                case StringSelectInteractionEvent selectMenu -> reason = username + " used string selection: " + selectMenu.getComponentId();
+                case ModalInteractionEvent modal -> reason = username + " used modal: " + modal.getModalId();
+                default -> reason = "Last Command Unknown - No Event Provided";
             }
         }
         saveMap(game, keepModifiedDate, reason);
@@ -170,20 +170,7 @@ public class GameSaveLoadManager {
 
     public static void saveMap(Game game, boolean keepModifiedDate, String saveReason) {
         long saveStart = System.nanoTime();
-
-        // ADD COMMAND/BUTTON FOR UNDO INFORMATION
-        List<String> trivialSaveReasons = new ArrayList<>(List.of(
-            "Last Command Unknown - No Event Provided",
-            "Bot Reload",
-            "Auto Ping"));
-        //boolean lastSaveTrivial = trivialSaveReasons.contains(game.getLatestCommand());
-        boolean thisSaveTrivial = saveReason == null || trivialSaveReasons.contains(saveReason);
-        //if (keepModifiedDate && game.isHasEnded() && lastSaveTrivial && thisSaveTrivial) {
-            // return;
-        //}
-
         game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
-
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
@@ -214,7 +201,6 @@ public class GameSaveLoadManager {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
         txtTime += System.nanoTime() - txtStart;
-
         long undoStart = System.nanoTime();
         mapFile = Storage.getMapImageStorage(game.getName() + TXT);
         if (mapFile.exists()) {
@@ -254,36 +240,12 @@ public class GameSaveLoadManager {
                         .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
                         .map(fileName -> fileName.replace(Constants.TXT, ""))
                         .map(Integer::parseInt).toList();
-                    int maxNumber = numbers.isEmpty() ? 0
-                        : numbers.stream().mapToInt(value -> value)
-                            .max().orElseThrow(NoSuchElementException::new);
-
-                    File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                    int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
+                    File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
+                    File mapUndoStorage2 = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                     CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                    Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
-                    mapUndoStorage.delete();
+                    Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
                     Game loadedGame = loadMap(originalMapFile);
-                    for (Player p1 : loadedGame.getRealPlayers()) {
-                        Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
-                        if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
-                            CardsInfo.sendCardsInfo(loadedGame, p1);
-                        }
-                    }
-                    GameManager.getInstance().deleteGame(game.getName());
-                    GameManager.getInstance().addGame(loadedGame);
-                    StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `")
-                        .append(maxNumber).append("` ");
-                    if (loadedGame.getSavedChannel() instanceof ThreadChannel
-                        && loadedGame.getSavedChannel().getName().contains("Cards Info")) {
-                        sb.append("[CLASSIFIED]");
-                    } else {
-                        sb.append(loadedGame.getLatestCommand());
-                    }
-                    if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-                    } else {
-                        ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
-                    }
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
                             && !game.getPhaseOfGame().contains("status")) {
@@ -298,6 +260,34 @@ public class GameSaveLoadManager {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "Had trouble getting the saved buttons, sorry");
                     }
+                    StringBuilder sb = new StringBuilder("Rolled the game back, including this command:\n> `")
+                        .append(maxNumber).append("` ");
+                    if (loadedGame.getSavedChannel() instanceof ThreadChannel
+                        && loadedGame.getSavedChannel().getName().contains("Cards Info")) {
+                        sb.append("[CLASSIFIED]");
+                    } else {
+                        sb.append(loadedGame.getLatestCommand());
+                    }
+                    Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
+                    mapUndoStorage2.delete();
+                    loadedGame = loadMap(originalMapFile);
+                    if (loadedGame == null) throw new Exception("Failed to load undo copy");
+
+                    for (Player p1 : loadedGame.getRealPlayers()) {
+                        Player p2 = game.getPlayerFromColorOrFaction(p1.getFaction());
+                        if (p1.getAc() != p2.getAc() || p1.getSo() != p2.getSo()) {
+                            CardsInfo.sendCardsInfo(loadedGame, p1);
+                        }
+                    }
+                    GameManager.getInstance().deleteGame(game.getName());
+                    GameManager.getInstance().addGame(loadedGame);
+
+                    if (game.isFowMode()) {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                    } else {
+                        ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
+                    }
+
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
@@ -309,8 +299,10 @@ public class GameSaveLoadManager {
         File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
         if (originalMapFile.exists()) {
             Game loadedGame = loadMap(originalMapFile);
-            GameManager.getInstance().deleteGame(game.getName());
-            GameManager.getInstance().addGame(loadedGame);
+            if (loadedGame != null) {
+                GameManager.getInstance().deleteGame(game.getName());
+                GameManager.getInstance().addGame(loadedGame);
+            }
         }
     }
 
@@ -391,7 +383,7 @@ public class GameSaveLoadManager {
         writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", game.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.SPEAKER + " " + game.getSpeaker());
+        writer.write(Constants.SPEAKER + " " + game.getSpeakerUserID());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.ACTIVE_PLAYER + " " + game.getActivePlayerID());
@@ -579,6 +571,8 @@ public class GameSaveLoadManager {
 
         writer.write(Constants.CREATION_DATE + " " + game.getCreationDate());
         writer.write(System.lineSeparator());
+        writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
+        writer.write(System.lineSeparator());
         long time = keepModifiedDate ? game.getLastModifiedDate() : new Date().getTime();
         game.setLastModifiedDate(time);
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
@@ -670,7 +664,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.CRYYPTER_MODE + " " + game.isCryypterMode());
+        writer.write(Constants.VOTC_MODE + " " + game.isVotcMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.MILTYMOD_MODE + " " + game.isMiltyModMode());
         writer.write(System.lineSeparator());
@@ -770,13 +764,20 @@ public class GameSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + game.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
+        game.getPlayersWithGMRole(); //init gmIds
+        writer.write(Constants.FOW_GM_IDS + " " + String.join(",", game.getFogOfWarGMIDs()));
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", game.getRunMigrations()));
         writer.write(System.lineSeparator());
 
         if (game.getMinimumTIGLRankAtGameStart() != null) {
-            writer.write(Constants.TIGL_RANK + " " + game.getMinimumTIGLRankAtGameStart().toString());
+            writer.write(Constants.TIGL_RANK + " " + game.getMinimumTIGLRankAtGameStart());
             writer.write(System.lineSeparator());
         }
+
+        // writer.write("historicalStatsDashboardJsons " + )
+        // writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
@@ -1003,11 +1004,9 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
             writer.write(System.lineSeparator());
-            writer.write(Constants.STRATEGY_CARD + " "
-                + String.join(",", player.getSCs().stream().map(String::valueOf).toList()));
+            writer.write(Constants.STRATEGY_CARD + " " + String.join(",", player.getSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
-            writer.write(Constants.FOLLOWED_SC + " "
-                + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
+            writer.write(Constants.FOLLOWED_SC + " " + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
 
             StringBuilder leaderInfo = new StringBuilder();
@@ -1072,7 +1071,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
 
             if (player.getPlayerTIGLRankAtGameStart() != null) {
-                writer.write(Constants.TIGL_RANK + " " + player.getPlayerTIGLRankAtGameStart().toString());
+                writer.write(Constants.TIGL_RANK + " " + player.getPlayerTIGLRankAtGameStart());
                 writer.write(System.lineSeparator());
             }
 
@@ -1191,36 +1190,37 @@ public class GameSaveLoadManager {
         long loadStart = System.nanoTime();
         try (Stream<Path> pathStream = Files.list(Storage.getMapImageDirectory().toPath())) {
             pathStream.parallel()
-                    .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
-                    .forEach(path -> {
-                        File file = path.toFile();
-                        try {
-                            Game game = loadMap(file);
-                            if (game == null || game.getName() == null) {
-                                BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
-                                return;
-                            }
-                            GameManager.getInstance().addGame(game);
-                        } catch (Exception e) {
-                            BotLogger.log("Could not load game: " + file.getName(), e);
+                .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
+                .forEach(path -> {
+                    File file = path.toFile();
+                    try {
+                        Game game = loadMap(file);
+                        if (game == null || game.getName() == null) {
+                            BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
+                            return;
                         }
-                    });
+                        if (file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 60 || game.isCustodiansScored()) {
+                            GameManager.getInstance().addGame(game);
+                        }
+                    } catch (Exception e) {
+                        BotLogger.log("Could not load game: " + file.getName(), e);
+                    }
+                });
         } catch (IOException e) {
             BotLogger.log("Exception occurred while streaming map directory.", e);
         }
         long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size()
-                + "` games: ", loadTime, loadTime));
+        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size() + "` games: ", loadTime, loadTime));
     }
 
     @Nullable
     public static Game loadMap(File mapFile) {
         if (mapFile == null || !mapFile.exists()) {
-            BotLogger.log("Could not load map, map file does not exist: " +
-                    (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
+            BotLogger.log("Could not load map, map file does not exist: " + (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
             return null;
         }
         Game game = new Game();
+        boolean fatalError = false;
         try {
             Iterator<String> gameFileLines = Files.readAllLines(mapFile.toPath(), Charset.defaultCharset()).listIterator();
             game.setOwnerID(gameFileLines.next());
@@ -1247,6 +1247,7 @@ public class GameSaveLoadManager {
                         readGameInfo(game, data);
                     } catch (Exception e) {
                         BotLogger.log("Data is bad: " + game.getName(), e);
+                        fatalError = true;
                     }
                 }
 
@@ -1273,7 +1274,12 @@ public class GameSaveLoadManager {
                     }
                 }
             }
-            game.setTileMap(getTileMap(gameFileLines, game, mapFile));
+            Map<String, Tile> tileMap = getTileMap(gameFileLines, game, mapFile);
+            if (tileMap == null || fatalError) {
+                BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                return null;
+            }
+            game.setTileMap(tileMap);
             game.endGameIfOld();
             return game;
         } catch (Exception e) {
@@ -1301,8 +1307,7 @@ public class GameSaveLoadManager {
                 if (tile != null) {
                     tileMap.put(tile.getPosition(), tile);
                 } else {
-                    BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `"
-                            + tileData + "` - tile will be skipped - check save file");
+                    BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData + "` - tile will be skipped - check save file");
                 }
 
                 while (gameFileLines.hasNext()) {
@@ -1323,8 +1328,7 @@ public class GameSaveLoadManager {
                                 if (Constants.MIRAGE.equals(spaceHolder)) {
                                     Helper.addMirageToTile(tile);
                                 } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                    BotLogger.log(game.getName() + ": Not valid space holder detected: "
-                                            + spaceHolder);
+                                    BotLogger.log(game.getName() + ": Not valid space holder detected: " + spaceHolder);
                                 }
                             }
                             continue;
@@ -1370,6 +1374,7 @@ public class GameSaveLoadManager {
             }
         } catch (Exception e) {
             BotLogger.log("Data read error: " + mapFile.getName(), e);
+            return null;
         }
         return tileMap;
     }
@@ -1484,7 +1489,7 @@ public class GameSaveLoadManager {
                     }
                     game.setScTradeGoods(scTradeGoods);
                 }
-                case Constants.SPEAKER -> game.setSpeaker(info);
+                case Constants.SPEAKER -> game.setSpeakerUserID(info);
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {
@@ -2020,10 +2025,10 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
-                case Constants.CRYYPTER_MODE -> {
+                case Constants.VOTC_MODE, "cryypter_mode" -> { //TODO: Remove "cryypter_mode" option if found in prod after Nov 2024
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        game.setCryypterMode(value);
+                        game.setVotcMode(value);
                     } catch (Exception e) {
                         // Do nothing
                     }
@@ -2130,6 +2135,13 @@ public class GameSaveLoadManager {
                         BotLogger.log("Could not parse button press count", exception);
                     }
                 }
+                case Constants.STARTED_DATE -> {
+                    try {
+                        game.setStartedDate(Long.parseLong(info));
+                    } catch (Exception exception) {
+                        BotLogger.log("Could not parse started date", exception);
+                    }
+                }
                 case Constants.LAST_MODIFIED_DATE -> {
                     try {
                         game.setLastModifiedDate(Long.parseLong(info));
@@ -2152,6 +2164,7 @@ public class GameSaveLoadManager {
                         // Do nothing
                     }
                 }
+                case Constants.FOW_GM_IDS -> game.setFogOfWarGMIDs(Helper.getListFromCSV(info));
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
 
@@ -2277,10 +2290,8 @@ public class GameSaveLoadManager {
                     }
                     player.setDebtTokens(debtTokens);
                 }
-                case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<>(
-                    getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
-                case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<>(
-                    getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
+                case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
+                case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
@@ -2527,8 +2538,7 @@ public class GameSaveLoadManager {
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
-        if (tile == null)
-            return;
+        if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();

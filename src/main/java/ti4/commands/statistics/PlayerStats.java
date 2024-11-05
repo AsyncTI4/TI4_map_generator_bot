@@ -23,12 +23,7 @@ public class PlayerStats extends StatisticsSubcommandData {
     public PlayerStats() {
         super("players", "Player Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, GameStatisticFilterer.PLAYER_COUNT_FILTER, "Filter games of player by player count, e.g. 3-8"));
-        addOptions(new OptionData(OptionType.INTEGER, GameStatisticFilterer.VICTORY_POINT_GOAL_FILTER, "Filter games of player by victory point goal, e.g. 10-14"));
-        addOptions(new OptionData(OptionType.STRING, GameStatisticFilterer.GAME_TYPE_FILTER, "Filter games of player by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
-        addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.FOG_FILTER, "Filter games of player by if the game is a fog game"));
-        addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HOMEBREW_FILTER, "Filter games of player by if the game has any homebrew"));
-        addOptions(new OptionData(OptionType.BOOLEAN, GameStatisticFilterer.HAS_WINNER_FILTER, "Filter games of player by if the game has a winner"));
+        addOptions(GameStatisticFilterer.gameStatsFilters());
         addOptions(new OptionData(OptionType.INTEGER, MINIMUM_GAME_COUNT_FILTER, "Filter by the minimum number of games player has played, default 10"));
         addOptions(new OptionData(OptionType.INTEGER, MAX_LIST_SIZE, "The maximum number of players listed, default 50"));
     }
@@ -71,7 +66,7 @@ public class PlayerStats extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Game Count:**__").append("\n");
-        if (entries.size() == 0) {
+        if (entries.isEmpty()) {
             sb.append("No players found for the given filters!");
         }
         for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {
@@ -124,7 +119,7 @@ public class PlayerStats extends StatisticsSubcommandData {
 
         StringBuilder sb = new StringBuilder();
         sb.append("__**Player Win Percent:**__").append("\n");
-        if (entries.size() == 0) {
+        if (entries.isEmpty()) {
             sb.append("No players found for the given filters!");
         }
         for (int i = 0; i < entries.size() && i < maximumListedPlayers; i++) {
@@ -145,17 +140,17 @@ public class PlayerStats extends StatisticsSubcommandData {
 
     public enum PlayerStatistics {
 
-        PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"),
+        PLAYER_WIN_PERCENT("Player win percent", "Shows the win percent of each player rounded to the nearest integer"), //
         PLAYER_GAME_COUNT("Player game count", "Shows the number of games each player has played in");
-    
+
         private final String name;
         private final String description;
-    
+
         PlayerStatistics(String name, String description) {
             this.name = name;
             this.description = description;
         }
-    
+
         @Override
         public String toString() {
             return super.toString().toLowerCase();

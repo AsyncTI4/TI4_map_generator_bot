@@ -21,6 +21,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.Constants;
 import ti4.helpers.CryypterHelper;
+import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -99,7 +100,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             return;
         }
         if ((agendaTarget.toLowerCase().contains("elect law") || agendaID.equalsIgnoreCase("constitution"))
-            && game.getLaws().size() < 1) {
+            && game.getLaws().isEmpty()) {
             MessageHelper.sendMessageToChannel(channel,
                 game.getPing() + "A Law Related Agenda (" + agendaName
                     + ") was revealed when no laws in play, flipping next agenda");
@@ -136,7 +137,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                 agendaName = agendaModel.getName();
                 game.setCurrentAgendaInfo(agendaType + "_" + agendaTarget + "_CL_covert");
                 if ((agendaTarget.toLowerCase().contains("elect law") || id2.equalsIgnoreCase("constitution"))
-                    && game.getLaws().size() < 1) {
+                    && game.getLaws().isEmpty()) {
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel,
@@ -147,7 +148,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                     && game.getScoredSecrets() < 1) {
                     MessageHelper.sendMessageToChannel(channel,
                         game.getPing() + "An Elect Secret Agenda (" + agendaName
-                            + ") was revealed under COvert when no scored secrets were in play, flipping next agenda");
+                            + ") was revealed under Covert when no scored secrets were in play, flipping next agenda");
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
                 }
@@ -156,15 +157,14 @@ public class RevealAgenda extends AgendaSubcommandData {
                     cov = true;
 
                     Player speaker = null;
-                    if (game.getPlayer(game.getSpeaker()) != null) {
-                        speaker = game.getPlayers().get(game.getSpeaker());
+                    if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                        speaker = game.getPlayers().get(game.getSpeakerUserID());
                     }
                     if (speaker != null) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(speaker.getRepresentation(true, true))
-                            .append(" this is the top agenda for Covert Legislation:");
+                        String sb = speaker.getRepresentationUnfogged() +
+                            " this is the top agenda for Covert Legislation:";
                         List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
-                        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, speaker, sb.toString(), embeds);
+                        MessageHelper.sendMessageEmbedsToCardsInfoThread(game, speaker, sb, embeds);
                         game.drawAgenda();
 
                     }
@@ -242,20 +242,20 @@ public class RevealAgenda extends AgendaSubcommandData {
             AgendaHelper.pingAboutDebt(game);
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
-                String message = "Politics holder did the following with the agendas in terms of topping or bottoming them:";
+                StringBuilder message = new StringBuilder("Politics holder did the following with the agendas in terms of topping or bottoming them:");
                 for (String actionA : game.getStoredValue(key).split("_")) {
-                    message = message + " " + StringUtils.capitalize(actionA);
+                    message.append(" ").append(StringUtils.capitalize(actionA));
                 }
                 MessageHelper.sendMessageToChannel(channel,
-                    message);
+                    message.toString());
 
             }
         }
         for (Player player : game.getRealPlayers()) {
             if (!action && game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander")
-                && ButtonHelperCommanders.resolveFlorzenCommander(player, game).size() > 0 && aCount == 2) {
+                && !ButtonHelperCommanders.resolveFlorzenCommander(player, game).isEmpty() && aCount == 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation(true, true)
+                    player.getRepresentationUnfogged()
                         + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
             }
@@ -266,16 +266,16 @@ public class RevealAgenda extends AgendaSubcommandData {
             game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, new Date().getTime() + "");
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {
-            String summary = "The scored secrets so far are:\n";
+            StringBuilder summary = new StringBuilder("## Scored Secret Objectives:\n");
             for (Player p2 : game.getRealPlayers()) {
                 for (String soID : p2.getSecretsScored().keySet()) {
                     SecretObjectiveModel so = Mapper.getSecretObjective(soID);
                     if (so != null) {
-                        summary = summary + so.getName() + ": " + so.getText() + "\n";
+                        summary.append("- ").append(Emojis.SecretObjective).append("__**").append(so.getName()).append("**__: ").append(so.getText()).append("\n");
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(channel, summary);
+            MessageHelper.sendMessageToChannel(channel, summary.toString());
         }
     }
 }

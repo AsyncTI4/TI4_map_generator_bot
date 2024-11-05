@@ -77,7 +77,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 text += "~~ - PASSED";
             }
 
-            if (player.getUserID().equals(game.getSpeaker())) {
+            if (player.getUserID().equals(game.getSpeakerUserID())) {
                 text += " " + Emojis.SpeakerToken;
             }
 

@@ -5,10 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.amazonaws.util.CollectionUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -16,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.Command;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -112,17 +110,16 @@ abstract public class AddRemoveUnits implements Command {
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
 
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
         unitParsing(event, color, tile, unitList, game);
     }
 
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList,
-        Game game) {
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Game game) {
 
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
@@ -135,7 +132,7 @@ abstract public class AddRemoveUnits implements Command {
         if (!Mapper.isValidColor(color)) {
             return;
         }
-        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains("572698679618568193")) {
+        if (game.getPlayerFromColorOrFaction(color) == null && !game.getPlayerIDs().contains(Constants.dicecordId)) {
             game.setupNeutralPlayer(color);
         }
 
@@ -253,7 +250,7 @@ abstract public class AddRemoveUnits implements Command {
                 // players)]
                 Player player1 = game.getActivePlayer();
                 if (player1 == null)
-                    player1 = playersForCombat.get(0);
+                    player1 = playersForCombat.getFirst();
                 playersForCombat.remove(player1);
                 Player player2 = player1;
                 for (Player p2 : playersForCombat) {
@@ -306,8 +303,8 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
             ButtonHelper.checkFleetAndCapacity(player, game, tile, event);
-            CommanderUnlockCheck.checkPlayer(player, game, "naalu", event);
-            CommanderUnlockCheck.checkPlayer(player, game, "cabal", event);
+            CommanderUnlockCheck.checkPlayer(player, "naalu", "cabal");
+
         }
     }
 

@@ -51,14 +51,14 @@
     {
         "alias": "absol_quantumcore",
         "name": "Quantumcore",
-        "text": "Gain the following tech immediately: [Cybernetic][Warfare] During the movement step of your tactical actions, you may move 1 of your structures from a system that does not contain 1 of your command tokens to a planet you control in the active system.\nWhen an opponent commits ground forces to a planet that contains 1 or more of your structures, you may destroy 1 strucutre on that planet to return the committed units to the space area.  If you do, purge this card",
+        "text": "Gain the following tech immediately: [Cybernetic][Warfare] During the movement step of your tactical actions, you may move 1 of your structures from a system that does not contain 1 of your command tokens to a planet you control in the active system.\nWhen an opponent commits ground forces to a planet that contains 1 or more of your structures, you may destroy 1 structure on that planet to return the committed units to the space area.  If you do, purge this card",
         "source": "absol",
         "flavourText": "*Trilossa slipped the core into the hololattice's main terminal.  The lattice was ancient - as old as the Flight itself - and tampering with it was tantamount to sin.  Hopefully the rest of the Flight would would see the necessity of the upgrade.*"
     },
     {
         "alias": "absol_emelpar",
         "name": "Scepter of Emelpar",
-        "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.\nACTION: Spend a token from your strategy pool and purge this card to ready your strategy card..",
+        "text": "When you would spend a token from your strategy pool, you may exhaust this card to spend a token from your reinforcements instead.\nACTION: Spend a token from your strategy pool and purge this card to ready your strategy card.\n[Note: You can still use the ACTION if this card is exhausted]",
         "source": "absol",
         "flavourText": "*As the hilt began to fuse with the flesh of her hand, she worried that she should set the scepter aside. But the whispered suggestions in her mind were too valuable and insightful to seriously consider such a rash and illogical act.*"
     },

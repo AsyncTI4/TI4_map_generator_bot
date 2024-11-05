@@ -27,6 +27,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
+import ti4.helpers.CryypterHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -35,7 +36,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
-import ti4.helpers.CryypterHelper;
 
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
@@ -131,19 +131,19 @@ public class SCPlay extends PlayerSubcommandData {
         }
         message.append(".\n\n");
 
-        String gamePing = game.getPing();
+        StringBuilder gamePing = new StringBuilder(game.getPing());
         List<Player> playersToFollow = game.getRealPlayers();
         if (!"All".equals(scModel.getGroup().orElse("")) && (game.getName().equalsIgnoreCase("pbd1000") || game.getName().equalsIgnoreCase("pbd100two"))) {
             playersToFollow = new ArrayList<>();
             String num = scToPlay + "";
-            num = num.substring(num.length() - 1, num.length());
-            gamePing = "";
+            num = num.substring(num.length() - 1);
+            gamePing = new StringBuilder();
             for (Player p2 : game.getRealPlayers()) {
                 for (Integer sc : p2.getSCs()) {
                     String num2 = sc + "";
-                    num2 = num2.substring(num2.length() - 1, num2.length());
+                    num2 = num2.substring(num2.length() - 1);
                     if (num2.equalsIgnoreCase(num) || num.equalsIgnoreCase("0") || num2.equalsIgnoreCase("0")) {
-                        gamePing = gamePing + p2.getRepresentation() + " ";
+                        gamePing.append(p2.getRepresentation()).append(" ");
                         playersToFollow.add(p2);
                     }
                 }
@@ -167,6 +167,7 @@ public class SCPlay extends PlayerSubcommandData {
                 continue;
             }
             player2.removeFollowedSC(scToPlay);
+            player2.getCardsInfoThread(); // force thread to open if closed
         }
 
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
@@ -182,11 +183,11 @@ public class SCPlay extends PlayerSubcommandData {
         // GET BUTTONS
         List<Button> scButtons = new ArrayList<>(getSCButtons(scToPlay, game, winnuHero));
         if (scModel != null && scModel.usesAutomationForSCID("pok7technology") && !game.isFowMode() && Helper.getPlayerFromAbility(game, "propagation") != null) {
-            scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Emojis.Nekro)));
+            scButtons.add(Buttons.gray("nekroFollowTech", "Get CCs", Emojis.Nekro));
         }
 
         if (scModel != null && scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
-            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf").withEmoji(Emoji.fromFormatted(Emojis.Titans)));
+            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf", Emojis.Titans));
         }
         scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
@@ -259,21 +260,21 @@ public class SCPlay extends PlayerSubcommandData {
 
                     // Trade Neighbour Message
                     if (scModel.usesAutomationForSCID("pok5trade")) {
-                        String neighborsMsg = "NOT neighbors with the trade holder:";
+                        StringBuilder neighborsMsg = new StringBuilder("NOT neighbors with the trade holder:");
                         for (Player p2 : game.getRealPlayers()) {
                             if (!player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                neighborsMsg = neighborsMsg + " " + p2.getFactionEmoji();
+                                neighborsMsg.append(" ").append(p2.getFactionEmoji());
                             }
                         }
-                        String neighborsMsg2 = "Neighbors with the trade holder:";
+                        StringBuilder neighborsMsg2 = new StringBuilder("Neighbors with the trade holder:");
                         for (Player p2 : game.getRealPlayers()) {
                             if (player.getNeighbouringPlayers().contains(p2) && player != p2) {
-                                neighborsMsg2 = neighborsMsg2 + " " + p2.getFactionEmoji();
+                                neighborsMsg2.append(" ").append(p2.getFactionEmoji());
                             }
                         }
                         if (!player.getPromissoryNotesInPlayArea().contains("convoys") && !player.hasAbility("guild_ships")) {
-                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg);
-                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2);
+                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg.toString());
+                            MessageHelper.sendMessageToChannel(threadChannel_, neighborsMsg2.toString());
                         }
                     }
 
@@ -334,14 +335,14 @@ public class SCPlay extends PlayerSubcommandData {
 
             for (Player p2 : playersToFollow) {
                 if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                    String message2 = p2.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
+                    String message2 = p2.getRepresentationUnfogged() + " heads up, trade has just been played and this is a reminder that you do not hold your Trade Agreement";
                     MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), message2);
                     for (Player p3 : game.getRealPlayers()) {
                         if (p2 == p3) {
                             continue;
                         }
                         if (p3.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
-                            String message3 = p3.getRepresentation(true, true) + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they may force the player to replenish and then you will be prompted to play the TA. ";
+                            String message3 = p3.getRepresentationUnfogged() + " heads up, trade has just been played and this is a reminder that hold the trade agreement of " + p2.getColor() + ". If you work out a deal with the trade holder, they may force the player to replenish and then you will be prompted to play the TA. ";
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }
                     }
@@ -360,17 +361,17 @@ public class SCPlay extends PlayerSubcommandData {
                 Button deleteB = Buttons.red("deleteButtons", "Delete These Buttons");
                 empNMahButtons.add(deleteB);
                 if (player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")) {
-                    empNMahButtons.add(0, emelpar);
+                    empNMahButtons.addFirst(emelpar);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with the Scepter of Emelpar.",
+                        player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with the Scepter of Emelpar.",
                         empNMahButtons);
                 }
-                if (player3.hasUnexhaustedLeader("mahactagent") && ButtonHelper.getTilesWithYourCC(player, game, event).size() > 0 && !winnuHero) {
+                if (player3.hasUnexhaustedLeader("mahactagent") && !ButtonHelper.getTilesWithYourCC(player, game, event).isEmpty() && !winnuHero) {
                     Button mahactA = Buttons.red("mahactA_follow_" + scToPlay,
-                        "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Emojis.Mahact));
-                    empNMahButtons.add(0, mahactA);
+                        "Use Mahact Agent", Emojis.Mahact);
+                    empNMahButtons.addFirst(mahactA);
                     MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(),
-                        player3.getRepresentation(true, true) + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        player3.getRepresentationUnfogged() + " You may follow " + Helper.getSCName(scToPlay, game) + " with " + (player3.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
                         empNMahButtons);
                 }
@@ -398,7 +399,7 @@ public class SCPlay extends PlayerSubcommandData {
             graceButtons.add(Buttons.green("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you may resolve Grace with the buttons.",
+                player.getRepresentationUnfogged() + " you may resolve Grace with the buttons.",
                 graceButtons);
         }
         if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
@@ -406,7 +407,7 @@ public class SCPlay extends PlayerSubcommandData {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.ownsPromissoryNote("acq") && "acq".equalsIgnoreCase(pn)) {
-                            String acqMessage = player2.getRepresentation(true, true)
+                            String acqMessage = player2.getRepresentationUnfogged()
                                 + " you may use this button to play Winnu PN!";
                             List<Button> buttons = new ArrayList<>();
                             buttons.add(Buttons.green("winnuPNPlay_" + scToPlay, "Use Acquisence"));
@@ -471,7 +472,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         Player imperialHolder = Helper.getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
-            imperialHolder = game.getPlayer(game.getSpeaker());
+            imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
@@ -524,7 +525,7 @@ public class SCPlay extends PlayerSubcommandData {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
                     if (!game.isFowMode()) {
-                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, null, player.getFactionEmoji());
+                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ", player.getFactionEmoji());
                         assignSpeakerButtons.add(button);
                     } else {
                         Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, player.getColor(), Emojis.getColorEmoji(player.getColor()));

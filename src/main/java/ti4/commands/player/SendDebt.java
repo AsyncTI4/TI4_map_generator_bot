@@ -61,11 +61,8 @@ public class SendDebt extends PlayerSubcommandData {
         }
 
         sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
-
-        CommanderUnlockCheck.checkPlayer(receivingPlayer, game, "vaden", event);
-
+        CommanderUnlockCheck.checkPlayer(receivingPlayer, "vaden");
         MessageHelper.sendMessageToEventChannel(event, sendingPlayer.getRepresentation() + " sent " + debtCountToSend + " debt tokens to " + receivingPlayer.getRepresentation());
-
     }
 
     public static void sendDebt(Player sendingPlayer, Player receivingPlayer, int debtCountToSend) {

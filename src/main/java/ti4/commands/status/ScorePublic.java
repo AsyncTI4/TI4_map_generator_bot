@@ -91,7 +91,7 @@ public class ScorePublic extends StatusSubcommandData {
             for (Player p2 : player.getNeighbouringPlayers()) {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);
-                    String msg = p2.getRepresentation(true, true)
+                    String msg = p2.getRepresentationUnfogged()
                         + " you gained 1TG due to your neighbor scoring a PO while you have Fillipo Rois, the Tnelis commander. Your TGs went from "
                         + (p2.getTg() - 1) + " -> " + p2.getTg();
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
@@ -145,7 +145,7 @@ public class ScorePublic extends StatusSubcommandData {
             || poName.toLowerCase().contains("amass wealth")
             || poName.toLowerCase().contains("manipulate galactic law")
             || poName.toLowerCase().contains("hold vast reserves")) {
-            String message2 = player.getRepresentation(true, true)
+            String message2 = player.getRepresentationUnfogged()
                 + " Click the names of the planets you wish to exhaust to score the objective.";
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
             Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");

@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,14 +32,17 @@ import ti4.helpers.Units.UnitType;
 import ti4.message.BotLogger;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
+import ti4.model.WormholeModel;
 
 public class Tile {
     private final String tileID;
     private String position;
-    private final Map<String, UnitHolder> unitHolders = new HashMap<>();
+    private final Map<String, UnitHolder> unitHolders = new LinkedHashMap<>();
 
-    private final HashMap<Player, Boolean> fog = new HashMap<>();
-    private final HashMap<Player, String> fogLabel = new HashMap<>();
+    @JsonIgnore
+    private final HashMap<Player, Boolean> fog = new LinkedHashMap<>();
+    @JsonIgnore
+    private final HashMap<Player, String> fogLabel = new LinkedHashMap<>();
 
     public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;
@@ -70,6 +75,11 @@ public class Tile {
         if (Optional.ofNullable(tilePlanetPositions).isPresent())
             tilePlanetPositions
                 .forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
+    }
+
+    public void inheritFogData(Tile t) {
+        fog.putAll(t.getFog());
+        fogLabel.putAll(t.getFogLabel());
     }
 
     @Nullable
@@ -130,6 +140,12 @@ public class Tile {
         if (unitHolder != null) {
             unitHolder.addCC(ccID);
         }
+    }
+
+    public boolean hasPlayerCC(Player player) {
+        String color = player.getColor();
+        String ccID = Mapper.getCCID(color);
+        return hasCC(ccID);
     }
 
     public boolean hasCC(String ccID) {
@@ -264,6 +280,14 @@ public class Tile {
             BotLogger.log("Could not find tile: " + tileID);
         }
         return tilePath;
+    }
+
+    public Map<Player, Boolean> getFog() {
+        return new HashMap<>(fog);
+    }
+
+    public Map<Player, String> getFogLabel() {
+        return new HashMap<>(fogLabel);
     }
 
     public boolean hasFog(Player player) {
@@ -451,6 +475,32 @@ public class Tile {
     }
 
     @JsonIgnore
+    public Set<WormholeModel.Wormhole> getWormholes() {
+        Set<WormholeModel.Wormhole> whs = new HashSet<>();
+        if (getTileModel().getWormholes() != null)
+            whs.addAll(getTileModel().getWormholes());
+        for (String token : getSpaceUnitHolder().getTokenList()) {
+            if (token.contains("alpha")) whs.add(WormholeModel.Wormhole.ALPHA);
+            if (token.contains("beta")) whs.add(WormholeModel.Wormhole.BETA);
+            if (token.contains("gamma")) whs.add(WormholeModel.Wormhole.GAMMA);
+        }
+        return whs;
+    }
+
+    @JsonIgnore
+    public int getWormholeCount() {
+        int whs = 0;
+        if (getTileModel().getWormholes() != null)
+            whs += getTileModel().getWormholes().size();
+        for (String token : getSpaceUnitHolder().getTokenList()) {
+            if (token.contains("alpha")) whs++;
+            if (token.contains("beta")) whs++;
+            if (token.contains("gamma")) whs++;
+        }
+        return whs;
+    }
+
+    @JsonIgnore
     public boolean hasCabalSpaceDockOrGravRiftToken() {
         return hasCabalSpaceDockOrGravRiftToken(null);
     }
@@ -496,10 +546,7 @@ public class Tile {
         if (Constants.MECATOL_SYSTEMS.contains(getTileID())) {
             return true;
         }
-        if (CollectionUtils.containsAny(unitHolders.keySet(), Constants.MECATOLS)) {
-            return true;
-        }
-        return false;
+        return CollectionUtils.containsAny(unitHolders.keySet(), Constants.MECATOLS);
     }
 
     @JsonIgnore
@@ -525,8 +572,7 @@ public class Tile {
             return true;
         }
         for (UnitHolder unitHolder : getUnitHolders().values()) {
-            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png",
-                "token_anomalydummy.png")) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
                 return true;
             }
         }
@@ -566,6 +612,15 @@ public class Tile {
         return getTileID().contains(searchString) ||
             getPosition().contains(searchString) ||
             getTileModel().search(searchString);
+    }
+
+    public boolean isHomeSystem(Game game) {
+        for (Player p : game.getRealAndEliminatedPlayers()) {
+            Tile home = p.getHomeSystemTile();
+            if (home != null && home.getTileID().equals(this.getTileID()))
+                return true;
+        }
+        return false;
     }
 
     @JsonIgnore
@@ -611,7 +666,7 @@ public class Tile {
             .map(Map.Entry::getKey)
             .map(player::getUnitFromUnitKey)
             .filter(Objects::nonNull)
-            .mapToInt(unit -> unit.getFleetSupplyBonus())
+            .mapToInt(UnitModel::getFleetSupplyBonus)
             .sum();
     }
 

@@ -57,7 +57,7 @@ public class Whisper extends FOWSubcommandData {
 
     public static void sendWhisper(Game game, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild) {
         String message;
-        String realIdentity = player_.getRepresentation(true, true);
+        String realIdentity = player_.getRepresentationUnfogged();
         String player1 = Emojis.getColorEmojiWithName(player.getColor());
         if (!game.isFowMode() && !(feedbackChannel instanceof ThreadChannel)) {
             feedbackChannel = player.getCardsInfoThread();

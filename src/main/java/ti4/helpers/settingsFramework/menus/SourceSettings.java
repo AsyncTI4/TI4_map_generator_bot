@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.menus.MiltySettings.DraftingMode;
@@ -20,7 +19,15 @@ public class SourceSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private BooleanSetting base, pok, codexes, discoStars, unchartedSpace, absol, miltymod, eronous, cryypter;
+    private final BooleanSetting base;
+    private final BooleanSetting pok;
+    private final BooleanSetting codexes;
+    private final BooleanSetting discoStars;
+    private final BooleanSetting unchartedSpace;
+    private final BooleanSetting absol;
+    private final BooleanSetting miltymod;
+    private final BooleanSetting eronous;
+    private BooleanSetting cryypter;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -67,7 +74,7 @@ public class SourceSettings extends SettingsMenu {
             absol.initialize(json.get("absol"));
             miltymod.initialize(json.get("miltymod"));
             eronous.initialize(json.get("eronous"));
-            // cryypter.initialize(json.get("cryypter"));
+            // cryypter.initialize(json.get("voice_of_the_council"));
         }
     }
 
@@ -76,7 +83,7 @@ public class SourceSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
 
         // Over-Validation for Twilight Falls
         if (parent instanceof MiltySettings milty && milty.getDraftMode().getValue() == DraftingMode.twilightfalls) {
