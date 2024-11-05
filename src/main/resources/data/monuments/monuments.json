@@ -1,0 +1,20 @@
+[
+    {
+        "id": "arborec_monument",
+        "baseType": "monument",
+        "asyncID": "monument",
+        "name": "Flaah Orbitals",
+        "subtitle": "Arborec Monument",
+        "source": "monuments",
+        "faction": "arborec",
+        "eligiblePlanetTypes": [
+            "HAZARDOUS",
+            "CULTURAL"
+        ],
+        "spaceCannonHitsOn": 8,
+        "spaceCannonDieCount": 2,
+        "isStructure": true,
+        "isMonument": true,
+        "ability": "When you pass, place 1 infantry on a planet in or adjacent to this system other than Mecatol Rex that contains no other player's units. Then, gain control of that planet, if able."
+    }
+]
