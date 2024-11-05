@@ -1,10 +1,5 @@
 package ti4.generator;
 
-import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -14,14 +9,19 @@ import ti4.helpers.GlobalSettings;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 
-public class MapGenerationPipeline {
+import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
-    private static final MapGenerationPipeline instance = new MapGenerationPipeline();
+public class MapRenderPipeline {
+
+    private static final MapRenderPipeline instance = new MapRenderPipeline();
 
     private final BlockingQueue<RenderEvent> gameRenderQueue = new LinkedBlockingQueue<>();
     private final Thread worker;
 
-    private MapGenerationPipeline() {
+    private MapRenderPipeline() {
         worker = new Thread(() -> {
             while (true) {
                 try {

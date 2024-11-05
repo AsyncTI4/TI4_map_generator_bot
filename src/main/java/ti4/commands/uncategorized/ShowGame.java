@@ -1,8 +1,5 @@
 package ti4.commands.uncategorized;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,13 +12,16 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
-import ti4.generator.MapGenerationPipeline;
+import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShowGame implements Command {
 
@@ -70,7 +70,7 @@ public class ShowGame implements Command {
             String temp = statsOption.getAsString();
             if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                MapGenerationPipeline.render(game, event, displayType,
+                MapRenderPipeline.render(game, event, displayType,
                                 fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else {
@@ -95,12 +95,12 @@ public class ShowGame implements Command {
 
     @ButtonHandler("showMap")
     public static void showMap(Game game, ButtonInteractionEvent event) {
-        MapGenerationPipeline.render(game, event, DisplayType.map, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
+        MapRenderPipeline.render(game, event, DisplayType.map, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     @ButtonHandler("showPlayerAreas")
     public static void showPlayArea(Game game, ButtonInteractionEvent event) {
-        MapGenerationPipeline.render(game, event, DisplayType.stats, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
+        MapRenderPipeline.render(game, event, DisplayType.stats, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     public static boolean includeButtons(DisplayType displayType) {
@@ -112,7 +112,7 @@ public class ShowGame implements Command {
     }
 
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        MapGenerationPipeline.render(game, event, displayType, fileUpload -> {
+        MapRenderPipeline.render(game, event, displayType, fileUpload -> {
             if (includeButtons(displayType)) {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {

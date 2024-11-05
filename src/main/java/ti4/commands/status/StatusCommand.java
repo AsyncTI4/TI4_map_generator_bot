@@ -1,20 +1,20 @@
 package ti4.commands.status;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.cardsac.ACCardsCommand;
-import ti4.generator.MapGenerationPipeline;
+import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class StatusCommand implements Command {
 
@@ -58,7 +58,7 @@ public class StatusCommand implements Command {
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(game, event);
 
-        MapGenerationPipeline.render(game, event,
+        MapRenderPipeline.render(game, event,
                 fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));
     }
 

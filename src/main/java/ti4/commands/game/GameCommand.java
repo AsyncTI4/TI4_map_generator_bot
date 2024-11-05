@@ -1,23 +1,23 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
-import ti4.generator.MapGenerationPipeline;
+import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class GameCommand implements Command {
 
@@ -61,7 +61,7 @@ public class GameCommand implements Command {
             !Constants.OBSERVER.equalsIgnoreCase(subcommandName) &&
             !Constants.OPTIONS.equalsIgnoreCase(subcommandName)) {
 
-            MapGenerationPipeline.render(game, event, fileUpload -> {
+            MapRenderPipeline.render(game, event, fileUpload -> {
                 List<Button> buttons = new ArrayList<>();
                 if (!game.isFowMode()) {
                     Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");

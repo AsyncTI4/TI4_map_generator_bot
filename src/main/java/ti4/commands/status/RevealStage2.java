@@ -1,12 +1,9 @@
 package ti4.commands.status;
 
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.MapGenerationPipeline;
+import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -16,6 +13,9 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
+
+import java.util.List;
+import java.util.Map;
 
 public class RevealStage2 extends StatusSubcommandData {
     public RevealStage2() {
@@ -53,7 +53,7 @@ public class RevealStage2 extends StatusSubcommandData {
                     game.getPing() + " **Status Cleanup Run!**");
                 if (!game.isFowMode()) {
                     DisplayType displayType = DisplayType.map;
-                    MapGenerationPipeline.render(game, event, displayType,
+                    MapRenderPipeline.render(game, event, displayType,
                             fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
                 }
             }
