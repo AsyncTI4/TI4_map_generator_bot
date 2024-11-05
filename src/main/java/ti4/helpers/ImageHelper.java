@@ -71,14 +71,6 @@ public class ImageHelper {
     }
 
     @Nullable
-    public static BufferedImage readURL(String imageURL) {
-        if (imageURL == null) {
-            return null;
-        }
-        return getOrLoadExpiringImage(imageURL, k -> readImageURL(imageURL));
-    }
-
-    @Nullable
     public static BufferedImage readScaled(String filePath, float percent) {
         if (filePath == null) {
             return null;
@@ -148,7 +140,7 @@ public class ImageHelper {
             return null;
         }
         return getOrLoadExpiringImage(width + "x" + height + imageURL, k -> {
-            BufferedImage image = readURL(imageURL);
+            BufferedImage image = readImageURL(imageURL);
             if (image == null) {
                 return null;
             }
@@ -228,7 +220,11 @@ public class ImageHelper {
         return null;
     }
 
+    @Nullable
     private static BufferedImage readImageURL(String imageURL) {
+        if (imageURL == null) {
+            return null;
+        }
         ImageIO.setUseCache(false);
         try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
             return readImage(inputStream);
