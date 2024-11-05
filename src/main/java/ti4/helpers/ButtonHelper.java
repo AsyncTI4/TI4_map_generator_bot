@@ -78,7 +78,7 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateTile;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapGenerationPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -1325,8 +1325,7 @@ public class ButtonHelper {
     public static void updateMap(Game game, GenericInteractionCreateEvent event, String message) {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
-        MapGenerator.saveImage(game, DisplayType.all, event)
-            .thenApply(fileUpload -> {
+        MapGenerationPipeline.render(game, event, DisplayType.all, fileUpload -> {
                 boolean foundSomething = false;
                 if (!game.isFowMode()) {
                     for (ThreadChannel threadChannel_ : threadChannels) {
@@ -1369,7 +1368,6 @@ public class ButtonHelper {
                     MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, message,
                         buttonsWeb);
                 }
-                return fileUpload;
             });
     }
 
@@ -1381,9 +1379,8 @@ public class ButtonHelper {
     }
 
     public static int getAllTilesWithAlphaNBetaNUnits(Player player, Game game) {
-        game.getTileMap().values().stream().filter(t -> t.containsPlayersUnits(player));
         int count = 0;
-        for (Tile tile : game.getTileMap().values()) {
+        for (Tile tile : game.getTileMap().values().stream().filter(t -> t.containsPlayersUnits(player)).toList()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)
                 && FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition())) {
                 count = count + 1;
@@ -5719,8 +5716,8 @@ public class ButtonHelper {
     }
 
     public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
-        MapGenerator.saveImage(game, feature, event, true)
-            .thenAccept(fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
+        MapGenerationPipeline.render(game, event, feature,
+                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
     public static List<Player> tileHasPDS2Cover(Player player, Game game, String tilePos) {

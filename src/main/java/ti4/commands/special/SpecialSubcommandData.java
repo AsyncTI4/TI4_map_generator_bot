@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapGenerationPipeline;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -39,6 +39,6 @@ public abstract class SpecialSubcommandData extends SubcommandData {
 
     public void reply(SlashCommandInteractionEvent event) {
         GameSaveLoadManager.saveMap(game, event);
-        MapGenerator.saveImageToWebsiteOnly(game, event);
+        MapGenerationPipeline.renderToWebsiteOnly(game, event);
     }
 }

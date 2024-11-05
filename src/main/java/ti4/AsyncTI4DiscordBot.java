@@ -1,7 +1,5 @@
 package ti4;
 
-import static org.reflections.scanners.Scanners.*;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,11 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -30,6 +23,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
@@ -82,6 +79,7 @@ import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
 import ti4.commands.user.UserSettingsManager;
+import ti4.generator.MapGenerationPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -102,6 +100,8 @@ import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
+
+import static org.reflections.scanners.Scanners.SubTypes;
 
 public class AsyncTI4DiscordBot {
 
@@ -138,7 +138,7 @@ public class AsyncTI4DiscordBot {
             // (also including embeds/attachments/components).
             .enableIntents(GatewayIntent.MESSAGE_CONTENT)
             // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
-            .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+            .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
             // It *appears* we need to pull all members or else the bot has trouble pinging players
             // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
             // and avoid loading every user at startup
@@ -302,6 +302,9 @@ public class AsyncTI4DiscordBot {
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
         DataMigrationManager.runMigrations();
         BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
+
+        // START MAP GENERATION
+        MapGenerationPipeline.start();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);

@@ -29,7 +29,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.special.Rematch;
 import ti4.commands.statistics.GameStatisticFilterer;
 import ti4.commands.statistics.GameStats;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapGenerationPipeline;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -229,7 +229,7 @@ public class GameEnd extends GameSubcommandData {
         TextChannel summaryChannel = getGameSummaryChannel(game);
         if (!game.isFowMode()) {
             // SEND THE MAP IMAGE
-            MapGenerator.saveImage(game, DisplayType.all, event).thenAccept(fileUpload -> {
+            MapGenerationPipeline.render(game, event, DisplayType.all, fileUpload -> {
                 MessageHelper.replyToMessage(event, fileUpload);
                 // CREATE POST
                 if (publish) {

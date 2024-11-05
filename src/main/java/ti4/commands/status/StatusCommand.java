@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.cardsac.ACCardsCommand;
-import ti4.generator.MapGenerator;
+import ti4.generator.MapGenerationPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -58,8 +58,8 @@ public class StatusCommand implements Command {
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         GameSaveLoadManager.saveMap(game, event);
 
-        MapGenerator.saveImage(game, event)
-            .thenAccept(fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));
+        MapGenerationPipeline.render(game, event,
+                fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));
     }
 
     protected String getActionDescription() {
