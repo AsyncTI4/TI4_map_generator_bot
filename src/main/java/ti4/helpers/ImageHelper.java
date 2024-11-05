@@ -49,14 +49,6 @@ public class ImageHelper {
         .recordStats()
         .build();
 
-    private static final int CALCULATED_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.CALCULATED_IMAGE_CACHE_SIZE.toString(), Integer.class, 500);
-    private static final int CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
-    private static final Cache<String, BufferedImage> calculatedImageCache = Caffeine.newBuilder()
-            .maximumSize(CALCULATED_IMAGE_CACHE_SIZE)
-            .expireAfterAccess(CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
-            .recordStats()
-            .build();
-
     private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 30);
     private static final AtomicReference<Instant> logStatsScheduledTime = new AtomicReference<>();
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
@@ -180,15 +172,6 @@ public class ImageHelper {
         return outputImage;
     }
 
-    public static BufferedImage createOrLoadCalculatedImage(String key, Function<String, BufferedImage> loader) {
-        try {
-            return calculatedImageCache.get(key, loader);
-        } catch (Exception e) {
-            BotLogger.log("Unable to load from image cache.", e);
-        }
-        return null;
-    }
-
     private static BufferedImage getOrLoadStaticImage(String key, Function<String, BufferedImage> loader) {
         try {
             return fileImageCache.get(key, loader);
@@ -254,8 +237,7 @@ public class ImageHelper {
         }
         return Optional.of(
                 cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " +
-                      cacheStatsToString("urlImageCache", urlImageCache) + "\n\n" +
-                      cacheStatsToString("calculatedImageCache", calculatedImageCache));
+                      cacheStatsToString("urlImageCache", urlImageCache));
     }
 
     private static String cacheStatsToString(String name, Cache<String, BufferedImage> cache) {

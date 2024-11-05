@@ -3181,18 +3181,9 @@ public class MapGenerator {
         return img;
     }
 
-    private BufferedImage hexBorderCache(ColorModel color, List<Integer> openSides) {
+    private BufferedImage hexBorder(ColorModel color, List<Integer> openSides) {
         String style = game.getHexBorderStyle();
-        // don't cache these, it's not worth it
-        if (openSides.size() > 2) return hexBorder(color, openSides, style.equals("solid"));
-
-        // Otherwise, cache it
-        Collections.sort(openSides);
-        StringBuilder key = new StringBuilder(color.getName() + "-HexBorder-" + style);
-        for (int x : openSides)
-            key.append("_").append(x);
-        Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides, style.equals("solid"));
-        return ImageHelper.createOrLoadCalculatedImage(key.toString(), loader);
+        return hexBorder(color, openSides, style.equals("solid"));
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
@@ -3230,7 +3221,7 @@ public class MapGenerator {
             for (int i = 0; i < 6; i++)
                 if (statTiles.contains(adjPos.get(i)))
                     adjDir.add(i);
-            BufferedImage hex = hexBorderCache(playerColor, adjDir);
+            BufferedImage hex = hexBorder(playerColor, adjDir);
             graphics.drawImage(hex, p.x, p.y, null);
         }
 
@@ -4621,7 +4612,7 @@ public class MapGenerator {
                         sideNum++;
                     }
                     if (fow && this.fowPlayer == null) openSides.clear();
-                    BufferedImage border = hexBorderCache(Mapper.getColor(controllingPlayer.getColor()), openSides);
+                    BufferedImage border = hexBorder(Mapper.getColor(controllingPlayer.getColor()), openSides);
                     tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
                 }
 
