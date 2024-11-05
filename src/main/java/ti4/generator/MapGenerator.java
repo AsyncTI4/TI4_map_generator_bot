@@ -250,7 +250,8 @@ public class MapGenerator {
     private DisplayType defaultIfNull(DisplayType displayType) {
         if (game.getDisplayTypeForced() != null) {
             return game.getDisplayTypeForced();
-        } else if (displayType == null) {
+        }
+        if (displayType == null) {
             displayType = game.getDisplayTypeForced();
             if (displayType == null) {
                 return DisplayType.all;
@@ -279,6 +280,8 @@ public class MapGenerator {
             sendToWebsite(event);
             if (debug) debugWebsiteTime.stop();
         }
+
+        mainImage.flush();
 
         logDebug(event);
         return fileUpload;
