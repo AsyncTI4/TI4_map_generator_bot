@@ -968,6 +968,9 @@ public class Emojis {
     public static final String syndicate = "<:syndicate:1189668205355073667>";
     public static final String terminator = "<:terminator:1189668214125363231>";
 
+    // MEMEPHILOSPHER
+    public static final String netharii = "<:netharii:1303204852532383804>";
+
     // DICE
     public static final String d10green_0 = "<:d10green_0:1180170565819039916>";
     public static final String d10green_1 = "<:d10green_1:1180170567337386026>";
@@ -1232,6 +1235,8 @@ public class Emojis {
             case "raven" -> raven;
             case "syndicate" -> syndicate;
             case "terminator" -> terminator;
+
+            case "netharii" -> netharii;
 
             default -> getRandomizedEmoji(0, null);
         };

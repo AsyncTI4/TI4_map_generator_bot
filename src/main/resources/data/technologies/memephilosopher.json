@@ -1,0 +1,24 @@
+[
+    {
+        "alias": "ne_inf2",
+        "name": "Sentinel II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GGR",
+        "faction": "netharii",
+        "source": "memephilosopher",
+        "text": "Cost 1, Combat 5. When on a planet, this unit participates in space combat, but cannot be destroyed during space combat. This unit can participate in space combats in adjacent systems."
+    },
+    {
+        "alias": "ne_qed",
+        "name": "Quantum Entanglement Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "netharii",
+        "source": "memephilosopher",
+        "text": "Exhaust this card. Systems with sentinels are considered adjacent during this tactical action."
+    }
+]
