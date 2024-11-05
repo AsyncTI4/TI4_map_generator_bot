@@ -46,7 +46,7 @@ public class MapRenderPipeline {
     public static void shutdown() {
         instance.running = false;
         try {
-            instance.worker.join();
+            instance.worker.join(20000);
         } catch (InterruptedException e) {
             BotLogger.log("MapRenderPipeline shutdown interrupted.");
             Thread.currentThread().interrupt();
