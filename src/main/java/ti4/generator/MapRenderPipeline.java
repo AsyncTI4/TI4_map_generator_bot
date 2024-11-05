@@ -12,6 +12,7 @@ import ti4.message.BotLogger;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class MapRenderPipeline {
@@ -26,9 +27,11 @@ public class MapRenderPipeline {
         worker = new Thread(() -> {
             while (running || !gameRenderQueue.isEmpty()) {
                 try {
-                    RenderEvent renderEvent = gameRenderQueue.take();
-                    render(renderEvent);
-                    System.gc();
+                    RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
+                    if (renderEvent != null) {
+                        render(renderEvent);
+                        System.gc();
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
