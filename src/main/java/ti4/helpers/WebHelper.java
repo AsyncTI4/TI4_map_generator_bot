@@ -1,6 +1,19 @@
 package ti4.helpers;
 
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.ResourceHelper;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameStatsDashboardPayload;
+import ti4.map.Player;
+import ti4.message.BotLogger;
+import ti4.website.WebsiteOverlay;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -20,26 +33,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import ti4.ResourceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameStatsDashboardPayload;
-import ti4.map.Player;
-import ti4.message.BotLogger;
-import ti4.website.WebsiteOverlay;
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class WebHelper {
-    private static final Properties webProperties;
 
+    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final S3Client s3Client = S3Client.builder().region(Region.US_EAST_1).build();
+    private static final Properties webProperties;
     static {
         webProperties = new Properties();
         try (InputStream input = new FileInputStream(Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
@@ -49,12 +49,13 @@ public class WebHelper {
         }
     }
 
+
     public static void putData(String gameId, Game game) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
             return;
 
         ObjectMapper mapper = new ObjectMapper();
-        try (HttpClient client = HttpClient.newHttpClient()) {
+        try {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
             String json = mapper.writeValueAsString(exportableFieldMap);
 
@@ -63,7 +64,7 @@ public class WebHelper {
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
-            client.send(request, HttpResponse.BodyHandlers.ofString());
+            httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
             BotLogger.log("Could not put data to web server", e);
         }
@@ -74,7 +75,7 @@ public class WebHelper {
             return;
 
         ObjectMapper mapper = new ObjectMapper();
-        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+        try {
             Map<String, WebsiteOverlay> overlays = game.getWebsiteOverlays();
             String json = mapper.writeValueAsString(overlays);
 
@@ -85,7 +86,7 @@ public class WebHelper {
                 .cacheControl("no-cache, no-store, must-revalidate")
                 .build();
 
-            s3.putObject(request, RequestBody.fromString(json));
+            s3Client.putObject(request, RequestBody.fromString(json));
         } catch (Exception e) {
             BotLogger.log("Could not put overlay to web server", e);
         }
@@ -119,7 +120,7 @@ public class WebHelper {
         if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
         BotLogger.log(message);
 
-        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+        try {
             String json = mapper.writeValueAsString(payloads);
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
@@ -128,7 +129,7 @@ public class WebHelper {
                 .cacheControl("no-cache, no-store, must-revalidate")
                 .build();
 
-            s3.putObject(request, RequestBody.fromString(json));
+            s3Client.putObject(request, RequestBody.fromString(json));
         } catch (Exception e) {
             BotLogger.log("Could not put statistics to web server", e);
         }
@@ -142,7 +143,7 @@ public class WebHelper {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
             return;
 
-        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+        try {
             String mapPath;
             if (frog != null && frog && player != null) {
                 mapPath = "fogmap/" + player.getUserID() + "/%s/%s.";
@@ -163,7 +164,7 @@ public class WebHelper {
                     .key(String.format(mapPath, gameId, dtstamp))
                     .contentType("image/" + format)
                     .build();
-                s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
+                s3Client.putObject(request, RequestBody.fromBytes(out.toByteArray()));
             }
         } catch (SdkClientException e) {
             BotLogger.log("Could not add image for game `" + gameId + "` to web server. Likely invalid credentials.", e);
@@ -176,7 +177,7 @@ public class WebHelper {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
             return;
 
-        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+        try {
             String jsonPathFormat = "json_saves/%s/%s";
 
             PutObjectRequest request = PutObjectRequest.builder()
@@ -185,7 +186,7 @@ public class WebHelper {
                 .contentType("application/json")
                 .build();
 
-            s3.putObject(request, RequestBody.fromFile(file));
+            s3Client.putObject(request, RequestBody.fromFile(file));
         } catch (SdkClientException e) {
             BotLogger.log("Could not add json file for game `" + gameId + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
