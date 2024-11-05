@@ -27,9 +27,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.RepositoryDispatchEvent;
-import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
-import ti4.helpers.WebHelper;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -39,7 +37,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -197,14 +194,6 @@ public class GameEnd extends GameSubcommandData {
         }
         if (actionsChannel != null) {
             new RepositoryDispatchEvent("archive_game_channel", Map.of("channel", actionsChannel.getId())).sendEvent();
-        }
-
-        // send game json file to s3
-        GameSaveLoadManager.saveMapJson(game);
-        File jsonGameFile = Storage.getMapsJSONStorage(game.getName() + ".json");
-        boolean isWon = game.getWinner().isPresent() && game.isHasEnded();
-        if (isWon) {
-            WebHelper.putFile(game.getName(), jsonGameFile);
         }
 
         if (rematch) {

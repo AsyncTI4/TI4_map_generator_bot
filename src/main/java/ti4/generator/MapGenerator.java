@@ -1,37 +1,5 @@
 package ti4.generator;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.color.ColorSpace;
-import java.awt.font.GlyphVector;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
-import java.awt.image.RescaleOp;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -44,6 +12,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
@@ -91,6 +60,38 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
+import java.awt.image.RescaleOp;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator {
@@ -125,14 +126,13 @@ public class MapGenerator {
     private int minY = -1;
     private int maxX = -1;
     private int maxY = -1;
-    private Boolean isFoWPrivate;
+    private boolean isFoWPrivate;
     private Player fowPlayer;
-    private long debugAbsoluteStartTime;
-    private long debugStartTime;
-    private long debugFowTime;
-    private long debugTileTime;
-    private long debugGameInfoTime;
-    private long debugDiscordTime;
+    private StopWatch debugAbsoluteStartTime;
+    private StopWatch debugTileTime;
+    private StopWatch debugDrawTime;
+    private StopWatch debugDiscordTime;
+    private StopWatch debugWebsiteTime;
 
     //private static final BasicStroke stroke1 = new BasicStroke(1.0f);
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
@@ -259,17 +259,26 @@ public class MapGenerator {
     }
 
     FileUpload saveImage(@Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord, boolean uploadToWebsite) {
-        if (debug) debugAbsoluteStartTime = System.nanoTime();
+        if (debug) debugAbsoluteStartTime = StopWatch.createStarted();
 
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
         game.resetWebsiteOverlays();
 
+        if (debug) debugDrawTime = StopWatch.createStarted();
         drawGame(event);
+        if (debug) debugDrawTime.stop();
+
+        if (debug) debugDiscordTime = StopWatch.createStarted();
         FileUpload fileUpload = uploadToDiscord ? createFileUpload() : null;
+        if (debug) debugDiscordTime.stop();
+
         if (uploadToWebsite) {
+            if (debug) debugWebsiteTime = StopWatch.createStarted();
             sendToWebsite(event);
+            if (debug) debugWebsiteTime.stop();
         }
+
         logDebug(event);
         return fileUpload;
     }
@@ -277,9 +286,6 @@ public class MapGenerator {
     private void setupTilesForDisplayTypeAllAndMap(Map<String, Tile> tilesToDisplay) {
         if (displayTypeBasic != DisplayType.all && displayTypeBasic != DisplayType.map) {
             return;
-        }
-        if (debug) {
-            debugStartTime = System.nanoTime();
         }
         Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
@@ -345,13 +351,9 @@ public class MapGenerator {
         } else if (displayType == DisplayType.attachments) {
             tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Attachments));
         }
-        if (debug)
-            debugTileTime = System.nanoTime() - debugStartTime;
     }
 
     private void setupFow(GenericInteractionCreateEvent event, Map<String, Tile> tilesToDisplay) {
-        if (debug)
-            debugStartTime = System.nanoTime();
         if (game.isFowMode() && event != null) {
             if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)
                 || event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper) {
@@ -375,24 +377,23 @@ public class MapGenerator {
                 }
             }
         }
-        if (debug)
-            debugFowTime = System.nanoTime() - debugStartTime;
     }
 
     public boolean shouldConvertToGeneric(Player player) {
-        return isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        return isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
     }
 
     private void logDebug(GenericInteractionCreateEvent event) {
         ImageHelper.getCacheStats().ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
         if (!debug)
             return;
-        long total = System.nanoTime() - debugAbsoluteStartTime;
-        String sb = " Total time to generate map " + game.getName() + ": " + Helper.getTimeRepresentationNanoSeconds(total) +
-            "\n" + debugString("    Frog time: ", debugFowTime, total) +
-            "\n" + debugString("    Tile time: ", debugTileTime, total) +
-            "\n" + debugString("    Info time: ", debugGameInfoTime, total) +
-            "\n" + debugString(" Discord time: ", debugDiscordTime, total) +
+        debugAbsoluteStartTime.stop();
+        long total = debugAbsoluteStartTime.getNanoTime();
+        String sb = " Total time (" + game.getName() + "):               " + Helper.getTimeRepresentationNanoSeconds(total) +
+            "\n" + debugString(" Draw time:                          ", debugDrawTime.getNanoTime(), total) +
+            "\n" + debugString("     Tile time (part of Draw):             ", debugTileTime.getNanoTime(), debugDrawTime.getNanoTime()) +
+            "\n" + debugString(" Discord time:                       ", debugDiscordTime.getNanoTime(), total) +
+            "\n" + debugString(" Website time:                       ", debugWebsiteTime.getNanoTime(), total) +
             "\n";
         MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
     }
@@ -403,23 +404,18 @@ public class MapGenerator {
 
     private void sendToWebsite(GenericInteractionCreateEvent event) {
         String testing = System.getenv("TESTING");
-        if (testing == null && displayTypeBasic == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
+        if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
             WebHelper.putMap(game.getName(), mainImage);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game);
-        } else if (isFoWPrivate != null && isFoWPrivate) {
+        } else if (isFoWPrivate) {
             Player player = getFowPlayer(event);
             WebHelper.putMap(game.getName(), mainImage, true, player);
         }
     }
 
     private FileUpload createFileUpload() {
-        if (debug) debugStartTime = System.nanoTime();
-
-        FileUpload fileUpload = createFileUpload(mainImage, .2f, game.getName());
-
-        if (debug) debugDiscordTime = System.nanoTime() - debugStartTime;
-        return fileUpload;
+        return createFileUpload(mainImage, .2f, game.getName());
     }
 
     public static FileUpload createFileUpload(BufferedImage imageToUpload, float compressionQuality, String filenamePrefix) {
@@ -615,12 +611,12 @@ public class MapGenerator {
     }
 
     private void drawGame(GenericInteractionCreateEvent event) {
-        if (debug) {
-            debugStartTime = System.nanoTime();
-        }
         Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
         setupFow(event, tilesToDisplay);
+
+        if (debug) debugTileTime = StopWatch.createStarted();
         setupTilesForDisplayTypeAllAndMap(tilesToDisplay);
+        if (debug) debugTileTime.stop();
 
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
@@ -707,8 +703,7 @@ public class MapGenerator {
                 int baseY = y;
                 x = realX;
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
-                    && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
                 if (convertToGeneric) {
                     continue;
                 }
@@ -1074,8 +1069,6 @@ public class MapGenerator {
 
             }
         }
-
-        if (debug) debugGameInfoTime = System.nanoTime() - debugStartTime;
     }
 
     private int speakerToken(Player player, int xDeltaFromRightSide, int yPlayAreaSecondRow) {
@@ -1550,7 +1543,7 @@ public class MapGenerator {
         deltaX += 24;
         deltaY += 2;
 
-        boolean hideFactionIcon = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        boolean hideFactionIcon = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
 
         int tokenDeltaY = 0;
         int playerCount = 0;
@@ -2059,7 +2052,7 @@ public class MapGenerator {
 
         deltaX += 156;
 
-        boolean randomizeList = player != fowPlayer && isFoWPrivate != null && isFoWPrivate;
+        boolean randomizeList = player != fowPlayer && isFoWPrivate;
         if (randomizeList) {
             Collections.shuffle(planets);
         }
@@ -2782,7 +2775,7 @@ public class MapGenerator {
         }
 
         List<Player> players = new ArrayList<>(game.getRealPlayers());
-        if (isFoWPrivate != null && isFoWPrivate) {
+        if (isFoWPrivate) {
             Collections.shuffle(players);
         }
 
@@ -2800,7 +2793,7 @@ public class MapGenerator {
         for (List<Player> playerChunk : playerChunks) {
             for (Player player : playerChunk) {
                 try {
-                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                    boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
                     String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
 
                     BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
@@ -2829,7 +2822,7 @@ public class MapGenerator {
     private Coord drawStrategyCards(Coord coord) {
         int x = coord.x;
         int y = coord.y;
-        boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
+        boolean convertToGenericSC = isFoWPrivate;
         int deltaY = y + 80;
         Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
         Collection<Player> players = game.getPlayers().values();
@@ -2885,7 +2878,7 @@ public class MapGenerator {
     }
 
     private Coord drawTurnOrderTracker(int x, int y) {
-        boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
+        boolean convertToGenericSC = isFoWPrivate;
         String activePlayerUserID = game.getActivePlayerID();
         if (!convertToGenericSC && activePlayerUserID != null && "action".equals(game.getPhaseOfGame())) {
             graphics.setFont(Storage.getFont20());
@@ -2980,7 +2973,7 @@ public class MapGenerator {
     }
 
     private List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken) {
-        boolean fow = isFoWPrivate != null && isFoWPrivate;
+        boolean fow = isFoWPrivate;
         boolean randomizeLocation = false;
         if (fow && player != fowPlayer) {
             if (FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
@@ -3059,7 +3052,7 @@ public class MapGenerator {
         graphics.setColor(Color.WHITE);
 
         // Do some stuff for FoW
-        boolean fow = isFoWPrivate != null && isFoWPrivate;
+        boolean fow = isFoWPrivate;
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         List<Player> statOrder = new ArrayList<>(game.getRealPlayers());
         if (fow) {
@@ -3194,7 +3187,7 @@ public class MapGenerator {
     }
 
     private void paintPlayerInfo(Game game, Player player, List<String> statTiles) {
-        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+        boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
         if (convertToGeneric) {
             return;
         }
@@ -3812,7 +3805,7 @@ public class MapGenerator {
 
         String userName = player.getUserName();
 
-        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate
+        boolean convertToGeneric = isFoWPrivate
             && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
         if (convertToGeneric) {
             return;
@@ -4124,8 +4117,7 @@ public class MapGenerator {
                     boolean convertToGeneric = false;
                     for (Player player : game.getPlayers().values()) {
                         if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
-                            if (isFoWPrivate != null && isFoWPrivate
-                                && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
+                            if (isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
                                 convertToGeneric = true;
                             }
                             electedPlayer = player;
@@ -4143,7 +4135,7 @@ public class MapGenerator {
                     int count = 0;
                     for (String debtToken : game.getStoredValue("controlTokensOnAgenda" + lawEntry.getValue()).split("_")) {
 
-                        boolean hideFactionIcon = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, game.getPlayerFromColorOrFaction(debtToken), fowPlayer);
+                        boolean hideFactionIcon = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, game.getPlayerFromColorOrFaction(debtToken), fowPlayer);
                         String controlID = hideFactionIcon ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken);
                         if (controlID.contains("null")) {
                             continue;
@@ -4350,7 +4342,7 @@ public class MapGenerator {
                 Player player = playerEntry.getValue();
                 String userID = player.getUserID();
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
+                boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
                 if (scoredPlayerID.contains(userID)) {
                     String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
                     if (controlID.contains("null")) {
