@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,7 +39,6 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
@@ -115,7 +113,6 @@ public class MapGenerator {
     private final Game game;
     private final DisplayType displayType;
     private final DisplayType displayTypeBasic;
-    private final boolean uploadToDiscord;
     private final boolean debug;
     private final int width;
     private final int height;
@@ -157,18 +154,13 @@ public class MapGenerator {
     private static final Color LawColor = new Color(228, 255, 0);
     private static final Color TradeGoodColor = new Color(241, 176, 0);
 
-    private MapGenerator(Game game) {
-        this(game, null, true);
+    MapGenerator(Game game) {
+        this(game, null);
     }
 
-    private MapGenerator(Game game, DisplayType displayType) {
-        this(game, displayType, true);
-    }
-
-    private MapGenerator(Game game, DisplayType displayType, boolean uploadToDiscord) {
+    MapGenerator(Game game, DisplayType displayType) {
         this.game = game;
         this.displayType = defaultIfNull(displayType);
-        this.uploadToDiscord = uploadToDiscord;
         this.playerControlMap = game.getPlayerControlMap();
 
         debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
@@ -266,25 +258,7 @@ public class MapGenerator {
         return displayType;
     }
 
-    public static void saveImageToWebsiteOnly(Game game, @Nullable GenericInteractionCreateEvent event) {
-        if (GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) {
-            saveImage(game, null, event, false);
-        }
-    }
-
-    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable SlashCommandInteractionEvent event) {
-        return saveImage(game, null, event);
-    }
-
-    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
-        return AsyncTI4DiscordBot.completeAsync(() -> new MapGenerator(game, displayType).saveImage(event));
-    }
-
-    public static CompletableFuture<FileUpload> saveImage(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord) {
-        return AsyncTI4DiscordBot.completeAsync(() -> new MapGenerator(game, displayType, uploadToDiscord).saveImage(event));
-    }
-
-    private FileUpload saveImage(@Nullable GenericInteractionCreateEvent event) {
+    FileUpload saveImage(@Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord, boolean uploadToWebsite) {
         if (debug) debugAbsoluteStartTime = System.nanoTime();
 
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
@@ -292,8 +266,10 @@ public class MapGenerator {
         game.resetWebsiteOverlays();
 
         drawGame(event);
-        AsyncTI4DiscordBot.THREAD_POOL.submit(() -> sendToWebsite(event));
-        FileUpload fileUpload = createFileUpload();
+        FileUpload fileUpload = uploadToDiscord ? createFileUpload() : null;
+        if (uploadToWebsite) {
+            sendToWebsite(event);
+        }
         logDebug(event);
         return fileUpload;
     }
@@ -438,7 +414,6 @@ public class MapGenerator {
     }
 
     private FileUpload createFileUpload() {
-        if (!uploadToDiscord) return null;
         if (debug) debugStartTime = System.nanoTime();
 
         FileUpload fileUpload = createFileUpload(mainImage, .2f, game.getName());
