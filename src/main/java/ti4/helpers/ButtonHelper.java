@@ -714,10 +714,13 @@ public class ButtonHelper {
         if (game.getStoredValue("lawsDisabled").equalsIgnoreCase("yes")) {
             return false;
         }
+        if (player == null) {
+            return false;
+        }
         for (String law : game.getLaws().keySet()) {
-            if (lawID.equalsIgnoreCase(law)) {
-                if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())
-                    || game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
+            if (lawID.equalsIgnoreCase(law) && game.getLawsInfo().get(law) != null) {
+                if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) ||
+                    game.getLawsInfo().get(law).equalsIgnoreCase(player.getColor())) {
                     return true;
                 }
             }
@@ -2874,7 +2877,7 @@ public class ButtonHelper {
         if (!player.hasAbility("arms_dealers")) {
             for (String shipOrder : getPlayersShipOrders(player)) {
                 if (!Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought",
-                        "placeOneNDone_skipbuild", null).isEmpty()) {
+                    "placeOneNDone_skipbuild", null).isEmpty()) {
                     endButtons.add(Buttons.green(finChecker + "resolveShipOrder_" + shipOrder,
                         "Use " + Mapper.getRelic(shipOrder).getName()));
                 }
@@ -4717,9 +4720,9 @@ public class ButtonHelper {
         game.setSpecificThalnosUnit(id, game.getSpecificThalnosUnit(id) + 1);
 
         StringBuilder message = new StringBuilder(player.getRepresentation()
-                + " select the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed\n"
-                +
-                "Currently you are rerolling: \n");
+            + " select the units for which you wish to reroll. Units that fail and did not have extra rolls will be automatically removed\n"
+            +
+            "Currently you are rerolling: \n");
         String damaged = "";
         for (String unit : game.getThalnosUnits().keySet()) {
             String rep = unit.split("_")[2];
@@ -5507,8 +5510,8 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[4];
         Player speaker = null;
         Player player = game.getPlayer(userId);
-        if (game.getPlayer(game.getSpeaker()) != null) {
-            speaker = game.getPlayers().get(game.getSpeaker());
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
         }
         if (game.getPlayerFromColorOrFaction(color) != null)
             color = player.getNextAvailableColour();
@@ -6569,7 +6572,7 @@ public class ButtonHelper {
     private static List<Button> getAssignSpeakerButtons(Game game) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
-            if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeaker())) {
+            if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeakerUserID())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
                     Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmoji());

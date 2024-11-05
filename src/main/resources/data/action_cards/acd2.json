@@ -210,8 +210,8 @@
     "alias": "decisive_victory",
     "name": "Decisive Victory",
     "phase": "Action",
-    "window": "When your opponent has no ships remaining in the active system at the end of the first round of a space combat",
-    "text": "Remove your command token from the active system.",
+    "window": "When only you have ships in the space area of the active system at the end of the first round of a space combat",
+    "text": "Remove your command token from that system.",
     "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
     "source": "action_deck_2"
   },
@@ -850,7 +850,7 @@
     "name": "Short-lived Clone",
     "phase": "Action",
     "window": "At the start of your turn",
-    "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted, and is readied at the end of your turn.",
+    "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted. At the end of this turn, ready your chosen agent.",
     "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that spinner after all. This galaxy can barely handle one of me.\"",
     "source": "action_deck_2"
   },

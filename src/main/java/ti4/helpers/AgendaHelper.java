@@ -16,6 +16,12 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,11 +35,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
@@ -410,7 +411,7 @@ public class AgendaHelper {
                     String message = "Discarded elected player's ACs and marked them as unable to vote on the next agenda.";
                     new DiscardACRandom().discardRandomAC(event, game, player2, player2.getAc());
                     game.setStoredValue("PublicExecution", player2.getFaction());
-                    if (game.getSpeaker().equalsIgnoreCase(player2.getUserID())) {
+                    if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
                         message = message + " Also passed the speaker token.";
                         boolean foundSpeaker = false;
                         boolean assignedSpeaker = false;
@@ -419,7 +420,7 @@ public class AgendaHelper {
                                 break;
                             }
                             if (foundSpeaker) {
-                                game.setSpeaker(p4.getUserID());
+                                game.setSpeakerUserID(p4.getUserID());
                                 assignedSpeaker = true;
                                 break;
                             }
@@ -432,7 +433,7 @@ public class AgendaHelper {
                                 break;
                             }
                             if (foundSpeaker) {
-                                game.setSpeaker(p4.getUserID());
+                                game.setSpeakerUserID(p4.getUserID());
                                 assignedSpeaker = true;
                                 break;
                             }
@@ -810,7 +811,7 @@ public class AgendaHelper {
                     message.append(playerWL.getRepresentation()).append(" scored 'Seed'\n");
                     Helper.checkEndGame(game, playerWL);
                     if ("for".equalsIgnoreCase(winner)) {
-                        game.setSpeaker(playerWL.getUserID());
+                        game.setSpeakerUserID(playerWL.getUserID());
                         message.append(playerWL.getRepresentation()).append(" was made speaker and owes everyone who voted for them a PN\n");
                         for (Player p2 : getWinningVoters(winner, game)) {
                             if (p2 == playerWL) {
@@ -1644,8 +1645,8 @@ public class AgendaHelper {
                     resolveTime = true;
                 } else {
                     Player speaker;
-                    if (game.getPlayer(game.getSpeaker()) != null) {
-                        speaker = game.getPlayers().get(game.getSpeaker());
+                    if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                        speaker = game.getPlayers().get(game.getSpeakerUserID());
                     } else {
                         speaker = game.getRealPlayers().getFirst();
                     }
@@ -1974,8 +1975,8 @@ public class AgendaHelper {
             button = Buttons.gray(prefix + "_for", "For");
             button2 = Buttons.red(prefix + "_against", "Against");
         } else {
-            button = Buttons.blue("rider_fa;for_" + rider, "For");
-            button2 = Buttons.red("rider_fa;against_" + rider, "Against");
+            button = Buttons.blue(prefix + "rider_fa;for_" + rider, "For");
+            button2 = Buttons.red(prefix + "rider_fa;against_" + rider, "Against");
         }
         voteButtons.add(button);
         voteButtons.add(button2);
@@ -2179,7 +2180,7 @@ public class AgendaHelper {
             if (!game.isFowMode() && !faction.contains("franken")) {
                 if (rider != null) {
                     if (planetRes != null) {
-                        button = Buttons.gray(planetRes + "_" + faction + "_" + rider, " ");
+                        button = Buttons.gray(prefix + planetRes + "_" + faction + "_" + rider, " ");
                     } else {
                         button = Buttons.gray(prefix + "rider_player;" + faction + "_" + rider, " ");
                     }
@@ -2385,7 +2386,7 @@ public class AgendaHelper {
                                     ACInfo.getDiscardActionCardButtons(game, winningR, false));
                             }
 
-                            game.setSpeaker(winningR.getUserID());
+                            game.setSpeakerUserID(winningR.getUserID());
                             MessageHelper.sendMessageToChannel(channel,
                                 identity + " due to having a winning **Politics Rider**, you have been given " + amount + " Action Cards " + Emojis.ActionCard.repeat(amount) + " and the " + Emojis.SpeakerToken + " Speaker Token");
                         }
@@ -2647,7 +2648,7 @@ public class AgendaHelper {
         List<Player> orderList = new ArrayList<>(game.getPlayers().values().stream()
             .filter(Player::isRealPlayer)
             .toList());
-        String speakerName = game.getSpeaker();
+        String speakerName = game.getSpeakerUserID();
         Optional<Player> optSpeaker = orderList.stream()
             .filter(player -> player.getUserID().equals(speakerName))
             .findFirst();
@@ -2683,7 +2684,7 @@ public class AgendaHelper {
         if (!conspiratorsFaction.isEmpty()) {
             Player rhodun = game.getPlayerFromColorOrFaction(conspiratorsFaction);
             Optional<Player> speaker = orderList.stream()
-                .filter(player -> player.getFaction() != null && game.getSpeaker().equals(player.getUserID()))
+                .filter(player -> player.getFaction() != null && game.getSpeakerUserID().equals(player.getUserID()))
                 .findFirst();
             if (speaker.isPresent() && rhodun != null) {
                 orderList.remove(rhodun);

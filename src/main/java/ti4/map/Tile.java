@@ -1,10 +1,11 @@
 package ti4.map;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,11 +14,13 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -34,12 +37,12 @@ import ti4.model.WormholeModel;
 public class Tile {
     private final String tileID;
     private String position;
-    private final Map<String, UnitHolder> unitHolders = new HashMap<>();
+    private final Map<String, UnitHolder> unitHolders = new LinkedHashMap<>();
 
     @JsonIgnore
-    private final HashMap<Player, Boolean> fog = new HashMap<>();
+    private final HashMap<Player, Boolean> fog = new LinkedHashMap<>();
     @JsonIgnore
-    private final HashMap<Player, String> fogLabel = new HashMap<>();
+    private final HashMap<Player, String> fogLabel = new LinkedHashMap<>();
 
     public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;

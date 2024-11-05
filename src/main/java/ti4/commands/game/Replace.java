@@ -128,8 +128,8 @@ public class Replace extends GameSubcommandData {
         player.setUserID(addedUser.getId());
         player.setTotalTurnTime(0);
         player.setNumberTurns(0);
-        if (removedPlayer.getUserID().equals(game.getSpeaker())) {
-            game.setSpeaker(addedUser.getId());
+        if (removedPlayer.getUserID().equals(game.getSpeakerUserID())) {
+            game.setSpeakerUserID(addedUser.getId());
         }
         if (removedPlayer.getUserID().equals(game.getActivePlayerID())) {
             // do not update stats for this action
@@ -144,7 +144,7 @@ public class Replace extends GameSubcommandData {
         game.getMiltyDraftManager().replacePlayer(game, removedPlayerID, player.getUserID());
 
         if (speaker) {
-            game.setSpeaker(player.getUserID());
+            game.setSpeakerUserID(player.getUserID());
         }
         GameSaveLoadManager.saveMap(game, event);
         GameSaveLoadManager.reload(game);

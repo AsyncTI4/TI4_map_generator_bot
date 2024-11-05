@@ -1,5 +1,7 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.*;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +14,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -23,10 +30,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
@@ -100,8 +103,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
 
-import static org.reflections.scanners.Scanners.SubTypes;
-
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
@@ -130,30 +131,31 @@ public class AsyncTI4DiscordBot {
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         jda = JDABuilder.createDefault(args[0])
-                // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
-                // This is required to cache all members of a guild (including chunking)
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-                // This is a privileged gateway intent this is only used to enable access to the user content in messages
-                // (also including embeds/attachments/components).
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
-                .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
-                // It *appears* we need to pull all members or else the bot has trouble pinging players
-                // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
-                // and avoid loading every user at startup
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .setChunkingFilter(ChunkingFilter.ALL)
-                .setEnableShutdownHook(false)
-                .build();
+            // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
+            // This is required to cache all members of a guild (including chunking)
+            .enableIntents(GatewayIntent.GUILD_MEMBERS)
+            // This is a privileged gateway intent this is only used to enable access to the user content in messages
+            // (also including embeds/attachments/components).
+            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+            // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+            .enableIntents(GatewayIntent.GUILD_EMOJIS_AND_STICKERS)
+            // It *appears* we need to pull all members or else the bot has trouble pinging players
+            // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
+            // and avoid loading every user at startup
+            .setMemberCachePolicy(MemberCachePolicy.ALL)
+            .setChunkingFilter(ChunkingFilter.ALL)
+            // This allows us to use our own ShutdownHook, created below
+            .setEnableShutdownHook(false)
+            .build();
 
         jda.addEventListener(
-                new MessageListener(),
-                new SlashCommandListener(),
-                ButtonListener.getInstance(),
-                ModalListener.getInstance(),
-                new SelectionMenuListener(),
-                new UserJoinServerListener(),
-                new AutoCompleteListener());
+            new MessageListener(),
+            new SlashCommandListener(),
+            ButtonListener.getInstance(),
+            ModalListener.getInstance(),
+            new SelectionMenuListener(),
+            new UserJoinServerListener(),
+            new AutoCompleteListener());
 
         try {
             jda.awaitReady();
@@ -315,9 +317,10 @@ public class AsyncTI4DiscordBot {
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
-                BotLogger.logWithTimestamp("SAVING GAMES");
-                GameSaveLoadManager.saveMaps();
-                BotLogger.logWithTimestamp("GAMES HAVE BEEN SAVED");
+                //No Longer Necessary 
+                //BotLogger.logWithTimestamp("SAVING GAMES");
+                //GameSaveLoadManager.saveMaps();
+                //BotLogger.logWithTimestamp("GAMES HAVE BEEN SAVED");
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();

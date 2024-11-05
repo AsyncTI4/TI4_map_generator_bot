@@ -103,8 +103,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (ChangeColor.colorIsExclusive(color, player)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This color is not valid, please try set up again manually with a different color.");
-            return;
+            color = player.getNextAvailableColorIgnoreCurrent();
         }
 
         if (player.isRealPlayer() && player.getSo() > 0) {
@@ -203,7 +202,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (setSpeaker) {
-            game.setSpeaker(player.getUserID());
+            game.setSpeakerUserID(player.getUserID());
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), Emojis.SpeakerToken + " Speaker assigned to: " + player.getRepresentation());
         }
 

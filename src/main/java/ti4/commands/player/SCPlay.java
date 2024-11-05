@@ -472,7 +472,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         Player imperialHolder = Helper.getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
-            imperialHolder = game.getPlayer(game.getSpeaker());
+            imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
         String key = "factionsThatAreNotDiscardingSOs";
         String key2 = "queueToDrawSOs";
@@ -525,7 +525,7 @@ public class SCPlay extends PlayerSubcommandData {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
                     if (!game.isFowMode()) {
-                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, null, player.getFactionEmoji());
+                        Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ", player.getFactionEmoji());
                         assignSpeakerButtons.add(button);
                     } else {
                         Button button = Buttons.gray(politicsHolder.getFinsFactionCheckerPrefix() + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, player.getColor(), Emojis.getColorEmoji(player.getColor()));

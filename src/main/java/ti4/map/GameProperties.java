@@ -1,6 +1,8 @@
 package ti4.map;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ public class GameProperties {
     private @ExportableField int strategyCardsPerPlayer = 1;
     private @ExportableField int round = 1;
     private @ExportableField int vp = 10;
+    private @ExportableField long startedDate;
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
@@ -68,6 +71,7 @@ public class GameProperties {
     private @ExportableField int mapImageGenerationCount;
     private @ExportableField int numberOfPurgedFragments;
     private @ExportableField int pingSystemCounter;
+    private Map<Timestamp, GameStatsDashboardPayload> historicalGameStatsDashboardPayloads = new LinkedHashMap<>();
 
     // Customization Flags/Settings
     private boolean botFactionReacts;
@@ -118,7 +122,7 @@ public class GameProperties {
 
     // Discord Snowflakes
     private @ExportableField String guildID;
-    private String speaker = "";
+    private String speakerUserID = "";
     private String activePlayerID;
     private String launchPostThreadID;
     private @ExportableField String botMapUpdatesThreadID;

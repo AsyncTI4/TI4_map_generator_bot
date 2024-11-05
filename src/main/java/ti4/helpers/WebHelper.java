@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,11 +14,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -24,11 +31,11 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
 import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
-
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class WebHelper {
     private static final Properties webProperties;
@@ -84,6 +91,49 @@ public class WebHelper {
         }
     }
 
+    public static void putStats() {
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false)) //Only upload when setting is true
+            return;
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        List<GameStatsDashboardPayload> payloads = new ArrayList<>();
+        List<String> badGames = new ArrayList<>();
+        int count = 0;
+        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+            if (game.isHasEnded() && game.hasWinner()) {
+                count++;
+                try {
+                    // Quick & Dirty bypass for failed json creation
+                    GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
+                    mapper.writeValueAsString(payload);
+                    payloads.add(new GameStatsDashboardPayload(game));
+                } catch (Exception e) {
+                    badGames.add(game.getID());
+                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + game.getID() + "`", e);
+                }
+            }
+        }
+
+        String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
+        if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
+        BotLogger.log(message);
+
+        try (S3Client s3 = S3Client.builder().region(Region.US_EAST_1).build()) {
+            String json = mapper.writeValueAsString(payloads);
+            PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(webProperties.getProperty("bucket"))
+                .key(String.format("statistics/%s.json", "test")) // TODO: when this export is final/good, change from "test", tell ParsleySage (stats dashboard dev)
+                .contentType("application/json")
+                .cacheControl("no-cache, no-store, must-revalidate")
+                .build();
+
+            s3.putObject(request, RequestBody.fromString(json));
+        } catch (Exception e) {
+            BotLogger.log("Could not put statistics to web server", e);
+        }
+    }
+
     public static void putMap(String gameId, BufferedImage img) {
         putMap(gameId, img, false, null);
     }
@@ -109,10 +159,10 @@ public class WebHelper {
                 writeCompressedFormat(img, out, format, 0.1f);
                 mapPath += format;
                 PutObjectRequest request = PutObjectRequest.builder()
-                        .bucket(webProperties.getProperty("bucket"))
-                        .key(String.format(mapPath, gameId, dtstamp))
-                        .contentType("image/" + format)
-                        .build();
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format(mapPath, gameId, dtstamp))
+                    .contentType("image/" + format)
+                    .build();
                 s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
             }
         } catch (SdkClientException e) {

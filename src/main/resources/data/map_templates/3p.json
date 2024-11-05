@@ -1,5 +1,5 @@
 [
-{
+  {
     "alias": "3pInPersonHyperlanes",
     "playerCount": 3,
     "templateTiles": [
@@ -13,17 +13,17 @@
       { "pos": "106", "staticTileId": "46" },
 
       { "pos": "201", "playerNumber": 1, "miltyTileIndex": 1 },
-      { "pos": "202", "staticTileId": "84b1" },
+      { "pos": "202", "staticTileId": "83b0" },
       { "pos": "203", "playerNumber": 1, "miltyTileIndex": 3 },
-      { "pos": "204", "staticTileId": "83b" },
+      { "pos": "204", "staticTileId": "84b5" },
       { "pos": "205", "playerNumber": 2, "miltyTileIndex": 1 },
-      { "pos": "206", "staticTileId": "84b5" },
+      { "pos": "206", "staticTileId": "83b2" },
       { "pos": "207", "playerNumber": 2, "miltyTileIndex": 3 },
-      { "pos": "208", "staticTileId": "83b1" },
+      { "pos": "208", "staticTileId": "91A1" },
       { "pos": "209", "playerNumber": 3, "miltyTileIndex": 1 },
-      { "pos": "210", "staticTileId": "84b" },
+      { "pos": "210", "staticTileId": "83b4" },
       { "pos": "211", "playerNumber": 3, "miltyTileIndex": 3 },
-      { "pos": "212", "staticTileId": "83b5" },
+      { "pos": "212", "staticTileId": "91A3" },
 
       { "pos": "301", "playerNumber": 1, "home": true },
       { "pos": "302", "playerNumber": 1, "miltyTileIndex": 0 },

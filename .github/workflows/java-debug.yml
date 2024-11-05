@@ -1,8 +1,10 @@
 on: workflow_dispatch
-name: ExportChannelTest
+name: JavaDebug
+concurrency:
+  group: "Debug"
 jobs:
   build:
-    name: ExportChannelTest
+    name: Run Debug Commands
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands using password
@@ -18,5 +20,14 @@ jobs:
         script_stop: true
         envs: AWS_KEY, AWS_SECRET
         script: |
-          docker version
-          docker run --rm -v /opt/STORAGE/exported_channels:/out tyrrrz/discordchatexporter:stable export -t BOT_KEY=$DISCORD_BOT_KEY -c 1142100229072638023
+          CONTAINER_ID=$(docker ps -q)
+          docker exec -i $CONTAINER_ID bash -c '
+            for pid in /proc/[0-9]*; do
+              if grep -q "java" "$pid/comm" 2>/dev/null; then
+            echo "${pid##*/}"
+            export JAVA_PID="${pid##*/}"
+              fi
+            done
+            echo $JAVA_PID
+            jhsdb jmap --pid $JAVA_PID
+          '

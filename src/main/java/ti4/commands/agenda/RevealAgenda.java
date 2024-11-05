@@ -148,7 +148,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                     && game.getScoredSecrets() < 1) {
                     MessageHelper.sendMessageToChannel(channel,
                         game.getPing() + "An Elect Secret Agenda (" + agendaName
-                            + ") was revealed under COvert when no scored secrets were in play, flipping next agenda");
+                            + ") was revealed under Covert when no scored secrets were in play, flipping next agenda");
                     notEmergency = false;
                     game.revealAgenda(revealFromBottom);
                 }
@@ -157,12 +157,12 @@ public class RevealAgenda extends AgendaSubcommandData {
                     cov = true;
 
                     Player speaker = null;
-                    if (game.getPlayer(game.getSpeaker()) != null) {
-                        speaker = game.getPlayers().get(game.getSpeaker());
+                    if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                        speaker = game.getPlayers().get(game.getSpeakerUserID());
                     }
                     if (speaker != null) {
                         String sb = speaker.getRepresentationUnfogged() +
-                                " this is the top agenda for Covert Legislation:";
+                            " this is the top agenda for Covert Legislation:";
                         List<MessageEmbed> embeds = List.of(Mapper.getAgenda(id2).getRepresentationEmbed());
                         MessageHelper.sendMessageEmbedsToCardsInfoThread(game, speaker, sb, embeds);
                         game.drawAgenda();
@@ -247,7 +247,7 @@ public class RevealAgenda extends AgendaSubcommandData {
                     message.append(" ").append(StringUtils.capitalize(actionA));
                 }
                 MessageHelper.sendMessageToChannel(channel,
-                        message.toString());
+                    message.toString());
 
             }
         }

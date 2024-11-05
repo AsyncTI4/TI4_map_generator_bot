@@ -1,9 +1,11 @@
 package ti4.map;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import java.awt.Point;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -231,6 +233,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Player setupNeutralPlayer(String color) {
+        if (players.get(Constants.dicecordId) != null)
+            return players.get(Constants.dicecordId);
         addPlayer(Constants.dicecordId, "Dicecord"); //Dicecord
         Player neutral = getPlayer(Constants.dicecordId);
         neutral.setColor(color);
@@ -239,7 +243,6 @@ public class Game extends GameProperties {
         FactionModel setupInfo = neutral.getFactionSetupInfo();
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
-
         return neutral;
     }
 
@@ -393,6 +396,11 @@ public class Game extends GameProperties {
 
     public List<String> getPurgedPN() {
         return purgedPN;
+    }
+
+    @JsonIgnore
+    public boolean hasWinner() {
+        return getWinner().isPresent();
     }
 
     @JsonIgnore
@@ -760,6 +768,22 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public int getActionPhaseTurnOrder(String userId) {
+        return getActionPhaseTurnOrder().stream()
+            .map(Player::getUserID)
+            .toList()
+            .indexOf(userId);
+    }
+
+    public List<Player> getActionPhaseTurnOrder() {
+        return players.values().stream()
+            .filter(player -> !player.getSCs().isEmpty())
+            .map(player -> new ImmutablePair<>(player, Collections.min(player.getSCs())))
+            .sorted((p1, p2) -> p1.getLeft().hasTheZeroToken() ? -1 : p2.getLeft().hasTheZeroToken() ? 1 : Integer.compare(p1.getRight(), p2.getRight()))
+            .map(ImmutablePair::getLeft)
+            .toList();
+    }
+
     public DisplayType getDisplayTypeForced() {
         return displayTypeForced;
     }
@@ -836,6 +860,15 @@ public class Game extends GameProperties {
     @JsonIgnore
     public Player getActivePlayer() {
         return getPlayer(getActivePlayerID());
+    }
+
+    @JsonIgnore
+    public Player getSpeaker() {
+        return getPlayer(getSpeakerUserID());
+    }
+
+    public void setSpeaker(Player speaker) {
+        setSpeakerUserID(speaker.getUserID());
     }
 
     public Map<String, Integer> getCurrentMovedUnitsFrom1System() {
@@ -1029,6 +1062,9 @@ public class Game extends GameProperties {
         publicObjectives2Peeked.remove(id);
     }
 
+    /**
+     * @return Map of (scInitiativeNum, tradeGoodCount)
+     */
     public Map<Integer, Integer> getScTradeGoods() {
         return scTradeGoods;
     }
@@ -1084,8 +1120,8 @@ public class Game extends GameProperties {
         if (!scTradeGoods.containsKey(sc)) {
             setScTradeGood(sc, 0);
             return true;
-        } else
-            return false;
+        }
+        return false;
     }
 
     public boolean removeSC(Integer sc) {
@@ -1629,6 +1665,9 @@ public class Game extends GameProperties {
         soToPoList.remove(id);
     }
 
+    /**
+     * @return Map of (ObjectiveModelID or ProperName if Custom, List of ({@link Player#getUserID}))
+     */
     public Map<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
     }
@@ -1801,7 +1840,6 @@ public class Game extends GameProperties {
             }
         }
         if (!id.isEmpty()) {
-
             Collection<Integer> values = laws.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
             while (values.contains(identifier)) {
@@ -1825,7 +1863,6 @@ public class Game extends GameProperties {
     }
 
     public boolean reviseLaw(Integer idNumber, String optionalText) {
-
         String id = "";
         for (Entry<String, Integer> ac : laws.entrySet()) {
             if (ac.getValue().equals(idNumber)) {
@@ -3884,7 +3921,6 @@ public class Game extends GameProperties {
                         player = player_;
                         break;
                     }
-
                 }
                 if (Objects.equals(factionColor, player_.getFaction()) ||
                     Objects.equals(factionColor, player_.getColor()) ||
@@ -4034,8 +4070,8 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean hasHomebrew() {
-        return isExtraSecretMode()
-            || isHomebrew()
+        return isHomebrew()
+            || isExtraSecretMode()
             || isFowMode()
             || isAgeOfExplorationMode()
             || isMinorFactionsMode()
@@ -4054,11 +4090,12 @@ public class Game extends GameProperties {
             || isCommunityMode()
             || !checkAllDecksAreOfficial()
             || !checkAllTilesAreOfficial()
-            || Mapper.getFactions().stream()
-                .filter(faction -> !faction.getSource().isPok())
-                .anyMatch(faction -> getFactions().contains(faction.getAlias()))
+            || getFactions().stream()
+                .map(Mapper::getFaction)
+                .filter(Objects::nonNull)
+                .anyMatch(faction -> !faction.getSource().isOfficial())
             || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isPok())
+                .filter(leader -> !leader.getSource().isOfficial())
                 .anyMatch(leader -> isLeaderInGame(leader.getID()))
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
@@ -4237,4 +4274,13 @@ public class Game extends GameProperties {
         setWebsiteOverlays(new HashMap<>());
     }
 
+    @JsonIgnore
+    public String getGameStatsDashboardJSON() {
+        return new GameStatsDashboardPayload(this).getJson();
+    }
+
+    public void addHistoricalGameStatsDashboardPayload() {
+        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(this);
+        getHistoricalGameStatsDashboardPayloads().put(Timestamp.from(Instant.now()), payload);
+    }
 }

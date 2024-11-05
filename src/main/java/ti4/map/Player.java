@@ -873,7 +873,8 @@ public class Player {
             return true;
         } else if (getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
             return true;
-        } else return getGame().getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction());
+        } else
+            return getGame().getStoredValue("naaluPNUser").equalsIgnoreCase(getFaction());
     }
 
     public Set<String> getUnitsOwned() {
@@ -883,7 +884,7 @@ public class Player {
     @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
         Set<String> specialUnits = unitsOwned.stream()
-                .filter(u -> Mapper.getUnit(u).getFaction().isPresent()).collect(Collectors.toSet());
+            .filter(u -> Mapper.getUnit(u).getFaction().isPresent()).collect(Collectors.toSet());
         return specialUnits;
     }
 
@@ -1186,6 +1187,9 @@ public class Player {
         return Mapper.getSecretObjective(idToRemove);
     }
 
+    /**
+     * @return Map of (SecretObjectiveModel ID, Random Number ID)
+     */
     public Map<String, Integer> getSecretsScored() {
         return secretsScored;
     }
@@ -1439,7 +1443,7 @@ public class Player {
         return getRepresentation(false, true);
     }
 
-        /**
+    /**
      * @return [FactionEmoji][PlayerPing][ColorEmoji][ColorName] even in Fog of War (will reveal faction/name)
      */
     @JsonIgnore
@@ -1817,12 +1821,6 @@ public class Player {
     public void removeAllianceMember(String color) {
         if (!"null".equals(color)) {
             allianceMembers = allianceMembers.replace(color, "");
-        }
-    }
-
-    public void changeColor(String color) {
-        if (!"null".equals(color)) {
-            this.color = AliasHandler.resolveColor(color);
         }
     }
 
@@ -2969,6 +2967,11 @@ public class Player {
         if (getColor() != null && !getColor().equals("null")) {
             return getColor();
         }
+        return getNextAvailableColorIgnoreCurrent();
+    }
+
+    @JsonIgnore
+    public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
         String color = getPreferredColours().stream()
             .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
@@ -2995,7 +2998,7 @@ public class Player {
 
     @JsonIgnore
     public boolean isSpeaker() {
-        return getGame().getSpeaker().equals(getUserID());
+        return getGame().getSpeakerUserID().equals(getUserID());
     }
 
     /**
@@ -3051,7 +3054,7 @@ public class Player {
 
         // DESCRIPTION
         String desc = Emojis.getColorEmojiWithName(getColor()) +
-                "\n" + StringUtils.repeat(Emojis.comm, getCommoditiesTotal());
+            "\n" + StringUtils.repeat(Emojis.comm, getCommoditiesTotal());
         eb.setDescription(desc);
 
         // FIELDS
