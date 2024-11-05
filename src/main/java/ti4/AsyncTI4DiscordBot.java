@@ -106,10 +106,10 @@ import static org.reflections.scanners.Scanners.SubTypes;
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
-    public static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
     public static final List<Role> adminRoles = new ArrayList<>();
     public static final List<Role> developerRoles = new ArrayList<>();
     public static final List<Role> bothelperRoles = new ArrayList<>();
+    private static final ExecutorService THREAD_POOL = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
 
     public static JDA jda;
     public static String userID;
@@ -425,6 +425,10 @@ public class AsyncTI4DiscordBot {
             }
             return result;
         });
+    }
+
+    public static void runAsync(Runnable runnable) {
+        THREAD_POOL.submit(runnable);
     }
 
     public static List<Category> getAvailablePBDCategories() {
