@@ -64,6 +64,9 @@ public class Units {
             if (UnitType.PlenaryOrbital == unitType) {
                 return String.format("%s_%s.png", colorID, "sd");
             }
+            if (UnitType.Monument == unitType) {
+                return "monument.png"; // TODO: Colours
+            }
 
             return String.format("%s_%s.png", colorID, asyncID());
         }

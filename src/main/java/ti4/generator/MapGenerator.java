@@ -6098,16 +6098,13 @@ public class MapGenerator {
                         unitPath = unitPath.replace("sd", "csd");
                     }
                     if (unitKey.getUnitType() == UnitType.TyrantsLament) {
-                        unitPath = unitPath.replace("tyrantslament", "fs");
                         String name = "TyrantNew.png";
                         unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
-                        // spoopy = ImageHelper.read(spoopyPath);
                     }
                     if (unitKey.getUnitType() == UnitType.Lady) {
                         unitPath = unitPath.replace("lady", "fs");
                     }
                     if (unitKey.getUnitType() == UnitType.Cavalry) {
-                        unitPath = unitPath.replace("cavalry", "fs");
                         String name = "Memoria_1.png";
                         if (game.getPNOwner("cavalry") != null && game.getPNOwner("cavalry").hasTech("m2")) {
                             name = "Memoria_2.png";
@@ -6115,9 +6112,11 @@ public class MapGenerator {
                         unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
                     }
                     if (unitKey.getUnitType() == UnitType.PlenaryOrbital) {
-                        unitPath = unitPath.replace("plenaryorbital", "sd");
                         String name = "PlenaryNew.png";
                         unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
+                    }
+                    if (unitKey.getUnitType() == UnitType.Monument) {
+                        unitPath = ResourceHelper.getInstance().getUnitFile("Monument.png");
                     }
                 }
 

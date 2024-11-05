@@ -116,7 +116,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        String name = getName() == null ? "" : getName();
+        String name = getName();
         StringBuilder title = new StringBuilder(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji());
         eb.setTitle(title.toString(), null);
         if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
