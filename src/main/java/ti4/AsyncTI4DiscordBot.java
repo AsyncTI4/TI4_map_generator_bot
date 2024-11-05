@@ -328,7 +328,6 @@ public class AsyncTI4DiscordBot {
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
-                //e.printStackTrace();
             }
         }));
     }
