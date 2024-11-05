@@ -250,7 +250,8 @@ public class MapGenerator {
     private DisplayType defaultIfNull(DisplayType displayType) {
         if (game.getDisplayTypeForced() != null) {
             return game.getDisplayTypeForced();
-        } else if (displayType == null) {
+        }
+        if (displayType == null) {
             displayType = game.getDisplayTypeForced();
             if (displayType == null) {
                 return DisplayType.all;
@@ -279,6 +280,8 @@ public class MapGenerator {
             sendToWebsite(event);
             if (debug) debugWebsiteTime.stop();
         }
+
+        mainImage.flush();
 
         logDebug(event);
         return fileUpload;
@@ -3184,11 +3187,11 @@ public class MapGenerator {
         if (openSides.size() > 2) return hexBorder(color, openSides, style.equals("solid"));
 
         // Otherwise, cache it
-        Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides, style.equals("solid"));
         Collections.sort(openSides);
         StringBuilder key = new StringBuilder(color.getName() + "-HexBorder-" + style);
         for (int x : openSides)
             key.append("_").append(x);
+        Function<String, BufferedImage> loader = (name) -> hexBorder(color, openSides, style.equals("solid"));
         return ImageHelper.createOrLoadCalculatedImage(key.toString(), loader);
     }
 

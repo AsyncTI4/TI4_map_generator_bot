@@ -14,7 +14,6 @@ import ti4.message.BotLogger;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
 import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
@@ -50,7 +49,15 @@ public class ImageHelper {
         .recordStats()
         .build();
 
-    private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 60 * 4);
+    private static final int CALCULATED_IMAGE_CACHE_SIZE = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.CALCULATED_IMAGE_CACHE_SIZE.toString(), Integer.class, 500);
+    private static final int CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES.toString(), Integer.class, 60 * 8);
+    private static final Cache<String, BufferedImage> calculatedImageCache = Caffeine.newBuilder()
+            .maximumSize(CALCULATED_IMAGE_CACHE_SIZE)
+            .expireAfterAccess(CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
+            .recordStats()
+            .build();
+
+    private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 30);
     private static final AtomicReference<Instant> logStatsScheduledTime = new AtomicReference<>();
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
 
@@ -175,7 +182,7 @@ public class ImageHelper {
 
     public static BufferedImage createOrLoadCalculatedImage(String key, Function<String, BufferedImage> loader) {
         try {
-            return fileImageCache.get(key, loader);
+            return calculatedImageCache.get(key, loader);
         } catch (Exception e) {
             BotLogger.log("Unable to load from image cache.", e);
         }
@@ -245,7 +252,10 @@ public class ImageHelper {
         if (logStatsScheduledTime.get().equals(oldValue)) {
             return Optional.empty();
         }
-        return Optional.of(cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " + cacheStatsToString("urlImageCache", urlImageCache));
+        return Optional.of(
+                cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " +
+                      cacheStatsToString("urlImageCache", urlImageCache) + "\n\n" +
+                      cacheStatsToString("calculatedImageCache", calculatedImageCache));
     }
 
     private static String cacheStatsToString(String name, Cache<String, BufferedImage> cache) {
@@ -278,21 +288,24 @@ public class ImageHelper {
         if (image.getHeight() > 16383 || image.getWidth() > 16383) {
             writeCompressedFormat(image, out, defaultFormat, 0.1f);
             return defaultFormat;
-        } else {
-            ImageIO.write(image, "webp", out);
-            return "webp";
         }
+        ImageIO.write(image, "webp", out);
+        return "webp";
     }
 
     public static void writeCompressedFormat(BufferedImage image, ByteArrayOutputStream out, String format, float compressionQuality) throws IOException {
-        ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(format).next();
-        imageWriter.setOutput(ImageIO.createImageOutputStream(out));
-        ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-        if (defaultWriteParam.canWriteCompressed()) {
-            defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            defaultWriteParam.setCompressionQuality(compressionQuality);
+        var imageWriter = ImageIO.getImageWritersByFormatName(format).next();
+        try (var imageOutputStream = ImageIO.createImageOutputStream(out)) {
+            imageWriter.setOutput(imageOutputStream);
+            ImageWriteParam param = imageWriter.getDefaultWriteParam();
+            if (param.canWriteCompressed()) {
+                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                param.setCompressionQuality(compressionQuality);
+            }
+            imageWriter.write(null, new IIOImage(image, null, null), param);
+        } finally {
+            imageWriter.dispose();
         }
-        imageWriter.write(null, new IIOImage(image, null, null), defaultWriteParam);
     }
 
     public static BufferedImage redrawWithoutAlpha(BufferedImage image) {

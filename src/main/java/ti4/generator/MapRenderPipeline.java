@@ -83,6 +83,9 @@ public class MapRenderPipeline {
 
     public static void render(Game game, @Nullable GenericInteractionCreateEvent event,  @Nullable DisplayType displayType,
                        @Nullable Consumer<FileUpload> callback, boolean uploadToDiscord, boolean uploadToWebsite) {
+        if (game == null) {
+            throw new IllegalArgumentException("game cannot be null in render pipeline");
+        }
         instance.gameRenderQueue.add(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
     }
 
