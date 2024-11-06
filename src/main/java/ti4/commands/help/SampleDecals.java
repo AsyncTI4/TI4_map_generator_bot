@@ -1,12 +1,5 @@
 package ti4.commands.help;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,12 +7,20 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.player.ChangeUnitDecal;
+import ti4.generator.DrawingUtil;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class SampleDecals extends HelpSubcommandData {
     public SampleDecals() {
@@ -91,14 +92,14 @@ public class SampleDecals extends HelpSubcommandData {
             }
 
             graphic.setFont(bigFont);
-            MapGenerator.superDrawString(graphic, (mid == -1 ? label : label.substring(0, mid)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
+            DrawingUtil.superDrawString(graphic, (mid == -1 ? label : label.substring(0, mid)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
                 Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                 stroke, Color.BLACK);
-            MapGenerator.superDrawString(graphic, (mid == -1 ? "" : label.substring(mid + 1)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+            DrawingUtil.superDrawString(graphic, (mid == -1 ? "" : label.substring(mid + 1)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                 Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                 stroke, Color.BLACK);
             graphic.setFont(smallFont);
-            MapGenerator.superDrawString(graphic, d, x + DREADWIDTH / 2, y + DREADSUBHIGHT + 2 * LINEHEIGHT + SPACING,
+            DrawingUtil.superDrawString(graphic, d, x + DREADWIDTH / 2, y + DREADSUBHIGHT + 2 * LINEHEIGHT + SPACING,
                 Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                 stroke, Color.BLACK);
 

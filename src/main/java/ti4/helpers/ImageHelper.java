@@ -7,15 +7,12 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
-import ti4.generator.MapGenerator;
-import ti4.helpers.Emojis.TI4Emoji;
 import ti4.message.BotLogger;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import java.awt.*;
-import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -101,36 +98,10 @@ public class ImageHelper {
     }
 
     @Nullable
-    public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        if (emoji.asEmoji() instanceof CustomEmoji e)
-            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
-        return null;
-    }
-
-    @Nullable
     public static BufferedImage readEmojiImageScaled(String emoji, int size) {
         if (Emoji.fromFormatted(emoji) instanceof CustomEmoji e)
             return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
         return null;
-    }
-
-    @Nullable
-    public static BufferedImage readUnicodeScaled(String unicode, int width, int height) {
-        if (unicode == null) {
-            return null;
-        }
-        return getOrLoadExpiringImage(width + "x" + height + unicode, k -> {
-            BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = img.createGraphics();
-            g2.setFont(Storage.getEmojiFont());
-            BasicStroke stroke4 = new BasicStroke(4.0f);
-            MapGenerator.superDrawString(g2, unicode, 20, 60, Color.white, null, null, stroke4, Color.black);
-            GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), unicode);
-            Rectangle rect = gv.getGlyphPixelBounds(0, g2.getFontRenderContext(), 20, 60);
-            int pad = 5;
-            BufferedImage img2 = img.getSubimage(rect.x - pad, rect.y - pad, rect.width + pad * 2, rect.height + pad * 2);
-            return ImageHelper.scale(ImageHelper.square(img2), width, height);
-        });
     }
 
     @Nullable

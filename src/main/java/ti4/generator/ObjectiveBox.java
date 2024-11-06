@@ -97,12 +97,12 @@ public class ObjectiveBox {
 				BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), controlTokenScale);
 
 				if (objective.isMultiScoring(game) || game.isFowMode()) {
-					MapGenerator.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
+					DrawingUtil.drawControlToken(graphics, controlTokenImage, player, x, y, convertToGeneric, controlTokenScale);
 					x += scoreTokenWidth;
 
 				} else {
 					int xPosition = x + scoreTokenWidth * (game.getRealPlayers().indexOf(player));
-					MapGenerator.drawControlToken(graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
+					DrawingUtil.drawControlToken(graphics, controlTokenImage, player, xPosition, y, convertToGeneric, controlTokenScale);
 				}
 			}
 		} catch (Exception e) {

@@ -45,13 +45,15 @@ public class MapRenderPipeline {
         instance.worker.start();
     }
 
-    public static void shutdown() {
+    public static boolean shutdown() {
         instance.running = false;
         try {
             instance.worker.join(20000);
+            return !instance.worker.isAlive();
         } catch (InterruptedException e) {
             BotLogger.log("MapRenderPipeline shutdown interrupted.");
             Thread.currentThread().interrupt();
+            return false;
         }
     }
 
@@ -70,7 +72,7 @@ public class MapRenderPipeline {
     }
 
     private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {
-        try (var fileUpload = mapGenerator.uploadToDiscord()) {
+        try (var fileUpload = mapGenerator.createFileUpload()) {
             if (fileUpload != null && callback != null) {
                 callback.accept(fileUpload);
             }

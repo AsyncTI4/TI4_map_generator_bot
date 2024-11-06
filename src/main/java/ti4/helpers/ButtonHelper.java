@@ -56,10 +56,10 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.generator.GenerateTile;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileGenerator;
 import ti4.generator.TileHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -2713,13 +2713,12 @@ public class ButtonHelper {
         // numInfNFightersNMechs);
         if (capacityViolated || fleetSupplyViolated) {
             List<Button> buttons = new ArrayList<>();
-            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),
-                event, player);
             buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
                 "Remove units in " + tile.getRepresentationForButtons(game, player)));
             buttons.add(Buttons.red("deleteButtons",
                 "Dismiss These Buttons"));
 
+            FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
             MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message, buttons);
 
         }
