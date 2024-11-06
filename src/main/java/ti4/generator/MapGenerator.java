@@ -373,23 +373,35 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void logDebug() {
-        ImageHelper.getCacheStats().ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
-        if (!debug)
-            return;
+        if (!debug) return;
         debugAbsoluteStartTime.stop();
-        long total = debugAbsoluteStartTime.getNanoTime();
-        String sb = " Total time (" + game.getName() + "):               " + Helper.getTimeRepresentationNanoSeconds(total) +
-            "\n" + debugString(" Draw time:                          ", debugDrawTime.getNanoTime(), total) +
-            "\n" + debugString("     Tile time (part of Draw):             ", debugTileTime.getNanoTime(), debugDrawTime.getNanoTime()) +
-            "\n" + debugString("     Graphics time (part of Draw):         ", debugImageGraphicsTime.getNanoTime(), debugDrawTime.getNanoTime()) +
-            "\n" + debugString(" Discord time:                       ", debugDiscordTime.getNanoTime(), total) +
-            "\n" + debugString(" Website time:                       ", debugWebsiteTime.getNanoTime(), total) +
-            "\n";
-        MessageHelper.sendMessageToBotLogChannel(event, "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```");
+
+        StringBuilder sb = new StringBuilder();
+
+        String totalTimeStr = Helper.getTimeRepresentationNanoSeconds(debugAbsoluteStartTime.getNanoTime());
+        String totalLine = String.format("%-34s%s", "Total time (" + game.getName() + "):", totalTimeStr);
+        sb.append(totalLine);
+
+        sb.append(debugString("  Draw time:", 36, debugDrawTime, debugAbsoluteStartTime));
+        sb.append(debugString("    Tile time (of Draw Time):", 38, debugTileTime, debugDrawTime));
+        sb.append(debugString("    Graphics time (of Draw Time):", 38, debugImageGraphicsTime, debugDrawTime));
+        sb.append(debugString("  Discord time:", 36, debugDiscordTime, debugAbsoluteStartTime));
+        sb.append(debugString("  Website time:", 36, debugWebsiteTime, debugAbsoluteStartTime));
+        sb.append("\n");
+
+        String message = "```\nDEBUG - GenerateMap Timing:\n" + sb + "\n```";
+        MessageHelper.sendMessageToBotLogChannel(event, message);
     }
 
-    private static String debugString(String prefix, long time, long total) {
-        return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
+    private static String debugString(String name, int padRight, StopWatch subStopWatch, StopWatch totalStopWatch) {
+        if (subStopWatch == null || totalStopWatch == null) {
+            return "";
+        }
+        long subTime = subStopWatch.getNanoTime();
+        long totalTime = totalStopWatch.getNanoTime();
+        double percentage = ((double) subTime / totalTime) * 100.0;
+        String timeStr = Helper.getTimeRepresentationNanoSeconds(subTime);
+        return String.format("\n%-" + padRight + "s%s (%2.2f%%)", name, timeStr, percentage);
     }
 
     private void sendToWebsite() {
