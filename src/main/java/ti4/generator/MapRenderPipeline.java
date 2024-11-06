@@ -34,6 +34,8 @@ public class MapRenderPipeline {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
+                } catch (Exception e) {
+                    BotLogger.log("MapRenderPipeline worker threw an exception.", e);
                 }
             }
         });
