@@ -54,7 +54,6 @@ public class ShowGame implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         GameManager gameManager = GameManager.getInstance();

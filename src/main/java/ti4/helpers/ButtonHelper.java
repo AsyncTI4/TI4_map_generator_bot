@@ -3710,15 +3710,14 @@ public class ButtonHelper {
     }
 
     public static List<Button> getTilesToModify(Player player, Game game) {
-        return getTilesWithUnitsForAction(player, game, "genericModify", true);
+        return getTilesWithUnitsForModifyUnitsButton(player, game, "genericModify", true);
     }
 
     public static List<Button> getDomnaStepOneTiles(Player player, Game game) {
         return getTilesWithShipsForAction(player, game, "domnaStepOne", false);
     }
 
-    public static List<Button> getTilesWithUnitsForAction(Player player, Game game, String action,
-        boolean includeDelete) {
+    public static List<Button> getTilesWithUnitsForAction(Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerUnits = tile -> tile.containsPlayersUnits(player);
         return getTilesWithPredicateForAction(player, game, action, hasPlayerUnits, includeDelete);
     }
@@ -3726,6 +3725,19 @@ public class ButtonHelper {
     public static List<Button> getTilesWithShipsForAction(Player player, Game game, String action, boolean includeDelete) {
         Predicate<Tile> hasPlayerShips = tile -> tile.containsPlayersUnitsWithModelCondition(player, UnitModel::getIsShip);
         return getTilesWithPredicateForAction(player, game, action, hasPlayerShips, includeDelete);
+    }
+
+    public static List<Button> getAllTilesToModify(Player player, Game game, String action, boolean includeDelete) {
+        Predicate<Tile> tRue = tile -> true;
+        return getTilesWithPredicateForAction(player, game, action, tRue, includeDelete);
+    }
+
+    public static List<Button> getTilesWithUnitsForModifyUnitsButton(Player player, Game game, String action, boolean includeDelete) {
+        Predicate<Tile> hasPlayerUnits = tile -> tile.containsPlayersUnits(player);
+        List<Button> buttons = new ArrayList<>(16);
+        buttons.addAll(getTilesWithPredicateForAction(player, game, action, hasPlayerUnits, includeDelete));
+        buttons.add(Buttons.green("modifyUnitsAllTiles" + "deleteThisMessage", "Show All Tiles"));
+        return buttons;
     }
 
     public static List<Button> getTilesWithPredicateForAction(Player player, Game game, String action, Predicate<Tile> predicate, boolean includeDelete) {

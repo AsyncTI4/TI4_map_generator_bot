@@ -1,5 +1,24 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -11,10 +30,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
@@ -60,6 +75,7 @@ import ti4.commands.uncategorized.ShowDistances;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddUnitDamage;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.ModifyUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveAllUnitDamage;
 import ti4.commands.units.RemoveAllUnits;
@@ -88,20 +104,6 @@ import ti4.map.GameSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import static org.reflections.scanners.Scanners.SubTypes;
 
 public class AsyncTI4DiscordBot {
 
@@ -183,6 +185,7 @@ public class AsyncTI4DiscordBot {
         commandManager.addCommand(new RemoveAllCC());
         commandManager.addCommand(new AddFrontierTokens());
         commandManager.addCommand(new MoveUnits());
+        commandManager.addCommand(new ModifyUnits());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
         commandManager.addCommand(new AddUnitDamage());
