@@ -23,6 +23,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -1930,9 +1931,12 @@ public class MapGenerator {
                 String decalFile = p != null ? p.getDecalFile(unitKey.asyncID()) : null;
                 BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFile));
                 BufferedImage spoopy = null;
-                if ((unitKey.getUnitType() == UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(1000) == 0)) {
-                    String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
-                    spoopy = ImageHelper.read(spoopypath);
+                if (unitKey.getUnitType() == UnitType.Warsun) {
+                    int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
+                    if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
+                        String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
+                        spoopy = ImageHelper.read(spoopypath);
+                    }
                 }
 
                 if (justNumber) {
@@ -6097,10 +6101,6 @@ public class MapGenerator {
                     if (unitKey.getUnitType() == UnitType.Spacedock && p.ownsUnitSubstring("cabal_spacedock")) {
                         unitPath = unitPath.replace("sd", "csd");
                     }
-                    if (unitKey.getUnitType() == UnitType.TyrantsLament) {
-                        String name = "TyrantNew.png";
-                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
-                    }
                     if (unitKey.getUnitType() == UnitType.Lady) {
                         unitPath = unitPath.replace("lady", "fs");
                     }
@@ -6109,14 +6109,10 @@ public class MapGenerator {
                         if (game.getPNOwner("cavalry") != null && game.getPNOwner("cavalry").hasTech("m2")) {
                             name = "Memoria_2.png";
                         }
-                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
-                    }
-                    if (unitKey.getUnitType() == UnitType.PlenaryOrbital) {
-                        String name = "PlenaryNew.png";
-                        unitPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
+                        unitPath = ResourceHelper.getInstance().getUnitFile(name);
                     }
                     if (unitKey.getUnitType() == UnitType.Monument) {
-                        unitPath = ResourceHelper.getInstance().getUnitFile("Monument.png");
+                        unitPath = ResourceHelper.getInstance().getUnitFile("Monument.png"); // TODO remove when colours are done
                     }
                 }
 
@@ -6141,21 +6137,22 @@ public class MapGenerator {
             }
 
             BufferedImage spoopy = null;
-            if ((unitKey.getUnitType() == UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(1000) == 0)) {
-
-                String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
-                spoopy = ImageHelper.read(spoopypath);
-                // BotLogger.log("SPOOPY TIME: " + spoopypath);
+            if (unitKey.getUnitType() == UnitType.Warsun) {
+                int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
+                if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
+                    String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
+                    spoopy = ImageHelper.read(spoopypath);
+                }
             }
 
             if (unitKey.getUnitType() == UnitType.Lady) {
                 String name = "units_ds_ghemina_lady_wht.png";
-                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
+                String spoopyPath = ResourceHelper.getInstance().getDecalFile(name);
                 spoopy = ImageHelper.read(spoopyPath);
             }
             if (unitKey.getUnitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
                 String name = "units_ds_ghemina_lord_wht.png";
-                String spoopyPath = ResourceHelper.getInstance().getNonSpoopyFinFile(name);
+                String spoopyPath = ResourceHelper.getInstance().getDecalFile(name);
                 spoopy = ImageHelper.read(spoopyPath);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();

@@ -65,7 +65,7 @@ public class Units {
                 return "TyrantsLament.png";
             }
             if (UnitType.PlenaryOrbital == unitType) {
-                return "PlentaryOrbital.png";
+                return "PlenaryOrbital.png";
             }
             if (UnitType.Monument == unitType) {
                 return "monument.png"; // TODO: Colours
