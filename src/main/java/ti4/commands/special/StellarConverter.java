@@ -1,7 +1,5 @@
 package ti4.commands.special;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -11,8 +9,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
-import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
+import ti4.generator.TileGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
@@ -24,6 +22,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class StellarConverter extends SpecialSubcommandData {
 
@@ -114,7 +114,7 @@ public class StellarConverter extends SpecialSubcommandData {
     public static void postTileInDisasterWatch(Game game, Tile tile, Integer rings, String message) {
         if (!AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).isEmpty() && !game.isFowMode()) {
             TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
-            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, rings, tile.getPosition(), null);
+            FileUpload systemWithContext = new TileGenerator(game, null, null, rings, tile.getPosition()).createFileUpload();
             MessageHelper.sendMessageWithFile(watchPary, systemWithContext, message, false);
         }
     }

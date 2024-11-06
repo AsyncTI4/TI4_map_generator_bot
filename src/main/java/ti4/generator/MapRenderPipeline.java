@@ -70,7 +70,7 @@ public class MapRenderPipeline {
     }
 
     private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {
-        try (var fileUpload = mapGenerator.uploadToDiscord()) {
+        try (var fileUpload = mapGenerator.createFileUpload()) {
             if (fileUpload != null && callback != null) {
                 callback.accept(fileUpload);
             }
