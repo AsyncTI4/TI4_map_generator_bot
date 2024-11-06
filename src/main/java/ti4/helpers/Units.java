@@ -58,11 +58,14 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (UnitType.TyrantsLament == unitType || UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
+            if (UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
+            if (UnitType.TyrantsLament == unitType) {
+                return "TyrantsLament.png";
+            }
             if (UnitType.PlenaryOrbital == unitType) {
-                return String.format("%s_%s.png", colorID, "sd");
+                return "PlentaryOrbital.png";
             }
             if (UnitType.Monument == unitType) {
                 return "monument.png"; // TODO: Colours
@@ -90,6 +93,9 @@ public class Units {
         }
     }
 
+    /**
+     * UnitType - aka {@link UnitModel.getAsyncId()} - is a list of all the units in the game.
+     */
     public enum UnitType {
         Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
