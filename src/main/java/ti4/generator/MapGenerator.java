@@ -373,6 +373,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void logDebug() {
+        ImageHelper.getCacheStats().ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
         if (!debug) return;
         debugAbsoluteStartTime.stop();
 
