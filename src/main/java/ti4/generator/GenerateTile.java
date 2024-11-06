@@ -33,6 +33,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class GenerateTile {
+
+    private static final int TILE_PADDING = 100;
+
     private Graphics graphics;
     private BufferedImage mainImage;
     private int width;
@@ -212,8 +215,8 @@ public class GenerateTile {
                 throw new Exception("Could not map tile to a position on the map: " + game.getName());
             }
 
-            int tileX = positionPoint.x + offsetX - MapGenerator.TILE_PADDING;
-            int tileY = positionPoint.y + offsetY - MapGenerator.TILE_PADDING;
+            int tileX = positionPoint.x + offsetX - TILE_PADDING;
+            int tileY = positionPoint.y + offsetY - TILE_PADDING;
 
             BufferedImage tileImage = MapGenerator.partialTileImage(tile, game, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);

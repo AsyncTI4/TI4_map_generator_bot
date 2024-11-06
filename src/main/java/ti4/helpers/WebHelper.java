@@ -49,7 +49,7 @@ public class WebHelper {
         }
     }
 
-    public static void putData(String gameId, Game game) {
+    public static void putData(String gameName, Game game) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
             return;
 
@@ -58,7 +58,7 @@ public class WebHelper {
             String json = objectMapper.writeValueAsString(exportableFieldMap);
 
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s", gameId)))
+                .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s", gameName)))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
@@ -72,17 +72,16 @@ public class WebHelper {
         }
     }
 
-    public static void putOverlays(Game game) {
+    public static void putOverlays(String gameId, Map<String, WebsiteOverlay> overlays) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
             return;
 
         try {
-            Map<String, WebsiteOverlay> overlays = game.getWebsiteOverlays();
             String json = objectMapper.writeValueAsString(overlays);
 
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
-                .key(String.format("overlays/%s/%s.json", game.getID(), game.getID()))
+                .key(String.format("overlays/%s/%s.json", gameId, gameId))
                 .contentType("application/json")
                 .cacheControl("no-cache, no-store, must-revalidate")
                 .build();
@@ -142,11 +141,11 @@ public class WebHelper {
         }
     }
 
-    public static void putMap(String gameId, BufferedImage img) {
-        putMap(gameId, img, false, null);
+    public static void putMap(String gameName, BufferedImage img) {
+        putMap(gameName, img, false, null);
     }
 
-    public static void putMap(String gameId, BufferedImage img, Boolean frog, Player player) {
+    public static void putMap(String gameName, BufferedImage img, Boolean frog, Player player) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
             return;
 
@@ -168,7 +167,7 @@ public class WebHelper {
                 mapPath += format;
                 PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))
-                    .key(String.format(mapPath, gameId, dtstamp))
+                    .key(String.format(mapPath, gameName, dtstamp))
                     .contentType("image/" + format)
                     .build();
                 s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(out.toByteArray()))
@@ -178,9 +177,9 @@ public class WebHelper {
                         });
             }
         } catch (SdkClientException e) {
-            BotLogger.log("Could not add image for game `" + gameId + "` to web server. Likely invalid credentials.", e);
+            BotLogger.log("Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
-            BotLogger.log("Could not add image for game `" + gameId + "` to web server", e);
+            BotLogger.log("Could not add image for game `" + gameName + "` to web server", e);
         }
     }
 }
