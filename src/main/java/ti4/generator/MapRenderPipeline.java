@@ -35,7 +35,7 @@ public class MapRenderPipeline {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    BotLogger.log("Render event threw an exception.", e);
+                    BotLogger.log("MapRenderPipeline worker threw an exception.", e);
                 }
             }
         });
@@ -56,13 +56,26 @@ public class MapRenderPipeline {
     }
 
     private static void render(RenderEvent renderEvent) {
-        try (var fileUpload = new MapGenerator(renderEvent.game, renderEvent.displayType)
-                .saveImage(renderEvent.event, renderEvent.uploadToDiscord, renderEvent.uploadToWebsite)) {
-            if (fileUpload != null && renderEvent.callback != null) {
-                renderEvent.callback.accept(fileUpload);
+        try (var mapGenerator = new MapGenerator(renderEvent.game, renderEvent.displayType, renderEvent.event)) {
+            mapGenerator.draw();
+            if (renderEvent.uploadToDiscord) {
+                uploadToDiscord(mapGenerator, renderEvent.callback());
+            }
+            if (renderEvent.uploadToWebsite) {
+                mapGenerator.uploadToWebsite();
+            }
+        } catch (Exception e) {
+            BotLogger.log("Render event threw an exception.", e);
+        }
+    }
+
+    private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {
+        try (var fileUpload = mapGenerator.uploadToDiscord()) {
+            if (fileUpload != null && callback != null) {
+                callback.accept(fileUpload);
             }
         } catch (IOException e) {
-            BotLogger.log("Could not render images for " + renderEvent.game.getName(), e);
+            BotLogger.log("Could not render images for " + mapGenerator.getGameName(), e);
         }
     }
 

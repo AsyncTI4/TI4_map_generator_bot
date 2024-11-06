@@ -59,6 +59,7 @@ import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.website.WebsiteOverlay;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -94,22 +95,41 @@ import java.util.stream.Collectors;
 
 import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
-public class MapGenerator {
+public class MapGenerator implements AutoCloseable {
 
-    public static final int DELTA_Y = 26;
-    public static final int RING_MAX_COUNT = 8;
-    public static final int RING_MIN_COUNT = 3;
-    public static final int PLAYER_STATS_HEIGHT = 650;
-    public static final int TILE_PADDING = 100;
+    private static final int DELTA_Y = 26;
+    private static final int RING_MAX_COUNT = 8;
+    private static final int RING_MIN_COUNT = 3;
+    private static final int PLAYER_STATS_HEIGHT = 650;
+    private static final int TILE_PADDING = 100;
     private static final int EXTRA_X = 300;
     private static final int EXTRA_Y = 200;
-    public static final int SPACING_BETWEEN_OBJECTIVE_TYPES = 10;
-    private static final Point tilePositionPoint = new Point(255, 295);
-    private static final Point labelPositionPoint = new Point(90, 295);
-    private static final Point numberPositionPoint = new Point(40, 27);
+    private static final int SPACING_BETWEEN_OBJECTIVE_TYPES = 10;
+    private static final Point TILE_POSITION_POINT = new Point(255, 295);
+    private static final Point LABEL_POSITION_POINT = new Point(90, 295);
+    private static final Point NUMBER_POSITION_POINT = new Point(40, 27);
+    //private static final BasicStroke stroke1 = new BasicStroke(1.0f);
+    private static final BasicStroke stroke2 = new BasicStroke(2.0f);
+    private static final BasicStroke stroke3 = new BasicStroke(3.0f);
+    private static final BasicStroke stroke4 = new BasicStroke(4.0f);
+    private static final BasicStroke stroke5 = new BasicStroke(5.0f);
+    private static final BasicStroke stroke6 = new BasicStroke(6.0f);
+    private static final BasicStroke stroke7 = new BasicStroke(7.0f);
+    private static final BasicStroke stroke8 = new BasicStroke(8.0f);
+    private static final Color EliminatedColor = new Color(150, 0, 24); // Carmine
+    private static final Color ActiveColor = new Color(80, 200, 120); // Emerald
+    private static final Color PassedColor = new Color(220, 20, 60); // Crimson
+    //private static final Color DummyColor = new Color(0, 128, 255); // Azure
+    private static final Color Stage1RevealedColor = new Color(230, 126, 34);
+    //private static final Color Stage1HiddenColor = new Color(130, 70, 0);
+    //private static final Color Stage2RevealedColor = new Color(93, 173, 226);
+    //private static final Color Stage2HiddenColor = new Color(30, 60, 128);
+    private static final Color LawColor = new Color(228, 255, 0);
+    private static final Color TradeGoodColor = new Color(241, 176, 0);
 
     private final Graphics graphics;
     private final BufferedImage mainImage;
+    private final GenericInteractionCreateEvent event;
     private final int scoreTokenWidth;
     private final Game game;
     private final DisplayType displayType;
@@ -121,6 +141,7 @@ public class MapGenerator {
     private final boolean extraRow;
     private final Map<String, Player> playerControlMap;
 
+    private final Map<String, WebsiteOverlay> websiteOverlays = new HashMap<>(); // ID, WebsiteOverlay
     private int mapWidth;
     private int minX = -1;
     private int minY = -1;
@@ -135,36 +156,18 @@ public class MapGenerator {
     private StopWatch debugDiscordTime;
     private StopWatch debugWebsiteTime;
 
-    //private static final BasicStroke stroke1 = new BasicStroke(1.0f);
-    private static final BasicStroke stroke2 = new BasicStroke(2.0f);
-    private static final BasicStroke stroke3 = new BasicStroke(3.0f);
-    private static final BasicStroke stroke4 = new BasicStroke(4.0f);
-    private static final BasicStroke stroke5 = new BasicStroke(5.0f);
-    private static final BasicStroke stroke6 = new BasicStroke(6.0f);
-    private static final BasicStroke stroke7 = new BasicStroke(7.0f);
-    private static final BasicStroke stroke8 = new BasicStroke(8.0f);
-
-    private static final Color EliminatedColor = new Color(150, 0, 24); // Carmine
-    private static final Color ActiveColor = new Color(80, 200, 120); // Emerald
-    private static final Color PassedColor = new Color(220, 20, 60); // Crimson
-    private static final Color DummyColor = new Color(0, 128, 255); // Azure
-    private static final Color Stage1RevealedColor = new Color(230, 126, 34);
-    private static final Color Stage1HiddenColor = new Color(130, 70, 0);
-    private static final Color Stage2RevealedColor = new Color(93, 173, 226);
-    private static final Color Stage2HiddenColor = new Color(30, 60, 128);
-    private static final Color LawColor = new Color(228, 255, 0);
-    private static final Color TradeGoodColor = new Color(241, 176, 0);
-
-    MapGenerator(Game game) {
-        this(game, null);
+    MapGenerator(Game game, @Nullable GenericInteractionCreateEvent event) {
+        this(game, null, event);
     }
 
-    MapGenerator(Game game, DisplayType displayType) {
+    MapGenerator(Game game, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+        debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
+        if (debug) debugAbsoluteStartTime = StopWatch.createStarted();
+
         this.game = game;
         this.displayType = defaultIfNull(displayType);
+        this.event = event;
         this.playerControlMap = game.getPlayerControlMap();
-
-        debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
 
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
@@ -185,21 +188,7 @@ public class MapGenerator {
         int objectivesY = Math.max((mostObjs - 5) * 43, 0);
 
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
-        int playerY = playerCountForMap * 340;
-        int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * 26;
-        for (Player player : game.getPlayers().values()) {
-            if (player.isEliminated()) {
-                playerY -= 190;
-            } else if (player.getSecretsScored().size() == 4) {
-                playerY += 23;
-            } else if (player.getSecretsScored().size() > 4) {
-                playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
-            }
-        }
-
-        int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
-        int heightStats = playerY + lawsY + objectivesY + 600;
+        int heightStats = getHeightStats(game, playerCountForMap, objectivesY);
 
         int mapHeight = getMapHeight(game);
         mapWidth = getMapWidth(game);
@@ -242,9 +231,26 @@ public class MapGenerator {
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
-        ImageIO.setUseCache(false);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
+    }
+
+    private static int getHeightStats(Game game, int playerCountForMap, int objectivesY) {
+        int playerY = playerCountForMap * 340;
+        int unrealPlayers = game.getNotRealPlayers().size();
+        playerY += unrealPlayers * 26;
+        for (Player player : game.getPlayers().values()) {
+            if (player.isEliminated()) {
+                playerY -= 190;
+            } else if (player.getSecretsScored().size() == 4) {
+                playerY += 23;
+            } else if (player.getSecretsScored().size() > 4) {
+                playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
+            }
+        }
+
+        int lawsY = (game.getLaws().keySet().size() / 2 + 1) * 115;
+        return playerY + lawsY + objectivesY + 600;
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
@@ -260,31 +266,25 @@ public class MapGenerator {
         return displayType;
     }
 
-    FileUpload saveImage(@Nullable GenericInteractionCreateEvent event, boolean uploadToDiscord, boolean uploadToWebsite) {
-        if (debug) debugAbsoluteStartTime = StopWatch.createStarted();
-
+    FileUpload uploadToDiscord() {
+        if (debug) debugDiscordTime = StopWatch.createStarted();
         AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
-        game.resetWebsiteOverlays();
-
-        if (debug) debugDrawTime = StopWatch.createStarted();
-        drawGame(event);
-        if (debug) debugDrawTime.stop();
-
-        if (debug) debugDiscordTime = StopWatch.createStarted();
-        FileUpload fileUpload = uploadToDiscord ? createFileUpload() : null;
+        FileUpload fileUpload = createFileUpload();
         if (debug) debugDiscordTime.stop();
-
-        if (uploadToWebsite) {
-            if (debug) debugWebsiteTime = StopWatch.createStarted();
-            sendToWebsite(event);
-            if (debug) debugWebsiteTime.stop();
-        }
-
-        mainImage.flush();
-
-        logDebug(event);
         return fileUpload;
+    }
+
+    void uploadToWebsite() {
+        if (debug) debugWebsiteTime = StopWatch.createStarted();
+        sendToWebsite();
+        if (debug) debugWebsiteTime.stop();
+    }
+
+    void draw() {
+        if (debug) debugDrawTime = StopWatch.createStarted();
+        drawGame();
+        if (debug) debugDrawTime.stop();
     }
 
     private void setupTilesForDisplayTypeAllAndMap(Map<String, Tile> tilesToDisplay) {
@@ -357,37 +357,40 @@ public class MapGenerator {
         }
     }
 
-    private void setupFow(GenericInteractionCreateEvent event, Map<String, Tile> tilesToDisplay) {
-        if (game.isFowMode() && event != null) {
-            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)
-                || event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper) {
+    private void setupFow(Map<String, Tile> tilesToDisplay) {
+        if(!isFowModeActive()) {
+            return;
+        }
+        isFoWPrivate = true;
+        Player player = getFowPlayer();
 
-                isFoWPrivate = true;
-                Player player = getFowPlayer(event);
+        // IMPORTANT NOTE : This method used to be local and was refactored to extract
+        // any references to tilesToDisplay
+        fowPlayer = Helper.getGamePlayer(game, player, event, null);
 
-                // IMPORTANT NOTE : This method used to be local and was refactored to extract
-                // any references to tilesToDisplay
-                fowPlayer = Helper.getGamePlayer(game, player, event, null);
-
-                Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
-                Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
-                keys.removeAll(tilesToShow);
-                for (String key : keys) {
-                    tilesToDisplay.remove(key);
-                    playerControlMap.remove(key);
-                    if (fowPlayer != null) {
-                        tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
-                    }
-                }
+        Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
+        Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
+        keys.removeAll(tilesToShow);
+        for (String key : keys) {
+            tilesToDisplay.remove(key);
+            playerControlMap.remove(key);
+            if (fowPlayer != null) {
+                tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
             }
         }
+    }
+
+    private boolean isFowModeActive() {
+        return game.isFowMode() && event != null &&
+                (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
+                        event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper);
     }
 
     public boolean shouldConvertToGeneric(Player player) {
         return isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
     }
 
-    private void logDebug(GenericInteractionCreateEvent event) {
+    private void logDebug() {
         ImageHelper.getCacheStats().ifPresent(stats -> MessageHelper.sendMessageToBotLogChannel("```\n" + stats + "\n```"));
         if (!debug)
             return;
@@ -407,14 +410,14 @@ public class MapGenerator {
         return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
     }
 
-    private void sendToWebsite(GenericInteractionCreateEvent event) {
+    private void sendToWebsite() {
         String testing = System.getenv("TESTING");
         if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
             WebHelper.putMap(game.getName(), mainImage);
             WebHelper.putData(game.getName(), game);
-            WebHelper.putOverlays(game);
+            WebHelper.putOverlays(game.getID(), websiteOverlays);
         } else if (isFoWPrivate) {
-            Player player = getFowPlayer(event);
+            Player player = getFowPlayer();
             WebHelper.putMap(game.getName(), mainImage, true, player);
         }
     }
@@ -450,7 +453,7 @@ public class MapGenerator {
         return fileUpload;
     }
 
-    private Player getFowPlayer(@Nullable GenericInteractionCreateEvent event) {
+    private Player getFowPlayer() {
         if (event == null)
             return null;
         String user = event.getUser().getId();
@@ -614,9 +617,9 @@ public class MapGenerator {
         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
     }
 
-    private void drawGame(GenericInteractionCreateEvent event) {
+    private void drawGame() {
         Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
-        setupFow(event, tilesToDisplay);
+        setupFow(tilesToDisplay);
 
         if (debug) debugTileTime = StopWatch.createStarted();
         setupTilesForDisplayTypeAllAndMap(tilesToDisplay);
@@ -791,7 +794,7 @@ public class MapGenerator {
                         } else {
                             superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
-                                game.addWebsiteOverlay(player, "strategyCardPlayerArea", scModel.getId(), x + 110, y + 20, 25, 50);
+                                addWebsiteOverlay(player, "strategyCardPlayerArea", scModel.getId(), x + 110, y + 20, 25, 50);
                                 // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
@@ -1776,7 +1779,7 @@ public class MapGenerator {
         int widthOfSection = 180;
         int leftSide = width - widthOfSection - xDeltaFromRightSide;
         int verticalSpacing = 39;
-        game.addWebsiteOverlay(player, "unitCombatSummary", null, leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
+        addWebsiteOverlay(player, "unitCombatSummary", null, leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
         int imageSize = verticalSpacing - 2;
         drawPAImageScaled(leftSide, y + verticalSpacing, "pa_resources.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
@@ -2421,6 +2424,13 @@ public class MapGenerator {
         return false;
     }
 
+    @Override
+    public void close() throws Exception {
+        mainImage.flush();
+        graphics.dispose();
+        logDebug();
+    }
+
     private record Coord(int x, int y) {
         public Coord translate(int dx, int dy) {
             return coord(x + dx, y + dy);
@@ -2548,7 +2558,7 @@ public class MapGenerator {
                 }
             }
             // Unit Overlays
-            game.addWebsiteOverlay(player, "unit", unit.getId(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+            addWebsiteOverlay(player, "unit", unit.getId(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
             // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
         }
         graphics.setColor(Color.WHITE);
@@ -2858,7 +2868,7 @@ public class MapGenerator {
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 // graphics.drawRect(x, y + 24, textWidth, 64); // debug
-                game.addWebsiteOverlay("strategyCardByScoretrack", scModel.getId(), x, y + 24, textWidth, 60);
+                addWebsiteOverlay("strategyCardByScoretrack", scModel.getId(), x, y + 24, textWidth, 60);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
                     graphics.setFont(Storage.getFont24());
@@ -3317,7 +3327,7 @@ public class MapGenerator {
                     int fontYoffset = (scsize / 2) + 25;
                     superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     if (scModel != null) {
-                        game.addWebsiteOverlay(player, "strategyCardNearMap", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        addWebsiteOverlay(player, "strategyCardNearMap", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
                         // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
                     }
                     point.translate(scsize, 0);
@@ -4073,7 +4083,7 @@ public class MapGenerator {
 
             graphics.drawRect(x, y, 1178, 110);
             if (agendaModel != null) {
-                game.addWebsiteOverlay("agenda", agendaModel.getAlias(), x, y, 1178, 110);
+                addWebsiteOverlay("agenda", agendaModel.getAlias(), x, y, 1178, 110);
             }
             String agendaTitle = Mapper.getAgendaTitle(lawID);
             if (agendaTitle == null) {
@@ -4511,7 +4521,7 @@ public class MapGenerator {
     }
 
     public static BufferedImage partialTileImage(Tile tile, Game game, TileStep step, Player frogPlayer, Boolean isFrogPrivate) {
-        return new MapGenerator(game).partialTileImage(tile, step, frogPlayer, isFrogPrivate);
+        return new MapGenerator(game, null).partialTileImage(tile, step, frogPlayer, isFrogPrivate);
     }
 
     private static void drawOnWormhole(Tile tile, Graphics graphics, BufferedImage icon, int offset) {
@@ -4627,13 +4637,13 @@ public class MapGenerator {
                 if (isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer)) {
                     BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(frogPlayer));
                     tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
-                    int labelX = TILE_PADDING + labelPositionPoint.x;
-                    int labelY = TILE_PADDING + labelPositionPoint.y;
+                    int labelX = TILE_PADDING + LABEL_POSITION_POINT.x;
+                    int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
                     superDrawString(tileGraphics, tile.getFogLabel(frogPlayer), labelX, labelY, Color.WHITE, null, null, null, null);
                 }
 
-                int textX = TILE_PADDING + tilePositionPoint.x;
-                int textY = TILE_PADDING + tilePositionPoint.y;
+                int textX = TILE_PADDING + TILE_POSITION_POINT.x;
+                int textY = TILE_PADDING + TILE_POSITION_POINT.y;
                 superDrawString(tileGraphics, tile.getPosition(), textX, textY, Color.WHITE, HorizontalAlign.Right, VerticalAlign.Bottom, stroke7, Color.BLACK);
 
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
@@ -4769,9 +4779,9 @@ public class MapGenerator {
                     } else {
                         xMod = -155;
                     }
-                    tileGraphics.drawImage(gearImage, TILE_PADDING + tilePositionPoint.x + xMod - 29, TILE_PADDING + tilePositionPoint.y + yMod - 4, null);
+                    tileGraphics.drawImage(gearImage, TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29, TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4, null);
                     tileGraphics.setFont(Storage.getFont35());
-                    tileGraphics.drawString(prodInSystem + "", TILE_PADDING + tilePositionPoint.x + xMod + 15 + textModifer - 25, TILE_PADDING + tilePositionPoint.y + yMod + 40);
+                    tileGraphics.drawString(prodInSystem + "", TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifer - 25, TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
                 }
 
                 if (spaceUnitHolder != null) {
@@ -5472,11 +5482,6 @@ public class MapGenerator {
 
     public static String getColorFilterForDistance(int distance) {
         return "Distance" + distance + ".png";
-    }
-
-    public static void drawCrosshair(Graphics g, int x, int y) {
-        g.drawLine(x - 100, y, x + 100, y);
-        g.drawLine(x, y - 100, x, y + 100);
     }
 
     private Point getTilePosition(String position, int x, int y) {
@@ -6300,8 +6305,8 @@ public class MapGenerator {
                     tileGraphics.setFont(Storage.getFont24());
                     tileGraphics.setColor(groupUnitColor);
 
-                    int scaledNumberPositionX = numberPositionPoint.x;
-                    int scaledNumberPositionY = numberPositionPoint.y;
+                    int scaledNumberPositionX = NUMBER_POSITION_POINT.x;
+                    int scaledNumberPositionY = NUMBER_POSITION_POINT.y;
                     if (bulkUnitCount > 9) {
                         tileGraphics.setFont(Storage.getFont28());
                         scaledNumberPositionX = scaledNumberPositionX + 5;
@@ -6337,14 +6342,7 @@ public class MapGenerator {
         }
     }
 
-    /**
-     * @deprecated use {@link MapGenerator#superDrawString()} instead
-     *             Draw a String centered in the middle of a Rectangle.
-     * 
-     * @param g The Graphics instance.
-     * @param text The String to draw.
-     * @param rect The Rectangle to center the text in.
-     */
+    // use {@link MapGenerator#superDrawString()}
     @Deprecated
     public static void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
         // Get the FontMetrics
@@ -6479,8 +6477,24 @@ public class MapGenerator {
         return op.filter(image, null);
     }
 
-    private static void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, Player player, String cardType, String cardID) {
+    private void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, Player player, String cardType, String cardID) {
         g.drawRect(x, y, width, height);
-        game.addWebsiteOverlay(player, cardType, cardID, x, y, width, height);
+        addWebsiteOverlay(player, cardType, cardID, x, y, width, height);
+    }
+
+    void addWebsiteOverlay(Player player, String cardType, String cardID, int x, int y, int width, int height) {
+        if (player == null) {
+            addWebsiteOverlay(cardType, cardID, x, y, width, height);
+            return;
+        }
+        websiteOverlays.put(cardType + ":" + cardID + ":" + player.getFaction(), new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+    }
+
+    void addWebsiteOverlay(String cardType, String cardID, int x, int y, int width, int height) {
+        websiteOverlays.put(cardType + ":" + cardID, new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+    }
+
+    String getGameName() {
+        return game.getName();
     }
 }
