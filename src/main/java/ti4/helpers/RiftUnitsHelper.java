@@ -90,7 +90,6 @@ public class RiftUnitsHelper {
 
                     int totalUnits = unitEntry.getValue();
                     String unitAsyncID = unitModel.getAsyncId();
-                    unitAsyncID = ButtonHelper.getUnitName(unitAsyncID);
                     int damagedUnits = 0;
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);

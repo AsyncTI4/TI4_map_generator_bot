@@ -492,7 +492,7 @@ public class CombatHelper {
                     String unitHolderName = thalnosUnit.split("_")[1];
                     Tile tile = game.getTileByPosition(pos);
                     //int amount = game.getSpecificThalnosUnit(thalnosUnit);
-                    String unitName = ButtonHelper.getUnitName(unitModel.getAsyncId());
+                    String unitName = unitModel.getAsyncId();
                     thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                     if (thalnosUnit.equals(unitName)) {
                         new RemoveUnits().unitParsing(event, player.getColor(), tile, misses + " " + unitName + " " + unitHolderName, game);

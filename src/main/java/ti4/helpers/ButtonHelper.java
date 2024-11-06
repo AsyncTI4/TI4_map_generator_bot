@@ -4426,28 +4426,6 @@ public class ButtonHelper {
         return list;
     }
 
-    /**
-     * @deprecated We should be using {@link UnitKey#getUnitType()#getPlainName()} data instead (TODO)
-     */
-    @Deprecated
-    public static String getUnitName(String id) {
-        return switch (id) {
-            case "fs" -> "flagship";
-            case "ws" -> "warsun";
-            case "gf" -> "infantry";
-            case "mf" -> "mech";
-            case "sd" -> "spacedock";
-            case "csd" -> "cabalspacedock";
-            case "pd" -> "pds";
-            case "ff" -> "fighter";
-            case "ca", "cr" -> "cruiser";
-            case "dd" -> "destroyer";
-            case "cv" -> "carrier";
-            case "dn" -> "dreadnought";
-            default -> id;
-        };
-    }
-
     @ButtonHandler("unflipMallice")
     public static void unflipMallice(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
@@ -4757,7 +4735,7 @@ public class ButtonHelper {
             playerUnitsByQuantity.put(unitModel, 0);
             for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                 int amount = game.getSpecificThalnosUnit(thalnosUnit);
-                String unitName = getUnitName(unitModel.getAsyncId());
+                String unitName = unitModel.getAsyncId();
                 thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                 if (thalnosUnit.equals(unitName)) {
                     playerUnitsByQuantity.put(unitModel, amount + playerUnitsByQuantity.get(unitModel));

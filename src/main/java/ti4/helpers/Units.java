@@ -113,8 +113,7 @@ public class Units {
                 case "gf" -> "Infantry";
                 case "mf" -> "Mech";
                 case "pd" -> "PDS";
-                case "sd" -> "Space Dock";
-                case "csd" -> "Dimensional Tear";
+                case "sd", "csd" -> "Space Dock";
                 case "ff" -> "Fighter";
                 case "dd" -> "Destroyer";
                 case "ca" -> "Cruiser";
@@ -136,8 +135,7 @@ public class Units {
                 case "gf" -> "infantry";
                 case "mf" -> "mech";
                 case "pd" -> "pds";
-                case "sd" -> "spacedock";
-                case "csd" -> "cabalspacedock";
+                case "sd", "csd" -> "spacedock";
                 case "ff" -> "fighter";
                 case "dd" -> "destroyer";
                 case "ca" -> "cruiser";
