@@ -45,13 +45,15 @@ public class MapRenderPipeline {
         instance.worker.start();
     }
 
-    public static void shutdown() {
+    public static boolean shutdown() {
         instance.running = false;
         try {
             instance.worker.join(20000);
+            return !instance.worker.isAlive();
         } catch (InterruptedException e) {
             BotLogger.log("MapRenderPipeline shutdown interrupted.");
             Thread.currentThread().interrupt();
+            return false;
         }
     }
 
