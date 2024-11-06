@@ -1,15 +1,14 @@
 package ti4.map;
 
+import lombok.Getter;
+import lombok.Setter;
+import ti4.helpers.Constants;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.Setter;
-import ti4.helpers.Constants;
-import ti4.website.WebsiteOverlay;
 
 @Getter
 @Setter
@@ -61,9 +60,6 @@ public class GameProperties {
     private boolean componentAction;
     private boolean justPlayedComponentAC;
     private boolean hasHackElectionBeenPlayed;
-
-    // Website Overlays
-    private Map<String, WebsiteOverlay> websiteOverlays; // ID, WebsiteOverlay
 
     // Aggregate Game Stats
     private @ExportableField int activationCount;

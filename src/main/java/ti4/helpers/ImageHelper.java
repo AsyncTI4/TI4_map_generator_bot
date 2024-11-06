@@ -191,7 +191,6 @@ public class ImageHelper {
     }
 
     private static BufferedImage readImage(String filePath) {
-        ImageIO.setUseCache(false);
         try {
             return ImageIO.read(new File(filePath));
         } catch (IOException e) {
@@ -201,7 +200,6 @@ public class ImageHelper {
     }
 
     private static BufferedImage readImage(InputStream inputStream) {
-        ImageIO.setUseCache(false);
         try {
             return ImageIO.read(inputStream);
         } catch (IOException e) {
@@ -215,7 +213,6 @@ public class ImageHelper {
         if (imageURL == null) {
             return null;
         }
-        ImageIO.setUseCache(false);
         try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
             return readImage(inputStream);
         } catch (IOException e) {

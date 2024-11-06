@@ -89,6 +89,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
 
+import javax.imageio.ImageIO;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -305,6 +306,7 @@ public class AsyncTI4DiscordBot {
 
         // START MAP GENERATION
         MapRenderPipeline.start();
+        ImageIO.setUseCache(false);
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
