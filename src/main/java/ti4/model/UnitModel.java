@@ -69,10 +69,6 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && name != null
             && asyncId != null
             && source != null
-            && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament", "lady", "cavalry", "monument").contains(getAsyncId())
-            // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
-            // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
-            // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
             && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
             && getEligiblePlanetTypes().stream().allMatch(type -> List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY").contains(type));
     }
