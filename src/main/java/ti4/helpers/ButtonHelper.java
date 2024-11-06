@@ -1326,49 +1326,49 @@ public class ButtonHelper {
         String threadName = game.getName() + "-bot-map-updates";
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         MapRenderPipeline.render(game, event, DisplayType.all, fileUpload -> {
-                boolean foundSomething = false;
-                if (!game.isFowMode()) {
-                    for (ThreadChannel threadChannel_ : threadChannels) {
-                        if (threadChannel_.getName().equals(threadName)) {
-                            foundSomething = true;
+            boolean foundSomething = false;
+            if (!game.isFowMode()) {
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        foundSomething = true;
 
-                            List<Button> buttonsWeb = new ArrayList<>();
-                            if (!game.isFowMode()) {
-                                Button linkToWebsite = Button.link(
-                                    "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
-                                    "Website View");
-                                buttonsWeb.add(linkToWebsite);
-                                buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
-                            }
-                            buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
-                            buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                            buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
-
-                            MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, fileUpload, message,
-                                buttonsWeb);
+                        List<Button> buttonsWeb = new ArrayList<>();
+                        if (!game.isFowMode()) {
+                            Button linkToWebsite = Button.link(
+                                "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
+                                "Website View");
+                            buttonsWeb.add(linkToWebsite);
+                            buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
                         }
-                    }
-                } else {
-                    MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
-                    foundSomething = true;
-                }
-                if (!foundSomething) {
-                    List<Button> buttonsWeb = new ArrayList<>();
-                    if (!game.isFowMode()) {
-                        Button linkToWebsite = Button.link(
-                            "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
-                            "Website View");
-                        buttonsWeb.add(linkToWebsite);
-                        buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
-                    }
-                    buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
-                    buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                    buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
+                        buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
+                        buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
+                        buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
 
-                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, message,
-                        buttonsWeb);
+                        MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, fileUpload, message,
+                            buttonsWeb);
+                    }
                 }
-            });
+            } else {
+                MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
+                foundSomething = true;
+            }
+            if (!foundSomething) {
+                List<Button> buttonsWeb = new ArrayList<>();
+                if (!game.isFowMode()) {
+                    Button linkToWebsite = Button.link(
+                        "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
+                        "Website View");
+                    buttonsWeb.add(linkToWebsite);
+                    buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
+                }
+                buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
+                buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
+                buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
+
+                MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), fileUpload, message,
+                    buttonsWeb);
+            }
+        });
     }
 
     public static boolean nomadHeroAndDomOrbCheck(Player player, Game game, Tile tile) {
@@ -3770,6 +3770,7 @@ public class ButtonHelper {
             "Choose to either add units (build) or remove them", buttons);
     }
 
+    @ButtonHandler("combatRoll_")
     public static void resolveCombatRoll(Player player, Game game, GenericInteractionCreateEvent event, String buttonID) {
         String[] idInfo = buttonID.split("_");
         String pos = idInfo[1];
@@ -3786,8 +3787,7 @@ public class ButtonHelper {
                 }
             }
         }
-        new CombatRoll().secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos),
-            unitHolderName, rollType);
+        CombatRoll.secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos), unitHolderName, rollType);
         if (buttonID.contains("bombardment") && ButtonHelper.isLawInPlay(game, "conventions")) {
             boolean relevant = false;
             for (UnitHolder unitHolder : game.getTileByPosition(pos).getPlanetUnitHolders()) {
@@ -3800,6 +3800,9 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "This is a reminder that Conventions of War is in play, so bombardment of cultural planets is illegal.");
             }
+        }
+        if (buttonID.contains("bombard")) {
+            ButtonHelper.deleteTheOneButton(event);
         }
     }
 
@@ -4423,10 +4426,13 @@ public class ButtonHelper {
         return list;
     }
 
+    /**
+     * @deprecated We should be using {@link UnitModel} data instead (TODO)
+     */
+    @Deprecated
     public static String getUnitName(String id) {
         return switch (id) {
             case "fs" -> "flagship";
-            case "tyrantslament" -> "tyrantslament";
             case "ws" -> "warsun";
             case "gf" -> "infantry";
             case "mf" -> "mech";
@@ -4438,10 +4444,7 @@ public class ButtonHelper {
             case "dd" -> "destroyer";
             case "cv" -> "carrier";
             case "dn" -> "dreadnought";
-            case "lady" -> "lady";
-            case "plenaryorbital" -> "plenaryorbital";
-            case "cavalry" -> "cavalry";
-            default -> "";
+            default -> id;
         };
     }
 
@@ -4482,14 +4485,12 @@ public class ButtonHelper {
         if (buttonID.contains("alpha")) {
             String tokenFilename = Mapper.getTokenID("ionalpha");
             tile.addToken(tokenFilename, Constants.SPACE);
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Added ionstorm alpha to " + tile.getRepresentation());
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Added ionstorm alpha to " + tile.getRepresentation());
 
         } else {
             String tokenFilename = Mapper.getTokenID("ionbeta");
             tile.addToken(tokenFilename, Constants.SPACE);
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Added ionstorm beta to " + tile.getRepresentation());
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Added ionstorm beta to " + tile.getRepresentation());
         }
         deleteMessage(event);
         CommanderUnlockCheck.checkPlayer(player, "ghost");
@@ -5717,7 +5718,7 @@ public class ButtonHelper {
 
     public static void showFeatureType(GenericInteractionCreateEvent event, Game game, DisplayType feature) {
         MapRenderPipeline.render(game, event, feature,
-                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
+            fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 
     public static List<Player> tileHasPDS2Cover(Player player, Game game, String tilePos) {

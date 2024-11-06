@@ -119,15 +119,11 @@ public class CombatRoll extends CombatSubcommandData {
         return !playerUnitsByQuantity.isEmpty();
     }
 
-    public int secondHalfOfCombatRoll(Player player, Game game, GenericInteractionCreateEvent event, Tile tile,
-        String unitHolderName,
-        CombatRollType rollType) {
+    public static int secondHalfOfCombatRoll(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, CombatRollType rollType) {
         return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, false);
     }
 
-    public int secondHalfOfCombatRoll(Player player, Game game, GenericInteractionCreateEvent event, Tile tile,
-        String unitHolderName,
-        CombatRollType rollType, boolean automated) {
+    public static int secondHalfOfCombatRoll(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, CombatRollType rollType, boolean automated) {
         String sb = "";
         UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
         if (combatOnHolder == null) {

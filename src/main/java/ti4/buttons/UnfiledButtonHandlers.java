@@ -531,14 +531,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
     }
 
-    @ButtonHandler("combatRoll_")
-    public static void combatRoll(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelper.resolveCombatRoll(player, game, event, buttonID);
-        if (buttonID.contains("bombard")) {
-            ButtonHelper.deleteTheOneButton(event);
-        }
-    }
-
     @ButtonHandler("bombardConfirm_")
     public static void bombardConfirm(ButtonInteractionEvent event, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
