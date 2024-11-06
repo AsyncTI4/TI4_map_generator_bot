@@ -204,7 +204,7 @@ public class ButtonHelper {
         if (player.hasTech("so2")) {
             d1 = new Die(5);
         }
-        String msg = Emojis.infantry + " rolled a " + d1.getEmojiRepresentation();
+        String msg = Emojis.infantry + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
         if (player.hasTech("cl2")) {
             msg = Emojis.infantry + " died";
         }
@@ -219,7 +219,7 @@ public class ButtonHelper {
 
     public static void rollMykoMechRevival(Game game, Player player) {
         Die d1 = new Die(6);
-        String msg = player.getFactionEmoji() + Emojis.mech + " rolled a " + d1.getEmojiRepresentation();
+        String msg = player.getFactionEmoji() + Emojis.mech + " rolled a " + d1.getGreenDieIfSuccessOrRedDieIfFailure();
         if (d1.isSuccess()) {
             msg += " and revived. You will be prompted to replace 1 infantry with 1 mech at the start of your turn.";
             ButtonHelperFactionSpecific.increaseMykoMech(game);
