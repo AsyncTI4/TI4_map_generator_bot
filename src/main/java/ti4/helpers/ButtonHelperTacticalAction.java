@@ -96,7 +96,7 @@ public class ButtonHelperTacticalAction {
                             UnitKey unitKey = unitEntry.getKey();
                             if ((unitKey.getUnitType() == UnitType.Infantry
                                 || unitKey.getUnitType() == UnitType.Mech)) {
-                                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                                String unitName = unitKey.unitName();
                                 int amount = unitEntry.getValue();
                                 int totalUnits = amount;
                                 int damagedUnits = 0;
@@ -154,7 +154,7 @@ public class ButtonHelperTacticalAction {
                                 continue;
 
                             UnitKey unitKey = unitEntry.getKey();
-                            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                            String unitName = unitKey.unitName();
                             int totalUnits = unitEntry.getValue();
                             int amount;
 
@@ -710,7 +710,7 @@ public class ButtonHelperTacticalAction {
                 if (!player.unitBelongsToPlayer(unitEntry.getKey()))
                     continue;
                 UnitKey unitKey = unitEntry.getKey();
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                String unitName = unitKey.unitName();
 
                 if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.getUnitType()))) {
                     continue;

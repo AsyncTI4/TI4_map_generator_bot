@@ -89,20 +89,20 @@ public class RiftUnitsHelper {
                     }
 
                     int totalUnits = unitEntry.getValue();
-                    String unitKey = unitModel.getAsyncId();
-                    unitKey = ButtonHelper.getUnitName(unitKey);
+                    String unitAsyncID = unitModel.getAsyncId();
+                    unitAsyncID = ButtonHelper.getUnitName(unitAsyncID);
                     int damagedUnits = 0;
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(key);
                     }
                     for (int x = 1; x < damagedUnits + 1; x++) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            ident + " " + riftUnit(unitKey + "damaged", tile, game, event, player, cabal));
+                            ident + " " + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
                     }
                     totalUnits = totalUnits - damagedUnits;
                     for (int x = 1; x < totalUnits + 1; x++) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            ident + " " + riftUnit(unitKey, tile, game, event, player, cabal));
+                            ident + " " + riftUnit(unitAsyncID, tile, game, event, player, cabal));
                     }
                 }
             }
@@ -189,7 +189,7 @@ public class RiftUnitsHelper {
                     }
 
                     String asyncID = key.asyncID();
-                    asyncID = ButtonHelper.getUnitName(asyncID);
+                    asyncID = key.unitName();
 
                     int totalUnits = unitEntry.getValue();
 

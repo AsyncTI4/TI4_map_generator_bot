@@ -4427,7 +4427,7 @@ public class ButtonHelper {
     }
 
     /**
-     * @deprecated We should be using {@link UnitModel} data instead (TODO)
+     * @deprecated We should be using {@link UnitKey#getUnitType()#getPlainName()} data instead (TODO)
      */
     @Deprecated
     public static String getUnitName(String id) {
@@ -4568,7 +4568,7 @@ public class ButtonHelper {
                         continue;
 
                     UnitKey unitKey = unitEntry.getKey();
-                    String unitName = getUnitName(unitKey.asyncID());
+                    String unitName = unitKey.getUnitType().plainName();
 
                     int damagedUnits = 0;
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
@@ -4614,7 +4614,7 @@ public class ButtonHelper {
                     if (unitModel == null)
                         continue;
                     UnitKey key = unitEntry.getKey();
-                    String unitName = getUnitName(key.asyncID());
+                    String unitName = key.unitName();
                     int totalUnits = unitEntry.getValue();
                     int damagedUnits = 0;
                     if (type.equalsIgnoreCase("assaultcannoncombat") && key.getUnitType() == UnitType.Fighter) {
@@ -4753,18 +4753,18 @@ public class ButtonHelper {
         Map<UnitModel, Integer> playerUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, player,
             event, rollType, game);
         List<UnitModel> units = new ArrayList<>(playerUnitsByQuantity.keySet());
-        for (UnitModel unit : units) {
-            playerUnitsByQuantity.put(unit, 0);
+        for (UnitModel unitModel : units) {
+            playerUnitsByQuantity.put(unitModel, 0);
             for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                 int amount = game.getSpecificThalnosUnit(thalnosUnit);
-                String unitName = getUnitName(unit.getAsyncId());
+                String unitName = getUnitName(unitModel.getAsyncId());
                 thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                 if (thalnosUnit.equals(unitName)) {
-                    playerUnitsByQuantity.put(unit, amount + playerUnitsByQuantity.get(unit));
+                    playerUnitsByQuantity.put(unitModel, amount + playerUnitsByQuantity.get(unitModel));
                 }
             }
-            if (playerUnitsByQuantity.get(unit) == 0) {
-                playerUnitsByQuantity.remove(unit);
+            if (playerUnitsByQuantity.get(unitModel) == 0) {
+                playerUnitsByQuantity.remove(unitModel);
             }
         }
 
@@ -4881,7 +4881,7 @@ public class ButtonHelper {
                 if (unitModel == null)
                     continue;
                 UnitKey unitKey = unitEntry.getKey();
-                String unitName = getUnitName(unitKey.asyncID());
+                String unitName = unitKey.unitName();
                 if (!unitModel.getIsGroundForce()) {
                     continue;
                 }
@@ -4922,7 +4922,7 @@ public class ButtonHelper {
                 if (unitModel == null)
                     continue;
                 UnitKey key = unitEntry.getKey();
-                String unitName = getUnitName(key.asyncID());
+                String unitName = key.unitName();
                 int totalUnits = unitEntry.getValue();
                 int damagedUnits = 0;
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
@@ -5689,7 +5689,7 @@ public class ButtonHelper {
                     continue;
 
                 UnitKey key = unitEntry.getKey();
-                String unitName = getUnitName(key.asyncID());
+                String unitName = key.unitName();
                 int damagedUnits = 0;
 
                 if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
