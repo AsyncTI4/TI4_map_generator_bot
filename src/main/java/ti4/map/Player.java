@@ -1,23 +1,5 @@
 package ti4.map;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -48,7 +30,7 @@ import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.generator.MapGenerator;
+import ti4.generator.DrawingUtil;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -74,6 +56,24 @@ import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class Player {
 
@@ -250,7 +250,7 @@ public class Player {
     public String getDecalFile(String unitType) {
         if (getDecalSet() == null)
             return null;
-        return String.format("%s_%s%s", getDecalSet(), unitType, MapGenerator.getBlackWhiteFileSuffix(getColorID()));
+        return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
     }
 
     public Tile getNomboxTile() {

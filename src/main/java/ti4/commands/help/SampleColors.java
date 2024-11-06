@@ -1,18 +1,12 @@
 package ti4.commands.help;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
+import ti4.generator.DrawingUtil;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -20,6 +14,13 @@ import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SampleColors extends HelpSubcommandData {
     public SampleColors() {
@@ -79,11 +80,11 @@ public class SampleColors extends HelpSubcommandData {
                 BufferedImage dread = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(alias + "_dn.png"));
                 graphic.drawImage(dread, x + SPACING, y + SPACING, null);
                 graphic.setFont(bigFont);
-                MapGenerator.superDrawString(graphic, c.getName(), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
+                DrawingUtil.superDrawString(graphic, c.getName(), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
                     Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                     stroke, Color.BLACK);
                 graphic.setFont(smallFont);
-                MapGenerator.superDrawString(graphic, alias, x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+                DrawingUtil.superDrawString(graphic, alias, x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                     Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                     stroke, Color.BLACK);
 
@@ -92,11 +93,11 @@ public class SampleColors extends HelpSubcommandData {
                     dread = ImageHelper.read(file);
                     graphic.drawImage(dread, x + SPACING, y + SPACING + DREADTEXHIGHT, null);
                     graphic.setFont(bigFont);
-                    MapGenerator.superDrawString(graphic, (alias.equals("lgy") ? "orca" : "split" + c.getName()), x + DREADWIDTH / 2, y + DREADTEXHIGHT + DREADSUBHIGHT + SPACING,
+                    DrawingUtil.superDrawString(graphic, (alias.equals("lgy") ? "orca" : "split" + c.getName()), x + DREADWIDTH / 2, y + DREADTEXHIGHT + DREADSUBHIGHT + SPACING,
                         Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                         stroke, Color.BLACK);
                     graphic.setFont(smallFont);
-                    MapGenerator.superDrawString(graphic, (alias.equals("lgy") ? "orca" : "split" + alias), x + DREADWIDTH / 2, y + DREADTEXHIGHT + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+                    DrawingUtil.superDrawString(graphic, (alias.equals("lgy") ? "orca" : "split" + alias), x + DREADWIDTH / 2, y + DREADTEXHIGHT + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                         Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                         stroke, Color.BLACK);
                 }

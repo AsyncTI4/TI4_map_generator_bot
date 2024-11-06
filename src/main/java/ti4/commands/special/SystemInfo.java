@@ -1,10 +1,5 @@
 package ti4.commands.special;
 
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -13,8 +8,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.units.AddUnits;
-import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
+import ti4.generator.TileGenerator;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -30,6 +25,11 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SystemInfo extends SpecialSubcommandData {
     public SystemInfo() {
@@ -150,12 +150,11 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 sb.append("----------\n");
             }
-            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event);
+            FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, "System", false);
             if (!game.isFowMode()) {
                 for (Player player : game.getRealPlayers()) {
-
                     if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                         continue;
                     }

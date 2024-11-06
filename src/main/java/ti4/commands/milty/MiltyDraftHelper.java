@@ -1,18 +1,11 @@
 package ti4.commands.milty;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.milty.MiltyDraftManager.PlayerDraft;
+import ti4.generator.DrawingUtil;
 import ti4.generator.MapGenerator;
 import ti4.generator.MapGenerator.HorizontalAlign;
 import ti4.generator.Mapper;
@@ -33,6 +26,14 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class MiltyDraftHelper {
 
@@ -196,8 +197,8 @@ public class MiltyDraftHelper {
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont50());
-        MapGenerator.superDrawString(graphics, totalsString, hs.x + 172, hs.y + 110, Color.white, hCenter, null, outlineStroke, Color.black);
-        MapGenerator.superDrawString(graphics, optimalString, hs.x + 172, hs.y + 165, Color.white, hCenter, null, outlineStroke, Color.black);
+        DrawingUtil.superDrawString(graphics, totalsString, hs.x + 172, hs.y + 110, Color.white, hCenter, null, outlineStroke, Color.black);
+        DrawingUtil.superDrawString(graphics, optimalString, hs.x + 172, hs.y + 165, Color.white, hCenter, null, outlineStroke, Color.black);
 
         return sliceImage;
     }
@@ -213,7 +214,7 @@ public class MiltyDraftHelper {
         HorizontalAlign hCenter = HorizontalAlign.Center;
         graphics.setColor(Color.white);
         graphics.setFont(Storage.getFont64());
-        MapGenerator.superDrawString(graphics, slice.getName(), hs.x + 172, hs.y + 50, Color.white, hCenter, null, outlineStroke, Color.black);
+        DrawingUtil.superDrawString(graphics, slice.getName(), hs.x + 172, hs.y + 50, Color.white, hCenter, null, outlineStroke, Color.black);
 
         if (player != null) {
             graphics.setColor(Color.white);
@@ -222,7 +223,7 @@ public class MiltyDraftHelper {
             PlayerDraft pd = manager.getPlayerDraft(player);
             String playerName = player.getUserName();
             String faction = pd.getFaction() == null ? "no faction" : pd.getFaction();
-            MapGenerator.superDrawString(graphics, playerName, hs.x + 172, hs.y + 230, Color.red, hCenter, null, outlineStroke, Color.black);
+            DrawingUtil.superDrawString(graphics, playerName, hs.x + 172, hs.y + 230, Color.red, hCenter, null, outlineStroke, Color.black);
 
             if (pd.getFaction() != null) {
                 FactionModel factionModel = Mapper.getFaction(faction);
@@ -230,7 +231,7 @@ public class MiltyDraftHelper {
                 if (factionModel.getAlias().startsWith("keleres"))
                     factionName = "The Council Keleres";
                 graphics.setFont(Storage.getFont35());
-                MapGenerator.superDrawString(graphics, factionName, hs.x + 172, hs.y + 270, Color.orange, hCenter, null, outlineStroke, Color.black);
+                DrawingUtil.superDrawString(graphics, factionName, hs.x + 172, hs.y + 270, Color.orange, hCenter, null, outlineStroke, Color.black);
                 BufferedImage img = getEmojiImage(factionModel.getFactionEmoji());
                 int offset = graphics.getFontMetrics().stringWidth(factionName) / 2 + 10;
                 graphics.drawImage(img, hs.x + 172 - offset - 40, hs.y + 240, null);
