@@ -322,5 +322,14 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true
+    },
+    {
+        "id": "monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Factionless Monument",
+        "source": "monuments",
+        "isStructure": true,
+        "isMonument": true
     }
 ]
