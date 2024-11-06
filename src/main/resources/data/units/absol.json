@@ -1,7 +1,7 @@
 [
     {
         "id": "plenaryorbital",
-        "baseType": "spacedock",
+        "baseType": "plenaryorbital",
         "asyncId": "plenaryorbital",
         "name": "Plenary Orbital",
         "source": "absol",
@@ -14,7 +14,7 @@
     },
     {
         "id": "tyrantslament",
-        "baseType": "flagship",
+        "baseType": "tyrantslament",
         "asyncId": "tyrantslament",
         "name": "Tyrant's Lament",
         "source": "absol",
