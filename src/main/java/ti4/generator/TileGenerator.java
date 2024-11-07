@@ -109,6 +109,7 @@ public class TileGenerator {
         int width = TILE_WIDTH + (TILE_EXTRA_WIDTH * 2 * context) + EXTRA_X;
         int height = TILE_HEIGHT * (2 * context + 1) + EXTRA_Y;
         var mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        var graphics = mainImage.getGraphics();
 
         try {
             Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
@@ -116,11 +117,10 @@ public class TileGenerator {
 
             Set<String> tiles = tileMap.keySet();
             Set<String> tilesWithExtra = new HashSet<>(game.getAdjacentTileOverrides().values());
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
-            tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Units));
+            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
+            tilesWithExtra.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
+            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
 
-            var graphics = mainImage.getGraphics();
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             String timeStamp = getTimeStamp();
@@ -128,7 +128,6 @@ public class TileGenerator {
         } catch (Exception e) {
             BotLogger.log(game.getName() + ": Could not save generated system info image");
         }
-
 
         FileUpload fileUpload = null;
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
@@ -166,7 +165,7 @@ public class TileGenerator {
         return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
-    private void addTile(Tile tile, TileStep step) {
+    private void addTile(Graphics graphics, Tile tile, TileStep step) {
         if (tile == null || tile.getTileID() == null) {
             return;
         }
@@ -184,7 +183,7 @@ public class TileGenerator {
             int tileY = positionPoint.y + offsetY - TILE_PADDING;
 
             BufferedImage tileImage = draw(tile, step);
-            tileImage.getGraphics().drawImage(tileImage, tileX, tileY, null);
+            graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
             BotLogger.log("Tile Error, when building map: " + tile.getTileID(), exception);
         }
