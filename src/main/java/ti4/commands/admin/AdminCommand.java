@@ -63,7 +63,6 @@ public class AdminCommand implements Command {
         subcommands.add(new DeleteGame());
         subcommands.add(new SaveMap());
         subcommands.add(new ResetEmojiCache());
-        subcommands.add(new ResetImageCache());
         subcommands.add(new ReloadMap());
         subcommands.add(new ReloadMapperObjects());
         subcommands.add(new RestoreGame());

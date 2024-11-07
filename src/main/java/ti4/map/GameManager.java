@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+import ti4.cron.LogCacheStatsCron;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class GameManager {
                 .expireAfterAccess(2, TimeUnit.HOURS)
                 .build(this::loadGame);
         allGameNames.addAll(GameSaveLoadManager.getAllGameNames());
+        LogCacheStatsCron.registerCache("gameCache", gameCache);
     }
 
     private Game loadGame(String gameName) {
