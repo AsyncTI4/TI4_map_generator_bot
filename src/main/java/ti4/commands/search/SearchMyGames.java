@@ -49,7 +49,8 @@ public class SearchMyGames extends SearchSubcommandData {
         searchGames(user, event, onlyMyTurn, includeEndedGames, showAverageTurnTime, showSecondaries, showGameModes, ignoreSpectate, ignoreAborted, false);
     }
 
-    public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
+    public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime,
+                                  boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
         String userID = user.getId();
 
         Predicate<Game> ignoreSpectateFilter = ignoreSpectate ? game -> game.getRealPlayerIDs().contains(userID) : game -> game.getPlayerIDs().contains(userID);
@@ -61,17 +62,27 @@ public class SearchMyGames extends SearchSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGames().stream()
-            .filter(allFilterPredicates)
-            .sorted(mapSort)
-            .toList();
+        List<Game> filteredGames = new ArrayList<>();
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            if (pagedGames == null) {
+                break;
+            }
+            var pagedFilteredGames = pagedGames.getGames().stream()
+                    .filter(allFilterPredicates)
+                    .sorted(mapSort)
+                    .toList();
+            filteredGames.addAll(pagedFilteredGames);
+        } while (pagedGames.hasNextPage());
 
         int index = 1;
         if (wantNum) {
-            return games.size();
+            return filteredGames.size();
         }
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
-        for (Game playerGame : games) {
+        for (Game playerGame : filteredGames) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             sb.append(getPlayerMapListRepresentation(playerGame, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
@@ -83,8 +94,7 @@ public class SearchMyGames extends SearchSubcommandData {
         if (event instanceof ButtonInteractionEvent butt) {
             MessageHelper.sendMessageToThread(butt.getChannel(), user.getName() + "'s Game List", sb.toString());
         }
-        return games.size();
-
+        return filteredGames.size();
     }
 
     public static String getPlayerMapListRepresentation(Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
