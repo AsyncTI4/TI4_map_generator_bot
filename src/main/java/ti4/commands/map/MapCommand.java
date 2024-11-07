@@ -22,11 +22,6 @@ public class MapCommand implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         for (MapSubcommandData subcommand : subcommandData) {

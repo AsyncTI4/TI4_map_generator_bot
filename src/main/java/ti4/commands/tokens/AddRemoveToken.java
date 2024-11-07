@@ -98,11 +98,6 @@ abstract public class AddRemoveToken implements Command {
 
     abstract void parsingForTile(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game game);
 
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {

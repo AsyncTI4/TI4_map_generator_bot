@@ -1,23 +1,17 @@
 package ti4.commands.cardsso;
 
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 
 public class SOCardsCommand implements Command {
@@ -31,44 +25,7 @@ public class SOCardsCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
-    }
-
-    public static boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
-        if (event.getName().equals(actionID)) {
-            String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-                return false;
-            }
-            Member member = event.getMember();
-            if (member != null) {
-                List<Role> roles = member.getRoles();
-                for (Role role : AsyncTI4DiscordBot.adminRoles) {
-                    if (roles.contains(role)) {
-                        return true;
-                    }
-                }
-            }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (userActiveGame.isCommunityMode()) {
-                Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
-                if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                    MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                    return false;
-                }
-            } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-            if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
-                MessageHelper.replyToMessage(event, "Commands may be executed only in game specific channels.");
-                return false;
-            }
-            return true;
-        }
-        return false;
+        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
     }
 
     @Override

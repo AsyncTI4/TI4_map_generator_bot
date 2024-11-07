@@ -29,11 +29,6 @@ public class GameCommand implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean undoCommand = false;
         String subcommandName = event.getInteraction().getSubcommandName();

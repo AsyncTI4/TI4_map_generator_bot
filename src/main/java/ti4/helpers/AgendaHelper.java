@@ -865,7 +865,7 @@ public class AgendaHelper {
                                 ACInfo.sendActionCardInfo(game, playerWL, event);
                                 MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(),
                                     playerWL.getRepresentationUnfogged() + " use buttons to discard",
-                                    ACInfo.getDiscardActionCardButtons(game, playerWL, false));
+                                    ACInfo.getDiscardActionCardButtons(playerWL, false));
                             } else {
                                 ACInfo.sendActionCardInfo(game, playerWL, event);
                             }
@@ -892,7 +892,7 @@ public class AgendaHelper {
                                 ACInfo.sendActionCardInfo(game, playerWL, event);
                                 MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(),
                                     playerWL.getRepresentationUnfogged() + " use buttons to discard",
-                                    ACInfo.getDiscardActionCardButtons(game, playerWL, false));
+                                    ACInfo.getDiscardActionCardButtons(playerWL, false));
                             } else {
                                 ACInfo.sendActionCardInfo(game, playerWL, event);
                             }
@@ -2337,7 +2337,7 @@ public class AgendaHelper {
                                     game.drawActionCard(winningR.getUserID());
                                     MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
                                         winningR.getRepresentationUnfogged() + " use buttons to discard",
-                                        ACInfo.getDiscardActionCardButtons(game, winningR, false));
+                                        ACInfo.getDiscardActionCardButtons(winningR, false));
                                 }
                                 ButtonHelper.checkACLimit(game, event, winningR);
                                 ACInfo.sendActionCardInfo(game, winningR, event);
@@ -2373,7 +2373,7 @@ public class AgendaHelper {
                                 game.drawActionCard(winningR.getUserID());
                                 MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
                                     winningR.getRepresentationUnfogged() + " use buttons to discard",
-                                    ACInfo.getDiscardActionCardButtons(game, winningR, false));
+                                    ACInfo.getDiscardActionCardButtons(winningR, false));
                             }
 
                             game.setSpeakerUserID(winningR.getUserID());

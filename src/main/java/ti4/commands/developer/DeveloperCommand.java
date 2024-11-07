@@ -1,19 +1,16 @@
 package ti4.commands.developer;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
+import ti4.helpers.SlashCommandAcceptanceHelper;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class DeveloperCommand implements Command {
 
@@ -26,20 +23,7 @@ public class DeveloperCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
-            Member member = event.getMember();
-            if (member != null) {
-                List<Role> roles = member.getRoles();
-                for (Role role : AsyncTI4DiscordBot.developerRoles) {
-                    if (roles.contains(role)) {
-                        return true;
-                    }
-                }
-                MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Developer role.");
-                return false;
-            }
-        }
-        return false;
+        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getActionID(), event, AsyncTI4DiscordBot.developerRoles);
     }
 
     @Override

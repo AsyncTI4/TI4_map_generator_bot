@@ -31,32 +31,32 @@ public class FrankenCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
-            User user = event.getUser();
-            String userID = user.getId();
-            if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
-                Member member = event.getMember();
-                List<Role> roles = member.getRoles();
-                for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                    if (roles.contains(role)) {
-                        return true;
-                    }
+        if (!event.getName().equals(getActionID())) {
+            return false;
+        }
+        User user = event.getUser();
+        String userID = user.getId();
+        if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
+            Member member = event.getMember();
+            List<Role> roles = member.getRoles();
+            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                if (roles.contains(role)) {
+                    return true;
                 }
             }
-
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-                return false;
-            }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-            return true;
         }
-        return false;
+
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
+            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+            return false;
+        }
+        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
+            MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+            return false;
+        }
+        return true;
     }
 
     @Override

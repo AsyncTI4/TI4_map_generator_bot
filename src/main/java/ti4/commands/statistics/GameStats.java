@@ -334,14 +334,16 @@ public class GameStats extends StatisticsSubcommandData {
             }
         }
         StringBuilder longMsg = new StringBuilder("The number of games that finished in the last " + pastDays + " days is " + num + ". They are listed below based on the number of days it took to complete\n");
-        Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
-        int num2 = 0;
-        for (String command : sortedMapAsc.keySet()) {
-            num2++;
-            longMsg.append(num2).append(". ").append(command).append(": ")
-                .append(sortedMapAsc.get(command)).append(" \n");
+        if (num != 0) {
+            Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
+            int num2 = 0;
+            for (String command : sortedMapAsc.keySet()) {
+                num2++;
+                longMsg.append(num2).append(". ").append(command).append(": ")
+                        .append(sortedMapAsc.get(command)).append(" \n");
+            }
+            longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
         }
-        longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths", longMsg.toString());
     }
 

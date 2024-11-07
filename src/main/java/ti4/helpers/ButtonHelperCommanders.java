@@ -145,7 +145,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(game, player, false));
+            ACInfo.getDiscardActionCardButtons(player, false));
         event.getMessage().delete().queue();
     }
 

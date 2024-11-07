@@ -313,7 +313,7 @@ public class ButtonHelperAgents {
         resolveArtunoCheck(p2, game, 2);
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
             p2.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(game, p2, false));
+            ACInfo.getDiscardActionCardButtons(p2, false));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -781,7 +781,7 @@ public class ButtonHelperAgents {
                 successMessage2 += " Drew another AC for scheming. Please discard 1";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard.",
-                    ACInfo.getDiscardActionCardButtons(game, player, false));
+                    ACInfo.getDiscardActionCardButtons(player, false));
             }
             if (p2.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
@@ -797,7 +797,7 @@ public class ButtonHelperAgents {
             if (p2.hasAbility("scheming")) {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                     p2.getRepresentationUnfogged() + " use buttons to discard.",
-                    ACInfo.getDiscardActionCardButtons(game, p2, false));
+                    ACInfo.getDiscardActionCardButtons(p2, false));
             }
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), successMessage2);
         }
@@ -816,14 +816,14 @@ public class ButtonHelperAgents {
                 successMessage += " Drew another AC for scheming. Please discard 1";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(game, player, false));
+                    ACInfo.getDiscardActionCardButtons(player, false));
             }
             if (p2.hasAbility("scheming")) {
                 game.drawActionCard(p2.getUserID());
                 successMessage2 += " Drew another AC for scheming. Please discard 1.";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                     p2.getRepresentationUnfogged() + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(game, p2, false));
+                    ACInfo.getDiscardActionCardButtons(p2, false));
             }
             if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
@@ -850,12 +850,12 @@ public class ButtonHelperAgents {
             if (p2.hasAbility("scheming")) {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                     p2.getRepresentationUnfogged() + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(game, p2, false));
+                    ACInfo.getDiscardActionCardButtons(p2, false));
             }
             if (player.hasAbility("scheming")) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(game, player, false));
+                    ACInfo.getDiscardActionCardButtons(player, false));
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), successMessage2);

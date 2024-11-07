@@ -1,9 +1,5 @@
 package ti4.commands.cardsac;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -21,6 +17,10 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public ACInfo() {
@@ -46,11 +46,11 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     private static void sendTrapCardInfo(Game game, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(game, player));
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(player));
         }
     }
 
-    private static String getTrapCardInfo(Game game, Player player) {
+    private static String getTrapCardInfo(Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
         sb.append("**Trap Cards:**").append("\n");
@@ -168,7 +168,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getActionPlayActionCardButtons(Game game, Player player) {
+    public static List<Button> getActionPlayActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -186,23 +186,23 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static void sendDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
-        List<Button> buttons = getDiscardActionCardButtons(game, player, doingAction);
+    public static void sendDiscardActionCardButtons(Player player, boolean doingAction) {
+        List<Button> buttons = getDiscardActionCardButtons(player, doingAction);
         String msg = player.getRepresentationUnfogged() + " use buttons to discard";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void sendDiscardAndDrawActionCardButtons(Game game, Player player) {
-        List<Button> buttons = getDiscardActionCardButtonsWithSuffix(game, player, "redraw");
+    public static void sendDiscardAndDrawActionCardButtons(Player player) {
+        List<Button> buttons = getDiscardActionCardButtonsWithSuffix(player, "redraw");
         String msg = player.getRepresentationUnfogged() + " use buttons to discard. A new action card will be automatically drawn afterwards.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static List<Button> getDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
-        return getDiscardActionCardButtonsWithSuffix(game, player, doingAction ? "stall" : "");
+    public static List<Button> getDiscardActionCardButtons(Player player, boolean doingAction) {
+        return getDiscardActionCardButtonsWithSuffix(player, doingAction ? "stall" : "");
     }
 
-    public static List<Button> getDiscardActionCardButtonsWithSuffix(Game game, Player player, String suffix) {
+    public static List<Button> getDiscardActionCardButtonsWithSuffix(Player player, String suffix) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
 
@@ -219,7 +219,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getYssarilHeroActionCardButtons(Game game, Player yssaril, Player notYssaril) {
+    public static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -235,7 +235,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getToBeStolenActionCardButtons(Game game, Player player) {
+    public static List<Button> getToBeStolenActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
