@@ -8,14 +8,11 @@ import ti4.helpers.ToStringHelper;
 import ti4.message.MessageHelper;
 
 import java.text.DecimalFormat;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class LogCacheStatsCron {
@@ -23,7 +20,6 @@ public class LogCacheStatsCron {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static final Map<String, Cache<?, ?>> cacheNameToCache = new ConcurrentHashMap<>();
     private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 30);
-    private static final AtomicReference<Instant> logStatsScheduledTime = new AtomicReference<>();
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
 
     public static void registerCache(String name, Cache<?, ?> cache) {
@@ -31,20 +27,10 @@ public class LogCacheStatsCron {
     }
 
     public static void start() {
-        SCHEDULER.scheduleAtFixedRate(LogCacheStatsCron::logCacheStats, 1, 2, TimeUnit.MINUTES);
+        SCHEDULER.scheduleAtFixedRate(LogCacheStatsCron::logCacheStats, 1, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
     }
 
     private static void logCacheStats() {
-        Instant oldValue = logStatsScheduledTime.getAndUpdate(scheduledLogTime -> {
-            Instant now = Instant.now();
-            if (scheduledLogTime == null || scheduledLogTime.isBefore(now)) {
-                return now.plus(LOG_CACHE_STATS_INTERVAL_MINUTES, ChronoUnit.MINUTES);
-            }
-            return scheduledLogTime;
-        });
-        if (logStatsScheduledTime.get().equals(oldValue)) {
-            return;
-        }
         var cacheStats = cacheNameToCache.entrySet().stream()
                 .map(entry -> cacheStatsToString(entry.getKey(), entry.getValue()))
                 .collect(Collectors.joining("\n\n"));
