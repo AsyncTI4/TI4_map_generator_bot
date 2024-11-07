@@ -35,7 +35,7 @@ public class AutoPingCron {
     private static void autoPingGames() {
         Game mapReference = GameManager.getInstance().getGame("finreference");
         if (mapReference == null) return;
-        long timeSinceLast = (System.currentTimeMillis()) - mapReference.getLastTimeGamesChecked().getTime();
+        long timeSinceLast = System.currentTimeMillis() - mapReference.getLastTimeGamesChecked().getTime();
 
         if (timeSinceLast > TEN_MINUTES_IN_MILLISECONDS) {
             mapReference.setLastTimeGamesChecked(new Date());
@@ -77,7 +77,7 @@ public class AutoPingCron {
                             String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                             if (!scTime.isEmpty()) {
                                 long scPlayTime = Long.parseLong(scTime);
-                                long timeDifference = (System.currentTimeMillis()) - scPlayTime;
+                                long timeDifference = System.currentTimeMillis() - scPlayTime;
                                 String timesPinged = game
                                         .getStoredValue("scPlayPingCount" + sc + player.getFaction());
                                 if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds) {
