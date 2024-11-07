@@ -5072,9 +5072,9 @@ public class ButtonHelper {
         //String undoFileToRestorePath = game.getName() + "_" + 1 + ".txt";
         //File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
 
-        File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
+        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
 
-        File mapUndoDirectory = Storage.getMapUndoDirectory();
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
         if (!mapUndoDirectory.exists()) {
             return;
         }
@@ -5092,7 +5092,7 @@ public class ButtonHelper {
                     : numbers.stream().mapToInt(value -> value)
                         .max().orElseThrow(NoSuchElementException::new);
 
-                File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                 Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                 Game gameToRestore = GameSaveLoadManager.loadMap(originalMapFile);

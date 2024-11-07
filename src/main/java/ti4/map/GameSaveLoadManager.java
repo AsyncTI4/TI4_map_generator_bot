@@ -1,5 +1,39 @@
 package ti4.map;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
+import ti4.commands.milty.MiltyDraftManager;
+import ti4.commands.uncategorized.CardsInfo;
+import ti4.draft.BagDraft;
+import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
+import ti4.helpers.DisplayType;
+import ti4.helpers.GlobalSettings;
+import ti4.helpers.Helper;
+import ti4.helpers.Storage;
+import ti4.helpers.TIGLHelper.TIGLRank;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.settingsFramework.menus.MiltySettings;
+import ti4.json.ObjectMapperFactory;
+import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.TemporaryCombatModifierModel;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,42 +62,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
-import net.dv8tion.jda.internal.utils.tuple.Pair;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.uncategorized.CardsInfo;
-import ti4.draft.BagDraft;
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.Constants;
-import ti4.helpers.DiscordantStarsHelper;
-import ti4.helpers.DisplayType;
-import ti4.helpers.GlobalSettings;
-import ti4.helpers.Helper;
-import ti4.helpers.Storage;
-import ti4.helpers.TIGLHelper.TIGLRank;
-import ti4.helpers.Units;
-import ti4.helpers.Units.UnitKey;
-import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.json.ObjectMapperFactory;
-import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.TemporaryCombatModifierModel;
 
 public class GameSaveLoadManager {
 
@@ -180,7 +178,7 @@ public class GameSaveLoadManager {
             BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
         }
 
-        File mapFile = Storage.getMapImageStorage(game.getName() + TXT);
+        File mapFile = Storage.getGameFile(game.getName() + TXT);
 
         long txtStart = System.nanoTime();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {
@@ -202,7 +200,7 @@ public class GameSaveLoadManager {
         }
         txtTime += System.nanoTime() - txtStart;
         long undoStart = System.nanoTime();
-        mapFile = Storage.getMapImageStorage(game.getName() + TXT);
+        mapFile = Storage.getGameFile(game.getName() + TXT);
         if (mapFile.exists()) {
             saveUndo(game, mapFile);
         }
@@ -212,21 +210,10 @@ public class GameSaveLoadManager {
         saveTimes.add(saveTime);
     }
 
-    public static void saveMapJson(Game game) {
-        ObjectMapper mapper = ObjectMapperFactory.build();
-        try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(game.getName() + JSON), game);
-        } catch (IOException e) {
-            BotLogger.log(game.getName() + ": IOException with JSON SAVER - Likely need to @JsonIgnore something", e);
-        } catch (Exception e) {
-            BotLogger.log("JSON SAVER", e);
-        }
-    }
-
     public static void undo(Game game, GenericInteractionCreateEvent event) {
-        File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
+        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
         if (originalMapFile.exists()) {
-            File mapUndoDirectory = Storage.getMapUndoDirectory();
+            File mapUndoDirectory = Storage.getGameUndoDirectory();
             if (!mapUndoDirectory.exists()) {
                 return;
             }
@@ -241,8 +228,8 @@ public class GameSaveLoadManager {
                         .map(fileName -> fileName.replace(Constants.TXT, ""))
                         .map(Integer::parseInt).toList();
                     int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-                    File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
-                    File mapUndoStorage2 = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                    File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
+                    File mapUndoStorage2 = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                     CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                     Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
                     Game loadedGame = loadMap(originalMapFile);
@@ -296,7 +283,7 @@ public class GameSaveLoadManager {
     }
 
     public static void reload(Game game) {
-        File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
+        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
         if (originalMapFile.exists()) {
             Game loadedGame = loadMap(originalMapFile);
             if (loadedGame != null) {
@@ -307,7 +294,7 @@ public class GameSaveLoadManager {
     }
 
     private static void saveUndo(Game game, File originalMapFile) {
-        File mapUndoDirectory = Storage.getMapUndoDirectory();
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
         if (!mapUndoDirectory.exists()) {
             mapUndoDirectory.mkdir();
         }
@@ -324,14 +311,14 @@ public class GameSaveLoadManager {
                 if (numbers.size() == 50) {
                     int minNumber = numbers.stream().mapToInt(value -> value)
                         .min().orElseThrow(NoSuchElementException::new);
-                    File mapToDelete = Storage.getMapUndoStorage(mapName + "_" + minNumber + Constants.TXT);
+                    File mapToDelete = Storage.getGameUndoStorage(mapName + "_" + minNumber + Constants.TXT);
                     mapToDelete.delete();
                 }
                 int maxNumber = numbers.isEmpty() ? 0
                     : numbers.stream().mapToInt(value -> value)
                         .max().orElseThrow(NoSuchElementException::new);
                 maxNumber++;
-                File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                 Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
             } catch (Exception e) {
@@ -1178,17 +1165,17 @@ public class GameSaveLoadManager {
     }
 
     public static boolean deleteMap(String mapName) {
-        File mapStorage = Storage.getMapStorage(mapName + TXT);
+        File mapStorage = Storage.getGameFile(mapName + TXT);
         if (!mapStorage.exists()) {
             return false;
         }
-        File deletedMapStorage = Storage.getDeletedMapStorage(mapName + "_" + System.currentTimeMillis() + TXT);
+        File deletedMapStorage = Storage.getDeletedGame(mapName + "_" + System.currentTimeMillis() + TXT);
         return mapStorage.renameTo(deletedMapStorage);
     }
 
     public static void loadMaps() {
         long loadStart = System.nanoTime();
-        try (Stream<Path> pathStream = Files.list(Storage.getMapImageDirectory().toPath())) {
+        try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             pathStream.parallel()
                 .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
                 .forEach(path -> {
