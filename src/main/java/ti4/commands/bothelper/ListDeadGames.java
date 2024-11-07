@@ -14,6 +14,7 @@ import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 import java.util.Date;
+import java.util.List;
 
 public class ListDeadGames extends BothelperSubcommandData {
     public ListDeadGames() {
@@ -22,13 +23,25 @@ public class ListDeadGames extends BothelperSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            if (pagedGames == null) {
+                break;
+            }
+            execute(event, pagedGames.getGames());
+        } while (pagedGames.hasNextPage());
+    }
+
+    private void execute(SlashCommandInteractionEvent event, List<Game> games) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
         StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         StringBuilder sb = new StringBuilder("Dead Channels\n");
         int channelCount = 0;
         int roleCount = 0;
-        for (Game game : GameManager.getInstance().getGames()) {
+        for (Game game : games) {
             if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
@@ -36,7 +49,7 @@ public class ListDeadGames extends BothelperSubcommandData {
                 continue;
             }
             long milliSinceLastTurnChange = new Date().getTime()
-                - game.getLastActivePlayerChange().getTime();
+                    - game.getLastActivePlayerChange().getTime();
 
             if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000L) {
                 continue;

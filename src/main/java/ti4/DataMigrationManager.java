@@ -643,12 +643,11 @@ public class DataMigrationManager {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage);
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
             if (pagedGames == null) {
                 break;
             }
             migrationsApplied.addAll(migrateGames(pagedGames.getGames(), migrationName, migrationMethod, migrationForGamesBeforeDate));
-            currentPage++;
         } while (pagedGames.hasNextPage());
         if (!migrationsApplied.isEmpty()) {
             String gameNames = String.join(", ", migrationsApplied);

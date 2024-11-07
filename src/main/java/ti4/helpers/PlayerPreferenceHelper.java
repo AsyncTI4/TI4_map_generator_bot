@@ -63,42 +63,37 @@ public class PlayerPreferenceHelper {
     }
 
     @ButtonHandler("playerPrefDecision_")
-    public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID,
-        Game game) {
+    public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID, Game game) {
         String trueOrFalse = buttonID.split("_")[1];
         String distanceOrAgenda = buttonID.split("_")[2];
-        if ("true".equals(trueOrFalse)) {
-            if ("distance".equals(distanceOrAgenda)) {
-                player.setPreferenceForDistanceBasedTacticalActions(true);
-                for (Game game2 : GameManager.getInstance().getGames()) {
-                    for (Player player2 : game2.getRealPlayers()) {
-                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                            player2.setPreferenceForDistanceBasedTacticalActions(true);
-                            GameSaveLoadManager.saveGame(game2, player2.getUserName() + " Updated Player Settings");
-                        }
-                    }
-                }
-            } else {
-                player.setAutoPassWhensAfters(true);
-            }
+        if ("distance".equals(distanceOrAgenda)) {
+            setPlayerPreferenceForDistanceBasedTacticalActions(player, "true".equals(trueOrFalse));
         } else {
-            if ("distance".equals(distanceOrAgenda)) {
-                player.setPreferenceForDistanceBasedTacticalActions(false);
-                for (Game game2 : GameManager.getInstance().getGames()) {
-                    for (Player player2 : game2.getRealPlayers()) {
-                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                            player2.setPreferenceForDistanceBasedTacticalActions(false);
-                            GameSaveLoadManager.saveGame(game2, player2.getUserName() + " Updated Player Settings");
-                        }
-                    }
-                }
-            } else {
-                player.setAutoPassWhensAfters(false);
-            }
+            player.setAutoPassWhensAfters("true".equals(trueOrFalse));
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
-
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void setPlayerPreferenceForDistanceBasedTacticalActions(Player player, boolean preference) {
+        player.setPreferenceForDistanceBasedTacticalActions(preference);
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            if (pagedGames == null) {
+                break;
+            }
+            for (Game game : pagedGames.getGames()) {
+                for (Player player2 : game.getRealPlayers()) {
+                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                        player2.setPreferenceForDistanceBasedTacticalActions(preference);
+                        GameSaveLoadManager.saveGame(game, player2.getUserName() + " Updated Player Settings");
+                    }
+                }
+            }
+        } while (pagedGames.hasNextPage());
     }
 
     public static void offerSetAutoPassOnSaboButtons(Game game, Player player2) {
@@ -223,17 +218,30 @@ public class PlayerPreferenceHelper {
     }
 
     @ButtonHandler("setHourAsAFK_")
-    public static void resolveSetAFKTime(Game gameOG, Player player, String buttonID, ButtonInteractionEvent event) {
+    public static void resolveSetAFKTime(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String time = buttonID.split("_")[1];
         player.addHourThatIsAFK(time);
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
-        String afkTimes = player.getHoursThatPlayerIsAFK();
-        for (Game game : GameManager.getInstance().getGames()) {
+
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            if (pagedGames == null) {
+                break;
+            }
+            resolveSetAfkTime(player, pagedGames.getGames());
+        } while (pagedGames.hasNextPage());
+    }
+
+    private static void resolveSetAfkTime(Player player, List<Game> games) {
+        for (Game game : games) {
             if (!game.isHasEnded()) {
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        player2.setHoursThatPlayerIsAFK(afkTimes);
+                        player2.setHoursThatPlayerIsAFK(player.getHoursThatPlayerIsAFK());
                         GameSaveLoadManager.saveGame(game, player2.getUserName() + " Updated Player Settings");
                     }
                 }

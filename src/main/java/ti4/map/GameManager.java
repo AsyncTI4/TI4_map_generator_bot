@@ -97,9 +97,9 @@ public class GameManager {
         return allGameNames.size();
     }
 
+    // WARNING, THIS INVOLVES READING EVERY GAME. IT IS AN EXPENSIVE OPERATION.
     public PagedGames getGamesPage(int page) {
         var pagedGames = new PagedGames();
-        pagedGames.page = page;
         for (int i = PagedGames.PAGE_SIZE * page; i < allGameNames.size(); i++) {
             pagedGames.games.add(loadGame(allGameNames.get(i)));
         }
@@ -113,7 +113,6 @@ public class GameManager {
 
         @Getter
         private final List<Game> games = new ArrayList<>();
-        private int page;
         private boolean hasNextPage;
 
         public boolean hasNextPage() {

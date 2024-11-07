@@ -237,40 +237,6 @@ public class GameSaveLoadManager {
         }
     }
 
-    private static void saveUndo(Game game, File originalMapFile) {
-        File mapUndoDirectory = Storage.getGameUndoDirectory();
-        if (!mapUndoDirectory.exists()) {
-            mapUndoDirectory.mkdir();
-        }
-
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-        if (mapUndoFiles != null) {
-            try {
-                List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                    .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
-                    .map(fileName -> fileName.replace(Constants.TXT, ""))
-                    .map(Integer::parseInt).toList();
-                if (numbers.size() == 50) {
-                    int minNumber = numbers.stream().mapToInt(value -> value)
-                        .min().orElseThrow(NoSuchElementException::new);
-                    File mapToDelete = Storage.getGameUndoStorage(mapName + "_" + minNumber + Constants.TXT);
-                    mapToDelete.delete();
-                }
-                int maxNumber = numbers.isEmpty() ? 0
-                    : numbers.stream().mapToInt(value -> value)
-                        .max().orElseThrow(NoSuchElementException::new);
-                maxNumber++;
-                File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
-                CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
-            } catch (Exception e) {
-                BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
-            }
-        }
-    }
-
     private static void saveMapInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
