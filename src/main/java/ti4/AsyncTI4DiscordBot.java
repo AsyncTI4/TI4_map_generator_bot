@@ -295,8 +295,8 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        // LOAD GAMES
-        BotLogger.logWithTimestamp(" LOADING GAMES");
+        // LOAD GAME NAMES
+        BotLogger.logWithTimestamp(" LOADING GAME NAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameManager.getInstance();
 

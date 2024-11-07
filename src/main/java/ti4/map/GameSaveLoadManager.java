@@ -1090,14 +1090,16 @@ public class GameSaveLoadManager {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             allGameNames = pathStream.parallel()
                     .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
-                    .map(Path::getFileName)
-                    .map(Path::toString)
+                    .map(path -> {
+                        var fileName = path.getFileName().toString();
+                        return fileName.substring(0, fileName.length() - 4); // remove ".txt"
+                    })
                     .collect(Collectors.toList());
         } catch (IOException e) {
             BotLogger.log("Exception occurred while streaming map directory.", e);
         }
         long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getNumberOfGames() + "` games: ", loadTime, loadTime));
+        BotLogger.logWithTimestamp(debugString("Time to load `" + allGameNames.size() + "` games: ", loadTime, loadTime));
         return allGameNames;
     }
 
