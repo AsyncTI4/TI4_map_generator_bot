@@ -15,7 +15,6 @@ import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
 import ti4.map.Game;
-import ti4.map.MapFileDeleter;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -25,12 +24,10 @@ import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.UnitModel;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -48,7 +45,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class TileGenerator implements AutoCloseable {
+public class TileGenerator {
 
     private static final int TILE_PADDING = 100;
     private static final Point TILE_POSITION_POINT = new Point(255, 295);
@@ -58,19 +55,19 @@ public class TileGenerator implements AutoCloseable {
     private static final BasicStroke stroke6 = new BasicStroke(6.0f);
     private static final BasicStroke stroke7 = new BasicStroke(7.0f);
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
+    private static final int TILE_EXTRA_WIDTH = 260;
+    private static final int EXTRA_X = 100;
+    private static final int TILE_WIDTH = 345;
+    private static final int TILE_HEIGHT = 300;
+    private static final int EXTRA_Y = 100;
 
     private final Game game;
     private final GenericInteractionCreateEvent event;
-    private final Graphics graphics;
-    private final BufferedImage mainImage;
     private final boolean isFoWPrivate;
     private final Player fowPlayer;
     private final int context;
     private final String focusTile;
     private final DisplayType displayType;
-
-    private final int offsetX;
-    private final int offsetY;
 
     public TileGenerator(Game game, GenericInteractionCreateEvent event) {
         this(game, event, null, 0, "000");
@@ -85,32 +82,6 @@ public class TileGenerator implements AutoCloseable {
         this.focusTile = focusTile;
         isFoWPrivate = isFowModeActive();
         fowPlayer = getFowPlayer();
-
-        int tileExtraWidth = 260;
-        int tileWidth = 345;
-        int extraX = 100;
-        int width = tileWidth + (tileExtraWidth * 2 * context) + extraX;
-        int tileHeight = 300;
-        int extraY = 100;
-        int height = tileHeight * (2 * context + 1) + extraY;
-
-        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        graphics = mainImage.getGraphics();
-
-        if (focusTile == null) {
-            offsetX = 0;
-            offsetY = 0;
-            return;
-        }
-
-        Point p = PositionMapper.getTilePosition(focusTile);
-        if (p != null) {
-            offsetX = -1 * p.x + (extraX / 2) + (context * tileExtraWidth);
-            offsetY = -1 * p.y + (extraY / 2) + (context * tileHeight);
-        } else {
-            offsetX = 0;
-            offsetY = 0;
-        }
     }
 
     private boolean isFowModeActive() {
@@ -135,15 +106,20 @@ public class TileGenerator implements AutoCloseable {
             tilesToDisplay.remove(tile_);
         }
 
+        int width = TILE_WIDTH + (TILE_EXTRA_WIDTH * 2 * context) + EXTRA_X;
+        int height = TILE_HEIGHT * (2 * context + 1) + EXTRA_Y;
+        var mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        var graphics = mainImage.getGraphics();
+
         try {
             Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
             tileMap.remove(null);
 
             Set<String> tiles = tileMap.keySet();
             Set<String> tilesWithExtra = new HashSet<>(game.getAdjacentTileOverrides().values());
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Tile));
-            tilesWithExtra.forEach(key -> addTile(tileMap.get(key), TileStep.Extras));
-            tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), TileStep.Units));
+            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Tile));
+            tilesWithExtra.forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Extras));
+            tiles.stream().sorted().forEach(key -> addTile(graphics, tileMap.get(key), TileStep.Units));
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
@@ -153,20 +129,15 @@ public class TileGenerator implements AutoCloseable {
             BotLogger.log(game.getName() + ": Could not save generated system info image");
         }
 
-        String timeStamp = getTimeStamp();
-        String absolutePath = Storage.getMapImageDirectory() + "/" + game.getName() + "_" + timeStamp + ".jpg";
-        try (FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
-            BufferedImage convertedImage = ImageHelper.redrawWithoutAlpha(mainImage);
-            boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
-            if (!canWrite) {
-                throw new IllegalStateException("Failed to write image.");
-            }
+        FileUpload fileUpload = null;
+        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
+            ImageHelper.writeCompressedFormat(mainImage, byteArrayOutputStream, "jpg", 1f);
+            String imageName = game.getName() + "_" + getTimeStamp() + ".jpg";
+            fileUpload = FileUpload.fromData(byteArrayOutputStream.toByteArray(), imageName);
         } catch (IOException e) {
-            BotLogger.log("Could not save jpg file", e);
+            BotLogger.log("Failed to create FileUpload for tile.", e);
         }
-        File jpgFile = new File(absolutePath);
-        MapFileDeleter.addFileToDelete(jpgFile);
-        return FileUpload.fromData(jpgFile, jpgFile.getName());
+        return fileUpload;
     }
 
     private static Set<String> getTilesToShow(Game game, int context, String focusTile) {
@@ -194,7 +165,7 @@ public class TileGenerator implements AutoCloseable {
         return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
     }
 
-    private void addTile(Tile tile, TileStep step) {
+    private void addTile(Graphics graphics, Tile tile, TileStep step) {
         if (tile == null || tile.getTileID() == null) {
             return;
         }
@@ -205,6 +176,9 @@ public class TileGenerator implements AutoCloseable {
                 throw new Exception("Could not map tile to a position on the map: " + game.getName());
             }
 
+            Point p = PositionMapper.getTilePosition(focusTile);
+            int offsetY = p == null ? 0 : -1 * p.y + (EXTRA_Y / 2) + (context * TILE_HEIGHT);
+            int offsetX = p == null ? 0 : -1 * p.x + (EXTRA_X / 2) + (context * TILE_EXTRA_WIDTH);
             int tileX = positionPoint.x + offsetX - TILE_PADDING;
             int tileY = positionPoint.y + offsetY - TILE_PADDING;
 
@@ -2012,11 +1986,5 @@ public class TileGenerator implements AutoCloseable {
                     graphics.drawImage(icon, TILE_PADDING + offset + wormholeLocation.x, TILE_PADDING + offset + wormholeLocation.y, null);
                 }
         }
-    }
-
-    @Override
-    public void close() throws Exception {
-        mainImage.flush();
-        graphics.dispose();
     }
 }
