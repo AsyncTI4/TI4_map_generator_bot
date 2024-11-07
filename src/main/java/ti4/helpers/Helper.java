@@ -91,7 +91,7 @@ public class Helper {
     }
 
     public static int getCurrentHour() {
-        long currentTime = new Date().getTime();
+        long currentTime = System.currentTimeMillis();
         currentTime = currentTime / 1000;
         currentTime = currentTime % (60 * 60 * 24);
         currentTime = currentTime / (60 * 60);

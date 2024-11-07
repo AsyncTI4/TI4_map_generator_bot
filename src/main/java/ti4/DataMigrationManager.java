@@ -1,7 +1,6 @@
 package ti4;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import ti4.commands.player.ChangeColor;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -42,6 +41,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DataMigrationManager {
+
+    private static final DateFormat MAP_CREATED_ON_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
     ///
     /// To add a new migration,
@@ -93,9 +94,7 @@ public class DataMigrationManager {
 
             int currentPage = 0;
             GameManager.PagedGames pagedGames;
-            StopWatch stopWatch1 = StopWatch.createStarted();
             do {
-                StopWatch stopWatch2 = StopWatch.createStarted();
                 pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
                 for (Entry<String, Function<Game, Boolean>> entry : migrations.entrySet()) {
                     Date migrationCutoffDate = migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
@@ -106,9 +105,7 @@ public class DataMigrationManager {
                             .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
                             .addAll(migrateGames(pagedGames.getGames(), entry.getKey(), entry.getValue(), migrationCutoffDate));
                 }
-                System.out.println(stopWatch2.getDuration());
             } while (pagedGames.hasNextPage());
-            System.out.println(stopWatch1.getDuration());
             for (Entry<String, List<String>> entry : migrationNamesToAppliedGameNames.entrySet()) {
                 if (!entry.getValue().isEmpty()) {
                     String gameNames = String.join(", ", entry.getValue());
@@ -137,10 +134,9 @@ public class DataMigrationManager {
                                              Date migrationForGamesBeforeDate) {
         List<String> migrationsApplied = new ArrayList<>();
         for (Game game : games) {
-            DateFormat mapCreatedOnFormat = new SimpleDateFormat("yyyy.MM.dd");
             Date mapCreatedOn = null;
             try {
-                mapCreatedOn = mapCreatedOnFormat.parse(game.getCreationDate());
+                mapCreatedOn = MAP_CREATED_ON_FORMAT.parse(game.getCreationDate());
             } catch (ParseException ignored) {
             }
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {

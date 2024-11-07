@@ -13,7 +13,6 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -61,7 +60,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
     private static void listSlashCommands(List<Game> games, Map<String, Integer> slashCommands, Map<String, Integer> actionCards,
                                                Map<String, Integer> actionCardsPlayed, UsedStats usedStats, boolean useOnlyLastMonth) {
         for (Game game : games) {
-            if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
+            if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
                 continue;
             }
             if (game.getButtonPressCount() > usedStats.largestAmountOfButtonsIn1Game) {

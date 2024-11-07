@@ -172,8 +172,8 @@ public class Game extends GameProperties {
     private TIGLRank minimumTIGLRankAtGameStart;
 
     public Game() {
-        setCreationDate(Helper.getDateRepresentation(new Date().getTime()));
-        setLastModifiedDate(new Date().getTime());
+        setCreationDate(Helper.getDateRepresentation(System.currentTimeMillis()));
+        setLastModifiedDate(System.currentTimeMillis());
 
         miltyDraftManager = new MiltyDraftManager();
     }
@@ -3212,13 +3212,8 @@ public class Game extends GameProperties {
         return controlMap;
     }
 
-    public void addPlayer(String id, String name) {
-        Player player = new Player(id, name, getName());
-        players.put(id, player);
-    }
-
-    public Player addPlayerLoad(String id, String name) {
-        Player player = new Player(id, name, getName());
+    public Player addPlayer(String id, String name) {
+        Player player = new Player(id, name, this);
         players.put(id, player);
         return player;
     }

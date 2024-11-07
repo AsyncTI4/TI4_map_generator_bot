@@ -33,7 +33,6 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -45,7 +44,7 @@ public class MessageListener extends ListenerAdapter {
         if (!isAsyncServer(event.getGuild().getId())) {
             return;
         }
-        long timeNow = new Date().getTime();
+        long timeNow = System.currentTimeMillis();
         try {
             Message msg = event.getMessage();
             if (msg.getContentRaw().startsWith("[DELETE]")) {
@@ -65,7 +64,7 @@ public class MessageListener extends ListenerAdapter {
                 if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
                     Game mapReference = GameManager.getInstance().getGame("finreference");
                     if (mapReference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
-                        mapReference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
+                        mapReference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
                         MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
                     }
                 }
@@ -77,8 +76,8 @@ public class MessageListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
-        if (new Date().getTime() - timeNow > 1500) {
-            BotLogger.log(event.getMessage().getChannel().getName() + " A message in this channel took longer than 1500 ms (" + (new Date().getTime() - timeNow) + ")");
+        if (System.currentTimeMillis() - timeNow > 1500) {
+            BotLogger.log(event.getMessage().getChannel().getName() + " A message in this channel took longer than 1500 ms (" + (System.currentTimeMillis() - timeNow) + ")");
         }
     }
 

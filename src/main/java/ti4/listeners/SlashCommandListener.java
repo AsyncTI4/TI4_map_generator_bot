@@ -20,7 +20,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import javax.annotation.Nonnull;
-import java.util.Date;
 import java.util.List;
 
 public class SlashCommandListener extends ListenerAdapter {
@@ -31,7 +30,7 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
 
         String userID = event.getUser().getId();
         // CHECK IF CHANNEL IS MATCHED TO A GAME
@@ -113,7 +112,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 }
             }
         }
-        long endTime = new Date().getTime();
+        long endTime = System.currentTimeMillis();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This slash command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }

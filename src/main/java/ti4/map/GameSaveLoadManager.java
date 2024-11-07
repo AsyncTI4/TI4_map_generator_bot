@@ -87,6 +87,8 @@ public class GameSaveLoadManager {
     public static final String PLAYER = "-player-";
     public static final String ENDPLAYER = "-endplayer-";
 
+    private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
+
     private static String debugString(String prefix, long time, long total) {
         return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
     }
@@ -471,7 +473,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
         writer.write(System.lineSeparator());
-        long time = keepModifiedDate ? game.getLastModifiedDate() : new Date().getTime();
+        long time = keepModifiedDate ? game.getLastModifiedDate() : System.currentTimeMillis();
         game.setLastModifiedDate(time);
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
@@ -1159,7 +1161,7 @@ public class GameSaveLoadManager {
                         data = tmpData != null ? tmpData : gameFileLines.next();
                         tmpData = null;
                         if (PLAYER.equals(data)) {
-                            player = game.addPlayerLoad(gameFileLines.next(), gameFileLines.next());
+                            player = game.addPlayer(gameFileLines.next(), gameFileLines.next());
                             continue;
                         }
                         if (ENDPLAYER.equals(data)) {
@@ -2474,12 +2476,11 @@ public class GameSaveLoadManager {
             return peekedPublicObjectives;
         }
 
-        Pattern pattern = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
-        Matcher matcher = pattern.matcher(data);
+        Matcher matcher = PEEKED_OBJECTIVE_PATTERN.matcher(data);
 
         while (matcher.find()) {
             String po = matcher.group(1);
-            List<String> playerIDs = new ArrayList<>(Arrays.asList(matcher.group(2).split(",")));
+            List<String> playerIDs = Arrays.asList(matcher.group(2).split(","));
             peekedPublicObjectives.put(po, playerIDs);
         }
 

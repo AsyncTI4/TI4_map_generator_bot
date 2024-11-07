@@ -1,10 +1,5 @@
 package ti4.commands.agenda;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -27,6 +22,11 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.SecretObjectiveModel;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
@@ -51,7 +51,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             channel = game.getMainGameChannel();
         }
         if (!game.getStoredValue("lastAgendaReactTime").isEmpty()
-            && ((new Date().getTime()) - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60 * 10) {
+            && ((System.currentTimeMillis()) - Long.parseLong(game.getStoredValue("lastAgendaReactTime"))) < 10 * 60 * 10) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Sorry, the last agenda was flipped too recently, so the bot is stopping here to prevent a double flip. Do /agenda reveal if there's no button and this was a mistake.");
             return;
@@ -214,7 +214,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
 
-        game.setStoredValue("lastAgendaReactTime", "" + new Date().getTime());
+        game.setStoredValue("lastAgendaReactTime", "" + System.currentTimeMillis());
 
         List<Button> proceedButtons = new ArrayList<>();
         String msg;
@@ -263,7 +263,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         if (!game.isFowMode() && !action) {
             ButtonHelper.updateMap(game, event,
                 "Start of the agenda " + agendaName + " (Agenda #" + aCount + ")");
-            game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, new Date().getTime() + "");
+            game.setStoredValue("startTimeOfRound" + game.getRound() + "Agenda" + aCount, System.currentTimeMillis() + "");
         }
         if (game.getCurrentAgendaInfo().contains("Secret")) {
             StringBuilder summary = new StringBuilder("## Scored Secret Objectives:\n");

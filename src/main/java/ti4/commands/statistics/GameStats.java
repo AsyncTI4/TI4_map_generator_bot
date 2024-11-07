@@ -24,7 +24,6 @@ import ti4.model.PublicObjectiveModel;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -328,7 +327,7 @@ public class GameStats extends StatisticsSubcommandData {
         Map<String, Integer> endedGames = new HashMap<>();
         for (Game game : filteredGames) {
             if (game.isHasEnded() && game.getWinner().isPresent() && game.getPlayerCountForMap() > 2
-                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
+                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis())) < pastDays) {
                 num++;
                 int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
                 endedGames.put(game.getName() + " (" + game.getPlayerCountForMap() + "p, " + game.getVp() + "pt)", dif);

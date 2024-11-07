@@ -35,7 +35,7 @@ public class AutoPingCron {
     private static void autoPingGames() {
         Game mapReference = GameManager.getInstance().getGame("finreference");
         if (mapReference == null) return;
-        long timeSinceLast = (new Date().getTime()) - mapReference.getLastTimeGamesChecked().getTime();
+        long timeSinceLast = (System.currentTimeMillis()) - mapReference.getLastTimeGamesChecked().getTime();
 
         if (timeSinceLast > TEN_MINUTES_IN_MILLISECONDS) {
             mapReference.setLastTimeGamesChecked(new Date());
@@ -77,7 +77,7 @@ public class AutoPingCron {
                             String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                             if (!scTime.isEmpty()) {
                                 long scPlayTime = Long.parseLong(scTime);
-                                long timeDifference = (new Date().getTime()) - scPlayTime;
+                                long timeDifference = (System.currentTimeMillis()) - scPlayTime;
                                 String timesPinged = game
                                         .getStoredValue("scPlayPingCount" + sc + player.getFaction());
                                 if (timeDifference > twelveHoursInMilliseconds && timeDifference < twentyFourHoursInMilliseconds) {
@@ -140,7 +140,7 @@ public class AutoPingCron {
             if (game.getAutoPingStatus() && spacer != 0 && !game.isTemporaryPingDisable()) {
                 if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                     if (player != null || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
-                        long milliSinceLastPing = new Date().getTime()
+                        long milliSinceLastPing = System.currentTimeMillis()
                                 - game.getLastActivePlayerPing().getTime();
                         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS * spacer)
                                 || (player != null && player.shouldPlayerBeTenMinReminded()
@@ -170,7 +170,7 @@ public class AutoPingCron {
                             if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                 AgendaHelper.pingMissingPlayers(game);
                             } else {
-                                long milliSinceLastTurnChange = new Date().getTime()
+                                long milliSinceLastTurnChange = System.currentTimeMillis()
                                         - game.getLastActivePlayerChange().getTime();
                                 int autoPingSpacer = (int) spacer;
                                 int pingNumber = (int) (milliSinceLastTurnChange / (ONE_HOUR_IN_MILLISECONDS * autoPingSpacer));
@@ -383,7 +383,7 @@ public class AutoPingCron {
                         }
                     }
                 } else {
-                    long milliSinceLastPing = new Date().getTime() - game.getLastActivePlayerPing().getTime();
+                    long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
                     if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS * game.getAutoPingSpacer())) {
                         if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                             AgendaHelper.pingMissingPlayers(game);
