@@ -1,0 +1,19 @@
+[
+    {
+        "name": "PoK + Unfulvio's Intrigue",
+        "alias": "pok_intrigue",
+        "scIDs": [
+            "pok1leadership",
+            "pok2diplomacy",
+            "pok3politics",
+            "pok4construction",
+            "pok5trade",
+            "pok6warfare",
+            "pok7technology",
+            "pok8imperial",
+            "unfulvio9intrigue"
+        ],
+        "description": "PoK + Unfulvio's Intrigue",
+        "source": "unfulvio"
+    }
+]
