@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class GameManager {
 
     private static volatile GameManager instance;
 
-    private final List<String> allGameNames = new ArrayList<>();
+    private final List<String> allGameNames = new CopyOnWriteArrayList<>();
     private final ConcurrentMap<String, String> userIdToCurrentGameName = new ConcurrentHashMap<>();
     private final LoadingCache<String, Game> gameCache;
 
@@ -48,6 +49,9 @@ public class GameManager {
     }
 
     public Game getGame(String gameName) {
+        if (!isValidGame(gameName)) {
+            return null;
+        }
         return gameCache.get(gameName);
     }
 
