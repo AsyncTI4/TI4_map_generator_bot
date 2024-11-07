@@ -51,9 +51,6 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
-                break;
-            }
             for (Game game : pagedGames.getGames().stream().filter(endedGamesFilter).toList()) {
                 mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
             }
@@ -147,7 +144,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
+            if (pagedGames.getGames().isEmpty()) {
                 break;
             }
             for (Game game : pagedGames.getGames().stream().filter(endedGamesFilter).toList()) {

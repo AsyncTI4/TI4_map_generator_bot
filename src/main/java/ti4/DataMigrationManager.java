@@ -644,9 +644,6 @@ public class DataMigrationManager {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
-                break;
-            }
             migrationsApplied.addAll(migrateGames(pagedGames.getGames(), migrationName, migrationMethod, migrationForGamesBeforeDate));
         } while (pagedGames.hasNextPage());
         if (!migrationsApplied.isEmpty()) {

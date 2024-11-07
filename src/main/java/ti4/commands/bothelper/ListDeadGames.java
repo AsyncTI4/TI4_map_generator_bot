@@ -27,9 +27,6 @@ public class ListDeadGames extends BothelperSubcommandData {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
-                break;
-            }
             execute(event, pagedGames.getGames());
         } while (pagedGames.hasNextPage());
     }

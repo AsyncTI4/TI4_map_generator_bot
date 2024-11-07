@@ -337,9 +337,6 @@ public class Setup extends PlayerSubcommandData {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
-                break;
-            }
             for (Game game2 : pagedGames.getGames()) {
                 for (Player player2 : game2.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {

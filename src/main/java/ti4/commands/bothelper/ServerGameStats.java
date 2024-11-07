@@ -44,9 +44,6 @@ public class ServerGameStats extends BothelperSubcommandData {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
-                break;
-            }
             for (Guild guild : guilds) {
                 int gameCount = guildToGameCount.computeIfAbsent(guild.getId(), k -> 0);
                 int filteredGames = (int) pagedGames.getGames().stream()

@@ -39,9 +39,6 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
-                break;
-            }
             listSlashCommands(pagedGames.getGames(), slashCommands, actionCards, actionCardsPlayed, stats, useOnlyLastMonth);
         } while (pagedGames.hasNextPage());
 

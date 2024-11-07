@@ -162,15 +162,20 @@ public class Stats extends PlayerSubcommandData {
 
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
-            player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-            for (Game activeGame2 : GameManager.getInstance().getGames()) {
-                for (Player player2 : activeGame2.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-                        GameSaveLoadManager.saveGame(activeGame2, event);
+            int currentPage = 0;
+            GameManager.PagedGames pagedGames;
+            do {
+                pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+                player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
+                for (Game activeGame2 : pagedGames.getGames()) {
+                    for (Player player2 : activeGame2.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
+                            GameSaveLoadManager.saveGame(activeGame2, event);
+                        }
                     }
                 }
-            }
+            } while (pagedGames.hasNextPage());
         }
 
         Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
@@ -180,7 +185,6 @@ public class Stats extends PlayerSubcommandData {
 
         Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
         if (turnCount != null) {
-
             player.setTurnCount(turnCount);
             String message = ">  set **Turn Count** to " + turnCount;
             MessageHelper.sendMessageToEventChannel(event, message);

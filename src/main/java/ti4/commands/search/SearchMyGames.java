@@ -67,9 +67,6 @@ public class SearchMyGames extends SearchSubcommandData {
         GameManager.PagedGames pagedGames;
         do {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            if (pagedGames == null) {
-                break;
-            }
             var pagedFilteredGames = pagedGames.getGames().stream()
                     .filter(allFilterPredicates)
                     .sorted(mapSort)
