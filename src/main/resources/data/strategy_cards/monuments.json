@@ -12,7 +12,6 @@
             "Spend 1 token from your strategy pool and place it in any system; you may place either 1 space dock or 1 PDS on a planet you control in that system"
         ],
         "botSCAutomationID": "pok4construction",
-        "imageFileName": "pok_4",
         "colourHexCode": "#39b54a",
         "source": "monuments"
     }
