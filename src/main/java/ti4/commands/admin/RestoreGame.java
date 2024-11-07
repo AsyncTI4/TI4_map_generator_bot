@@ -46,7 +46,7 @@ public class RestoreGame extends AdminSubcommandData {
             e.printStackTrace();
         }
 
-        Game game = GameSaveLoadManager.loadMap(gameFile);
+        Game game = GameSaveLoadManager.loadGame(gameFile);
         if (game == null) {
             MessageHelper.sendMessageToEventChannel(event, "Failed to load game.");
             return;

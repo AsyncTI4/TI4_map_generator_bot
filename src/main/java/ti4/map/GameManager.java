@@ -15,24 +15,20 @@ public class GameManager {
 
     private static volatile GameManager instance;
 
-    @Getter
-    private final long loadTime;
     private final List<String> allGameNames = new ArrayList<>();
     private final ConcurrentMap<String, String> userIdToCurrentGameName = new ConcurrentHashMap<>();
     private final LoadingCache<String, Game> gameCache;
 
     private GameManager() {
-        loadTime = System.currentTimeMillis();
         gameCache = Caffeine.newBuilder()
                 .maximumSize(200)
                 .expireAfterAccess(2, TimeUnit.HOURS)
                 .build(this::loadGame);
+        allGameNames.addAll(GameSaveLoadManager.getAllGameNames());
     }
 
     private Game loadGame(String gameName) {
-        // get file name via game name
-        // GameSaveLoadManager.loadMap();
-        return new Game();
+        return GameSaveLoadManager.loadGame(gameName);
     }
 
     public static GameManager getInstance() {

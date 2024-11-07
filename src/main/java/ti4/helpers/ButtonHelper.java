@@ -5095,7 +5095,7 @@ public class ButtonHelper {
                 File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                 Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
-                Game gameToRestore = GameSaveLoadManager.loadMap(originalMapFile);
+                Game gameToRestore = GameSaveLoadManager.loadGame(originalMapFile);
                 gameToRestore.setTableTalkChannelID(chatChannel.getId());
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);

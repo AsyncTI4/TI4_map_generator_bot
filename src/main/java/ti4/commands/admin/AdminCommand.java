@@ -1,10 +1,5 @@
 package ti4.commands.admin;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,6 +9,11 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class AdminCommand implements Command {
 
@@ -61,7 +61,6 @@ public class AdminCommand implements Command {
     private Collection<AdminSubcommandData> getSubcommands() {
         Collection<AdminSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DeleteGame());
-        subcommands.add(new SaveMaps());
         subcommands.add(new SaveMap());
         subcommands.add(new ResetEmojiCache());
         subcommands.add(new ResetImageCache());

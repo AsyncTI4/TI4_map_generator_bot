@@ -85,7 +85,7 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
@@ -298,7 +298,7 @@ public class AsyncTI4DiscordBot {
         // LOAD GAMES
         BotLogger.logWithTimestamp(" LOADING GAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
-        GameSaveLoadManager.loadMaps();
+        GameManager.getInstance();
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
