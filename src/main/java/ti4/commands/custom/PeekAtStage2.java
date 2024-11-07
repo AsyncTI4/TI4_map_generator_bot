@@ -13,9 +13,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
-public class PeakAtStage2 extends CustomSubcommandData {
-    public PeakAtStage2() {
-        super(Constants.PEAK_AT_STAGE2, "Peak at a stage 2 objective");
+public class PeekAtStage2 extends CustomSubcommandData {
+    public PeekAtStage2() {
+        super(Constants.PEEK_AT_STAGE2, "Peek at a stage 2 objective");
         addOptions(new OptionData(OptionType.INTEGER, Constants.LOCATION1, "Location Of Objective (typical 1-5)").setRequired(true));
     }
 
@@ -28,8 +28,8 @@ public class PeakAtStage2 extends CustomSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
         }
-        OptionMapping loc1 = event.getOption(Constants.LOCATION1);
-        secondHalfOfPeak(event, game, player, loc1.getAsInt());
+        Integer loc1 = event.getOption(Constants.LOCATION1, null, OptionMapping::getAsInt);
+        secondHalfOfPeak(event, game, player, loc1);
 
     }
 

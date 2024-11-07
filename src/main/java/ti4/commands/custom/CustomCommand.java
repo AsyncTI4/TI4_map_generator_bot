@@ -84,9 +84,9 @@ public class CustomCommand implements Command {
         subcommands.add(new DiscardSpecificAgenda());
         // subcommands.add(new FixSODeck());
         subcommands.add(new SetThreadName());
-        subcommands.add(new PeakAtObjectiveDeck());
-        subcommands.add(new PeakAtStage1());
-        subcommands.add(new PeakAtStage2());
+        subcommands.add(new PeekAtObjectiveDeck());
+        subcommands.add(new PeekAtStage1());
+        subcommands.add(new PeekAtStage2());
         subcommands.add(new SetUpPeakableObjectives());
         subcommands.add(new SwapStage1());
         subcommands.add(new ShuffleBackInUnrevealedObj());

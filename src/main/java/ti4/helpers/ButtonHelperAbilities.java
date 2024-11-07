@@ -17,8 +17,8 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.combat.StartCombat;
-import ti4.commands.custom.PeakAtStage1;
-import ti4.commands.custom.PeakAtStage2;
+import ti4.commands.custom.PeekAtStage1;
+import ti4.commands.custom.PeekAtStage2;
 import ti4.commands.ds.TrapReveal;
 import ti4.commands.ds.TrapToken;
 import ti4.commands.explore.ExplorePlanet;
@@ -1458,9 +1458,9 @@ public class ButtonHelperAbilities {
     @ButtonHandler("augersPeak_")
     public static void handleAugursPeak(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         if ("1".equalsIgnoreCase(buttonID.split("_")[1])) {
-            new PeakAtStage1().secondHalfOfPeak(event, game, player, 1);
+            new PeekAtStage1().secondHalfOfPeak(event, game, player, 1);
         } else {
-            new PeakAtStage2().secondHalfOfPeak(event, game, player, 1);
+            new PeekAtStage2().secondHalfOfPeak(event, game, player, 1);
         }
         ButtonHelper.deleteMessage(event);
     }

@@ -247,9 +247,10 @@ public class SCPlay extends PlayerSubcommandData {
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
                 threadChannel.queue(m5 -> {
                     ThreadChannel threadChannel_ = m5;
-                    if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
+                    if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel != null && scModel.hasImageFile()) {
                         MessageHelper.sendFileToChannel(threadChannel_, Helper.getSCImageFile(scToPlay, game));
                     }
+
                     if (scModel.usesAutomationForSCID("pok5trade")) {
                         Button transaction = Buttons.blue("transaction", "Transaction");
                         scButtons.add(transaction);
