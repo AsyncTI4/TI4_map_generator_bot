@@ -77,7 +77,6 @@ public class SlashCommandListener extends ListenerAdapter {
                     && !event.getInteraction().getName().equals(Constants.USER)
                         & !event.getInteraction().getName().equals(Constants.SHOW_GAME)
                     && event.getOption(Constants.GAME_NAME) == null) {
-
                 } else {
                     harmless = true;
                 }
