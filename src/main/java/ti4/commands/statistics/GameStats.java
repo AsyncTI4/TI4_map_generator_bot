@@ -257,7 +257,6 @@ public class GameStats extends StatisticsSubcommandData {
         index = 1;
         sb = new StringBuilder("List of times a particular relic has been drawn \n");
         for (String ket : topThousand.keySet()) {
-
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
@@ -620,9 +619,8 @@ public class GameStats extends StatisticsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Time Per Phase:").append("\n");
-        timeCount.entrySet()
-            .forEach(entry -> sb.append(entry.getKey()).append(": ")
-                .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4)).append(" days (based on ").append(amountCount.get(entry.getKey())).append(" games)")
+        timeCount.forEach((key, value) -> sb.append(key).append(": ")
+                .append(StringUtils.leftPad(convertMillisecondsToDays((float) value / amountCount.get(key)), 4)).append(" days (based on ").append(amountCount.get(key)).append(" games)")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }

@@ -496,9 +496,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public String getGameModesText() {
+        boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put(Emojis.TI4PoK + "Normal", isNormalGame());
+                put(Emojis.TI4PoK + "Normal", isNormalGame);
                 put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
@@ -514,7 +515,7 @@ public class Game extends GameProperties {
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
                 put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
-                put("Homebrew", hasHomebrew());
+                put("Homebrew", !isNormalGame);
             }
         };
         for (String tag : getTags()) {
@@ -4084,9 +4085,10 @@ public class Game extends GameProperties {
                 .map(Mapper::getFaction)
                 .filter(Objects::nonNull)
                 .anyMatch(faction -> !faction.getSource().isOfficial())
-            || Mapper.getLeaders().values().stream()
-                .filter(leader -> !leader.getSource().isOfficial())
-                .anyMatch(leader -> isLeaderInGame(leader.getID()))
+            || getRealAndEliminatedAndDummyPlayers().stream().map(Player::getLeaderIDs)
+                .flatMap(Collection::stream)
+                .map(Mapper::getLeader)
+                .anyMatch(leader -> !leader.getSource().isOfficial())
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()
