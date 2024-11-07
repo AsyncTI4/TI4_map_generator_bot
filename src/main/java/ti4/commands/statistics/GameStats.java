@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -77,7 +76,6 @@ public class GameStats extends StatisticsSubcommandData {
             case FACTION_WINS -> showMostWinningFactions(event);
             case PHASE_TIMES -> showTimeOfRounds(event);
             case SOS_SCORED -> listScoredSOsPulledRelicsRevealedPOs(event);
-            //case UNFINISHED_GAMES -> findHowManyUnfinishedGamesAreDueToNewPlayers(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
@@ -246,7 +244,6 @@ public class GameStats extends StatisticsSubcommandData {
         index = 1;
         sb = new StringBuilder("List of times a particular public has been revealed \n");
         for (String ket : topThousand.keySet()) {
-
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
@@ -323,63 +320,6 @@ public class GameStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
     }
 
-    public static boolean hasPlayerFinishedAGame(Player player) {
-        String userID = player.getUserID();
-
-        Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
-        Predicate<Game> endedGamesFilter = game -> game.getWinner().isPresent();
-        Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
-
-        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
-
-        List<Game> games = GameManager.getInstance().getGames().stream()
-            .filter(allFilterPredicates)
-            .sorted(mapSort)
-            .toList();
-        return !games.isEmpty();
-    }
-
-    public static int numberOfPlayersUnfinishedGames(String userID) {
-        Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
-        Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && game.getWinner().isEmpty() && game.getHighestScore() > 0;
-        Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
-
-        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
-
-        List<Game> games = GameManager.getInstance().getGames().stream()
-            .filter(allFilterPredicates)
-            .sorted(mapSort)
-            .toList();
-        return games.size();
-    }
-
-    public static void findHowManyUnfinishedGamesAreDueToNewPlayers(SlashCommandInteractionEvent event) {
-        StringBuilder names = new StringBuilder();
-        int num = 0;
-        Predicate<Game> allFilterPredicates = game1 -> game1.isHasEnded() && game1.getWinner().isEmpty() && game1.getHighestScore() > 0;
-
-        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
-
-        List<Game> games = GameManager.getInstance().getGames().stream()
-            .filter(allFilterPredicates)
-            .sorted(mapSort)
-            .toList();
-        for (Game game : games) {
-            num++;
-            names.append(num).append(". ").append(game.getName());
-            if (isNotBlank(game.getCustomName())) {
-                names.append(" (").append(game.getCustomName()).append(")");
-            }
-            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
-                if (!hasPlayerFinishedAGame(player)) {
-                    names.append(" ").append(player.getUserName()).append(" had not finished any games and had ").append(numberOfPlayersUnfinishedGames(player.getUserID())).append(" unfinished games. ");
-                }
-            }
-            names.append("\n");
-        }
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
-    }
-
     public static void showGameLengths(SlashCommandInteractionEvent event, Integer pastDays) {
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         if (pastDays == null) pastDays = 3650;
@@ -407,10 +347,11 @@ public class GameStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths", longMsg.toString());
     }
 
-    private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
+    private static void showMostPlayedFactions(SlashCommandInteractionEvent event) {
+        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> custodians = new HashMap<>();
-        for (Game game : GameManager.getInstance().getGames()) {
+        for (Game game : filteredGames) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
                 factionCount.put(faction,
@@ -689,15 +630,22 @@ public class GameStats extends StatisticsSubcommandData {
 
     private static void showMostWinningColour(GenericInteractionCreateEvent event) {
         Map<String, Integer> winnerColorCount = new HashMap<>();
-        for (Game game : GameManager.getInstance().getGames()) {
-            Optional<Player> winner = game.getWinner();
-            if (winner.isEmpty()) {
-                continue;
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                Optional<Player> winner = game.getWinner();
+                if (winner.isEmpty()) {
+                    continue;
+                }
+                String winningColor = winner.get().getColor();
+                winnerColorCount.put(winningColor, 1 + winnerColorCount.getOrDefault(winningColor, 0));
             }
-            String winningColor = winner.get().getColor();
-            winnerColorCount.put(winningColor,
-                1 + winnerColorCount.getOrDefault(winningColor, 0));
-        }
+        } while (pagedGames.hasNextPage());
+
+
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Colour:").append("\n");
         winnerColorCount.entrySet().stream()

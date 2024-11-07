@@ -62,8 +62,6 @@ import ti4.model.UnitModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -4249,15 +4247,5 @@ public class Game extends GameProperties {
             }
         }
         return false;
-    }
-
-    @JsonIgnore
-    public String getGameStatsDashboardJSON() {
-        return new GameStatsDashboardPayload(this).getJson();
-    }
-
-    public void addHistoricalGameStatsDashboardPayload() {
-        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(this);
-        getHistoricalGameStatsDashboardPayloads().put(Timestamp.from(Instant.now()), payload);
     }
 }

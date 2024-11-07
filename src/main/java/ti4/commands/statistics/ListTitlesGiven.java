@@ -32,19 +32,25 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();
-        for (Game game : GameManager.getInstance().getGames()) {
-            for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
-                if (storedValue.contains("TitlesFor")) {
-                    String userID = storedValue.replace("TitlesFor", "");
-                    for (String title : game.getStoredValue(storedValue).split("_")) {
-                        timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
-                        titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
-                        timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
+                    if (storedValue.contains("TitlesFor")) {
+                        String userID = storedValue.replace("TitlesFor", "");
+                        for (String title : game.getStoredValue(storedValue).split("_")) {
+                            timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
+                            titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
+                            timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
+                        }
                     }
                 }
             }
+        } while (pagedGames.hasNextPage());
 
-        }
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
         Map<String, Integer> sortedTitlesMapAsc = sortByValue(timesTitleHasBeenBestowed, false);
         for (String title : sortedTitlesMapAsc.keySet()) {

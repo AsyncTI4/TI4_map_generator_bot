@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
@@ -8,6 +9,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
 import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
@@ -23,6 +26,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
@@ -88,6 +93,57 @@ public class WebHelper {
                     });
         } catch (Exception e) {
             BotLogger.log("Could not put overlay to web server", e);
+        }
+    }
+
+    public static void putStats() {
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
+            return;
+
+        List<GameStatsDashboardPayload> payloads = new ArrayList<>();
+        List<String> badGames = new ArrayList<>();
+        int count = 0;
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                if (game.isHasEnded() && game.hasWinner()) {
+                    count++;
+                    try {
+                        // Quick & Dirty bypass for failed json creation
+                        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
+                        objectMapper.writeValueAsString(payload);
+                        payloads.add(new GameStatsDashboardPayload(game));
+                    } catch (Exception e) {
+                        badGames.add(game.getID());
+                        BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + game.getID() + "`", e);
+                    }
+                }
+            }
+        } while (pagedGames.hasNextPage());
+
+        String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
+        if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
+        BotLogger.log(message);
+
+        try {
+            String json = objectMapper.writeValueAsString(payloads);
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format("statistics/%s.json", "test")) // TODO: when this export is final/good, change from "test", tell ParsleySage (stats dashboard dev)
+                    .contentType("application/json")
+                    .cacheControl("no-cache, no-store, must-revalidate")
+                    .build();
+
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
+                    .exceptionally(e -> {
+                        BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
+                        return null;
+                    });
+        } catch (Exception e) {
+            BotLogger.log("Could not put statistics to web server", e);
         }
     }
 

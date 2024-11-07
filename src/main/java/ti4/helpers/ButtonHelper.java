@@ -6021,15 +6021,20 @@ public class ButtonHelper {
     }
 
     public static boolean isPlayerNew(Game gameOG, Player player) {
-        for (Game game : GameManager.getInstance().getGames()) {
-            if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
-                for (Player player2 : game.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        return false;
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
+                    for (Player player2 : game.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            return false;
+                        }
                     }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
         return true;
     }
 
