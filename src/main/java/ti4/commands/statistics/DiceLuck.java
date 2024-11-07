@@ -77,14 +77,7 @@ public class DiceLuck extends StatisticsSubcommandData {
 
                 if (user == null || expectedHits == 0 || actualHits == 0) return;
 
-                double averageDiceLuck = actualHits / expectedHits;
-
-                sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
-                sb.append(String.format("%.2f", averageDiceLuck));
-                sb.append("` ").append(user.getEffectiveName());
-                sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
-                sb.append("\n");
-                index.getAndIncrement();
+                appendDiceLuck(sb, index, user, expectedHits, actualHits);
             });
 
         return sb.toString();
@@ -96,21 +89,27 @@ public class DiceLuck extends StatisticsSubcommandData {
 
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : GameManager.getInstance().getGames().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
-                playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
-                    (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames().stream().filter(endedGamesFilter).toList()) {
+                for (Player player : game.getPlayers().values()) {
+                    Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
+                    playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
+                            (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
 
-                if (playerDiceLuck.getKey() == 0) continue;
-                Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
-                playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
-                    if (value == null) value = new HashSet<>();
-                    value.add(averageDiceLuck);
-                    return value;
-                });
+                    if (playerDiceLuck.getKey() == 0) continue;
+                    Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
+                    playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
+                        if (value == null) value = new HashSet<>();
+                        value.add(averageDiceLuck);
+                        return value;
+                    });
+                }
             }
-        }
+        } while (pagedGames.hasNextPage());
+
         return playerDiceLucks;
     }
 
@@ -122,17 +121,20 @@ public class DiceLuck extends StatisticsSubcommandData {
             Entry<Double, Integer> userTurnCountTotalTime = playerDiceLucks.get(user.getId());
             double expectedHits = userTurnCountTotalTime.getKey();
             int actualHits = userTurnCountTotalTime.getValue();
-
-            if (user == null || expectedHits == 0 || actualHits == 0) return "";
-
-            double averageDiceLuck = actualHits / expectedHits;
-            sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
-            sb.append(String.format("%.2f", averageDiceLuck));
-            sb.append("` ").append(user.getEffectiveName());
-            sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
-            sb.append("\n");
-            index.getAndIncrement();
+            if (expectedHits != 0 && actualHits != 0) {
+                appendDiceLuck(sb, index, user, expectedHits, actualHits);
+            }
         }
         return sb.toString();
+    }
+
+    private void appendDiceLuck(StringBuilder sb, AtomicInteger index, User user, double expectedHits, int actualHits) {
+        double averageDiceLuck = actualHits / expectedHits;
+        sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
+        sb.append(String.format("%.2f", averageDiceLuck));
+        sb.append("` ").append(user.getEffectiveName());
+        sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
+        sb.append("\n");
+        index.getAndIncrement();
     }
 }

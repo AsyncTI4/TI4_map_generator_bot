@@ -44,19 +44,24 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : GameManager.getInstance().getGames().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
-                if (playerTurnTime.getKey() == 0) continue;
-                Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-                playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
-                    if (value == null) value = new HashSet<>();
-                    value.add(averageTurnTime);
-                    return value;
-                });
-                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), Integer::sum);
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames().stream().filter(endedGamesFilter).toList()) {
+                for (Player player : game.getPlayers().values()) {
+                    Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
+                    if (playerTurnTime.getKey() == 0) continue;
+                    Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
+                    playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+                        if (value == null) value = new HashSet<>();
+                        value.add(averageTurnTime);
+                        return value;
+                    });
+                    playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), Integer::sum);
+                }
             }
-        }
+        } while (pagedGames.hasNextPage());
 
         Map<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream().map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
         StringBuilder sb = new StringBuilder();
