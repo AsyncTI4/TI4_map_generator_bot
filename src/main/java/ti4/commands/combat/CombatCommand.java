@@ -1,8 +1,5 @@
 package ti4.commands.combat;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -12,6 +9,10 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class CombatCommand implements Command {
     private final Collection<CombatSubcommandData> subcommandData = getSubcommands();
@@ -62,7 +63,7 @@ public class CombatCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 
     protected String getActionDescription() {

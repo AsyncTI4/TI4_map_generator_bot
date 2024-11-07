@@ -206,7 +206,7 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
         game.setHasEnded(true);
         game.setEndedDate(new Date().getTime());
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         String gameEndText = getGameEndText(game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         game.setAutoPing(false);

@@ -21,7 +21,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
-import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper.TIGLRank;
@@ -57,7 +56,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringTokenizer;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -88,61 +86,19 @@ public class GameSaveLoadManager {
     public static final String PLAYER = "-player-";
     public static final String ENDPLAYER = "-endplayer-";
 
-    // Log the save times for each map for benchmarking
-    private static final List<Long> saveTimes = new ArrayList<>();
-    private static long txtTime = 0L;
-    private static long undoTime = 0L;
-
-    public static void saveMaps() {
-        // TODO: Make sure all commands and buttons and such actually save the game
-        AtomicInteger savedGamesCount = new AtomicInteger();
-        AtomicInteger skippedGamesCount = new AtomicInteger();
-        long loadTime = GameManager.getInstance().getLoadTime();
-        GameManager.getInstance().getGameNameToGame().values().parallelStream().forEach(game -> {
-            try {
-                long time = game.getLastModifiedDate();
-                if (time > loadTime) {
-                    saveMap(game, true, "Bot Reload");
-                    savedGamesCount.getAndIncrement();
-                } else {
-                    skippedGamesCount.getAndIncrement();
-                }
-            } catch (Exception e) {
-                BotLogger.log("Error saving game: " + game.getName(), e);
-            }
-        });
-
-        BotLogger.logWithTimestamp("**__Saved `" + savedGamesCount.get() + "` games.__**");
-        BotLogger.logWithTimestamp("**__Skipped saving `" + skippedGamesCount.get() + "` games.__**");
-
-        boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
-        if (debug && !saveTimes.isEmpty()) {
-            long tot = 0;
-            for (long time : saveTimes)
-                tot += time;
-
-            String sb = "Map save time stats:\n```fix" + "\n" + debugString("        total:", tot, tot) +
-                "\n" + debugString("          txt:", txtTime, tot) +
-                "\n" + debugString("    undo file:", undoTime, tot) +
-                "\n" + debugString("  other stuff:", tot - txtTime - undoTime, tot) +
-                "\n```";
-            BotLogger.logWithTimestamp(sb);
-        }
-    }
-
     private static String debugString(String prefix, long time, long total) {
         return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
     }
 
-    public static void saveMap(Game game, String reason) {
-        saveMap(game, false, reason);
+    public static void saveGame(Game game, String reason) {
+        saveGame(game, false, reason);
     }
 
-    public static void saveMap(Game game, GenericInteractionCreateEvent event) {
-        saveMap(game, false, event);
+    public static void saveGame(Game game, GenericInteractionCreateEvent event) {
+        saveGame(game, false, event);
     }
 
-    public static void saveMap(Game game, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
+    public static void saveGame(Game game, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
         String reason = null;
         if (event != null) {
             String username = event.getUser().getName();
@@ -163,11 +119,10 @@ public class GameSaveLoadManager {
                 default -> reason = "Last Command Unknown - No Event Provided";
             }
         }
-        saveMap(game, keepModifiedDate, reason);
+        saveGame(game, keepModifiedDate, reason);
     }
 
-    public static void saveMap(Game game, boolean keepModifiedDate, String saveReason) {
-        long saveStart = System.nanoTime();
+    public static void saveGame(Game game, boolean keepModifiedDate, String saveReason) {
         game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
@@ -180,7 +135,6 @@ public class GameSaveLoadManager {
 
         File mapFile = Storage.getGameFile(game.getName() + TXT);
 
-        long txtStart = System.nanoTime();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(mapFile.getAbsoluteFile()))) {
             Map<String, Tile> tileMap = game.getTileMap();
             writer.write(game.getOwnerID());
@@ -198,16 +152,6 @@ public class GameSaveLoadManager {
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
-        txtTime += System.nanoTime() - txtStart;
-        long undoStart = System.nanoTime();
-        mapFile = Storage.getGameFile(game.getName() + TXT);
-        if (mapFile.exists()) {
-            saveUndo(game, mapFile);
-        }
-        undoTime += System.nanoTime() - undoStart;
-
-        long saveTime = System.nanoTime() - saveStart;
-        saveTimes.add(saveTime);
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
@@ -1197,7 +1141,7 @@ public class GameSaveLoadManager {
             BotLogger.log("Exception occurred while streaming map directory.", e);
         }
         long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size() + "` games: ", loadTime, loadTime));
+        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getNumberOfGames() + "` games: ", loadTime, loadTime));
     }
 
     @Nullable

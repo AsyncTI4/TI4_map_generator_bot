@@ -3425,7 +3425,7 @@ public class Game extends GameProperties {
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
             setHasEnded(true);
-            GameSaveLoadManager.saveMap(this, "Game ended");
+            GameSaveLoadManager.saveGame(this, "Game ended");
         }
     }
 

@@ -1,10 +1,5 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,6 +12,11 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SetOrder extends GameSubcommandData {
 
@@ -61,7 +61,7 @@ public class SetOrder extends GameSubcommandData {
         } catch (Exception e) {
             game.setPlayers(playersBackup);
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         StringBuilder sb = new StringBuilder("Player order set:");
         for (Player player : game.getPlayers().values()) {
             sb.append("\n> ").append(player.getRepresentationNoPing());

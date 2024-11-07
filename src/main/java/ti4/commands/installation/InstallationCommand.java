@@ -68,7 +68,7 @@ public class InstallationCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         MapRenderPipeline.renderToWebsiteOnly(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }

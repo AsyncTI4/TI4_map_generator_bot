@@ -1,8 +1,5 @@
 package ti4.commands.game;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -17,6 +14,10 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GameCreate extends GameSubcommandData {
 
@@ -37,7 +38,7 @@ public class GameCreate extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Game name can only contain a-z 0-9 symbols");
             return;
         }
-        if (GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+        if (GameManager.getInstance().isValidGame(mapName)) {
             MessageHelper.replyToMessage(event, "Game with such name exist already, choose different name");
             return;
         }
@@ -66,7 +67,7 @@ public class GameCreate extends GameSubcommandData {
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);
         }
-        GameSaveLoadManager.saveMap(newGame, event);
+        GameSaveLoadManager.saveGame(newGame, event);
         return newGame;
     }
 

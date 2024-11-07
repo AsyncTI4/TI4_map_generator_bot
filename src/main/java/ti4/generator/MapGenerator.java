@@ -2337,11 +2337,7 @@ public class MapGenerator implements AutoCloseable {
         logDebug();
     }
 
-    private record Coord(int x, int y) {
-        public Coord translate(int dx, int dy) {
-            return coord(x + dx, y + dy);
-        }
-    }
+    private record Coord(int x, int y) {}
 
     private static Coord coord(int x, int y) {
         return new Coord(x, y);

@@ -1,14 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,6 +11,15 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class ListSlashCommandsUsed extends BothelperSubcommandData {
     public ListSlashCommandsUsed() {
@@ -38,11 +38,10 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         }
         int largestAmountOfButtonsIn1Game = 0;
         String largestGame = "";
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
-        for (Game game : mapList.values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
                 continue;
             }

@@ -50,7 +50,7 @@ public class GameCommand implements Command {
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         if (game == null) return;
         if (!undoCommand) {
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
         }
 
         // Post Map Image Unless Command is x

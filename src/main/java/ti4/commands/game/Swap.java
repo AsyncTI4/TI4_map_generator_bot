@@ -1,9 +1,5 @@
 package ti4.commands.game;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -19,6 +15,10 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class Swap extends GameSubcommandData {
 
@@ -68,7 +68,7 @@ public class Swap extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Specify player to swap");
             return;
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         GameSaveLoadManager.reload(game);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
@@ -124,7 +124,7 @@ public class Swap extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
             return;
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         GameSaveLoadManager.reload(game);
         // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
         // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);

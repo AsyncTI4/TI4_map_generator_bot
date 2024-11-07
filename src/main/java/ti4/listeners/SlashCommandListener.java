@@ -22,7 +22,6 @@ import ti4.message.MessageHelper;
 import javax.annotation.Nonnull;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public class SlashCommandListener extends ListenerAdapter {
     @Override
@@ -145,7 +144,7 @@ public class SlashCommandListener extends ListenerAdapter {
         String channelName = channel.getName();
         GameManager gameManager = GameManager.getInstance();
         Game userActiveGame = gameManager.getUserActiveGame(userID);
-        Set<String> mapList = gameManager.getGameNameToGame().keySet();
+        List<String> mapList = gameManager.getGameNames();
 
         String gameID = StringUtils.substringBefore(channelName, "-");
         boolean gameExists = mapList.contains(gameID);
@@ -177,7 +176,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 // MessageHelper.sendMessageToChannel(channel,"Active game reset. Channel name
                 // indicates to have map associated with it. Please select correct active game
                 // or do action in neutral channel");
-                gameManager.resetMapForUser(userID);
+                gameManager.resetGameForUser(userID);
             }
         }
         return true;

@@ -1,13 +1,5 @@
 package ti4.commands.statistics;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -20,6 +12,14 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class MedianTurnTime extends StatisticsSubcommandData {
 
@@ -37,8 +37,6 @@ public class MedianTurnTime extends StatisticsSubcommandData {
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
-
         Map<String, Integer> playerTurnCount = new HashMap<>();
 
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
@@ -46,7 +44,7 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
+        for (Game game : GameManager.getInstance().getGames().stream().filter(endedGamesFilter).toList()) {
             for (Player player : game.getPlayers().values()) {
                 Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
                 if (playerTurnTime.getKey() == 0) continue;

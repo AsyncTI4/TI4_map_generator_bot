@@ -1,6 +1,5 @@
 package ti4.commands.statistics;
 
-import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -51,8 +50,7 @@ public class CompareAFKTimes extends StatisticsSubcommandData {
         }
         User extraUser = option.getAsUser();
         playerID = extraUser.getId();
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             if (!game.isHasEnded()) {
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(playerID)) {

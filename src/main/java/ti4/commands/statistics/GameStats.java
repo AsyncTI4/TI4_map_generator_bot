@@ -1,6 +1,25 @@
 package ti4.commands.statistics;
 
-import static org.apache.commons.lang3.StringUtils.*;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
+import ti4.AsyncTI4DiscordBot;
+import ti4.commands.bothelper.ListSlashCommandsUsed;
+import ti4.generator.Mapper;
+import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
+import ti4.model.PublicObjectiveModel;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -15,27 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
-import ti4.commands.bothelper.ListSlashCommandsUsed;
-import ti4.generator.Mapper;
-import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
-import ti4.model.PublicObjectiveModel;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class GameStats extends StatisticsSubcommandData {
 
@@ -333,7 +332,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getInstance().getGames().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
@@ -347,7 +346,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getInstance().getGames().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
@@ -361,7 +360,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getInstance().getGames().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
@@ -411,8 +410,7 @@ public class GameStats extends StatisticsSubcommandData {
     private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> custodians = new HashMap<>();
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
                 factionCount.put(faction,
@@ -691,8 +689,7 @@ public class GameStats extends StatisticsSubcommandData {
 
     private static void showMostWinningColour(GenericInteractionCreateEvent event) {
         Map<String, Integer> winnerColorCount = new HashMap<>();
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             Optional<Player> winner = game.getWinner();
             if (winner.isEmpty()) {
                 continue;

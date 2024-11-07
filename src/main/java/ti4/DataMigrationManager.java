@@ -1,26 +1,6 @@
 package ti4;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.commands.player.ChangeColor;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -39,6 +19,25 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 public class DataMigrationManager {
 
@@ -640,9 +639,27 @@ public class DataMigrationManager {
                 "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)",
                 migrationDateString), e);
         }
-        List<String> migrationsAppliedThisTime = new ArrayList<>();
-        Map<String, Game> loadedMaps = GameManager.getInstance().getGameNameToGame();
-        for (Game game : loadedMaps.values()) {
+        List<String> migrationsApplied = new ArrayList<>();
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage);
+            if (pagedGames == null) {
+                break;
+            }
+            migrationsApplied.addAll(migrateGames(pagedGames.getGames(), migrationName, migrationMethod, migrationForGamesBeforeDate));
+            currentPage++;
+        } while (pagedGames.hasNextPage());
+        if (!migrationsApplied.isEmpty()) {
+            String gameNames = String.join(", ", migrationsApplied);
+            BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, gameNames));
+        }
+    }
+
+    private static List<String> migrateGames(List<Game> games, String migrationName, Function<Game, Boolean> migrationMethod,
+                                             Date migrationForGamesBeforeDate) {
+        List<String> migrationsApplied = new ArrayList<>();
+        for (Game game : games) {
             DateFormat mapCreatedOnFormat = new SimpleDateFormat("yyyy.MM.dd");
             Date mapCreatedOn = null;
             try {
@@ -662,15 +679,12 @@ public class DataMigrationManager {
                 game.addMigration(migrationName);
 
                 if (changesMade) {
-                    migrationsAppliedThisTime.add(game.getName());
-                    GameSaveLoadManager.saveMap(game, "Data Migration - " + migrationName);
+                    migrationsApplied.add(game.getName());
+                    GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);
                 }
             }
         }
-        if (!migrationsAppliedThisTime.isEmpty()) {
-            String mapNames = String.join(", ", migrationsAppliedThisTime);
-            BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
-        }
+        return migrationsApplied;
     }
 
     public static boolean migrateFrankenItems_111223(Game game) {

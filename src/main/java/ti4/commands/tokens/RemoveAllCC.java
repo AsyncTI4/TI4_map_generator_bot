@@ -38,7 +38,7 @@ public class RemoveAllCC implements Command {
         } else {
             Game game = gameManager.getUserActiveGame(userID);
             parsingForTile(event, game);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);
         }
     }

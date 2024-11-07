@@ -1,11 +1,5 @@
 package ti4.commands.player;
 
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -28,6 +22,12 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
+
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class Stats extends PlayerSubcommandData {
     public Stats() {
@@ -167,12 +167,11 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
             player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-            Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-            for (Game activeGame2 : mapList.values()) {
+            for (Game activeGame2 : GameManager.getInstance().getGames()) {
                 for (Player player2 : activeGame2.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                         player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-                        GameSaveLoadManager.saveMap(activeGame2, event);
+                        GameSaveLoadManager.saveGame(activeGame2, event);
                     }
                 }
             }

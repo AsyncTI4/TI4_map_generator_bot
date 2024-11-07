@@ -56,7 +56,7 @@ public class StatusCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
         MapRenderPipeline.render(game, event,
                 fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));

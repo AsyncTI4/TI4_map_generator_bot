@@ -104,7 +104,7 @@ public class StartPhase extends GameSubcommandData {
             case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
             case "pbd1000decks" -> {
                 game.pbd1000decks();
-                GameSaveLoadManager.saveMap(game, event);
+                GameSaveLoadManager.saveGame(game, event);
             }
             case "action" -> startActionPhase(event, game);
             case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);

@@ -1,8 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.Date;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -16,6 +13,8 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
+import java.util.Date;
+
 public class ListDeadGames extends BothelperSubcommandData {
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
@@ -23,15 +22,13 @@ public class ListDeadGames extends BothelperSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
         StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         StringBuilder sb = new StringBuilder("Dead Channels\n");
         int channelCount = 0;
         int roleCount = 0;
-        for (Game game : mapList.values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }

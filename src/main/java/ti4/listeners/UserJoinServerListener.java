@@ -1,11 +1,5 @@
 package ti4.listeners;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
-
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
@@ -25,6 +19,11 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class UserJoinServerListener extends ListenerAdapter {
 
@@ -69,7 +68,7 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
         List<Game> mapsJoined = new ArrayList<>();
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             Guild gameGuild = game.getGuild();
             if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
@@ -107,7 +106,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             return;
         }
         String threadID = game.getLaunchPostThreadID();
-        if (threadID == null || !ButtonHelper.isNumeric(threadID)) {
+        if (!ButtonHelper.isNumeric(threadID)) {
             return;
         }
         ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);
@@ -129,7 +128,7 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private void checkIfUserLeftActiveGames(Guild guild, User user, boolean voluntary) {
         List<Game> gamesQuit = new ArrayList<>();
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
             if (game.isHasEnded() || endVPReachedButNotEnded) continue;
             Guild gameGuild = game.getGuild();

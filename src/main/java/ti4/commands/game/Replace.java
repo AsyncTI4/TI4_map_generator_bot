@@ -1,10 +1,5 @@
 package ti4.commands.game;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -24,6 +19,11 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class Replace extends GameSubcommandData {
 
@@ -146,7 +146,7 @@ public class Replace extends GameSubcommandData {
         if (speaker) {
             game.setSpeakerUserID(player.getUserID());
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         GameSaveLoadManager.reload(game);
 
         // Load the new game instance so that we can repost the milty draft

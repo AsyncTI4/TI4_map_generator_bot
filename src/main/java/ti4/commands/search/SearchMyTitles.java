@@ -1,11 +1,5 @@
 package ti4.commands.search;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,6 +11,12 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameProperties;
 import ti4.message.MessageHelper;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 public class SearchMyTitles extends SearchSubcommandData {
 
@@ -39,7 +39,7 @@ public class SearchMyTitles extends SearchSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getInstance().getGames().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();

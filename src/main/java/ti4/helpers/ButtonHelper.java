@@ -5033,7 +5033,7 @@ public class ButtonHelper {
 
     public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
         String name = game.getName();
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         String newName = name + "clone";
         Guild guild = game.getGuild();
         Role gameRole = null;
@@ -5108,7 +5108,7 @@ public class ButtonHelper {
                 for (Player player : gameToRestore.getRealPlayers()) {
                     player.setCardsInfoThreadID(null);
                 }
-                GameSaveLoadManager.saveMap(gameToRestore, event);
+                GameSaveLoadManager.saveGame(gameToRestore, event);
             } catch (Exception e) {
 
             }
@@ -6021,8 +6021,7 @@ public class ButtonHelper {
     }
 
     public static boolean isPlayerNew(Game gameOG, Player player) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {

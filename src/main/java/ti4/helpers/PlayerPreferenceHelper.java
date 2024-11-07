@@ -1,13 +1,8 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.user.SetPersonalPingInterval;
 import ti4.listeners.annotations.ButtonHandler;
@@ -16,6 +11,9 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerPreferenceHelper {
 
@@ -72,12 +70,11 @@ public class PlayerPreferenceHelper {
         if ("true".equals(trueOrFalse)) {
             if ("distance".equals(distanceOrAgenda)) {
                 player.setPreferenceForDistanceBasedTacticalActions(true);
-                Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-                for (Game game2 : mapList.values()) {
+                for (Game game2 : GameManager.getInstance().getGames()) {
                     for (Player player2 : game2.getRealPlayers()) {
                         if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                             player2.setPreferenceForDistanceBasedTacticalActions(true);
-                            GameSaveLoadManager.saveMap(game2, player2.getUserName() + " Updated Player Settings");
+                            GameSaveLoadManager.saveGame(game2, player2.getUserName() + " Updated Player Settings");
                         }
                     }
                 }
@@ -87,12 +84,11 @@ public class PlayerPreferenceHelper {
         } else {
             if ("distance".equals(distanceOrAgenda)) {
                 player.setPreferenceForDistanceBasedTacticalActions(false);
-                Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-                for (Game game2 : mapList.values()) {
+                for (Game game2 : GameManager.getInstance().getGames()) {
                     for (Player player2 : game2.getRealPlayers()) {
                         if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                             player2.setPreferenceForDistanceBasedTacticalActions(false);
-                            GameSaveLoadManager.saveMap(game2, player2.getUserName() + " Updated Player Settings");
+                            GameSaveLoadManager.saveGame(game2, player2.getUserName() + " Updated Player Settings");
                         }
                     }
                 }
@@ -232,14 +228,13 @@ public class PlayerPreferenceHelper {
         player.addHourThatIsAFK(time);
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         String afkTimes = player.getHoursThatPlayerIsAFK();
-        for (Game game : mapList.values()) {
+        for (Game game : GameManager.getInstance().getGames()) {
             if (!game.isHasEnded()) {
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                         player2.setHoursThatPlayerIsAFK(afkTimes);
-                        GameSaveLoadManager.saveMap(game, player2.getUserName() + " Updated Player Settings");
+                        GameSaveLoadManager.saveGame(game, player2.getUserName() + " Updated Player Settings");
                     }
                 }
             }
