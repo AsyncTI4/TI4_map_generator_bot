@@ -11,7 +11,9 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "When on a planet, this unit participates in space combat, but cannot be destroyed during space combat. "
+        "ability": "This unit can only use SPACE CANNON if on a planet.",
+        "spaceCannonHitsOn": 7,
+        "spaceCannonDieCount": 1
     },
     {
         "id": "netharii_inf2",
@@ -25,7 +27,10 @@
         "combatHitsOn": 5,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "When on a planet, this unit participates in space combat, but cannot be destroyed during space combat. This unit can participate in space combats in adjacent systems"
+        "ability": "This unit can only use SPACE CANNON if on a planet. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",
+        "spaceCannonHitsOn": 6,
+        "spaceCannonDieCount": 1,
+        "deepSpaceCannon": true
     },
     {
         "id": "netharii_fs",
