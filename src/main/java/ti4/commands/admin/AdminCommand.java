@@ -52,6 +52,7 @@ public class AdminCommand implements Command {
         subcommands.add(new RestoreGame());
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new UpdateThreadArchiveTime());
+        subcommands.add(new UploadStatistics());
         return subcommands;
     }
 
