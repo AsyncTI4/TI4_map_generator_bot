@@ -1,5 +1,14 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -28,15 +37,6 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ButtonHelperCommanders {
 
@@ -145,7 +145,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(player, false));
+            ACInfo.getDiscardActionCardButtons(game, player, false));
         event.getMessage().delete().queue();
     }
 
@@ -237,7 +237,7 @@ public class ButtonHelperCommanders {
         Matcher matcher;
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
-        if (Pattern.compile(part1).matcher(buttonID).matches()) {
+        if ((matcher = Pattern.compile(part1).matcher(buttonID)).matches()) {
             String message = player.getRepresentation() + " Choose a tile to migrate from:";
             Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
@@ -275,8 +275,8 @@ public class ButtonHelperCommanders {
             newMessage = player.getRepresentation() + " You are migrating a " + unitType.humanReadableName() + " from " + planetName + " in " + from.getRepresentationForButtons(game, player) + ".";
             newMessage += "\nChoose your destination:";
             for (Tile t : game.getTileMap().values()) {
-                boolean hasPlanet = t.getPlanetUnitHolders().stream().anyMatch(uh -> player.hasPlanet(uh.getName()));
-                if (t.containsPlayersUnits(player) || hasPlanet) {
+                boolean hasplanet = t.getPlanetUnitHolders().stream().anyMatch(uh -> player.hasPlanet(uh.getName()));
+                if (t.containsPlayersUnits(player) || hasplanet) {
                     newButtons.add(Buttons.green(prefix + t.getPosition() + suffix, t.getRepresentationForButtons(game, player)));
                 }
             }

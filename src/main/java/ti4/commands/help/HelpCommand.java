@@ -3,6 +3,7 @@ package ti4.commands.help;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 
@@ -17,6 +18,11 @@ public class HelpCommand implements Command {
     @Override
     public String getActionID() {
         return Constants.HELP;
+    }
+
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return true;
     }
 
     @Override

@@ -28,7 +28,7 @@ public class RemoveTitle extends BothelperSubcommandData {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!GameManager.getInstance().isValidGame(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
                 return;
             }
@@ -46,6 +46,6 @@ public class RemoveTitle extends BothelperSubcommandData {
         String userID = user.getUser().getId();
         game.setStoredValue("TitlesFor" + userID, game.getStoredValue("TitlesFor" + userID).replace(title, ""));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed the title " + title + " in game " + game.getName());
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

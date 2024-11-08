@@ -40,6 +40,7 @@ import ti4.message.MessageHelper;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -204,8 +205,8 @@ public class GameEnd extends GameSubcommandData {
         String gameName = game.getName();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
         game.setHasEnded(true);
-        game.setEndedDate(System.currentTimeMillis());
-        GameSaveLoadManager.saveGame(game, event);
+        game.setEndedDate(new Date().getTime());
+        GameSaveLoadManager.saveMap(game, event);
         String gameEndText = getGameEndText(game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         game.setAutoPing(false);
@@ -293,7 +294,7 @@ public class GameEnd extends GameSubcommandData {
     }
 
     private static TextChannel getGameSummaryChannel(Game game) {
-        List<TextChannel> textChannels;
+        List<TextChannel> textChannels = null;
         if (game.isFowMode() && AsyncTI4DiscordBot.guildFogOfWar != null) {
             Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
             textChannels = AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);

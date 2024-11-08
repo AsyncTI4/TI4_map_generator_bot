@@ -38,7 +38,7 @@ public abstract class SpecialSubcommandData extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
         MapRenderPipeline.renderToWebsiteOnly(game, event);
     }
 }

@@ -274,7 +274,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (hasSchemingAbility) {
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + " use buttons to discard",
-                        ACInfo.getDiscardActionCardButtons(player, false));
+                        ACInfo.getDiscardActionCardButtons(game, player, false));
                 }
                 MessageHelper.sendMessageToEventChannel(event, message);
                 ButtonHelper.checkACLimit(game, event, player);

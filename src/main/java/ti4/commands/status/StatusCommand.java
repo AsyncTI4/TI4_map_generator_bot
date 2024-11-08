@@ -4,9 +4,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.commands.cardsac.ACCardsCommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -27,7 +27,7 @@ public class StatusCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
+        return ACCardsCommand.acceptEvent(event, getActionID());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class StatusCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
 
         MapRenderPipeline.render(game, event,
                 fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));

@@ -1,11 +1,11 @@
 package ti4.listeners.context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import ti4.map.GameSaveLoadManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class SelectionMenuContext extends ListenerContext {
@@ -32,7 +32,7 @@ public class SelectionMenuContext extends ListenerContext {
         this.values = new ArrayList<>(event.getValues());
 
         if (game != null) {
-            GameSaveLoadManager.saveGame(game, event);
+            GameSaveLoadManager.saveMap(game, event);
         }
     }
 }

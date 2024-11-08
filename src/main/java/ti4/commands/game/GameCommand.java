@@ -29,6 +29,11 @@ public class GameCommand implements Command {
     }
 
     @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(getActionID());
+    }
+
+    @Override
     public void execute(SlashCommandInteractionEvent event) {
         boolean undoCommand = false;
         String subcommandName = event.getInteraction().getSubcommandName();
@@ -45,7 +50,7 @@ public class GameCommand implements Command {
         Game game = GameManager.getInstance().getUserActiveGame(userID);
         if (game == null) return;
         if (!undoCommand) {
-            GameSaveLoadManager.saveGame(game, event);
+            GameSaveLoadManager.saveMap(game, event);
         }
 
         // Post Map Image Unless Command is x

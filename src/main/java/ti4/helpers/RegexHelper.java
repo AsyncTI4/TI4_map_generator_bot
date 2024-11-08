@@ -1,25 +1,49 @@
 package ti4.helpers;
 
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
-import ti4.helpers.Units.UnitType;
-import ti4.map.Game;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
+import ti4.helpers.Units.UnitType;
+import ti4.map.Game;
+import ti4.message.BotLogger;
 
 public class RegexHelper {
 
-    private static String regexBuilder(String groupName, Set<String> options) {
-        return "(?<" + groupName + ">(" + String.join("|", options) + "))";
+    public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function) {
+        return runMatcher(regex, buttonID, function, fail -> BotLogger.log("Error matching regex: " + buttonID + "\n" + Constants.jazzPing()));
     }
 
-    private static String regexBuilder(String groupName, String pattern) {
-        return "(?<" + groupName + ">" + pattern + ")";
+    public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function, Consumer<Void> failure) {
+        Matcher matcher = Pattern.compile(regex).matcher(buttonID);
+        if (matcher.matches()) {
+            function.accept(matcher);
+            return true;
+        } else {
+            failure.accept(null);
+            return false;
+        }
+    }
+
+    private static String regexBuilder(String groupname, Set<String> options) {
+        String sb = "(?<" + groupname + ">(" +
+                String.join("|", options) +
+                "))";
+        return sb;
+    }
+
+    private static String regexBuilder(String groupname, String pattern) {
+        String sb = "(?<" + groupname + ">" +
+                pattern + ")";
+        return sb;
     }
 
     private static Set<String> legalColors(Game game) {
@@ -48,7 +72,9 @@ public class RegexHelper {
     }
 
     public static String oneOf(List<String> regex) {
-        return "(" + "(" + String.join(")|(", regex) + ")" + ")";
+        String sb = "(" + "(" + String.join(")|(", regex) + ")" +
+                ")";
+        return sb;
     }
 
     /**

@@ -97,6 +97,6 @@ public class RevealStage2 extends StatusSubcommandData {
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

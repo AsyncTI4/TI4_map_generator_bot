@@ -1,5 +1,6 @@
 package ti4.commands.franken;
 
+import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,8 +13,6 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Objects;
 
 public class FrankenEdit extends FrankenSubcommandData {
     public FrankenEdit() {
@@ -55,7 +54,7 @@ public class FrankenEdit extends FrankenSubcommandData {
 
         if ("forceSwap".equals(command)) {
             FrankenDraftHelper.passBags(game);
-            GameSaveLoadManager.saveGame(game, event);
+            GameSaveLoadManager.saveMap(game, event);
             return;
         }
 
@@ -100,7 +99,7 @@ public class FrankenEdit extends FrankenSubcommandData {
             dmPlayerBag(game, editingPlayer, editingBag, bagName);
         }
 
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 
     private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName) {

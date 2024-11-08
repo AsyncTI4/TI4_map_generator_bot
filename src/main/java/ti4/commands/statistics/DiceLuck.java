@@ -1,5 +1,14 @@
 package ti4.commands.statistics;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -12,16 +21,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 public class DiceLuck extends StatisticsSubcommandData {
 
@@ -77,39 +76,42 @@ public class DiceLuck extends StatisticsSubcommandData {
 
                 if (user == null || expectedHits == 0 || actualHits == 0) return;
 
-                appendDiceLuck(sb, index, user, expectedHits, actualHits);
+                double averageDiceLuck = actualHits / expectedHits;
+
+                sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
+                sb.append(String.format("%.2f", averageDiceLuck));
+                sb.append("` ").append(user.getEffectiveName());
+                sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
+                sb.append("\n");
+                index.getAndIncrement();
             });
 
         return sb.toString();
     }
 
     public Map<String, Entry<Double, Integer>> getAllPlayersDiceLuck(boolean ignoreEndedGames) {
+        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
+
         Map<String, Entry<Double, Integer>> playerDiceLucks = new HashMap<>();
         Map<String, Set<Double>> playerAverageDiceLucks = new HashMap<>();
 
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            for (Game game : pagedGames.getGames().stream().filter(endedGamesFilter).toList()) {
-                for (Player player : game.getPlayers().values()) {
-                    Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
-                    playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
-                            (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
+        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
+            for (Player player : game.getPlayers().values()) {
+                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
+                playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
+                    (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
 
-                    if (playerDiceLuck.getKey() == 0) continue;
-                    Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
-                    playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
-                        if (value == null) value = new HashSet<>();
-                        value.add(averageDiceLuck);
-                        return value;
-                    });
-                }
+                if (playerDiceLuck.getKey() == 0) continue;
+                Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
+                playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
+                    if (value == null) value = new HashSet<>();
+                    value.add(averageDiceLuck);
+                    return value;
+                });
             }
-        } while (pagedGames.hasNextPage());
-
+        }
         return playerDiceLucks;
     }
 
@@ -121,20 +123,17 @@ public class DiceLuck extends StatisticsSubcommandData {
             Entry<Double, Integer> userTurnCountTotalTime = playerDiceLucks.get(user.getId());
             double expectedHits = userTurnCountTotalTime.getKey();
             int actualHits = userTurnCountTotalTime.getValue();
-            if (expectedHits != 0 && actualHits != 0) {
-                appendDiceLuck(sb, index, user, expectedHits, actualHits);
-            }
+
+            if (user == null || expectedHits == 0 || actualHits == 0) return "";
+
+            double averageDiceLuck = actualHits / expectedHits;
+            sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
+            sb.append(String.format("%.2f", averageDiceLuck));
+            sb.append("` ").append(user.getEffectiveName());
+            sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
+            sb.append("\n");
+            index.getAndIncrement();
         }
         return sb.toString();
-    }
-
-    private void appendDiceLuck(StringBuilder sb, AtomicInteger index, User user, double expectedHits, int actualHits) {
-        double averageDiceLuck = actualHits / expectedHits;
-        sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
-        sb.append(String.format("%.2f", averageDiceLuck));
-        sb.append("` ").append(user.getEffectiveName());
-        sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
-        sb.append("\n");
-        index.getAndIncrement();
     }
 }
