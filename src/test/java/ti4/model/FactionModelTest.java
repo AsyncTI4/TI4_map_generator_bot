@@ -68,17 +68,17 @@ class FactionModelTest extends BaseTi4Test {
     }
 
     private static boolean validateHomePlanets(FactionModel faction) {
-        if (TileHelper.getPlanetIdsToPlanetModels().keySet().containsAll(faction.getHomePlanets())) return true;
+        if (faction.getHomePlanets().stream().allMatch(TileHelper::isValidPlanet)) return true;
         List<String> invalidPlanetIDs = new ArrayList<>();
         for (String planetID : faction.getHomePlanets()) {
-            if (!TileHelper.getPlanetIdsToPlanetModels().containsKey(planetID)) invalidPlanetIDs.add(planetID);
+            if (!TileHelper.isValidPlanet(planetID)) invalidPlanetIDs.add(planetID);
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home planet IDs: `" + invalidPlanetIDs + "`");
         return false;
     }
 
     private static boolean validateHomeSystem(FactionModel faction) {
-        if (TileHelper.getTileIdsToTileModels().containsKey(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
+        if (TileHelper.isValidTile(faction.getHomeSystem()) || faction.getHomeSystem().isEmpty()) {
             return true;
         }
         System.out.println("Faction **" + faction.getAlias() + "** failed validation due to invalid home system IDs: `" + faction.getHomeSystem() + "`");

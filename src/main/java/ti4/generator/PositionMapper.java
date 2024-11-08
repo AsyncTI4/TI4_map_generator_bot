@@ -62,8 +62,9 @@ public class PositionMapper {
         if ("nombox".equals(tileID)) {
             return null;
         }
-        return TileHelper.getPlanetsByTileId(tileID).stream()
-                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
+        var tileIdToPlanets = TileHelper.getPlanetsByTileId(tileID);
+        return tileIdToPlanets == null ? null :
+                tileIdToPlanets.stream().collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {

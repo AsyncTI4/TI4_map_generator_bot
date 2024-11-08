@@ -20,7 +20,7 @@ public class PlanetModelTest extends BaseTi4Test {
 
     private boolean validateTileId(PlanetModel model) {
         if (model.getTileId() == null) return true;
-        return TileHelper.getTileIdsToTileModels().containsKey(model.getTileId());
+        return TileHelper.isValidTile(model.getTileId());
     }
 
     private boolean validateTileContainsPlanet(PlanetModel model) {
