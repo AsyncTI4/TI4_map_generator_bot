@@ -1,9 +1,5 @@
 package ti4.commands.cardsso;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -21,6 +17,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class DiscardSO extends SOCardsSubcommandData {
     public DiscardSO() {
@@ -95,20 +95,7 @@ public class DiscardSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
         }
 
-        String key = "factionsThatAreNotDiscardingSOs";
-        String key2 = "queueToDrawSOs";
-        String key3 = "potentialBlockers";
-        if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
-        }
-        if (!game.getStoredValue(key).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
-        }
-        if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-            game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
-            Helper.resolveQueue(game);
-        }
-
+        handleSecretObjectiveDrawOrder(game, player);
     }
 
     @ButtonHandler("drawSpecificSO_")
@@ -123,5 +110,30 @@ public class DiscardSO extends SOCardsSubcommandData {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), publicMsg);
         ButtonHelper.deleteMessage(event);
         SOInfo.sendSecretObjectiveInfo(game, player);
+    }
+
+    private static void handleSecretObjectiveDrawOrder(Game game, Player player) {
+        String key = "factionsThatAreNotDiscardingSOs";
+        String key2 = "queueToDrawSOs";
+        String key3 = "potentialBlockers";
+        if (game.getStoredValue(key2)
+                .contains(player.getFaction() + "*")) {
+            game.setStoredValue(key2,
+                    game.getStoredValue(key2)
+                            .replace(player.getFaction() + "*", ""));
+        }
+        if (!game.getStoredValue(key)
+                .contains(player.getFaction() + "*")) {
+            game.setStoredValue(key,
+                    game.getStoredValue(key)
+                            + player.getFaction() + "*");
+        }
+        if (game.getStoredValue(key3)
+                .contains(player.getFaction() + "*")) {
+            game.setStoredValue(key3,
+                    game.getStoredValue(key3)
+                            .replace(player.getFaction() + "*", ""));
+            Helper.resolveQueue(game);
+        }
     }
 }

@@ -108,7 +108,7 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         ACInfo.sendActionCardInfo(game, player, event);
         if (player.hasAbility("autonetic_memory")) {
             String message = player.getRepresentationUnfogged() + " if you did not just use the Codex to get that AC, please discard 1 AC due to your Cybernetic Madness ability";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ACInfo.getDiscardActionCardButtons(game, player, false));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, ACInfo.getDiscardActionCardButtons(player, false));
         }
     }
 }

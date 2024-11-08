@@ -1,9 +1,5 @@
 package ti4.commands.tokens;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -23,16 +19,15 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class AddFrontierTokens implements Command {
 
     @Override
     public String getActionID() {
         return Constants.ADD_FRONTIER_TOKENS;
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
     }
 
     public static void parsingForTile(GenericInteractionCreateEvent event, Game game) {
@@ -65,7 +60,7 @@ public class AddFrontierTokens implements Command {
         } else {
             Game game = gameManager.getUserActiveGame(userID);
             parsingForTile(event, game);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);
         }
     }

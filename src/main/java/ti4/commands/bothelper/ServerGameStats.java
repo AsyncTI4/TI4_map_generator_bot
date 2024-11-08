@@ -1,10 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -14,6 +9,13 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ServerGameStats extends BothelperSubcommandData {
     public ServerGameStats() {
@@ -37,6 +39,21 @@ public class ServerGameStats extends BothelperSubcommandData {
             .sorted(Comparator.comparing(Guild::getIdLong)) // Sort by creation date
             .toList();
 
+        Map<String, Integer> guildToGameCount = new HashMap<>();
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Guild guild : guilds) {
+                int gameCount = guildToGameCount.computeIfAbsent(guild.getId(), k -> 0);
+                int filteredGames = (int) pagedGames.getGames().stream()
+                        .filter(g -> Objects.equals(g.getGuildId(), guild.getId()))
+                        .filter(g -> g.getMainGameChannel() != null && g.getMainGameChannel().getParentCategory() != null && !g.getMainGameChannel().getParentCategory().getName().equals("The in-limbo PBD Archive"))
+                        .count();
+                guildToGameCount.put(guild.getId(), gameCount + filteredGames);
+            }
+        } while (pagedGames.hasNextPage());
+
         StringBuilder sb = new StringBuilder();
         sb.append("## __Server Game Statistics__\n");
         for (Guild guild : guilds) {
@@ -45,10 +62,7 @@ public class ServerGameStats extends BothelperSubcommandData {
             int guildRoomForGames = 250 - roleCount;
             int channelCount = guild.getChannels().size(); //500
             guildRoomForGames = Math.min(guildRoomForGames, (500 - channelCount) / 2);
-            long gameCount = GameManager.getInstance().getGameNameToGame().values().stream()
-                .filter(g -> Objects.equals(g.getGuildId(), guild.getId()))
-                .filter(g -> g.getMainGameChannel() != null && g.getMainGameChannel().getParentCategory() != null && !g.getMainGameChannel().getParentCategory().getName().equals("The in-limbo PBD Archive"))
-                .count();
+            int gameCount = guildToGameCount.get(guild.getId());
             sb.append("> hosting **").append(gameCount).append("** games  -  ");
             sb.append("space for **").append(guildRoomForGames).append("** more games\n");
             hostedGames += gameCount;

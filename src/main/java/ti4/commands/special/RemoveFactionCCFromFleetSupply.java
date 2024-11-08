@@ -18,6 +18,6 @@ public class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFlee
         for (String color : colors) {
             player.removeMahactCC(color);
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 }

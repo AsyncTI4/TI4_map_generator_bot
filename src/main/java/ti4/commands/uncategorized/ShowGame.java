@@ -15,6 +15,7 @@ import ti4.commands.Command;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -32,24 +33,8 @@ public class ShowGame implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getActionID())) {
-            return false;
-        }
-        OptionMapping option = event.getOption(Constants.GAME_NAME);
-        if (option != null) {
-            String mapName = option.getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
-                MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
-                return false;
-            }
-        } else {
-            Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
-            if (userActiveGame == null) {
-                MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
-                return false;
-            }
-        }
-        return true;
+        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+
     }
 
     @Override

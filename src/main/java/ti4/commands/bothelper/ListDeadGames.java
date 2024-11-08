@@ -1,8 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.Date;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -16,6 +13,8 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
+import java.util.List;
+
 public class ListDeadGames extends BothelperSubcommandData {
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
@@ -23,23 +22,30 @@ public class ListDeadGames extends BothelperSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            execute(event, pagedGames.getGames());
+        } while (pagedGames.hasNextPage());
+    }
 
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+    private void execute(SlashCommandInteractionEvent event, List<Game> games) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
         StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         StringBuilder sb = new StringBuilder("Dead Channels\n");
         int channelCount = 0;
         int roleCount = 0;
-        for (Game game : mapList.values()) {
-            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
+        for (Game game : games) {
+            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
             if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100") || game.getName().equalsIgnoreCase("pbd100two")) {
                 continue;
             }
-            long milliSinceLastTurnChange = new Date().getTime()
-                - game.getLastActivePlayerChange().getTime();
+            long milliSinceLastTurnChange = System.currentTimeMillis()
+                    - game.getLastActivePlayerChange().getTime();
 
             if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000L) {
                 continue;

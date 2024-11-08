@@ -1,6 +1,5 @@
 package ti4.commands.admin;
 
-import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -13,6 +12,8 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.util.List;
 
 public class DeleteGame extends AdminSubcommandData {
     DeleteGame() {
@@ -48,7 +49,7 @@ public class DeleteGame extends AdminSubcommandData {
             return;
         }
 
-        if (GameSaveLoadManager.deleteMap(mapName)) {
+        if (GameSaveLoadManager.deleteGame(mapName)) {
             GameEnd.secondHalfOfGameEnd(event, gameToDelete, false, true, false);
             GameManager.getInstance().deleteGame(mapName);
             MessageHelper.replyToMessage(event, "Map: " + mapName + " deleted.");

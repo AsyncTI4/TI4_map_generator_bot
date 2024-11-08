@@ -14,8 +14,16 @@ import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 //Handles positions of map
@@ -55,8 +63,7 @@ public class PositionMapper {
             return null;
         }
         return TileHelper.getAllPlanets().values().stream()
-            .filter(planetModel -> Optional.ofNullable(planetModel.getTileId()).isPresent())
-            .filter(planetModel -> planetModel.getTileId().equals(tileID))
+            .filter(planetModel -> planetModel.getTileId() != null && planetModel.getTileId().equals(tileID))
             .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 

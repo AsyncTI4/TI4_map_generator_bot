@@ -1,10 +1,5 @@
 package ti4.commands.franken;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -20,6 +15,11 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+
 public class FrankenCommand implements Command {
 
     private final Collection<FrankenSubcommandData> subcommandData = getSubcommands();
@@ -31,32 +31,32 @@ public class FrankenCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
-            User user = event.getUser();
-            String userID = user.getId();
-            if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
-                Member member = event.getMember();
-                List<Role> roles = member.getRoles();
-                for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                    if (roles.contains(role)) {
-                        return true;
-                    }
+        if (!event.getName().equals(getActionID())) {
+            return false;
+        }
+        User user = event.getUser();
+        String userID = user.getId();
+        if (Objects.equals(event.getInteraction().getSubcommandName(), Constants.FRANKEN_EDIT)) {
+            Member member = event.getMember();
+            List<Role> roles = member.getRoles();
+            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                if (roles.contains(role)) {
+                    return true;
                 }
             }
-
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-                return false;
-            }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-            return true;
         }
-        return false;
+
+        GameManager gameManager = GameManager.getInstance();
+        if (!gameManager.isUserWithActiveGame(userID)) {
+            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+            return false;
+        }
+        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
+            MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class FrankenCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 

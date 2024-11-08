@@ -1,15 +1,15 @@
 package ti4.commands.statistics;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class LifetimeRecord extends StatisticsSubcommandData {
 
@@ -32,15 +32,14 @@ public class LifetimeRecord extends StatisticsSubcommandData {
         for (int i = 1; i <= 8; i++) {
             if (Objects.nonNull(event.getOption("player" + i))) {
                 User member = event.getOption("player" + i).getAsUser();
-                if (member != null)
-                    members.add(member);
+                members.add(member);
             } else {
                 break;
             }
         }
         DiceLuck luck = new DiceLuck();
         AverageTurnTime time = new AverageTurnTime();
-        String sb = String.valueOf(luck.getSelectUsersDiceLuck(members, luck.getAllPlayersDiceLuck(false))) +
+        String sb = luck.getSelectUsersDiceLuck(members, luck.getAllPlayersDiceLuck(false)) +
                 time.getSelectUsersTurnTimes(members, time.getAllPlayersTurnTimes(false));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
     }
