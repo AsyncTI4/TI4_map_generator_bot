@@ -240,7 +240,7 @@ public class GameSaveLoadManager {
         }
     }
 
-    private static void saveMapInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
+    private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
