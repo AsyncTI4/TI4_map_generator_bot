@@ -143,7 +143,7 @@ public class UnitRenderGenerator {
 
                 tileGraphics.drawImage(unitImage, imageX, imageY, null);
 
-                if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                if (!posCtx.fighterOrInfantry) {
                     tileGraphics.drawImage(decal, imagePos.x(), imagePos.y(), null);
                 }
 
