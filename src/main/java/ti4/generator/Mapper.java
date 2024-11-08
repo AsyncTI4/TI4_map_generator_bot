@@ -21,10 +21,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -45,6 +47,7 @@ import ti4.model.DraftErrataModel;
 import ti4.model.EventModel;
 import ti4.model.ExploreModel;
 import ti4.model.FactionModel;
+import ti4.model.GameModeModel;
 import ti4.model.GenericCardModel;
 import ti4.model.GenericCardModel.CardType;
 import ti4.model.LeaderModel;
@@ -96,6 +99,7 @@ public class Mapper {
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
     private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
     private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
+    private static final Map<String, GameModeModel> gameModes = new HashMap<>();
 
     public static void init() {
         try {
@@ -135,6 +139,7 @@ public class Mapper {
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
         importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
+        importJsonObjectsFromFolder("game_modes", gameModes, GameModeModel.class);
 
         duplicateObjectsForAllColors(promissoryNotes);
     }

@@ -31,6 +31,8 @@ public class GameProperties {
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
 
+    private String initialGameModeID;
+
     // Deck IDs
     private @ExportableField String acDeckID = "action_cards_pok";
     private @ExportableField String soDeckID = "secret_objectives_pok";
