@@ -299,7 +299,6 @@ public class AsyncTI4DiscordBot {
         TIGLHelper.validateTIGLness();
 
         // LOAD GAME NAMES
-        BotLogger.logWithTimestamp(" LOADING GAME NAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
         GameManager.getInstance();
 
@@ -309,8 +308,8 @@ public class AsyncTI4DiscordBot {
         BotLogger.logWithTimestamp(" FINISHED CHECKING FOR DATA MIGRATIONS");
 
         // START MAP GENERATION
-        MapRenderPipeline.start();
         ImageIO.setUseCache(false);
+        MapRenderPipeline.start();
 
         // START CRONS
         AutoPingCron.start();
