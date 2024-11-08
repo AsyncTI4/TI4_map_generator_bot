@@ -55,15 +55,15 @@ public class UnitTokenPosition implements Serializable {
         coordinateMap.put(id, points);
     }
 
-    public Point getPosition(String id) {
-        List<Point> points = coordinateMap.get(id);
+    public Point getPosition(String unitAsyncID) {
+        List<Point> points = coordinateMap.get(unitAsyncID);
         if (points == null) {
-            id = coordinateMap.keySet().stream().filter(id::contains).findFirst().orElse(null);
-            if (id == null) {
+            unitAsyncID = coordinateMap.keySet().stream().filter(unitAsyncID::contains).findFirst().orElse(null); // TODO This is why Cavalry lands on Cruiser (id = "ca")
+            if (unitAsyncID == null) {
                 return null;
             }
         }
-        points = coordinateMap.get(id);
+        points = coordinateMap.get(unitAsyncID);
         if (points == null || points.isEmpty()) {
             return null;
         }
@@ -74,9 +74,9 @@ public class UnitTokenPosition implements Serializable {
             points.removeFirst();
         }
         if (points.isEmpty()) {
-            coordinateMap.remove(id);
+            coordinateMap.remove(unitAsyncID);
         } else {
-            coordinateMap.put(id, points);
+            coordinateMap.put(unitAsyncID, points);
         }
         return new Point(point);
     }

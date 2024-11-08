@@ -94,7 +94,7 @@ public class ButtonHelperHeroes {
                 if (unitModel == null || unitModel.getIsStructure())
                     continue;
                 UnitKey unitKey = unitEntry.getKey();
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                String unitName = unitKey.unitName();
                 int totalUndamagedUnits = unitEntry.getValue();
                 int damagedUnits = 0;
 
@@ -1711,7 +1711,7 @@ public class ButtonHelperHeroes {
                 continue;
             }
             UnitKey unitKey = unitEntry.getKey();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            String unitName = unitKey.unitName();
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
 
@@ -1737,7 +1737,7 @@ public class ButtonHelperHeroes {
                 continue;
             }
             UnitKey unitKey = unitEntry.getKey();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            String unitName = unitKey.unitName();
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
 

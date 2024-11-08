@@ -1183,4 +1183,5 @@ public class Constants {
     public static final String SHOW_FULL_TEXT = "show_full_text";
     public static final String FOW_GM_IDS = "fogOfWarGMIDs";
     public static final String STARTED_DATE = "started_date";
+    public static final String MODIFY_UNITS = "modify_units";
 }

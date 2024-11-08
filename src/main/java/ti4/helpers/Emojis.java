@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.DiceHelper.Die;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.message.BotLogger;
@@ -342,6 +343,9 @@ public class Emojis {
     public static final String destroyer = "<:destroyer:1156670514077634601>";
     public static final String carrier = "<:carrier:1156670484788805633>";
     public static final String cruiser = "<:cruiser:1156670491159973888>";
+    public static final String TyrantsLament = "<:TyrantsLament:1303447974701170738>";
+    public static final String PlenaryOrbital = "<:PlenaryOrbital:1303447973761388606>";
+    public static final String Monument = "<:Monument:1303448130749988874>";
 
     // EMOJI FARM 4
     public static final String ArborecAgent = "<:ArborecAgent:1159149650465525760>";
@@ -1057,6 +1061,10 @@ public class Emojis {
     public static final String speakerPick11 = "<:position11:1227093805963022398>";
     public static final String speakerPick12 = "<:position12:1227093807372308550>";
 
+    // TILES
+    public static final String Anomaly = "<:Anomaly:1303437791740432384>";
+    public static final String EmptySystem = "<:EmptySystem:1303437779417698366>";
+
     // OTHER
     public static final String WHalpha = "<:WHalpha:1159118794334146570>";
     public static final String WHbeta = "<:WHbeta:1159118795508547625>";
@@ -1096,6 +1104,7 @@ public class Emojis {
     public static final String ProjectPi = "<:ProjectPie:1128504084811481219>";
     public static final String MiltyMod = "<:MiltyMod:1181981333694722178>"; // Symbol for Milty's mod https://discord.com/channels/743629929484386395/1087435266249207869
     public static final String StrategicAlliance = "<:StrategicAlliance:1225473614946500680>"; // Symbol for Holytispoon's Strategic Alliance
+    public static final String Monuments = "<:Monuments:1303420074434236537>"; // Monuments+ https://discord.com/channels/743629929484386395/1205395696950321172
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static final List<String> symbols = new ArrayList<>(Arrays.asList(
@@ -1798,16 +1807,15 @@ public class Emojis {
             case "pds" -> pds;
             case "mech" -> mech;
             case "infantry" -> infantry;
-            case "flagship" -> flagship;
-            case "lady" -> flagship;
-            case "cavalry" -> flagship;
-            case "tyrantslament" -> flagship;
+            case "flagship", "lady", "cavalry" -> flagship;
             case "fighter" -> fighter;
             case "dreadnought" -> dreadnought;
             case "destroyer" -> destroyer;
             case "carrier" -> carrier;
             case "cruiser" -> cruiser;
-            case "plenaryorbital" -> spacedock;
+            case "tyrantslament" -> TyrantsLament;
+            case "plenaryorbital" -> PlenaryOrbital;
+            case "monument" -> Monument;
 
             // LEADERS - AGENTS
             case "arborecagent" -> ArborecAgent;
@@ -1957,6 +1965,10 @@ public class Emojis {
             case "lanefircommander" -> LanefirCommander;
             // case "lanefirhero" -> "";
 
+            // TILES
+            case "emptysystem", "empty_nonanomaly" -> EmptySystem;
+            case "anomaly" -> Anomaly;
+
             // OTHER
             case "whalpha" -> WHalpha;
             case "grift" -> GravityRift;
@@ -1967,12 +1979,16 @@ public class Emojis {
             case "creussgamma" -> CreussGamma;
             case "influence" -> influence;
             case "resources" -> resources;
-            case "legendaryplanet" -> LegendaryPlanet;
+            case "legendaryplanet", "legendary" -> LegendaryPlanet;
+            case "mecatol_rex" -> Mecatol;
+
+            // TECH
             case "cybernetictech" -> CyberneticTech;
             case "propulsiontech" -> PropulsionTech;
             case "biotictech" -> BioticTech;
             case "warfaretech" -> WarfareTech;
             case "unitupgradetech" -> UnitUpgradeTech;
+            case "tech_specialty" -> PropulsionTech + CyberneticTech + BioticTech + WarfareTech; // just for Monument Embed's Description field (will break if need for full emoji)
 
             default -> getRandomGoodDog(emojiName);
         };

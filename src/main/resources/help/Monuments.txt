@@ -1,0 +1,10 @@
+# Monuments
+The Monuments+ Expansion is a stand-alone mini-expansion of cards marked with the original Monuments mini-expansion logo and a +.
+It can be used with the base Twilight Imperium: Fourth Edition game as well as the Prophecy of Kings expansion.
+It extends the base Monuments mini-expansion designed by Blarknob, and contains assets to support factions in the fan expansion Discordant Stars, and related content.
+At its core, this mini-expansion aims to encourage a variant strategic option for supported Twilight Imperium factions by placing their faction monument unit.
+The intent is to lean on faction strengths without simply adding a ‘more of the same’ ability (eg. more infantry for Sol, more technology for Jol-Nar, etc.), and to emphasize the importance of strategic placement.
+These units are not purely intended to rebalance or strengthen/nerf any particular factions.
+
+[Rules Document](https://drive.google.com/file/d/1aTKWtu7kmIHXU2BoS4HYFC8VUnTU6EvD/view)
+[Monuments Google Drive folder](https://drive.google.com/drive/folders/1kqtY943syNMRsM1ijmHfymCxVVWxYUJq)

@@ -304,7 +304,6 @@ abstract public class AddRemoveUnits implements Command {
             }
             ButtonHelper.checkFleetAndCapacity(player, game, tile, event);
             CommanderUnlockCheck.checkPlayer(player, "naalu", "cabal");
-
         }
     }
 
