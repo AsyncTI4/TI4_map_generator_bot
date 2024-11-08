@@ -28,7 +28,7 @@ public class AutoPingCron {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void start() {
-        SCHEDULER.scheduleAtFixedRate(AutoPingCron::autoPingGames, 1, 1, TimeUnit.MINUTES);
+        SCHEDULER.scheduleAtFixedRate(AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
