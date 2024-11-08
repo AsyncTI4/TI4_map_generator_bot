@@ -237,7 +237,7 @@ public class ButtonHelperCommanders {
         Matcher matcher;
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
-        if ((matcher = Pattern.compile(part1).matcher(buttonID)).matches()) {
+        if (Pattern.compile(part1).matcher(buttonID).matches()) {
             String message = player.getRepresentation() + " Choose a tile to migrate from:";
             Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
@@ -275,8 +275,8 @@ public class ButtonHelperCommanders {
             newMessage = player.getRepresentation() + " You are migrating a " + unitType.humanReadableName() + " from " + planetName + " in " + from.getRepresentationForButtons(game, player) + ".";
             newMessage += "\nChoose your destination:";
             for (Tile t : game.getTileMap().values()) {
-                boolean hasplanet = t.getPlanetUnitHolders().stream().anyMatch(uh -> player.hasPlanet(uh.getName()));
-                if (t.containsPlayersUnits(player) || hasplanet) {
+                boolean hasPlanet = t.getPlanetUnitHolders().stream().anyMatch(uh -> player.hasPlanet(uh.getName()));
+                if (t.containsPlayersUnits(player) || hasPlanet) {
                     newButtons.add(Buttons.green(prefix + t.getPosition() + suffix, t.getRepresentationForButtons(game, player)));
                 }
             }

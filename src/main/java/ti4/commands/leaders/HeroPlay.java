@@ -451,7 +451,7 @@ public class HeroPlay extends LeaderAction {
                         continue;
                     }
                     List<Button> buttons = new ArrayList<>(
-                        ACInfo.getYssarilHeroActionCardButtons(game, player, p2));
+                        ACInfo.getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged()
                             + " Kyver, Blade and Key, the Yssaril hero, has been played.  Use buttons to select which AC you will offer to them.",

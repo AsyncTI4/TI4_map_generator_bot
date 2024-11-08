@@ -293,7 +293,7 @@ public class GameEnd extends GameSubcommandData {
     }
 
     private static TextChannel getGameSummaryChannel(Game game) {
-        List<TextChannel> textChannels = null;
+        List<TextChannel> textChannels;
         if (game.isFowMode() && AsyncTI4DiscordBot.guildFogOfWar != null) {
             Helper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildFogOfWar);
             textChannels = AsyncTI4DiscordBot.guildFogOfWar.getTextChannelsByName("fow-war-stories", true);
