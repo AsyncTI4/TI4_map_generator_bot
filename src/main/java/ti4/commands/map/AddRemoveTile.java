@@ -2,6 +2,7 @@ package ti4.commands.map;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -12,8 +13,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import org.jetbrains.annotations.NotNull;
 
 abstract public class AddRemoveTile extends MapSubcommandData {
     public AddRemoveTile(@NotNull String name, @NotNull String description) {
@@ -36,7 +35,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
         } else {
             Game userActiveGame = tileParsing(event, userID, gameManager);
             if (userActiveGame == null) return;
-            GameSaveLoadManager.saveMap(userActiveGame, event);
+            GameSaveLoadManager.saveGame(userActiveGame, event);
         }
     }
 

@@ -1,13 +1,5 @@
 package ti4.commands.statistics;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -16,6 +8,14 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class ListTitlesGiven extends StatisticsSubcommandData {
     public ListTitlesGiven() {
@@ -29,24 +29,28 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
         if (specificTitle != null) {
             titleOnly = true;
         }
-        //String titles = game.getStoredValue("TitlesFor" + p2.getUserID());
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();
-        for (Game game : mapList.values()) {
-            for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
-                if (storedValue.contains("TitlesFor")) {
-                    String userID = storedValue.replace("TitlesFor", "");
-                    for (String title : game.getStoredValue(storedValue).split("_")) {
-                        timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
-                        titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
-                        timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
+                    if (storedValue.contains("TitlesFor")) {
+                        String userID = storedValue.replace("TitlesFor", "");
+                        for (String title : game.getStoredValue(storedValue).split("_")) {
+                            timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
+                            titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
+                            timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
+                        }
                     }
                 }
             }
+        } while (pagedGames.hasNextPage());
 
-        }
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
         Map<String, Integer> sortedTitlesMapAsc = sortByValue(timesTitleHasBeenBestowed, false);
         for (String title : sortedTitlesMapAsc.keySet()) {

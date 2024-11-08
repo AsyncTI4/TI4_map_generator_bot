@@ -50,7 +50,7 @@ public class ButtonHelperRelics {
                     + " Drew 2 ACs With Scheming. Please Discard 1 AC with the blue buttons";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " use buttons to discard",
-                    ACInfo.getDiscardActionCardButtons(game, player, false));
+                    ACInfo.getDiscardActionCardButtons(player, false));
             } else if (player.hasAbility("autonetic_memory")) {
                 ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
                 message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";

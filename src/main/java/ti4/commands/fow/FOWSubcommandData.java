@@ -39,7 +39,7 @@ public abstract class FOWSubcommandData extends SubcommandData {
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
         // FileUpload file = new GenerateMap().saveImage(activeMap, event);
         //  MessageHelper.replyToMessage(event, file);

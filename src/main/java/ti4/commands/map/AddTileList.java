@@ -1,11 +1,5 @@
 package ti4.commands.map;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -38,6 +32,11 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class AddTileList extends MapSubcommandData {
     public AddTileList() {
         super(Constants.ADD_TILE_LIST, "Add tile list (map string) to generate map");
@@ -64,7 +63,7 @@ public class AddTileList extends MapSubcommandData {
 
         addTileListToMap(game, tileList, event);
 
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 
     public static void addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {

@@ -1,12 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
-import java.util.Set;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -28,6 +21,13 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 public class CreateFOWGameChannels extends BothelperSubcommandData {
     public CreateFOWGameChannels() {
@@ -183,7 +183,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
             "> " + actionsChannel.getAsMention() + "\n";
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameSaveLoadManager.saveMap(newGame, event);
+        GameSaveLoadManager.saveGame(newGame, event);
     }
 
     private static String getNextFOWGameName() {
@@ -208,7 +208,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
+        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNames());
         gameAndRoleNames.addAll(mapNames);
 
         //CHECK
@@ -237,7 +237,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
+        List<String> mapNames = GameManager.getInstance().getGameNames().stream()
             .filter(mapName -> mapName.startsWith("fow"))
             .toList();
         for (String mapName : mapNames) {

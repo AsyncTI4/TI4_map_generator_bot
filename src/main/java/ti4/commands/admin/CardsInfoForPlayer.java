@@ -27,7 +27,7 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
             Player player = game.getPlayer(user.getId());
             CardsInfo.sendCardsInfo(game, player, event);
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         MessageHelper.sendMessageToEventChannel(event, "Cards Info sent");
     }
 }

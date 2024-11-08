@@ -27,6 +27,6 @@ public class ShuffleBackInUnrevealedObj extends CustomSubcommandData {
         game.swapObjectiveOut(loc2.getAsInt(), loc1.getAsInt() - 1, id);
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Shuffle objective at position " + loc1.getAsInt() + " back into the deck and drew a new one there.");
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 }

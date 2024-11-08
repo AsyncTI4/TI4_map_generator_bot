@@ -1,6 +1,5 @@
 package ti4.commands.statistics;
 
-import java.util.Map;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -12,7 +11,16 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 public class CompareAFKTimes extends StatisticsSubcommandData {
+
+    private static final List<String> PLAYER_OPTIONS_TO_CHECK = List.of(
+            Constants.PLAYER1, Constants.PLAYER2, Constants.PLAYER3, Constants.PLAYER4,
+            Constants.PLAYER5, Constants.PLAYER6, Constants.PLAYER7, Constants.PLAYER8);
 
     public CompareAFKTimes() {
         super(Constants.COMPARE_AFK_TIMES, "Compare different players set AFK Times");
@@ -28,39 +36,47 @@ public class CompareAFKTimes extends StatisticsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String times = "";
-        times = times + getUsersAFKTime(event, Constants.PLAYER1);
-        times = times + getUsersAFKTime(event, Constants.PLAYER2);
-        times = times + getUsersAFKTime(event, Constants.PLAYER3);
-        times = times + getUsersAFKTime(event, Constants.PLAYER4);
-        times = times + getUsersAFKTime(event, Constants.PLAYER5);
-        times = times + getUsersAFKTime(event, Constants.PLAYER6);
-        times = times + getUsersAFKTime(event, Constants.PLAYER7);
-        times = times + getUsersAFKTime(event, Constants.PLAYER8);
-        MessageHelper.sendMessageToChannel(event.getChannel(), times);
-    }
+        List<String> playersToCheck = PLAYER_OPTIONS_TO_CHECK.stream()
+                .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
+                .filter(Objects::nonNull)
+                .map(User::getId)
+                .toList();
 
-    private String getUsersAFKTime(SlashCommandInteractionEvent event, String playerID) {
-        if (playerID == null) {
-            return "";
-        }
-        OptionMapping option;
-        option = event.getOption(playerID);
-        if (option == null) {
-            return "";
-        }
-        User extraUser = option.getAsUser();
-        playerID = extraUser.getId();
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
-            if (!game.isHasEnded()) {
-                for (Player player2 : game.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(playerID)) {
-                        return player2.getRepresentationUnfogged() + "afk hours are: " + player2.getHoursThatPlayerIsAFK().replace(";", ", ") + "\n";
-                    }
+        Map<String, String> playerIdToAfkTimeMessage = new HashMap<>();
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (String player : playersToCheck) {
+                var afkTime = getUsersAFKTime(pagedGames.getGames(), player);
+                if (afkTime != null) {
+                    playerIdToAfkTimeMessage.put(player, afkTime);
+                }
+            }
+        } while (pagedGames.hasNextPage() && playerIdToAfkTimeMessage.size() < playersToCheck.size());
+
+        if (playerIdToAfkTimeMessage.size() < playersToCheck.size()) {
+            for (String player : playersToCheck) {
+                if (!playerIdToAfkTimeMessage.containsKey(player)) {
+                    playerIdToAfkTimeMessage.put(player, "No active games found with this user");
                 }
             }
         }
-        return "No games found with this user";
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), "");
+    }
+
+    private String getUsersAFKTime(List<Game> games, String playerId) {
+        for (Game game : games) {
+            if (game.isHasEnded()) {
+                continue;
+            }
+            for (Player player : game.getRealPlayers()) {
+                if (player.getUserID().equalsIgnoreCase(playerId)) {
+                    return player.getRepresentationUnfogged() + "afk hours are: " + player.getHoursThatPlayerIsAFK().replace(";", ", ") + "\n";
+                }
+            }
+        }
+        return null;
     }
 }

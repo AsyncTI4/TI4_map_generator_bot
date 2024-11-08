@@ -1,13 +1,5 @@
 package ti4.commands.milty;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Function;
-
 import lombok.Data;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -32,6 +24,14 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
 
 public class StartMilty extends MiltySubcommandData {
 
@@ -230,7 +230,7 @@ public class StartMilty extends MiltySubcommandData {
             specs.presetSlices.forEach(draftManager::addSlice);
             // Kick it off with a bang!
             draftManager.repostDraftInformation(game);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = generateSlices(event, draftManager, specs);
@@ -243,7 +243,7 @@ public class StartMilty extends MiltySubcommandData {
                 } else {
                     // Kick it off with a bang!
                     draftManager.repostDraftInformation(game);
-                    GameSaveLoadManager.saveMap(game, event);
+                    GameSaveLoadManager.saveGame(game, event);
                     game.setPhaseOfGame("miltydraft");
                 }
             });

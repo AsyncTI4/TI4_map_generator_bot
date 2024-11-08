@@ -23,6 +23,6 @@ public class SwapStage1 extends CustomSubcommandData {
         OptionMapping loc2 = event.getOption(Constants.LOCATION2);
         game.swapStage1(loc1.getAsInt(), loc2.getAsInt());
         MessageHelper.sendMessageToChannel(event.getChannel(), "Objectives at position " + loc1.getAsInt() + " and position " + loc2.getAsInt() + " swapped.");
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 }

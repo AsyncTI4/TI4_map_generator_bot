@@ -1,33 +1,5 @@
 package ti4.helpers;
 
-import java.awt.Point;
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -49,6 +21,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -84,6 +60,29 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
+import java.awt.*;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+
 public class Helper {
 
     @Nullable
@@ -92,7 +91,7 @@ public class Helper {
     }
 
     public static int getCurrentHour() {
-        long currentTime = new Date().getTime();
+        long currentTime = System.currentTimeMillis();
         currentTime = currentTime / 1000;
         currentTime = currentTime % (60 * 60 * 24);
         currentTime = currentTime / (60 * 60);
@@ -2393,27 +2392,38 @@ public class Helper {
 
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
         Guild guild = event.getGuild();
+        if (guild == null) {
+            BotLogger.log("Guild was null in addBotHelperPermissionsToGameChannels.");
+            return;
+        }
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
-            if (!game.isHasEnded()) {
-                TextChannel tableTalkChannel = game.getTableTalkChannel();
-                if (tableTalkChannel != null && game.getGuild() == guild) {
-                    addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
-                }
-                TextChannel actionsChannel = game.getMainGameChannel();
-                if (actionsChannel != null && game.getGuild() == guild) {
-                    addRolePermissionsToGameChannel(guild, actionsChannel, role);
-                }
-                String gameName = game.getName();
-                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-                    .toList();
-                for (GuildChannel channel : channels) {
-                    addRolePermissionsToGameChannel(guild, channel, role);
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                if (!game.isHasEnded()) {
+                    if (game.getGuildId() != null && game.getGuildId().equals(guild.getId())) {
+                        TextChannel tableTalkChannel = game.getTableTalkChannel();
+                        if (tableTalkChannel != null) {
+                            addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
+                        }
+                        TextChannel actionsChannel = game.getMainGameChannel();
+                        if (actionsChannel != null) {
+                            addRolePermissionsToGameChannel(guild, actionsChannel, role);
+                        }
+                    }
+                    String gameName = game.getName();
+                    List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
+                            .toList();
+                    for (GuildChannel channel : channels) {
+                        addRolePermissionsToGameChannel(guild, channel, role);
+                    }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
     }
 
     private static void addPlayerPermissionsToGameChannel(Guild guild, Game game, GuildChannel channel) {

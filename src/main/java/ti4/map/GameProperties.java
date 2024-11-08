@@ -4,11 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -67,7 +64,6 @@ public class GameProperties {
     private @ExportableField int mapImageGenerationCount;
     private @ExportableField int numberOfPurgedFragments;
     private @ExportableField int pingSystemCounter;
-    private Map<Timestamp, GameStatsDashboardPayload> historicalGameStatsDashboardPayloads = new LinkedHashMap<>();
 
     // Customization Flags/Settings
     private boolean botFactionReacts;

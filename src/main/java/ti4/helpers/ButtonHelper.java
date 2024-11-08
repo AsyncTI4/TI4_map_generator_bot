@@ -778,7 +778,7 @@ public class ButtonHelper {
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, player, false));
+                ACInfo.getDiscardActionCardButtons(player, false));
         }
 
         addReaction(event, true, false, message, "");
@@ -1300,7 +1300,7 @@ public class ButtonHelper {
                 ident + " you are exceeding the AC hand limit of " + limit
                     + ". Please discard down to the limit. Check your cards info thread for the blue discard buttons. ");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                ident + " use buttons to discard", ACInfo.getDiscardActionCardButtons(game, player, false));
+                ident + " use buttons to discard", ACInfo.getDiscardActionCardButtons(player, false));
         }
     }
 
@@ -5033,7 +5033,7 @@ public class ButtonHelper {
 
     public static void cloneGame(GenericInteractionCreateEvent event, Game game) {
         String name = game.getName();
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         String newName = name + "clone";
         Guild guild = game.getGuild();
         Role gameRole = null;
@@ -5095,7 +5095,7 @@ public class ButtonHelper {
                 File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                 Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
-                Game gameToRestore = GameSaveLoadManager.loadMap(originalMapFile);
+                Game gameToRestore = GameSaveLoadManager.loadGame(originalMapFile);
                 gameToRestore.setTableTalkChannelID(chatChannel.getId());
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);
@@ -5108,7 +5108,7 @@ public class ButtonHelper {
                 for (Player player : gameToRestore.getRealPlayers()) {
                     player.setCardsInfoThreadID(null);
                 }
-                GameSaveLoadManager.saveMap(gameToRestore, event);
+                GameSaveLoadManager.saveGame(gameToRestore, event);
             } catch (Exception e) {
 
             }
@@ -6021,16 +6021,20 @@ public class ButtonHelper {
     }
 
     public static boolean isPlayerNew(Game gameOG, Player player) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
-            if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
-                for (Player player2 : game.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        return false;
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
+                    for (Player player2 : game.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            return false;
+                        }
                     }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
         return true;
     }
 
@@ -6526,7 +6530,7 @@ public class ButtonHelper {
             message = p2.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 p2.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, p2, false));
+                ACInfo.getDiscardActionCardButtons(p2, false));
         } else if (p2.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
             message = p2.getFactionEmoji() + " Triggered Autonetic Memory Option";
