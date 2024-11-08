@@ -4,14 +4,14 @@
         "name": "Eternal Watchers",
         "faction": "netharii",
         "window": "Once per combat",
-        "windowEffect": "when a unit is destroyed, you may place it in your home system instead.",
+        "windowEffect": "when a unit is destroyed, you may place it in your home system instead",
         "source": "memephilosopher"
     },
     {
         "id": "limited_presence",
         "name": "Limited Presence",
         "faction": "netharii",
-        "permanentEffect": "You cannot have more than 2 sentinels on a single planet.",
+        "permanentEffect": "You cannot have more than 2 sentinels on a single planet",
         "source": "memephilosopher"
     },
     {
@@ -19,6 +19,13 @@
         "name": "Immovable Guardians",
         "faction": "netharii",
         "permanentEffect": "Your ground forces cannot be removed or destroyed by action cards or agenda effects",
+        "source": "memephilosopher"
+    },
+    {
+        "id": "eon_beam",
+        "name": "Eon Beam",
+        "faction": "netharii",
+        "permanentEffect": "At the end of each round of space combat, your infantry in the active system may use their space cannon abilities",
         "source": "memephilosopher"
     }
 ]
