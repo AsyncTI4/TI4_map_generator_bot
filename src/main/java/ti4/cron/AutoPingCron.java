@@ -1,7 +1,6 @@
 package ti4.cron;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -34,25 +33,7 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
-        Game mapReference = GameManager.getInstance().getGame("finreference");
-        if (mapReference == null) return;
-        long timeSinceLast = System.currentTimeMillis() - mapReference.getLastTimeGamesChecked().getTime();
-
-        if (timeSinceLast > TEN_MINUTES_IN_MILLISECONDS) {
-            mapReference.setLastTimeGamesChecked(new Date());
-            List<String> storedValues = new ArrayList<>(mapReference.getMessagesThatICheckedForAllReacts().keySet());
-            for (String value : storedValues) {
-                if (value.startsWith("gameCreator")) {
-                    mapReference.removeStoredValue(value);
-                }
-            }
-            GameSaveLoadManager.saveGame(mapReference, "Auto Ping");
-            handleAutoPings(GameManager.getInstance().getGameNameToGame().values(), mapReference);
-        }
-    }
-
-    private static void handleAutoPings(Collection<Game> games, Game mapReference) {
-        for (Game game : games) {
+        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
             if (game.isHasEnded()) {
                 continue;
             }
@@ -367,8 +348,11 @@ public class AutoPingCron {
                                         }
                                     }
                                 }
-                                if (player != null)
-                                    ButtonHelper.increasePingCounter(mapReference, player.getUserID());
+
+                                if (player != null) {
+                                    Game mapReference = GameManager.getInstance().getGame("finreference");
+                                    if (mapReference != null) ButtonHelper.increasePingCounter(mapReference, player.getUserID());
+                                }
                             }
                             if (player != null) {
                                 player.setWhetherPlayerShouldBeTenMinReminded(false);
