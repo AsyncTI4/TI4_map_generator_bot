@@ -447,7 +447,7 @@ public class StartPhase extends GameSubcommandData {
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Remember to click Ready for " + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Remember to click Ready for " + (custodiansTaken ? "Agenda" : "Strategy Phase") + " when done with homework!");
         }
         UserJoinServerListener.checkIfCanCloseGameLaunchThread(game, false);
     }
