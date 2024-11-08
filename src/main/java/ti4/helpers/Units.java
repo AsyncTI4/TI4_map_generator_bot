@@ -28,6 +28,7 @@ public class Units {
      */
     @Data
     public static class UnitKey {
+
         private UnitType unitType;
         private String colorID;
 

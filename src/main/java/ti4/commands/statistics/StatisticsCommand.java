@@ -23,11 +23,6 @@ public class StatisticsCommand implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         StatisticsSubcommandData executedCommand = null;
@@ -49,7 +44,7 @@ public class StatisticsCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 
     protected String getActionDescription() {

@@ -1,5 +1,13 @@
 package ti4.buttons;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -91,14 +99,6 @@ import ti4.model.FactionModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -2455,7 +2455,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("getDiscardButtonsACs")
     public static void getDiscardButtonsACs(Player player, Game game) {
         String msg = player.getRepresentationUnfogged() + " use buttons to discard";
-        List<Button> buttons = ACInfo.getDiscardActionCardButtons(game, player, false);
+        List<Button> buttons = ACInfo.getDiscardActionCardButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -2612,7 +2612,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.addReaction(event, true, false, message, "");
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(game, player, false));
+            ACInfo.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.deleteMessage(event);
         ButtonHelper.checkACLimit(game, event, player);
@@ -2860,7 +2860,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ACInfo.sendActionCardInfo(game, player, event);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, player, false));
+                ACInfo.getDiscardActionCardButtons(player, false));
         } else if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
             message = player.getFactionEmoji() + " Triggered Autonetic Memory Option";
@@ -2892,7 +2892,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ACInfo.sendActionCardInfo(game, player, event);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, player, false));
+                ACInfo.getDiscardActionCardButtons(player, false));
 
         } else if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
@@ -3060,7 +3060,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, player, false));
+                ACInfo.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         ButtonHelper.deleteTheOneButton(event);
@@ -3478,7 +3478,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, player, false));
+                ACInfo.getDiscardActionCardButtons(player, false));
         }
 
         ButtonHelper.addReaction(event, false, false, message, "");

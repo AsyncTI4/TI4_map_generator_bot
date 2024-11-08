@@ -8,9 +8,9 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.map.GameSaveLoadManager;
 
 public class PingActivePlayer extends FOWSubcommandData {
 
@@ -32,7 +32,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             return;
         }
         Player playerOrig = Helper.getGamePlayer(game, player, event, null);
-        long milliSinceLastPing = new Date().getTime() - game.getLastActivePlayerPing().getTime();
+        long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
         boolean samePlayer = false;
         if (playerOrig != null) {
             samePlayer = playerOrig.getUserID().equalsIgnoreCase(player.getUserID());
@@ -49,7 +49,7 @@ public class PingActivePlayer extends FOWSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
             game.setLastActivePlayerPing(new Date());
-            GameSaveLoadManager.saveMap(game, "Auto Ping");
+            GameSaveLoadManager.saveGame(game, "Auto Ping");
         }
         ButtonHelper.increasePingCounter(GameManager.getInstance().getGame("finreference"), player.getUserID());
     }

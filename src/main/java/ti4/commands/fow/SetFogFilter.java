@@ -7,7 +7,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class SetFogFilter extends FOWSubcommandData {
@@ -45,6 +47,6 @@ public class SetFogFilter extends FOWSubcommandData {
         }
 
         player.setFogFilter(color_suffix);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 }

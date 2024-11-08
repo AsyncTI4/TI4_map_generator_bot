@@ -1553,7 +1553,7 @@ public class ButtonHelperHeroes {
                 "The Voice United, the Cymiae hero, has given " + Mapper.getActionCard(acID).getName()
                     + " to you and you now have to discard 1A.C");
             String msg = p2.getRepresentationUnfogged() + " use buttons to discard.";
-            List<Button> buttons = ACInfo.getDiscardActionCardButtons(game, p2, false);
+            List<Button> buttons = ACInfo.getDiscardActionCardButtons(p2, false);
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
         }
     }

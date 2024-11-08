@@ -32,6 +32,6 @@ public class SetUpPeakableObjectives extends CustomSubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(),
             "Set up objective decks. Check map to confirm remaining unrevealed objectives.");
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 }

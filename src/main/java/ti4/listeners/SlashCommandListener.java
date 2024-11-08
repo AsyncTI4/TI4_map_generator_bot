@@ -20,9 +20,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import javax.annotation.Nonnull;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public class SlashCommandListener extends ListenerAdapter {
     @Override
@@ -32,7 +30,7 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
 
         String userID = event.getUser().getId();
         // CHECK IF CHANNEL IS MATCHED TO A GAME
@@ -79,7 +77,6 @@ public class SlashCommandListener extends ListenerAdapter {
                     && !event.getInteraction().getName().equals(Constants.USER)
                         & !event.getInteraction().getName().equals(Constants.SHOW_GAME)
                     && event.getOption(Constants.GAME_NAME) == null) {
-
                 } else {
                     harmless = true;
                 }
@@ -114,7 +111,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 }
             }
         }
-        long endTime = new Date().getTime();
+        long endTime = System.currentTimeMillis();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This slash command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }
@@ -145,7 +142,7 @@ public class SlashCommandListener extends ListenerAdapter {
         String channelName = channel.getName();
         GameManager gameManager = GameManager.getInstance();
         Game userActiveGame = gameManager.getUserActiveGame(userID);
-        Set<String> mapList = gameManager.getGameNameToGame().keySet();
+        List<String> mapList = gameManager.getGameNames();
 
         String gameID = StringUtils.substringBefore(channelName, "-");
         boolean gameExists = mapList.contains(gameID);
@@ -177,7 +174,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 // MessageHelper.sendMessageToChannel(channel,"Active game reset. Channel name
                 // indicates to have map associated with it. Please select correct active game
                 // or do action in neutral channel");
-                gameManager.resetMapForUser(userID);
+                gameManager.resetGameForUser(userID);
             }
         }
         return true;

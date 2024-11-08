@@ -2,10 +2,9 @@ package ti4.helpers;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.leaders.RefreshLeader;
@@ -180,7 +179,7 @@ public class ExploreHelper {
                     message = player.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                         player.getRepresentationUnfogged() + " use buttons to discard",
-                        ACInfo.getDiscardActionCardButtons(game, player, false));
+                        ACInfo.getDiscardActionCardButtons(player, false));
                 } else {
                     game.drawActionCard(player.getUserID());
                     message = player.getFactionEmoji() + " Drew 1 AC";

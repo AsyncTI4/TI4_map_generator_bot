@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -31,6 +30,6 @@ public class ControlGameCreation extends BothelperSubcommandData {
             mapreference.setStoredValue("allowedButtonPress", "true");
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set game creation button presses as allowed");
         }
-        GameSaveLoadManager.saveMap(mapreference, "Updated Setting");
+        GameSaveLoadManager.saveGame(mapreference, "Updated Setting");
     }
 }

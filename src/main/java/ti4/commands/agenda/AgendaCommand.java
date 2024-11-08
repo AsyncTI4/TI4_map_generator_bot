@@ -1,19 +1,19 @@
 package ti4.commands.agenda;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.cardsac.ACCardsCommand;
 import ti4.helpers.Constants;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class AgendaCommand implements Command {
 
@@ -26,7 +26,7 @@ public class AgendaCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return ACCardsCommand.acceptEvent(event, getActionID());
+        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AgendaCommand implements Command {
 
         Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
         if (game != null) {
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
         }
         if (executedCommand != null) {
             // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());
