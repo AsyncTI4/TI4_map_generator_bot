@@ -52,6 +52,6 @@ public class AddBorderAnomaly extends MapSubcommandData {
         }
 
         game.addBorderAnomaly(tile, directionVal, anomalyType);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

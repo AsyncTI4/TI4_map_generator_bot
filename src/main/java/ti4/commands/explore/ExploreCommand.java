@@ -1,5 +1,9 @@
 package ti4.commands.explore;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -8,10 +12,6 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
 
 public class ExploreCommand implements Command {
 
@@ -27,6 +27,11 @@ public class ExploreCommand implements Command {
     }
 
     @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(getActionID());
+    }
+
+    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         for (ExploreSubcommandData subcommand : subcommandData) {
@@ -38,7 +43,7 @@ public class ExploreCommand implements Command {
         }
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 
     private Collection<ExploreSubcommandData> getSubcommands() {

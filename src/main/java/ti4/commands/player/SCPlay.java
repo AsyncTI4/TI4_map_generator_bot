@@ -1,5 +1,11 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -30,11 +36,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.StrategyCardModel;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
@@ -228,7 +229,7 @@ public class SCPlay extends PlayerSubcommandData {
             }
             game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl());
             game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId());
-            game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, System.currentTimeMillis() + "");
+            game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction()).isEmpty()) {
                     game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());

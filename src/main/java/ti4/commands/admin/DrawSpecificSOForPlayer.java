@@ -40,7 +40,7 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
         MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
     }
 }

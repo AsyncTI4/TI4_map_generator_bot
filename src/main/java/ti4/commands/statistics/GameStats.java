@@ -1,5 +1,22 @@
 package ti4.commands.statistics;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
+import java.text.DecimalFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -7,7 +24,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.generator.Mapper;
@@ -20,19 +36,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
-
-import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class GameStats extends StatisticsSubcommandData {
 
@@ -75,6 +78,7 @@ public class GameStats extends StatisticsSubcommandData {
             case FACTION_WINS -> showMostWinningFactions(event);
             case PHASE_TIMES -> showTimeOfRounds(event);
             case SOS_SCORED -> listScoredSOsPulledRelicsRevealedPOs(event);
+            //case UNFINISHED_GAMES -> findHowManyUnfinishedGamesAreDueToNewPlayers(event);
             case FACTION_WIN_PERCENT -> showFactionWinPercent(event);
             case COLOUR_WINS -> showMostWinningColour(event);
             case GAME_COUNT -> showGameCount(event);
@@ -228,6 +232,7 @@ public class GameStats extends StatisticsSubcommandData {
         int index = 1;
         StringBuilder sb = new StringBuilder("List of times a particular secret has been scored\n");
         for (String ket : topThousand.keySet()) {
+
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
@@ -242,6 +247,7 @@ public class GameStats extends StatisticsSubcommandData {
         index = 1;
         sb = new StringBuilder("List of times a particular public has been revealed \n");
         for (String ket : topThousand.keySet()) {
+
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
@@ -256,6 +262,7 @@ public class GameStats extends StatisticsSubcommandData {
         index = 1;
         sb = new StringBuilder("List of times a particular relic has been drawn \n");
         for (String ket : topThousand.keySet()) {
+
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
@@ -317,6 +324,63 @@ public class GameStats extends StatisticsSubcommandData {
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Expenses", names.toString());
     }
 
+    public static boolean hasPlayerFinishedAGame(Player player) {
+        String userID = player.getUserID();
+
+        Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
+        Predicate<Game> endedGamesFilter = game -> game.getWinner().isPresent();
+        Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
+
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
+
+        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(allFilterPredicates)
+            .sorted(mapSort)
+            .toList();
+        return !games.isEmpty();
+    }
+
+    public static int numberOfPlayersUnfinishedGames(String userID) {
+        Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
+        Predicate<Game> endedGamesFilter = game -> game.isHasEnded() && game.getWinner().isEmpty() && game.getHighestScore() > 0;
+        Predicate<Game> allFilterPredicates = endedGamesFilter.and(ignoreSpectateFilter);
+
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
+
+        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(allFilterPredicates)
+            .sorted(mapSort)
+            .toList();
+        return games.size();
+    }
+
+    public static void findHowManyUnfinishedGamesAreDueToNewPlayers(SlashCommandInteractionEvent event) {
+        StringBuilder names = new StringBuilder();
+        int num = 0;
+        Predicate<Game> allFilterPredicates = game1 -> game1.isHasEnded() && game1.getWinner().isEmpty() && game1.getHighestScore() > 0;
+
+        Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
+
+        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+            .filter(allFilterPredicates)
+            .sorted(mapSort)
+            .toList();
+        for (Game game : games) {
+            num++;
+            names.append(num).append(". ").append(game.getName());
+            if (isNotBlank(game.getCustomName())) {
+                names.append(" (").append(game.getCustomName()).append(")");
+            }
+            for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
+                if (!hasPlayerFinishedAGame(player)) {
+                    names.append(" ").append(player.getUserName()).append(" had not finished any games and had ").append(numberOfPlayersUnfinishedGames(player.getUserID())).append(" unfinished games. ");
+                }
+            }
+            names.append("\n");
+        }
+        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Names", names.toString());
+    }
+
     public static void showGameLengths(SlashCommandInteractionEvent event, Integer pastDays) {
         List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
         if (pastDays == null) pastDays = 3650;
@@ -325,7 +389,7 @@ public class GameStats extends StatisticsSubcommandData {
         Map<String, Integer> endedGames = new HashMap<>();
         for (Game game : filteredGames) {
             if (game.isHasEnded() && game.getWinner().isPresent() && game.getPlayerCountForMap() > 2
-                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis())) < pastDays) {
+                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
                 num++;
                 int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
                 endedGames.put(game.getName() + " (" + game.getPlayerCountForMap() + "p, " + game.getVp() + "pt)", dif);
@@ -333,24 +397,22 @@ public class GameStats extends StatisticsSubcommandData {
             }
         }
         StringBuilder longMsg = new StringBuilder("The number of games that finished in the last " + pastDays + " days is " + num + ". They are listed below based on the number of days it took to complete\n");
-        if (num != 0) {
-            Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
-            int num2 = 0;
-            for (String command : sortedMapAsc.keySet()) {
-                num2++;
-                longMsg.append(num2).append(". ").append(command).append(": ")
-                        .append(sortedMapAsc.get(command)).append(" \n");
-            }
-            longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
+        Map<String, Integer> sortedMapAsc = ListSlashCommandsUsed.sortByValue(endedGames, false);
+        int num2 = 0;
+        for (String command : sortedMapAsc.keySet()) {
+            num2++;
+            longMsg.append(num2).append(". ").append(command).append(": ")
+                .append(sortedMapAsc.get(command)).append(" \n");
         }
+        longMsg.append("\n The average completion time of these games is: ").append(total / num).append("\n");
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Game Lengths", longMsg.toString());
     }
 
-    private static void showMostPlayedFactions(SlashCommandInteractionEvent event) {
-        List<Game> filteredGames = GameStatisticFilterer.getFilteredGames(event);
+    private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> custodians = new HashMap<>();
-        for (Game game : filteredGames) {
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        for (Game game : mapList.values()) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
                 factionCount.put(faction,
@@ -620,30 +682,25 @@ public class GameStats extends StatisticsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Time Per Phase:").append("\n");
-        timeCount.forEach((key, value) -> sb.append(key).append(": ")
-                .append(StringUtils.leftPad(convertMillisecondsToDays((float) value / amountCount.get(key)), 4)).append(" days (based on ").append(amountCount.get(key)).append(" games)")
+        timeCount.entrySet()
+            .forEach(entry -> sb.append(entry.getKey()).append(": ")
+                .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4)).append(" days (based on ").append(amountCount.get(entry.getKey())).append(" games)")
                 .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }
 
     private static void showMostWinningColour(GenericInteractionCreateEvent event) {
         Map<String, Integer> winnerColorCount = new HashMap<>();
-
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            for (Game game : pagedGames.getGames()) {
-                Optional<Player> winner = game.getWinner();
-                if (winner.isEmpty()) {
-                    continue;
-                }
-                String winningColor = winner.get().getColor();
-                winnerColorCount.put(winningColor, 1 + winnerColorCount.getOrDefault(winningColor, 0));
+        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        for (Game game : mapList.values()) {
+            Optional<Player> winner = game.getWinner();
+            if (winner.isEmpty()) {
+                continue;
             }
-        } while (pagedGames.hasNextPage());
-
-
+            String winningColor = winner.get().getColor();
+            winnerColorCount.put(winningColor,
+                1 + winnerColorCount.getOrDefault(winningColor, 0));
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Wins per Colour:").append("\n");
         winnerColorCount.entrySet().stream()

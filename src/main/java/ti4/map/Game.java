@@ -62,6 +62,8 @@ import ti4.model.UnitModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -172,8 +174,8 @@ public class Game extends GameProperties {
     private TIGLRank minimumTIGLRankAtGameStart;
 
     public Game() {
-        setCreationDate(Helper.getDateRepresentation(System.currentTimeMillis()));
-        setLastModifiedDate(System.currentTimeMillis());
+        setCreationDate(Helper.getDateRepresentation(new Date().getTime()));
+        setLastModifiedDate(new Date().getTime());
 
         miltyDraftManager = new MiltyDraftManager();
     }
@@ -496,10 +498,9 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public String getGameModesText() {
-        boolean isNormalGame = isNormalGame();
         Map<String, Boolean> gameModes = new HashMap<>() {
             {
-                put(Emojis.TI4PoK + "Normal", isNormalGame);
+                put(Emojis.TI4PoK + "Normal", isNormalGame());
                 put(Emojis.TI4BaseGame + "Base Game", isBaseGameMode());
                 put(Emojis.MiltyMod + "MiltyMod", isMiltyModMode());
                 put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
@@ -515,7 +516,7 @@ public class Game extends GameProperties {
                 put("HomebrewSC", isHomebrewSCMode());
                 put("Little Omega", isLittleOmega());
                 put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
-                put("Homebrew", !isNormalGame);
+                put("Homebrew", hasHomebrew());
             }
         };
         for (String tag : getTags()) {
@@ -3213,8 +3214,13 @@ public class Game extends GameProperties {
         return controlMap;
     }
 
-    public Player addPlayer(String id, String name) {
-        Player player = new Player(id, name, this);
+    public void addPlayer(String id, String name) {
+        Player player = new Player(id, name, getName());
+        players.put(id, player);
+    }
+
+    public Player addPlayerLoad(String id, String name) {
+        Player player = new Player(id, name, getName());
         players.put(id, player);
         return player;
     }
@@ -3419,7 +3425,7 @@ public class Game extends GameProperties {
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate + " - the game flag `hasEnded` has been set to true");
             setHasEnded(true);
-            GameSaveLoadManager.saveGame(this, "Game ended");
+            GameSaveLoadManager.saveMap(this, "Game ended");
         }
     }
 
@@ -4085,10 +4091,9 @@ public class Game extends GameProperties {
                 .map(Mapper::getFaction)
                 .filter(Objects::nonNull)
                 .anyMatch(faction -> !faction.getSource().isOfficial())
-            || getRealAndEliminatedAndDummyPlayers().stream().map(Player::getLeaderIDs)
-                .flatMap(Collection::stream)
-                .map(Mapper::getLeader)
-                .anyMatch(leader -> !leader.getSource().isOfficial())
+            || Mapper.getLeaders().values().stream()
+                .filter(leader -> !leader.getSource().isOfficial())
+                .anyMatch(leader -> isLeaderInGame(leader.getID()))
             || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
             || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()
@@ -4244,5 +4249,15 @@ public class Game extends GameProperties {
             }
         }
         return false;
+    }
+
+    @JsonIgnore
+    public String getGameStatsDashboardJSON() {
+        return new GameStatsDashboardPayload(this).getJson();
+    }
+
+    public void addHistoricalGameStatsDashboardPayload() {
+        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(this);
+        getHistoricalGameStatsDashboardPayloads().put(Timestamp.from(Instant.now()), payload);
     }
 }

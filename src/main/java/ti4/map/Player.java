@@ -81,7 +81,6 @@ public class Player {
     private String userName;
 
     private String gameID;
-    private final Game game;
     private boolean tenMinReminderPing;
 
     private boolean passed;
@@ -227,15 +226,19 @@ public class Player {
 
     private final Tile nomboxTile = new Tile("nombox", "nombox");
 
-    public Player(String userID, String userName, Game game) {
+    public Player() {
+    }
+
+    public Player(@JsonProperty("userID") String userID, @JsonProperty("userName") String userName,
+        @JsonProperty("gameID") String gameID) {
         this.userID = userID;
         this.userName = userName;
-        this.game = game;
+        this.gameID = gameID;
     }
 
     @JsonIgnore
     public Game getGame() {
-        return game;
+        return GameManager.getInstance().getGame(gameID);
     }
 
     @JsonIgnore
@@ -503,7 +506,9 @@ public class Player {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
             return null;
+
         }
+
     }
 
     public String getCardsInfoThreadID() {

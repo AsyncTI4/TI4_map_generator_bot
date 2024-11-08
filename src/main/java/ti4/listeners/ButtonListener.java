@@ -1,5 +1,13 @@
 package ti4.listeners;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -22,13 +30,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
-import javax.annotation.Nonnull;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class ButtonListener extends ListenerAdapter {
     public static ButtonListener instance = null;
@@ -58,7 +59,7 @@ public class ButtonListener extends ListenerAdapter {
             event.deferEdit().queue();
         }
         BotLogger.logButton(event);
-        long startTime = System.currentTimeMillis();
+        long startTime = new Date().getTime();
         try {
             ButtonContext context = new ButtonContext(event);
             if (context.isValid()) {
@@ -68,7 +69,7 @@ public class ButtonListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-        long endTime = System.currentTimeMillis();
+        long endTime = new Date().getTime();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }
