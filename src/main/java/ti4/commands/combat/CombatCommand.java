@@ -1,18 +1,17 @@
 package ti4.commands.combat;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import ti4.message.MessageHelper;
 
 public class CombatCommand implements Command {
     private final Collection<CombatSubcommandData> subcommandData = getSubcommands();
@@ -24,7 +23,21 @@ public class CombatCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        if (event.getName().equals(getActionID())) {
+            String userID = event.getUser().getId();
+            GameManager gameManager = GameManager.getInstance();
+            if (!gameManager.isUserWithActiveGame(userID)) {
+                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+                return false;
+            }
+            Game userActiveGame = gameManager.getUserActiveGame(userID);
+            if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -49,7 +62,7 @@ public class CombatCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 
     protected String getActionDescription() {

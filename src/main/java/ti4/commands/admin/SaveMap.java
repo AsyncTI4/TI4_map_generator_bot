@@ -23,12 +23,12 @@ public class SaveMap extends AdminSubcommandData {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!GameManager.getInstance().isValidGame(mapName)) {
+            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
                 return;
             }
             Game game = GameManager.getInstance().getGame(mapName);
-            GameSaveLoadManager.saveGame(game, event);
+            GameSaveLoadManager.saveMap(game, event);
             MessageHelper.sendMessageToEventChannel(event, "Save map: " + game.getName());
 
         } else {

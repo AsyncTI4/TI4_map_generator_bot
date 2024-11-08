@@ -11,9 +11,7 @@ import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.Player;
+import ti4.map.*;
 import ti4.message.MessageHelper;
 
 public class AddFogTile extends FOWSubcommandData {
@@ -67,6 +65,6 @@ public class AddFogTile extends FOWSubcommandData {
 
         //add the custom tile to the player
         player.addFogTile(planetTileName, position, label);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

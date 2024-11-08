@@ -1,5 +1,11 @@
 package ti4.commands.special;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -24,12 +30,6 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Rematch extends SpecialSubcommandData {
     public Rematch() {
@@ -193,7 +193,7 @@ public class Rematch extends SpecialSubcommandData {
         buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
         buttons2.add(Buttons.red("deleteButtons", "No Homebrew"));
         MessageHelper.sendMessageToChannel(actionsChannel, "If you plan to have a supported homebrew mode in this game, please indicate so with these buttons", buttons2);
-        GameSaveLoadManager.saveGame(newGame, event);
+        GameSaveLoadManager.saveMap(newGame, event);
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
         }

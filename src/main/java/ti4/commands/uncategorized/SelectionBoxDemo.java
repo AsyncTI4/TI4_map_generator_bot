@@ -14,6 +14,11 @@ public class SelectionBoxDemo implements Command {
     }
 
     @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(getActionID());
+    }
+
+    @Override
     public void execute(SlashCommandInteractionEvent event) {
         BigSelectDemo.serveDemoSelectMenu(event);
     }

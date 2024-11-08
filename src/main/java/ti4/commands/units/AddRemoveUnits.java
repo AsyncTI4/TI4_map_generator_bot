@@ -1,5 +1,10 @@
 package ti4.commands.units;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import com.amazonaws.util.CollectionUtils;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -30,11 +35,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -77,7 +77,7 @@ abstract public class AddRemoveUnits implements Command {
         }
         new AddUnits().actionAfterAll(event, tile, color, game);
 
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
 
         boolean generateMap = !event.getOption(Constants.NO_MAPGEN, false, OptionMapping::getAsBoolean);
         if (generateMap) {
@@ -366,6 +366,11 @@ abstract public class AddRemoveUnits implements Command {
 
     protected void actionAfterAll(GenericInteractionCreateEvent event, Tile tile, String color, Game game) {
         // do nothing, overriden by child classes
+    }
+
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(getActionID());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

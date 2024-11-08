@@ -44,6 +44,7 @@ import ti4.model.PromissoryNoteModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -103,7 +104,7 @@ public class StartPhase extends GameSubcommandData {
             case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
             case "pbd1000decks" -> {
                 game.pbd1000decks();
-                GameSaveLoadManager.saveGame(game, event);
+                GameSaveLoadManager.saveMap(game, event);
             }
             case "action" -> startActionPhase(event, game);
             case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);
@@ -261,7 +262,7 @@ public class StartPhase extends GameSubcommandData {
             pickSCMsg = "Use buttons to pick the strategy card you want to give someone else.";
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
-        game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
+        game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", new Date().getTime() + "");
         if (game.isFowMode()) {
             if (!game.isHomebrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(event, game, speaker));
@@ -334,7 +335,7 @@ public class StartPhase extends GameSubcommandData {
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("statusHomework");
-        game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
+        game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", new Date().getTime() + "");
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {

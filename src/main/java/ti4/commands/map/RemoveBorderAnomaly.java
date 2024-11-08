@@ -41,6 +41,6 @@ public class RemoveBorderAnomaly extends MapSubcommandData {
         }
 
         game.removeBorderAnomaly(tile, directionVal);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
     }
 }

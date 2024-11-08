@@ -7,9 +7,7 @@ public interface Command {
     String getActionID();
 
     //If command can be executed for given command text
-    default boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
+    boolean accept(SlashCommandInteractionEvent event);
 
     //Command action execution method
     void execute(SlashCommandInteractionEvent event);

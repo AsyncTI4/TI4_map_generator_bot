@@ -53,7 +53,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
         MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
         SOInfo.sendSecretObjectiveInfo(game, game.getPlayer(user.getId()));
     }

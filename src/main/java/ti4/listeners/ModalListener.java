@@ -1,5 +1,12 @@
 package ti4.listeners;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
@@ -8,11 +15,6 @@ import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
 import ti4.map.Game;
 import ti4.message.BotLogger;
-
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class ModalListener extends ListenerAdapter {
     public static ModalListener instance = null;
@@ -36,7 +38,7 @@ public class ModalListener extends ListenerAdapter {
             return;
         }
         event.deferEdit().queue();
-        long startTime = System.currentTimeMillis();
+        long startTime = new Date().getTime();
         try {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
@@ -45,7 +47,7 @@ public class ModalListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-        long endTime = System.currentTimeMillis();
+        long endTime = new Date().getTime();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }

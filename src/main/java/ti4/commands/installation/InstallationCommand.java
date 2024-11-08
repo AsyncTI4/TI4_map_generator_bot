@@ -1,5 +1,6 @@
 package ti4.commands.installation;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -7,7 +8,6 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -28,7 +28,22 @@ public class InstallationCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        if (event.getName().equals(getActionID())) {
+            User user = event.getUser();
+            String userID = user.getId();
+            GameManager gameManager = GameManager.getInstance();
+            if (!gameManager.isUserWithActiveGame(userID)) {
+                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+                return false;
+            }
+            Game userActiveGame = gameManager.getUserActiveGame(userID);
+            if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -53,7 +68,7 @@ public class InstallationCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
         MapRenderPipeline.renderToWebsiteOnly(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }

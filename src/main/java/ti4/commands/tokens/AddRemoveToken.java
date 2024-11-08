@@ -1,5 +1,9 @@
 package ti4.commands.tokens;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -18,10 +22,6 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
 abstract public class AddRemoveToken implements Command {
 
@@ -92,11 +92,16 @@ abstract public class AddRemoveToken implements Command {
         for (Tile tile : tiles) {
             parsingForTile(event, colors, tile, game);
         }
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
         ShowGame.simpleShowGame(game, event);
     }
 
     abstract void parsingForTile(SlashCommandInteractionEvent event, List<String> color, Tile tile, Game game);
+
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(getActionID());
+    }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override

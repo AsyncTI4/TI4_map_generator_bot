@@ -69,7 +69,7 @@ public class ChangeUnitDecal extends PlayerSubcommandData {
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
+        GameSaveLoadManager.saveMap(game, event);
         ShowGame.simpleShowGame(game, event);
     }
 }

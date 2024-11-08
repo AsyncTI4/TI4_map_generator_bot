@@ -77,7 +77,7 @@ public class Undo extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
             return;
         }
-        Game gameToRestore = GameSaveLoadManager.loadGame(undoFileToRestore);
+        Game gameToRestore = GameSaveLoadManager.loadMap(undoFileToRestore);
         if (gameToRestore == null) {
             MessageHelper.replyToMessage(event,
                 "Undo failed - Couldn't load game to undo back to: " + undoFileToRestorePath);
@@ -159,6 +159,6 @@ public class Undo extends GameSubcommandData {
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
         return Arrays.stream(mapUndoFiles).map(Storage::getGameUndoStorage)
-            .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadGame));
+            .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadMap));
     }
 }

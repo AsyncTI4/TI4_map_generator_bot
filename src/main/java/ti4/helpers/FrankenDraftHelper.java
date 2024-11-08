@@ -1,5 +1,10 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -19,11 +24,6 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class FrankenDraftHelper {
 
@@ -63,14 +63,14 @@ public class FrankenDraftHelper {
                     player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     showPlayerBag(game, player);
-                    GameSaveLoadManager.saveGame(game, player.getUserName() + " reset their draft queue");
+                    GameSaveLoadManager.saveMap(game, player.getUserName() + " reset their draft queue");
                     return;
                 }
                 case "confirm_draft" -> {
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
                     draft.setPlayerReadyToPass(player, true);
-                    GameSaveLoadManager.saveGame(game, player.getUserName() + " confirmed their draft picks");
+                    GameSaveLoadManager.saveMap(game, player.getUserName() + " confirmed their draft picks");
 
                     // Clear out all existing messages
                     draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
@@ -119,7 +119,7 @@ public class FrankenDraftHelper {
 
         showPlayerBag(game, player);
 
-        GameSaveLoadManager.saveGame(game, player.getUserName() + " did something");
+        GameSaveLoadManager.saveMap(game, player.getUserName() + " did something");
         event.getMessage().delete().queue();
     }
 
@@ -286,7 +286,7 @@ public class FrankenDraftHelper {
             "> Once you have made your " + next + " pick" + (next == 1 ? "" : "s") + " (" + first + " in the first bag), the bags will automatically be passed once everyone is ready.";
 
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
-        GameSaveLoadManager.saveGame(game, "Franken draft was started");
+        GameSaveLoadManager.saveMap(game, "Franken draft was started");
     }
 
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {
