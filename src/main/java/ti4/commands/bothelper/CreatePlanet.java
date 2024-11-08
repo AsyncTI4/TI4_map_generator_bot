@@ -1,5 +1,12 @@
 package ti4.commands.bothelper;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -16,13 +23,6 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.Source;
 import ti4.model.TechSpecialtyModel;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class CreatePlanet extends BothelperSubcommandData {
     public CreatePlanet() {
@@ -91,7 +91,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         }
 
         String message = "Created new planet! Please check and make sure everything generated properly. This is the model:\n" +
-            "```json\n" + TileHelper.getAllPlanets().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```";
+            "```json\n" + TileHelper.getPlanetIdsToPlanetModels().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```";
         MessageHelper.sendMessageToChannelWithEmbed(event.getChannel(), message, planet.getRepresentationEmbed(true));
     }
 

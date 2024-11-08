@@ -16,6 +16,12 @@ import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 
+import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
+import ti4.helpers.Units.UnitType;
+import ti4.map.Game;
+
 public class RegexHelper {
 
     public static boolean runMatcher(String regex, String buttonID, Consumer<Matcher> function) {
@@ -152,7 +158,7 @@ public class RegexHelper {
 
     /** @return group "tileID" matching any legal tile ID in the bot */
     public static String tileIDRegex() {
-        return regexBuilder("tileID", TileHelper.getAllTiles().keySet());
+        return regexBuilder("tileID", TileHelper.getTileIdsToTileModels().keySet());
     }
 
     /** @return group matching any planet on the map, and also "space" */

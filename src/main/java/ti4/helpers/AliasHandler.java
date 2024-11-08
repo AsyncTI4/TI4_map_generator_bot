@@ -158,8 +158,8 @@ public class AliasHandler {
     }
 
     public static void initAliases() {
-        TileHelper.getAllTiles().values().forEach(AliasHandler::addNewTileAliases);
-        TileHelper.getAllPlanets().values().forEach(AliasHandler::addNewPlanetAliases);
+        TileHelper.getTileIdsToTileModels().values().forEach(AliasHandler::addNewTileAliases);
+        TileHelper.getPlanetIdsToPlanetModels().values().forEach(AliasHandler::addNewPlanetAliases);
     }
 
     public static void addNewPlanetAliases(PlanetModel planetModel) {
@@ -223,7 +223,7 @@ public class AliasHandler {
     }
 
     public static List<String> getPlanetKeyList() {
-        return TileHelper.getAllPlanets().values().stream()
+        return TileHelper.getPlanetIdsToPlanetModels().values().stream()
             .map(PlanetModel::getId)
             .toList();
     }
@@ -341,13 +341,13 @@ public class AliasHandler {
     }
 
     public static Map<String, String> getPlanetAliasEntryList() {
-        return TileHelper.getAllPlanets().values().stream()
+        return TileHelper.getPlanetIdsToPlanetModels().values().stream()
             .collect(Collectors.toMap(PlanetModel::getId,
                 planetModel -> StringUtils.join(Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 
     public static Map<String, String> getTileAliasEntryList() {
-        return TileHelper.getAllTiles().values().stream()
+        return TileHelper.getTileIdsToTileModels().values().stream()
             .collect(Collectors.toMap(TileModel::getId,
                 tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }

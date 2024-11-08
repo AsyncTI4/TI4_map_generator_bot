@@ -1,16 +1,15 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
-
 import ti4.generator.TileHelper;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TileModelTest extends BaseTi4Test {
     @Test
     public void testTiles() {
-        for (TileModel model : TileHelper.getAllTiles().values()) {
+        for (TileModel model : TileHelper.getTileIdsToTileModels().values()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validatePlanetIDs(model), model.getAlias() + ": invalid Planet IDs: " + model.getPlanets());
         }
@@ -19,7 +18,7 @@ public class TileModelTest extends BaseTi4Test {
     private boolean validatePlanetIDs(TileModel model) {
         if (model.getPlanets() == null) return true;
         for (String planetId : model.getPlanets()) {
-            if (!TileHelper.getAllPlanets().containsKey(planetId)) return false;
+            if (!TileHelper.getPlanetIdsToPlanetModels().containsKey(planetId)) return false;
         }
         return true;
     }

@@ -90,7 +90,7 @@ public class DrawRedBackTile extends DiscordantStarsSubcommandData {
         for (int i = 0; i < count; i++) {
             String tileID = tilesToPullFrom.get(i);
             ids.add(tileID);
-            TileModel tile = TileHelper.getTile(tileID);
+            TileModel tile = TileHelper.getTileById(tileID);
             tileEmbeds.add(tile.getHelpMessageEmbed(false));
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " red back tiles from this list:\n> " + tileToPullFromUnshuffled);

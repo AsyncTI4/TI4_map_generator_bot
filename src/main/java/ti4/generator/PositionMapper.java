@@ -1,5 +1,21 @@
 package ti4.generator;
 
+import java.awt.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -9,14 +25,6 @@ import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
 import ti4.model.TileModel;
-
-import java.awt.*;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.*;
-import java.util.stream.Collectors;
 
 //Handles positions of map
 public class PositionMapper {
@@ -54,15 +62,13 @@ public class PositionMapper {
         if ("nombox".equals(tileID)) {
             return null;
         }
-        return TileHelper.getAllPlanets().values().stream()
-            .filter(planetModel -> Optional.ofNullable(planetModel.getTileId()).isPresent())
-            .filter(planetModel -> planetModel.getTileId().equals(tileID))
-            .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
+        return TileHelper.getPlanetsByTileId(tileID).stream()
+                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {
         List<Point> backup = List.of(new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 190), new Point(60, 130));
-        TileModel tile = TileHelper.getAllTiles().get(tileID);
+        TileModel tile = TileHelper.getTileById(tileID);
 
         if (Optional.ofNullable(tile.getShipPositionsType()).isPresent()) {
             return Optional.ofNullable(tile.getShipPositionsType().getSpaceTokenLayout()).orElse(backup);
@@ -153,7 +159,7 @@ public class PositionMapper {
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
         if ("space".equals(planetName))
             return null;
-        UnitTokenPosition pos = TileHelper.getAllPlanets().get(planetName).getUnitPositions();
+        UnitTokenPosition pos = TileHelper.getPlanetById(planetName).getUnitPositions();
         return SerializationUtils.clone(pos);
     }
 
@@ -187,13 +193,10 @@ public class PositionMapper {
     }
 
     public static String getTileSpaceUnitLayout(String tileId) {
-        return Optional.ofNullable(TileHelper.getAllTiles().get(tileId).getShipPositionsType())
+        return Optional.ofNullable(TileHelper.getTileById(tileId).getShipPositionsType())
             .orElse(ShipPositionModel.ShipPosition.TYPE08).getPositions();
     }
 
-    /**
-     * <p>See {@link ShipPositionModel#getPositions()}</p>
-     */
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
         String shipPositionString = getTileSpaceUnitLayout(tileID);
 

@@ -32,7 +32,7 @@ public class SearchPlanets extends SearchComponentModel {
             return;
         }
 
-        List<MessageEmbed> messageEmbeds = TileHelper.getAllPlanets().values().stream()
+        List<MessageEmbed> messageEmbeds = TileHelper.getPlanetIdsToPlanetModels().values().stream()
             .filter(model -> model.search(searchString, source))
             .sorted(Comparator.comparing(PlanetModel::getId))
             .map(model -> model.getRepresentationEmbed(true))
