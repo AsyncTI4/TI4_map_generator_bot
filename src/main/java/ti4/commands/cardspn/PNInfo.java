@@ -28,10 +28,6 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
         super(Constants.INFO, "Send your Promissory Notes to your Cards Info thread");
     }
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
-    }
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();

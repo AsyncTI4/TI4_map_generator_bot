@@ -28,10 +28,6 @@ public class SOInfo extends SOCardsSubcommandData implements InfoThreadCommand {
         super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread");
     }
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
-    }
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();

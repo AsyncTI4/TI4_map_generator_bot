@@ -34,10 +34,6 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
         return "Sends list of owned planets to your Cards-Info thread";
     }
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
-    }
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getUser();

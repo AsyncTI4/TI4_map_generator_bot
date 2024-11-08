@@ -6,7 +6,7 @@ import ti4.helpers.SlashCommandAcceptanceHelper;
 public interface InfoThreadCommand {
     String getActionID();
 
-    default boolean acceptEvent(SlashCommandInteractionEvent event) {
+    default boolean accept(SlashCommandInteractionEvent event) {
         return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
     }
 }

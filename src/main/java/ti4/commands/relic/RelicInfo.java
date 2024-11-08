@@ -24,10 +24,6 @@ public class RelicInfo extends RelicSubcommandData implements InfoThreadCommand 
         super(Constants.RELIC_INFO, "Send relic information to your Cards Info channel");
     }
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
-    }
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();

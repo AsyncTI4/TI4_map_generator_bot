@@ -1,5 +1,9 @@
 package ti4.commands.cardsac;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -18,17 +22,9 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public ACInfo() {
         super(Constants.INFO, "Send Action Cards to your Cards Info thread");
-    }
-
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
     }
 
     @Override

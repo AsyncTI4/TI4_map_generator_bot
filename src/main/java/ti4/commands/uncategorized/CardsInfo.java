@@ -36,10 +36,6 @@ public class CardsInfo implements Command, InfoThreadCommand {
         return Constants.CARDS_INFO;
     }
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
-    }
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
