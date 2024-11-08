@@ -118,7 +118,7 @@ public class MessageListener extends ListenerAdapter {
         if (mapreference == null) return;
         int multiplier = 1000; // should be 1000
         int tenMin = 10 * 60 * multiplier; // 10 minutes
-        long timeSinceLast = (System.currentTimeMillis()) - mapreference.getLastTimeGamesChecked().getTime();
+        long timeSinceLast = System.currentTimeMillis() - mapreference.getLastTimeGamesChecked().getTime();
 
         if (timeSinceLast > tenMin) {
             mapreference.setLastTimeGamesChecked(new Date());
@@ -152,7 +152,7 @@ public class MessageListener extends ListenerAdapter {
                                 String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
-                                    long timeDifference = (System.currentTimeMillis()) - scPlayTime;
+                                    long timeDifference = System.currentTimeMillis() - scPlayTime;
                                     String timesPinged = game
                                         .getStoredValue("scPlayPingCount" + sc + player.getFaction());
                                     if (timeDifference > twelveHrs && timeDifference < twentyFourhrs) {
