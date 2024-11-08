@@ -50,7 +50,7 @@ public final class GameStatisticFilterer {
     }
 
     public static List<Game> getFilteredGames(Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter,
-                                              String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
+                                              String gameTypeFilter, Boolean hasWinnerFilter, Boolean homebrewFilter, Boolean fogFilter) {
         List<Game> filteredGames = new ArrayList<>();
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
@@ -58,13 +58,13 @@ public final class GameStatisticFilterer {
             pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
             filteredGames.addAll(
                     getFilteredGames(pagedGames.getGames(), playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter,
-                            gameTypeFilter, fogFilter, homebrewFilter, hasWinnerFilter));
+                            gameTypeFilter, hasWinnerFilter, homebrewFilter, fogFilter));
         } while (pagedGames.hasNextPage());
         return filteredGames;
     }
 
     public static List<Game> getFilteredGames(List<Game> games, Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter,
-                                              String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
+                                              String gameTypeFilter, Boolean hasWinnerFilter, Boolean homebrewFilter, Boolean fogFilter) {
         return games.stream()
             .filter(GameStatisticFilterer::filterAbortedGames)
             .filter(game -> filterOnPlayerCount(playerCountFilter, game))

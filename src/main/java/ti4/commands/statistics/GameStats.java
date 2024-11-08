@@ -228,7 +228,6 @@ public class GameStats extends StatisticsSubcommandData {
         int index = 1;
         StringBuilder sb = new StringBuilder("List of times a particular secret has been scored\n");
         for (String ket : topThousand.keySet()) {
-
             sb.append("`").append(Helper.leftpad(String.valueOf(index), 4)).append(". ");
             sb.append("` ").append(ket).append(": ");
             sb.append(topThousand.get(ket));
