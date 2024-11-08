@@ -24,13 +24,13 @@ public class BlueTileDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return TileHelper.getTile(ItemId).getName() + " (" + ItemId + ")";
+        return TileHelper.getTileById(ItemId).getName() + " (" + ItemId + ")";
     }
 
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
-        TileModel tile = TileHelper.getTile(ItemId);
+        TileModel tile = TileHelper.getTileById(ItemId);
         StringBuilder sb = new StringBuilder();
         List<String> planetIds = tile.getPlanets();
         for (int i = 0; i < planetIds.size() - 1; i++) {

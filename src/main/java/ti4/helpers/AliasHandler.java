@@ -12,9 +12,8 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import lombok.Getter;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
@@ -27,6 +26,7 @@ public class AliasHandler {
 
     private static final Map<String, String> tilemapAliasList = new HashMap<>();
     private static final Map<String, String> unitAliasList = new HashMap<>();
+    @Getter
     private static final Map<String, String> unitListForHelp = new HashMap<>();
     private static final Map<String, String> ccTokenAliasList = new HashMap<>();
     private static final Map<String, String> attachmentAliasList = new HashMap<>();
@@ -158,8 +158,8 @@ public class AliasHandler {
     }
 
     public static void initAliases() {
-        TileHelper.getAllTiles().values().forEach(AliasHandler::addNewTileAliases);
-        TileHelper.getAllPlanets().values().forEach(AliasHandler::addNewPlanetAliases);
+        TileHelper.getAllTileModels().forEach(AliasHandler::addNewTileAliases);
+        TileHelper.getAllPlanetModels().forEach(AliasHandler::addNewPlanetAliases);
     }
 
     public static void addNewPlanetAliases(PlanetModel planetModel) {
@@ -214,16 +214,8 @@ public class AliasHandler {
         return Objects.requireNonNullElse(aliasID, name);
     }
 
-    public static List<String> getUnitValuesList() {
-        return unitValuesList;
-    }
-
-    public static Map<String, String> getUnitListForHelp() {
-        return unitListForHelp;
-    }
-
     public static List<String> getPlanetKeyList() {
-        return TileHelper.getAllPlanets().values().stream()
+        return TileHelper.getAllPlanetModels().stream()
             .map(PlanetModel::getId)
             .toList();
     }
@@ -305,12 +297,6 @@ public class AliasHandler {
         return Objects.requireNonNullElse(aliasID, name);
     }
 
-    public static String resolveTTPGToken(String name) {
-        String aliasID = ttpgTokenAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for TTPGToken: " + name);
-        return Objects.requireNonNullElse(aliasID, name);
-    }
-
     public static String resolveTTPGUnit(String name) {
         String aliasID = ttpgUnitAliasList.get(name.toLowerCase());
         if (aliasID != null) {
@@ -338,18 +324,6 @@ public class AliasHandler {
     public static String resolveTTPGPosition(String position) {
         // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
         return ttpgPositionAliasList.get(position);
-    }
-
-    public static Map<String, String> getPlanetAliasEntryList() {
-        return TileHelper.getAllPlanets().values().stream()
-            .collect(Collectors.toMap(PlanetModel::getId,
-                planetModel -> StringUtils.join(Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>()), ", ")));
-    }
-
-    public static Map<String, String> getTileAliasEntryList() {
-        return TileHelper.getAllTiles().values().stream()
-            .collect(Collectors.toMap(TileModel::getId,
-                tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 
     public static String getFactionAliasEntryList(String faction) {

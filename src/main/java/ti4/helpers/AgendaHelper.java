@@ -1322,11 +1322,8 @@ public class AgendaHelper {
     }
 
     public static void pingMissingPlayers(Game game) {
-
-        List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestWhenMsg(),
-            game);
-        List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestAfterMsg(),
-            game);
+        List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestWhenMsg(), game);
+        List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(game.getLatestAfterMsg(), game);
         if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
             return;
         }

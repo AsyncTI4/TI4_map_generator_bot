@@ -1,11 +1,12 @@
 package ti4.map;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -85,7 +86,7 @@ public class GameProperties {
     private String hexBorderStyle = "off";
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
-    private long autoPingSpacer;
+    private int autoPingSpacer;
     private List<String> tags = new ArrayList<>();
 
     // Game modes / homebrew flags

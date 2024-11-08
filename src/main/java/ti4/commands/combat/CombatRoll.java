@@ -7,14 +7,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.TileHelper;
@@ -196,7 +195,7 @@ public class CombatRoll extends CombatSubcommandData {
         }
         Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent, event, rollType, game);
 
-        TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
+        TileModel tileModel = TileHelper.getTileById(tile.getTileID());
         List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
 
@@ -208,11 +207,8 @@ public class CombatRoll extends CombatSubcommandData {
         CombatTempModHelper.InitializeNewTempMods(player, tileModel, combatOnHolder);
         List<NamedCombatModifierModel> tempMods = new ArrayList<>(CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(player, tileModel,
             combatOnHolder, false, rollType));
-        List<NamedCombatModifierModel> tempOpponentMods = new ArrayList<>();
-        if (opponent != null) {
-            tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(opponent, tileModel,
+        List<NamedCombatModifierModel> tempOpponentMods = CombatTempModHelper.BuildCurrentRoundTempNamedModifiers(opponent, tileModel,
                 combatOnHolder, true, rollType);
-        }
         tempMods.addAll(tempOpponentMods);
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
@@ -220,14 +216,14 @@ public class CombatRoll extends CombatSubcommandData {
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
-        int round = 0;
+        int round;
         String combatName = "combatRoundTracker" + (opponent == null ? "nullfaction" : opponent.getFaction()) + tile.getPosition() + combatOnHolder.getName();
         if (game.getStoredValue(combatName).isEmpty()) {
             round = 0;
         } else {
             round = Integer.parseInt(game.getStoredValue(combatName));
         }
-        int round2 = 0;
+        int round2;
         String combatName2 = "combatRoundTracker" + player.getFaction() + tile.getPosition() + combatOnHolder.getName();
         if (game.getStoredValue(combatName2).isEmpty()) {
             round2 = 1;

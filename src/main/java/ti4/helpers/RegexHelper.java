@@ -1,5 +1,15 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;
@@ -14,12 +24,12 @@ import java.util.Set;
 
 public class RegexHelper {
 
-    private static String regexBuilder(String groupName, Set<String> options) {
-        return "(?<" + groupName + ">(" + String.join("|", options) + "))";
+    private static String regexBuilder(String groupname, Collection<String> options) {
+        return "(?<" + groupname + ">(" + String.join("|", options) + "))";
     }
 
-    private static String regexBuilder(String groupName, String pattern) {
-        return "(?<" + groupName + ">" + pattern + ")";
+    private static String regexBuilder(String groupname, String pattern) {
+        return "(?<" + groupname + ">" + pattern + ")";
     }
 
     private static Set<String> legalColors(Game game) {
@@ -126,7 +136,7 @@ public class RegexHelper {
 
     /** @return group "tileID" matching any legal tile ID in the bot */
     public static String tileIDRegex() {
-        return regexBuilder("tileID", TileHelper.getAllTiles().keySet());
+        return regexBuilder("tileID", TileHelper.getAllTileIds());
     }
 
     /** @return group matching any planet on the map, and also "space" */

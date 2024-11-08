@@ -107,7 +107,7 @@ public class AddTileList extends MapSubcommandData {
             if ("0".equals(tileID)) {
                 tileID = "0g";
             }
-            if (!TileHelper.getAllTiles().containsKey(tileID)) {
+            if (!TileHelper.isValidTile(tileID)) {
                 badTiles.add(tileID);
                 tileID = "0gray";
             }

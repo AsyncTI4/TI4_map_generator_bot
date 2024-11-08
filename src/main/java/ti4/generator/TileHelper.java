@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,8 +21,9 @@ import ti4.model.TileModel;
 
 public class TileHelper {
 
-    private static final Map<String, TileModel> allTiles = new HashMap<>();
-    private static final Map<String, PlanetModel> allPlanets = new HashMap<>();
+    private static final Map<String, TileModel> tileIdsToTileModels = new HashMap<>();
+    private static final Map<String, PlanetModel> planetIdsToPlanetModels = new HashMap<>();
+    private static final Map<String, List<PlanetModel>> tileIdsToPlanetModels = new HashMap<>();
 
     public static void init() {
         BotLogger.logWithTimestamp("Initiating Planets");
@@ -30,20 +32,28 @@ public class TileHelper {
         initTilesFromJson();
     }
 
-    public static Map<String, PlanetModel> getAllPlanets() {
-        return allPlanets;
+    public static PlanetModel getPlanetById(String planetId) {
+        return planetIdsToPlanetModels.get(planetId);
     }
 
-    public static PlanetModel getPlanet(String planetId) {
-        return allPlanets.get(planetId);
+    public static List<PlanetModel> getPlanetsByTileId(String tileId) {
+        return tileIdsToPlanetModels.get(tileId);
     }
 
-    public static Map<String, TileModel> getAllTiles() {
-        return allTiles;
+    public static TileModel getTileById(String tileId) {
+        return tileIdsToTileModels.get(tileId);
     }
 
-    public static TileModel getTile(String tileId) {
-        return allTiles.get(tileId);
+    public static Collection<String> getAllTileIds() {
+        return tileIdsToTileModels.keySet();
+    }
+
+    public static Collection<TileModel> getAllTileModels() {
+        return tileIdsToTileModels.values();
+    }
+
+    public static Collection<PlanetModel> getAllPlanetModels() {
+        return planetIdsToPlanetModels.values();
     }
 
     public static void initPlanetsFromJson() {
@@ -66,7 +76,8 @@ public class TileHelper {
         files.forEach(file -> {
             try {
                 PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
-                allPlanets.put(planet.getId(), planet);
+                planetIdsToPlanetModels.put(planet.getId(), planet);
+                tileIdsToPlanetModels.computeIfAbsent(planet.getTileId(), k -> new ArrayList<>()).add(planet);
                 if (!planet.isValid()) {
                     badObjects.add(planet.getAlias());
                 }
@@ -99,7 +110,7 @@ public class TileHelper {
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
-                allTiles.put(tile.getId(), tile);
+                tileIdsToTileModels.put(tile.getId(), tile);
                 if (!tile.isValid()) {
                     badObjects.add(tile.getAlias());
                 }
@@ -129,7 +140,7 @@ public class TileHelper {
             newTile.setWormholes(Collections.emptySet());
             newTile.setPlanets(Collections.emptyList());
             newTile.setSource(tile.getSource());
-            allTiles.put(newTile.getId(), newTile);
+            tileIdsToTileModels.put(newTile.getId(), newTile);
         }
     }
 
@@ -138,17 +149,17 @@ public class TileHelper {
     }
 
     public static void addNewTileToList(TileModel tile) {
-        allTiles.put(tile.getId(), tile);
+        tileIdsToTileModels.put(tile.getId(), tile);
     }
 
     public static void addNewPlanetToList(PlanetModel planet) {
-        allPlanets.put(planet.getId(), planet);
+        planetIdsToPlanetModels.put(planet.getId(), planet);
     }
 
     public static void exportAllPlanets() {
         ObjectMapper mapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "planets" + File.separator;
-        allPlanets.values().forEach(planetModel -> {
+        planetIdsToPlanetModels.values().forEach(planetModel -> {
             try {
                 mapper.writeValue(new File(resourcePath + planetModel.getId() + ".json"), planetModel);
             } catch (IOException e) {
@@ -160,7 +171,7 @@ public class TileHelper {
     public static void exportAllTiles() {
         ObjectMapper mapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
-        allTiles.values().forEach(tileModel -> {
+        tileIdsToTileModels.values().forEach(tileModel -> {
             try {
                 mapper.writeValue(new File(resourcePath + tileModel.getId() + ".json"), tileModel);
             } catch (IOException e) {
@@ -170,10 +181,10 @@ public class TileHelper {
     }
 
     public static boolean isValidTile(String tileID) {
-        return allTiles.containsKey(tileID);
+        return tileIdsToTileModels.containsKey(tileID);
     }
 
     public static boolean isValidPlanet(String planetID) {
-        return allPlanets.containsKey(planetID);
+        return planetIdsToPlanetModels.containsKey(planetID);
     }
 }
