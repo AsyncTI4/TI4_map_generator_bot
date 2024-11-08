@@ -54,7 +54,7 @@ public class GameManager {
         return false;
     }
 
-    public void resetMapForUser(String userID) {
+    public void resetGameForUser(String userID) {
         userNameToGameName.remove(userID);
     }
 

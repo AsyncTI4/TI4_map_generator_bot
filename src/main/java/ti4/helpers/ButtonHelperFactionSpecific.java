@@ -1907,7 +1907,7 @@ public class ButtonHelperFactionSpecific {
         player.refreshPlanet(planet);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard",
-            ACInfo.getDiscardActionCardButtons(game, player, false));
+            ACInfo.getDiscardActionCardButtons(player, false));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
     }

@@ -778,7 +778,7 @@ public class ButtonHelper {
         if (player.hasAbility("scheming")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, player, false));
+                ACInfo.getDiscardActionCardButtons(player, false));
         }
 
         addReaction(event, true, false, message, "");
@@ -1300,7 +1300,7 @@ public class ButtonHelper {
                 ident + " you are exceeding the AC hand limit of " + limit
                     + ". Please discard down to the limit. Check your cards info thread for the blue discard buttons. ");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                ident + " use buttons to discard", ACInfo.getDiscardActionCardButtons(game, player, false));
+                ident + " use buttons to discard", ACInfo.getDiscardActionCardButtons(player, false));
         }
     }
 
@@ -6526,7 +6526,7 @@ public class ButtonHelper {
             message = p2.getFactionEmoji() + " Drew 2 ACs with Scheming. Please discard 1 AC with the blue buttons";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                 p2.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, p2, false));
+                ACInfo.getDiscardActionCardButtons(p2, false));
         } else if (p2.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, p2, 1);
             message = p2.getFactionEmoji() + " Triggered Autonetic Memory Option";
