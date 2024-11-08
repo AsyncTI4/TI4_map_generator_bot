@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.cardsac.ACCardsCommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -27,7 +27,7 @@ public class StatusCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return ACCardsCommand.acceptEvent(event, getActionID());
+        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
     }
 
     @Override
