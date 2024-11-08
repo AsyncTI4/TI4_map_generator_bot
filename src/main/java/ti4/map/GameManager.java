@@ -1,6 +1,5 @@
 package ti4.map;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +15,7 @@ public class GameManager {
     private static final ConcurrentMap<String, Game> gameNameToGame = new ConcurrentHashMap<>();
 
     private GameManager() {
-        loadTime = new Date().getTime();
+        loadTime = System.currentTimeMillis();
     }
 
     public static GameManager getInstance() {
@@ -54,7 +53,7 @@ public class GameManager {
         return false;
     }
 
-    public void resetMapForUser(String userID) {
+    public void resetGameForUser(String userID) {
         userNameToGameName.remove(userID);
     }
 

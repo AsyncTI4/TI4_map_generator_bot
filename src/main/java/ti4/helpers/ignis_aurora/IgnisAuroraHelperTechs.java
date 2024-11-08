@@ -53,7 +53,7 @@ public class IgnisAuroraHelperTechs {
 
     @ButtonHandler("fibrileRealign_AC")
     public static void handleFibrileAC(ButtonInteractionEvent event, Game game, Player player) {
-        ACInfo.sendDiscardAndDrawActionCardButtons(game, player);
+        ACInfo.sendDiscardAndDrawActionCardButtons(player);
         ButtonHelper.deleteMessage(event);
     }
 

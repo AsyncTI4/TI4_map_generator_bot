@@ -1,10 +1,9 @@
 package ti4.commands.map;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -64,7 +63,7 @@ public class AddTileList extends MapSubcommandData {
 
         addTileListToMap(game, tileList, event);
 
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 
     public static void addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {

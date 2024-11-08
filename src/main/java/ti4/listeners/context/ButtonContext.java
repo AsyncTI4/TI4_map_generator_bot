@@ -1,7 +1,6 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -49,7 +48,7 @@ public class ButtonContext extends ListenerContext {
         boolean isNoSabo = "no_sabotage".equalsIgnoreCase(componentID);
         if (game != null && !isUndo && !isShow && !isNoSabo) {
             ButtonHelper.saveButtons(event, game, player);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
         }
     }
 }

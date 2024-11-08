@@ -1,15 +1,14 @@
 package ti4.map;
 
-import static org.assertj.core.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
-
 import ti4.generator.Mapper;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class GameSaveLoadManagerTest {
 
     @Test
-    void loadMaps() {
+    void loadGame() {
         Mapper.init();
 
         assertThat(0 == 0);

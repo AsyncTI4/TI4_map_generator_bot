@@ -45,10 +45,10 @@ public class CryypterHelper {
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " use buttons to discard 1 of the " + draw + " cards just drawn.",
-            ACInfo.getDiscardActionCardButtons(game, player, false));
+            ACInfo.getDiscardActionCardButtons(player, false));
 
         ButtonHelper.checkACLimit(game, null, player);
-        if (addScheming && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(game, player, false);
+        if (addScheming && player.hasAbility("scheming")) ACInfo.sendDiscardActionCardButtons(player, false);
         if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
             CommanderUnlockCheck.checkPlayer(player, "yssaril");
         }

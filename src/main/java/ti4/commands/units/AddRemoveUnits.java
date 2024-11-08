@@ -77,7 +77,7 @@ abstract public class AddRemoveUnits implements Command {
         }
         new AddUnits().actionAfterAll(event, tile, color, game);
 
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
         boolean generateMap = !event.getOption(Constants.NO_MAPGEN, false, OptionMapping::getAsBoolean);
         if (generateMap) {
@@ -366,11 +366,6 @@ abstract public class AddRemoveUnits implements Command {
 
     protected void actionAfterAll(GenericInteractionCreateEvent event, Tile tile, String color, Game game) {
         // do nothing, overriden by child classes
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

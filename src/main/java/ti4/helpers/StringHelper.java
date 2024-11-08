@@ -36,12 +36,12 @@ public final class StringHelper {
         return escape;
     }
 
+    // Calling .replace over and over like this is actually pretty slow, probably better to iterate character by character
     public static String escape(String input) {
         String output = input;
         for (Entry<String, String> entry : escapables().entrySet())
             output = output.replace(entry.getKey(), entry.getValue());
-        output.replace("\r", "");
-        return output;
+        return output.replace("\r", "");
     }
 
     public static String unescape(String input) {
@@ -50,7 +50,6 @@ public final class StringHelper {
             output = output.replace(entry.getValue(), entry.getKey());
         output = output.replace("666fin", ":");
         output = output.replace("667fin", ",");
-        output.replace("\r", "");
-        return output;
+        return output.replace("\r", "");
     }
 }

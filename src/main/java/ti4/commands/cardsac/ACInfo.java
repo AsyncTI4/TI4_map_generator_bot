@@ -168,7 +168,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getActionPlayActionCardButtons(Game game, Player player) {
+    public static List<Button> getActionPlayActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -186,23 +186,23 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static void sendDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
-        List<Button> buttons = getDiscardActionCardButtons(game, player, doingAction);
+    public static void sendDiscardActionCardButtons(Player player, boolean doingAction) {
+        List<Button> buttons = getDiscardActionCardButtons(player, doingAction);
         String msg = player.getRepresentationUnfogged() + " use buttons to discard";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static void sendDiscardAndDrawActionCardButtons(Game game, Player player) {
-        List<Button> buttons = getDiscardActionCardButtonsWithSuffix(game, player, "redraw");
+    public static void sendDiscardAndDrawActionCardButtons(Player player) {
+        List<Button> buttons = getDiscardActionCardButtonsWithSuffix(player, "redraw");
         String msg = player.getRepresentationUnfogged() + " use buttons to discard. A new action card will be automatically drawn afterwards.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
-    public static List<Button> getDiscardActionCardButtons(Game game, Player player, boolean doingAction) {
-        return getDiscardActionCardButtonsWithSuffix(game, player, doingAction ? "stall" : "");
+    public static List<Button> getDiscardActionCardButtons(Player player, boolean doingAction) {
+        return getDiscardActionCardButtonsWithSuffix(player, doingAction ? "stall" : "");
     }
 
-    public static List<Button> getDiscardActionCardButtonsWithSuffix(Game game, Player player, String suffix) {
+    public static List<Button> getDiscardActionCardButtonsWithSuffix(Player player, String suffix) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
 

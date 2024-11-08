@@ -1,6 +1,9 @@
 package ti4.commands.admin;
 
 
+import java.io.File;
+import java.util.concurrent.ExecutionException;
+
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -12,9 +15,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.io.File;
-import java.util.concurrent.ExecutionException;
 
 public class RestoreGame extends AdminSubcommandData {
 
@@ -46,7 +46,7 @@ public class RestoreGame extends AdminSubcommandData {
             e.printStackTrace();
         }
 
-        Game game = GameSaveLoadManager.loadMap(gameFile);
+        Game game = GameSaveLoadManager.loadGame(gameFile);
         if (game == null) {
             MessageHelper.sendMessageToEventChannel(event, "Failed to load game.");
             return;
@@ -59,6 +59,6 @@ public class RestoreGame extends AdminSubcommandData {
         GameManager.getInstance().deleteGame(game.getName());
         GameManager.getInstance().addGame(game);
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " restored.");
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 }

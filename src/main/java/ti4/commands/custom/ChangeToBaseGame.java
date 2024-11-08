@@ -34,7 +34,7 @@ public class ChangeToBaseGame extends CustomSubcommandData {
         Helper.removePoKComponents(game, codex);
         SetDeck.setDeck(event, game, "agenda_deck", Mapper.getDecks().get("agendas_base_game"));
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
     }
 }
