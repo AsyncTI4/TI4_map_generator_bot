@@ -32,7 +32,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             return;
         }
         Player playerOrig = Helper.getGamePlayer(game, player, event, null);
-        long milliSinceLastPing = new Date().getTime() - game.getLastActivePlayerPing().getTime();
+        long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
         boolean samePlayer = false;
         if (playerOrig != null) {
             samePlayer = playerOrig.getUserID().equalsIgnoreCase(player.getUserID());

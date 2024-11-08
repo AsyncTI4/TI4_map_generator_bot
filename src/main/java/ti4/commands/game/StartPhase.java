@@ -2,7 +2,6 @@ package ti4.commands.game;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -262,7 +261,7 @@ public class StartPhase extends GameSubcommandData {
             pickSCMsg = "Use buttons to pick the strategy card you want to give someone else.";
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
-        game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", new Date().getTime() + "");
+        game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
         if (game.isFowMode()) {
             if (!game.isHomebrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(event, game, speaker));
@@ -335,7 +334,7 @@ public class StartPhase extends GameSubcommandData {
 
     public static void startStatusHomework(GenericInteractionCreateEvent event, Game game) {
         game.setPhaseOfGame("statusHomework");
-        game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", new Date().getTime() + "");
+        game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusHomework", System.currentTimeMillis() + "");
         // first do cleanup if necessary
         int playersWithSCs = 0;
         for (Player player : game.getRealPlayers()) {

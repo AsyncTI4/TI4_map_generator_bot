@@ -560,7 +560,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.STARTED_DATE + " " + game.getStartedDate());
         writer.write(System.lineSeparator());
-        long time = keepModifiedDate ? game.getLastModifiedDate() : new Date().getTime();
+        long time = keepModifiedDate ? game.getLastModifiedDate() : System.currentTimeMillis();
         game.setLastModifiedDate(time);
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
@@ -1186,7 +1186,7 @@ public class GameSaveLoadManager {
                             BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                             return;
                         }
-                        if (file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 60 || game.isCustodiansScored()) {
+                        if (file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 60 || game.isCustodiansScored()) {
                             GameManager.getInstance().addGame(game);
                         }
                     } catch (Exception e) {

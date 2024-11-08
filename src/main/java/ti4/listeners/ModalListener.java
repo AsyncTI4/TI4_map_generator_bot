@@ -1,11 +1,9 @@
 package ti4.listeners;
 
-import java.util.Date;
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -38,7 +36,7 @@ public class ModalListener extends ListenerAdapter {
             return;
         }
         event.deferEdit().queue();
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
         try {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
@@ -47,7 +45,7 @@ public class ModalListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-        long endTime = new Date().getTime();
+        long endTime = System.currentTimeMillis();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }

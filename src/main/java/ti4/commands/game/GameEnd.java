@@ -3,7 +3,6 @@ package ti4.commands.game;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -205,7 +204,7 @@ public class GameEnd extends GameSubcommandData {
         String gameName = game.getName();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
         game.setHasEnded(true);
-        game.setEndedDate(new Date().getTime());
+        game.setEndedDate(System.currentTimeMillis());
         GameSaveLoadManager.saveGame(game, event);
         String gameEndText = getGameEndText(game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
