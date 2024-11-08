@@ -22,6 +22,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -29,11 +30,16 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CardsInfo implements Command, InfoThreadCommand {
+public class CardsInfo implements Command {
 
     @Override
     public String getActionID() {
         return Constants.CARDS_INFO;
+    }
+
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
     }
 
     @Override
