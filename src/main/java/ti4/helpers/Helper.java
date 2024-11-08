@@ -18,7 +18,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -274,56 +273,6 @@ public class Helper {
             Tile tile = unusedRedTiles.getFirst().getTile();
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You randomly drew the tile: " + tile.getRepresentation());
         }
-    }
-
-    public static boolean canPlayerConceivablySabo(Player player, Game game) {
-        if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
-            return true;
-        }
-        if (player.hasUnit("empyrean_mech")
-            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).isEmpty()) {
-            return true;
-        }
-        return player.getAc() > 0;
-    }
-
-    public static boolean shouldPlayerLeaveAReact(Player player, Game game, String messageID) {
-
-        if (player.hasTechReady("it") && player.getStrategicCC() > 0) {
-            return false;
-        }
-        if ((playerHasSabotage(player)
-            || (game.getActionCardDeckSize() + game.getDiscardActionCards().size()) > 180)
-            && !ButtonHelper.isPlayerElected(game, player, "censure")
-            && !ButtonHelper.isPlayerElected(game, player, "absol_censure")) {
-            return false;
-        }
-        if (player.hasUnit("empyrean_mech")
-            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).isEmpty()) {
-            return false;
-        }
-        if (player.getAc() == 0) {
-            return !UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game);
-        }
-        if (player.isAFK()) {
-            return false;
-        }
-        if (player.getAutoSaboPassMedian() == 0) {
-            return false;
-        }
-        return !UnfiledButtonHandlers.checkForASpecificPlayerReact(messageID, player, game);
-    }
-
-    private static boolean playerHasSabotage(Player player) {
-        return player.getActionCards().containsKey("sabo1")
-            || player.getActionCards().containsKey("sabo2")
-            || player.getActionCards().containsKey("sabo3")
-            || player.getActionCards().containsKey("sabo4")
-            || player.getActionCards().containsKey("sabotage_ds")
-            || player.getActionCards().containsKey("sabotage1_acd2")
-            || player.getActionCards().containsKey("sabotage2_acd2")
-            || player.getActionCards().containsKey("sabotage3_acd2")
-            || player.getActionCards().containsKey("sabotage4_acd2");
     }
 
     public static void giveMeBackMyAgendaButtons(Game game) {
@@ -606,46 +555,6 @@ public class Helper {
                     }
                 });
             }
-        }
-    }
-
-    public static void checkAllSaboWindows(Game game) {
-        List<String> messageIDs = new ArrayList<>(game.getMessageIDsForSabo());
-        for (Player player : game.getRealPlayers()) {
-            if (player.getAutoSaboPassMedian() == 0) {
-                continue;
-            }
-            int highNum = player.getAutoSaboPassMedian() * 6 * 3 / 2;
-            int result = ThreadLocalRandom.current().nextInt(1, highNum + 1);
-            boolean shouldDoIt = result == highNum;
-            if (shouldDoIt || !canPlayerConceivablySabo(player, game)) {
-                for (String messageID : messageIDs) {
-                    if (shouldPlayerLeaveAReact(player, game, messageID)) {
-                        String message = game.isFowMode() ? "No Sabotage" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, messageID, game);
-                    }
-                }
-            }
-            if ("agendawaiting".equals(game.getPhaseOfGame())) {
-                int highNum2 = player.getAutoSaboPassMedian() * 4 / 2;
-                int result2 = ThreadLocalRandom.current().nextInt(1, highNum2 + 1);
-                boolean shouldDoIt2 = result2 == highNum2;
-                if (shouldDoIt2) {
-                    String whensID = game.getLatestWhenMsg();
-                    if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                        && !UnfiledButtonHandlers.checkForASpecificPlayerReact(whensID, player, game)) {
-                        String message = game.isFowMode() ? "No whens" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, whensID, game);
-                    }
-                    String aftersID = game.getLatestAfterMsg();
-                    if (!AgendaHelper.doesPlayerHaveAnyWhensOrAfters(player)
-                        && !UnfiledButtonHandlers.checkForASpecificPlayerReact(aftersID, player, game)) {
-                        String message = game.isFowMode() ? "No afters" : null;
-                        ButtonHelper.addReaction(player, false, false, message, null, aftersID, game);
-                    }
-                }
-            }
-
         }
     }
 
