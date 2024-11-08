@@ -6273,23 +6273,16 @@ public class MapGenerator {
                 if (i == 0 && !(UnitType.Infantry.equals(unitKey.getUnitType())) && game.isShowUnitTags()) { // DRAW TAG
                     UnitModel unitModel = game.getUnitFromUnitKey(unitKey);
                     if (player != null && unitModel != null && unitModel.getIsShip()) {
-                        // TODO: Only paint the tag of the most expensive ship per player, or if no
-                        // ships, the "bottom most" unit on a planet
+                        // TODO: Only paint the tag of the most expensive ship per player, or if no ships, the "bottom most" unit on a planet
                         String factionTag = player.getFactionModel().getShortTag();
-                        BufferedImage plaquette = ImageHelper
-                            .read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
+                        BufferedImage plaquette = ImageHelper.read(ResourceHelper.getInstance().getUnitFile("unittags_plaquette.png"));
                         Point plaquetteOffset = getUnitTagLocation(id);
 
-                        tileGraphics.drawImage(plaquette, imageX + plaquetteOffset.x,
-                            imageY + plaquetteOffset.y, null);
-                        drawPlayerFactionIconImage(tileGraphics, player, imageX + plaquetteOffset.x,
-                            imageY + plaquetteOffset.y, 32, 32);
+                        tileGraphics.drawImage(plaquette, imageX + plaquetteOffset.x, imageY + plaquetteOffset.y, null);
+                        drawPlayerFactionIconImage(tileGraphics, player, imageX + plaquetteOffset.x, imageY + plaquetteOffset.y, 32, 32);
 
                         tileGraphics.setColor(Color.WHITE);
-                        drawCenteredString(tileGraphics, factionTag,
-                            new Rectangle(imageX + plaquetteOffset.x + 25,
-                                imageY + plaquetteOffset.y + 17, 40, 13),
-                            Storage.getFont13());
+                        drawCenteredString(tileGraphics, factionTag, new Rectangle(imageX + plaquetteOffset.x + 25, imageY + plaquetteOffset.y + 17, 40, 13), Storage.getFont13());
                     }
                 }
                 if (bulkUnitCount != null) {

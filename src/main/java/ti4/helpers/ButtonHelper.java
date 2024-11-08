@@ -1,5 +1,31 @@
 package ti4.helpers;
 
+import java.io.File;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,10 +49,6 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -89,27 +111,6 @@ import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.selections.selectmenus.SelectFaction;
-
-import java.io.File;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ButtonHelper {
 
@@ -4533,19 +4534,18 @@ public class ButtonHelper {
     }
 
     public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, Game game, Tile tile, String type) {
-        String finChecker = "FFCC_" + player.getFaction() + "_";
+        String finChecker = player.getFinsFactionCheckerPrefix();
         List<Button> buttons = new ArrayList<>();
         game.setStoredValue(player.getFaction() + "latestAssignHits", type);
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
-            String representation = planetRepresentations.get(name);
+            String representation = planetRepresentations.get(entry.getKey());
             if (representation == null) {
-                representation = name;
+                representation = entry.getKey();
             }
             UnitHolder unitHolder = entry.getValue();
             Map<UnitKey, Integer> units = unitHolder.getUnits();
-            if (unitHolder instanceof Planet) {
+            if (unitHolder instanceof Planet) { // Ground
                 if ((type.equalsIgnoreCase("spacecombat") || type.equalsIgnoreCase("assaultcannoncombat"))
                     && !ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile)) {
                     continue;
@@ -4558,42 +4558,31 @@ public class ButtonHelper {
                         continue;
 
                     UnitKey unitKey = unitEntry.getKey();
-                    String unitName = unitKey.getUnitType().plainName();
+                    String unitName = unitKey.unitName();
 
                     int damagedUnits = 0;
                     if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
                         damagedUnits = unitHolder.getUnitDamage().get(unitKey);
                     }
                     int totalUnits = unitEntry.getValue() - damagedUnits;
-                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
                     for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
-                        String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_"
-                            + representation;
-                        String buttonText = "Remove " + x + " " + unitModel.getBaseType() + " from "
-                            + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
-                        Button validTile2 = Buttons.red(buttonID, buttonText);
-                        validTile2 = validTile2.withEmoji(emoji);
-                        buttons.add(validTile2);
+                        String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_" + representation;
+                        String buttonText = "Remove " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
+                        buttons.add(Buttons.red(buttonID, buttonText, unitModel.getUnitEmoji()));
 
                         if (unitModel.getSustainDamage() && !type.equalsIgnoreCase("assaultcannoncombat")) {
                             buttonID = finChecker + "assignDamage_" + tile.getPosition() + "_" + x + unitName + "_" + representation;
                             buttonText = "Sustain " + x + " " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
-                            Button validTile3 = Buttons.gray(buttonID, buttonText);
-                            validTile2 = validTile2.withEmoji(emoji);
-                            buttons.add(validTile3);
+                            buttons.add(Buttons.gray(buttonID, buttonText, unitModel.getUnitEmoji()));
                         }
                     }
                     for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                        String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_"
-                            + representation + "damaged";
-                        String buttonText = "Remove " + x + " damaged " + unitModel.getBaseType() + " from "
-                            + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
-                        Button validTile2 = Buttons.red(buttonID, buttonText);
-                        validTile2 = validTile2.withEmoji(emoji);
-                        buttons.add(validTile2);
+                        String buttonID = finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "_" + representation + "damaged";
+                        String buttonText = "Remove " + x + " damaged " + unitModel.getBaseType() + " from " + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
+                        buttons.add(Buttons.red(buttonID, buttonText, unitModel.getUnitEmoji()));
                     }
                 }
-            } else {
+            } else { // Space
                 if (type.equalsIgnoreCase("groundcombat")) {
                     continue;
                 }
@@ -4615,55 +4604,47 @@ public class ButtonHelper {
                     }
                     totalUnits = totalUnits - damagedUnits;
 
-                    EmojiUnion emoji = Emoji.fromFormatted(unitModel.getUnitEmoji());
                     for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
-                        Button validTile2 = Buttons.red(
+                        buttons.add(Buttons.red(
                             finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName + "damaged",
-                            "Remove " + x + " damaged " + unitModel.getBaseType());
-                        validTile2 = validTile2.withEmoji(emoji);
-                        buttons.add(validTile2);
+                            "Remove " + x + " damaged " + unitModel.getBaseType(),
+                            unitModel.getUnitEmoji()));
                     }
 
                     for (int x = 1; x < totalUnits + 1 && x < 3; x++) {
-                        Button validTile2 = Buttons.red(
+                        buttons.add(Buttons.red(
                             finChecker + "assignHits_" + tile.getPosition() + "_" + x + unitName,
-                            "Remove " + x + " " + unitModel.getBaseType());
-                        validTile2 = validTile2.withEmoji(emoji);
-                        buttons.add(validTile2);
+                            "Remove " + x + " " + unitModel.getBaseType(),
+                            unitModel.getUnitEmoji()));
                     }
-                    if (!type.equalsIgnoreCase("assaultcannoncombat")) {
-                        if ((("mech".equalsIgnoreCase(unitName) && !game.getLaws().containsKey("articles_war")
-                            && player.getUnitsOwned().contains("nomad_mech"))
-                            || "dreadnought".equalsIgnoreCase(unitName)
-                            || (player != game.getActivePlayer() && !"fighter".equalsIgnoreCase(unitName)
-                                && !"mech".equalsIgnoreCase(unitName) && !"infantry".equalsIgnoreCase(unitName)
-                                && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander"))
-                            || ("warsun".equalsIgnoreCase(unitName) && !ButtonHelper.isLawInPlay(game, "schematics"))
-                            || "lady".equalsIgnoreCase(unitName) || "cavalry".equalsIgnoreCase(unitName)
-                            || "flagship".equalsIgnoreCase(unitName)
-                            || ("mech".equalsIgnoreCase(unitName)
-                                && doesPlayerHaveFSHere("nekro_flagship", player, tile))
-                            || ("cruiser".equalsIgnoreCase(unitName) && player.hasTech("se2"))
-                            || ("carrier".equalsIgnoreCase(unitName) && player.hasTech("ac2"))) && totalUnits > 0) {
-                            Button validTile2 = Button
-                                .secondary(finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName,
-                                    "Sustain " + 1 + " " + unitModel.getBaseType());
-                            validTile2 = validTile2.withEmoji(emoji);
-                            buttons.add(validTile2);
-                        }
+                    if (totalUnits > 0 && !type.equalsIgnoreCase("assaultcannoncombat") && unitCanSustainDamage(game, player, tile, unitName)) {
+                        buttons.add(Buttons.gray(
+                            finChecker + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName,
+                            "Sustain " + 1 + " " + unitModel.getBaseType(),
+                            unitModel.getUnitEmoji()));
                     }
                 }
             }
         }
-        Button doAllShips;
-        doAllShips = Buttons.gray(finChecker + "assignHits_" + tile.getPosition() + "_AllShips",
-            "Remove all Ships");
-        buttons.add(doAllShips);
-        Button doAll = Buttons.gray(finChecker + "assignHits_" + tile.getPosition() + "_All", "Remove all units");
-        Button concludeMove = Buttons.blue("deleteButtons", "Done removing/sustaining units");
-        buttons.add(doAll);
-        buttons.add(concludeMove);
+
+        buttons.add(Buttons.gray(finChecker + "assignHits_" + tile.getPosition() + "_AllShips", "Remove all Ships"));
+        buttons.add(Buttons.gray(finChecker + "assignHits_" + tile.getPosition() + "_All", "Remove all units"));
+        buttons.add(Buttons.blue("deleteButtons", "Done removing/sustaining units"));
         return buttons;
+    }
+
+    private static boolean unitCanSustainDamage(Game game, Player player, Tile tile, String unitBaseType) {
+        UnitModel unitModel = player.getUnitByBaseType(unitBaseType);
+        return "dreadnought".equalsIgnoreCase(unitBaseType)
+            || "lady".equalsIgnoreCase(unitBaseType)
+            || "cavalry".equalsIgnoreCase(unitBaseType)
+            || "flagship".equalsIgnoreCase(unitBaseType)
+            || ("cruiser".equalsIgnoreCase(unitBaseType) && unitModel.getSustainDamage())
+            || ("carrier".equalsIgnoreCase(unitBaseType) && unitModel.getSustainDamage())
+            || ("warsun".equalsIgnoreCase(unitBaseType) && !ButtonHelper.isLawInPlay(game, "schematics"))
+            || ("mech".equalsIgnoreCase(unitBaseType) && !game.getLaws().containsKey("articles_war") && player.getUnitsOwned().contains("nomad_mech"))
+            || ("mech".equalsIgnoreCase(unitBaseType) && doesPlayerHaveFSHere("nekro_flagship", player, tile))
+            || (!player.isActivePlayer() && game.playerHasLeaderUnlockedOrAlliance(player, "mortheuscommander") && !List.of("fighter", "infantry", "mech").contains(unitBaseType.toLowerCase()));
     }
 
     @ButtonHandler("startThalnos_")
