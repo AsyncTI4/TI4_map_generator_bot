@@ -120,16 +120,14 @@ public class UnitRenderGenerator {
             Integer unitDamageCount = unitDamage.get(unitKey);
             BufferedImage decal = getUnitDecal(player, unitKey);
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
-            Point centerPosition = unitHolder.getHolderCenterPosition();
-            String id = unitKey.asyncID();
 
             // Contains pre-computed values common to this 'unit class'
             // (e.g. all fighters, all infantry, all mechs, etc.)
             PositioningContext posCtx = new PositioningContext(
-                centerPosition,
+                unitHolder.getHolderCenterPosition(),
                 unitHolder.getName(),
                 tile.getTileID(),
-                id,
+                unitKey.asyncID(),
                 unitImage,
                 tile.getPlanetUnitHolders().size(),
                 Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType()));
@@ -369,15 +367,13 @@ public class UnitRenderGenerator {
 
         // Handle special unit replacements
         return switch (unitKey.getUnitType()) {
-            case TyrantsLament -> resourceHelper.getNonSpoopyFinFile("TyrantNew.png");
             case Lady -> unitPath.replace("lady", "fs");
             case Cavalry -> {
                 boolean hasM2Tech = game.getPNOwner("cavalry") != null &&
                     game.getPNOwner("cavalry").hasTech("m2");
                 String version = hasM2Tech ? "Memoria_2.png" : "Memoria_1.png";
-                yield resourceHelper.getNonSpoopyFinFile(version);
+                yield resourceHelper.getUnitFile(version);
             }
-            case PlenaryOrbital -> resourceHelper.getNonSpoopyFinFile("PlenaryNew.png");
             default -> unitPath;
         };
     }
