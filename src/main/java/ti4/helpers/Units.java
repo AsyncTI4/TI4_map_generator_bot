@@ -58,11 +58,17 @@ public class Units {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (UnitType.TyrantsLament == unitType || UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
+            if (UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
+            if (UnitType.TyrantsLament == unitType) {
+                return "TyrantsLament.png";
+            }
             if (UnitType.PlenaryOrbital == unitType) {
-                return String.format("%s_%s.png", colorID, "sd");
+                return "PlenaryOrbital.png";
+            }
+            if (UnitType.Monument == unitType) {
+                return "monument.png"; // TODO: Colours
             }
 
             return String.format("%s_%s.png", colorID, asyncID());
@@ -87,9 +93,11 @@ public class Units {
         }
     }
 
+    /**
+     * UnitType - aka {@link UnitModel.getAsyncId()} - is a list of all the units in the game.
+     */
     public enum UnitType {
-
-        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), // ground based
+        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
         PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"); //relics
 
@@ -105,8 +113,7 @@ public class Units {
                 case "gf" -> "Infantry";
                 case "mf" -> "Mech";
                 case "pd" -> "PDS";
-                case "sd" -> "Space Dock";
-                case "csd" -> "Dimensional Tear";
+                case "sd", "csd" -> "Space Dock";
                 case "ff" -> "Fighter";
                 case "dd" -> "Destroyer";
                 case "ca" -> "Cruiser";
@@ -118,6 +125,7 @@ public class Units {
                 case "tyrantslament" -> "Tyrant's Lament";
                 case "cavalry" -> "The Cavalry";
                 case "lady" -> "The Lady";
+                case "monument" -> "Monument";
                 default -> null;
             };
         }
@@ -127,8 +135,7 @@ public class Units {
                 case "gf" -> "infantry";
                 case "mf" -> "mech";
                 case "pd" -> "pds";
-                case "sd" -> "spacedock";
-                case "csd" -> "cabalspacedock";
+                case "sd", "csd" -> "spacedock";
                 case "ff" -> "fighter";
                 case "dd" -> "destroyer";
                 case "ca" -> "cruiser";
@@ -140,6 +147,7 @@ public class Units {
                 case "tyrantslament" -> "tyrantslament";
                 case "cavalry" -> "cavalry";
                 case "lady" -> "lady";
+                case "monument" -> "monument";
                 default -> null;
             };
         }
@@ -149,14 +157,17 @@ public class Units {
                 case "gf" -> Emojis.infantry;
                 case "mf" -> Emojis.mech;
                 case "pd" -> Emojis.pds;
-                case "sd", "csd", "plenaryorbital" -> Emojis.spacedock;
+                case "sd", "csd" -> Emojis.spacedock;
+                case "plenaryorbital" -> Emojis.PlenaryOrbital;
                 case "ff" -> Emojis.fighter;
                 case "dd" -> Emojis.destroyer;
                 case "ca" -> Emojis.cruiser;
                 case "cv" -> Emojis.carrier;
                 case "dn" -> Emojis.dreadnought;
-                case "fs", "tyrantslament", "lady", "cavalry" -> Emojis.flagship;
+                case "fs", "lady", "cavalry" -> Emojis.flagship;
+                case "tyrantslament" -> Emojis.TyrantsLament;
                 case "ws" -> Emojis.warsun;
+                case "monument" -> Emojis.Monument;
                 default -> null;
             };
         }

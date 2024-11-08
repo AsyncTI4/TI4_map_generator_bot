@@ -523,7 +523,7 @@
     },
     {
         "id": "ghemina_flagship_lady",
-        "baseType": "flagship",
+        "baseType": "lady",
         "asyncId": "lady",
         "name": "The Lady",
         "source": "ds",

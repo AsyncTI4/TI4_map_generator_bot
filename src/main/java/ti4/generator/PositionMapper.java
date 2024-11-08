@@ -166,7 +166,6 @@ public class PositionMapper {
         String valuePosition = (String) value;
         StringTokenizer tokenizer = new StringTokenizer(valuePosition, ";");
         while (tokenizer.hasMoreTokens()) {
-
             String nextPoint = tokenizer.nextToken();
             StringTokenizer positionTokenizer = new StringTokenizer(nextPoint, ",");
             if (positionTokenizer.countTokens() == 2) {
@@ -192,6 +191,9 @@ public class PositionMapper {
             .orElse(ShipPositionModel.ShipPosition.TYPE08).getPositions();
     }
 
+    /**
+     * <p>See {@link ShipPositionModel#getPositions()}</p>
+     */
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
         String shipPositionString = getTileSpaceUnitLayout(tileID);
 

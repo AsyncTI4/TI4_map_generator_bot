@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,10 +22,12 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String baseType;
     private String asyncId;
     private String name;
+    private String subtitle;
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
     private String requiredTechId;
     private String faction;
+    private List<String> eligiblePlanetTypes;
     private int moveValue;
     private int productionValue;
     private int capacityValue;
@@ -45,6 +48,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean disablesPlanetaryShield;
     private Boolean canBeDirectHit;
     private Boolean isStructure;
+    private Boolean isMonument;
     private Boolean isGroundForce;
     private Boolean isShip;
     private String ability;
@@ -65,11 +69,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && name != null
             && asyncId != null
             && source != null
-            && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament", "lady", "cavalry").contains(getAsyncId())
-            // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
-            // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
-            // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
-            && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()));
+            && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
+            && getEligiblePlanetTypes().stream().allMatch(type -> List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY").contains(type));
     }
 
     public String getAlias() {
@@ -111,14 +112,17 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        String name = getName() == null ? "" : getName();
-        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
+        String name = getName();
+        StringBuilder title = new StringBuilder(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji());
+        eb.setTitle(title.toString(), null);
+        if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
         if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
+        // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
@@ -365,6 +369,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             || getFaction().orElse("").toLowerCase().contains(searchString)
             || getId().toLowerCase().contains(searchString)
             || getBaseType().toLowerCase().contains(searchString)
+            || getSubtitle().orElse("").toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 
@@ -410,6 +415,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isStructure).orElse(false);
     }
 
+    public boolean getIsMonument() {
+        return Optional.ofNullable(isMonument).orElse(false);
+    }
+
     public boolean getIsGroundForce() {
         return Optional.ofNullable(isGroundForce).orElse(false);
     }
@@ -430,6 +439,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(requiredTechId);
     }
 
+    public Optional<String> getSubtitle() {
+        return Optional.ofNullable(subtitle);
+    }
+
     public Optional<String> getFaction() {
         return Optional.ofNullable(faction);
     }
@@ -444,5 +457,17 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getHomebrewReplacesID() {
         return Optional.ofNullable(homebrewReplacesID);
+    }
+
+    public List<String> getEligiblePlanetTypes() {
+        return Optional.ofNullable(eligiblePlanetTypes).orElse(Collections.emptyList());
+    }
+
+    public String getEligiblePlanetEmojis() {
+        StringBuilder sb = new StringBuilder();
+        for (String type : getEligiblePlanetTypes()) {
+            sb.append(Emojis.getEmojiFromDiscord(type));
+        }
+        return sb.toString();
     }
 }

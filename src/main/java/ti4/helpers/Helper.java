@@ -1927,7 +1927,7 @@ public class Helper {
                 if (warfareNOtherstuff.contains("integrated") && !unitHolder.getName().equalsIgnoreCase(planetInteg)) {
                     continue;
                 }
-                if (!player.getPlanetsAllianceMode().contains(unitHolder.getName())) {
+                if (!player.getPlanetsAllianceMode().contains(unitHolder.getName()) && !"genericModifyAllTiles".equals(warfareNOtherstuff)) {
                     continue;
                 }
 

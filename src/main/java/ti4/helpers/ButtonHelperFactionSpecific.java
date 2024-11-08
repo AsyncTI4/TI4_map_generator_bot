@@ -213,7 +213,7 @@ public class ButtonHelperFactionSpecific {
                 continue;
 
             UnitKey unitKey = unitEntry.getKey();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            String unitName = unitKey.unitName();
             // System.out.println(unitKey.asyncID());
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
@@ -985,7 +985,7 @@ public class ButtonHelperFactionSpecific {
             UnitKey unitKey = unitEntry.getKey();
             UnitModel unit = saar.getUnitFromUnitKey(unitKey);
             if (saar.unitBelongsToPlayer(unitKey) && unit.getIsGroundForce()) {
-                String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                String unitName = unitKey.unitName();
                 int amount = unitEntry.getValue();
                 new RemoveUnits().unitParsing(event, saar.getColor(), game.getTileFromPlanet(origPlanet),
                     amount + " " + unitName + " " + origPlanet, game);
@@ -1024,7 +1024,7 @@ public class ButtonHelperFactionSpecific {
         for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
             int amount = unitEntry.getValue();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            String unitName = unitKey.unitName();
 
             new RemoveUnits().unitParsing(event, hacan.getColor(), game.getTileFromPlanet(origPlanet),
                 amount + " " + unitName + " " + origPlanet, game);
@@ -1139,21 +1139,15 @@ public class ButtonHelperFactionSpecific {
             for (UnitKey unitKey : unitKeys) {
                 if (blockader.unitBelongsToPlayer(unitKey)) {
                     int amount = unitHolder.getUnits().get(unitKey);
-                    String unit = ButtonHelper.getUnitName(unitKey.asyncID());
-                    new RemoveUnits().unitParsing(event, blockader.getColor(), cabal.getNomboxTile(),
-                        amount + " " + unit, game);
+                    String unit = unitKey.unitName();
+                    new RemoveUnits().unitParsing(event, blockader.getColor(), cabal.getNomboxTile(), amount + " " + unit, game);
                     MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(),
-                        cabal.getRepresentationUnfogged() + " released " + amount + " "
-                            + blockader.getFactionEmojiOrColor() + " " + unit
-                            + " from prison due to blockade");
+                        cabal.getRepresentationUnfogged() + " released " + amount + " " + blockader.getFactionEmojiOrColor() + " " + unit + " from prison due to blockade");
                     if (cabal != blockader) {
                         MessageHelper.sendMessageToChannel(blockader.getCorrectChannel(),
-                            blockader.getRepresentationUnfogged() + " " + amount + " " + unit
-                                + " of yours was released from prison.");
+                            blockader.getRepresentationUnfogged() + " " + amount + " " + unit + " of yours was released from prison.");
                     }
-
                 }
-
             }
         }
     }
@@ -1164,7 +1158,7 @@ public class ButtonHelperFactionSpecific {
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 for (Player player : game.getRealPlayers()) {
                     if (player.unitBelongsToPlayer(unitKey)) {
-                        String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                        String unitName = unitKey.unitName();
                         String buttonID = "cabalRelease_" + player.getFaction() + "_" + unitName;
                         if (game.isFowMode()) {
                             buttons.add(Buttons.gray(buttonID, player.getColor() + " " + unitName));
@@ -1185,7 +1179,7 @@ public class ButtonHelperFactionSpecific {
             for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
                 Player player = kollecc;
                 if (player.unitBelongsToPlayer(unitKey)) {
-                    String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+                    String unitName = unitKey.unitName();
                     String buttonID = "kolleccRelease_" + unitName;
                     buttons.add(Buttons.gray(buttonID, "Release 1  " + unitName).withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
                 }
@@ -1989,7 +1983,7 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-@ButtonHandler("terraformPlanet_")
+    @ButtonHandler("terraformPlanet_")
     public static void terraformPlanet(Player player, String buttonID, ButtonInteractionEvent event, Game game) {
         String planet = buttonID.replace("terraformPlanet_", "");
         Planet unitHolder = game.getPlanetsInfo().get(planet);

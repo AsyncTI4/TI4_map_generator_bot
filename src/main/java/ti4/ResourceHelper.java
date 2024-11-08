@@ -131,19 +131,6 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getNonSpoopyFinFile(String name) {
-        // overlay_jackolantern_1
-
-        String spoopyPath = spoopyCache.get(name);
-        if (spoopyPath != null) {
-            return spoopyPath;
-        }
-        String unit = getResourceFromFolder("decals/", name, "Could not find decal file");
-        spoopyCache.put(name, unit);
-        return unit;
-    }
-
-    @Nullable
     public String getCCFile(String name) {
         String ccPath = ccCache.get(name);
         if (ccPath != null) {

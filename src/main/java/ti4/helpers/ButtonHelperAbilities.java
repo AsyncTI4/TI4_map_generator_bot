@@ -69,7 +69,7 @@ public class ButtonHelperAbilities {
             if ((player.unitBelongsToPlayer(unitEntry.getKey())))
                 continue;
             UnitKey unitKey = unitEntry.getKey();
-            String unitName = ButtonHelper.getUnitName(unitKey.asyncID());
+            String unitName = unitKey.unitName();
             int totalUnits = unitEntry.getValue();
             if (totalUnits > 0) {
                 String buttonID2 = "facsimileStep2_" + unitName;

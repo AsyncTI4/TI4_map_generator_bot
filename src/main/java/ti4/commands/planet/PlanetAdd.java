@@ -80,11 +80,10 @@ public class PlanetAdd extends PlanetAddRemove {
                     channel = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
-                String message2 = player.getRepresentationUnfogged()
-                    + " Click the names of the planets you wish to exhaust to spend 6i.";
+                String message2 = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust to spend " + Emojis.Resources_6;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-                Button DoneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
-                buttons.add(DoneExhausting);
+                Button doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
+                buttons.add(doneExhausting);
                 if (!player.hasAbility("reclamation")) {
                     MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
                 }
@@ -126,8 +125,8 @@ public class PlanetAdd extends PlanetAddRemove {
                         }
                     }
                     if (Mapper.getPlanet(planet) != null &&
-                            !"action_deck_2".equals(game.getAcDeckID()) &&
-                            !game.isACInDiscard("Reparations")) {
+                        !"action_deck_2".equals(game.getAcDeckID()) &&
+                        !game.isACInDiscard("Reparations")) {
                         String msg = player_.getRepresentation()
                             + " has a window to play Reparations for the taking of "
                             + Mapper.getPlanet(planet).getName();

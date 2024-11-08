@@ -53,6 +53,7 @@ public class HelpCommand implements Command {
         subcommands.add(new SampleDecals());
         subcommands.add(new WhatsTIGL());
         subcommands.add(new Absol());
+        subcommands.add(new Monuments());
         subcommands.add(new DiscordantStars());
         subcommands.add(new NewPlayerInfo());
 

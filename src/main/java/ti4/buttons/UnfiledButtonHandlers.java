@@ -265,19 +265,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("genericModifyAllTiles_")
+    public static void genericModifyAllTiles(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String pos = buttonID.replace("genericModifyAllTiles_", "");
+        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos), "genericModifyAllTiles", "place");
+        String message = player.getRepresentation() + " Use the buttons to modify units. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("genericModify_")
     public static void genericModify(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("genericModify_", "");
         Tile tile = game.getTileByPosition(pos);
         ButtonHelper.offerBuildOrRemove(player, game, event, tile);
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("getModifyTiles")
-    public static void getModifyTiles(Player player, Game game) {
-        List<Button> buttons = ButtonHelper.getTilesToModify(player, game);
-        String message = player.getRepresentation() + " Use the buttons to select the tile in which you wish to modify units. ";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
     @ButtonHandler("genericReact")
@@ -529,14 +531,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String faction = buttonID.replace("forceAbstainForPlayer_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
-    }
-
-    @ButtonHandler("combatRoll_")
-    public static void combatRoll(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        ButtonHelper.resolveCombatRoll(player, game, event, buttonID);
-        if (buttonID.contains("bombard")) {
-            ButtonHelper.deleteTheOneButton(event);
-        }
     }
 
     @ButtonHandler("bombardConfirm_")

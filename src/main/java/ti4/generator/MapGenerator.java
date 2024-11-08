@@ -19,6 +19,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -1848,9 +1849,12 @@ public class MapGenerator implements AutoCloseable {
                 String decalFile = p != null ? p.getDecalFile(unitKey.asyncID()) : null;
                 BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFile));
                 BufferedImage spoopy = null;
-                if ((unitKey.getUnitType() == UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(1000) == 0)) {
-                    String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
-                    spoopy = ImageHelper.read(spoopypath);
+                if (unitKey.getUnitType() == UnitType.Warsun) {
+                    int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
+                    if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
+                        String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
+                        spoopy = ImageHelper.read(spoopypath);
+                    }
                 }
 
                 if (justNumber) {

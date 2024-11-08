@@ -27,7 +27,7 @@ public class CombatMessageHelper {
         if (dupes.isEmpty()) return;
         // Gracefully fail when units don't exist
         String error = "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n" +
-                "> Duplicate units: " + dupes;
+            "> Duplicate units: " + dupes;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
     }
 
@@ -35,12 +35,12 @@ public class CombatMessageHelper {
         if (missing.isEmpty()) return;
         // Gracefully fail when units don't exist
         String error = "You do not seem to own any of the following unit types, so they will be skipped." +
-                " Ping bothelper if this seems to be in error.\n" +
-                "> Unowned units: " + missing + "\n";
+            " Ping bothelper if this seems to be in error.\n" +
+            "> Unowned units: " + missing + "\n";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
     }
 
-    public static String displayUnitRoll(UnitModel unit, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit) {
+    public static String displayUnitRoll(UnitModel unitModel, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit) {
         String hitsSuffix = "";
         if (numHit > 1) {
             hitsSuffix = "s";
@@ -61,7 +61,7 @@ public class CombatMessageHelper {
             }
         }
 
-        String unitTypeHitsInfo = String.format("hits on %s", toHit);
+        String unitTypeHitsInfo = String.format("hits on **%s**", toHit);
         if (modifier != 0) {
             String modifierToHitString = Integer.toString(modifier);
             if (modifier > 0) {
@@ -69,28 +69,24 @@ public class CombatMessageHelper {
             }
 
             if ((toHit - modifier) <= 1) {
-                unitTypeHitsInfo = String.format("always hits (%s mods)",
-                    modifierToHitString);
+                unitTypeHitsInfo = String.format("always hits (%s mods)", modifierToHitString);
             } else {
-                unitTypeHitsInfo = String.format("hits on %s (%s mods)", (toHit - modifier),
-                    modifierToHitString);
+                unitTypeHitsInfo = String.format("hits on **%s** (%s mods)", (toHit - modifier), modifierToHitString);
             }
         }
         String upgradedUnitName = "";
-        if (unit.getUpgradesFromUnitId().isPresent() || unit.getFaction().isPresent()) {
-            upgradedUnitName = String.format(" %s", unit.getName());
+        if (unitModel.getUpgradesFromUnitId().isPresent() || unitModel.getFaction().isPresent()) {
+            upgradedUnitName = unitModel.getName();
         }
 
-        List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo,
-            unitTypeHitsInfo);
+        List<String> optionalInfoParts = Arrays.asList(upgradedUnitName, unitRollsTextInfo, unitTypeHitsInfo);
         String optionalText = optionalInfoParts.stream().filter(StringUtils::isNotBlank)
             .collect(Collectors.joining(" "));
 
-        String unitEmoji = Emojis.getEmojiFromDiscord(unit.getBaseType());
+        String unitEmoji = unitModel.getUnitEmoji();
 
-        String resultRollsString = "[" + resultRolls.stream().map(die -> Integer.toString(die.getResult())).collect(Collectors.joining(", ")) + "]";
-        return String.format("%s %s%s %s - %s hit%s\n", unitQuantity, unitEmoji, optionalText,
-            resultRollsString, numHit, hitsSuffix);
+        String resultRollsString = "[" + resultRolls.stream().map(Die::getRedDieIfSuccessOrGrayDieIfFailure).collect(Collectors.joining("")) + "]";
+        return String.format("> `%sx`%s %s %s - %s hit%s\n", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix);
     }
 
     public static String displayModifiers(String prefixText, Map<UnitModel, Integer> units,
