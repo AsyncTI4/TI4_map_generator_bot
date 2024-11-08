@@ -395,12 +395,12 @@ public class UnitRenderGenerator {
         // Ghemina special units
         if (unitKey.getUnitType() == UnitType.Lady) {
             String name = "units_ds_ghemina_lady_wht.png";
-            String spoopyPath = resourceHelper.getNonSpoopyFinFile(name);
+            String spoopyPath = resourceHelper.getDecalFile(name);
             spoopy = ImageHelper.read(spoopyPath);
         }
         if (unitKey.getUnitType() == UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
             String name = "units_ds_ghemina_lord_wht.png";
-            String spoopyPath = resourceHelper.getNonSpoopyFinFile(name);
+            String spoopyPath = resourceHelper.getDecalFile(name);
             spoopy = ImageHelper.read(spoopyPath);
         }
 
