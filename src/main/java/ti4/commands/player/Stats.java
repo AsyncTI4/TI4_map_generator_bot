@@ -138,17 +138,14 @@ public class Stats extends PlayerSubcommandData {
             setValue(event, game, player, optionTG, player::setTg, player::getTg);
             if (optionTG.getAsString().contains("+")) {
                 ButtonHelperAbilities.pillageCheck(player, game);
-            } else {
-                if (player.getTg() > oldTg) {
-                    ButtonHelperAbilities.pillageCheck(player, game);
-                }
+            } else if (player.getTg() > oldTg) {
+                ButtonHelperAbilities.pillageCheck(player, game);
             }
 
         }
 
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
-
             setValue(event, game, player, optionC, player::setCommodities, player::getCommodities);
             if (player.hasAbility("military_industrial_complex")
                 && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {

@@ -219,7 +219,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getYssarilHeroActionCardButtons(Game game, Player yssaril, Player notYssaril) {
+    public static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {

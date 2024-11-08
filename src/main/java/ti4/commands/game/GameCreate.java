@@ -21,6 +21,8 @@ import ti4.message.MessageHelper;
 
 public class GameCreate extends GameSubcommandData {
 
+    private static final Pattern ALPHANUMERIC_PATTERN = Pattern.compile("^[a-zA-Z0-9]+$");
+
     public GameCreate() {
         super(Constants.CREATE_GAME, "Create a new game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true));
@@ -31,9 +33,7 @@ public class GameCreate extends GameSubcommandData {
         String mapName = event.getOptions().getFirst().getAsString().toLowerCase();
         Member member = event.getMember();
 
-        String regex = "^[a-zA-Z0-9]+$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(mapName);
+        Matcher matcher = ALPHANUMERIC_PATTERN.matcher(mapName);
         if (!matcher.matches()) {
             MessageHelper.replyToMessage(event, "Game name can only contain a-z 0-9 symbols");
             return;
