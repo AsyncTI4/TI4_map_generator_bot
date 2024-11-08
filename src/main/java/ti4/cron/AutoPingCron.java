@@ -1,7 +1,6 @@
 package ti4.cron;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -25,34 +24,15 @@ import ti4.model.StrategyCardModel;
 public class AutoPingCron {
 
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
-    private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final long FIVE_MINUTES_IN_MILLISECONDS = 5 * 60 * 1000;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void start() {
-        SCHEDULER.scheduleAtFixedRate(AutoPingCron::autoPingGames, 1, 1, TimeUnit.MINUTES);
+        SCHEDULER.scheduleAtFixedRate(AutoPingCron::autoPingGames, 1, 10, TimeUnit.MINUTES);
     }
 
     private static void autoPingGames() {
-        Game mapReference = GameManager.getInstance().getGame("finreference");
-        if (mapReference == null) return;
-        long timeSinceLast = System.currentTimeMillis() - mapReference.getLastTimeGamesChecked().getTime();
-
-        if (timeSinceLast > TEN_MINUTES_IN_MILLISECONDS) {
-            mapReference.setLastTimeGamesChecked(new Date());
-            List<String> storedValues = new ArrayList<>(mapReference.getMessagesThatICheckedForAllReacts().keySet());
-            for (String value : storedValues) {
-                if (value.startsWith("gameCreator")) {
-                    mapReference.removeStoredValue(value);
-                }
-            }
-            GameSaveLoadManager.saveGame(mapReference, "Auto Ping");
-            handleAutoPings(GameManager.getInstance().getGameNameToGame().values(), mapReference);
-        }
-    }
-
-    private static void handleAutoPings(Collection<Game> games, Game mapReference) {
-        for (Game game : games) {
+        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
             if (game.isHasEnded()) {
                 continue;
             }
@@ -367,8 +347,11 @@ public class AutoPingCron {
                                         }
                                     }
                                 }
-                                if (player != null)
-                                    ButtonHelper.increasePingCounter(mapReference, player.getUserID());
+
+                                if (player != null) {
+                                    Game mapReference = GameManager.getInstance().getGame("finreference");
+                                    if (mapReference != null) ButtonHelper.increasePingCounter(mapReference, player.getUserID());
+                                }
                             }
                             if (player != null) {
                                 player.setWhetherPlayerShouldBeTenMinReminded(false);
