@@ -6,8 +6,8 @@
         "name": "Aethra",
         "title": "Tribune",
         "abilityName": "Tribute in Loss",
-        "abilityWindow": "When a planet is lost",
-        "abilityText": "Exhaust this card and that owner of the planet gains two trade goods",
+        "abilityWindow": "When a player loses a planet",
+        "abilityText": "Exhaust this card and the owner of that planet gains two trade goods",
         "unlockCondition": "Always Unlocked",
         "source": "memephilosopher"
     },
@@ -19,8 +19,8 @@
         "title": "Warden",
         "abilityName": "Last Stand",
         "abilityWindow": "During combat",
-        "abilityText": "Once per ground combat, when one of your Sentinels is destroyed, you may place it on any other planet you control.",
-        "unlockCondition": "Have sentinels in 6 non-home planets",
+        "abilityText": "Once per ground combat, when one of your infantry is destroyed, you may place it on any other planet you control.",
+        "unlockCondition": "Have infantry in 6 non-home planets",
         "source": "memephilosopher"
     },
     {
