@@ -1,5 +1,9 @@
 package ti4.commands.map;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -9,21 +13,12 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-
 public class MapCommand implements Command {
     private final Collection<MapSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
         return Constants.MAP;
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
     }
 
     @Override
