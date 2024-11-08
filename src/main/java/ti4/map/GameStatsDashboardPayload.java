@@ -1,6 +1,15 @@
 package ti4.map;
 
-import java.sql.Timestamp;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import software.amazon.awssdk.utils.StringUtils;
+import ti4.generator.Mapper;
+import ti4.message.BotLogger;
+import ti4.model.AgendaModel;
+import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -14,16 +23,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import software.amazon.awssdk.utils.StringUtils;
-import ti4.generator.Mapper;
-import ti4.message.BotLogger;
-import ti4.model.AgendaModel;
-import ti4.model.PublicObjectiveModel;
-import ti4.model.SecretObjectiveModel;
 
 public class GameStatsDashboardPayload {
 
@@ -80,10 +79,6 @@ public class GameStatsDashboardPayload {
         // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ?? 
         // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
         return null;
-    }
-
-    public Map<Timestamp, GameStatsDashboardPayload> getHistory() {
-        return game.getHistoricalGameStatsDashboardPayloads();
     }
 
     @JsonProperty("isPoK")

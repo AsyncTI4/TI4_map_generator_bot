@@ -41,7 +41,6 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.FOWGM, "Default GM is whoever runs this command"));
-        // addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next fow###)"));
     }
 
     @Override
@@ -208,7 +207,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
+        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNames());
         gameAndRoleNames.addAll(mapNames);
 
         //CHECK
@@ -237,7 +236,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
+        List<String> mapNames = GameManager.getInstance().getGameNames().stream()
             .filter(mapName -> mapName.startsWith("fow"))
             .toList();
         for (String mapName : mapNames) {

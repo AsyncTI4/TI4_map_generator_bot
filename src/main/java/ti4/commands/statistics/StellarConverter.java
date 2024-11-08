@@ -1,11 +1,5 @@
 package ti4.commands.statistics;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -14,6 +8,12 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class StellarConverter extends StatisticsSubcommandData {
 
@@ -29,27 +29,32 @@ public class StellarConverter extends StatisticsSubcommandData {
     }
 
     private String getStellarConverts(SlashCommandInteractionEvent event) {
-        Map<String, Game> games = GameManager.getInstance().getGameNameToGame();
         Map<String, Integer> numberConverts = new HashMap<>();
 
         int count = 0;
-        for (Game g : games.values()) {
-            List<String> worldsThisGame = g.getTileMap().values().stream()
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets
-                .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
-                .map(UnitHolder::getName)
-                .toList();
 
-            if (worldsThisGame.size() == 1) {
-                count++;
-                String planet = worldsThisGame.getFirst();
-                if (numberConverts.containsKey(planet)) {
-                    numberConverts.put(planet, numberConverts.get(planet) + 1);
-                } else {
-                    numberConverts.put(planet, 1);
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game g : pagedGames.getGames()) {
+                List<String> worldsThisGame = g.getTileMap().values().stream()
+                        .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets
+                        .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
+                        .map(UnitHolder::getName)
+                        .toList();
+
+                if (worldsThisGame.size() == 1) {
+                    count++;
+                    String planet = worldsThisGame.getFirst();
+                    if (numberConverts.containsKey(planet)) {
+                        numberConverts.put(planet, numberConverts.get(planet) + 1);
+                    } else {
+                        numberConverts.put(planet, 1);
+                    }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
 
         Comparator<Entry<String, Integer>> comparator = (p1, p2) -> (-1) * p1.getValue().compareTo(p2.getValue());
 

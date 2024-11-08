@@ -1,5 +1,14 @@
 package ti4.helpers;
 
+import org.apache.commons.lang3.StringUtils;
+import ti4.ResourceHelper;
+import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
+import ti4.message.BotLogger;
+import ti4.model.ColorModel;
+import ti4.model.PlanetModel;
+import ti4.model.TileModel;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,22 +23,12 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
-import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
-import ti4.message.BotLogger;
-import ti4.model.ColorModel;
-import ti4.model.PlanetModel;
-import ti4.model.TileModel;
-
 public class AliasHandler {
 
     private static final Map<String, String> tilemapAliasList = new HashMap<>();
     private static final Map<String, String> unitAliasList = new HashMap<>();
     private static final Map<String, String> unitListForHelp = new HashMap<>();
-    private static final Map<String, String> cctokenAliasList = new HashMap<>();
+    private static final Map<String, String> ccTokenAliasList = new HashMap<>();
     private static final Map<String, String> attachmentAliasList = new HashMap<>();
     private static final Map<String, String> tokenAliasList = new HashMap<>();
     private static final Map<String, String> factionAliasList = new HashMap<>();
@@ -55,7 +54,7 @@ public class AliasHandler {
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitListForHelp);
-        readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read CC token alias file");
+        readAliasFile("cc_token_alias.properties", ccTokenAliasList, "Could not read CC token alias file");
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
@@ -182,10 +181,9 @@ public class AliasHandler {
         String tileId = allTileAliases.get(name.toLowerCase());
         if (tileId != null) {
             return tileId;
-        } else {
-            System.out.println("Could not find an alias for Tile: " + name);
-            return name;
         }
+        System.out.println("Could not find an alias for Tile: " + name);
+        return name;
     }
 
     /**
@@ -254,7 +252,7 @@ public class AliasHandler {
     }
 
     public static String resolveToken(String name) {
-        String aliasID = cctokenAliasList.get(name.toLowerCase());
+        String aliasID = ccTokenAliasList.get(name.toLowerCase());
         //System.out.println("Could not find an alias for Token: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }

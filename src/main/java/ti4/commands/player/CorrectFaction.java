@@ -1,12 +1,5 @@
 package ti4.commands.player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -24,6 +17,13 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CorrectFaction extends PlayerSubcommandData {
     public CorrectFaction() {

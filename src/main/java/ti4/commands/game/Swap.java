@@ -1,9 +1,5 @@
 package ti4.commands.game;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -19,6 +15,10 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class Swap extends GameSubcommandData {
 

@@ -51,7 +51,6 @@ public class Stats extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
@@ -138,17 +137,14 @@ public class Stats extends PlayerSubcommandData {
             setValue(event, game, player, optionTG, player::setTg, player::getTg);
             if (optionTG.getAsString().contains("+")) {
                 ButtonHelperAbilities.pillageCheck(player, game);
-            } else {
-                if (player.getTg() > oldTg) {
-                    ButtonHelperAbilities.pillageCheck(player, game);
-                }
+            } else if (player.getTg() > oldTg) {
+                ButtonHelperAbilities.pillageCheck(player, game);
             }
 
         }
 
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
-
             setValue(event, game, player, optionC, player::setCommodities, player::getCommodities);
             if (player.hasAbility("military_industrial_complex")
                 && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
@@ -166,16 +162,20 @@ public class Stats extends PlayerSubcommandData {
 
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
-            player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-            Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-            for (Game activeGame2 : mapList.values()) {
-                for (Player player2 : activeGame2.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-                        GameSaveLoadManager.saveGame(activeGame2, event);
+            int currentPage = 0;
+            GameManager.PagedGames pagedGames;
+            do {
+                pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+                player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
+                for (Game activeGame2 : pagedGames.getGames()) {
+                    for (Player player2 : activeGame2.getRealPlayers()) {
+                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                            player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
+                            GameSaveLoadManager.saveGame(activeGame2, event);
+                        }
                     }
                 }
-            }
+            } while (pagedGames.hasNextPage());
         }
 
         Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
@@ -185,7 +185,6 @@ public class Stats extends PlayerSubcommandData {
 
         Integer turnCount = event.getOption(Constants.TURN_COUNT, null, OptionMapping::getAsInt);
         if (turnCount != null) {
-
             player.setTurnCount(turnCount);
             String message = ">  set **Turn Count** to " + turnCount;
             MessageHelper.sendMessageToEventChannel(event, message);

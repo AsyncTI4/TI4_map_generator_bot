@@ -1,12 +1,5 @@
 package ti4.commands.player;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -41,6 +34,13 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 public class Setup extends PlayerSubcommandData {
     public Setup() {
@@ -268,10 +268,10 @@ public class Setup extends PlayerSubcommandData {
 
                     List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
                     String msg = player.getRepresentationUnfogged() + " use the buttons to choose your starting technology:";
-                    if (techs.isEmpty() && bonusOptions > 0) {
+                    if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-                    } else if (bonusOptions > 0) {
+                    } else {
                         for (int x = 0; x < bonusOptions; x++) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                         }
@@ -332,19 +332,25 @@ public class Setup extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game2 : mapList.values()) {
-            for (Player player2 : game2.getRealPlayers()) {
-                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
-                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
-                    }
-                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
-                        player.setPreferenceForDistanceBasedTacticalActions(true);
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game2 : pagedGames.getGames()) {
+                for (Player player2 : game2.getRealPlayers()) {
+                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                        if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
+                            player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
+                        }
+                        if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
+                            player.setPreferenceForDistanceBasedTacticalActions(true);
+                        }
+                        break;
                     }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
 
         if (!game.isFowMode()) {
             StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName(), false);

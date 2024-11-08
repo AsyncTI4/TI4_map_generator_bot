@@ -2392,27 +2392,38 @@ public class Helper {
 
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
         Guild guild = event.getGuild();
+        if (guild == null) {
+            BotLogger.log("Guild was null in addBotHelperPermissionsToGameChannels.");
+            return;
+        }
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
-            if (!game.isHasEnded()) {
-                TextChannel tableTalkChannel = game.getTableTalkChannel();
-                if (tableTalkChannel != null && game.getGuild() == guild) {
-                    addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
-                }
-                TextChannel actionsChannel = game.getMainGameChannel();
-                if (actionsChannel != null && game.getGuild() == guild) {
-                    addRolePermissionsToGameChannel(guild, actionsChannel, role);
-                }
-                String gameName = game.getName();
-                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-                    .toList();
-                for (GuildChannel channel : channels) {
-                    addRolePermissionsToGameChannel(guild, channel, role);
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                if (!game.isHasEnded()) {
+                    if (game.getGuildId() != null && game.getGuildId().equals(guild.getId())) {
+                        TextChannel tableTalkChannel = game.getTableTalkChannel();
+                        if (tableTalkChannel != null) {
+                            addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
+                        }
+                        TextChannel actionsChannel = game.getMainGameChannel();
+                        if (actionsChannel != null) {
+                            addRolePermissionsToGameChannel(guild, actionsChannel, role);
+                        }
+                    }
+                    String gameName = game.getName();
+                    List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
+                            .toList();
+                    for (GuildChannel channel : channels) {
+                        addRolePermissionsToGameChannel(guild, channel, role);
+                    }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
     }
 
     private static void addPlayerPermissionsToGameChannel(Guild guild, Game game, GuildChannel channel) {

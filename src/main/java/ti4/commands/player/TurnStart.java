@@ -1,10 +1,5 @@
 package ti4.commands.player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -34,6 +29,11 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TurnStart extends PlayerSubcommandData {
     public TurnStart() {
@@ -310,14 +310,7 @@ public class TurnStart extends PlayerSubcommandData {
                         StringBuilder sb = new StringBuilder();
                         sb.append(p2.getRepresentationUnfogged());
                         sb.append(" You are getting this ping because ").append(Helper.getSCName(sc, game)).append(" has been played and now it is their turn again and you still haven't reacted. If you already reacted, check if your reaction got undone");
-                        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
-                            sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
-                        }
-                        sb.append("You currently have ").append(p2.getStrategicCC())
-                            .append(" CC in your strategy pool.");
-                        if (!p2.hasFollowedSC(sc)) {
-                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), sb.toString());
-                        }
+                        appendScMessages(game, p2, sc, sb);
                     }
                 }
             }
@@ -448,5 +441,17 @@ public class TurnStart extends PlayerSubcommandData {
         startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
 
         return startButtons;
+    }
+
+    private static void appendScMessages(Game game, Player player, int sc, StringBuilder sb) {
+        if (!game.getStoredValue("scPlay" + sc).isEmpty()) {
+            sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
+        }
+        sb.append("You currently have ").append(player.getStrategicCC())
+                .append(" CC in your strategy pool.");
+        if (!player.hasFollowedSC(sc)) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    sb.toString());
+        }
     }
 }

@@ -103,20 +103,26 @@ public class WebHelper {
         List<GameStatsDashboardPayload> payloads = new ArrayList<>();
         List<String> badGames = new ArrayList<>();
         int count = 0;
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
-            if (game.isHasEnded() && game.hasWinner()) {
-                count++;
-                try {
-                    // Quick & Dirty bypass for failed json creation
-                    GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
-                    objectMapper.writeValueAsString(payload);
-                    payloads.add(new GameStatsDashboardPayload(game));
-                } catch (Exception e) {
-                    badGames.add(game.getID());
-                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + game.getID() + "`", e);
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                if (game.isHasEnded() && game.hasWinner()) {
+                    count++;
+                    try {
+                        // Quick & Dirty bypass for failed json creation
+                        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
+                        objectMapper.writeValueAsString(payload);
+                        payloads.add(new GameStatsDashboardPayload(game));
+                    } catch (Exception e) {
+                        badGames.add(game.getID());
+                        BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + game.getID() + "`", e);
+                    }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
 
         String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
         if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
@@ -125,11 +131,11 @@ public class WebHelper {
         try {
             String json = objectMapper.writeValueAsString(payloads);
             PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(webProperties.getProperty("bucket"))
-                .key(String.format("statistics/%s.json", "test")) // TODO: when this export is final/good, change from "test", tell ParsleySage (stats dashboard dev)
-                .contentType("application/json")
-                .cacheControl("no-cache, no-store, must-revalidate")
-                .build();
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format("statistics/%s.json", "test")) // TODO: when this export is final/good, change from "test", tell ParsleySage (stats dashboard dev)
+                    .contentType("application/json")
+                    .cacheControl("no-cache, no-store, must-revalidate")
+                    .build();
 
             s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
                     .exceptionally(e -> {

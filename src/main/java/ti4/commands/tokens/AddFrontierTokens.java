@@ -30,7 +30,6 @@ public class AddFrontierTokens implements Command {
         return Constants.ADD_FRONTIER_TOKENS;
     }
 
-
     public static void parsingForTile(GenericInteractionCreateEvent event, Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
         for (Tile tile : tileList) {

@@ -1,10 +1,5 @@
 package ti4.commands.units;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import com.amazonaws.util.CollectionUtils;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -35,6 +30,11 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 abstract public class AddRemoveUnits implements Command {
 

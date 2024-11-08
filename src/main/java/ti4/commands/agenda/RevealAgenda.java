@@ -1,10 +1,5 @@
 package ti4.commands.agenda;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -27,6 +22,11 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.SecretObjectiveModel;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {

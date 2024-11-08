@@ -80,6 +80,8 @@ import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
 import ti4.commands.user.UserSettingsManager;
+import ti4.cron.AutoPingCron;
+import ti4.cron.LogCacheStatsCron;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -97,7 +99,7 @@ import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
 import ti4.listeners.SlashCommandListener;
 import ti4.listeners.UserJoinServerListener;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.selections.SelectionManager;
@@ -294,10 +296,10 @@ public class AsyncTI4DiscordBot {
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
 
-        // LOAD GAMES
-        BotLogger.logWithTimestamp(" LOADING GAMES");
+        // LOAD GAME NAMES
+        BotLogger.logWithTimestamp(" LOADING GAME NAMES");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
-        GameSaveLoadManager.loadGame();
+        GameManager.getInstance();
 
         // RUN DATA MIGRATIONS
         BotLogger.logWithTimestamp(" CHECKING FOR DATA MIGRATIONS");
@@ -307,6 +309,10 @@ public class AsyncTI4DiscordBot {
         // START MAP GENERATION
         MapRenderPipeline.start();
         ImageIO.setUseCache(false);
+
+        // START CRONS
+        AutoPingCron.start();
+        LogCacheStatsCron.start();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);

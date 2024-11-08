@@ -1,11 +1,5 @@
 package ti4.commands.special;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -30,6 +24,12 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Rematch extends SpecialSubcommandData {
     public Rematch() {

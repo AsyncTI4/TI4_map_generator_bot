@@ -422,11 +422,6 @@ public class SCPlay extends PlayerSubcommandData {
         }
     }
 
-    /**
-     * These buttons are only the buttons to be attached to the SC play itself, for all players to use - any additional buttons for the Primary SC holder should add specific logic to {@link SCPlay#scPlay()}
-     * 
-     * @return Buttons for the SCPlay message only (for all players to use)
-     */
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(sc).orElse(null);
         if (scModel == null) {

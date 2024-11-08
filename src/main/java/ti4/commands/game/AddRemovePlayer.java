@@ -35,7 +35,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         String mapName;
         if (gameOption != null) {
             mapName = event.getOptions().getFirst().getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+            if (!GameManager.getInstance().isValidGame(mapName)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exist, use `/help list_games`");
                 return;
             }

@@ -1,9 +1,5 @@
 package ti4.commands.cardsac;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -21,6 +17,10 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
     public ACInfo() {
@@ -46,11 +46,11 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     private static void sendTrapCardInfo(Game game, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(game, player));
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(player));
         }
     }
 
-    private static String getTrapCardInfo(Game game, Player player) {
+    private static String getTrapCardInfo(Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
         sb.append("**Trap Cards:**").append("\n");
@@ -219,7 +219,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getYssarilHeroActionCardButtons(Game game, Player yssaril, Player notYssaril) {
+    public static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = notYssaril.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
@@ -235,7 +235,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getToBeStolenActionCardButtons(Game game, Player player) {
+    public static List<Button> getToBeStolenActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
