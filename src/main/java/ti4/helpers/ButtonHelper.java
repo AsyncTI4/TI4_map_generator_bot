@@ -2335,16 +2335,14 @@ public class ButtonHelper {
     public static void findOrCreateThreadWithMessage(Game game, String threadName, String message) {
         TextChannel channel = game.getMainGameChannel();
         Helper.checkThreadLimitAndArchive(game.getGuild());
-        TextChannel textChannel = channel;
         // Use existing thread, if it exists
-        for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
+        for (ThreadChannel threadChannel_ : channel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_, message);
                 return;
             }
         }
-        String finalThreadName = threadName;
-        List<ThreadChannel> hiddenThreadChannels = textChannel.retrieveArchivedPublicThreadChannels().complete();
+        List<ThreadChannel> hiddenThreadChannels = channel.retrieveArchivedPublicThreadChannels().complete();
         for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 MessageHelper.sendMessageToChannel(threadChannel_, message);
@@ -2355,10 +2353,10 @@ public class ButtonHelper {
 
         channel.sendMessage(msg).queue(m -> {
             ThreadChannel.AutoArchiveDuration duration = ThreadChannel.AutoArchiveDuration.TIME_3_DAYS;
-            if (finalThreadName.contains("undo-log"))
+            if (threadName.contains("undo-log"))
                 duration = ThreadChannel.AutoArchiveDuration.TIME_1_HOUR;
 
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(finalThreadName, m.getId());
+            ThreadChannelAction threadChannel = channel.createThreadChannel(threadName, m.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(duration);
             threadChannel.queue(tc -> MessageHelper.sendMessageToChannel(tc, message + game.getPing()));
         });
