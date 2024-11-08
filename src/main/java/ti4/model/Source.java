@@ -10,7 +10,7 @@ public class Source {
         base, pok, codex1, codex2, codex3,
 
         //big homebrew
-        ds, absol, franken, uncharted_space,
+        ds, absol, franken, uncharted_space, monuments,
 
         // lil homebrew
         lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises,
@@ -81,6 +81,7 @@ public class Source {
                 case lazax -> Emojis.Lazax;
                 case neutral -> Emojis.Neutral;
                 case salliance -> Emojis.StrategicAlliance;
+                case monuments -> Emojis.Monuments;
                 default -> "";
             };
         }
@@ -97,6 +98,7 @@ public class Source {
                 case flagshipping -> "Flagshipping";
                 case promises_promises -> "Promises Promises";
                 case franken -> "Franken Draft [Homebrew Game Mode]";
+                case monuments -> "Monuments+";
                 default -> toString();
             };
         }
