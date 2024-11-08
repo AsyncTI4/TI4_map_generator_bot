@@ -314,7 +314,6 @@ public class TurnStart extends PlayerSubcommandData {
                     }
                 }
             }
-
         }
         if (doneActionThisTurn) {
             ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
@@ -427,12 +426,6 @@ public class TurnStart extends PlayerSubcommandData {
                 .queue(Consumers.nop(), BotLogger::catchRestError);
             game.setLatestTransactionMsg("");
         }
-        // if (game.getActionCards().size() > 130 &&
-        // getButtonsToSwitchWithAllianceMembers(player, game, false).size() > 0)
-        // {
-        // startButtons.addAll(getButtonsToSwitchWithAllianceMembers(player, game,
-        // false));
-        // }
         if (!doneActionThisTurn && game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Show Game"));
         }

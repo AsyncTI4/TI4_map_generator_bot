@@ -1,10 +1,5 @@
 package ti4.helpers;
 
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.jetbrains.annotations.Nullable;
-import ti4.message.BotLogger;
-
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -17,10 +12,14 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 
-public class ImageHelper {
+import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import org.jetbrains.annotations.Nullable;
+import ti4.message.BotLogger;
 
-    private ImageHelper() {
-    }
+@UtilityClass
+public class ImageHelper {
 
     @Nullable
     public static BufferedImage read(String filePath) {

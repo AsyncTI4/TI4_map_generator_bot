@@ -1,5 +1,15 @@
 package ti4.commands.statistics;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -74,10 +84,9 @@ public class DiceLuck extends StatisticsSubcommandData {
                 User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
                 double expectedHits = userTurnCountTotalTime.getValue().getKey();
                 int actualHits = userTurnCountTotalTime.getValue().getValue();
-
-                if (user == null || expectedHits == 0 || actualHits == 0) return;
-
-                appendDiceLuck(sb, index, user, expectedHits, actualHits);
+                if (user != null && expectedHits != 0 && actualHits != 0) {
+                    appendDiceLuck(sb, index, user, expectedHits, actualHits);
+                }
             });
 
         return sb.toString();

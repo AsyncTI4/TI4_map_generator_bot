@@ -27,7 +27,7 @@ public class LogCacheStatsCron {
     }
 
     public static void start() {
-        SCHEDULER.scheduleAtFixedRate(LogCacheStatsCron::logCacheStats, 1, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
+        SCHEDULER.scheduleAtFixedRate(LogCacheStatsCron::logCacheStats, 5, LOG_CACHE_STATS_INTERVAL_MINUTES, TimeUnit.MINUTES);
     }
 
     private static void logCacheStats() {

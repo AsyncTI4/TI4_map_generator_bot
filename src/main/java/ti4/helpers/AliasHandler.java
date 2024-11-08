@@ -1,14 +1,5 @@
 package ti4.helpers;
 
-import org.apache.commons.lang3.StringUtils;
-import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
-import ti4.message.BotLogger;
-import ti4.model.ColorModel;
-import ti4.model.PlanetModel;
-import ti4.model.TileModel;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +13,15 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import ti4.ResourceHelper;
+import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
+import ti4.message.BotLogger;
+import ti4.model.ColorModel;
+import ti4.model.PlanetModel;
+import ti4.model.TileModel;
 
 public class AliasHandler {
 
