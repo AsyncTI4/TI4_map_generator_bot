@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-
 import ti4.commands.player.ChangeColor;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -663,7 +662,7 @@ public class DataMigrationManager {
 
                 if (changesMade) {
                     migrationsAppliedThisTime.add(game.getName());
-                    GameSaveLoadManager.saveMap(game, "Data Migration - " + migrationName);
+                    GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);
                 }
             }
         }

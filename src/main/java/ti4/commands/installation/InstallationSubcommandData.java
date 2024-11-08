@@ -3,9 +3,7 @@ package ti4.commands.installation;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
 import org.jetbrains.annotations.NotNull;
-
 import ti4.commands.uncategorized.ShowGame;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -42,7 +40,7 @@ public abstract class InstallationSubcommandData extends SubcommandData {
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }
 }

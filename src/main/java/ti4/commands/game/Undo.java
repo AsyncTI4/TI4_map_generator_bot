@@ -1,5 +1,12 @@
 package ti4.commands.game;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -15,13 +22,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 public class Undo extends GameSubcommandData {
     public Undo() {
@@ -77,7 +77,7 @@ public class Undo extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
             return;
         }
-        Game gameToRestore = GameSaveLoadManager.loadMap(undoFileToRestore);
+        Game gameToRestore = GameSaveLoadManager.loadGame(undoFileToRestore);
         if (gameToRestore == null) {
             MessageHelper.replyToMessage(event,
                 "Undo failed - Couldn't load game to undo back to: " + undoFileToRestorePath);
@@ -159,6 +159,6 @@ public class Undo extends GameSubcommandData {
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
         return Arrays.stream(mapUndoFiles).map(Storage::getGameUndoStorage)
-            .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadMap));
+            .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadGame));
     }
 }

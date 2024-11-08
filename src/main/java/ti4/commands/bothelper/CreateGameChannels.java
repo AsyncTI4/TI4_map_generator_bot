@@ -270,7 +270,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             actionsChannel.getAsMention();
         MessageHelper.sendMessageToEventChannel(event, message);
 
-        GameSaveLoadManager.saveMap(newGame, event);
+        GameSaveLoadManager.saveGame(newGame, event);
         GameCreate.reportNewGameCreated(newGame);
 
         presentSetupToPlayers(newGame);

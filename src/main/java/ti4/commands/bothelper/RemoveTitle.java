@@ -46,6 +46,6 @@ public class RemoveTitle extends BothelperSubcommandData {
         String userID = user.getUser().getId();
         game.setStoredValue("TitlesFor" + userID, game.getStoredValue("TitlesFor" + userID).replace(title, ""));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed the title " + title + " in game " + game.getName());
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 }

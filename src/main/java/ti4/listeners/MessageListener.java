@@ -1,5 +1,6 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,10 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nonnull;
-
-import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -28,6 +25,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.bothelper.CreateGameChannels;
@@ -57,7 +55,7 @@ public class MessageListener extends ListenerAdapter {
         if (!isAsyncServer(event.getGuild().getId())) {
             return;
         }
-        long timeNow = new Date().getTime();
+        long timeNow = System.currentTimeMillis();
         try {
             Message msg = event.getMessage();
             if (msg.getContentRaw().startsWith("[DELETE]")) {
@@ -77,7 +75,7 @@ public class MessageListener extends ListenerAdapter {
                 if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
                     Game mapreference = GameManager.getInstance().getGame("finreference");
                     if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
-                        mapreference.setStoredValue("makingGamePost" + channel.getId(), new Date().getTime() + "");
+                        mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
                         MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
                     }
                 }
@@ -90,8 +88,8 @@ public class MessageListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " + event.getMessage().getJumpUrl(), e);
         }
-        if (new Date().getTime() - timeNow > 1500) {
-            BotLogger.log(event.getMessage().getChannel().getName() + " A message in this channel took longer than 1500 ms (" + (new Date().getTime() - timeNow) + ")");
+        if (System.currentTimeMillis() - timeNow > 1500) {
+            BotLogger.log(event.getMessage().getChannel().getName() + " A message in this channel took longer than 1500 ms (" + (System.currentTimeMillis() - timeNow) + ")");
         }
     }
 
@@ -120,7 +118,7 @@ public class MessageListener extends ListenerAdapter {
         if (mapreference == null) return;
         int multiplier = 1000; // should be 1000
         int tenMin = 10 * 60 * multiplier; // 10 minutes
-        long timeSinceLast = (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime();
+        long timeSinceLast = System.currentTimeMillis() - mapreference.getLastTimeGamesChecked().getTime();
 
         if (timeSinceLast > tenMin) {
             mapreference.setLastTimeGamesChecked(new Date());
@@ -130,7 +128,7 @@ public class MessageListener extends ListenerAdapter {
                     mapreference.removeStoredValue(value);
                 }
             }
-            GameSaveLoadManager.saveMap(mapreference, "Auto Ping");
+            GameSaveLoadManager.saveGame(mapreference, "Auto Ping");
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
 
             for (Game game : mapList.values()) {
@@ -154,7 +152,7 @@ public class MessageListener extends ListenerAdapter {
                                 String scTime = game.getStoredValue("scPlayMsgTime" + game.getRound() + sc);
                                 if (!scTime.isEmpty()) {
                                     long scPlayTime = Long.parseLong(scTime);
-                                    long timeDifference = (new Date().getTime()) - scPlayTime;
+                                    long timeDifference = System.currentTimeMillis() - scPlayTime;
                                     String timesPinged = game
                                         .getStoredValue("scPlayPingCount" + sc + player.getFaction());
                                     if (timeDifference > twelveHrs && timeDifference < twentyFourhrs) {
@@ -249,7 +247,7 @@ public class MessageListener extends ListenerAdapter {
                 if (game.getAutoPingStatus() && spacer != 0 && !game.isTemporaryPingDisable()) {
                     if ((playerID != null && player != null && !player.isAFK()) || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                         if (player != null || "agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
-                            long milliSinceLastPing = new Date().getTime()
+                            long milliSinceLastPing = System.currentTimeMillis()
                                 - game.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (60 * 60 * multiplier * spacer)
                                 || (player != null && player.shouldPlayerBeTenMinReminded()
@@ -278,7 +276,7 @@ public class MessageListener extends ListenerAdapter {
                                 if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                     AgendaHelper.pingMissingPlayers(game);
                                 } else {
-                                    long milliSinceLastTurnChange = new Date().getTime()
+                                    long milliSinceLastTurnChange = System.currentTimeMillis()
                                         - game.getLastActivePlayerChange().getTime();
                                     int autoPingSpacer = (int) spacer;
                                     int pingNumber = (int) (milliSinceLastTurnChange
@@ -491,16 +489,16 @@ public class MessageListener extends ListenerAdapter {
                                     player.setWhetherPlayerShouldBeTenMinReminded(false);
                                 }
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game, "Auto Ping");
+                                GameSaveLoadManager.saveGame(game, "Auto Ping");
                             }
                         }
                     } else {
-                        long milliSinceLastPing = new Date().getTime() - game.getLastActivePlayerPing().getTime();
+                        long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
                         if (milliSinceLastPing > (60 * 60 * multiplier * game.getAutoPingSpacer())) {
                             if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                 AgendaHelper.pingMissingPlayers(game);
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game, "Auto Ping");
+                                GameSaveLoadManager.saveGame(game, "Auto Ping");
                             }
                         }
                     }

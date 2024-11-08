@@ -16,7 +16,6 @@ public interface InfoThreadCommand {
     String getActionID();
 
     default boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
-
         if (event.getName().equals(actionID)) {
             String userID = event.getUser().getId();
             GameManager gameManager = GameManager.getInstance();

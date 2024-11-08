@@ -1,6 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.Date;
 import java.util.Map;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -32,13 +31,13 @@ public class ListDeadGames extends BothelperSubcommandData {
         int channelCount = 0;
         int roleCount = 0;
         for (Game game : mapList.values()) {
-            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
+            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
             if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100") || game.getName().equalsIgnoreCase("pbd100two")) {
                 continue;
             }
-            long milliSinceLastTurnChange = new Date().getTime()
+            long milliSinceLastTurnChange = System.currentTimeMillis()
                 - game.getLastActivePlayerChange().getTime();
 
             if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000L) {

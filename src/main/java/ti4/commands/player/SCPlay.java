@@ -2,7 +2,6 @@ package ti4.commands.player;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -229,7 +228,7 @@ public class SCPlay extends PlayerSubcommandData {
             }
             game.setStoredValue("scPlay" + scToPlay, message_.getJumpUrl());
             game.setStoredValue("scPlayMsgID" + scToPlay, message_.getId());
-            game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, new Date().getTime() + "");
+            game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, System.currentTimeMillis() + "");
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction()).isEmpty()) {
                     game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());

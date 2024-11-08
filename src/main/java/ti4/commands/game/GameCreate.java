@@ -3,6 +3,7 @@ package ti4.commands.game;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -66,7 +67,7 @@ public class GameCreate extends GameSubcommandData {
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);
         }
-        GameSaveLoadManager.saveMap(newGame, event);
+        GameSaveLoadManager.saveGame(newGame, event);
         return newGame;
     }
 

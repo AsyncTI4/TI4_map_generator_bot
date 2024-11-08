@@ -53,7 +53,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         User user = event.getUser();
         action(event, game, user);
         Helper.fixGameChannelPermissions(event.getGuild(), game);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, getResponseMessage(game, user));
     }
 

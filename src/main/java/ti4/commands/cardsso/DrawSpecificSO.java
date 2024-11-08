@@ -1,5 +1,7 @@
 package ti4.commands.cardsso;
 
+import java.util.Map;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -9,8 +11,6 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Map;
 
 public class DrawSpecificSO extends SOCardsSubcommandData {
 
@@ -53,7 +53,7 @@ public class DrawSpecificSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
             return;
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
         SOInfo.sendSecretObjectiveInfo(game, game.getPlayer(user.getId()));
     }

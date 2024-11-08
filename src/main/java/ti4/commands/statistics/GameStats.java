@@ -1,11 +1,8 @@
 package ti4.commands.statistics;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,8 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -24,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.bothelper.ListSlashCommandsUsed;
 import ti4.generator.Mapper;
@@ -36,6 +32,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class GameStats extends StatisticsSubcommandData {
 
@@ -389,7 +387,7 @@ public class GameStats extends StatisticsSubcommandData {
         Map<String, Integer> endedGames = new HashMap<>();
         for (Game game : filteredGames) {
             if (game.isHasEnded() && game.getWinner().isPresent() && game.getPlayerCountForMap() > 2
-                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(new Date().getTime())) < pastDays) {
+                && Helper.getDateDifference(game.getEndedDateString(), Helper.getDateRepresentation(System.currentTimeMillis())) < pastDays) {
                 num++;
                 int dif = Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString());
                 endedGames.put(game.getName() + " (" + game.getPlayerCountForMap() + "p, " + game.getVp() + "pt)", dif);

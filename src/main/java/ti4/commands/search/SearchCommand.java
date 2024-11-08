@@ -20,11 +20,6 @@ public class SearchCommand implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return true;
-    }
-
-    @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
         for (SearchSubcommandData subcommand : subcommandData) {

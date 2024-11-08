@@ -712,7 +712,7 @@ public class ButtonHelperSCs {
         if (hasSchemingAbility) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " use buttons to discard",
-                ACInfo.getDiscardActionCardButtons(game, player, false));
+                ACInfo.getDiscardActionCardButtons(player, false));
         }
         CommanderUnlockCheck.checkPlayer(player, "yssaril");
         if (player.hasAbility("contagion")) {

@@ -30,10 +30,6 @@ public class AddFrontierTokens implements Command {
         return Constants.ADD_FRONTIER_TOKENS;
     }
 
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
 
     public static void parsingForTile(GenericInteractionCreateEvent event, Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
@@ -65,7 +61,7 @@ public class AddFrontierTokens implements Command {
         } else {
             Game game = gameManager.getUserActiveGame(userID);
             parsingForTile(event, game);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);
         }
     }

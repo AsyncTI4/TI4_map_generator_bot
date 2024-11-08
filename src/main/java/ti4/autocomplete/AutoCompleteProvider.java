@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -579,7 +578,7 @@ public class AutoCompleteProvider {
                 if (game.isFowMode()) {
                     event.replyChoiceStrings("Game is Fog of War mode - you can't see what you are undoing.").queue();
                 }
-                long datetime = new Date().getTime();
+                long datetime = System.currentTimeMillis();
                 List<Command.Choice> options = Undo.getAllUndoSavedGames(game).entrySet().stream()
                     .sorted(Map.Entry.<String, Game>comparingByValue(Comparator.comparing(Game::getLastModifiedDate)).reversed())
                     .limit(25)

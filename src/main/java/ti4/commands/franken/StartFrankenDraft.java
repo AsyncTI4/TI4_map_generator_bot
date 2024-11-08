@@ -52,7 +52,7 @@ public class StartFrankenDraft extends FrankenSubcommandData {
         }
 
         FrankenDraftHelper.startDraft(game);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 
     public enum FrankenDraftMode {

@@ -28,6 +28,7 @@ public class Units {
      */
     @Data
     public static class UnitKey {
+
         private UnitType unitType;
         private String colorID;
 
@@ -87,6 +88,7 @@ public class Units {
     }
 
     public enum UnitType {
+
         Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
         PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"); //relics

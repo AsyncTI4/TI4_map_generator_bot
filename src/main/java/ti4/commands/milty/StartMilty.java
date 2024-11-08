@@ -230,7 +230,7 @@ public class StartMilty extends MiltySubcommandData {
             specs.presetSlices.forEach(draftManager::addSlice);
             // Kick it off with a bang!
             draftManager.repostDraftInformation(game);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
         } else {
             event.getMessageChannel().sendMessage(startMsg).queue((ignore) -> {
                 boolean slicesCreated = generateSlices(event, draftManager, specs);
@@ -243,7 +243,7 @@ public class StartMilty extends MiltySubcommandData {
                 } else {
                     // Kick it off with a bang!
                     draftManager.repostDraftInformation(game);
-                    GameSaveLoadManager.saveMap(game, event);
+                    GameSaveLoadManager.saveGame(game, event);
                     game.setPhaseOfGame("miltydraft");
                 }
             });

@@ -1,5 +1,7 @@
 package ti4.commands.tokens;
 
+import java.util.Collection;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -13,8 +15,6 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
 
 public class RemoveAllCC implements Command {
 
@@ -38,14 +38,9 @@ public class RemoveAllCC implements Command {
         } else {
             Game game = gameManager.getUserActiveGame(userID);
             parsingForTile(event, game);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);
         }
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

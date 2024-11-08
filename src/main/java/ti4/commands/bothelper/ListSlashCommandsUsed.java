@@ -1,7 +1,6 @@
 package ti4.commands.bothelper;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();
         for (Game game : mapList.values()) {
-            if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) > 30) {
+            if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
                 continue;
             }
             if (game.getButtonPressCount() > largestAmountOfButtonsIn1Game) {

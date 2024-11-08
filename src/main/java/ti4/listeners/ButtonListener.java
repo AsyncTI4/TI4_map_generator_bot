@@ -1,12 +1,11 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -59,7 +58,7 @@ public class ButtonListener extends ListenerAdapter {
             event.deferEdit().queue();
         }
         BotLogger.logButton(event);
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
         try {
             ButtonContext context = new ButtonContext(event);
             if (context.isValid()) {
@@ -69,7 +68,7 @@ public class ButtonListener extends ListenerAdapter {
         } catch (Exception e) {
             BotLogger.log(event, "Something went wrong with button interaction", e);
         }
-        long endTime = new Date().getTime();
+        long endTime = System.currentTimeMillis();
         if (endTime - startTime > 3000) {
             BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
         }

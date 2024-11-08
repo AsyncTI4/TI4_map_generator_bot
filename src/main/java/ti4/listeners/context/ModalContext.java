@@ -36,7 +36,7 @@ public class ModalContext extends ListenerContext {
         }
 
         if (game != null) {
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
         }
     }
 }

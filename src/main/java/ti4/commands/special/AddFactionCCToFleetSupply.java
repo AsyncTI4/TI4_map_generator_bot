@@ -22,7 +22,7 @@ public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
             Helper.isCCCountCorrect(event, game, color);
         }
         CommanderUnlockCheck.checkPlayer(player, "mahact");
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
     }
 }

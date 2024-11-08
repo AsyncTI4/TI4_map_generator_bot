@@ -99,7 +99,7 @@ public class CorrectFaction extends PlayerSubcommandData {
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }
 
