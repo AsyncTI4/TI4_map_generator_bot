@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,18 @@ public class TileHelper {
 
     public static TileModel getTileById(String tileId) {
         return tileIdsToTileModels.get(tileId);
+    }
+
+    public static Collection<String> getAllTileIds() {
+        return tileIdsToTileModels.keySet();
+    }
+
+    public static Collection<TileModel> getAllTileModels() {
+        return tileIdsToTileModels.values();
+    }
+
+    public static Collection<PlanetModel> getAllPlanetModels() {
+        return planetIdsToPlanetModels.values();
     }
 
     public static void initPlanetsFromJson() {

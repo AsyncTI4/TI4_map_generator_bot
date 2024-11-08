@@ -312,7 +312,7 @@ public class Mapper {
 
     public static List<String> getFrontierTileIds() {
         List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
-        return TileHelper.getTileIdsToTileModels().values().stream()
+        return TileHelper.getAllTileModels().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
             .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
             .filter(TileModel::isEmpty)
@@ -321,10 +321,10 @@ public class Mapper {
     }
 
     public static String getTileID(String tileID) {
-        if (TileHelper.getTileIdsToTileModels().get(tileID) == null) {
+        if (TileHelper.getTileById(tileID) == null) {
             return null;
         }
-        return TileHelper.getTileIdsToTileModels().get(tileID).getImagePath();
+        return TileHelper.getTileById(tileID).getImagePath();
     }
 
     public static List<List<Boolean>> getHyperlaneData(String tileID) {
@@ -345,10 +345,10 @@ public class Mapper {
     }
 
     public static Set<String> getWormholes(String tileID) {
-        if (tileID == null || TileHelper.getTileIdsToTileModels().get(tileID) == null || TileHelper.getTileIdsToTileModels().get(tileID).getWormholes() == null) {
+        if (tileID == null || TileHelper.getTileById(tileID) == null || TileHelper.getTileById(tileID).getWormholes() == null) {
             return new HashSet<>();
         }
-        return TileHelper.getTileIdsToTileModels().get(tileID).getWormholes().stream()
+        return TileHelper.getTileById(tileID).getWormholes().stream()
             .filter(Objects::nonNull)
             .map(WormholeModel.Wormhole::toString)
             .collect(Collectors.toSet());
@@ -361,7 +361,7 @@ public class Mapper {
             return new HashSet<>();
         }
 
-        return TileHelper.getTileIdsToTileModels().values().stream()
+        return TileHelper.getAllTileModels().stream()
             .filter(tileModel -> tileModel.getWormholes() != null && tileModel.getWormholes().contains(wormhole))
             .map(TileModel::getId)
             .collect(Collectors.toSet());
@@ -564,7 +564,7 @@ public class Mapper {
     }
 
     public static PlanetModel getPlanet(String id) {
-        return TileHelper.getPlanetIdsToPlanetModels().get(id);
+        return TileHelper.getPlanetById(id);
     }
 
     public static boolean isValidAttachment(String id) {
@@ -645,7 +645,7 @@ public class Mapper {
     }
 
     public static Map<String, String> getPlanetRepresentations() {
-        return TileHelper.getPlanetIdsToPlanetModels().values().stream()
+        return TileHelper.getAllPlanetModels().stream()
             .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
@@ -662,7 +662,7 @@ public class Mapper {
     }
 
     public static Map<String, String> getTileRepresentations() {
-        return TileHelper.getTileIdsToTileModels().values().stream()
+        return TileHelper.getAllTileModels().stream()
             .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 

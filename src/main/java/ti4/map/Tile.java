@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
@@ -70,14 +69,9 @@ public class Tile {
         unitHolders.put(Constants.SPACE, space);
         Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
 
-        if (Optional.ofNullable(tilePlanetPositions).isPresent())
+        if (tilePlanetPositions != null)
             tilePlanetPositions
                 .forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
-    }
-
-    public void inheritFogData(Tile t) {
-        fog.putAll(t.getFog());
-        fogLabel.putAll(t.getFogLabel());
     }
 
     @Nullable

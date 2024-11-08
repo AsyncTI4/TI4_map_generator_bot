@@ -46,7 +46,7 @@ public class SearchTiles extends SearchComponentModel {
             TileModel tile = TileHelper.getTileById(searchString);
             tileEmbeds.add(Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)));
         } else {
-            TileHelper.getTileIdsToTileModels().values().stream()
+            TileHelper.getAllTileModels().stream()
                 .filter(tile -> tile.search(searchString, source))
                 .sorted(Comparator.comparing(TileModel::getId))
                 .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))

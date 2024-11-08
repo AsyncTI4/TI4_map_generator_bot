@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PlanetModelTest extends BaseTi4Test {
     @Test
     public void testPlanets() {
-        for (PlanetModel model : TileHelper.getPlanetIdsToPlanetModels().values()) {
+        for (PlanetModel model : TileHelper.getAllPlanetModels()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validateTileId(model), model.getAlias() + ": invalid TileID: " + model.getTileId());
             assertTrue(validateTileContainsPlanet(model), model.getAlias() + ": invalid TileID - tile does not contain planet: " + model.getTileId());
@@ -25,7 +25,7 @@ public class PlanetModelTest extends BaseTi4Test {
 
     private boolean validateTileContainsPlanet(PlanetModel model) {
         if (model.getTileId() == null) return true;
-        return TileHelper.getTileIdsToTileModels().get(model.getTileId()).getPlanets().contains(model.getAlias());
+        return TileHelper.getTileById(model.getTileId()).getPlanets().contains(model.getAlias());
     }
 
     private boolean validateFactionHomeworld(PlanetModel model) {

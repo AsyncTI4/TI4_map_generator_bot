@@ -4754,7 +4754,7 @@ public class ButtonHelper {
         Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent,
             event, rollType, game);
 
-        TileModel tileModel = TileHelper.getTileIdsToTileModels().get(tile.getTileID());
+        TileModel tileModel = TileHelper.getTileById(tile.getTileID());
         List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
 

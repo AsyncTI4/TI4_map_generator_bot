@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TileModelTest extends BaseTi4Test {
     @Test
     public void testTiles() {
-        for (TileModel model : TileHelper.getTileIdsToTileModels().values()) {
+        for (TileModel model : TileHelper.getAllTileModels()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
             assertTrue(validatePlanetIDs(model), model.getAlias() + ": invalid Planet IDs: " + model.getPlanets());
         }

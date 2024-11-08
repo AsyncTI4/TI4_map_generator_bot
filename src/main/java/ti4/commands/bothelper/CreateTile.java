@@ -83,7 +83,7 @@ public class CreateTile extends BothelperSubcommandData {
             }
         }
         String message = "Created new tile! Please check and make sure everything generated properly. This is the model:\n" +
-                "```json\n" + TileHelper.getTileIdsToTileModels().get(event.getOption(Constants.TILE_ID).getAsString()) + "\n```";
+                "```json\n" + TileHelper.getTileById(event.getOption(Constants.TILE_ID).getAsString()) + "\n```";
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 

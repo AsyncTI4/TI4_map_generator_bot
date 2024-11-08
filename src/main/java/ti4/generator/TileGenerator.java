@@ -201,7 +201,7 @@ public class TileGenerator {
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                ShipPositionModel.ShipPosition shipPositionsType = TileHelper.getTileIdsToTileModels().get(tile.getTileID()).getShipPositionsType();
+                ShipPositionModel.ShipPosition shipPositionsType = TileHelper.getTileById(tile.getTileID()).getShipPositionsType();
                 if (tile.isAnomaly(game) && shipPositionsType != null) {
                     BufferedImage anomalyImage = ImageHelper.read(ResourceHelper.getInstance().getTileFile("tile_anomaly.png"));
                     switch (shipPositionsType.toString().toUpperCase()) {
@@ -1968,7 +1968,7 @@ public class TileGenerator {
                 if (types.contains("b")) graphics.drawImage(icon, TILE_PADDING + offset + 49, TILE_PADDING + offset + 147, null);
                 break;
             default:
-                Point wormholeLocation = TileHelper.getTileIdsToTileModels().get(tile.getTileID()).getShipPositionsType().getWormholeLocation();
+                Point wormholeLocation = TileHelper.getTileById(tile.getTileID()).getShipPositionsType().getWormholeLocation();
                 if (wormholeLocation == null) {
                     graphics.drawImage(icon, TILE_PADDING + offset + 86, TILE_PADDING + 260, null);
                 } else {

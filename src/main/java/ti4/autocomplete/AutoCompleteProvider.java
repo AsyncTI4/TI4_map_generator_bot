@@ -910,8 +910,8 @@ public class AutoCompleteProvider {
         if (optionName.equals(Constants.SEARCH)) {
             List<Command.Choice> options = null;
             switch (subCommandName) {
-                case Constants.SEARCH_PLANETS -> options = searchModels(event, TileHelper.getPlanetIdsToPlanetModels().values(), source);
-                case Constants.SEARCH_TILES -> options = searchModels(event, TileHelper.getTileIdsToTileModels().values(), source);
+                case Constants.SEARCH_PLANETS -> options = searchModels(event, TileHelper.getAllPlanetModels(), source);
+                case Constants.SEARCH_TILES -> options = searchModels(event, TileHelper.getAllTileModels(), source);
                 case Constants.SEARCH_FACTIONS -> options = searchModels(event, Mapper.getFactions(), source);
                 case Constants.SEARCH_LEADERS -> options = searchModels(event, Mapper.getLeaders().values(), source);
                 case Constants.SEARCH_UNITS -> options = searchModels(event, Mapper.getUnits().values(), source);
@@ -970,21 +970,12 @@ public class AutoCompleteProvider {
             case Constants.ADD_TILE -> {
                 if (optionName.equals(Constants.TILE_NAME)) {
                     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    List<Command.Choice> options = TileHelper.getTileIdsToTileModels().entrySet().stream()
-                        .filter(entry -> entry.getValue().search(enteredValue))
+                    List<Command.Choice> options = TileHelper.getAllTileModels().stream()
+                        .filter(tileModel -> tileModel.search(enteredValue))
                         .limit(25)
-                        .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
+                        .map(tileModel -> new Command.Choice(tileModel.getAutoCompleteName(), tileModel.getId()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                    // case Constants.POSITION -> {
-                    //     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    //     List<Command.Choice> options = game.getTileMap().entrySet().stream()
-                    //         .filter(entry -> entry.getValue().search(enteredValue))
-                    //         .limit(25)
-                    //         .map(entry -> new Command.Choice(entry.getValue().getAutoCompleteName(), entry.getKey()))
-                    //         .collect(Collectors.toList());
-                    //     event.replyChoices(options).queue();
-                    // }
                 }
             }
             case Constants.REMOVE_TILE -> {

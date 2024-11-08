@@ -258,7 +258,7 @@ public class MiltyDraftHelper {
     }
 
     public static void initDraftTiles(MiltyDraftManager draftManager, List<ComponentSource> sources) {
-        List<TileModel> allTiles = new ArrayList<>(TileHelper.getTileIdsToTileModels().values());
+        List<TileModel> allTiles = new ArrayList<>(TileHelper.getAllTileModels());
         for (TileModel tileModel : allTiles) {
             String tileID = tileModel.getId();
             if (isInvalid(tileModel)) {

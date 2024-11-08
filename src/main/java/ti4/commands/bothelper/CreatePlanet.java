@@ -91,7 +91,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         }
 
         String message = "Created new planet! Please check and make sure everything generated properly. This is the model:\n" +
-            "```json\n" + TileHelper.getPlanetIdsToPlanetModels().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```";
+            "```json\n" + TileHelper.getPlanetById(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```";
         MessageHelper.sendMessageToChannelWithEmbed(event.getChannel(), message, planet.getRepresentationEmbed(true));
     }
 
