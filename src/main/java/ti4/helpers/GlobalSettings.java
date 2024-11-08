@@ -1,17 +1,15 @@
 package ti4.helpers;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.HashMap;
-
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
 import ti4.message.BotLogger;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,6 +25,8 @@ public class GlobalSettings {
         FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, //
         URL_IMAGE_CACHE_MAX_SIZE, //
         URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, //
+        CALCULATED_IMAGE_CACHE_SIZE,
+        CALCULATED_IMAGE_CACHE_EXPIRE_TIME_MINUTES,
         LOG_CACHE_STATS_INTERVAL_MINUTES, //
         GUILD_ID_FOR_NEW_GAME_CATEGORIES, //Which guild to create new game categories in (DEPRECATED)
         MAX_GAMES_PER_CATEGORY, //Max # of games when creating a category

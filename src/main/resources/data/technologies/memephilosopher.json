@@ -5,10 +5,10 @@
         "types": [
             "UNITUPGRADE"
         ],
-        "requirements": "GGR",
+        "requirements": "GG",
         "faction": "netharii",
         "source": "memephilosopher",
-        "text": "Cost 1, Combat 5. When on a planet, this unit participates in space combat, but cannot be destroyed during space combat. This unit can participate in space combats in adjacent systems."
+        "text": "Cost 1, Combat 5. This unit can only use SPACE CANNON if on a planet. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system."
     },
     {
         "alias": "ne_qed",

@@ -1,8 +1,5 @@
 package ti4.commands.combat;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -20,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
-import ti4.generator.GenerateTile;
+import ti4.generator.TileGenerator;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -39,6 +36,9 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StartCombat extends CombatSubcommandData {
 
@@ -240,7 +240,7 @@ public class StartCombat extends CombatSubcommandData {
         }
 
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event, player1);
+        FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
 
         // Create the thread
         final String finalThreadName = threadName;
@@ -276,7 +276,7 @@ public class StartCombat extends CombatSubcommandData {
         // PDS2 Context
         int context = getTileImageContextForPDS2(game, player1, tile, spaceOrGround);
         if (file == null) {
-            file = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event, player1);
+            file = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
         }
 
         message.append("\nImage of System:");
@@ -334,8 +334,7 @@ public class StartCombat extends CombatSubcommandData {
     private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event,
         String spaceOrGround) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),
-            event, player);
+        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
 
         // Use existing thread, if it exists
         TextChannel textChannel = (TextChannel) player.getPrivateChannel();

@@ -1,9 +1,6 @@
 package ti4.commands.admin;
 
 
-import java.io.File;
-import java.util.concurrent.ExecutionException;
-
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -15,6 +12,9 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
+
+import java.io.File;
+import java.util.concurrent.ExecutionException;
 
 public class RestoreGame extends AdminSubcommandData {
 
@@ -39,7 +39,7 @@ public class RestoreGame extends AdminSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Save file must be text/plain; charset=utf-8");
             return;
         }
-        File gameFile = Storage.getMapImageStorage(attachment.getFileName());
+        File gameFile = Storage.getGameFile(attachment.getFileName());
         try {
             gameFile = attachment.getProxy().downloadToFile(gameFile).get();
         } catch (InterruptedException | ExecutionException e) {

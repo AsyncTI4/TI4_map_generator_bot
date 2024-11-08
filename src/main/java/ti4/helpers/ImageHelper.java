@@ -1,11 +1,18 @@
 package ti4.helpers;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import org.jetbrains.annotations.Nullable;
+import ti4.AsyncTI4DiscordBot;
+import ti4.message.BotLogger;
+
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
 import java.awt.*;
-import java.awt.font.GlyphVector;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,17 +27,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.jetbrains.annotations.Nullable;
-import ti4.AsyncTI4DiscordBot;
-import ti4.generator.MapGenerator;
-import ti4.helpers.Emojis.TI4Emoji;
-import ti4.message.BotLogger;
 
 public class ImageHelper {
 
@@ -50,7 +46,7 @@ public class ImageHelper {
         .recordStats()
         .build();
 
-    private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 60 * 4);
+    private static final int LOG_CACHE_STATS_INTERVAL_MINUTES = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.LOG_CACHE_STATS_INTERVAL_MINUTES.toString(), Integer.class, 30);
     private static final AtomicReference<Instant> logStatsScheduledTime = new AtomicReference<>();
     private static final ThreadLocal<DecimalFormat> percentFormatter = ThreadLocal.withInitial(() -> new DecimalFormat("##.##%"));
 
@@ -102,36 +98,10 @@ public class ImageHelper {
     }
 
     @Nullable
-    public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        if (emoji.asEmoji() instanceof CustomEmoji e)
-            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
-        return null;
-    }
-
-    @Nullable
     public static BufferedImage readEmojiImageScaled(String emoji, int size) {
         if (Emoji.fromFormatted(emoji) instanceof CustomEmoji e)
             return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
         return null;
-    }
-
-    @Nullable
-    public static BufferedImage readUnicodeScaled(String unicode, int width, int height) {
-        if (unicode == null) {
-            return null;
-        }
-        return getOrLoadExpiringImage(width + "x" + height + unicode, k -> {
-            BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = img.createGraphics();
-            g2.setFont(Storage.getEmojiFont());
-            BasicStroke stroke4 = new BasicStroke(4.0f);
-            MapGenerator.superDrawString(g2, unicode, 20, 60, Color.white, null, null, stroke4, Color.black);
-            GlyphVector gv = g2.getFont().createGlyphVector(g2.getFontRenderContext(), unicode);
-            Rectangle rect = gv.getGlyphPixelBounds(0, g2.getFontRenderContext(), 20, 60);
-            int pad = 5;
-            BufferedImage img2 = img.getSubimage(rect.x - pad, rect.y - pad, rect.width + pad * 2, rect.height + pad * 2);
-            return ImageHelper.scale(ImageHelper.square(img2), width, height);
-        });
     }
 
     @Nullable
@@ -173,15 +143,6 @@ public class ImageHelper {
         return outputImage;
     }
 
-    public static BufferedImage createOrLoadCalculatedImage(String key, Function<String, BufferedImage> loader) {
-        try {
-            return fileImageCache.get(key, loader);
-        } catch (Exception e) {
-            BotLogger.log("Unable to load from image cache.", e);
-        }
-        return null;
-    }
-
     private static BufferedImage getOrLoadStaticImage(String key, Function<String, BufferedImage> loader) {
         try {
             return fileImageCache.get(key, loader);
@@ -201,7 +162,6 @@ public class ImageHelper {
     }
 
     private static BufferedImage readImage(String filePath) {
-        ImageIO.setUseCache(false);
         try {
             return ImageIO.read(new File(filePath));
         } catch (IOException e) {
@@ -211,7 +171,6 @@ public class ImageHelper {
     }
 
     private static BufferedImage readImage(InputStream inputStream) {
-        ImageIO.setUseCache(false);
         try {
             return ImageIO.read(inputStream);
         } catch (IOException e) {
@@ -225,7 +184,6 @@ public class ImageHelper {
         if (imageURL == null) {
             return null;
         }
-        ImageIO.setUseCache(false);
         try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
             return readImage(inputStream);
         } catch (IOException e) {
@@ -245,7 +203,9 @@ public class ImageHelper {
         if (logStatsScheduledTime.get().equals(oldValue)) {
             return Optional.empty();
         }
-        return Optional.of(cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " + cacheStatsToString("urlImageCache", urlImageCache));
+        return Optional.of(
+                cacheStatsToString("fileImageCache", fileImageCache) + "\n\n " +
+                      cacheStatsToString("urlImageCache", urlImageCache));
     }
 
     private static String cacheStatsToString(String name, Cache<String, BufferedImage> cache) {
@@ -278,20 +238,29 @@ public class ImageHelper {
         if (image.getHeight() > 16383 || image.getWidth() > 16383) {
             writeCompressedFormat(image, out, defaultFormat, 0.1f);
             return defaultFormat;
-        } else {
-            ImageIO.write(image, "webp", out);
-            return "webp";
         }
+        ImageIO.write(image, "webp", out);
+        return "webp";
     }
 
     public static void writeCompressedFormat(BufferedImage image, ByteArrayOutputStream out, String format, float compressionQuality) throws IOException {
-        ImageWriter imageWriter = ImageIO.getImageWritersByFormatName(format).next();
-        imageWriter.setOutput(ImageIO.createImageOutputStream(out));
-        ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-        if (defaultWriteParam.canWriteCompressed()) {
-            defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            defaultWriteParam.setCompressionQuality(compressionQuality);
+        var imageWriter = ImageIO.getImageWritersByFormatName(format).next();
+        try (var imageOutputStream = ImageIO.createImageOutputStream(out)) {
+            imageWriter.setOutput(imageOutputStream);
+            ImageWriteParam param = imageWriter.getDefaultWriteParam();
+            if (param.canWriteCompressed()) {
+                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                param.setCompressionQuality(compressionQuality);
+            }
+            imageWriter.write(null, new IIOImage(image, null, null), param);
+        } finally {
+            imageWriter.dispose();
         }
-        imageWriter.write(null, new IIOImage(image, null, null), defaultWriteParam);
+    }
+
+    public static BufferedImage redrawWithoutAlpha(BufferedImage image) {
+        var imageWithoutAlpha = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        imageWithoutAlpha.createGraphics().drawImage(image, 0, 0, Color.BLACK, null);
+        return imageWithoutAlpha;
     }
 }

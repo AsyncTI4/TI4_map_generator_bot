@@ -1,12 +1,5 @@
 package ti4.commands.game;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -22,6 +15,13 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 public class Undo extends GameSubcommandData {
     public Undo() {
@@ -72,7 +72,7 @@ public class Undo extends GameSubcommandData {
             .mapToInt(Integer::parseInt).max().orElseThrow(NoSuchElementException::new);
 
         String undoFileToRestorePath = game.getName() + "_" + gameToUndoBackToNumber + ".txt";
-        File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
+        File undoFileToRestore = new File(Storage.getGameUndoDirectory(), undoFileToRestorePath);
         if (!undoFileToRestore.exists()) {
             MessageHelper.replyToMessage(event, "Undo failed - Couldn't find game to undo back to: " + undoFileToRestorePath);
             return;
@@ -88,7 +88,7 @@ public class Undo extends GameSubcommandData {
             "Undoing Save #" + maxSaveNumber + " back to before Save #" + gameToUndoBackToNumber + ":\n");
         for (int i = maxSaveNumber; i > gameToUndoBackToNumber; i--) {
             String undoFile = game.getName() + "_" + i + ".txt";
-            File undoFileToBeDeleted = new File(Storage.getMapUndoDirectory(), undoFile);
+            File undoFileToBeDeleted = new File(Storage.getGameUndoDirectory(), undoFile);
             if (undoFileToBeDeleted.exists()) {
                 sb.append("> `").append(i).append("` ")
                     .append(undoFiles.get(undoFileToBeDeleted.getName()).getLatestCommand()).append("\n");
@@ -123,7 +123,7 @@ public class Undo extends GameSubcommandData {
             }
         }
         String highestNumBefore = buttonID.split("_")[1];
-        File mapUndoDirectory = Storage.getMapUndoDirectory();
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
         if (!mapUndoDirectory.exists()) {
             return;
         }
@@ -154,11 +154,11 @@ public class Undo extends GameSubcommandData {
     }
 
     public static Map<String, Game> getAllUndoSavedGames(Game game) {
-        File mapUndoDirectory = Storage.getMapUndoDirectory();
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
         String mapName = game.getName();
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
-        return Arrays.stream(mapUndoFiles).map(Storage::getMapUndoStorage)
+        return Arrays.stream(mapUndoFiles).map(Storage::getGameUndoStorage)
             .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadMap));
     }
 }

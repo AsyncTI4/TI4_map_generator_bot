@@ -1,12 +1,7 @@
 package ti4.helpers.async;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.generator.DrawingUtil;
 import ti4.generator.MapGenerator;
 import ti4.generator.MapGenerator.HorizontalAlign;
 import ti4.generator.MapGenerator.VerticalAlign;
@@ -15,6 +10,12 @@ import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.model.BorderAnomalyModel.BorderAnomalyType;
 import ti4.model.TileModel;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 // Jazz's Interactive Map Builder
 public class JimboImageHelper {
@@ -44,7 +45,7 @@ public class JimboImageHelper {
             BufferedImage img = ImageHelper.square(ImageHelper.read(getImgPath.apply(model)));
             Graphics2D g2 = img.createGraphics();
             g2.setFont(Storage.getFont32());
-            MapGenerator.superDrawString(g2, getDisplayName.apply(model), img.getWidth() / 2, 0, null, HorizontalAlign.Center, VerticalAlign.Top, null, null);
+            DrawingUtil.superDrawString(g2, getDisplayName.apply(model), img.getWidth() / 2, 0, null, HorizontalAlign.Center, VerticalAlign.Top, null, null);
             images.add(img);
         }
         return layoutImagesAndUpload(images);

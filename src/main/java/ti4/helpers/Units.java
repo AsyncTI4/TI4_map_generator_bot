@@ -1,20 +1,19 @@
 package ti4.helpers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import lombok.Data;
-import lombok.Getter;
-
 public class Units {
 
-    private static final String emdash = "—";
+    private static final String EMDASH = "—";
+    private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
 
     /**
      * <H3>
@@ -84,7 +83,7 @@ public class Units {
         }
 
         public String outputForSave() {
-            return String.format("%s%s%s", colorID, emdash, asyncID());
+            return String.format("%s%s%s", colorID, EMDASH, asyncID());
         }
 
         public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
@@ -178,10 +177,6 @@ public class Units {
         }
     }
 
-    private static String unitRegex() {
-        return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
-    }
-
     public static UnitType findUnitType(String unitType) {
         for (UnitType t : UnitType.values()) {
             if (t.value.equalsIgnoreCase(unitType)) return t;
@@ -202,10 +197,10 @@ public class Units {
     @Nullable
     public static UnitKey parseID(String id) {
         if (id.contains(".png")) {
-            id = id.replace(".png", "").replace("_", emdash);
+            id = id.replace(".png", "").replace("_", EMDASH);
         }
 
-        Matcher unitParser = Pattern.compile(unitRegex()).matcher(id);
+        Matcher unitParser = UNIT_PATTERN.matcher(id);
         if (unitParser.matches()) {
             String colorID = unitParser.group("color");
             String unitType = unitParser.group("unittype");

@@ -1,19 +1,5 @@
 package ti4.message;
 
-import java.io.File;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -51,6 +37,20 @@ import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
+
+import java.io.File;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 
 public class MessageHelper {
 	public interface MessageFunction {
@@ -112,7 +112,7 @@ public class MessageHelper {
 				undoPresent = true;
 			}
 		}
-		File mapUndoDirectory = Storage.getMapUndoDirectory();
+		File mapUndoDirectory = Storage.getGameUndoDirectory();
 		if (mapUndoDirectory.exists() && !undoPresent) {
 			String mapName = game.getName();
 			String mapNameForUndoStart = mapName + "_";

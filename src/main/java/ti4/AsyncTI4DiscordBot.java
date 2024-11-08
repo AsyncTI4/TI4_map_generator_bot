@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import javax.imageio.ImageIO;
+
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -308,6 +310,7 @@ public class AsyncTI4DiscordBot {
 
         // START MAP GENERATION
         MapRenderPipeline.start();
+        ImageIO.setUseCache(false);
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
@@ -321,14 +324,15 @@ public class AsyncTI4DiscordBot {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-                BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS");
+                BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS, WAITING 10 SECONDS FOR COMPLETION");
                 TimeUnit.SECONDS.sleep(10); // wait for current commands to complete
-                MapRenderPipeline.shutdown();
-                BotLogger.logWithTimestamp("DONE RENDERING MAPS");
+                if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
+                    BotLogger.logWithTimestamp("DONE RENDERING MAPS");
+                }
                 BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
-                jda.awaitShutdown();
+                jda.awaitShutdown(30, TimeUnit.SECONDS);
                 mainThread.join();
             } catch (Exception e) {
                 MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());

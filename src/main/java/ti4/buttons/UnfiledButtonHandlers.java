@@ -1,13 +1,5 @@
 package ti4.buttons;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -60,8 +52,8 @@ import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
-import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
+import ti4.generator.TileGenerator;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -99,6 +91,14 @@ import ti4.model.FactionModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -829,7 +829,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Player p1 = game.getPlayerFromColorOrFaction(rest.split("_")[1]);
         Player p2 = game.getPlayerFromColorOrFaction(rest.split("_")[2]);
         String groundOrSpace = rest.split("_")[3];
-        FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, pos, event);
+        FileUpload systemWithContext = new TileGenerator(game, event, null, 0, pos).createFileUpload();
         MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
         List<Button> buttons = StartCombat.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);

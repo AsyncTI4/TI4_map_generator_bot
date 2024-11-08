@@ -1,14 +1,5 @@
 package ti4.listeners;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -17,15 +8,21 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.MapFileDeleter;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+
+import javax.annotation.Nonnull;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class SlashCommandListener extends ListenerAdapter {
     @Override
@@ -150,8 +147,6 @@ public class SlashCommandListener extends ListenerAdapter {
         Game userActiveGame = gameManager.getUserActiveGame(userID);
         Set<String> mapList = gameManager.getGameNameToGame().keySet();
 
-        MapFileDeleter.deleteFiles();
-
         String gameID = StringUtils.substringBefore(channelName, "-");
         boolean gameExists = mapList.contains(gameID);
         
@@ -159,11 +154,9 @@ public class SlashCommandListener extends ListenerAdapter {
             (Constants.COMBAT.equals(eventName) && Constants.COMBAT_ROLL.equals(subCommandName));
         if (!gameExists && channel instanceof ThreadChannel && isThreadEnabledSubcommand) {
             IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
-            if (parentChannel != null) {
-                channelName = parentChannel.getName();
-                gameID = StringUtils.substringBefore(channelName, "-");
-                gameExists = mapList.contains(gameID);
-            }
+            channelName = parentChannel.getName();
+            gameID = StringUtils.substringBefore(channelName, "-");
+            gameExists = mapList.contains(gameID);
         }
 
         boolean isUnprotectedCommand = eventName.contains(Constants.SHOW_GAME)

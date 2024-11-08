@@ -78,10 +78,10 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
-import ti4.generator.GenerateTile;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileGenerator;
 import ti4.generator.TileHelper;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -2714,13 +2714,12 @@ public class ButtonHelper {
         // numInfNFightersNMechs);
         if (capacityViolated || fleetSupplyViolated) {
             List<Button> buttons = new ArrayList<>();
-            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, 0, tile.getPosition(),
-                event, player);
             buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
                 "Remove units in " + tile.getRepresentationForButtons(game, player)));
             buttons.add(Buttons.red("deleteButtons",
                 "Dismiss These Buttons"));
 
+            FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
             MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message, buttons);
 
         }
@@ -5045,9 +5044,9 @@ public class ButtonHelper {
         //String undoFileToRestorePath = game.getName() + "_" + 1 + ".txt";
         //File undoFileToRestore = new File(Storage.getMapUndoDirectory(), undoFileToRestorePath);
 
-        File originalMapFile = Storage.getMapImageStorage(game.getName() + Constants.TXT);
+        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
 
-        File mapUndoDirectory = Storage.getMapUndoDirectory();
+        File mapUndoDirectory = Storage.getGameUndoDirectory();
         if (!mapUndoDirectory.exists()) {
             return;
         }
@@ -5065,7 +5064,7 @@ public class ButtonHelper {
                     : numbers.stream().mapToInt(value -> value)
                         .max().orElseThrow(NoSuchElementException::new);
 
-                File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                 CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                 Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                 Game gameToRestore = GameSaveLoadManager.loadMap(originalMapFile);
