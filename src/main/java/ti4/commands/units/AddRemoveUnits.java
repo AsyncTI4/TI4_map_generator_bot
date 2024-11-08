@@ -368,11 +368,6 @@ abstract public class AddRemoveUnits implements Command {
         // do nothing, overriden by child classes
     }
 
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {

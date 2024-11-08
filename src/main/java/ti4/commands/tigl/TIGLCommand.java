@@ -1,15 +1,14 @@
 package ti4.commands.tigl;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-
-import ti4.commands.Command;
-import ti4.helpers.Constants;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.Command;
+import ti4.helpers.Constants;
 
 public class TIGLCommand implements Command {
 
@@ -18,11 +17,6 @@ public class TIGLCommand implements Command {
     @Override
     public String getActionID() {
         return Constants.TIGL;
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return true;
     }
 
     @Override
