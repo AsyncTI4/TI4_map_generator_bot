@@ -1,5 +1,12 @@
 package ti4.commands.game;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -41,13 +48,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
 
 public class StartPhase extends GameSubcommandData {
     public StartPhase() {
@@ -104,7 +104,7 @@ public class StartPhase extends GameSubcommandData {
             case "agendaResolve" -> AgendaHelper.resolveTime(game, null);
             case "pbd1000decks" -> {
                 game.pbd1000decks();
-                GameSaveLoadManager.saveMap(game, event);
+                GameSaveLoadManager.saveGame(game, event);
             }
             case "action" -> startActionPhase(event, game);
             case "playerSetup" -> ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);

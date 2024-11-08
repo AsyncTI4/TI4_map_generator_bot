@@ -1,5 +1,6 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,10 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nonnull;
-
-import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -28,6 +25,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.RestAction;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.bothelper.CreateGameChannels;
@@ -130,7 +128,7 @@ public class MessageListener extends ListenerAdapter {
                     mapreference.removeStoredValue(value);
                 }
             }
-            GameSaveLoadManager.saveMap(mapreference, "Auto Ping");
+            GameSaveLoadManager.saveGame(mapreference, "Auto Ping");
             Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
 
             for (Game game : mapList.values()) {
@@ -491,7 +489,7 @@ public class MessageListener extends ListenerAdapter {
                                     player.setWhetherPlayerShouldBeTenMinReminded(false);
                                 }
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game, "Auto Ping");
+                                GameSaveLoadManager.saveGame(game, "Auto Ping");
                             }
                         }
                     } else {
@@ -500,7 +498,7 @@ public class MessageListener extends ListenerAdapter {
                             if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
                                 AgendaHelper.pingMissingPlayers(game);
                                 game.setLastActivePlayerPing(new Date());
-                                GameSaveLoadManager.saveMap(game, "Auto Ping");
+                                GameSaveLoadManager.saveGame(game, "Auto Ping");
                             }
                         }
                     }

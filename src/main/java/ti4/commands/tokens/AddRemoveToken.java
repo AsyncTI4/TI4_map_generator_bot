@@ -92,7 +92,7 @@ abstract public class AddRemoveToken implements Command {
         for (Tile tile : tiles) {
             parsingForTile(event, colors, tile, game);
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }
 

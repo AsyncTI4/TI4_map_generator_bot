@@ -1,5 +1,34 @@
 package ti4.map;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -33,35 +62,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.StringTokenizer;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class GameSaveLoadManager {
 
@@ -102,7 +102,7 @@ public class GameSaveLoadManager {
             try {
                 long time = game.getLastModifiedDate();
                 if (time > loadTime) {
-                    saveMap(game, true, "Bot Reload");
+                    saveGame(game, true, "Bot Reload");
                     savedGamesCount.getAndIncrement();
                 } else {
                     skippedGamesCount.getAndIncrement();
@@ -134,15 +134,15 @@ public class GameSaveLoadManager {
         return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
     }
 
-    public static void saveMap(Game game, String reason) {
-        saveMap(game, false, reason);
+    public static void saveGame(Game game, String reason) {
+        saveGame(game, false, reason);
     }
 
-    public static void saveMap(Game game, GenericInteractionCreateEvent event) {
-        saveMap(game, false, event);
+    public static void saveGame(Game game, GenericInteractionCreateEvent event) {
+        saveGame(game, false, event);
     }
 
-    public static void saveMap(Game game, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
+    public static void saveGame(Game game, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
         String reason = null;
         if (event != null) {
             String username = event.getUser().getName();
@@ -163,10 +163,10 @@ public class GameSaveLoadManager {
                 default -> reason = "Last Command Unknown - No Event Provided";
             }
         }
-        saveMap(game, keepModifiedDate, reason);
+        saveGame(game, keepModifiedDate, reason);
     }
 
-    public static void saveMap(Game game, boolean keepModifiedDate, String saveReason) {
+    public static void saveGame(Game game, boolean keepModifiedDate, String saveReason) {
         long saveStart = System.nanoTime();
         game.setLatestCommand(Objects.requireNonNullElse(saveReason, "Last Command Unknown - No Event Provided"));
         try {
@@ -189,7 +189,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(game.getName());
             writer.write(System.lineSeparator());
-            saveMapInfo(writer, game, keepModifiedDate);
+            saveGameInfo(writer, game, keepModifiedDate);
 
             for (Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
                 Tile tile = tileEntry.getValue();
@@ -232,7 +232,7 @@ public class GameSaveLoadManager {
                     File mapUndoStorage2 = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
                     CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
                     Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
-                    Game loadedGame = loadMap(originalMapFile);
+                    Game loadedGame = loadGame(originalMapFile);
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
                             && !game.getPhaseOfGame().contains("status")) {
@@ -257,7 +257,7 @@ public class GameSaveLoadManager {
                     }
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                     mapUndoStorage2.delete();
-                    loadedGame = loadMap(originalMapFile);
+                    loadedGame = loadGame(originalMapFile);
                     if (loadedGame == null) throw new Exception("Failed to load undo copy");
 
                     for (Player p1 : loadedGame.getRealPlayers()) {
@@ -285,7 +285,7 @@ public class GameSaveLoadManager {
     public static void reload(Game game) {
         File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
         if (originalMapFile.exists()) {
-            Game loadedGame = loadMap(originalMapFile);
+            Game loadedGame = loadGame(originalMapFile);
             if (loadedGame != null) {
                 GameManager.getInstance().deleteGame(game.getName());
                 GameManager.getInstance().addGame(loadedGame);
@@ -327,7 +327,7 @@ public class GameSaveLoadManager {
         }
     }
 
-    private static void saveMapInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
+    private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
@@ -1164,7 +1164,7 @@ public class GameSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    public static boolean deleteMap(String mapName) {
+    public static boolean deleteGame(String mapName) {
         File mapStorage = Storage.getGameFile(mapName + TXT);
         if (!mapStorage.exists()) {
             return false;
@@ -1173,7 +1173,7 @@ public class GameSaveLoadManager {
         return mapStorage.renameTo(deletedMapStorage);
     }
 
-    public static void loadMaps() {
+    public static void loadGame() {
         long loadStart = System.nanoTime();
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             pathStream.parallel()
@@ -1181,7 +1181,7 @@ public class GameSaveLoadManager {
                 .forEach(path -> {
                     File file = path.toFile();
                     try {
-                        Game game = loadMap(file);
+                        Game game = loadGame(file);
                         if (game == null || game.getName() == null) {
                             BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                             return;
@@ -1201,7 +1201,7 @@ public class GameSaveLoadManager {
     }
 
     @Nullable
-    public static Game loadMap(File mapFile) {
+    public static Game loadGame(File mapFile) {
         if (mapFile == null || !mapFile.exists()) {
             BotLogger.log("Could not load map, map file does not exist: " + (mapFile == null ? "null file" : mapFile.getAbsolutePath()));
             return null;

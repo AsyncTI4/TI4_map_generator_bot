@@ -172,7 +172,7 @@ public class Stats extends PlayerSubcommandData {
                 for (Player player2 : activeGame2.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
                         player2.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-                        GameSaveLoadManager.saveMap(activeGame2, event);
+                        GameSaveLoadManager.saveGame(activeGame2, event);
                     }
                 }
             }

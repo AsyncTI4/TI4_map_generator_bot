@@ -146,7 +146,7 @@ public class Replace extends GameSubcommandData {
         if (speaker) {
             game.setSpeakerUserID(player.getUserID());
         }
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         GameSaveLoadManager.reload(game);
 
         // Load the new game instance so that we can repost the milty draft

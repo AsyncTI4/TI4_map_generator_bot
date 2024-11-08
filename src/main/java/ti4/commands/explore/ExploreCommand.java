@@ -38,7 +38,7 @@ public class ExploreCommand implements Command {
         }
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
     }
 
     private Collection<ExploreSubcommandData> getSubcommands() {

@@ -1,5 +1,9 @@
 package ti4.commands.status;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -11,10 +15,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
 
 public class StatusCommand implements Command {
 
@@ -56,7 +56,7 @@ public class StatusCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
         Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
         MapRenderPipeline.render(game, event,
                 fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));

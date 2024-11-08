@@ -28,7 +28,7 @@ public class SaveMap extends AdminSubcommandData {
                 return;
             }
             Game game = GameManager.getInstance().getGame(mapName);
-            GameSaveLoadManager.saveMap(game, event);
+            GameSaveLoadManager.saveGame(game, event);
             MessageHelper.sendMessageToEventChannel(event, "Save map: " + game.getName());
 
         } else {

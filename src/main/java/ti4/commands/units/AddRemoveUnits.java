@@ -77,7 +77,7 @@ abstract public class AddRemoveUnits implements Command {
         }
         new AddUnits().actionAfterAll(event, tile, color, game);
 
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
 
         boolean generateMap = !event.getOption(Constants.NO_MAPGEN, false, OptionMapping::getAsBoolean);
         if (generateMap) {

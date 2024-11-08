@@ -1,5 +1,14 @@
 package ti4.commands.game;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -36,15 +45,6 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static ti4.helpers.StringHelper.ordinal;
 
@@ -206,7 +206,7 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
         game.setHasEnded(true);
         game.setEndedDate(new Date().getTime());
-        GameSaveLoadManager.saveMap(game, event);
+        GameSaveLoadManager.saveGame(game, event);
         String gameEndText = getGameEndText(game, event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         game.setAutoPing(false);
