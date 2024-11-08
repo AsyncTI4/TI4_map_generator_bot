@@ -2043,7 +2043,7 @@ public class MapGenerator implements AutoCloseable {
                 planetDisplayIcon = "none";
             }
             if (originalPlanetTypes != null && originalPlanetTypes.contains(PlanetType.FACTION)) {
-                planetDisplayIcon = TileHelper.getAllPlanets().get(planetName).getFactionHomeworld();
+                planetDisplayIcon = TileHelper.getPlanetById(planetName).getFactionHomeworld();
                 if (planetDisplayIcon == null) // fallback to current player's faction
                     planetDisplayIcon = player.getFaction();
             }

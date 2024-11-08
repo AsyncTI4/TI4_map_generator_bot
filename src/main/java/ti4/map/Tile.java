@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,18 +9,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -72,14 +69,9 @@ public class Tile {
         unitHolders.put(Constants.SPACE, space);
         Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
 
-        if (Optional.ofNullable(tilePlanetPositions).isPresent())
+        if (tilePlanetPositions != null)
             tilePlanetPositions
                 .forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
-    }
-
-    public void inheritFogData(Tile t) {
-        fog.putAll(t.getFog());
-        fogLabel.putAll(t.getFogLabel());
     }
 
     @Nullable
@@ -431,7 +423,7 @@ public class Tile {
 
     @JsonIgnore
     public TileModel getTileModel() {
-        return TileHelper.getTile(getTileID());
+        return TileHelper.getTileById(getTileID());
     }
 
     @JsonIgnore

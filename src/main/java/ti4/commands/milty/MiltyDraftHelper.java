@@ -1,5 +1,13 @@
 package ti4.commands.milty;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -26,14 +34,6 @@ import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class MiltyDraftHelper {
 
@@ -258,7 +258,7 @@ public class MiltyDraftHelper {
     }
 
     public static void initDraftTiles(MiltyDraftManager draftManager, List<ComponentSource> sources) {
-        List<TileModel> allTiles = new ArrayList<>(TileHelper.getAllTiles().values());
+        List<TileModel> allTiles = new ArrayList<>(TileHelper.getAllTileModels());
         for (TileModel tileModel : allTiles) {
             String tileID = tileModel.getId();
             if (isInvalid(tileModel)) {

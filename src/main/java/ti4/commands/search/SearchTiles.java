@@ -43,10 +43,10 @@ public class SearchTiles extends SearchComponentModel {
 
         List<Entry<TileModel, MessageEmbed>> tileEmbeds = new ArrayList<>();
         if (TileHelper.isValidTile(searchString)) {
-            TileModel tile = TileHelper.getTile(searchString);
+            TileModel tile = TileHelper.getTileById(searchString);
             tileEmbeds.add(Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)));
         } else {
-            TileHelper.getAllTiles().values().stream()
+            TileHelper.getAllTileModels().stream()
                 .filter(tile -> tile.search(searchString, source))
                 .sorted(Comparator.comparing(TileModel::getId))
                 .map(tile -> Map.entry(tile, tile.getHelpMessageEmbed(includeAliases)))

@@ -31,7 +31,7 @@ public class HomeSystemDraftItem extends DraftItem {
             return "Delta Wormhole / Delta Wormhole, Creuss (4/2)";
         }
         FactionModel faction = Mapper.getFaction(ItemId);
-        TileModel tile = TileHelper.getTile(faction.getHomeSystem());
+        TileModel tile = TileHelper.getTileById(faction.getHomeSystem());
         StringBuilder sb = new StringBuilder();
         List<String> planetIds = tile.getPlanets();
         for (int i = 0; i < planetIds.size() - 1; i++) {

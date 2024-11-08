@@ -21,11 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,6 +44,10 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -2961,7 +2960,7 @@ public class ButtonHelper {
     public static void starChartStep0(Game game, Player player, List<String> newTileIDs) {
         List<Button> buttons = new ArrayList<>();
         for (String newTileID : newTileIDs) {
-            TileModel tile = TileHelper.getTile(newTileID);
+            TileModel tile = TileHelper.getTileById(newTileID);
             buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "starChartsStep1_" + newTileID,
                 tile.getName()));
 
@@ -2972,7 +2971,7 @@ public class ButtonHelper {
 
     public static void detTileAdditionStep1(Game game, Player player, String newTileID) {
         List<Button> buttons = new ArrayList<>();
-        TileModel tile = TileHelper.getTile(newTileID);
+        TileModel tile = TileHelper.getTileById(newTileID);
         buttons.add(Buttons.green("detTileAdditionStep2_" + newTileID, "Next to only 1 tile"));
         buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "starChartsStep1_" + newTileID,
             "Next to 2 tiles"));
@@ -4755,7 +4754,7 @@ public class ButtonHelper {
         Map<UnitModel, Integer> opponentUnitsByQuantity = CombatHelper.GetUnitsInCombat(tile, combatOnHolder, opponent,
             event, rollType, game);
 
-        TileModel tileModel = TileHelper.getAllTiles().get(tile.getTileID());
+        TileModel tileModel = TileHelper.getTileById(tile.getTileID());
         List<NamedCombatModifierModel> modifiers = CombatModHelper.GetModifiers(player, opponent,
             playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
 

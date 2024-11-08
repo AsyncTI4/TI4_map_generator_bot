@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,17 +34,12 @@ public class RegexHelper {
         }
     }
 
-    private static String regexBuilder(String groupname, Set<String> options) {
-        String sb = "(?<" + groupname + ">(" +
-                String.join("|", options) +
-                "))";
-        return sb;
+    private static String regexBuilder(String groupname, Collection<String> options) {
+        return "(?<" + groupname + ">(" + String.join("|", options) + "))";
     }
 
     private static String regexBuilder(String groupname, String pattern) {
-        String sb = "(?<" + groupname + ">" +
-                pattern + ")";
-        return sb;
+        return "(?<" + groupname + ">" + pattern + ")";
     }
 
     private static Set<String> legalColors(Game game) {
@@ -152,7 +148,7 @@ public class RegexHelper {
 
     /** @return group "tileID" matching any legal tile ID in the bot */
     public static String tileIDRegex() {
-        return regexBuilder("tileID", TileHelper.getAllTiles().keySet());
+        return regexBuilder("tileID", TileHelper.getAllTileIds());
     }
 
     /** @return group matching any planet on the map, and also "space" */

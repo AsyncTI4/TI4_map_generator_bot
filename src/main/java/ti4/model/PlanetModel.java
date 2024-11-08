@@ -107,7 +107,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
             }
         }
 
-        TileModel tile = TileHelper.getTile(getTileId());
+        TileModel tile = TileHelper.getTileById(getTileId());
         sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());

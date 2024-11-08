@@ -76,7 +76,7 @@ public class JimboConst {
         Function<TileModel, Integer> sourceOrder = t -> t.getSource().ordinal();
         Comparator<TileModel> comp = Comparator.comparing(sourceOrder).thenComparing(TileModel::getAlias);
         // sort by source, then by alias
-        List<TileModel> allTilesSorted = TileHelper.getAllTiles().values().stream().sorted(comp).toList();
+        List<TileModel> allTilesSorted = TileHelper.getAllTileModels().stream().sorted(comp).toList();
 
         blueTiles = allTilesSorted.stream().filter(t -> "0b".equals(t.getAlias()) || "blue".equals(t.getTileBack())).toList();
         redTiles = allTilesSorted.stream().filter(t -> "0r".equals(t.getAlias()) || "red".equals(t.getTileBack())).toList();

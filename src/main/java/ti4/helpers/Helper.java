@@ -787,15 +787,15 @@ public class Helper {
     }
 
     public static String getBasicTileRep(String tileID) {
-        StringBuilder name = new StringBuilder(TileHelper.getTile(tileID).getName());
-        if (!TileHelper.getTile(tileID).getPlanets().isEmpty()) {
+        StringBuilder name = new StringBuilder(TileHelper.getTileById(tileID).getName());
+        if (!TileHelper.getTileById(tileID).getPlanets().isEmpty()) {
             name.append(" (");
         }
-        for (String planet : TileHelper.getTile(tileID).getPlanets()) {
+        for (String planet : TileHelper.getTileById(tileID).getPlanets()) {
             name.append(Mapper.getPlanet(planet).getResources()).append("/")
                 .append(Mapper.getPlanet(planet).getInfluence()).append(", ");
         }
-        if (!TileHelper.getTile(tileID).getPlanets().isEmpty()) {
+        if (!TileHelper.getTileById(tileID).getPlanets().isEmpty()) {
             name = new StringBuilder(name.substring(0, name.length() - 2) + ")");
         }
         return name.toString();
