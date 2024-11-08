@@ -24,7 +24,6 @@ import ti4.model.StrategyCardModel;
 public class AutoPingCron {
 
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
-    private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
     private static final long FIVE_MINUTES_IN_MILLISECONDS = 5 * 60 * 1000;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
