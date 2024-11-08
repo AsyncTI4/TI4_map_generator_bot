@@ -15,10 +15,10 @@ public class UnitModelTest extends BaseTi4Test {
     public void testUnitModels() {
         for (UnitModel unitModel : Mapper.getUnits().values()) {
             assertTrue(validateBaseType(unitModel), unitModel.getAlias() + ": invalid BaseType: " + unitModel.getBaseType());
-            assertTrue(validateRequiredTechId(unitModel), unitModel.getAlias() + ": invalid RequiredTechId: " + unitModel.getRequiredTechId().get());
-            assertTrue(validateUpgradesToUnitId(unitModel), unitModel.getAlias() + ": invalid UpgradesToUnitId: " + unitModel.getUpgradesToUnitId().get());
-            assertTrue(validateUpgradesFromUnitId(unitModel), unitModel.getAlias() + ": invalid UpgradesFromUnitId: " + unitModel.getUpgradesFromUnitId().get());
-            assertTrue(validateHomebrewReplacesID(unitModel), unitModel.getAlias() + ": invalid HomebrewReplacesID: " + unitModel.getHomebrewReplacesID().get());
+            assertTrue(validateRequiredTechId(unitModel), unitModel.getAlias() + ": invalid RequiredTechId: " + unitModel.getRequiredTechId().orElse(null));
+            assertTrue(validateUpgradesToUnitId(unitModel), unitModel.getAlias() + ": invalid UpgradesToUnitId: " + unitModel.getUpgradesToUnitId().orElse(null));
+            assertTrue(validateUpgradesFromUnitId(unitModel), unitModel.getAlias() + ": invalid UpgradesFromUnitId: " + unitModel.getUpgradesFromUnitId().orElse(null));
+            assertTrue(validateHomebrewReplacesID(unitModel), unitModel.getAlias() + ": invalid HomebrewReplacesID: " + unitModel.getHomebrewReplacesID().orElse(null));
             assertTrue(validateAsyncID(unitModel), unitModel.getAlias() + ": invalid asyncID: " + unitModel.getAsyncId());
         }
     }

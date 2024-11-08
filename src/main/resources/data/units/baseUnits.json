@@ -331,5 +331,12 @@
         "source": "monuments",
         "isStructure": true,
         "isMonument": true
+    },
+    {
+        "id": "lady",
+        "baseType": "lady",
+        "asyncId": "lady",
+        "name": "Fake Lady Flagship Basetype",
+        "source": "ds"
     }
 ]
