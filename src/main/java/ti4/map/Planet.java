@@ -36,7 +36,7 @@ public class Planet extends UnitHolder {
     private boolean hasAbility;
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
-    private String contrastColor = "";
+    private String contrastColor;
 
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {

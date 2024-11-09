@@ -1263,10 +1263,12 @@ public class TileGenerator {
             return o1.compareTo(o2);
         });
         if (game.isShowBubbles() && unitHolder instanceof Planet planetHolder && shouldPlanetHaveShield(unitHolder, game)) {
-            String tokenPath = switch (planetHolder.getContrastColor()) {
-                case "orange" -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
-                default -> ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
-            };
+            String tokenPath;
+            if ("orange".equals(planetHolder.getContrastColor())) {
+                tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield_orange.png");
+            } else {
+                tokenPath = ResourceHelper.getInstance().getTokenFile("token_planetaryShield.png");
+            }
             float scale = 0.95f;
             List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");
             if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
