@@ -185,7 +185,7 @@ public class TransactionHelper {
                                 }
                                 trans.append(Emojis.ActionCard);
                                 if (!hidePrivateCardText) {
-                                    trans.append(Emojis.ActionCard).append(" ").append(Mapper.getActionCard(acID).getName());
+                                    trans.append(" ").append(Mapper.getActionCard(acID).getName());
                                 }
                             }
 
