@@ -28,13 +28,13 @@ public class RemoveTitle extends BothelperSubcommandData {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!GameManager.getInstance().isValidGame(mapName)) {
+            if (!GameManager.isValidGame(mapName)) {
                 MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
                 return;
             }
-            game = GameManager.getInstance().getGame(mapName);
+            game = GameManager.getGame(mapName);
         } else {
-            game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+            game = GameManager.getUserActiveGame(event.getUser().getId());
             if (game == null) {
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return;

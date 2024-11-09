@@ -62,7 +62,7 @@ public class MessageListener extends ListenerAdapter {
             }
             if (event.getChannel() instanceof ThreadChannel channel) {
                 if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
-                    Game mapReference = GameManager.getInstance().getGame("finreference");
+                    Game mapReference = GameManager.getGame("finreference");
                     if (mapReference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
                         mapReference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
                         MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
@@ -105,7 +105,7 @@ public class MessageListener extends ListenerAdapter {
         if (!event.getAuthor().isBot() && event.getChannel().getName().contains("-")) {
             String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
-            Game game = GameManager.getInstance().getGame(gameName);
+            Game game = GameManager.getGame(gameName);
             if (game != null && game.isBotFactionReacts() && !game.isFowMode()) {
                 Player player = getPlayer(event, game);
                 try {
@@ -164,7 +164,7 @@ public class MessageListener extends ListenerAdapter {
         if (isFowCombatThread) {
             String gameName2 = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
-            Game game = GameManager.getInstance().getGame(gameName2);
+            Game game = GameManager.getGame(gameName2);
             Player player3 = game.getPlayer(event.getAuthor().getId());
             if (game.isCommunityMode()) {
                 Collection<Player> players = game.getPlayers().values();
@@ -233,7 +233,7 @@ public class MessageListener extends ListenerAdapter {
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
-            Game game = GameManager.getInstance().getGame(gameName);
+            Game game = GameManager.getGame(gameName);
 
             if (messageContent.isEmpty()) {
                 BotLogger.log("User tried to send an empty whisper " + event.getJumpUrl());

@@ -81,7 +81,7 @@ public class PlayerPreferenceHelper {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames()) {
                 for (Player player2 : game.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
@@ -225,7 +225,7 @@ public class PlayerPreferenceHelper {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             resolveSetAfkTime(player, pagedGames.getGames());
         } while (pagedGames.hasNextPage());
     }

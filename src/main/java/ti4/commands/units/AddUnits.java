@@ -37,7 +37,7 @@ public class AddUnits extends AddRemoveUnits {
             if (!event.getInteraction().getName().equals(Constants.MOVE_UNITS)) {
                 switch (value) {
                     case "t/tactics", "t", "tactics", "tac", "tact" -> {
-                        MoveUnits.removeTacticsCC(event, color, tile, GameManager.getInstance().getUserActiveGame(event.getUser().getId()));
+                        MoveUnits.removeTacticsCC(event, color, tile, GameManager.getUserActiveGame(event.getUser().getId()));
                         AddCC.addCC(event, color, tile);
                         Helper.isCCCountCorrect(event, game, color);
                     }

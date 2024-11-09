@@ -55,7 +55,7 @@ public final class GameStatisticFilterer {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             filteredGames.addAll(
                     getFilteredGames(pagedGames.getGames(), playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter,
                             gameTypeFilter, hasWinnerFilter, homebrewFilter, fogFilter));
@@ -82,7 +82,7 @@ public final class GameStatisticFilterer {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             filteredGames.addAll(
                     getNormalFinishedGames(pagedGames.getGames(), playerCountFilter, victoryPointGoalFilter));
         } while (pagedGames.hasNextPage());

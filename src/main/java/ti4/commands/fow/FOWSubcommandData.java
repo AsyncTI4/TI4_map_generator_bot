@@ -33,12 +33,12 @@ public abstract class FOWSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getUserActiveGame(user.getId());
     }
 
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
 
         // FileUpload file = new GenerateMap().saveImage(activeMap, event);

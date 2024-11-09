@@ -38,7 +38,7 @@ public class SearchMyTitles extends SearchSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
             List<Game> games = pagedGames.getGames().stream()
                     .filter(ignoreSpectateFilter.and(GameProperties::isHasEnded))

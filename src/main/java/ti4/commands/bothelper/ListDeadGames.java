@@ -11,42 +11,39 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.MinifiedGame;
 import ti4.message.MessageHelper;
 
 public class ListDeadGames extends BothelperSubcommandData {
+
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Delete with with DELETE, otherwise warning").setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            execute(event, pagedGames.getGames());
-        } while (pagedGames.hasNextPage());
+        execute(event, GameManager.getMinifiedGames());
     }
 
-    private void execute(SlashCommandInteractionEvent event, List<Game> games) {
+    private void execute(SlashCommandInteractionEvent event, List<MinifiedGame> games) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
         StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         StringBuilder sb = new StringBuilder("Dead Channels\n");
         int channelCount = 0;
         int roleCount = 0;
-        for (Game game : games) {
+        for (MinifiedGame game : games) {
             if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
             if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100") || game.getName().equalsIgnoreCase("pbd100two")) {
                 continue;
             }
-            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange().getTime();
+            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange();
 
-            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000L) {
+            // TODO: we really shouldn't use these magical numbers.
+            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange() && milliSinceLastTurnChange < 1259600000L) {
                 continue;
             }
             boolean warned = false;
@@ -55,7 +52,8 @@ public class ListDeadGames extends BothelperSubcommandData {
                     continue;
                 }
 
-                if (game.getActionsChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getActionsChannel().getParentCategory()) && game.getActionsChannel().getParentCategory() != null && !game.getActionsChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
+                if (game.getActionsChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getActionsChannel().getParentCategory()) &&
+                        game.getActionsChannel().getParentCategory() != null && !game.getActionsChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
                     sb.append(game.getActionsChannel().getJumpUrl()).append("\n");
                     channelCount++;
                     if (delete) {

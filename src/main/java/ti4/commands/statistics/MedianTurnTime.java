@@ -47,7 +47,7 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames().stream().filter(endedGamesFilter).toList()) {
                 for (Player player : game.getPlayers().values()) {
                     Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());

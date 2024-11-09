@@ -207,7 +207,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNames());
+        Set<String> mapNames = new HashSet<>(GameManager.getGameNames());
         gameAndRoleNames.addAll(mapNames);
 
         //CHECK
@@ -236,7 +236,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getInstance().getGameNames().stream()
+        List<String> mapNames = GameManager.getGameNames().stream()
             .filter(mapName -> mapName.startsWith("fow"))
             .toList();
         for (String mapName : mapNames) {

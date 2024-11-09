@@ -51,7 +51,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             game.setLastActivePlayerPing(new Date());
             GameSaveLoadManager.saveGame(game, "Auto Ping");
         }
-        ButtonHelper.increasePingCounter(GameManager.getInstance().getGame("finreference"), player.getUserID());
+        ButtonHelper.increasePingCounter(GameManager.getGame("finreference"), player.getUserID());
     }
 
     @Override

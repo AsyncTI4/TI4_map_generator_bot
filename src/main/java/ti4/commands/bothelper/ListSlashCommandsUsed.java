@@ -15,8 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.MinifiedGame;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
@@ -37,7 +37,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             listSlashCommands(pagedGames.getGames(), slashCommands, actionCards, actionCardsPlayed, stats, useOnlyLastMonth);
         } while (pagedGames.hasNextPage());
 
@@ -57,9 +57,9 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
 
-    private static void listSlashCommands(List<Game> games, Map<String, Integer> slashCommands, Map<String, Integer> actionCards,
-                                               Map<String, Integer> actionCardsPlayed, UsedStats usedStats, boolean useOnlyLastMonth) {
-        for (Game game : games) {
+    private static void listSlashCommands(List<MinifiedGame> games, Map<String, Integer> slashCommands, Map<String, Integer> actionCards,
+                                          Map<String, Integer> actionCardsPlayed, UsedStats usedStats, boolean useOnlyLastMonth) {
+        for (MinifiedGame game : games) {
             if (useOnlyLastMonth && Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) > 30) {
                 continue;
             }

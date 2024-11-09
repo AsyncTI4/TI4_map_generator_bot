@@ -23,14 +23,14 @@ public class ReloadMap extends AdminSubcommandData {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!GameManager.getInstance().isValidGame(mapName)) {
+            if (!GameManager.isValidGame(mapName)) {
                 MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
 
                 return;
             }
-            Game game = GameManager.getInstance().getGame(mapName);
+            Game game = GameManager.getGame(mapName);
             GameSaveLoadManager.reload(game);
-            game = GameManager.getInstance().getGame(mapName);
+            game = GameManager.getGame(mapName);
             ShowGame.simpleShowGame(game, event);
 
         } else {

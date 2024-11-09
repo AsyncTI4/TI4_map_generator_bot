@@ -1,7 +1,6 @@
 package ti4.map;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -17,47 +16,37 @@ import ti4.message.BotLogger;
 
 public class GameManager {
 
-    private static volatile GameManager instance;
+    private static final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
+    private static final ConcurrentMap<String, MinifiedGame> gameNameToMinifiedGame = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, String> userIdToCurrentGameName = new ConcurrentHashMap<>();
+    private static final LoadingCache<String, Game> gameCache;
 
-    private final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
-    private final ConcurrentMap<String, MinifiedGame> gameNameToMinifiedGame = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, String> userIdToCurrentGameName = new ConcurrentHashMap<>();
-    private final LoadingCache<String, Game> gameCache;
-
-    private GameManager() {
+    static {
         gameCache = Caffeine.newBuilder()
                 .maximumSize(200)
                 .expireAfterAccess(2, TimeUnit.HOURS)
-                .build(this::loadGame);
+                .build(GameManager::loadGame);
         LogCacheStatsCron.registerCache("gameCache", gameCache);
+    }
+
+    public static void initialize() {
         GameSaveLoadManager.loadMinifiedGames()
                 .forEach(minifiedGame -> gameNameToMinifiedGame.put(minifiedGame.getName(), minifiedGame));
         allGameNames.addAll(gameNameToMinifiedGame.keySet());
     }
 
-    private Game loadGame(String gameName) {
+    private static Game loadGame(String gameName) {
         return GameSaveLoadManager.loadGame(gameName);
     }
 
-    public static GameManager getInstance() {
-        if (instance == null) {
-            synchronized (GameManager.class) {
-                if (instance == null) {
-                    instance = new GameManager();
-                }
-            }
-        }
-        return instance;
-    }
-
-    public Game getGame(String gameName) {
+    public static Game getGame(String gameName) {
         if (!isValidGame(gameName)) {
             return null;
         }
         return gameCache.get(gameName);
     }
 
-    void addOrReplace(Game game) {
+    static void addOrReplace(Game game) {
         allGameNames.addIfAbsent(game.getName());
         if (!hasMatchingMinifiedGame(game)) {
             gameNameToMinifiedGame.put(game.getName(), new MinifiedGame(game));
@@ -67,17 +56,17 @@ public class GameManager {
         }
     }
 
-    void deleteGame(String gameName) {
+    static void deleteGame(String gameName) {
         allGameNames.remove(gameName);
         gameNameToMinifiedGame.remove(gameName);
         gameCache.invalidate(gameName);
     }
 
-    public boolean isValidGame(String gameName) {
+    public static boolean isValidGame(String gameName) {
         return allGameNames.contains(gameName);
     }
 
-    public boolean setGameForUser(String userId, String gameName) {
+    public static boolean setGameForUser(String userId, String gameName) {
         if (isValidGame(gameName)) {
             userIdToCurrentGameName.put(userId, gameName);
             return true;
@@ -85,16 +74,16 @@ public class GameManager {
         return false;
     }
 
-    public void resetGameForUser(String userId) {
+    public static void resetGameForUser(String userId) {
         userIdToCurrentGameName.remove(userId);
     }
 
-    public boolean isUserWithActiveGame(String userId) {
+    public static boolean isUserWithActiveGame(String userId) {
         return userIdToCurrentGameName.containsKey(userId);
     }
 
     @Nullable
-    public Game getUserActiveGame(String userId) {
+    public static Game getUserActiveGame(String userId) {
         String gameName = userIdToCurrentGameName.get(userId);
         if (gameName == null) {
             return null;
@@ -102,16 +91,16 @@ public class GameManager {
         return gameCache.get(gameName);
     }
 
-    public List<String> getGameNames() {
+    public static List<String> getGameNames() {
         return new ArrayList<>(allGameNames);
     }
 
-    public int getNumberOfGames() {
+    public static int getNumberOfGames() {
         return allGameNames.size();
     }
 
     // WARNING, THIS INVOLVES READING EVERY GAME. IT IS AN EXPENSIVE OPERATION.
-    public PagedGames getGamesPage(int page) {
+    public static PagedGames getGamesPage(int page) {
         var pagedGames = new PagedGames();
         for (int i = PagedGames.PAGE_SIZE * page; i < allGameNames.size() && pagedGames.getGames().size() < PagedGames.PAGE_SIZE; i++) {
             pagedGames.games.add(loadGame(allGameNames.get(i)));
@@ -124,7 +113,7 @@ public class GameManager {
         return gameNameToMinifiedGame.get(gameName);
     }
 
-    public Collection<MinifiedGame> getMinifiedGames() {
+    public static List<MinifiedGame> getMinifiedGames() {
         if (gameNameToMinifiedGame.size() != allGameNames.size()) {
             BotLogger.log("gameNameToMinifiedGame size " + gameNameToMinifiedGame.size() +
                     " does not match allGameNames size " + allGameNames.size());
@@ -132,7 +121,7 @@ public class GameManager {
         return new ArrayList<>(gameNameToMinifiedGame.values());
     }
 
-    private boolean hasMatchingMinifiedGame(Game game) {
+    private static boolean hasMatchingMinifiedGame(Game game) {
         var minifiedGame = gameNameToMinifiedGame.get(game.getName());
         return minifiedGame != null && minifiedGame.matches(game);
     }

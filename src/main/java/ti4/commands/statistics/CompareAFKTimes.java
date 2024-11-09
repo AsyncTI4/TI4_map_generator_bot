@@ -46,7 +46,7 @@ public class CompareAFKTimes extends StatisticsSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (String player : playersToCheck) {
                 var afkTime = getUsersAFKTime(pagedGames.getGames(), player);
                 if (afkTime != null) {

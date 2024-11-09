@@ -155,7 +155,7 @@ public class GameSaveLoadManager {
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
-        GameManager.getInstance().addOrReplace(game);
+        GameManager.addOrReplace(game);
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
@@ -1073,7 +1073,7 @@ public class GameSaveLoadManager {
     }
 
     public static boolean deleteGame(String gameName) {
-        GameManager.getInstance().deleteGame(gameName);
+        GameManager.deleteGame(gameName);
         File mapStorage = Storage.getGameFile(gameName + TXT);
         if (!mapStorage.exists()) {
             return false;
@@ -1117,7 +1117,7 @@ public class GameSaveLoadManager {
     public static Game loadGame(File gameFile) {
         Game game = readGame(gameFile);
         if (game != null) {
-            GameManager.getInstance().addOrReplace(game);
+            GameManager.addOrReplace(game);
         }
         return game;
     }

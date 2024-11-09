@@ -34,12 +34,11 @@ public class ShowGame implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            game = GameManager.getGame(mapName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            game = GameManager.getUserActiveGame(event.getUser().getId());
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);

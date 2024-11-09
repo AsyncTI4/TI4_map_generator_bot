@@ -42,7 +42,7 @@ public class ACCardsCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }

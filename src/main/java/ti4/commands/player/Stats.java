@@ -165,7 +165,7 @@ public class Stats extends PlayerSubcommandData {
             int currentPage = 0;
             GameManager.PagedGames pagedGames;
             do {
-                pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+                pagedGames = GameManager.getGamesPage(currentPage++);
                 player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
                 for (Game activeGame2 : pagedGames.getGames()) {
                     for (Player player2 : activeGame2.getRealPlayers()) {

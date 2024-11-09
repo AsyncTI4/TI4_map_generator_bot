@@ -101,7 +101,7 @@ public class DiceLuck extends StatisticsSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames().stream().filter(endedGamesFilter).toList()) {
                 for (Player player : game.getPlayers().values()) {
                     Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());

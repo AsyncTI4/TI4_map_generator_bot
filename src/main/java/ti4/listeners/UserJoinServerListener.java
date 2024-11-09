@@ -72,7 +72,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames()) {
                 boolean isInGame = checkIfNewUserIsInExistingGameAndAutoAddRole(game, guild, user);
                 if (isInGame) mapsJoined.add(game);
@@ -145,7 +145,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames()) {
                 boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
                 if (game.isHasEnded() || endVPReachedButNotEnded) continue;

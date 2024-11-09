@@ -33,7 +33,7 @@ public class ShowDistances implements Command {
             return false;
         }
 
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game userActiveGame = GameManager.getUserActiveGame(event.getUser().getId());
         if (userActiveGame == null) {
             MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
             return false;
@@ -46,12 +46,11 @@ public class ShowDistances implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            game = GameManager.getGame(mapName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            game = GameManager.getUserActiveGame(event.getUser().getId());
         }
 
         Player player = game.getPlayer(event.getUser().getId());

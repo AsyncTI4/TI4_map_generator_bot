@@ -148,7 +148,7 @@ public class GameStats extends StatisticsSubcommandData {
     }
 
     public static void listPingCounterList(SlashCommandInteractionEvent event) {
-        Game reference = GameManager.getInstance().getGame("finreference");
+        Game reference = GameManager.getGame("finreference");
         Map<String, Integer> pings = new HashMap<>();
         for (String pingsFor : reference.getMessagesThatICheckedForAllReacts().keySet()) {
 
@@ -632,7 +632,7 @@ public class GameStats extends StatisticsSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames()) {
                 Optional<Player> winner = game.getWinner();
                 if (winner.isEmpty()) {

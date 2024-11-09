@@ -72,7 +72,7 @@ public class SearchGames extends SearchSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             normalGames.addAll(pagedGames.getGames().stream().filter(Game::isNormalGame).toList());
             tIGLGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isCompetitiveTIGLGame).toList());
             communityGames.addAll(pagedGames.getGames().stream().filter(GameProperties::isCommunityMode).toList());
@@ -105,7 +105,7 @@ public class SearchGames extends SearchSubcommandData {
         if (searchUser != null) filteredListOfMaps.addAll(searchUserGames);
         if (!includeEndedGames) filteredListOfMaps.removeIf(GameProperties::isHasEnded);
 
-        int totalGames = GameManager.getInstance().getNumberOfGames();
+        int totalGames = GameManager.getNumberOfGames();
 
         StringBuilder sb = new StringBuilder("__**Search Games:**__\n");
         sb.append("-# Statistics:\n");

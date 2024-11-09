@@ -5992,7 +5992,7 @@ public class ButtonHelper {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames()) {
                 if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
                     for (Player player2 : game.getRealPlayers()) {
@@ -6075,7 +6075,7 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         Player player = Helper.getGamePlayer(game, null, event.getMember(), userID);
         if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();

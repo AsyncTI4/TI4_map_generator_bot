@@ -31,7 +31,7 @@ public class ExploreDrawAndDiscard extends ExploreSubcommandData {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             String userID = event.getUser().getId();
-            Game game = GameManager.getInstance().getUserActiveGame(userID);
+            Game game = GameManager.getUserActiveGame(userID);
             String cardID = game.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
             ExploreModel explore = Mapper.getExplore(cardID);
             sb.append(explore.textRepresentation()).append(System.lineSeparator());

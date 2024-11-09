@@ -1,5 +1,10 @@
 package ti4.commands.units;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import com.amazonaws.util.CollectionUtils;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -31,22 +36,16 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 abstract public class AddRemoveUnits implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game game = gameManager.getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         Player player = game.getPlayer(userID);
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
@@ -309,9 +308,8 @@ abstract public class AddRemoveUnits implements Command {
 
     public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
         if (game == null) {
-            game = gameManager.getUserActiveGame(userID);
+            game = GameManager.getUserActiveGame(userID);
         }
         // Map activeMap = mapManager.getUserActiveMap(userID);
         if (!Constants.SPACE.equals(planetName)) {

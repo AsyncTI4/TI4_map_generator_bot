@@ -33,9 +33,9 @@ public abstract class MapSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getUserActiveGame(user.getId());
         if (event.getOption(Constants.GAME_NAME) != null) {
-            game = GameManager.getInstance().getGame(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
+            game = GameManager.getGame(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
         }
     }
 }

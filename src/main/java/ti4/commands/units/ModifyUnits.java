@@ -33,7 +33,7 @@ public class ModifyUnits implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game  game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game  game = GameManager.getUserActiveGame(event.getUser().getId());
         Player player = game.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);

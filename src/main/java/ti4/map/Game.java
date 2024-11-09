@@ -156,7 +156,7 @@ public class Game extends GameProperties {
     private List<String> relics;
     @JsonIgnore
     private List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache;
-    private final List<String> runDataMigrations = new ArrayList<>();
+    private final Set<String> runDataMigrations = new HashSet<>();
     private BagDraft activeDraft;
     @JsonIgnore
     @Getter
@@ -3638,7 +3638,7 @@ public class Game extends GameProperties {
         runDataMigrations.add(string);
     }
 
-    public List<String> getRunMigrations() {
+    public Set<String> getRunMigrations() {
         return runDataMigrations;
     }
 

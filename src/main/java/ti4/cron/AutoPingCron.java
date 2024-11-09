@@ -45,7 +45,7 @@ public class AutoPingCron {
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         StopWatch stopWatch = debug ? StopWatch.createStarted() : null;
 
-        GameManager.getInstance().getMinifiedGames().stream().filter(not(MinifiedGame::isHasEnded))
+        GameManager.getMinifiedGames().stream().filter(not(MinifiedGame::isHasEnded))
                 .forEach(minifiedGame -> {
                     var game = GameSaveLoadManager.loadGame(minifiedGame.getName());
                     handleTechSummary(game); // TODO, move this?
@@ -189,7 +189,7 @@ public class AutoPingCron {
 
             pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
 
-            Game mapReference = GameManager.getInstance().getGame("finreference");
+            Game mapReference = GameManager.getGame("finreference");
             if (mapReference != null) ButtonHelper.increasePingCounter(mapReference, player.getUserID());
             player.setWhetherPlayerShouldBeTenMinReminded(false);
             game.setLastActivePlayerPing(new Date());

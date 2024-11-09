@@ -1,5 +1,9 @@
 package ti4.commands.tokens;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,17 +23,12 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
-
 abstract public class AddRemoveToken implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
@@ -42,7 +41,7 @@ abstract public class AddRemoveToken implements Command {
 
         OptionMapping factionOrColour = event.getOption(Constants.FACTION_COLOR);
         List<String> colors = new ArrayList<>();
-        Game game = gameManager.getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         if (factionOrColour != null) {
             String colorString = factionOrColour.getAsString().toLowerCase();
             colorString = colorString.replace(" ", "");

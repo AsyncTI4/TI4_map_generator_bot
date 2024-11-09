@@ -51,7 +51,7 @@ public class FOWCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }

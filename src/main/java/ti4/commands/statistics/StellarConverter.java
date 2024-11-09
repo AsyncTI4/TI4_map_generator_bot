@@ -36,7 +36,7 @@ public class StellarConverter extends StatisticsSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game g : pagedGames.getGames()) {
                 List<String> worldsThisGame = g.getTileMap().values().stream()
                         .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets

@@ -39,7 +39,7 @@ public class SOCardsCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
     }
 

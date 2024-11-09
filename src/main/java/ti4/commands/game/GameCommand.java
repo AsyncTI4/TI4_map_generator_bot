@@ -42,7 +42,7 @@ public class GameCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         if (game == null) return;
         if (!undoCommand) {
             GameSaveLoadManager.saveGame(game, event);

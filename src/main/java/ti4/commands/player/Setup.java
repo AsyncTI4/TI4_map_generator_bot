@@ -1,5 +1,12 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -28,19 +35,13 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.MinifiedGame;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechnologyModel;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 public class Setup extends PlayerSubcommandData {
     public Setup() {
@@ -333,24 +334,19 @@ public class Setup extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
 
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-            for (Game game2 : pagedGames.getGames()) {
-                for (Player player2 : game2.getRealPlayers()) {
-                    if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                        if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
-                            player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
-                        }
-                        if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
-                            player.setPreferenceForDistanceBasedTacticalActions(true);
-                        }
-                        break;
+        for (MinifiedGame minifiedGame : GameManager.getMinifiedGames()) {
+            for (Player player2 : minifiedGame.getRealPlayers()) {
+                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
+                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
+                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
                     }
+                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
+                        player.setPreferenceForDistanceBasedTacticalActions(true);
+                    }
+                    break;
                 }
             }
-        } while (pagedGames.hasNextPage());
+        }
 
         if (!game.isFowMode()) {
             StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName(), false);

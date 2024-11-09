@@ -7,7 +7,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 abstract class CaptureReleaseUnits extends CaptureSubcommandData {
@@ -26,12 +29,11 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game game = gameManager.getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         String color = Helper.getColor(game, event);
         if (!Mapper.isValidColor(color)) {
             MessageHelper.replyToMessage(event, "Color/Faction not valid");

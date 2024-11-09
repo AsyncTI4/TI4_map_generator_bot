@@ -50,7 +50,7 @@ public class SpecialCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }

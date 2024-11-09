@@ -150,7 +150,7 @@ public class Replace extends GameSubcommandData {
         GameSaveLoadManager.reload(game);
 
         // Load the new game instance so that we can repost the milty draft
-        game = GameManager.getInstance().getGame(game.getName());
+        game = GameManager.getGame(game.getName());
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }

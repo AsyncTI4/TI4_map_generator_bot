@@ -99,8 +99,7 @@ public class DataMigrationManager {
                 if (migrationCutoffDate == null) {
                     continue;
                 }
-                var migratedGames = migrateGames(GameManager.getInstance().getMinifiedGames(), entry.getKey(), entry.getValue(),
-                        migrationCutoffDate);
+                var migratedGames = migrateGames(GameManager.getMinifiedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
                 migrationNamesToAppliedGameNames
                         .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
                         .addAll(migratedGames);
@@ -134,7 +133,7 @@ public class DataMigrationManager {
                                              Date migrationForGamesBeforeDate) {
         List<String> migrationsApplied = new ArrayList<>();
         for (var minifiedGame : games) {
-            if (minifiedGame.hasRunMigration(migrationName) || minifiedGame.isHasEnded() || minifiedGame.isPlayerHasReachedVpTotal()) {
+            if (minifiedGame.isHasEnded()) {
                 continue;
             }
 
@@ -147,7 +146,12 @@ public class DataMigrationManager {
                 continue;
             }
 
-            var game = GameManager.getInstance().getGame(minifiedGame.getName());
+            var game = GameManager.getGame(minifiedGame.getName());
+
+            if (game == null || game.hasRunMigration(migrationName)) {
+                continue;
+            }
+
             var changesMade = migrationMethod.apply(game);
             game.addMigration(migrationName);
             GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);

@@ -107,7 +107,7 @@ public class WebHelper {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames()) {
                 if (game.isHasEnded() && game.hasWinner()) {
                     count++;

@@ -45,13 +45,12 @@ public class CardsInfo implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
         Game game;
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            game = gameManager.getUserActiveGame(userID);
+            game = GameManager.getUserActiveGame(userID);
             String color = Helper.getColor(game, event);
             if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");

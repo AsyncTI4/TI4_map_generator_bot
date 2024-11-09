@@ -36,7 +36,7 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
         int currentPage = 0;
         GameManager.PagedGames pagedGames;
         do {
-            pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
+            pagedGames = GameManager.getGamesPage(currentPage++);
             for (Game game : pagedGames.getGames()) {
                 for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
                     if (storedValue.contains("TitlesFor")) {

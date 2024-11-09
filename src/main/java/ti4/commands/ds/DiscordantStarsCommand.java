@@ -49,7 +49,7 @@ public class DiscordantStarsCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
 
         //  FileUpload file = new GenerateMap().saveImage(activeMap, event);

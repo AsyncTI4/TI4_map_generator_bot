@@ -29,7 +29,7 @@ class GameTest {
                 "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game),
                 "naaluPnPlayer", naaluPnPlayer
         ));
-        GameManager.getInstance().addOrReplace(game);
+        GameManager.addOrReplace(game);
         return game;
     }
 
