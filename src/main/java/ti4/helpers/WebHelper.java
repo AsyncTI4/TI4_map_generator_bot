@@ -1,20 +1,5 @@
 package ti4.helpers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import ti4.ResourceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameStatsDashboardPayload;
-import ti4.map.Player;
-import ti4.message.BotLogger;
-import ti4.website.WebsiteOverlay;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -31,6 +16,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.ResourceHelper;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.GameStatsDashboardPayload;
+import ti4.map.MinifiedGame;
+import ti4.map.Player;
+import ti4.message.BotLogger;
+import ti4.website.WebsiteOverlay;
 
 import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
@@ -104,25 +106,21 @@ public class WebHelper {
         List<String> badGames = new ArrayList<>();
         int count = 0;
 
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getGamesPage(currentPage++);
-            for (Game game : pagedGames.getGames()) {
-                if (game.isHasEnded() && game.hasWinner()) {
-                    count++;
-                    try {
-                        // Quick & Dirty bypass for failed json creation
-                        GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
-                        objectMapper.writeValueAsString(payload);
-                        payloads.add(new GameStatsDashboardPayload(game));
-                    } catch (Exception e) {
-                        badGames.add(game.getID());
-                        BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + game.getID() + "`", e);
-                    }
+        for (MinifiedGame minifiedGame : GameManager.getMinifiedGames()) {
+            if (minifiedGame.isHasEnded() && minifiedGame.isHasWinner()) {
+                count++;
+                try {
+                    // Quick & Dirty bypass for failed json creation
+                    var game = GameSaveLoadManager.loadGame(minifiedGame.getName());
+                    GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
+                    objectMapper.writeValueAsString(payload);
+                    payloads.add(new GameStatsDashboardPayload(game));
+                } catch (Exception e) {
+                    badGames.add(minifiedGame.getName());
+                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + minifiedGame.getName() + "`", e);
                 }
             }
-        } while (pagedGames.hasNextPage());
+        }
 
         String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
         if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
