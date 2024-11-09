@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
 
 public class PersistenceManager {
 
     public static final String PERSISTENCE_MANAGER_JSON_PATH = "/pm_json/";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static void writeObjectToJsonFile(String fileName, Object object) throws IOException {
         if (object == null) {
@@ -21,6 +22,10 @@ public class PersistenceManager {
         }
 
         var file = getFile(fileName);
+        var parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
+            throw new IOException("Failed to create directories: " + parentDir.getAbsolutePath());
+        }
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, object);
     }
 
@@ -34,7 +39,7 @@ public class PersistenceManager {
 
         var file = getFile(fileName);
         if (!file.exists()) {
-            throw new IOException("File not found: " + fileName);
+            return null;
         }
 
         return objectMapper.readValue(file, clazz);

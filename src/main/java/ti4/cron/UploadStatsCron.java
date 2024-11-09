@@ -19,16 +19,18 @@ public class UploadStatsCron {
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
     public static void start() {
-        SCHEDULER.scheduleAtFixedRate(UploadStatsCron::uploadStats, 1, 4, TimeUnit.HOURS);
+        SCHEDULER.scheduleAtFixedRate(UploadStatsCron::uploadStats, 2, 8, TimeUnit.HOURS);
     }
 
     private static void uploadStats() {
         var stopWatch = StopWatch.createStarted();
+
         var uploadStatsCronData = readUploadStatsCronData();
-        if (uploadStatsCronData == null || uploadStatsCronData.lastUpload == null ||
+        if (uploadStatsCronData != null && uploadStatsCronData.lastUpload != null &&
                 uploadStatsCronData.lastUpload.plusDays(UPLOAD_STATS_INTERVAL_DAYS).isBefore(LocalDate.now())) {
             return;
         }
+
         BotLogger.log("Starting stats upload.");
         WebHelper.putStats();
         persistUploadStatsCronData();
