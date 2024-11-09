@@ -1633,6 +1633,40 @@ public class TileGenerator {
             unitTokenPosition = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
         }
         BufferedImage dmgImage = ImageHelper.readScaled(Helper.getDamagePath(), 0.8f);
+        
+        // run through the units to see if there are any bulk fighters/infantry
+        boolean bulkInf = false;
+        boolean bulkFF = false;
+        int offsetInf = 0;
+        int offsetFF = 0;
+        for (Map.Entry<Units.UnitKey, Integer> unitEntry : units.entrySet()) {
+            Units.UnitKey unitKey = unitEntry.getKey();
+            if (unitKey != null && !Mapper.isValidColor(unitKey.getColor())) {
+                continue;
+            }
+            Integer unitCount = unitEntry.getValue();
+
+            if (isJail && fowPlayer != null) {
+                String colorID = Mapper.getColorID(fowPlayer.getColor());
+                if (!showJail && !unitKey.getColorID().equals(colorID)) {
+                    continue;
+                }
+            }
+
+            try {
+                String unitPath = Tile.getUnitPath(unitKey);
+                if (unitPath != null) {
+                    if (unitKey.getUnitType() == Units.UnitType.Fighter) {
+                        bulkFF |= unitCount >= 10;
+                    } else if (unitKey.getUnitType() == Units.UnitType.Infantry) {
+                        bulkInf |= unitCount >= 10;
+                    }
+                }
+            } catch (Exception e) {
+                BotLogger.log("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
+                continue;
+            }
+        }
 
         boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
         int multInf = 2;
@@ -1689,7 +1723,7 @@ public class TileGenerator {
                 }
 
                 unitImage = ImageHelper.read(unitPath);
-                if (bulkUnitCount != null && bulkUnitCount > 9) {
+                if (bulkUnitCount != null && bulkUnitCount >= 10) {
                     unitImage = ImageHelper.readScaled(unitPath, 1.2f);
                 }
             } catch (Exception e) {
@@ -1766,21 +1800,61 @@ public class TileGenerator {
                         }
                         position = new Point(x2 + 30 * (mult - 1), y2);
                     }
+                    // shift around the bulk units if there's a chonky boi
+                    if (unitKey.getUnitType() == Units.UnitType.Infantry)
+                    {
+                        offsetInf += (bulkUnitCount >= 10 ? 14 : 0);
+                        if (bulkInf)
+                        {
+                            position = new Point(position.x - offsetInf, position.y - (bulkUnitCount >= 10 ? 4 : 2));
+                        }
+                        else
+                        {
+                            position = new Point(position.x - offsetInf, position.y);
+                        }
+                    }
+                    else if (unitKey.getUnitType() == Units.UnitType.Fighter)
+                    {
+                        offsetFF += (bulkUnitCount >= 10 ? 14 : 0);
+                        if (bulkFF)
+                        {
+                            position = new Point(position.x - offsetFF, position.y + (bulkUnitCount >= 10 ? 2 : 4));
+                        }
+                        else
+                        {
+                            position = new Point(position.x - offsetFF, position.y);
+                        }
+                    }
                 }
-                if (unitKey.getUnitType() == Units.UnitType.Infantry && position == null) {
-                    UnitTokenPosition unitTokenPosition2 = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
-                    if (unitTokenPosition2 == null) {
-                        unitTokenPosition2 = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
+                if (unitKey.getUnitType() == Units.UnitType.Infantry) {
+                    if (position == null)
+                    {
+                        UnitTokenPosition unitTokenPosition2 = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+                        if (unitTokenPosition2 == null) {
+                            unitTokenPosition2 = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
+                        }
+                        int x2 = (int) centerPosition.getX() - 19;
+                        int y2 = (int) centerPosition.getY() - 15;
+                        if (unitTokenPosition2 != null) {
+                            Point position2 = unitTokenPosition2.getPosition(fighterOrInfantry ? "tkn_" + id : id);
+                            x2 = (int) position2.getX();
+                            y2 = (int) position2.getY();
+                        }
+                        position = new Point(x2 - 33 * multInf, y2);
+                        multInf++;
                     }
-                    int x2 = (int) centerPosition.getX() - 19;
-                    int y2 = (int) centerPosition.getY() - 15;
-                    if (unitTokenPosition2 != null) {
-                        Point position2 = unitTokenPosition2.getPosition(fighterOrInfantry ? "tkn_" + id : id);
-                        x2 = (int) position2.getX();
-                        y2 = (int) position2.getY();
+                    if (!isSpace)
+                    {
+                        offsetInf += (bulkUnitCount >= 10 ? 14 : 0);
+                        if (bulkInf)
+                        {
+                            position = new Point(position.x - offsetInf, position.y - (bulkUnitCount >= 10 ? 4 : 2));
+                        }
+                        else
+                        {
+                            position = new Point(position.x - offsetInf, position.y);
+                        }
                     }
-                    position = new Point(x2 - 33 * multInf, y2);
-                    multInf = multInf + 1;
                 }
                 while (searchPosition && position == null) {
                     x = (int) (radius * Math.sin(degree));
@@ -1867,12 +1941,12 @@ public class TileGenerator {
                     tileGraphics.setFont(Storage.getFont24());
                     tileGraphics.setColor(groupUnitColor);
 
-                    int scaledNumberPositionX = NUMBER_POSITION_POINT.x;
+                    int scaledNumberPositionX = NUMBER_POSITION_POINT.x + (bulkUnitCount == 1 ? 4 : 0); // can shift slightly to the right if it just reads "1"
                     int scaledNumberPositionY = NUMBER_POSITION_POINT.y;
-                    if (bulkUnitCount > 9) {
+                    if (bulkUnitCount >= 10) {
                         tileGraphics.setFont(Storage.getFont28());
-                        scaledNumberPositionX = scaledNumberPositionX + 5;
-                        scaledNumberPositionY = scaledNumberPositionY + 5;
+                        scaledNumberPositionX += 5;
+                        scaledNumberPositionY += 5;
                     }
                     tileGraphics.drawString(Integer.toString(bulkUnitCount),
                             imageX + scaledNumberPositionX,
