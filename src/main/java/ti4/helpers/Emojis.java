@@ -1802,17 +1802,17 @@ public class Emojis {
             case "sleeperb" -> SleeperB;
 
             // UNITS
-            case "warsun" -> warsun;
-            case "spacedock" -> spacedock;
-            case "pds" -> pds;
-            case "mech" -> mech;
-            case "infantry" -> infantry;
-            case "flagship", "lady", "cavalry" -> flagship;
-            case "fighter" -> fighter;
-            case "dreadnought" -> dreadnought;
-            case "destroyer" -> destroyer;
-            case "carrier" -> carrier;
-            case "cruiser" -> cruiser;
+            case "warsun", "ws" -> warsun;
+            case "spacedock", "sd" -> spacedock;
+            case "pds", "pd" -> pds;
+            case "mech", "mf" -> mech;
+            case "infantry", "gf" -> infantry;
+            case "flagship", "lady", "cavalry", "fs" -> flagship;
+            case "fighter", "ff" -> fighter;
+            case "dreadnought", "dn" -> dreadnought;
+            case "destroyer", "dd" -> destroyer;
+            case "carrier", "cv" -> carrier;
+            case "cruiser", "ca" -> cruiser;
             case "tyrantslament" -> TyrantsLament;
             case "plenaryorbital" -> PlenaryOrbital;
             case "monument" -> Monument;
