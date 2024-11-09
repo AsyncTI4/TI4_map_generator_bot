@@ -61,7 +61,6 @@ public class GameCreate extends GameSubcommandData {
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
         GameManager gameManager = GameManager.getInstance();
-        gameManager.addGame(newGame);
         boolean setMapSuccessful = gameManager.setGameForUser(ownerID, gameName);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         if (!setMapSuccessful) {

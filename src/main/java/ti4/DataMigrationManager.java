@@ -30,6 +30,7 @@ import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.MinifiedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -87,33 +88,32 @@ public class DataMigrationManager {
     }
 
     public static void runMigrations() {
+        Map<String, List<String>> migrationNamesToAppliedGameNames = new HashMap<>();
+
         try {
-            Map<String, List<String>> migrationNamesToAppliedGameNames = new HashMap<>();
             Map<String, Optional<Date>> migrationNamesToCutoffDates = migrations.entrySet().stream()
                     .collect(Collectors.toMap(Entry::getKey, entry -> getMigrationForGamesBeforeDate(entry.getKey())));
 
-            int currentPage = 0;
-            GameManager.PagedGames pagedGames;
-            do {
-                pagedGames = GameManager.getInstance().getGamesPage(currentPage++);
-                for (Entry<String, Function<Game, Boolean>> entry : migrations.entrySet()) {
-                    Date migrationCutoffDate = migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
-                    if (migrationCutoffDate == null) {
-                        continue;
-                    }
-                    migrationNamesToAppliedGameNames
-                            .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
-                            .addAll(migrateGames(pagedGames.getGames(), entry.getKey(), entry.getValue(), migrationCutoffDate));
+            for (Entry<String, Function<Game, Boolean>> entry : migrations.entrySet()) {
+                Date migrationCutoffDate = migrationNamesToCutoffDates.get(entry.getKey()).orElse(null);
+                if (migrationCutoffDate == null) {
+                    continue;
                 }
-            } while (pagedGames.hasNextPage());
-            for (Entry<String, List<String>> entry : migrationNamesToAppliedGameNames.entrySet()) {
-                if (!entry.getValue().isEmpty()) {
-                    String gameNames = String.join(", ", entry.getValue());
-                    BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
-                }
+                var migratedGames = migrateGames(GameManager.getInstance().getMinifiedGames(), entry.getKey(), entry.getValue(),
+                        migrationCutoffDate);
+                migrationNamesToAppliedGameNames
+                        .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
+                        .addAll(migratedGames);
             }
         } catch (Exception e) {
             BotLogger.log("Issue running migrations:", e);
+        }
+
+        for (Entry<String, List<String>> entry : migrationNamesToAppliedGameNames.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                String gameNames = String.join(", ", entry.getValue());
+                BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
+            }
         }
     }
 
@@ -130,31 +130,29 @@ public class DataMigrationManager {
         return Optional.empty();
     }
 
-    private static List<String> migrateGames(List<Game> games, String migrationName, Function<Game, Boolean> migrationMethod,
+    private static List<String> migrateGames(List<MinifiedGame> games, String migrationName, Function<Game, Boolean> migrationMethod,
                                              Date migrationForGamesBeforeDate) {
         List<String> migrationsApplied = new ArrayList<>();
-        for (Game game : games) {
+        for (var minifiedGame : games) {
+            if (minifiedGame.hasRunMigration(migrationName) || minifiedGame.isHasEnded() || minifiedGame.isPlayerHasReachedVpTotal()) {
+                continue;
+            }
+
             Date mapCreatedOn = null;
             try {
-                mapCreatedOn = MAP_CREATED_ON_FORMAT.parse(game.getCreationDate());
+                mapCreatedOn = MAP_CREATED_ON_FORMAT.parse(minifiedGame.getCreationDate());
             } catch (ParseException ignored) {
             }
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
                 continue;
             }
-            boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
-            if (game.isHasEnded() || endVPReachedButNotEnded) {
-                continue;
-            }
 
-            if (!game.hasRunMigration(migrationName)) {
-                Boolean changesMade = migrationMethod.apply(game);
-                game.addMigration(migrationName);
-
-                if (changesMade) {
-                    migrationsApplied.add(game.getName());
-                    GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);
-                }
+            var game = GameManager.getInstance().getGame(minifiedGame.getName());
+            var changesMade = migrationMethod.apply(game);
+            game.addMigration(migrationName);
+            GameSaveLoadManager.saveGame(game, "Data Migration - " + migrationName);
+            if (changesMade) {
+                migrationsApplied.add(game.getName());
             }
         }
         return migrationsApplied;

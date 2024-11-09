@@ -1,10 +1,10 @@
 package ti4.map;
 
-import org.junit.jupiter.api.Test;
-import ti4.helpers.Constants;
-
 import java.util.Map;
 import java.util.Set;
+
+import org.junit.jupiter.api.Test;
+import ti4.helpers.Constants;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +29,7 @@ class GameTest {
                 "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game),
                 "naaluPnPlayer", naaluPnPlayer
         ));
-        GameManager.getInstance().addGame(game);
+        GameManager.getInstance().addOrReplace(game);
         return game;
     }
 

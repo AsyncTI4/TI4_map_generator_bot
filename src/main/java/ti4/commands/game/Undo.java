@@ -102,8 +102,6 @@ public class Undo extends GameSubcommandData {
         }
         // MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
-        GameManager.getInstance().deleteGame(game.getName());
-        GameManager.getInstance().addGame(gameToRestore);
         GameSaveLoadManager.undo(gameToRestore, event);
     }
 

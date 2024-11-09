@@ -5069,7 +5069,6 @@ public class ButtonHelper {
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);
                 gameToRestore.shuffleDecks();
-                GameManager.getInstance().addGame(gameToRestore);
                 // CREATE BOT/MAP THREAD
                 ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
                     .complete();

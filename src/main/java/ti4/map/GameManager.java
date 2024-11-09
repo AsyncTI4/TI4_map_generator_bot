@@ -1,6 +1,7 @@
 package ti4.map;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -12,12 +13,14 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import ti4.cron.LogCacheStatsCron;
+import ti4.message.BotLogger;
 
 public class GameManager {
 
     private static volatile GameManager instance;
 
-    private final List<String> allGameNames = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
+    private final ConcurrentMap<String, MinifiedGame> gameNameToMinifiedGame = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, String> userIdToCurrentGameName = new ConcurrentHashMap<>();
     private final LoadingCache<String, Game> gameCache;
 
@@ -26,8 +29,10 @@ public class GameManager {
                 .maximumSize(200)
                 .expireAfterAccess(2, TimeUnit.HOURS)
                 .build(this::loadGame);
-        allGameNames.addAll(GameSaveLoadManager.getAllGameNames());
         LogCacheStatsCron.registerCache("gameCache", gameCache);
+        GameSaveLoadManager.loadMinifiedGames()
+                .forEach(minifiedGame -> gameNameToMinifiedGame.put(minifiedGame.getName(), minifiedGame));
+        allGameNames.addAll(gameNameToMinifiedGame.keySet());
     }
 
     private Game loadGame(String gameName) {
@@ -45,11 +50,6 @@ public class GameManager {
         return instance;
     }
 
-    public void addGame(Game game) {
-        allGameNames.add(game.getName());
-        gameCache.put(game.getName(), game);
-    }
-
     public Game getGame(String gameName) {
         if (!isValidGame(gameName)) {
             return null;
@@ -57,8 +57,19 @@ public class GameManager {
         return gameCache.get(gameName);
     }
 
-    public void deleteGame(String gameName) {
+    void addOrReplace(Game game) {
+        allGameNames.addIfAbsent(game.getName());
+        if (!hasMatchingMinifiedGame(game)) {
+            gameNameToMinifiedGame.put(game.getName(), new MinifiedGame(game));
+        }
+        if (gameCache.getIfPresent(game.getName()) != null) {
+            gameCache.put(game.getName(), game);
+        }
+    }
+
+    void deleteGame(String gameName) {
         allGameNames.remove(gameName);
+        gameNameToMinifiedGame.remove(gameName);
         gameCache.invalidate(gameName);
     }
 
@@ -107,6 +118,23 @@ public class GameManager {
         }
         pagedGames.hasNextPage = allGameNames.size() / PagedGames.PAGE_SIZE > page;
         return pagedGames;
+    }
+
+    public MinifiedGame getMinifiedGame(String gameName) {
+        return gameNameToMinifiedGame.get(gameName);
+    }
+
+    public Collection<MinifiedGame> getMinifiedGames() {
+        if (gameNameToMinifiedGame.size() != allGameNames.size()) {
+            BotLogger.log("gameNameToMinifiedGame size " + gameNameToMinifiedGame.size() +
+                    " does not match allGameNames size " + allGameNames.size());
+        }
+        return new ArrayList<>(gameNameToMinifiedGame.values());
+    }
+
+    private boolean hasMatchingMinifiedGame(Game game) {
+        var minifiedGame = gameNameToMinifiedGame.get(game.getName());
+        return minifiedGame != null && minifiedGame.matches(game);
     }
 
     public static class PagedGames {

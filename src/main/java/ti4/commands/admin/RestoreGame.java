@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
@@ -55,9 +54,6 @@ public class RestoreGame extends AdminSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Save file name must be the same as the game name.");
             return;
         }
-
-        GameManager.getInstance().deleteGame(game.getName());
-        GameManager.getInstance().addGame(game);
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " restored.");
         GameSaveLoadManager.saveGame(game, event);
     }

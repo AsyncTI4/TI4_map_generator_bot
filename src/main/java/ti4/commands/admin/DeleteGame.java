@@ -51,7 +51,6 @@ public class DeleteGame extends AdminSubcommandData {
 
         if (GameSaveLoadManager.deleteGame(mapName)) {
             GameEnd.secondHalfOfGameEnd(event, gameToDelete, false, true, false);
-            GameManager.getInstance().deleteGame(mapName);
             MessageHelper.replyToMessage(event, "Map: " + mapName + " deleted.");
         } else {
             MessageHelper.replyToMessage(event, "Map could not be deleted");

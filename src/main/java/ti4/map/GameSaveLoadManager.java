@@ -89,8 +89,8 @@ public class GameSaveLoadManager {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
 
-    private static String debugString(String prefix, long time, long total) {
-        return prefix + Helper.getTimeRepresentationNanoSeconds(time) + String.format(" (%2.2f%%)", (double) time / (double) total * 100.0);
+    private static String debugString(String prefix, long time) {
+        return prefix + Helper.getTimeRepresentationNanoSeconds(time);
     }
 
     public static void saveGame(Game game, String reason) {
@@ -155,6 +155,7 @@ public class GameSaveLoadManager {
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
+        GameManager.getInstance().addOrReplace(game);
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
@@ -213,8 +214,6 @@ public class GameSaveLoadManager {
                             CardsInfo.sendCardsInfo(loadedGame, p1);
                         }
                     }
-                    GameManager.getInstance().deleteGame(game.getName());
-                    GameManager.getInstance().addGame(loadedGame);
 
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
@@ -232,11 +231,7 @@ public class GameSaveLoadManager {
     public static void reload(Game game) {
         File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
         if (originalMapFile.exists()) {
-            Game loadedGame = loadGame(originalMapFile);
-            if (loadedGame != null) {
-                GameManager.getInstance().deleteGame(game.getName());
-                GameManager.getInstance().addGame(loadedGame);
-            }
+            loadGame(originalMapFile);
         }
     }
 
@@ -1078,6 +1073,7 @@ public class GameSaveLoadManager {
     }
 
     public static boolean deleteGame(String gameName) {
+        GameManager.getInstance().deleteGame(gameName);
         File mapStorage = Storage.getGameFile(gameName + TXT);
         if (!mapStorage.exists()) {
             return false;
@@ -1086,23 +1082,30 @@ public class GameSaveLoadManager {
         return mapStorage.renameTo(deletedMapStorage);
     }
 
-    public static List<String> getAllGameNames() {
-        List<String> allGameNames = Collections.emptyList();
-        long loadStart = System.nanoTime();
+    public static List<MinifiedGame> loadMinifiedGames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
-            allGameNames = pathStream.parallel()
+            return pathStream.parallel()
                     .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
                     .map(path -> {
-                        var fileName = path.getFileName().toString();
-                        return fileName.substring(0, fileName.length() - 4); // remove ".txt"
+                        File file = path.toFile();
+                        try {
+                            Game game = loadGame(file);
+                            if (game == null || game.getName() == null) {
+                                BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
+                                return null;
+                            }
+                            return new MinifiedGame(game);
+                        } catch (Exception e) {
+                            BotLogger.log("Could not load game: " + file.getName(), e);
+                        }
+                        return null;
                     })
-                    .collect(Collectors.toList());
+                    .filter(Objects::nonNull)
+                    .toList();
         } catch (IOException e) {
-            BotLogger.log("Exception occurred while streaming map directory.", e);
+            BotLogger.log("Exception occurred while getting all game names.", e);
         }
-        long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + allGameNames.size() + "` games: ", loadTime, loadTime));
-        return allGameNames;
+        return Collections.emptyList();
     }
 
     public static Game loadGame(String gameName) {
@@ -1112,13 +1115,22 @@ public class GameSaveLoadManager {
 
     @Nullable
     public static Game loadGame(File gameFile) {
+        Game game = readGame(gameFile);
+        if (game != null) {
+            GameManager.getInstance().addOrReplace(game);
+        }
+        return game;
+    }
+
+    private static Game readGame(File gameFile) {
         if (gameFile == null || !gameFile.exists()) {
             BotLogger.log("Could not load map, map file does not exist: " + (gameFile == null ? "null file" : gameFile.getAbsolutePath()));
             return null;
         }
-        Game game = new Game();
-        boolean fatalError = false;
+
         try {
+            Game game = new Game();
+            boolean fatalError = false;
             Iterator<String> gameFileLines = Files.readAllLines(gameFile.toPath(), Charset.defaultCharset()).listIterator();
             game.setOwnerID(gameFileLines.next());
             game.setOwnerName(gameFileLines.next());
@@ -1182,7 +1194,6 @@ public class GameSaveLoadManager {
         } catch (Exception e) {
             BotLogger.log("Data read error: " + gameFile.getName(), e);
         }
-
         return null;
     }
 
