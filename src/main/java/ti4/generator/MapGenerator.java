@@ -1,7 +1,16 @@
 package ti4.generator;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
+import static ti4.helpers.ImageHelper.*;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -29,17 +38,20 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
+import javax.imageio.ImageIO;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
@@ -51,7 +63,6 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CalendarHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Helper;
@@ -84,8 +95,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.website.WebsiteOverlay;
-
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -341,7 +350,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private void setupFow(Map<String, Tile> tilesToDisplay) {
-        if(!isFowModeActive()) {
+        if (!isFowModeActive()) {
             return;
         }
         isFoWPrivate = true;
@@ -365,8 +374,8 @@ public class MapGenerator implements AutoCloseable {
 
     private boolean isFowModeActive() {
         return game.isFowMode() && event != null &&
-                (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
-                        event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper);
+            (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
+                event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper);
     }
 
     public boolean shouldConvertToGeneric(Player player) {
@@ -761,23 +770,23 @@ public class MapGenerator implements AutoCloseable {
                         if (sc == ButtonHelper.getKyroHeroSC(game)) {
                             String kyroScNum = "" + (game.getSCList().size() + 1);
                             DrawingUtil.drawCenteredString(graphics, kyroScNum,
-                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                    Storage.getFont32());
+                                new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                Storage.getFont32());
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setColor(Color.RED);
                                 DrawingUtil.drawCenteredString(graphics, "X",
-                                        new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                        Storage.getFont24());
+                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                    Storage.getFont24());
                             }
                         } else {
                             DrawingUtil.drawCenteredString(graphics, scText,
-                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                    Storage.getFont32());
+                                new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                Storage.getFont32());
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
                                 graphics.setColor(Color.RED);
                                 DrawingUtil.drawCenteredString(graphics, "X",
-                                        new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
-                                        Storage.getFont24());
+                                    new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32),
+                                    Storage.getFont24());
                             }
                         }
 
@@ -1623,7 +1632,7 @@ public class MapGenerator implements AutoCloseable {
 
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.isCcNPlasticLimit()) {
-                    String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
+                    String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
                     List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), warningMessage, removeButtons);
                 }
@@ -2997,11 +3006,11 @@ public class MapGenerator implements AutoCloseable {
             factionText = StringUtils.capitalize(factionText);
             DrawingUtil.superDrawString(graphics, factionText, point.x, point.y, Color.WHITE, center, null, stroke5, Color.BLACK);
 
-            BufferedImage img = ImageHelper.readEmojiImageScaled(Emojis.getColorEmoji(player.getColor()), 30);
-            int offset = graphics.getFontMetrics().stringWidth(factionText) / 2 + 10;
-            point.translate(0, -25);
-            graphics.drawImage(img, point.x - offset - 30, point.y, null);
-            graphics.drawImage(img, point.x + offset, point.y, null);
+            // BufferedImage img = ImageHelper.readEmojiImageScaled(Emojis.getColorEmoji(player.getColor()), 30);
+            // int offset = graphics.getFontMetrics().stringWidth(factionText) / 2 + 10;
+            // point.translate(0, -25);
+            // graphics.drawImage(img, point.x - offset - 30, point.y, null);
+            // graphics.drawImage(img, point.x + offset, point.y, null);
         }
 
         { // PAINT VICTORY POINTS

@@ -116,13 +116,13 @@ public class StartPhase extends GameSubcommandData {
             if (game.getStoredValue("LastMinuteDeliberation") != null
                 && game.getStoredValue("LastMinuteDeliberation").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("last_minute_deliberation")) {
-                PlayAC.playAC(event, game, p2, "last_minute_deliberation", game.getMainGameChannel());
+                PlayAC.playAC(event, game, p2, "last minute deliberation", game.getMainGameChannel());
                 return;
             }
             if (game.getStoredValue("SpecialSession") != null
                 && game.getStoredValue("SpecialSession").contains(p2.getFaction())
                 && p2.getActionCards().containsKey("special_session")) {
-                PlayAC.playAC(event, game, p2, "special_session", game.getMainGameChannel());
+                PlayAC.playAC(event, game, p2, "special session", game.getMainGameChannel());
                 return;
             }
 
@@ -348,7 +348,7 @@ public class StartPhase extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 MapRenderPipeline.render(game, event, DisplayType.map,
-                        fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
+                    fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }
 
