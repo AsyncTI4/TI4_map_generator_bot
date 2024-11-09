@@ -65,7 +65,6 @@ import ti4.model.TemporaryCombatModifierModel;
 public class GameSaveLoadManager {
 
     public static final String TXT = ".txt";
-    public static final String JSON = ".json";
     public static final String TILE = "-tile-";
     public static final String UNITS = "-units-";
     public static final String UNITHOLDER = "-unitholder-";

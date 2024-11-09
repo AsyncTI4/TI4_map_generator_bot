@@ -21,6 +21,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -44,10 +49,6 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -3089,6 +3090,12 @@ public class ButtonHelper {
         }
     }
 
+    @ButtonHandler("confirmSecondAction")
+    public static void confirmSecondAction(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " is using an ability to take another action", TurnStart.getStartOfTurnButtons(player, game, true, event, true));
+    }
+
     @ButtonHandler("addToken_")
     public static void addTokenToTile(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         // addtoken_(tokenname)_(pos)_(planet?)
@@ -3145,6 +3152,9 @@ public class ButtonHelper {
             ringButtons.add(rex);
         }
         int rings = game.getRingCount();
+        for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+            ringButtons.add(Buttons.green(finChecker + "ringTile_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)).withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
+        }
         for (int x = 1; x < rings + 1; x++) {
             Button ringX = Buttons.green(finChecker + "ring_" + x, "Ring #" + x);
             ringButtons.add(ringX);

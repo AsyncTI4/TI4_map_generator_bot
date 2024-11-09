@@ -2405,6 +2405,8 @@ public class Helper {
                 buttonID = player.finChecker() + "getTech_" + techID;
             } else if ("nekro".equalsIgnoreCase(buttonPrefixType)) {
                 buttonID = player.finChecker() + "getTech_" + techID + "__noPay";
+            } else if ("noPay".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = player.finChecker() + "getTech_" + techID + "__noPay";
             } else if ("free".equalsIgnoreCase(buttonPrefixType)) {
                 buttonID = player.finChecker() + "getTech_" + techID + "__noPay!comp";
             } else if ("inf".equalsIgnoreCase(buttonPrefixType)) {

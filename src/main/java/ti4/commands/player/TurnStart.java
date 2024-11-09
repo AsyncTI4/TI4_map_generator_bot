@@ -1,5 +1,12 @@
 package ti4.commands.player;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.function.Consumers;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -7,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -259,6 +265,10 @@ public class TurnStart extends PlayerSubcommandData {
     }
 
     public static List<Button> getStartOfTurnButtons(Player player, Game game, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
+        return getStartOfTurnButtons(player, game, doneActionThisTurn, event, false);
+    }
+
+    public static List<Button> getStartOfTurnButtons(Player player, Game game, boolean doneActionThisTurn, GenericInteractionCreateEvent event, boolean confirmed2ndAction) {
         if (!doneActionThisTurn) {
             for (Player p2 : game.getRealPlayers()) {
                 if (!game.getStoredValue(p2.getFaction() + "graviton").isEmpty()) {
@@ -268,29 +278,63 @@ public class TurnStart extends PlayerSubcommandData {
         }
         String finChecker = player.getFinsFactionCheckerPrefix();
         game.setDominusOrb(false);
-
+        Player p1 = player;
         List<Button> startButtons = new ArrayList<>();
-        Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
-            "Tactical Action (" + player.getTacticalCC() + ")");
-        int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
-        Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
-
-        startButtons.add(tacticalAction);
-        startButtons.add(componentAction);
         boolean hadAnyUnplayedSCs = false;
-        for (Integer SC : player.getSCs()) {
-            if (!game.getPlayedSCs().contains(SC)) {
-                hadAnyUnplayedSCs = true;
-                String name = Helper.getSCName(SC, game);
-                if (game.getName().equalsIgnoreCase("pbd1000")) {
-                    name = name + "(" + SC + ")";
+        if (!doneActionThisTurn || confirmed2ndAction) {
+            Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
+                "Tactical Action (" + player.getTacticalCC() + ")");
+            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
+            Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
+
+            startButtons.add(tacticalAction);
+            startButtons.add(componentAction);
+
+            for (Integer SC : player.getSCs()) {
+                if (!game.getPlayedSCs().contains(SC)) {
+                    hadAnyUnplayedSCs = true;
+                    String name = Helper.getSCName(SC, game);
+                    if (game.getName().equalsIgnoreCase("pbd1000")) {
+                        name = name + "(" + SC + ")";
+                    }
+                    if (game.isHomebrewSCMode()) {
+                        Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name);
+                        startButtons.add(strategicAction);
+                    } else {
+                        Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name).withEmoji(Emoji.fromFormatted(Emojis.getSCEmojiFromInteger(SC)));
+                        startButtons.add(strategicAction);
+                    }
                 }
-                if (game.isHomebrewSCMode()) {
-                    Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name);
-                    startButtons.add(strategicAction);
-                } else {
-                    Button strategicAction = Buttons.green(finChecker + "strategicAction_" + SC, "Play " + name).withEmoji(Emoji.fromFormatted(Emojis.getSCEmojiFromInteger(SC)));
-                    startButtons.add(strategicAction);
+            }
+            String prefix = "componentActionRes_";
+            for (Leader leader : p1.getLeaders()) {
+                if (!leader.isExhausted() && !leader.isLocked()) {
+                    String leaderID = leader.getId();
+                    LeaderModel leaderModel = Mapper.getLeader(leaderID);
+                    if (leaderModel == null) {
+                        continue;
+                    }
+                    String leaderName = leaderModel.getName();
+                    String leaderAbilityWindow = leaderModel.getAbilityWindow();
+                    String factionEmoji = Emojis.getFactionLeaderEmoji(leader);
+                    if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
+                        if (leaderName.contains("Ssruu")) {
+                            String led = "naaluagent";
+                            if (p1.hasExternalAccessToLeader(led)) {
+                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Naalu Agent", factionEmoji);
+                                startButtons.add(lButton);
+                            }
+                        } else {
+                            if (leaderID.equalsIgnoreCase("naaluagent")) {
+                                Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, factionEmoji);
+                                startButtons.add(lButton);
+                            }
+                        }
+                    } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
+                        && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
+                        Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", factionEmoji);
+                        startButtons.add(lButton);
+                    }
                 }
             }
         }
@@ -369,38 +413,6 @@ public class TurnStart extends PlayerSubcommandData {
             psycho = psycho.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
             startButtons.add(psycho);
         }
-        Player p1 = player;
-        String prefix = "componentActionRes_";
-        for (Leader leader : p1.getLeaders()) {
-            if (!leader.isExhausted() && !leader.isLocked()) {
-                String leaderID = leader.getId();
-                LeaderModel leaderModel = Mapper.getLeader(leaderID);
-                if (leaderModel == null) {
-                    continue;
-                }
-                String leaderName = leaderModel.getName();
-                String leaderAbilityWindow = leaderModel.getAbilityWindow();
-                String factionEmoji = Emojis.getFactionLeaderEmoji(leader);
-                if ("ACTION:".equalsIgnoreCase(leaderAbilityWindow) || leaderName.contains("Ssruu")) {
-                    if (leaderName.contains("Ssruu")) {
-                        String led = "naaluagent";
-                        if (p1.hasExternalAccessToLeader(led)) {
-                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + led, "Use " + leaderName + " as Naalu Agent", factionEmoji);
-                            startButtons.add(lButton);
-                        }
-                    } else {
-                        if (leaderID.equalsIgnoreCase("naaluagent")) {
-                            Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, factionEmoji);
-                            startButtons.add(lButton);
-                        }
-                    }
-                } else if ("mahactcommander".equalsIgnoreCase(leaderID) && p1.getTacticalCC() > 0
-                    && !ButtonHelper.getTilesWithYourCC(p1, game, event).isEmpty()) {
-                    Button lButton = Buttons.gray(finChecker + "mahactCommander", "Use Mahact Commander", factionEmoji);
-                    startButtons.add(lButton);
-                }
-            }
-        }
 
         Button transaction = Buttons.blue("transaction", "Transaction");
         startButtons.add(transaction);
@@ -432,7 +444,9 @@ public class TurnStart extends PlayerSubcommandData {
 
         startButtons.add(Buttons.gray("showMap", "Show Map"));
         startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
-
+        if (!confirmed2ndAction && doneActionThisTurn) {
+            startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Peform Another Action"));
+        }
         return startButtons;
     }
 
@@ -441,10 +455,10 @@ public class TurnStart extends PlayerSubcommandData {
             sb.append("Message link is: ").append(game.getStoredValue("scPlay" + sc)).append("\n");
         }
         sb.append("You currently have ").append(player.getStrategicCC())
-                .append(" CC in your strategy pool.");
+            .append(" CC in your strategy pool.");
         if (!player.hasFollowedSC(sc)) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    sb.toString());
+                sb.toString());
         }
     }
 }

@@ -83,6 +83,7 @@ import ti4.commands.user.UserCommand;
 import ti4.commands.user.UserSettingsManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.LogCacheStatsCron;
+import ti4.cron.UploadStatsCron;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -314,6 +315,7 @@ public class AsyncTI4DiscordBot {
         // START CRONS
         AutoPingCron.start();
         LogCacheStatsCron.start();
+        UploadStatsCron.start();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
