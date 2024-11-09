@@ -20,7 +20,7 @@ public class ButtonHelperStats {
         boolean deleteMsg = true;
         if (buttonID.endsWith("_stay")) {
             deleteMsg = false;
-            buttonID.replace("_stay", "");
+            buttonID = buttonID.replace("_stay", "");
         }
         String regex = "convertComms_" + RegexHelper.intRegex("amt");
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
@@ -35,7 +35,7 @@ public class ButtonHelperStats {
         boolean deleteMsg = true;
         if (buttonID.endsWith("_stay")) {
             deleteMsg = false;
-            buttonID.replace("_stay", "");
+            buttonID = buttonID.replace("_stay", "");
         }
         String regex = "gainComms_" + RegexHelper.intRegex("amt");
         Matcher matcher = Pattern.compile(regex).matcher(buttonID);
