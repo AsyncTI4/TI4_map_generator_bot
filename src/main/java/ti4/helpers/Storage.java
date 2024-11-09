@@ -1,13 +1,13 @@
 package ti4.helpers;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import ti4.message.BotLogger;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ti4.message.BotLogger;
 
 public class Storage {
 
@@ -19,7 +19,6 @@ public class Storage {
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
 
     private static String resourcePath = null;
-    private static final String storagePath = null;
 
     private static Font EMOJI_FONT_40;
 
