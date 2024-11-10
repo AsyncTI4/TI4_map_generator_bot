@@ -16,7 +16,7 @@ public class TIGLCommand implements Command {
     private final Collection<TIGLSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.TIGL;
     }
 
@@ -55,6 +55,6 @@ public class TIGLCommand implements Command {
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+        commands.addCommands(Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

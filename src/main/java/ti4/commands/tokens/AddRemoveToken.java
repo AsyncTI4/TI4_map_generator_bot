@@ -100,7 +100,7 @@ abstract public class AddRemoveToken implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription())
+        commands.addCommands(Commands.slash(getActionId(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true)));

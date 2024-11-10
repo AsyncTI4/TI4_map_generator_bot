@@ -26,7 +26,7 @@ import ti4.message.MessageHelper;
 public class ShowGame implements Command {
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.SHOW_GAME;
     }
 
@@ -124,7 +124,7 @@ public class ShowGame implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Shows selected map")
+            Commands.slash(getActionId(), "Shows selected map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }

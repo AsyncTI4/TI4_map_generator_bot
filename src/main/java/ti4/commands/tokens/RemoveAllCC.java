@@ -24,7 +24,7 @@ public class RemoveAllCC implements Command {
         }
     }
 
-    public String getActionID() {
+    public String getActionId() {
         return Constants.REMOVE_ALL_CC;
     }
 
@@ -46,7 +46,7 @@ public class RemoveAllCC implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Remove all CCs from entire map")
+            Commands.slash(getActionId(), "Remove all CCs from entire map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                     .setRequired(true)));
     }

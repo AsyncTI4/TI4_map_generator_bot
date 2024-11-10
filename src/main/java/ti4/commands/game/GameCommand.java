@@ -15,7 +15,6 @@ import ti4.commands.Command;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
@@ -24,7 +23,7 @@ public class GameCommand implements Command {
     private final Collection<GameSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.GAME;
     }
 
@@ -107,7 +106,7 @@ public class GameCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getActionId(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

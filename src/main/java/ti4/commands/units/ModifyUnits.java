@@ -12,20 +12,19 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ModifyUnits implements Command {
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.MODIFY_UNITS;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+        return event.getName().equals(getActionId());
     }
 
     @Override
@@ -57,7 +56,7 @@ public class ModifyUnits implements Command {
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), "Present the Modify Units menu"));
+        commands.addCommands(Commands.slash(getActionId(), "Present the Modify Units menu"));
     }
 
 }

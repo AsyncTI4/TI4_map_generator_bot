@@ -5,15 +5,17 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 public interface Command {
 
-    String getActionID();
+    String getActionId();
 
     default boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+        return event.getName().equals(getActionId());
     }
 
-    void execute(SlashCommandInteractionEvent event);
-
     void registerCommands(CommandListUpdateAction commands);
+
+    default void preExecute(SlashCommandInteractionEvent event) {}
+
+    void execute(SlashCommandInteractionEvent event);
 
     default void postExecute(SlashCommandInteractionEvent event) {
         event.getHook().deleteOriginal().submit();

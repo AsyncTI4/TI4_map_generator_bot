@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 
 public class RelicCommand implements Command {
@@ -18,7 +17,7 @@ public class RelicCommand implements Command {
     private final Collection<RelicSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.RELIC;
     }
 
@@ -61,6 +60,6 @@ public class RelicCommand implements Command {
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+        commands.addCommands(Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

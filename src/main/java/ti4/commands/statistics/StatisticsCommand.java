@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 
 public class StatisticsCommand implements Command {
@@ -18,7 +17,7 @@ public class StatisticsCommand implements Command {
     private final Collection<StatisticsSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.STATISTICS;
     }
 
@@ -73,7 +72,7 @@ public class StatisticsCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getActionId(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

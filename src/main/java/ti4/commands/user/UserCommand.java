@@ -1,21 +1,21 @@
 package ti4.commands.user;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-
 public class UserCommand implements Command {
 
     private final Collection<UserSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.USER;
     }
 
@@ -46,6 +46,6 @@ public class UserCommand implements Command {
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+        commands.addCommands(Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

@@ -369,7 +369,7 @@ abstract public class AddRemoveUnits implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getActionId(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                     .setRequired(true).setAutoComplete(true))
                 .addOptions(

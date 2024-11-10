@@ -19,7 +19,7 @@ public class ExploreCommand implements Command {
     private final Collection<ExploreSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.EXPLORE;
     }
 
@@ -63,7 +63,7 @@ public class ExploreCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getActionId(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

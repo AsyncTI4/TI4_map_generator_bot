@@ -11,7 +11,6 @@ import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
@@ -20,13 +19,13 @@ public class EventCommand implements Command {
     private final Collection<EventSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.EVENT;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionId(), event);
     }
 
     @Override
@@ -80,7 +79,7 @@ public class EventCommand implements Command {
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getActionId(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

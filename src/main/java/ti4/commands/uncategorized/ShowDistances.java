@@ -23,13 +23,13 @@ import ti4.message.MessageHelper;
 public class ShowDistances implements Command {
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.SHOW_DISTANCES;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getActionID())) {
+        if (!event.getName().equals(getActionId())) {
             return false;
         }
 
@@ -85,7 +85,7 @@ public class ShowDistances implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Shows map with distances to each tile from specified tile")
+            Commands.slash(getActionId(), "Shows map with distances to each tile from specified tile")
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")));
     }

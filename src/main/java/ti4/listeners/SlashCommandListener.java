@@ -19,10 +19,12 @@ import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class SlashCommandListener extends ListenerAdapter {
+
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands() && !"developer setting".equals(event.getInteraction().getFullCommandName())) {
@@ -101,10 +103,11 @@ public class SlashCommandListener extends ListenerAdapter {
         for (Command command : commandManager.getCommandList()) {
             if (command.accept(event)) {
                 try {
+                    command.preExecute(event);
                     command.execute(event);
                     command.postExecute(event);
                 } catch (Exception e) {
-                    String messageText = "Error trying to execute command: " + command.getActionID();
+                    String messageText = "Error trying to execute command: " + command.getActionId();
                     String errorMessage = ExceptionUtils.getMessage(e);
                     event.getHook().editOriginal(errorMessage).queue();
                     BotLogger.log(event, messageText, e);

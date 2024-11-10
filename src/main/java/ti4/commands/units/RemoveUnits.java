@@ -1,5 +1,8 @@
 package ti4.commands.units;
 
+import java.util.Objects;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,8 +16,6 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import java.util.Objects;
 
 public class RemoveUnits extends AddRemoveUnits {
 
@@ -108,7 +109,7 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.REMOVE_UNITS;
     }
 
@@ -130,7 +131,7 @@ public class RemoveUnits extends AddRemoveUnits {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getActionId(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))

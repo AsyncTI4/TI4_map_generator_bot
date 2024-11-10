@@ -11,13 +11,12 @@ import ti4.commands.Command;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 
 public class MapCommand implements Command {
     private final Collection<MapSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getActionId() {
         return Constants.MAP;
     }
 
@@ -57,6 +56,6 @@ public class MapCommand implements Command {
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+        commands.addCommands(Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }
