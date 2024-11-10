@@ -9,6 +9,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 
 public abstract class SOCardsSubcommandData extends SubcommandData {
 
@@ -35,7 +36,8 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = UserGameContextManager.getContextGame(user.getId());
+        String gameName = UserGameContextManager.getContextGame(user.getId());
+        game = GameManager.getGame(gameName);
 
         Player player = Helper.getGamePlayer(game, null, event, user.getId());
         if (player != null) {

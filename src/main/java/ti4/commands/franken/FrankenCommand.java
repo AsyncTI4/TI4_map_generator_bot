@@ -16,7 +16,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
@@ -46,7 +45,7 @@ public class FrankenCommand implements Command {
             }
         }
 
-        if (!GameManager.doesUserHaveGameContext(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
         }

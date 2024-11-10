@@ -168,7 +168,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 && (GameManager.getGame(gameID) != null && (GameManager.getGame(gameID).isCommunityMode()
                     || GameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
             GameManager.setContextGame(userID, gameID);
-        } else if (GameManager.doesUserHaveGameContext(userID) && gameExists && !channelName.startsWith(userActiveGame.getName())) {
+        } else if (UserGameContextManager.doesUserHaveContextGame(userID) && gameExists && !channelName.startsWith(userActiveGame.getName())) {
             // MessageHelper.sendMessageToChannel(channel,"Active game reset. Channel name
             // indicates to have map associated with it. Please select correct active game
             // or do action in neutral channel");

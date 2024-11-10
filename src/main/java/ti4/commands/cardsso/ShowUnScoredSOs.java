@@ -53,19 +53,8 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
         x = 1;
         sb.append("\n").append("Unscored Status Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
-
             if (SOInfo.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
-                if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
-                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
-                    sb.append("> ");
-                    for (Player player : game.getRealPlayers()) {
-                        sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
-                    }
-                    sb.append("\n");
-
-                } else {
-                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
-                }
+                appendSecretObjectiveRepresentation(game, sb, id, x);
                 x++;
             }
         }
@@ -73,20 +62,24 @@ public class ShowUnScoredSOs extends SOCardsSubcommandData {
         sb.append("\n").append("Unscored Agenda Phase Secrets: ").append("\n");
         for (String id : currentSecrets) {
             if (SOInfo.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
-                if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
-                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
-                    sb.append("> ");
-                    for (Player player : game.getRealPlayers()) {
-                        sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
-                    }
-                    sb.append("\n");
-
-                } else {
-                    sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
-                }
+                appendSecretObjectiveRepresentation(game, sb, id, x);
                 x++;
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+    }
+
+    private static void appendSecretObjectiveRepresentation(Game game, StringBuilder sb, String id, int x) {
+        if (ListPlayerInfoButton.getObjectiveThreshold(id, game) > 0) {
+            sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+            sb.append("> ");
+            for (Player player : game.getRealPlayers()) {
+                sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player)).append("/").append(ListPlayerInfoButton.getObjectiveThreshold(id, game)).append(" ");
+            }
+            sb.append("\n");
+
+        } else {
+            sb.append(x).append(SOInfo.getSecretObjectiveRepresentation(id));
+        }
     }
 }

@@ -13,6 +13,7 @@ import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
 
 public class SOCardsCommand implements Command {
 
@@ -30,6 +31,10 @@ public class SOCardsCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        String userId = event.getUser().getId();
+        String gameName = UserGameContextManager.getContextGame(userId);
+        Game game = GameManager.getGame(gameName);
+
         String subcommandName = event.getInteraction().getSubcommandName();
         for (SOCardsSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
@@ -38,8 +43,7 @@ public class SOCardsCommand implements Command {
                 break;
             }
         }
-        String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+
         GameSaveLoadManager.saveGame(game, event);
     }
 

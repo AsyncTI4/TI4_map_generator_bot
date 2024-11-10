@@ -17,7 +17,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -28,7 +27,7 @@ abstract public class AddRemoveToken implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        if (!GameManager.doesUserHaveGameContext(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }

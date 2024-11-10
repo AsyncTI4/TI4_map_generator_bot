@@ -29,7 +29,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -41,7 +40,7 @@ abstract public class AddRemoveUnits implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        if (!GameManager.doesUserHaveGameContext(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }

@@ -11,7 +11,6 @@ import ti4.commands.Command;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -32,7 +31,7 @@ public class RemoveAllCC implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        if (!GameManager.doesUserHaveGameContext(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
             Game game = UserGameContextManager.getContextGame(userID);

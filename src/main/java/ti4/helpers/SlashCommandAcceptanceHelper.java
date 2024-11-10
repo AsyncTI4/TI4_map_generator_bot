@@ -10,6 +10,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class SlashCommandAcceptanceHelper {
@@ -19,12 +20,13 @@ public class SlashCommandAcceptanceHelper {
             return false;
         }
         String userID = event.getUser().getId();
-        if (!GameManager.doesUserHaveGameContext(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
         }
-        Game userActiveGame = UserGameContextManager.getContextGame(userID);
-        if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
+        String userActiveGameName = UserGameContextManager.getContextGame(userID);
+        Game game = GameManager.getGame(userActiveGameName);
+        if (!game.getPlayerIDs().contains(userID) && !game.isCommunityMode()) {
             MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
             return false;
         }
@@ -64,11 +66,12 @@ public class SlashCommandAcceptanceHelper {
                 }
             }
         }
-        Game userActiveGame = UserGameContextManager.getContextGame(userID);
-        if (userActiveGame == null) {
+        String contextGameName = UserGameContextManager.getContextGame(userID);
+        if (contextGameName == null) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
         }
+        Game userActiveGame = GameManager.getGame(contextGameName);
         if (userActiveGame.isCommunityMode()) {
             Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
             if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {

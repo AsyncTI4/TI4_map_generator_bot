@@ -2277,7 +2277,7 @@ public class Helper {
         if (role == null) { // make sure players have access to the game channels
             addMapPlayerPermissionsToGameChannels(guild, game);
         } else { // make sure players have the role
-            addGameRoleToMapPlayers(guild, game, role);
+            addGameRoleToMapPlayers(guild, role, game);
         }
     }
 

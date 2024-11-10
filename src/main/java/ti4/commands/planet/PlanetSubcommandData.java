@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.UserGameContextManager;
 
 public abstract class PlanetSubcommandData extends SubcommandData {
 
@@ -32,7 +33,8 @@ public abstract class PlanetSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = UserGameContextManager.getContextGame(user.getId());
+        String gameName = UserGameContextManager.getContextGame(user.getId());
+        game = GameManager.getGame(gameName);
     }
 
     public void reply(SlashCommandInteractionEvent event) {

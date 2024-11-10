@@ -14,6 +14,7 @@ import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
 
 public class PlayerCommand implements Command {
 
@@ -50,7 +51,8 @@ public class PlayerCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        String gameName = UserGameContextManager.getContextGame(userID);
+        Game game = GameManager.getGame(gameName);
         GameSaveLoadManager.saveGame(game, event);
 
         MapRenderPipeline.renderToWebsiteOnly(game, event);
