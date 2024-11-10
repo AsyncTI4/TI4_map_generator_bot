@@ -26,9 +26,9 @@ public class ManagedGame {
     private final long endedDate;
     private final String guildId;
     // TODO: Better to have just ids?
-    private final String mainGameChannelId;
-    private final String actionsChannelId;
-    private final String tableTalkChannelId;
+    private final TextChannel mainGameChannel;
+    private final TextChannel actionsChannel;
+    private final TextChannel tableTalkChannel;
     private final List<ManagedPlayer> players;
     private final Map<ManagedPlayer, String> playerIdToFaction; // TODO unsure if keeping
     //private final Map<String, String> playerIdToColor; // TODO unsure if keeping
@@ -48,9 +48,9 @@ public class ManagedGame {
         lastActivePlayerChange = game.getLastActivePlayerChange() == null ? 0 : game.getLastActivePlayerChange().getTime();
         endedDate = game.getEndedDate();
         guildId = game.getGuildId();
-        mainGameChannelId = game.getMainGameChannel() == null ? null : game.getMainGameChannel().getId();
-        actionsChannelId = game.getActionsChannel() == null ? null : game.getActionsChannel().getId();
-        tableTalkChannelId = game.getTableTalkChannel() == null ? null : game.getTableTalkChannel().getId();
+        mainGameChannel = game.getMainGameChannel();
+        actionsChannel = game.getActionsChannel();
+        tableTalkChannel = game.getTableTalkChannel();
 
         players = game.getRealPlayers().stream().map(player -> GameManager.addOrMergePlayer(this, player)).toList();
         var winningPlayerId = game.getWinner().map(Player::getUserID).orElse(null);
@@ -109,11 +109,5 @@ public class ManagedGame {
             return null;
         }
         return guild.getRoles().stream().filter(role -> getName().equals(role.getName().toLowerCase())).findFirst().orElse(null);
-    }
-
-    @Nullable
-    public TextChannel getTextChannelById(String channelId) {
-        var guild = AsyncTI4DiscordBot.getGuild(guildId);
-        return guild.getTextChannelById(channelId);
     }
 }

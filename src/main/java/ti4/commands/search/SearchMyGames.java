@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -92,8 +91,7 @@ public class SearchMyGames extends SearchSubcommandData {
         ManagedPlayer player = game.getManagedPlayer(userId);
         if (player == null) return "";
 
-        var guild = AsyncTI4DiscordBot.getGuild(game.getGuildId());
-        var actionsChannel = guild.getTextChannelById(game.getActionsChannelId());
+        var actionsChannel = game.getActionsChannel();
         String gameChannelLink = actionsChannel == null ? "" : actionsChannel.getAsMention();
 
         StringBuilder sb = new StringBuilder();

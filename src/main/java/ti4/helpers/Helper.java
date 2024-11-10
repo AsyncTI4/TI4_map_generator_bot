@@ -2312,13 +2312,13 @@ public class Helper {
         for (ManagedGame game : GameManager.getManagedGames()) {
             if (!game.isHasEnded()) {
                 if (game.getGuildId() != null && game.getGuildId().equals(guild.getId())) {
-                    var tableTalkChannel = guild.getTextChannelById(game.getTableTalkChannelId());
+                    var tableTalkChannel = game.getTableTalkChannel();
                     if (tableTalkChannel != null) {
                         addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
                     }
-                    var actionsChannel = guild.getTextChannelById(game.getMainGameChannelId());
-                    if (actionsChannel != null) {
-                        addRolePermissionsToGameChannel(guild, actionsChannel, role);
+                    var mainGameChannel = game.getMainGameChannel();
+                    if (mainGameChannel != null) {
+                        addRolePermissionsToGameChannel(guild, mainGameChannel, role);
                     }
                 }
                 String gameName = game.getName();
