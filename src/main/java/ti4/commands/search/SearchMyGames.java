@@ -91,11 +91,11 @@ public class SearchMyGames extends SearchSubcommandData {
         String gameChannelLink = actionsChannel == null ? "" : actionsChannel.getAsMention();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Emojis.getFactionIconFromDiscord(game.getPlayerIdToFaction().get(userId)));
+        sb.append(Emojis.getFactionIconFromDiscord(game.getPlayerToFaction().get(userId)));
         sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(averageTurnLengthForGame(game, userId)).append("`]");
-        var player = game.getManagedPlayer(userId);
+        var player = game.getPlayer(userId);
         if (player == game.getWinner()) sb.append(" **👑WINNER👑**");
         if (game.getActivePlayerId() != null && game.getActivePlayerId().equals(userId) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
@@ -103,8 +103,8 @@ public class SearchMyGames extends SearchSubcommandData {
     }
 
     private static String averageTurnLengthForGame(ManagedGame game, String playerId) {
-        long totalMillis = game.getPlayerIdToTotalTurns().get(playerId);
-        int numTurns = game.getPlayerIdToTotalTurns().get(playerId);
+        long totalMillis = game.getPlayerToTotalTurns().get(playerId);
+        int numTurns = game.getPlayerToTotalTurns().get(playerId);
         if (numTurns == 0 || totalMillis == 0) {
             return String.format("%02dh:%02dm:%02ds", 0, 0, 0);
         }

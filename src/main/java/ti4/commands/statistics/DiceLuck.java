@@ -74,8 +74,8 @@ public class DiceLuck extends StatisticsSubcommandData {
         for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
             for (ManagedPlayer player : game.getPlayers()) {
                 Entry<Double, Integer> playerDiceLuck = Map.entry(
-                        game.getPlayerIdToExpectedHitsTimes10().get(player) / 10.0,
-                        game.getPlayerIdToActualHits().get(player));
+                        game.getPlayerToExpectedHitsTimes10().get(player) / 10.0,
+                        game.getPlayerToActualHits().get(player));
                 playerDiceLucks.merge(player.getId(), playerDiceLuck,
                         (oldEntry, newEntry) -> Map.entry(
                                 oldEntry.getKey() + playerDiceLuck.getKey(),

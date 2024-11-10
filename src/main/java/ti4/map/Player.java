@@ -2600,22 +2600,9 @@ public class Player {
         this.isDummy = isDummy;
     }
 
-    /**
-     * @return true if the player is: not a "dummy", faction != null, color != null,
-     *         & color != "null"
-     */
     @JsonIgnore
     public boolean isRealPlayer() {
-        return !(isDummy || faction == null || color == null || "null".equals(color));
-    }
-
-    /**
-     * @return true if the player is: a "dummy", faction == null, color == null, &
-     *         color == "null"
-     */
-    @JsonIgnore
-    public boolean isNotRealPlayer() {
-        return !isRealPlayer();
+        return !isDummy && faction != null && color != null && !"null".equals(color);
     }
 
     public void setFogFilter(String preference) {

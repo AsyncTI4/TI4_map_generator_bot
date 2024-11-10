@@ -46,8 +46,8 @@ public class MedianTurnTime extends StatisticsSubcommandData {
 
         for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
             for (ManagedPlayer player : game.getPlayers()) {
-                Integer totalTurns = game.getPlayerIdToTotalTurns().get(player.getId());
-                Long totalTurnTime = game.getPlayerIdToTurnTime().get(player.getId());
+                Integer totalTurns = game.getPlayerToTotalTurns().get(player.getId());
+                Long totalTurnTime = game.getPlayerToTurnTime().get(player.getId());
                 Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();

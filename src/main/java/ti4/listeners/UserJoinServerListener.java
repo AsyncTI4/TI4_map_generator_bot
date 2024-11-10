@@ -93,7 +93,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         if (mapThread != null && !mapThread.isLocked()) {
             mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
         }
-        var player = game.getManagedPlayer(user.getId());
+        var player = game.getPlayer(user.getId());
         if (player == null || !ButtonHelper.isPlayerNew(player.getId()) || game.getTableTalkChannel() == null) {
             return true;
         }

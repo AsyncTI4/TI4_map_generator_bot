@@ -94,8 +94,8 @@ public class AverageTurnTime extends StatisticsSubcommandData {
 
     private void mapPlayerTurnTimes(Map<String, Entry<Integer, Long>> playerTurnTimes, Map<String, Set<Long>> playerAverageTurnTimes, ManagedGame game) {
         for (ManagedPlayer player : game.getPlayers()) {
-            Integer totalTurns = game.getPlayerIdToTotalTurns().get(player.getId());
-            Long totalTurnTime = game.getPlayerIdToTurnTime().get(player.getId());
+            Integer totalTurns = game.getPlayerToTotalTurns().get(player.getId());
+            Long totalTurnTime = game.getPlayerToTurnTime().get(player.getId());
             Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
             playerTurnTimes.merge(player.getId(), playerTurnTime, (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerTurnTime.getKey(), oldEntry.getValue() + playerTurnTime.getValue()));
 

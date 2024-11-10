@@ -14,8 +14,8 @@ public class ManagedPlayer {
     private final String id;
     private final String name;
     private final List<ManagedGame> games = new ArrayList<>();
-    private final String afkHours;
-    private final boolean distanceBasedTacticalActions;
+    private String afkHours;
+    private boolean distanceBasedTacticalActions;
 
     public ManagedPlayer(ManagedGame game, Player player) {
         id = player.getUserID();
@@ -25,10 +25,13 @@ public class ManagedPlayer {
         distanceBasedTacticalActions = player.doesPlayerPreferDistanceBasedTacticalActions();
     }
 
-    public void merge(ManagedGame game, Player player) {
+    public synchronized void merge(ManagedGame game, Player player) {
         if (!player.getUserID().equals(id)) {
             throw new IllegalArgumentException("Player " + player.getUserID() + " attempted merge with " + id);
         }
+        games.add(game);
+        afkHours = player.getHoursThatPlayerIsAFK();
+        distanceBasedTacticalActions = player.doesPlayerPreferDistanceBasedTacticalActions();
     }
 
     @Override

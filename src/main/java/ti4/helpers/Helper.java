@@ -67,6 +67,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Leader;
 import ti4.map.ManagedGame;
+import ti4.map.ManagedPlayer;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -1969,20 +1970,16 @@ public class Helper {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
-        } else {
-            Planet planet = unitHolder;
-            return planet.getResources();
         }
+        return unitHolder.getResources();
     }
 
     public static int getPlanetInfluence(String planetID, Game game) {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
-        } else {
-            Planet planet = unitHolder;
-            return planet.getInfluence();
         }
+        return unitHolder.getInfluence();
     }
 
     @Deprecated
@@ -2284,20 +2281,21 @@ public class Helper {
         }
     }
 
-    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, ManagedGame game) {
+        var players = game.getPlayerIds();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
-            addPlayerPermissionsToGameChannel(guild, game, tableTalkChannel);
+            addPlayerPermissionsToGameChannel(guild, tableTalkChannel, players);
         }
         TextChannel actionsChannel = game.getMainGameChannel();
         if (actionsChannel != null) {
-            addPlayerPermissionsToGameChannel(guild, game, actionsChannel);
+            addPlayerPermissionsToGameChannel(guild, actionsChannel, players);
         }
         String gameName = game.getName();
         List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
             .toList();
         for (GuildChannel channel : channels) {
-            addPlayerPermissionsToGameChannel(guild, game, channel);
+            addPlayerPermissionsToGameChannel(guild, channel, players);
         }
     }
 
@@ -2332,11 +2330,11 @@ public class Helper {
         }
     }
 
-    private static void addPlayerPermissionsToGameChannel(Guild guild, Game game, GuildChannel channel) {
+    private static void addPlayerPermissionsToGameChannel(Guild guild, GuildChannel channel, List<String> playerIds) {
         TextChannel textChannel = guild.getTextChannelById(channel.getId());
         if (textChannel != null) {
             TextChannelManager textChannelManager = textChannel.getManager();
-            for (String playerID : game.getPlayerIDs()) {
+            for (String playerID : playerIds) {
                 Member member = guild.getMemberById(playerID);
                 if (member == null)
                     continue;
@@ -2344,8 +2342,6 @@ public class Helper {
                 textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
             textChannelManager.queue();
-            // textChannel.sendMessage("This channel's permissions have been
-            // updated.").queue();
         }
     }
 
@@ -2361,14 +2357,13 @@ public class Helper {
         }
     }
 
-    private static void addGameRoleToMapPlayers(Guild guild, Game game, Role role) {
-        for (String playerID : game.getPlayerIDs()) {
-            if (game.getRound() > 1 && !game.getPlayer(playerID).isRealPlayer()) {
+    private static void addGameRoleToMapPlayers(Guild guild, Role role, ManagedGame game) {
+        for (ManagedPlayer player : game.getRealPlayers()) {
+            if (game.getRound() > 1) {
                 continue;
             }
-            Member member = guild.getMemberById(playerID);
-            if (member != null && !member.getRoles().contains(role))
-                guild.addRoleToMember(member, role).queue();
+            Member member = guild.getMemberById(player.getId());
+            if (member != null && !member.getRoles().contains(role)) guild.addRoleToMember(member, role).queue();
         }
     }
 

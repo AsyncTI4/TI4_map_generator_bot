@@ -27,6 +27,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final String activePlayerId;
     private final long lastActivePlayerChange;
     private final long endedDate;
+    private final int round;
     private final Guild guild;
     private final TextChannel mainGameChannel;
     private final TextChannel actionsChannel;
@@ -34,11 +35,12 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final ThreadChannel botMapUpdateThread;
     private final ManagedPlayer winner;
     private final List<ManagedPlayer> players;
-    private final Map<ManagedPlayer, String> playerIdToFaction; // TODO unsure if keeping
-    private final Map<ManagedPlayer, Integer> playerIdToTotalTurns; // TODO unsure if keeping
-    private final Map<ManagedPlayer, Long> playerIdToTurnTime; // TODO unsure if keeping
-    private final Map<ManagedPlayer, Integer> playerIdToExpectedHitsTimes10; // TODO unsure if keeping
-    private final Map<ManagedPlayer, Integer> playerIdToActualHits; // TODO unsure if keeping
+    private final Map<ManagedPlayer, Boolean> playerToIsReal;
+    private final Map<ManagedPlayer, String> playerToFaction; // TODO unsure if keeping
+    private final Map<ManagedPlayer, Integer> playerToTotalTurns; // TODO unsure if keeping
+    private final Map<ManagedPlayer, Long> playerToTurnTime; // TODO unsure if keeping
+    private final Map<ManagedPlayer, Integer> playerToExpectedHitsTimes10; // TODO unsure if keeping
+    private final Map<ManagedPlayer, Integer> playerToActualHits; // TODO unsure if keeping
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -51,21 +53,23 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
         lastActivePlayerChange = game.getLastActivePlayerChange() == null ? 0 : game.getLastActivePlayerChange().getTime();
         endedDate = game.getEndedDate();
+        round = game.getRound();
         guild = game.getGuild();
         mainGameChannel = game.getMainGameChannel();
         actionsChannel = game.getActionsChannel();
         tableTalkChannel = game.getTableTalkChannel();
         botMapUpdateThread = game.getBotMapUpdatesThread();
 
-        players = game.getRealPlayers().stream().map(player -> GameManager.addOrMergePlayer(this, player)).toList();
+        players = game.getPlayers().values().stream().map(player -> GameManager.addOrMergePlayer(this, player)).toList();
         var winningPlayerId = game.getWinner().map(Player::getUserID).orElse(null);
-        winner = winningPlayerId == null ? null : getManagedPlayer(winningPlayerId);
-        playerIdToFaction = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getFaction));
+        winner = winningPlayerId == null ? null : getPlayer(winningPlayerId);
+        playerToIsReal = game.getPlayers().values().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
+        playerToFaction = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getFaction));
         //playerIdToColor = game.getRealPlayers().stream().collect(Collectors.toMap(Player::getUserID, Player::getColor));
-        playerIdToTotalTurns = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getNumberTurns));
-        playerIdToTurnTime = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getTotalTurnTime));
-        playerIdToExpectedHitsTimes10 = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getExpectedHitsTimes10));
-        playerIdToActualHits = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getActualHits));
+        playerToTotalTurns = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getNumberTurns));
+        playerToTurnTime = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getTotalTurnTime));
+        playerToExpectedHitsTimes10 = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getExpectedHitsTimes10));
+        playerToActualHits = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::getActualHits));
     }
 
     private static String sanitizeToNull(String str) {
@@ -80,12 +84,20 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     }
 
     @Nullable
-    public ManagedPlayer getManagedPlayer(String id) {
+    public ManagedPlayer getPlayer(String id) {
         return players.stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    public List<String> getPlayerIds() {
+        return players.stream().map(ManagedPlayer::getId).toList();
     }
 
     public boolean hasPlayer(String playerId) {
         return players.stream().anyMatch(p -> p.getId().equals(playerId));
+    }
+
+    public List<ManagedPlayer> getRealPlayers() {
+        return playerToIsReal.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).toList();
     }
 
     public String getGameNameForSorting() {
