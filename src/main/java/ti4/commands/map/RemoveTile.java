@@ -29,7 +29,7 @@ public class RemoveTile extends AddRemoveTile {
         String positionOption = event.getOptions().getFirst().getAsString();
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
-        Game userActiveGame = GameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position `" + position + "` is not valid");

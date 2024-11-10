@@ -3,9 +3,7 @@ package ti4.commands.statistics;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
 import org.jetbrains.annotations.NotNull;
-
 import ti4.map.Game;
 import ti4.map.GameManager;
 
@@ -34,7 +32,7 @@ public abstract class StatisticsSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getUserActiveGame(user.getId());
+        game = UserGameContextManager.getContextGame(user.getId());
     }
 
     public void reply(SlashCommandInteractionEvent event) {

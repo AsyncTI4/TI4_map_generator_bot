@@ -38,7 +38,7 @@ public class ShowGame implements Command {
             String mapName = option.getAsString().toLowerCase();
             game = GameManager.getGame(mapName);
         } else {
-            game = GameManager.getUserActiveGame(event.getUser().getId());
+            game = UserGameContextManager.getContextGame(event.getUser().getId());
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);

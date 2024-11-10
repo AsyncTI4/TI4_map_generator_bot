@@ -58,7 +58,7 @@ public class GameEnd extends GameSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = GameManager.getUserActiveGame(event.getUser().getId());
+        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
 
         if (game == null) {
             MessageHelper.replyToMessage(event, "Must set active Game");

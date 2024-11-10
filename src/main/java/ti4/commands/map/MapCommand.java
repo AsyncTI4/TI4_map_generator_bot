@@ -31,7 +31,7 @@ public class MapCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         if (game == null) return;
         ShowGame.simpleShowGame(game, event);
     }

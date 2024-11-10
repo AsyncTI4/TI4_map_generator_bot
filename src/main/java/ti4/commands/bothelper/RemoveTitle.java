@@ -34,7 +34,7 @@ public class RemoveTitle extends BothelperSubcommandData {
             }
             game = GameManager.getGame(mapName);
         } else {
-            game = GameManager.getUserActiveGame(event.getUser().getId());
+            game = UserGameContextManager.getContextGame(event.getUser().getId());
             if (game == null) {
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return;

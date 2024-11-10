@@ -29,7 +29,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             return;
         }
         String userID = member.getId();
-        if (!GameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.doesUserHaveGameContext(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
             Game userActiveGame = tileParsing(event, userID);
@@ -62,7 +62,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             AddTile.addCustodianToken(tile);
         }
 
-        Game userActiveGame = GameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         Boolean isFowPrivate = null;
         if (userActiveGame.isFowMode()) {
             isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);

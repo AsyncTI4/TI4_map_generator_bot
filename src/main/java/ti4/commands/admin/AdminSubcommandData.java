@@ -28,6 +28,6 @@ public abstract class AdminSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getUserActiveGame(user.getId());
+        game = UserGameContextManager.getContextGame(user.getId());
     }
 }

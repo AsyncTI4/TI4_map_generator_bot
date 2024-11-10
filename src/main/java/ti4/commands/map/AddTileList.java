@@ -52,8 +52,8 @@ public class AddTileList extends MapSubcommandData {
         }
 
         String userID = member.getId();
-        Game game = GameManager.getUserActiveGame(userID);
-        if (!GameManager.isUserWithActiveGame(userID)) {
+        Game game = UserGameContextManager.getContextGame(userID);
+        if (!GameManager.doesUserHaveGameContext(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }

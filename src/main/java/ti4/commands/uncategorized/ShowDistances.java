@@ -33,7 +33,7 @@ public class ShowDistances implements Command {
             return false;
         }
 
-        Game userActiveGame = GameManager.getUserActiveGame(event.getUser().getId());
+        Game userActiveGame = UserGameContextManager.getContextGame(event.getUser().getId());
         if (userActiveGame == null) {
             MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
             return false;
@@ -50,7 +50,7 @@ public class ShowDistances implements Command {
             String mapName = option.getAsString().toLowerCase();
             game = GameManager.getGame(mapName);
         } else {
-            game = GameManager.getUserActiveGame(event.getUser().getId());
+            game = UserGameContextManager.getContextGame(event.getUser().getId());
         }
 
         Player player = game.getPlayer(event.getUser().getId());

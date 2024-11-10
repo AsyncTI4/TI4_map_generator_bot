@@ -2261,25 +2261,26 @@ public class Helper {
         return true;
     }
 
-    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
-        if (!game.isFowMode() && !game.isCommunityMode()) {
-            String gameName = game.getName();
-            List<Role> roles = guild.getRolesByName(gameName, true);
-            Role role = null;
-            if (!roles.isEmpty()) {
-                if (roles.size() > 1) {
-                    BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName
-                        + "` - please investigate, as this may cause issues.");
-                    return;
-                }
-                role = roles.getFirst();
+    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull ManagedGame game) {
+        if (game.isFowMode() || game.isCommunityMode()) {
+            return;
+        }
+        String gameName = game.getName();
+        List<Role> roles = guild.getRolesByName(gameName, true);
+        Role role = null;
+        if (!roles.isEmpty()) {
+            if (roles.size() > 1) {
+                BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName
+                    + "` - please investigate, as this may cause issues.");
+                return;
             }
+            role = roles.getFirst();
+        }
 
-            if (role == null) { // make sure players have access to the game channels
-                addMapPlayerPermissionsToGameChannels(guild, game);
-            } else { // make sure players have the role
-                addGameRoleToMapPlayers(guild, game, role);
-            }
+        if (role == null) { // make sure players have access to the game channels
+            addMapPlayerPermissionsToGameChannels(guild, game);
+        } else { // make sure players have the role
+            addGameRoleToMapPlayers(guild, game, role);
         }
     }
 
@@ -2311,7 +2312,7 @@ public class Helper {
 
         for (ManagedGame game : GameManager.getManagedGames()) {
             if (!game.isHasEnded()) {
-                if (game.getGuildId() != null && game.getGuildId().equals(guild.getId())) {
+                if (game.getGuild() != null && game.getGuild().equals(guild)) {
                     var tableTalkChannel = game.getTableTalkChannel();
                     if (tableTalkChannel != null) {
                         addRolePermissionsToGameChannel(guild, tableTalkChannel, role);

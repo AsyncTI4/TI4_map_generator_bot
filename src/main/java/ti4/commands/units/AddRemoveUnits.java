@@ -41,11 +41,11 @@ abstract public class AddRemoveUnits implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        if (!GameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.doesUserHaveGameContext(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         Player player = game.getPlayer(userID);
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);
@@ -309,7 +309,7 @@ abstract public class AddRemoveUnits implements Command {
     public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
         String userID = event.getUser().getId();
         if (game == null) {
-            game = GameManager.getUserActiveGame(userID);
+            game = UserGameContextManager.getContextGame(userID);
         }
         // Map activeMap = mapManager.getUserActiveMap(userID);
         if (!Constants.SPACE.equals(planetName)) {

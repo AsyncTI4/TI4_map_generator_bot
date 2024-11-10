@@ -1,5 +1,9 @@
 package ti4.commands.explore;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -8,10 +12,6 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
 
 public class ExploreCommand implements Command {
 
@@ -37,7 +37,7 @@ public class ExploreCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         GameSaveLoadManager.saveGame(game, event);
     }
 

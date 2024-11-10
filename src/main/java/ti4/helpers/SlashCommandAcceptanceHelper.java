@@ -19,11 +19,11 @@ public class SlashCommandAcceptanceHelper {
             return false;
         }
         String userID = event.getUser().getId();
-        if (!GameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.doesUserHaveGameContext(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
         }
-        Game userActiveGame = GameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
             MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
             return false;
@@ -64,7 +64,7 @@ public class SlashCommandAcceptanceHelper {
                 }
             }
         }
-        Game userActiveGame = GameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         if (userActiveGame == null) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;

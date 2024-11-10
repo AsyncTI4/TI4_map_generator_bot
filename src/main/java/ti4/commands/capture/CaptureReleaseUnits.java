@@ -29,11 +29,11 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        if (!GameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.doesUserHaveGameContext(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         String color = Helper.getColor(game, event);
         if (!Mapper.isValidColor(color)) {
             MessageHelper.replyToMessage(event, "Color/Faction not valid");

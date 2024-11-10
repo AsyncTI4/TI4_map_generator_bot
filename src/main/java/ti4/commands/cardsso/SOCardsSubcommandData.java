@@ -35,7 +35,7 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getUserActiveGame(user.getId());
+        game = UserGameContextManager.getContextGame(user.getId());
 
         Player player = Helper.getGamePlayer(game, null, event, user.getId());
         if (player != null) {

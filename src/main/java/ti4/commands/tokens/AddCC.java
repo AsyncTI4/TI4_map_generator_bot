@@ -1,5 +1,7 @@
 package ti4.commands.tokens;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -8,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.jetbrains.annotations.Nullable;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -19,9 +22,6 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import org.jetbrains.annotations.Nullable;
-import java.util.List;
 
 public class AddCC extends AddRemoveToken {
     @Override
@@ -67,7 +67,7 @@ public class AddCC extends AddRemoveToken {
     }
 
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
-        Game game = GameManager.getUserActiveGame(event.getUser().getId());
+        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {

@@ -55,7 +55,7 @@ public class StatusCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         GameSaveLoadManager.saveGame(game, event);
 
         MapRenderPipeline.render(game, event,

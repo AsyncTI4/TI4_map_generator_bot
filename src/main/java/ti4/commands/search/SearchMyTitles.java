@@ -1,5 +1,12 @@
 package ti4.commands.search;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -7,16 +14,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.GameProperties;
+import ti4.map.ManagedGame;
 import ti4.message.MessageHelper;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
 
 public class SearchMyTitles extends SearchSubcommandData {
 
@@ -32,43 +32,35 @@ public class SearchMyTitles extends SearchSubcommandData {
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Titles List", sb.toString());
     }
 
-    public StringBuilder getPlayerTitles(String userID, String userName, boolean gamesIncluded) {
-        HashMap<String, String> gameHist = new HashMap<>();
+    public StringBuilder getPlayerTitles(String userId, String userName, boolean gamesIncluded) {
+        HashMap<String, String> gameHistory = new HashMap<>();
         Map<String, Integer> titles = new HashMap<>();
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getGamesPage(currentPage++);
-            Predicate<Game> ignoreSpectateFilter = game -> game.getRealPlayerIDs().contains(userID);
-            List<Game> games = pagedGames.getGames().stream()
-                    .filter(ignoreSpectateFilter.and(GameProperties::isHasEnded))
-                    .sorted(Comparator.comparing(Game::getGameNameForSorting))
-                    .toList();
 
-            for (Game playerGame : games) {
-                String singularGameTiles = playerGame.getStoredValue("TitlesFor" + userID);
-                if (!singularGameTiles.isEmpty()) {
-                    for (String title : singularGameTiles.split("_")) {
-                        if (titles.containsKey(title)) {
-                            int amount = titles.get(title) + 1;
-                            titles.put(title, amount);
-                            gameHist.put(title, gameHist.get(title) + ", " + playerGame.getName());
-                        } else {
-                            titles.put(title, 1);
-                            gameHist.put(title, playerGame.getName());
-                        }
+        Predicate<ManagedGame> thisPlayerIsInGame = game -> game.hasPlayer(userId);
+        List<ManagedGame> games = GameManager.getManagedGames().stream()
+                .filter(thisPlayerIsInGame.and(ManagedGame::isHasEnded))
+                .sorted(Comparator.comparing(ManagedGame::getGameNameForSorting))
+                .toList();
 
-                    }
-                }
+        for (ManagedGame managedGame : games) {
+            var game = GameManager.getGame(managedGame.getName());
+            String titlesForPlayer = game.getStoredValue("TitlesFor" + userId);
+            if (titlesForPlayer.isEmpty()) {
+                continue;
             }
-        } while (pagedGames.hasNextPage());
+            Arrays.stream(titlesForPlayer.split("_"))
+                    .forEach(title -> {
+                        titles.merge(title, 1, Integer::sum);
+                        gameHistory.merge(title, game.getName(), (existing, newName) -> existing + ", " + newName);
+                    });
+        }
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(userName).append("'s Titles__**\n");
         for (String title : titles.keySet()) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             if (gamesIncluded) {
-                sb.append("**").append(title).append("** x").append(titles.get(title)).append(" (").append(gameHist.get(title)).append(")");
+                sb.append("**").append(title).append("** x").append(titles.get(title)).append(" (").append(gameHistory.get(title)).append(")");
             } else {
                 sb.append("**").append(title).append("** x").append(titles.get(title));
             }

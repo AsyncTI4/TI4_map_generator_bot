@@ -23,7 +23,7 @@ public class ReverseSpeakerOrder extends GameSubcommandData {
             return;
         }
         User user = event.getUser();
-        Game game = GameManager.getUserActiveGame(user.getId());
+        Game game = UserGameContextManager.getContextGame(user.getId());
 
         game.setReverseSpeakerOrder(!game.isReverseSpeakerOrder());
     }

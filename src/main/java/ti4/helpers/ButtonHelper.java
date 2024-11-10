@@ -5997,8 +5997,8 @@ public class ButtonHelper {
         Helper.checkEndGame(game, player);
     }
 
-    public static boolean isPlayerNew(Player player) {
-        return GameManager.getManagedPlayer(player.getUserID()).getGames().size() == 1;
+    public static boolean isPlayerNew(String playerId) {
+        return GameManager.getManagedPlayer(playerId).getGames().size() == 1;
     }
 
     public static boolean anyoneHaveInPlayArea(Game game, String pnID) {
@@ -6070,7 +6070,7 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         Player player = Helper.getGamePlayer(game, null, event.getMember(), userID);
         if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();

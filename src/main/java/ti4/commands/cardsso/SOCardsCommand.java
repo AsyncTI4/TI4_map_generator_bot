@@ -1,5 +1,9 @@
 package ti4.commands.cardsso;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -9,10 +13,6 @@ import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
 
 public class SOCardsCommand implements Command {
 
@@ -39,7 +39,7 @@ public class SOCardsCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         GameSaveLoadManager.saveGame(game, event);
     }
 

@@ -36,7 +36,7 @@ public class PlanetInfo extends PlanetSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getUser();
-        Game game = GameManager.getUserActiveGame(user.getId());
+        Game game = UserGameContextManager.getContextGame(user.getId());
 
         Player player = game.getPlayer(user.getId());
         sendPlanetInfo(player);

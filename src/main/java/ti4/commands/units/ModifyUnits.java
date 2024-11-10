@@ -3,10 +3,7 @@ package ti4.commands.units;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
@@ -33,7 +30,7 @@ public class ModifyUnits implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game  game = GameManager.getUserActiveGame(event.getUser().getId());
+        Game  game = UserGameContextManager.getContextGame(event.getUser().getId());
         Player player = game.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayer(game, player, event);

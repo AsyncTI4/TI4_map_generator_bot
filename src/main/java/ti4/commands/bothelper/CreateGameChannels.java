@@ -377,7 +377,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // Find new players
         for (Player player : game.getPlayers().values()) {
-            if (ButtonHelper.isPlayerNew(player)) {
+            if (ButtonHelper.isPlayerNew(player.getUserID())) {
                 newPlayers.add(player);
             }
         }

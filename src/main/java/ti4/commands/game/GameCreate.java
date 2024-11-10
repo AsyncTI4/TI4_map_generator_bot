@@ -60,7 +60,7 @@ public class GameCreate extends GameSubcommandData {
         newGame.setName(gameName);
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
-        boolean setMapSuccessful = GameManager.setGameForUser(ownerID, gameName);
+        boolean setMapSuccessful = GameManager.setContextGame(ownerID, gameName);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);

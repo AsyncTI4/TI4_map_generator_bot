@@ -79,7 +79,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getUserActiveGame(user.getId());
+        game = UserGameContextManager.getContextGame(user.getId());
     }
 
     protected Tile getTile(SlashCommandInteractionEvent event, String tileID, Game game) {

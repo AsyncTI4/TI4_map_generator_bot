@@ -1,5 +1,9 @@
 package ti4.commands.agenda;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -10,10 +14,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
 
 public class AgendaCommand implements Command {
 
@@ -42,7 +42,7 @@ public class AgendaCommand implements Command {
             }
         }
 
-        Game game = GameManager.getUserActiveGame(event.getUser().getId());
+        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
         if (game != null) {
             GameSaveLoadManager.saveGame(game, event);
         }

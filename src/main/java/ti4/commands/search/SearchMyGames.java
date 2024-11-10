@@ -16,7 +16,6 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.GameManager;
 import ti4.map.ManagedGame;
-import ti4.map.ManagedPlayer;
 import ti4.message.MessageHelper;
 
 public class SearchMyGames extends SearchSubcommandData {
@@ -88,9 +87,6 @@ public class SearchMyGames extends SearchSubcommandData {
     }
 
     public static String getGameListRepresentation(ManagedGame game, String userId, boolean showAverageTurnTime) {
-        ManagedPlayer player = game.getManagedPlayer(userId);
-        if (player == null) return "";
-
         var actionsChannel = game.getActionsChannel();
         String gameChannelLink = actionsChannel == null ? "" : actionsChannel.getAsMention();
 
@@ -99,6 +95,7 @@ public class SearchMyGames extends SearchSubcommandData {
         sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(averageTurnLengthForGame(game, userId)).append("`]");
+        var player = game.getManagedPlayer(userId);
         if (player == game.getWinner()) sb.append(" **👑WINNER👑**");
         if (game.getActivePlayerId() != null && game.getActivePlayerId().equals(userId) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (game.isHasEnded()) sb.append(" [GAME IS OVER]");

@@ -21,7 +21,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
+import ti4.map.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -69,15 +69,10 @@ public class UserJoinServerListener extends ListenerAdapter {
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
         List<Game> mapsJoined = new ArrayList<>();
 
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getGamesPage(currentPage++);
-            for (Game game : pagedGames.getGames()) {
-                boolean isInGame = checkIfNewUserIsInExistingGameAndAutoAddRole(game, guild, user);
-                if (isInGame) mapsJoined.add(game);
-            }
-        } while (pagedGames.hasNextPage());
+        for (ManagedGame game : GameManager.getManagedGames()) {
+            boolean isInGame = checkIfNewUserIsInExistingGameAndAutoAddRole(game, guild, user);
+            if (isInGame) mapsJoined.add(game);
+        }
 
         if (!mapsJoined.isEmpty()) {
             for (Game g : mapsJoined) {
@@ -88,26 +83,25 @@ public class UserJoinServerListener extends ListenerAdapter {
         }
     }
 
-    private static boolean checkIfNewUserIsInExistingGameAndAutoAddRole(Game game, Guild guild, User user) {
-        Guild gameGuild = game.getGuild();
-        if (gameGuild == null || !gameGuild.equals(guild) || !game.getPlayers().containsKey(user.getId())) {
+    private static boolean checkIfNewUserIsInExistingGameAndAutoAddRole(ManagedGame game, Guild guild, User user) {
+        var gameGuild = game.getGuild();
+        if (gameGuild == null || !gameGuild.equals(guild) || !game.hasPlayer(user.getId())) {
             return false;
         }
         Helper.fixGameChannelPermissions(guild, game);
-        ThreadChannel mapThread = game.getBotMapUpdatesThread();
+        ThreadChannel mapThread = game.getBotMapUpdateThread();
         if (mapThread != null && !mapThread.isLocked()) {
             mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
         }
-        Player player = game.getPlayer(user.getId());
-        if (player != null && ButtonHelper.isPlayerNew(player)) {
-            String msg = player.getRepresentation() + " ping here";
-            if (game.getTableTalkChannel() != null) {
-                List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();
-                for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().equalsIgnoreCase("Info for new players")) {
-                        MessageHelper.sendMessageToChannel(threadChannel_, msg);
-                    }
-                }
+        var player = game.getManagedPlayer(user.getId());
+        if (player == null || !ButtonHelper.isPlayerNew(player.getId()) || game.getTableTalkChannel() == null) {
+            return true;
+        }
+        String msg = player.getRepresentation() + " ping here";
+        List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();
+        for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equalsIgnoreCase("Info for new players")) {
+                MessageHelper.sendMessageToChannel(threadChannel_, msg);
             }
         }
         return true;
@@ -127,8 +121,8 @@ public class UserJoinServerListener extends ListenerAdapter {
             return;
         }
         List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
-        for (String playerIDs : game.getPlayerIDs()) {
-            if (!guildMemberIDs.contains(playerIDs)) {
+        for (String playerIds : game.getPlayerIDs()) {
+            if (!guildMemberIDs.contains(playerIds)) {
                 return;
             }
         }
