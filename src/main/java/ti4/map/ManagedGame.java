@@ -25,7 +25,6 @@ public class ManagedGame {
     private final long lastActivePlayerChange;
     private final long endedDate;
     private final String guildId;
-    // TODO: Better to have just ids?
     private final TextChannel mainGameChannel;
     private final TextChannel actionsChannel;
     private final TextChannel tableTalkChannel;
