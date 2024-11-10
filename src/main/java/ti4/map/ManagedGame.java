@@ -36,6 +36,8 @@ public class ManagedGame {
     private final Map<ManagedPlayer, Long> playerIdToTurnTime; // TODO unsure if keeping
     private final ManagedPlayer winner;
     // game.getGameModeText ?// TODO unsure if keeping
+    private final Map<ManagedPlayer, Integer> playerIdToExpectedHitsTimes10;
+    private final Map<ManagedPlayer, Integer> playerIdToActualHits;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -59,6 +61,8 @@ public class ManagedGame {
         //playerIdToColor = game.getRealPlayers().stream().collect(Collectors.toMap(Player::getUserID, Player::getColor));
         playerIdToTotalTurns = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getNumberTurns));
         playerIdToTurnTime = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getTotalTurnTime));
+        playerIdToExpectedHitsTimes10 = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getExpectedHitsTimes10));
+        playerIdToActualHits = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getActualHits));
     }
 
     private static String sanitizeToNull(String str) {
