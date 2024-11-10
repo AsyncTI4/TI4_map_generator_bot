@@ -29,8 +29,8 @@ public class ListDeadGames extends BothelperSubcommandData {
     private void execute(SlashCommandInteractionEvent event, List<ManagedGame> games) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
-        StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         StringBuilder sb = new StringBuilder("Dead Channels\n");
+        StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         int channelCount = 0;
         int roleCount = 0;
         for (ManagedGame game : games) {
@@ -46,33 +46,9 @@ public class ListDeadGames extends BothelperSubcommandData {
             if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange() && milliSinceLastTurnChange < 1259600000L) {
                 continue;
             }
-            boolean warned = false;
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
-                if (game.getActionsChannel() != null && !game.getActionsChannel().getName().equalsIgnoreCase(game.getName() + "-actions")) {
-                    continue;
-                }
-
-                if (game.getActionsChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getActionsChannel().getParentCategory()) &&
-                        game.getActionsChannel().getParentCategory() != null && !game.getActionsChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
-                    sb.append(game.getActionsChannel().getJumpUrl()).append("\n");
-                    channelCount++;
-                    if (delete) {
-                        game.getActionsChannel().delete().queue();
-                    } else {
-                        warned = true;
-                        MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
-                    }
-                }
-                if (game.getTableTalkChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getTableTalkChannel().getParentCategory()) && !game.getTableTalkChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
-                    if (game.getTableTalkChannel().getName().contains(game.getName() + "-")) {
-                        sb.append(game.getTableTalkChannel().getJumpUrl()).append("\n");
-                        channelCount++;
-                        if (delete) {
-                            game.getTableTalkChannel().delete().queue();
-                        } else if (!warned) {
-                            MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
-                        }
-                    }
+                if (game.getActionsChannelId() != null) {
+                    channelCount += sendMessageToChannel(game, sb, delete);
                 }
                 Guild guild = AsyncTI4DiscordBot.getGuild(game.getGuildId());
                 if (guild == null) {
@@ -95,6 +71,44 @@ public class ListDeadGames extends BothelperSubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb + "Channel Count = " + channelCount);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb2 + "Role Count =" + roleCount);
+    }
+
+    private static int sendMessageToChannel(ManagedGame game, StringBuilder sb, boolean delete) {
+        var actionsChannel = game.getTextChannelById(game.getActionsChannelId());
+        if (actionsChannel == null || !actionsChannel.getName().equalsIgnoreCase(game.getName() + "-actions")) {
+            return 0;
+        }
+
+        boolean warned = false;
+        int channelCount = 0;
+
+        if (AsyncTI4DiscordBot.getAvailablePBDCategories().contains(actionsChannel.getParentCategory()) &&
+                actionsChannel.getParentCategory() != null && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            sb.append(actionsChannel.getJumpUrl()).append("\n");
+            channelCount++;
+            if (delete) {
+                actionsChannel.delete().queue();
+            } else {
+                warned = true;
+                MessageHelper.sendMessageToChannel(actionsChannel, game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
+            }
+        }
+
+        var tableTalkChannel = game.getTextChannelById(game.getTableTalkChannelId());
+        if (tableTalkChannel != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory()) &&
+                tableTalkChannel.getParentCategory() != null && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            if (tableTalkChannel.getName().contains(game.getName() + "-")) {
+                sb.append(tableTalkChannel.getJumpUrl()).append("\n");
+                channelCount++;
+                if (delete) {
+                    tableTalkChannel.delete().queue();
+                } else if (!warned) {
+                    MessageHelper.sendMessageToChannel(actionsChannel, game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
+                }
+            }
+        }
+
+        return channelCount;
     }
 
 }

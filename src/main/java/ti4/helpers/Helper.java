@@ -2301,7 +2301,7 @@ public class Helper {
     }
 
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
         if (guild == null) {
             BotLogger.log("Guild was null in addBotHelperPermissionsToGameChannels.");
             return;
@@ -2312,11 +2312,11 @@ public class Helper {
         for (ManagedGame game : GameManager.getManagedGames()) {
             if (!game.isHasEnded()) {
                 if (game.getGuildId() != null && game.getGuildId().equals(guild.getId())) {
-                    TextChannel tableTalkChannel = game.getTableTalkChannel();
+                    var tableTalkChannel = guild.getTextChannelById(game.getTableTalkChannelId());
                     if (tableTalkChannel != null) {
                         addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
                     }
-                    TextChannel actionsChannel = game.getMainGameChannel();
+                    var actionsChannel = guild.getTextChannelById(game.getMainGameChannelId());
                     if (actionsChannel != null) {
                         addRolePermissionsToGameChannel(guild, actionsChannel, role);
                     }

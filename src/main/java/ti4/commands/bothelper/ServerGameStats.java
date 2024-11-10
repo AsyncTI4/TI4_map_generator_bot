@@ -42,13 +42,15 @@ public class ServerGameStats extends BothelperSubcommandData {
         Map<String, Integer> guildToGameCount = new HashMap<>();
 
         for (Guild guild : guilds) {
-            int gameCount = guildToGameCount.computeIfAbsent(guild.getId(), k -> 0);
-            int filteredGames = (int) GameManager.getManagedGames().stream()
-                    .filter(g -> Objects.equals(g.getGuildId(), guild.getId()))
-                    .filter(g -> g.getMainGameChannel() != null && g.getMainGameChannel().getParentCategory() != null && !g.getMainGameChannel().getParentCategory().getName().equals("The in-limbo PBD Archive"))
-                    .count();
-            guildToGameCount.put(guild.getId(), gameCount + filteredGames);
+            guildToGameCount.putIfAbsent(guild.getId(), 0);
         }
+
+        GameManager.getManagedGames().stream()
+                .filter(g -> g.getMainGameChannelId() != null)
+                .map(g -> g.getTextChannelById(g.getMainGameChannelId()))
+                .filter(Objects::nonNull)
+                .filter(channel -> channel.getParentCategory() != null && !channel.getParentCategory().getName().equals("The in-limbo PBD Archive"))
+                .forEach(channel -> guildToGameCount.merge(channel.getGuild().getId(), 1, Integer::sum));
 
         StringBuilder sb = new StringBuilder();
         sb.append("## __Server Game Statistics__\n");

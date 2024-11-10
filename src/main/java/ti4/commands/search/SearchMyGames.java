@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -90,13 +91,17 @@ public class SearchMyGames extends SearchSubcommandData {
     public static String getGameListRepresentation(ManagedGame game, String userId, boolean showAverageTurnTime) {
         ManagedPlayer player = game.getManagedPlayer(userId);
         if (player == null) return "";
-        String gameChannelLink = game.getActionsChannel() == null ? "" : game.getActionsChannel().getAsMention();
+
+        var guild = AsyncTI4DiscordBot.getGuild(game.getGuildId());
+        var actionsChannel = guild.getTextChannelById(game.getActionsChannelId());
+        String gameChannelLink = actionsChannel == null ? "" : actionsChannel.getAsMention();
+
         StringBuilder sb = new StringBuilder();
         sb.append(Emojis.getFactionIconFromDiscord(game.getPlayerIdToFaction().get(userId)));
         sb.append("**").append(game.getName()).append("**");
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(averageTurnLengthForGame(game, userId)).append("`]");
-        if (player.getId().equals(game.getWinningPlayerId())) sb.append(" **👑WINNER👑**");
+        if (player == game.getWinner()) sb.append(" **👑WINNER👑**");
         if (game.getActivePlayerId() != null && game.getActivePlayerId().equals(userId) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
         return sb.toString();

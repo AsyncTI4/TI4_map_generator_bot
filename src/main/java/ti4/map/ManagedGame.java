@@ -26,15 +26,15 @@ public class ManagedGame {
     private final long endedDate;
     private final String guildId;
     // TODO: Better to have just ids?
-    private final TextChannel mainGameChannel;
-    private final TextChannel actionsChannel;
-    private final TextChannel tableTalkChannel;
+    private final String mainGameChannelId;
+    private final String actionsChannelId;
+    private final String tableTalkChannelId;
     private final List<ManagedPlayer> players;
-    private final Map<String, String> playerIdToFaction; // TODO unsure if keeping
+    private final Map<ManagedPlayer, String> playerIdToFaction; // TODO unsure if keeping
     //private final Map<String, String> playerIdToColor; // TODO unsure if keeping
-    private final Map<String, Integer> playerIdToTotalTurns; // TODO unsure if keeping
-    private final Map<String, Long> playerIdToTurnTime; // TODO unsure if keeping
-    private final String winningPlayerId;
+    private final Map<ManagedPlayer, Integer> playerIdToTotalTurns; // TODO unsure if keeping
+    private final Map<ManagedPlayer, Long> playerIdToTurnTime; // TODO unsure if keeping
+    private final ManagedPlayer winner;
     // game.getGameModeText ?// TODO unsure if keeping
 
     public ManagedGame(Game game) {
@@ -44,20 +44,28 @@ public class ManagedGame {
         fowMode = game.isFowMode();
         lastModifiedDate = game.getLastModifiedDate();
         creationDate = game.getCreationDate();
-        activePlayerId = game.getActivePlayerID();
+        activePlayerId = sanitizeToNull(game.getActivePlayerID());
         lastActivePlayerChange = game.getLastActivePlayerChange() == null ? 0 : game.getLastActivePlayerChange().getTime();
         endedDate = game.getEndedDate();
         guildId = game.getGuildId();
-        mainGameChannel = game.getMainGameChannel();
-        actionsChannel = game.getActionsChannel();
-        tableTalkChannel = game.getTableTalkChannel();
+        mainGameChannelId = game.getMainGameChannel() == null ? null : game.getMainGameChannel().getId();
+        actionsChannelId = game.getActionsChannel() == null ? null : game.getActionsChannel().getId();
+        tableTalkChannelId = game.getTableTalkChannel() == null ? null : game.getTableTalkChannel().getId();
 
         players = game.getRealPlayers().stream().map(player -> GameManager.addOrMergePlayer(this, player)).toList();
-        winningPlayerId = game.getWinner().map(Player::getUserID).orElse(null);
-        playerIdToFaction = game.getRealPlayers().stream().collect(Collectors.toMap(Player::getUserID, Player::getFaction));
+        var winningPlayerId = game.getWinner().map(Player::getUserID).orElse(null);
+        winner = winningPlayerId == null ? null : getManagedPlayer(winningPlayerId);
+        playerIdToFaction = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getFaction));
         //playerIdToColor = game.getRealPlayers().stream().collect(Collectors.toMap(Player::getUserID, Player::getColor));
-        playerIdToTotalTurns = game.getRealPlayers().stream().collect(Collectors.toMap(Player::getUserID, Player::getNumberTurns));
-        playerIdToTurnTime = game.getRealPlayers().stream().collect(Collectors.toMap(Player::getUserID, Player::getTotalTurnTime));
+        playerIdToTotalTurns = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getNumberTurns));
+        playerIdToTurnTime = game.getRealPlayers().stream().collect(Collectors.toUnmodifiableMap(p -> getManagedPlayer(p.getUserID()), Player::getTotalTurnTime));
+    }
+
+    private static String sanitizeToNull(String str) {
+        if (StringUtils.isBlank(str) || "null".equalsIgnoreCase(str)) {
+            return null;
+        }
+        return str;
     }
 
     public boolean matches(Game game) {
@@ -101,5 +109,11 @@ public class ManagedGame {
             return null;
         }
         return guild.getRoles().stream().filter(role -> getName().equals(role.getName().toLowerCase())).findFirst().orElse(null);
+    }
+
+    @Nullable
+    public TextChannel getTextChannelById(String channelId) {
+        var guild = AsyncTI4DiscordBot.getGuild(guildId);
+        return guild.getTextChannelById(channelId);
     }
 }
