@@ -1,20 +1,16 @@
 package ti4.commands.statistics;
 
+import java.util.List;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class CompareAFKTimes extends StatisticsSubcommandData {
 
@@ -36,47 +32,20 @@ public class CompareAFKTimes extends StatisticsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        List<String> playersToCheck = PLAYER_OPTIONS_TO_CHECK.stream()
+        StringBuilder stringBuilder = new StringBuilder();
+        PLAYER_OPTIONS_TO_CHECK.stream()
                 .map(playerOptionName -> event.getOption(playerOptionName, null, OptionMapping::getAsUser))
                 .filter(Objects::nonNull)
                 .map(User::getId)
-                .toList();
-
-        Map<String, String> playerIdToAfkTimeMessage = new HashMap<>();
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getGamesPage(currentPage++);
-            for (String player : playersToCheck) {
-                var afkTime = getUsersAFKTime(pagedGames.getGames(), player);
-                if (afkTime != null) {
-                    playerIdToAfkTimeMessage.put(player, afkTime);
-                }
-            }
-        } while (pagedGames.hasNextPage() && playerIdToAfkTimeMessage.size() < playersToCheck.size());
-
-        if (playerIdToAfkTimeMessage.size() < playersToCheck.size()) {
-            for (String player : playersToCheck) {
-                if (!playerIdToAfkTimeMessage.containsKey(player)) {
-                    playerIdToAfkTimeMessage.put(player, "No active games found with this user");
-                }
-            }
-        }
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), "");
-    }
-
-    private String getUsersAFKTime(List<Game> games, String playerId) {
-        for (Game game : games) {
-            if (game.isHasEnded()) {
-                continue;
-            }
-            for (Player player : game.getRealPlayers()) {
-                if (player.getUserID().equalsIgnoreCase(playerId)) {
-                    return player.getRepresentationUnfogged() + "afk hours are: " + player.getHoursThatPlayerIsAFK().replace(";", ", ") + "\n";
-                }
-            }
-        }
-        return null;
+                .map(GameManager::getManagedPlayer)
+                .forEach(player -> {
+                    var afkTime = player.getAfkHours();
+                    if (afkTime != null) {
+                        stringBuilder.append(player.getName()).append(" afk hours are: ").append(player.getAfkHours().replace(";", ", ")).append("\n");
+                    } else {
+                        stringBuilder.append("AFK hours are not set for: ").append(player.getName()).append("\n");
+                    }
+                });
+        MessageHelper.sendMessageToChannel(event.getChannel(), stringBuilder.toString());
     }
 }
