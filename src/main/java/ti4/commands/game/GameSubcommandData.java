@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.UserGameContextManager;
 
 public abstract class GameSubcommandData extends SubcommandData {
 
@@ -33,10 +34,12 @@ public abstract class GameSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = UserGameContextManager.getContextGame(user.getId());
+        String gameName;
         if (event.getOption(Constants.GAME_NAME) != null) {
-            game = GameManager.getGame(event.getOption(Constants.GAME_NAME).getAsString().toLowerCase());
+            gameName = event.getOption(Constants.GAME_NAME).getAsString().toLowerCase();
+        } else {
+            gameName = UserGameContextManager.getContextGame(user.getId());
         }
-
+        game = GameManager.getGame(gameName);
     }
 }
