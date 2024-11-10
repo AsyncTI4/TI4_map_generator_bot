@@ -22,7 +22,7 @@ import ti4.helpers.Units;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.MinifiedGame;
+import ti4.map.ManagedGame;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -45,9 +45,9 @@ public class AutoPingCron {
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
         StopWatch stopWatch = debug ? StopWatch.createStarted() : null;
 
-        GameManager.getMinifiedGames().stream().filter(not(MinifiedGame::isHasEnded))
-                .forEach(minifiedGame -> {
-                    var game = GameSaveLoadManager.loadGame(minifiedGame.getName());
+        GameManager.getManagedGames().stream().filter(not(ManagedGame::isHasEnded))
+                .forEach(managedGame -> {
+                    var game = GameManager.getGame(managedGame.getName());
                     handleTechSummary(game); // TODO, move this?
                     checkAllSaboWindows(game);
                     if (game.isFastSCFollowMode()) {

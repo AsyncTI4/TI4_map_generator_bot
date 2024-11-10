@@ -673,9 +673,8 @@ public class Game extends GameProperties {
     public String getFactionsThatReactedToThis(String messageID) {
         if (checkingForAllReacts.get(messageID) != null) {
             return checkingForAllReacts.get(messageID);
-        } else {
-            return "";
         }
+        return "";
     }
 
     public void clearAllEmptyStoredValues() {

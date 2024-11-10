@@ -35,7 +35,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.MinifiedGame;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -334,19 +333,9 @@ public class Setup extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
 
-        for (MinifiedGame minifiedGame : GameManager.getMinifiedGames()) {
-            for (Player player2 : minifiedGame.getRealPlayers()) {
-                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
-                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
-                    }
-                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
-                        player.setPreferenceForDistanceBasedTacticalActions(true);
-                    }
-                    break;
-                }
-            }
-        }
+        var managedPlayer = GameManager.getManagedPlayer(player.getUserID());
+        player.setHoursThatPlayerIsAFK(managedPlayer.getAfkHours());
+        player.setPreferenceForDistanceBasedTacticalActions(managedPlayer.isDistanceBasedTacticalActions());
 
         if (!game.isFowMode()) {
             StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName(), false);

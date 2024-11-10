@@ -43,8 +43,8 @@ public class ServerGameStats extends BothelperSubcommandData {
 
         for (Guild guild : guilds) {
             int gameCount = guildToGameCount.computeIfAbsent(guild.getId(), k -> 0);
-            int filteredGames = (int) GameManager.getMinifiedGames().stream()
-                    .filter(g -> Objects.equals(g.getGuild().getId(), guild.getId()))
+            int filteredGames = (int) GameManager.getManagedGames().stream()
+                    .filter(g -> Objects.equals(g.getGuildId(), guild.getId()))
                     .filter(g -> g.getMainGameChannel() != null && g.getMainGameChannel().getParentCategory() != null && !g.getMainGameChannel().getParentCategory().getName().equals("The in-limbo PBD Archive"))
                     .count();
             guildToGameCount.put(guild.getId(), gameCount + filteredGames);

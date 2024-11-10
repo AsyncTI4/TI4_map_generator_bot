@@ -154,7 +154,7 @@ public class GameSaveLoadManager {
         } catch (IOException e) {
             BotLogger.log("Could not save map: " + game.getName(), e);
         }
-        GameManager.addOrReplace(game);
+        GameManager.addOrReplaceGame(game);
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
@@ -1081,19 +1081,19 @@ public class GameSaveLoadManager {
         return mapStorage.renameTo(deletedMapStorage);
     }
 
-    public static List<MinifiedGame> loadMinifiedGames() {
+    public static List<ManagedGame> loadManagedGames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
             return pathStream.parallel()
                     .filter(path -> path.toString().toLowerCase().endsWith(".txt"))
                     .map(path -> {
                         File file = path.toFile();
                         try {
-                            Game game = loadGame(file);
+                            Game game = readGame(file);
                             if (game == null || game.getName() == null) {
                                 BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                                 return null;
                             }
-                            return new MinifiedGame(game);
+                            return new ManagedGame(game);
                         } catch (Exception e) {
                             BotLogger.log("Could not load game: " + file.getName(), e);
                         }
@@ -1116,7 +1116,7 @@ public class GameSaveLoadManager {
     public static Game loadGame(File gameFile) {
         Game game = readGame(gameFile);
         if (game != null) {
-            GameManager.addOrReplace(game);
+            GameManager.addOrReplaceGame(game);
         }
         return game;
     }

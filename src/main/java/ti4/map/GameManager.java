@@ -17,22 +17,23 @@ import ti4.message.BotLogger;
 public class GameManager {
 
     private static final CopyOnWriteArrayList<String> allGameNames = new CopyOnWriteArrayList<>();
-    private static final ConcurrentMap<String, MinifiedGame> gameNameToMinifiedGame = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, ManagedGame> gameNameToManagedGame = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, ManagedPlayer> playerNameToManagedPlayer = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, String> userIdToCurrentGameName = new ConcurrentHashMap<>();
-    private static final LoadingCache<String, Game> gameCache;
+    private static final LoadingCache<String, Game> activeGameCache;
 
     static {
-        gameCache = Caffeine.newBuilder()
+        activeGameCache = Caffeine.newBuilder()
                 .maximumSize(200)
                 .expireAfterAccess(2, TimeUnit.HOURS)
                 .build(GameManager::loadGame);
-        LogCacheStatsCron.registerCache("gameCache", gameCache);
+        LogCacheStatsCron.registerCache("gameCache", activeGameCache);
     }
 
     public static void initialize() {
-        GameSaveLoadManager.loadMinifiedGames()
-                .forEach(minifiedGame -> gameNameToMinifiedGame.put(minifiedGame.getName(), minifiedGame));
-        allGameNames.addAll(gameNameToMinifiedGame.keySet());
+        GameSaveLoadManager.loadManagedGames()
+                .forEach(managedGame -> gameNameToManagedGame.put(managedGame.getName(), managedGame));
+        allGameNames.addAll(gameNameToManagedGame.keySet());
     }
 
     private static Game loadGame(String gameName) {
@@ -43,23 +44,26 @@ public class GameManager {
         if (!isValidGame(gameName)) {
             return null;
         }
-        return gameCache.get(gameName);
+        if (gameNameToManagedGame.get(gameName).isHasEnded()) {
+            return loadGame(gameName);
+        }
+        return activeGameCache.get(gameName);
     }
 
-    static void addOrReplace(Game game) {
+    static void addOrReplaceGame(Game game) {
         allGameNames.addIfAbsent(game.getName());
-        if (!hasMatchingMinifiedGame(game)) {
-            gameNameToMinifiedGame.put(game.getName(), new MinifiedGame(game));
+        if (!hasMatchingManagedGame(game)) {
+            gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
         }
-        if (gameCache.getIfPresent(game.getName()) != null) {
-            gameCache.put(game.getName(), game);
+        if (activeGameCache.getIfPresent(game.getName()) != null) {
+            activeGameCache.put(game.getName(), game);
         }
     }
 
     static void deleteGame(String gameName) {
         allGameNames.remove(gameName);
-        gameNameToMinifiedGame.remove(gameName);
-        gameCache.invalidate(gameName);
+        gameNameToManagedGame.remove(gameName);
+        activeGameCache.invalidate(gameName);
     }
 
     public static boolean isValidGame(String gameName) {
@@ -88,7 +92,7 @@ public class GameManager {
         if (gameName == null) {
             return null;
         }
-        return gameCache.get(gameName);
+        return getGame(gameName);
     }
 
     public static List<String> getGameNames() {
@@ -109,21 +113,29 @@ public class GameManager {
         return pagedGames;
     }
 
-    public MinifiedGame getMinifiedGame(String gameName) {
-        return gameNameToMinifiedGame.get(gameName);
-    }
-
-    public static List<MinifiedGame> getMinifiedGames() {
-        if (gameNameToMinifiedGame.size() != allGameNames.size()) {
-            BotLogger.log("gameNameToMinifiedGame size " + gameNameToMinifiedGame.size() +
+    public static List<ManagedGame> getManagedGames() {
+        if (gameNameToManagedGame.size() != allGameNames.size()) {
+            BotLogger.log("gameNameToManagedGame size " + gameNameToManagedGame.size() +
                     " does not match allGameNames size " + allGameNames.size());
         }
-        return new ArrayList<>(gameNameToMinifiedGame.values());
+        return new ArrayList<>(gameNameToManagedGame.values());
     }
 
-    private static boolean hasMatchingMinifiedGame(Game game) {
-        var minifiedGame = gameNameToMinifiedGame.get(game.getName());
-        return minifiedGame != null && minifiedGame.matches(game);
+    private static boolean hasMatchingManagedGame(Game game) {
+        var managedGame = gameNameToManagedGame.get(game.getName());
+        return managedGame != null && managedGame.matches(game);
+    }
+
+    public static ManagedPlayer getManagedPlayer(String playerId) {
+        return playerNameToManagedPlayer.get(playerId);
+    }
+
+    public static ManagedPlayer addOrMergePlayer(ManagedGame game, Player player) {
+        var managedPlayer = playerNameToManagedPlayer.computeIfAbsent(player.getUserID(), k -> new ManagedPlayer(game, player));
+        if (!managedPlayer.getGames().contains(game)) {
+            managedPlayer.merge(game, player);
+        }
+        return managedPlayer;
     }
 
     public static class PagedGames {

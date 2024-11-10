@@ -782,8 +782,7 @@ public class MiltyDraftManager {
     }
 
     private MiltyDraftTile findTile(String tileId) {
-        MiltyDraftTile result = null;
-        result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElse(null);
+        MiltyDraftTile result = all.stream().filter(t -> t.getTile().getTileID().equals(tileId)).findFirst().orElse(null);
         if (result == null) {
             TileModel tileRequested = TileHelper.getTileById(tileId);
             Set<ComponentSource> currentsources = all.stream()

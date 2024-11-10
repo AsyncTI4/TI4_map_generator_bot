@@ -462,4 +462,8 @@ public class AsyncTI4DiscordBot {
         // classes.sort(Comparator.comparing(Class<?>::getName));
         return classes;
     }
+
+    public static Guild getGuild(String guildId) {
+        return guilds.stream().filter(guild -> guild.getId().equals(guildId)).findFirst().orElse(null);
+    }
 }

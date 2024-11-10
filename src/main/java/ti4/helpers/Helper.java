@@ -66,7 +66,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Leader;
-import ti4.map.MinifiedGame;
+import ti4.map.ManagedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -2309,7 +2309,7 @@ public class Helper {
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
 
-        for (MinifiedGame game : GameManager.getMinifiedGames()) {
+        for (ManagedGame game : GameManager.getManagedGames()) {
             if (!game.isHasEnded()) {
                 if (game.getGuildId() != null && game.getGuildId().equals(guild.getId())) {
                     TextChannel tableTalkChannel = game.getTableTalkChannel();

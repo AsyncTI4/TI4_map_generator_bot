@@ -27,9 +27,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.GameStatsDashboardPayload;
-import ti4.map.MinifiedGame;
+import ti4.map.ManagedGame;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.website.WebsiteOverlay;
@@ -106,18 +105,17 @@ public class WebHelper {
         List<String> badGames = new ArrayList<>();
         int count = 0;
 
-        for (MinifiedGame minifiedGame : GameManager.getMinifiedGames()) {
-            if (minifiedGame.isHasEnded() && minifiedGame.isHasWinner()) {
+        for (ManagedGame managedGame : GameManager.getManagedGames()) {
+            if (managedGame.isHasEnded() && managedGame.isHasWinner()) {
                 count++;
                 try {
-                    // Quick & Dirty bypass for failed json creation
-                    var game = GameSaveLoadManager.loadGame(minifiedGame.getName());
+                    var game = GameManager.getGame(managedGame.getName());
                     GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
                     objectMapper.writeValueAsString(payload);
                     payloads.add(new GameStatsDashboardPayload(game));
                 } catch (Exception e) {
-                    badGames.add(minifiedGame.getName());
-                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + minifiedGame.getName() + "`", e);
+                    badGames.add(managedGame.getName());
+                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + "`", e);
                 }
             }
         }

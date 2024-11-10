@@ -1,5 +1,10 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,18 +25,13 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 public class UserJoinServerListener extends ListenerAdapter {
 
     private static boolean validateEvent(GenericGuildEvent event) {
         String eventGuild = event.getGuild().getId();
-        List<String> asyncGuilds = AsyncTI4DiscordBot.guilds.stream().map(Guild::getId).toList();
+        var guild = AsyncTI4DiscordBot.getGuild(eventGuild);
         // Do not process these events in guilds that we aren't initialized in
-        return asyncGuilds.contains(eventGuild);
+        return guild != null;
     }
 
     @Override

@@ -30,7 +30,7 @@ import ti4.helpers.Emojis;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.MinifiedGame;
+import ti4.map.ManagedGame;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -99,7 +99,7 @@ public class DataMigrationManager {
                 if (migrationCutoffDate == null) {
                     continue;
                 }
-                var migratedGames = migrateGames(GameManager.getMinifiedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
+                var migratedGames = migrateGames(GameManager.getManagedGames(), entry.getKey(), entry.getValue(), migrationCutoffDate);
                 migrationNamesToAppliedGameNames
                         .computeIfAbsent(entry.getKey(), k -> new ArrayList<>())
                         .addAll(migratedGames);
@@ -129,24 +129,24 @@ public class DataMigrationManager {
         return Optional.empty();
     }
 
-    private static List<String> migrateGames(List<MinifiedGame> games, String migrationName, Function<Game, Boolean> migrationMethod,
+    private static List<String> migrateGames(List<ManagedGame> games, String migrationName, Function<Game, Boolean> migrationMethod,
                                              Date migrationForGamesBeforeDate) {
         List<String> migrationsApplied = new ArrayList<>();
-        for (var minifiedGame : games) {
-            if (minifiedGame.isHasEnded()) {
+        for (var managedGame : games) {
+            if (managedGame.isHasEnded()) {
                 continue;
             }
 
             Date mapCreatedOn = null;
             try {
-                mapCreatedOn = MAP_CREATED_ON_FORMAT.parse(minifiedGame.getCreationDate());
+                mapCreatedOn = MAP_CREATED_ON_FORMAT.parse(managedGame.getCreationDate());
             } catch (ParseException ignored) {
             }
             if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
                 continue;
             }
 
-            var game = GameManager.getGame(minifiedGame.getName());
+            var game = GameManager.getGame(managedGame.getName());
 
             if (game == null || game.hasRunMigration(migrationName)) {
                 continue;
