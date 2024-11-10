@@ -21,6 +21,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
 public class ListSlashCommandsUsed extends BothelperSubcommandData {
+
     public ListSlashCommandsUsed() {
         super(Constants.LIST_SLASH_COMMANDS_USED, "List the frequency with which slash commands are used");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_LAST_MONTH, "Only include games started in last month? y/n").setRequired(false));
@@ -119,7 +120,6 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
 
     public static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
         List<Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
-
         // Sorting the list based on values
         list.sort((o1, o2) -> order ? o1.getValue().compareTo(o2.getValue()) == 0
             ? o1.getKey().compareTo(o2.getKey())

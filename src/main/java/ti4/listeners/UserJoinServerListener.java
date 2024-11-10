@@ -99,7 +99,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(user).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
         }
         Player player = game.getPlayer(user.getId());
-        if (player != null && ButtonHelper.isPlayerNew(game, player)) {
+        if (player != null && ButtonHelper.isPlayerNew(player)) {
             String msg = player.getRepresentation() + " ping here";
             if (game.getTableTalkChannel() != null) {
                 List<ThreadChannel> threadChannels = game.getTableTalkChannel().getThreadChannels();

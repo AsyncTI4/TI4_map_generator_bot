@@ -21,11 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,6 +44,10 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -5998,22 +5997,8 @@ public class ButtonHelper {
         Helper.checkEndGame(game, player);
     }
 
-    public static boolean isPlayerNew(Game gameOG, Player player) {
-        int currentPage = 0;
-        GameManager.PagedGames pagedGames;
-        do {
-            pagedGames = GameManager.getGamesPage(currentPage++);
-            for (Game game : pagedGames.getGames()) {
-                if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
-                    for (Player player2 : game.getRealPlayers()) {
-                        if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                            return false;
-                        }
-                    }
-                }
-            }
-        } while (pagedGames.hasNextPage());
-        return true;
+    public static boolean isPlayerNew(Player player) {
+        return GameManager.getManagedPlayer(player.getUserID()).getGames().size() == 1;
     }
 
     public static boolean anyoneHaveInPlayArea(Game game, String pnID) {
