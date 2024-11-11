@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class PutDiscardBackIntoDeckAgendas extends GameStateSubcommand {
@@ -15,24 +14,22 @@ public class PutDiscardBackIntoDeckAgendas extends GameStateSubcommand {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put agenda back into deck from discard", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SHUFFLE_AGENDAS, "Enter YES to shuffle, otherwise NO to put on top").setRequired(true));
-
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        OptionMapping option = event.getOption(Constants.AGENDA_ID);
-        if (option == null) {
+        OptionMapping agendaIdOption = event.getOption(Constants.AGENDA_ID);
+        if (agendaIdOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        OptionMapping option2 = event.getOption(Constants.SHUFFLE_AGENDAS);
+        OptionMapping shuffleAgendasOption = event.getOption(Constants.SHUFFLE_AGENDAS);
         boolean success = false;
-        if (option2 != null) {
-            if ("YES".equalsIgnoreCase(option2.getAsString())) {
-                success = game.shuffleAgendaBackIntoDeck(option.getAsInt());
+        if (shuffleAgendasOption != null) {
+            if ("YES".equalsIgnoreCase(shuffleAgendasOption.getAsString())) {
+                success = getGame().shuffleAgendaBackIntoDeck(agendaIdOption.getAsInt());
             } else {
-                success = game.putAgendaBackIntoDeckOnTop(option.getAsInt());
+                success = getGame().putAgendaBackIntoDeckOnTop(agendaIdOption.getAsInt());
             }
         }
 
