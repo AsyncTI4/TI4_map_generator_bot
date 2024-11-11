@@ -844,5 +844,14 @@
         "text": "Ready up to 3 planets you control. Then, reveal the top card of the agenda deck; players vote on this agenda.",
         "flavorText": "The rules for such an occasion were dubious. However, dubious had always been Elder Junn's specialty.",
         "source": "action_deck_2"
+    },
+    {
+        "alias": "promissory_rider",
+        "name": "Promissory Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, each other player that did not vote for that outcome must give you 1 promissory note from their hand.",
+        "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of bureaucracies and favors owed in many more.",
+        "source": "action_deck_2_old"
     }
 ]
