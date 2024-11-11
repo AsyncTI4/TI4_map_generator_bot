@@ -7,43 +7,32 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PickACFromDiscard extends ACCardsSubcommandData {
+public class PickACFromDiscard extends PlayerGameStateSubcommand {
+
     public PickACFromDiscard() {
-        super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand");
+        super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-        OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to draw from discard pile");
-            return;
-        }
-
-        int acIndex = option.getAsInt();
+        Game game = getGame();
+        Player player = getPlayer();
+        int acIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
         getActionCardFromDiscard(event, game, player, acIndex);
     }
 

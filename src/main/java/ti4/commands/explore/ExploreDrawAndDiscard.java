@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
@@ -21,13 +20,8 @@ public class ExploreDrawAndDiscard extends ExploreSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping countOpt = event.getOption(Constants.COUNT);
-        int count;
-        if (countOpt != null) {
-            count = countOpt.getAsInt();
-        } else {
-            count = 1;
-        }
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        count = Math.max(count, 1);
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             String userID = event.getUser().getId();

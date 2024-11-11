@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.commands.uncategorized.CardsInfoHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -21,21 +22,16 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
 
-public class ACInfo extends ACCardsSubcommandData {
+public class ACInfo extends PlayerGameStateSubcommand {
 
     public ACInfo() {
-        super(Constants.INFO, "Send Action Cards to your Cards Info thread");
+        super(Constants.INFO, "Send Action Cards to your Cards Info thread", true, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        var game = getGame();
+        var player = getPlayer();
         sendActionCardInfo(game, player, event);
         MessageHelper.sendMessageToEventChannel(event, "AC Info Sent");
     }
@@ -209,22 +205,6 @@ public class ACInfo extends ACCardsSubcommandData {
                 String ac_name = Mapper.getActionCard(key).getName();
                 if (ac_name != null) {
                     acButtons.add(Buttons.blue("ac_discard_from_hand_" + value + suffix, "(" + value + ") " + ac_name, Emojis.ActionCard));
-                }
-            }
-        }
-        return acButtons;
-    }
-
-    public static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
-        List<Button> acButtons = new ArrayList<>();
-        Map<String, Integer> actionCards = notYssaril.getActionCards();
-        if (actionCards != null && !actionCards.isEmpty()) {
-            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                Integer value = ac.getValue();
-                String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
-                if (ac_name != null) {
-                    acButtons.add(Buttons.gray("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name, Emojis.ActionCard));
                 }
             }
         }

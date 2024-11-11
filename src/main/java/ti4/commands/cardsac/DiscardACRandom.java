@@ -1,51 +1,43 @@
 package ti4.commands.cardsac;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
-import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class DiscardACRandom extends ACCardsSubcommandData {
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.PlayerGameStateSubcommand;
+import ti4.generator.Mapper;
+import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
+
+public class DiscardACRandom extends PlayerGameStateSubcommand {
+
     public DiscardACRandom() {
-        super(Constants.DISCARD_AC_RANDOM, "Discard a random Action Card");
+        super(Constants.DISCARD_AC_RANDOM, "Discard a random Action Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to discard, default 1"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        count = Math.max(count, 1);
 
-        OptionMapping option = event.getOption(Constants.COUNT);
-        int count = 1;
-        if (option != null) {
-            int providedCount = option.getAsInt();
-            count = providedCount > 0 ? providedCount : 1;
-        }
-
+        Player player = getPlayer();
         Map<String, Integer> actionCardsMap = player.getActionCards();
         if (actionCardsMap.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
             return;
         }
+
+        Game game = getGame();
         discardRandomAC(event, game, player, count);
 
     }

@@ -22,12 +22,8 @@ public class DealSO extends SOCardsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        OptionMapping option = event.getOption(Constants.COUNT);
-        int count = 1;
-        if (option != null) {
-            int providedCount = option.getAsInt();
-            count = providedCount > 0 ? providedCount : 1;
-        }
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        count = Math.max(count, 1);
 
         Player player_ = Helper.getPlayerFromEvent(game, null, event);
         if (player_ == null) {

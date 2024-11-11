@@ -4,46 +4,36 @@ import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DiscardAC extends ACCardsSubcommandData {
+public class DiscardAC extends PlayerGameStateSubcommand {
+
     public DiscardAC() {
-        super(Constants.DISCARD_AC, "Discard an Action Card");
+        super(Constants.DISCARD_AC, "Discard an Action Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-        OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
-        if (option == null) {
+        OptionMapping acIdOption = event.getOption(Constants.ACTION_CARD_ID);
+        if (acIdOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to discard");
             return;
         }
-        int acIndex = option.getAsInt();
-        discardAC(event, game, player, acIndex);
-    }
 
-    // @ButtonHandler("ac_discard_from_hand")
-    public static void discardAC(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String acID = buttonID.replace("ac_discard_from_hand_", "");
-        discardAC(event, game, player, Integer.parseInt(acID));
+        Game game = getGame();
+        Player player = getPlayer();
+        int acIndex = acIdOption.getAsInt();
+        discardAC(event, game, player, acIndex);
     }
 
     public static void discardAC(GenericInteractionCreateEvent event, Game game, Player player, int acNumericalID) {

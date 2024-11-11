@@ -3,12 +3,11 @@ package ti4.commands.agenda;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
-public class AddControlToken extends GameStateSubcommand {
+public class AddControlToken extends PlayerGameStateSubcommand {
 
     public AddControlToken() {
         super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law", true, true);
@@ -26,7 +25,6 @@ public class AddControlToken extends GameStateSubcommand {
         }
 
         var game = getGame();
-        var player = Helper.getPlayerFromEvent(game, event);
         int lawId = option.getAsInt();
         String msg = game.getStoredValue("controlTokensOnAgenda" + lawId);
         boolean undo = false;
@@ -34,6 +32,8 @@ public class AddControlToken extends GameStateSubcommand {
         if (option2 != null) {
             undo = option2.getAsBoolean();
         }
+
+        var player = getPlayer();
         if (!undo) {
             if (msg.isEmpty()) {
                 msg = player.getColor();

@@ -4,31 +4,27 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawAC extends ACCardsSubcommandData {
+public class DrawAC extends PlayerGameStateSubcommand {
+
     public DrawAC() {
-        super(Constants.DRAW_AC, "Draw Action Card");
+        super(Constants.DRAW_AC, "Draw Action Card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1, max 10"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
         OptionMapping option = event.getOption(Constants.COUNT);
         int count = 1;
         if (option != null) {

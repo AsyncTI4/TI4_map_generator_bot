@@ -5,32 +5,29 @@ import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.model.ActionCardModel;
 
-public class MakeCopiesOfACs extends ACCardsSubcommandData {
+public class MakeCopiesOfACs extends GameStateSubcommand {
+
     public MakeCopiesOfACs() {
-        super(Constants.MAKE_AC_COPIES, "Make Copies of ACS");
+        super(Constants.MAKE_AC_COPIES, "Make Copies of ACS", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many copies to make, 2 or 3").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-
-        OptionMapping option = event.getOption(Constants.COUNT);
-        int count = 1;
-        if (option != null) {
-            count = option.getAsInt();
-            if (count > 3 || count < 1) {
-                return;
-            }
+        int count = event.getOption(Constants.COUNT).getAsInt();
+        if (count > 3 || count < 1) {
+            return;
         }
+
+        Game game = getGame();
         if (count == 2) {
             Map<String, ActionCardModel> actionCards = Mapper.getActionCards("extra1");
             List<String> ACs = new ArrayList<>(actionCards.keySet());

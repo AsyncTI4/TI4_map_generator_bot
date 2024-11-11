@@ -4,15 +4,12 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 
-abstract class CaptureUnitsSubcommand extends GameStateSubcommand {
+abstract class CaptureUnitsSubcommand extends PlayerGameStateSubcommand {
 
     public CaptureUnitsSubcommand(String id, String description) {
         super(id, description, true, true);
@@ -27,13 +24,7 @@ abstract class CaptureUnitsSubcommand extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        Player player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-            return;
-        }
-
+        Player player = getPlayer();
         Tile tile = player.getNomboxTile();
         subExecute(event, tile);
     }

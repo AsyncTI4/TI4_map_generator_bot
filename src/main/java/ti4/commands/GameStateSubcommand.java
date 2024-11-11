@@ -5,16 +5,18 @@ import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
+import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
+
+import static ti4.helpers.SlashCommandAcceptanceHelper.acceptIfHasRoles;
 
 public abstract class GameStateSubcommand extends Subcommand {
 
     protected final boolean loadGame;
     protected final boolean saveGame;
-    private final ThreadLocal<String> gameName = new ThreadLocal<>();
     private final ThreadLocal<Game> game = new ThreadLocal<>();
     private final ThreadLocal<Long> gameLastModifiedDate = new ThreadLocal<>();
 
@@ -24,12 +26,16 @@ public abstract class GameStateSubcommand extends Subcommand {
         this.saveGame = saveGame;
     }
 
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return name.equals(event.getInteraction().getSubcommandName()) &&
+                acceptIfHasRoles(event, AsyncTI4DiscordBot.adminRoles) || SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
+    }
+
     public void preExecute(SlashCommandInteractionEvent event) {
         super.preExecute(event);
-        gameName.set(getGameName(event));
-        UserGameContextManager.setContextGame(event.getUser().getId(), gameName.get());//TODO, can we remove the context manager?
         if (loadGame) {
-            game.set(GameManager.getGame(gameName.get()));
+            game.set(GameManager.getGame(getGameName(event)));
             gameLastModifiedDate.set(game.get().getLastModifiedDate());
         }
     }
@@ -67,16 +73,12 @@ public abstract class GameStateSubcommand extends Subcommand {
         if (loadGame && saveGame && gameLastModifiedDate.get() != game.get().getLastModifiedDate()) {
             GameSaveLoadManager.saveGame(game.get(), event);
         }
-        gameName.remove();
         game.remove();
         gameLastModifiedDate.remove();
     }
 
+    @NotNull
     protected Game getGame() {
         return game.get();
-    }
-
-    protected String getGameName() {
-        return gameName.get();
     }
 }

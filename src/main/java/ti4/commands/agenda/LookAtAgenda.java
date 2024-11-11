@@ -9,11 +9,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -21,7 +20,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
-public class LookAtAgenda extends GameStateSubcommand {
+public class LookAtAgenda extends PlayerGameStateSubcommand {
 
     public LookAtAgenda() {
         super(Constants.LOOK, "Look at the agenda deck", true, false);
@@ -41,11 +40,7 @@ public class LookAtAgenda extends GameStateSubcommand {
         boolean lookAtBottom = event.getOption(Constants.LOOK_AT_BOTTOM, false, OptionMapping::getAsBoolean);
 
         Game game = getGame();
-        Player player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
         lookAtAgendas(game, player, count, lookAtBottom);
     }
 

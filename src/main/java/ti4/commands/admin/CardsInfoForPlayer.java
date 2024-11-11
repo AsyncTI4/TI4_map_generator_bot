@@ -21,11 +21,9 @@ public class CardsInfoForPlayer extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            User user = playerOption.getAsUser();
-            Player player = getGame().getPlayer(user.getId());
-            CardsInfo.sendCardsInfo(getGame(), player, event);
-        }
+        User user = playerOption.getAsUser();
+        Player player = getGame().getPlayer(user.getId());
+        CardsInfo.sendCardsInfo(getGame(), player, event);
         MessageHelper.sendMessageToEventChannel(event, "Cards Info sent");
     }
 }

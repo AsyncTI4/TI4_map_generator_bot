@@ -25,12 +25,8 @@ public class DrawAgenda extends GameStateSubcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping option = event.getOption(Constants.COUNT);
-        int count = 1;
-        if (option != null) {
-            int providedCount = option.getAsInt();
-            count = providedCount > 0 ? providedCount : 1;
-        }
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        count = Math.max(count, 1);
         OptionMapping fromBottomOption = event.getOption("from_bottom");
         boolean fromBottom = fromBottomOption != null && fromBottomOption.getAsBoolean();
         Game game = getGame();

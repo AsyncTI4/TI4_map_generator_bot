@@ -26,12 +26,8 @@ public class DrawSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        OptionMapping option = event.getOption(Constants.COUNT);
-        int count = 1;
-        if (option != null) {
-            int providedCount = option.getAsInt();
-            count = providedCount > 0 ? providedCount : 1;
-        }
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        count = Math.max(count, 1);
         drawSO(event, game, player, count, false);
     }
 

@@ -5,14 +5,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AddLaw extends GameStateSubcommand {
+public class AddLaw extends PlayerGameStateSubcommand {
 
     public AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law", true, true);
@@ -30,10 +29,10 @@ public class AddLaw extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        Player player = Helper.getPlayerFromEvent(game, event);
+        Player player = getPlayer();
         String optionText;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
-        if (playerWasElected && player != null) {
+        if (playerWasElected) {
             optionText = player.getFaction();
         } else {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);

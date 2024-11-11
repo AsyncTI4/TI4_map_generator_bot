@@ -1,22 +1,39 @@
 package ti4.commands.cardsac;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.SlashCommandAcceptanceHelper;
-import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
 
 public class ACCardsCommand implements Command {
 
-    private final Collection<ACCardsSubcommandData> subcommandData = getSubcommands();
+    private final Collection<Subcommand> subcommands = List.of(
+            new ACInfo(),
+            new DrawAC(),
+            new DiscardAC(),
+            new PurgeAC(),
+            new DiscardACRandom(),
+            new ShowAC(),
+            new ShowACToAll(),
+            new PlayAC(),
+            new ShuffleACDeck(),
+            new ShowAllAC(),
+            new ShowACRemainingCardCount(),
+            new ShowAllUnplayedACs(),
+            new PickACFromDiscard(),
+            new PickACFromPurged(),
+            new ShowDiscardActionCards(),
+            new ShowPurgedActionCards(),
+            new ShuffleACBackIntoDeck(),
+            new RevealAndPutACIntoDiscard(),
+            new SentAC(),
+            new SentACRandom(),
+            new DrawSpecificAC(),
+            new MakeCopiesOfACs());
 
     @Override
     public String getActionId() {
@@ -24,63 +41,18 @@ public class ACCardsCommand implements Command {
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.acceptIfAdminOrPlayerInGame(getActionId(), event);
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        ACCardsSubcommandData subCommandExecuted = null;
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (ACCardsSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                subCommandExecuted = subcommand;
-                break;
-            }
-        }
-        String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
-        MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
-    }
-
-    protected String getActionDescription() {
+    public String getActionDescription() {
         return "Action Cards";
     }
 
-    private Collection<ACCardsSubcommandData> getSubcommands() {
-        Collection<ACCardsSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ACInfo());
-        subcommands.add(new DrawAC());
-        subcommands.add(new DiscardAC());
-        subcommands.add(new PurgeAC());
-        subcommands.add(new DiscardACRandom());
-        subcommands.add(new ShowAC());
-        subcommands.add(new ShowACToAll());
-        subcommands.add(new PlayAC());
-        subcommands.add(new ShuffleACDeck());
-        subcommands.add(new ShowAllAC());
-        subcommands.add(new ShowACRemainingCardCount());
-        subcommands.add(new ShowAllUnplayedACs());
-        subcommands.add(new PickACFromDiscard());
-        subcommands.add(new PickACFromPurged());
-        subcommands.add(new ShowDiscardActionCards());
-        subcommands.add(new ShowPurgedActionCards());
-        subcommands.add(new ShuffleACBackIntoDeck());
-        subcommands.add(new RevealAndPutACIntoDiscard());
-        subcommands.add(new SentAC());
-        subcommands.add(new SentACRandom());
-        subcommands.add(new DrawSpecificAC());
-        subcommands.add(new MakeCopiesOfACs());
-        return subcommands;
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return Command.super.accept(event) &&
+                SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionId(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+    public Collection<Subcommand> getSubcommands() {
+        return subcommands;
     }
 }
