@@ -5,12 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -21,33 +20,23 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SentACRandom extends ACCardsSubcommandData {
+public class SentACRandom extends PlayerGameStateSubcommand {
+
     public SentACRandom() {
-        super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-        Player player_ = Helper.getPlayerFromEvent(game, null, event);
-        if (player_ == null) {
+        Game game = getGame();
+        Player otherPlayer = Helper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
-
-        User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
-        if (user == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-            return;
-        }
-        sendRandomACPart2(event, game, player, player_);
+        Player player = getPlayer();
+        sendRandomACPart2(event, game, player, otherPlayer);
     }
 
     public void sendRandomACPart2(GenericInteractionCreateEvent event, Game game, Player player, Player player_) {

@@ -30,7 +30,7 @@ public class ACCardsCommand implements Command {
             new ShowPurgedActionCards(),
             new ShuffleACBackIntoDeck(),
             new RevealAndPutACIntoDiscard(),
-            new SentAC(),
+            new SendAC(),
             new SentACRandom(),
             new DrawSpecificAC(),
             new MakeCopiesOfACs());

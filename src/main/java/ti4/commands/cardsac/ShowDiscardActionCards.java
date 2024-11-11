@@ -2,7 +2,6 @@ package ti4.commands.cardsac;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -24,15 +24,16 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ShowDiscardActionCards extends ACCardsSubcommandData {
+public class ShowDiscardActionCards extends GameStateSubcommand {
+
     public ShowDiscardActionCards() {
-        super(Constants.SHOW_AC_DISCARD_LIST, "Show Action Card discard list");
+        super(Constants.SHOW_AC_DISCARD_LIST, "Show Action Card discard list", false, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_TEXT, "'true' to show full card text"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         boolean showFullText = event.getOption(Constants.SHOW_FULL_TEXT, false, OptionMapping::getAsBoolean);
         showDiscard(game, event, showFullText);
     }

@@ -4,24 +4,26 @@ import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ShowPurgedActionCards extends ACCardsSubcommandData {
+public class ShowPurgedActionCards extends GameStateSubcommand {
+
     public ShowPurgedActionCards() {
-        super(Constants.SHOW_AC_PURGED_LIST, "Show Action Card purged list");
+        super(Constants.SHOW_AC_PURGED_LIST, "Show Action Card purged list", false, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         showPurged(game, event);
     }
 
-    public void showPurged(Game game, GenericInteractionCreateEvent event) {
+    private static void showPurged(Game game, GenericInteractionCreateEvent event) {
         StringBuilder sb = new StringBuilder();
         sb.append("Action card purge list: ").append("\n");
         int index = 1;

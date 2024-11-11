@@ -125,17 +125,38 @@ public class Helper {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
-            factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor())) {
-                    return player_;
-                }
-            }
+            return getPlayerByFactionColor(factionColor, game);
         }
 
         return getPlayerFromGame(game, event, event.getUser().getId());
+    }
+
+    public static Player getPlayerByFactionColor(String factionColor, Game game) {
+        factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
+        factionColor = AliasHandler.resolveFaction(factionColor);
+        for (Player player_ : game.getPlayers().values()) {
+            if (Objects.equals(factionColor, player_.getFaction()) ||
+                    Objects.equals(factionColor, player_.getColor())) {
+                return player_;
+            }
+        }
+        return null;
+    }
+
+    public static Player getOtherPlayerFromEvent(Game game, SlashCommandInteractionEvent event) {
+        OptionMapping playerOption = event.getOption(Constants.OTHER_PLAYER);
+        if (playerOption != null) {
+            String playerID = playerOption.getAsUser().getId();
+            return game.getPlayer(playerID);
+        }
+
+        OptionMapping factionColorOption = event.getOption(Constants.OTHER_FACTION_OR_COLOR);
+        if (factionColorOption != null) {
+            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
+            return getPlayerByFactionColor(factionColor, game);
+        }
+
+        return null;
     }
 
     public static List<String> unplayedACs(Game game) {
