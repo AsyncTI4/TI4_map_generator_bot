@@ -2408,7 +2408,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "# The hidden agenda was " + agendaName + "! You may find it in the discard.");
         }
-        RevealAgenda.revealAgenda(event, false, game, game.getMainGameChannel());
+        AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
         ButtonHelper.deleteMessage(event);
     }
 

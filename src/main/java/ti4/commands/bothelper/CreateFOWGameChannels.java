@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.Subcommand;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -29,7 +30,8 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CreateFOWGameChannels extends BothelperSubcommandData {
+public class CreateFOWGameChannels extends Subcommand {
+
     public CreateFOWGameChannels() {
         super(Constants.CREATE_FOW_GAME_CHANNELS, "Create Role and Game Channels for a New FOW Game");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName").setRequired(true));

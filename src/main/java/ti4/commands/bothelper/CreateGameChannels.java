@@ -38,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.commands.Subcommand;
 import ti4.commands.game.GameCreate;
 import ti4.commands.help.NewPlayerInfo;
 import ti4.generator.MapGenerator;
@@ -56,7 +57,8 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CreateGameChannels extends BothelperSubcommandData {
+public class CreateGameChannels extends Subcommand {
+
     public CreateGameChannels() {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));

@@ -52,11 +52,8 @@ import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.agenda.ListVoteCount;
-import ti4.commands.agenda.ShowDiscardedAgendas;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
-import ti4.commands.cardsso.ShowUnScoredSOs;
 import ti4.commands.combat.CombatRoll;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExploreInfo;
@@ -67,10 +64,8 @@ import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.player.SendDebt;
 import ti4.commands.player.Setup;
 import ti4.commands.player.TurnStart;
-import ti4.commands.relic.RelicShowRemaining;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.special.DiploSystem;
-import ti4.commands.tech.TechShowDeck;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.tokens.RemoveCC;
@@ -653,37 +648,6 @@ public class ButtonHelper {
         buttons.add(Buttons.gray("showDeck_unscoredSO", "Unscored SOs", Emojis.SecretObjective));
         buttons.add(Buttons.gray("showObjInfo_both", "All Revealed Objectives in Game", Emojis.Public1));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
-    }
-
-    @ButtonHandler("showDeck_")
-    public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
-        String deck = buttonID.replace("showDeck_", "");
-        switch (deck) {
-            case "ac" -> ShowDiscardActionCards.showDiscard(game, event, false);
-            case "agenda" -> ShowDiscardedAgendas.showDiscards(game, event);
-            case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
-            case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
-            case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);
-            case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {
-                List<String> types = new ArrayList<>();
-                String msg = "You may click this button to get the full text.";
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("showTextOfDeck_" + deck, "Show full text"));
-                buttons.add(Buttons.red("deleteButtons", "No Thanks"));
-                if ("all".equalsIgnoreCase(deck)) { // Show all explores
-                    types.add(Constants.CULTURAL);
-                    types.add(Constants.INDUSTRIAL);
-                    types.add(Constants.HAZARDOUS);
-                    types.add(Constants.FRONTIER);
-                } else {
-                    types.add(deck);
-                }
-                ExploreInfo.secondHalfOfExpInfo(types, event, player, game, false);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
-            }
-            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
-        }
-        deleteMessage(event);
     }
 
     @ButtonHandler("showTextOfDeck_")
@@ -2206,9 +2170,6 @@ public class ButtonHelper {
             bevent.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
             bevent.getButton();
             String message = bevent.getButton().getId().replace("deleteMessage_", "");
-            if (!message.isEmpty()) {
-                // MessageHelper.sendMessageToEventChannel(event, message);
-            }
         }
     }
 

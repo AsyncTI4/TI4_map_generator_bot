@@ -9,13 +9,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.GameManager;
 import ti4.map.ManagedGame;
 import ti4.message.MessageHelper;
 
-public class ListDeadGames extends BothelperSubcommandData {
+public class ListDeadGames extends Subcommand {
 
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
@@ -50,7 +51,7 @@ public class ListDeadGames extends BothelperSubcommandData {
                 if (game.getActionsChannel() != null) {
                     channelCount += sendMessageToChannel(game, sb, delete);
                 }
-                Guild guild = AsyncTI4DiscordBot.getGuild(game.getGuildId());
+                Guild guild = game.getGuild();
                 if (guild == null) {
                     continue;
                 }

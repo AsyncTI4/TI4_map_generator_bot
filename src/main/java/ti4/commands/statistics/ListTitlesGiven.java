@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-import static ti4.commands.bothelper.ListSlashCommandsUsed.sortByValue;
+import static ti4.commands.statistics.commandsToConvert.ListSlashCommandsUsed.sortByValue;
 
 public class ListTitlesGiven extends StatisticsSubcommandData {
     

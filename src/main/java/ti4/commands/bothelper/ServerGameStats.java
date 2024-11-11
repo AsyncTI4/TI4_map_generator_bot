@@ -13,12 +13,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.GameManager;
 import ti4.map.ManagedGame;
 import ti4.message.MessageHelper;
 
-public class ServerGameStats extends BothelperSubcommandData {
+public class ServerGameStats extends Subcommand {
+
     public ServerGameStats() {
         super(Constants.SERVER_GAME_STATS, "Game Statistics for Administration");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_HUB, "Include the HUB server in these stats"));

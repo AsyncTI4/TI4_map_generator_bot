@@ -1,6 +1,7 @@
 package ti4.commands.bothelper;
 
 import java.util.Objects;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -9,9 +10,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 
-public class ListButtons extends BothelperSubcommandData {
+public class ListButtons extends Subcommand {
+
     public ListButtons() {
         super("list_buttons", "list button IDs on a message");
         addOption(OptionType.STRING, "message_id", "Message ID of the message of which to list buttons", true);

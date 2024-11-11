@@ -4,23 +4,26 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ResetDrawStateAgendas extends AgendaSubcommandData {
+public class ResetDrawStateAgendas extends GameStateSubcommand {
+
     public ResetDrawStateAgendas() {
-        super(Constants.RESET_DRAW_STATE_FOR_AGENDAS, "Reset draw state of agenda deck");
+        super(Constants.RESET_DRAW_STATE_FOR_AGENDAS, "Reset draw state of agenda deck", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())){
+        OptionMapping confirmOption = event.getOption(Constants.CONFIRM);
+        if (confirmOption == null || !"YES".equals(confirmOption.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        getActiveGame().resetDrawStateAgendas();
+
+        getGame().resetDrawStateAgendas();
         MessageHelper.replyToMessage(event, "Agenda draw state reset.");
     }
 }
