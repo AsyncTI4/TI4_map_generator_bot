@@ -28,7 +28,7 @@ public class ShowAllAC extends ACCardsSubcommandData {
             return;
         }
 
-        Player player_ = Helper.getPlayer(game, null, event);
+        Player player_ = Helper.getPlayerFromEvent(game, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;

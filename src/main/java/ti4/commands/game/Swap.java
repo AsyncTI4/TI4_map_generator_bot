@@ -1,5 +1,9 @@
 package ti4.commands.game;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -15,10 +19,6 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public class Swap extends GameSubcommandData {
 
@@ -52,7 +52,7 @@ public class Swap extends GameSubcommandData {
         OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if (removeOption != null && addOption != null) {
-            Player removedPlayer = Helper.getPlayer(game, null, event);
+            Player removedPlayer = Helper.getPlayerFromEvent(game, null, event);
             Player swapperPlayer = game.getPlayer(addOption.getAsUser().getId());
             if (removedPlayer == null) {
                 MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
@@ -69,7 +69,7 @@ public class Swap extends GameSubcommandData {
             return;
         }
         GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game);
+        GameSaveLoadManager.reload(game.getName());
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
@@ -125,7 +125,7 @@ public class Swap extends GameSubcommandData {
             return;
         }
         GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game);
+        GameSaveLoadManager.reload(game.getName());
         // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
         // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
         message.append("> **After:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");

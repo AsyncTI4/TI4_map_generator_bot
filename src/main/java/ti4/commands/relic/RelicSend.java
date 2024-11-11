@@ -30,7 +30,7 @@ public class RelicSend extends RelicSubcommandData {
         Game game = getActiveGame();
         Player player1 = game.getPlayer(getUser().getId());
         player1 = Helper.getGamePlayer(game, player1, event, null);
-        player1 = Helper.getPlayer(game, player1, event);
+        player1 = Helper.getPlayerFromEvent(game, player1, event);
         if (player1 == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;

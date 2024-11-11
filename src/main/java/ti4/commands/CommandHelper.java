@@ -6,6 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 
 public class CommandHelper {
+
     public static List<Choice> toChoices(String... values) {
         return toChoices(Arrays.asList(values));
     }

@@ -4,14 +4,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.Subcommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class ReloadMap extends AdminSubcommandData {
+public class ReloadMap extends Subcommand {
 
     public ReloadMap() {
         super(Constants.RELOAD_GAME, "Reload game from save file");
@@ -21,20 +21,17 @@ public class ReloadMap extends AdminSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        if (option != null) {
-            String mapName = option.getAsString();
-            if (!GameManager.isValidGame(mapName)) {
-                MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
-
-                return;
-            }
-            Game game = GameManager.getGame(mapName);
-            GameSaveLoadManager.reload(game);
-            game = GameManager.getGame(mapName);
-            ShowGame.simpleShowGame(game, event);
-
-        } else {
+        if (option == null) {
             MessageHelper.sendMessageToEventChannel(event, "No Game specified.");
+            return;
         }
+        String gameName = option.getAsString();
+        if (!GameManager.isValidGame(gameName)) {
+            MessageHelper.sendMessageToEventChannel(event, "Game with such name does not exists, use /list_games");
+            return;
+        }
+
+        var game = GameSaveLoadManager.reload(gameName);
+        ShowGame.simpleShowGame(game, event);
     }
 }

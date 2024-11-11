@@ -1,5 +1,19 @@
 package ti4.message;
 
+import java.io.File;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -37,20 +51,6 @@ import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
-
-import java.io.File;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.StringTokenizer;
-import java.util.concurrent.TimeUnit;
 
 public class MessageHelper {
 	public interface MessageFunction {
@@ -114,19 +114,19 @@ public class MessageHelper {
 		}
 		File mapUndoDirectory = Storage.getGameUndoDirectory();
 		if (mapUndoDirectory.exists() && !undoPresent) {
-			String mapName = game.getName();
-			String mapNameForUndoStart = mapName + "_";
-			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+			String gameName = game.getName();
+			String gameNameForUndoStart = gameName + "_";
+			String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
 			if (mapUndoFiles != null && mapUndoFiles.length > 0) {
 				try {
 					List<Integer> numbers = Arrays.stream(mapUndoFiles)
-						.map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+						.map(fileName -> fileName.replace(gameNameForUndoStart, ""))
 						.map(fileName -> fileName.replace(Constants.TXT, ""))
 						.map(Integer::parseInt).toList();
 					int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
 					newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
 				} catch (Exception e) {
-					BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+					BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
 				}
 			}
 		}

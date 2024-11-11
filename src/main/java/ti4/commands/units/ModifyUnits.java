@@ -32,7 +32,7 @@ public class ModifyUnits implements Command {
         Game  game = UserGameContextManager.getContextGame(event.getUser().getId());
         Player player = game.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;

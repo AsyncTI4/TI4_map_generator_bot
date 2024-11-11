@@ -2,6 +2,8 @@ package ti4.map;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
@@ -34,7 +36,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final TextChannel tableTalkChannel;
     private final ThreadChannel botMapUpdateThread;
     private final ManagedPlayer winner;
-    private final List<ManagedPlayer> players;
+    private final Set<ManagedPlayer> players;
     private final Map<ManagedPlayer, Boolean> playerToIsReal;
     private final Map<ManagedPlayer, String> playerToFaction; // TODO unsure if keeping
     private final Map<ManagedPlayer, Integer> playerToTotalTurns; // TODO unsure if keeping
@@ -60,7 +62,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         tableTalkChannel = game.getTableTalkChannel();
         botMapUpdateThread = game.getBotMapUpdatesThread();
 
-        players = game.getPlayers().values().stream().map(player -> GameManager.addOrMergePlayer(this, player)).toList();
+        players = game.getPlayers().values().stream().map(player -> GameManager.addOrMergePlayer(this, player)).collect(Collectors.toUnmodifiableSet());
         var winningPlayerId = game.getWinner().map(Player::getUserID).orElse(null);
         winner = winningPlayerId == null ? null : getPlayer(winningPlayerId);
         playerToIsReal = game.getPlayers().values().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
@@ -122,5 +124,17 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
             if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ManagedGame that)) return false;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
     }
 }

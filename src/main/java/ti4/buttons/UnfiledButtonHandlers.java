@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.agenda.PutAgendaBottom;
 import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
@@ -3362,25 +3361,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Allant, the Edyn" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.");
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("bottomAgenda_")
-    public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
-        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-        new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), game);
-        AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
-        Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-            "Put " + agenda.getName()
-                + " on the bottom of the agenda deck. You may use this button to undo that and reassign it.",
-            reassign);
-        String key = "round" + game.getRound() + "AgendaPlacement";
-        if (game.getStoredValue(key).isEmpty()) {
-            game.setStoredValue(key, "bottom");
-        } else {
-            game.setStoredValue(key, game.getStoredValue(key) + "_bottom");
-        }
         ButtonHelper.deleteMessage(event);
     }
 

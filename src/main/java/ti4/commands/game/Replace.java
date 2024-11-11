@@ -65,7 +65,7 @@ public class Replace extends GameSubcommandData {
             return;
         }
 
-        Player removedPlayer = Helper.getPlayer(game, null, event);
+        Player removedPlayer = Helper.getPlayerFromEvent(game, null, event);
         if (removedPlayer == null || (removePlayerOption == null && removedPlayer.getFaction() == null)) {
             MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;
@@ -147,7 +147,7 @@ public class Replace extends GameSubcommandData {
             game.setSpeakerUserID(player.getUserID());
         }
         GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game);
+        GameSaveLoadManager.reload(game.getName());
 
         // Load the new game instance so that we can repost the milty draft
         game = GameManager.getGame(game.getName());

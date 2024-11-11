@@ -47,7 +47,7 @@ abstract public class AddRemoveUnits implements Command {
         Game game = UserGameContextManager.getContextGame(userID);
         Player player = game.getPlayer(userID);
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;

@@ -67,7 +67,7 @@ public class CombatRoll extends CombatSubcommandData {
         String userID = getUser().getId();
         Player player = game.getPlayer(userID);
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
 
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");

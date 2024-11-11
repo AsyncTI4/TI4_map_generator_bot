@@ -24,7 +24,7 @@ public class MiltyCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionId(), event);
+        return SlashCommandAcceptanceHelper.acceptIfPlayerInGame(getActionId(), event);
     }
 
     @Override

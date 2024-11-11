@@ -1258,7 +1258,7 @@ public class ButtonHelperAgents {
                     PlanetRefresh.doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
-                    ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+                    ListVoteCount.turnOrder(game, game.getMainGameChannel());
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
@@ -1298,7 +1298,7 @@ public class ButtonHelperAgents {
                     PlanetRefresh.doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
-                    ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+                    ListVoteCount.turnOrder(game, game.getMainGameChannel());
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());

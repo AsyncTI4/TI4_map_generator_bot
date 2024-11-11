@@ -15,28 +15,41 @@ import ti4.message.MessageHelper;
 
 public class SlashCommandAcceptanceHelper {
 
-    public static boolean shouldAcceptIfActivePlayerOfGame(String actionId, SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(actionId)) {
-            return false;
-        }
-        String userID = event.getUser().getId();
-        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
+    public static boolean acceptIfPlayerInGame(SlashCommandInteractionEvent event) {
+        String userId = event.getUser().getId();
+        if (!UserGameContextManager.doesUserHaveContextGame(userId)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
         }
-        String userActiveGameName = UserGameContextManager.getContextGame(userID);
-        Game game = GameManager.getGame(userActiveGameName);
-        if (!game.getPlayerIDs().contains(userID) && !game.isCommunityMode()) {
+        String userActiveGameName = UserGameContextManager.getContextGame(userId);
+        Game userActiveGame = GameManager.getGame(userActiveGameName);
+        if (userActiveGame.isCommunityMode()) {
+            Player player = Helper.getPlayerFromGame(userActiveGame, event, userId);
+            if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                return false;
+            }
+        } else if (!userActiveGame.getPlayerIDs().contains(userId) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
             MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+            return false;
+        }
+        if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
+            MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
             return false;
         }
         return true;
     }
 
-    public static boolean shouldAcceptIfHasRole(String actionId, SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
-        if (!event.getName().equals(actionId)) {
-            return false;
+    public static boolean acceptIfHasRoles(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
+        if (hasRole(event, acceptedRoles)) {
+            return true;
         }
+        var acceptRolesStr = acceptedRoles.stream().map(Role::getName).collect(Collectors.joining(", "));
+        MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have one of the following roles: " + acceptRolesStr);
+        return false;
+    }
+
+    private static boolean hasRole(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
         Member member = event.getMember();
         if (member == null) {
             return false;
@@ -47,45 +60,6 @@ public class SlashCommandAcceptanceHelper {
                 return true;
             }
         }
-        var acceptRolesStr = acceptedRoles.stream().map(Role::getName).collect(Collectors.joining(", "));
-        MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have one of the following roles: " + acceptRolesStr);
         return false;
-    }
-
-    public static boolean shouldAcceptIfIsAdminOrIsPartOfGame(String actionId, SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(actionId)) {
-            return false;
-        }
-        String userID = event.getUser().getId();
-        Member member = event.getMember();
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.adminRoles) {
-                if (roles.contains(role)) {
-                    return true;
-                }
-            }
-        }
-        String contextGameName = UserGameContextManager.getContextGame(userID);
-        if (contextGameName == null) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-            return false;
-        }
-        Game userActiveGame = GameManager.getGame(contextGameName);
-        if (userActiveGame.isCommunityMode()) {
-            Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
-            if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-        } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-            MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-            return false;
-        }
-        if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
-            MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
-            return false;
-        }
-        return true;
     }
 }

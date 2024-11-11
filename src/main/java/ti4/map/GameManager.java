@@ -58,9 +58,10 @@ public class GameManager {
         }
     }
 
-    static void deleteGame(String gameName) {
+    static void invalidateGame(String gameName) {
         allGameNames.remove(gameName);
-        gameNameToManagedGame.remove(gameName);
+        var managedGame = gameNameToManagedGame.remove(gameName);
+        managedGame.getPlayers().forEach(player -> player.getGames().remove(managedGame));
         activeGameCache.invalidate(gameName);
     }
 

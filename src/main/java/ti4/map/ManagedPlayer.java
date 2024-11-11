@@ -1,8 +1,8 @@
 package ti4.map;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import lombok.Getter;
 
@@ -13,13 +13,14 @@ public class ManagedPlayer {
 
     private final String id;
     private final String name;
-    private final List<ManagedGame> games = new ArrayList<>();
+    private final Set<ManagedGame> games;
     private String afkHours;
     private boolean distanceBasedTacticalActions;
 
     public ManagedPlayer(ManagedGame game, Player player) {
         id = player.getUserID();
         name = player.getUserName();
+        games = new HashSet<>();
         games.add(game);
         afkHours = defaultIfBlank(player.getHoursThatPlayerIsAFK(), null);
         distanceBasedTacticalActions = player.doesPlayerPreferDistanceBasedTacticalActions();

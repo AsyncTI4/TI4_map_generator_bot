@@ -1,5 +1,10 @@
 package ti4.commands.agenda;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -22,11 +27,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.SecretObjectiveModel;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
@@ -223,7 +223,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             msg = "It seems likely you are resolving Midir, the Edyn hero, you may use this button to skip straight to the resolution.";
             proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
-            ListVoteCount.turnOrder(event, game, channel);
+            ListVoteCount.turnOrder(game, channel);
             msg = "Press this button if the last person forgot to react, but verbally said no whens/afters";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));

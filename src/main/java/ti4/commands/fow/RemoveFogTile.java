@@ -38,7 +38,7 @@ public class RemoveFogTile extends FOWSubcommandData {
             return;
         }
 
-        Player targetPlayer = Helper.getPlayer(game, player, event);
+        Player targetPlayer = Helper.getPlayerFromEvent(game, player, event);
         if (targetPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to remove tiles from was not found.");
             return;

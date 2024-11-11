@@ -31,7 +31,7 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 		Game game = getActiveGame();
 		Player activePlayer = game.getPlayer(getUser().getId());
 		activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
-		activePlayer = Helper.getPlayer(game, activePlayer, event);
+		activePlayer = Helper.getPlayerFromEvent(game, activePlayer, event);
 		if (activePlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
 			return;

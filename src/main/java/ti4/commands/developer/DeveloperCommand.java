@@ -23,7 +23,8 @@ public class DeveloperCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getActionId(), event, AsyncTI4DiscordBot.developerRoles);
+        return Command.super.accept(event) &&
+                SlashCommandAcceptanceHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class RemoveAllianceMember extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(game, player, event);
+        Player player_ = Helper.getPlayerFromEvent(game, player, event);
         if (player_ == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to remove from the alliance could not be found");
             return;

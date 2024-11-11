@@ -29,7 +29,7 @@ public class ShowGameAsPlayer extends FOWSubcommandData {
             return;
         }
 
-        Player showMapAsPlayer = Helper.getPlayer(game, null, event);
+        Player showMapAsPlayer = Helper.getPlayerFromEvent(game, null, event);
         if (showMapAsPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;

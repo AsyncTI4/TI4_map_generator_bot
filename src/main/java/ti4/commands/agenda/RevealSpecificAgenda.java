@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -48,14 +47,14 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             return;
         }
 
-        revealAgenda(event, game, event.getChannel(), agendaID);
+        revealAgenda(game, event.getChannel(), agendaID);
     }
 
     /**
      * @deprecated This needs to be refactored to use {@link RevealAgenda#revealAgenda}'s version
      */
     @Deprecated
-    public void revealAgenda(GenericInteractionCreateEvent event, Game game, MessageChannel channel, String agendaID) {
+    public void revealAgenda(Game game, MessageChannel channel, String agendaID) {
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(agendaID);
         if (uniqueID == null) {
@@ -75,7 +74,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             MessageHelper.sendMessageToChannel(channel, "# " + game.getPing()
                 + " Emergency Session revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
             agendaID = game.revealAgenda(false);
-            revealAgenda(event, game, channel, agendaID);
+            revealAgenda(game, channel, agendaID);
             return;
         }
 
@@ -84,7 +83,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
             MessageHelper.sendMessageToChannel(channel,
                 game.getPing() + "An \"Elect Law\" Agenda (" + agendaName + ") was revealed when no laws in play, flipping next agenda");
             agendaID = game.revealAgenda(false);
-            revealAgenda(event, game, channel, agendaID);
+            revealAgenda(game, channel, agendaID);
             return;
         }
 
@@ -162,7 +161,7 @@ public class RevealSpecificAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, "when");
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
 
-        ListVoteCount.turnOrder(event, game, channel);
+        ListVoteCount.turnOrder(game, channel);
         Button proceed = Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         Button transaction = Buttons.blue("transaction", "Transaction");

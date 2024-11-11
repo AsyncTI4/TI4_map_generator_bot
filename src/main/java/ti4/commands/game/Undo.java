@@ -18,7 +18,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -124,12 +123,12 @@ public class Undo extends GameSubcommandData {
         if (!mapUndoDirectory.exists()) {
             return;
         }
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
         if (mapUndoFiles != null && mapUndoFiles.length > 0) {
             List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
                 .map(fileName -> fileName.replace(Constants.TXT, ""))
                 .map(Integer::parseInt).toList();
             int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
@@ -152,9 +151,9 @@ public class Undo extends GameSubcommandData {
 
     public static Map<String, Game> getAllUndoSavedGames(Game game) {
         File mapUndoDirectory = Storage.getGameUndoDirectory();
-        String mapName = game.getName();
-        String mapNameForUndoStart = mapName + "_";
-        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+        String gameName = game.getName();
+        String gameNameForUndoStart = gameName + "_";
+        String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
         return Arrays.stream(mapUndoFiles).map(Storage::getGameUndoStorage)
             .collect(Collectors.toMap(File::getName, GameSaveLoadManager::loadGame));
     }

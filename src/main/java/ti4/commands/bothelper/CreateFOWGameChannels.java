@@ -207,12 +207,12 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getGameNames());
-        gameAndRoleNames.addAll(mapNames);
+        Set<String> gameNames = new HashSet<>(GameManager.getGameNames());
+        gameAndRoleNames.addAll(gameNames);
 
         //CHECK
         // TODO: what about game and role names list?
-        return mapNames.contains(name);
+        return gameNames.contains(name);
     }
 
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
@@ -236,11 +236,11 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getGameNames().stream()
-            .filter(mapName -> mapName.startsWith("fow"))
+        List<String> gameNames = GameManager.getGameNames().stream()
+            .filter(gameName -> gameName.startsWith("fow"))
             .toList();
-        for (String mapName : mapNames) {
-            String pbdNum = mapName.replace("fow", "");
+        for (String gameName : gameNames) {
+            String pbdNum = gameName.replace("fow", "");
             if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }

@@ -1,18 +1,17 @@
 package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AddControlToken extends AgendaSubcommandData {
+public class AddControlToken extends GameStateSubcommand {
+
     public AddControlToken() {
-        super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law");
+        super(Constants.ADD_CONTROL_TOKEN, "Add or remove a faction control token to a law", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction that owns the token, default you").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to remove instead of add tokens").setRequired(false));
@@ -20,20 +19,18 @@ public class AddControlToken extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        OptionMapping option = event.getOption(Constants.AGENDA_ID);
+        var option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
-        int lawID = option.getAsInt();
-        String msg = game.getStoredValue("controlTokensOnAgenda" + lawID);
+        var game = getGame();
+        var player = Helper.getPlayerFromEvent(game, event);
+        int lawId = option.getAsInt();
+        String msg = game.getStoredValue("controlTokensOnAgenda" + lawId);
         boolean undo = false;
-        OptionMapping option2 = event.getOption(Constants.UNDO);
+        var option2 = event.getOption(Constants.UNDO);
         if (option2 != null) {
             undo = option2.getAsBoolean();
         }
@@ -43,15 +40,15 @@ public class AddControlToken extends AgendaSubcommandData {
             } else {
                 msg += "_" + player.getColor();
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Added control token to law #" + lawID);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Added control token to law #" + lawId);
         } else {
             if (!msg.isEmpty()) {
                 msg = msg.replaceFirst(player.getColor() + "_", "");
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed control token to law #" + lawID);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed control token to law #" + lawId);
 
         }
 
-        game.setStoredValue("controlTokensOnAgenda" + lawID, msg);
+        game.setStoredValue("controlTokensOnAgenda" + lawId, msg);
     }
 }

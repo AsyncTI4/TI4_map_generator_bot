@@ -31,7 +31,7 @@ public class AllInfo implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionId(), event);
+        return SlashCommandAcceptanceHelper.acceptIfAdminOrPlayerInGame(getActionId(), event);
     }
 
     @Override

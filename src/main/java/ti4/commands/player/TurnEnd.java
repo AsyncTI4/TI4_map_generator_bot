@@ -60,7 +60,7 @@ public class TurnEnd extends PlayerSubcommandData {
         Game game = getActiveGame();
         Player mainPlayer = game.getPlayer(getUser().getId());
         mainPlayer = Helper.getGamePlayer(game, mainPlayer, event, null);
-        mainPlayer = Helper.getPlayer(game, mainPlayer, event);
+        mainPlayer = Helper.getPlayerFromEvent(game, mainPlayer, event);
 
         if (mainPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());

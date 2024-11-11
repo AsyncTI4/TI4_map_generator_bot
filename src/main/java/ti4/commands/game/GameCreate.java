@@ -30,22 +30,22 @@ public class GameCreate extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String mapName = event.getOptions().getFirst().getAsString().toLowerCase();
+        String gameName = event.getOptions().getFirst().getAsString().toLowerCase();
         Member member = event.getMember();
 
-        Matcher matcher = ALPHANUMERIC_PATTERN.matcher(mapName);
+        Matcher matcher = ALPHANUMERIC_PATTERN.matcher(gameName);
         if (!matcher.matches()) {
             MessageHelper.replyToMessage(event, "Game name can only contain a-z 0-9 symbols");
             return;
         }
-        if (GameManager.isValidGame(mapName)) {
+        if (GameManager.isValidGame(gameName)) {
             MessageHelper.replyToMessage(event, "Game with such name exist already, choose different name");
             return;
         }
 
-        Game game = createNewGame(event, mapName, member);
+        Game game = createNewGame(event, gameName, member);
         reportNewGameCreated(game);
-        MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
+        MessageHelper.replyToMessage(event, "Game created with name: " + gameName);
         if (event.getMessageChannel().getName().startsWith(game.getName() + "-")) {
             ButtonHelper.offerPlayerSetupButtons(event.getMessageChannel(), game);
         }

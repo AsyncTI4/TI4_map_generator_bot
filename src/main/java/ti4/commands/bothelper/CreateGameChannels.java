@@ -469,11 +469,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getGameNames());
-        gameAndRoleNames.addAll(mapNames);
+        Set<String> gameNames = new HashSet<>(GameManager.getGameNames());
+        gameAndRoleNames.addAll(gameNames);
 
         // CHECK
-        return mapNames.contains(name);
+        return gameNames.contains(name);
     }
 
     private static List<Integer> getAllExistingPBDNumbers() {
@@ -496,11 +496,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getGameNames().stream()
-            .filter(mapName -> mapName.startsWith("pbd"))
+        List<String> gameNames = GameManager.getGameNames().stream()
+            .filter(gameName -> gameName.startsWith("pbd"))
             .toList();
-        for (String mapName : mapNames) {
-            String pbdNum = mapName.replace("pbd", "");
+        for (String gameName : gameNames) {
+            String pbdNum = gameName.replace("pbd", "");
             if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }

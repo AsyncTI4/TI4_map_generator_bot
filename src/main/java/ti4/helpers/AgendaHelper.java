@@ -33,6 +33,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
@@ -2946,7 +2947,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("refreshAgenda")
-    public static void refreshAgenda(Game game, ButtonInteractionEvent event) {
+    public static void refreshAgenda(Game game) {
         String agendaDetails = game.getCurrentAgendaInfo();
         String agendaID = "CL";
         if (StringUtils.countMatches(agendaDetails, "_") > 2) {
@@ -2964,7 +2965,7 @@ public class AgendaHelper {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "Buttons for various things";
 
-        ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+        ListVoteCount.turnOrder(game, game.getMainGameChannel());
 
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
@@ -3618,7 +3619,7 @@ public class AgendaHelper {
                 game.setStoredValue("conspiratorsFaction", player.getFaction());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " The conspirators ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
                 if (!game.isFowMode()) {
-                    ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+                    ListVoteCount.turnOrder(game, game.getMainGameChannel());
                 }
             } else {
                 MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
@@ -3643,5 +3644,66 @@ public class AgendaHelper {
         }
         // "dspnedyn"
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static void drawAgenda(GenericInteractionCreateEvent event, int count, Game game, @NotNull Player player) {
+        drawAgenda(event, count, false, game, player);
+    }
+
+    public static void drawAgenda(GenericInteractionCreateEvent event, int count, boolean fromBottom, Game game, @NotNull Player player) {
+        drawAgenda(count, fromBottom, game, player, false);
+    }
+
+    public static void drawAgenda(int count, Game game, @NotNull Player player) {
+        drawAgenda(count, false, game, player, false);
+    }
+
+    public static void drawAgenda(int count, boolean fromBottom, Game game, @NotNull Player player, boolean discard) {
+        if (game == null) return;
+        String sb = player.getRepresentationUnfogged() + " here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have drawn:";
+
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);
+        for (int i = 0; i < count; i++) {
+            Map.Entry<String, Integer> entry = fromBottom ? game.drawBottomAgenda() : game.drawAgenda();
+            if (entry != null) {
+                AgendaModel agenda = Mapper.getAgenda(entry.getKey());
+                List<MessageEmbed> agendaEmbed = Collections.singletonList(agenda.getRepresentationEmbed());
+
+                List<Button> buttons = agendaButtons(agenda, entry.getValue(), discard);
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, agendaEmbed, buttons);
+            }
+        }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "__Note: if you put both agendas on top, the second one you put will be revealed first!__");
+    }
+
+    public static void drawSpecificAgenda(String agendaID, Game game, @NotNull Player player) {
+        String sb = player.getRepresentationUnfogged() + " here is the agenda you have drawn:";
+        if (game == null) return;
+
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);
+
+        Map.Entry<String, Integer> entry = game.drawSpecificAgenda(agendaID);
+        if (entry != null) {
+            AgendaModel agenda = Mapper.getAgenda(entry.getKey());
+            List<MessageEmbed> agendaEmbed = Collections.singletonList(agenda.getRepresentationEmbed());
+
+            List<Button> buttons = agendaButtons(agenda, entry.getValue(), false);
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, agendaEmbed, buttons);
+        }
+    }
+
+    private static List<Button> agendaButtons(AgendaModel agenda, Integer id, boolean discard) {
+        List<Button> buttons = new ArrayList<>();
+        Button topButton = Buttons.green("topAgenda_" + id, "Put " + agenda.getName() + " on the top of the agenda deck.").withEmoji(Emoji.fromUnicode("🔼"));
+        Button bottomButton = Buttons.red("bottomAgenda_" + id, "Put " + agenda.getName() + " on the bottom of the agenda deck.").withEmoji(Emoji.fromUnicode("🔽"));
+        Button discardButton = Buttons.red("discardAgenda_" + id, "Discard " + agenda.getName()).withEmoji(Emoji.fromUnicode("🗑️"));
+
+        buttons.add(topButton);
+        if (!discard) {
+            buttons.add(bottomButton);
+        } else {
+            buttons.add(discardButton);
+        }
+        return buttons;
     }
 }

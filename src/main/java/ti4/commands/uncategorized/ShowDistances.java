@@ -47,15 +47,15 @@ public class ShowDistances implements Command {
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
-            String mapName = option.getAsString().toLowerCase();
-            game = GameManager.getGame(mapName);
+            String gameName = option.getAsString().toLowerCase();
+            game = GameManager.getGame(gameName);
         } else {
             game = UserGameContextManager.getContextGame(event.getUser().getId());
         }
 
         Player player = game.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;

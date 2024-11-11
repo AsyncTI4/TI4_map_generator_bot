@@ -158,28 +158,28 @@ public class GameSaveLoadManager {
     }
 
     public static void undo(Game game, GenericInteractionCreateEvent event) {
-        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
-        if (originalMapFile.exists()) {
+        File originalGameFile = Storage.getGameFile(game.getName() + Constants.TXT);
+        if (originalGameFile.exists()) {
             File mapUndoDirectory = Storage.getGameUndoDirectory();
             if (!mapUndoDirectory.exists()) {
                 return;
             }
 
-            String mapName = game.getName();
-            String mapNameForUndoStart = mapName + "_";
-            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+            String gameName = game.getName();
+            String gameNameForUndoStart = gameName + "_";
+            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(gameNameForUndoStart));
             if (mapUndoFiles != null && mapUndoFiles.length > 0) {
                 try {
                     List<Integer> numbers = Arrays.stream(mapUndoFiles)
-                        .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                        .map(fileName -> fileName.replace(gameNameForUndoStart, ""))
                         .map(fileName -> fileName.replace(Constants.TXT, ""))
                         .map(Integer::parseInt).toList();
                     int maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value).max().orElseThrow(NoSuchElementException::new);
-                    File mapUndoStorage = Storage.getGameUndoStorage(mapName + "_" + (maxNumber - 1) + Constants.TXT);
-                    File mapUndoStorage2 = Storage.getGameUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                    File mapUndoStorage = Storage.getGameUndoStorage(gameName + "_" + (maxNumber - 1) + Constants.TXT);
+                    File mapUndoStorage2 = Storage.getGameUndoStorage(gameName + "_" + maxNumber + Constants.TXT);
                     CopyOption[] options = { StandardCopyOption.REPLACE_EXISTING };
-                    Files.copy(mapUndoStorage2.toPath(), originalMapFile.toPath(), options);
-                    Game loadedGame = loadGame(originalMapFile);
+                    Files.copy(mapUndoStorage2.toPath(), originalGameFile.toPath(), options);
+                    Game loadedGame = loadGame(originalGameFile);
                     try {
                         if (!loadedGame.getSavedButtons().isEmpty() && loadedGame.getSavedChannel() != null
                             && !game.getPhaseOfGame().contains("status")) {
@@ -202,9 +202,9 @@ public class GameSaveLoadManager {
                     } else {
                         sb.append(loadedGame.getLatestCommand());
                     }
-                    Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
+                    Files.copy(mapUndoStorage.toPath(), originalGameFile.toPath(), options);
                     mapUndoStorage2.delete();
-                    loadedGame = loadGame(originalMapFile);
+                    loadedGame = loadGame(originalGameFile);
                     if (loadedGame == null) throw new Exception("Failed to load undo copy");
 
                     for (Player p1 : loadedGame.getRealPlayers()) {
@@ -217,21 +217,23 @@ public class GameSaveLoadManager {
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
                     } else {
-                        ButtonHelper.findOrCreateThreadWithMessage(game, mapName + "-undo-log", sb.toString());
+                        ButtonHelper.findOrCreateThreadWithMessage(game, gameName + "-undo-log", sb.toString());
                     }
 
                 } catch (Exception e) {
-                    BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
+                    BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
                 }
             }
         }
     }
 
-    public static void reload(Game game) {
-        File originalMapFile = Storage.getGameFile(game.getName() + Constants.TXT);
-        if (originalMapFile.exists()) {
-            loadGame(originalMapFile);
+    public static Game reload(String gameName) {
+        File gameFile = Storage.getGameFile(gameName + Constants.TXT);
+        if (gameFile.exists()) {
+            GameManager.invalidateGame(gameName);
+            return loadGame(gameFile);
         }
+        return null;
     }
 
     private static void saveGameInfo(Writer writer, Game game, boolean keepModifiedDate) throws IOException {
@@ -1072,7 +1074,7 @@ public class GameSaveLoadManager {
     }
 
     public static boolean deleteGame(String gameName) {
-        GameManager.deleteGame(gameName);
+        GameManager.invalidateGame(gameName);
         File mapStorage = Storage.getGameFile(gameName + TXT);
         if (!mapStorage.exists()) {
             return false;
@@ -1108,8 +1110,8 @@ public class GameSaveLoadManager {
     }
 
     public static Game loadGame(String gameName) {
-        File originalMapFile = Storage.getGameFile(gameName + Constants.TXT);
-        return loadGame(originalMapFile);
+        File originalGameFile = Storage.getGameFile(gameName + Constants.TXT);
+        return loadGame(originalGameFile);
     }
 
     @Nullable

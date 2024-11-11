@@ -54,7 +54,7 @@ public class AddUnits extends AddRemoveUnits {
                 String userID = event.getUser().getId();
                 Player player = game.getPlayer(userID);
                 player = Helper.getGamePlayer(game, player, event, null);
-                player = Helper.getPlayer(game, player, event);
+                player = Helper.getPlayerFromEvent(game, player, event);
                 if (player != null) {
                     player.exhaustTech("sr");
                 }

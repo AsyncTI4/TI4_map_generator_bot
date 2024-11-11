@@ -36,11 +36,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class TurnStart extends PlayerSubcommandData {
     public TurnStart() {
         super(Constants.TURN_START, "Start Turn");
@@ -54,7 +49,7 @@ public class TurnStart extends PlayerSubcommandData {
         Game game = getActiveGame();
         Player mainPlayer = game.getPlayer(getUser().getId());
         mainPlayer = Helper.getGamePlayer(game, mainPlayer, event, null);
-        mainPlayer = Helper.getPlayer(game, mainPlayer, event);
+        mainPlayer = Helper.getPlayerFromEvent(game, mainPlayer, event);
 
         if (mainPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());

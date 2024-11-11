@@ -29,7 +29,7 @@ public class DealSO extends SOCardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player_ = Helper.getPlayer(game, null, event);
+        Player player_ = Helper.getPlayerFromEvent(game, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;

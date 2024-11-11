@@ -87,8 +87,8 @@ import ti4.model.UnitModel;
 public class Helper {
 
     @Nullable
-    public static Player getGamePlayer(Game game, Player initialPlayer, GenericInteractionCreateEvent event, String userID) {
-        return getGamePlayer(game, initialPlayer, event.getMember(), userID);
+    public static Player getPlayerFromGame(Game game, GenericInteractionCreateEvent event, String userID) {
+        return getPlayerFromGame(game, event.getMember(), userID);
     }
 
     public static int getCurrentHour() {
@@ -100,56 +100,42 @@ public class Helper {
     }
 
     @Nullable
-    public static Player getGamePlayer(Game game, Player initialPlayer, Member member, String userID) {
+    public static Player getPlayerFromGame(Game game, Member member, String userID) {
+        if (!game.isCommunityMode() || member == null) {
+            return game.getPlayer(userID);
+        }
         Collection<Player> players = game.getPlayers().values();
-        if (!game.isCommunityMode()) {
-            Player player = game.getPlayer(userID);
-            if (player != null)
-                return player;
-            return initialPlayer;
-        }
-        if (member == null) {
-            Player player = game.getPlayer(userID);
-            if (player != null)
-                return player;
-            return initialPlayer;
-        }
         List<Role> roles = member.getRoles();
         for (Player player : players) {
-            if (roles.contains(player.getRoleForCommunity())) {
-                return player;
-            }
-            if (player.getTeamMateIDs().contains(member.getUser().getId())) {
+            if (roles.contains(player.getRoleForCommunity()) || player.getTeamMateIDs().contains(member.getUser().getId())) {
                 return player;
             }
         }
-        return initialPlayer != null ? initialPlayer : game.getPlayer(userID);
+        return null;
     }
 
     @Nullable
-    public static Player getPlayer(Game game, Player player, SlashCommandInteractionEvent event) {
+    public static Player getPlayerFromEvent(Game game, SlashCommandInteractionEvent event) {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (playerOption != null) {
             String playerID = playerOption.getAsUser().getId();
-            if (game.getPlayer(playerID) != null) {
-                player = game.getPlayers().get(playerID);
-            } else {
-                player = null;
-            }
-        } else if (factionColorOption != null) {
+            return game.getPlayer(playerID);
+        }
+
+        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
+        if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
             for (Player player_ : game.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) ||
                     Objects.equals(factionColor, player_.getColor())) {
-                    player = player_;
-                    break;
+                    return player_;
                 }
             }
         }
-        return player;
+
+        return getPlayerFromGame(game, event, event.getUser().getId());
     }
 
     public static List<String> unplayedACs(Game game) {
@@ -595,10 +581,7 @@ public class Helper {
                 return colorFromString;
             }
         } else {
-            String userID = event.getUser().getId();
-            Player foundPlayer = game.getPlayers().values().stream()
-                .filter(player -> player.getUserID().equals(userID)).findFirst().orElse(null);
-            foundPlayer = getGamePlayer(game, foundPlayer, event, null);
+            Player foundPlayer = getPlayerFromGame(game, event, event.getUser().getId());
             if (foundPlayer != null) {
                 return foundPlayer.getColor();
             }

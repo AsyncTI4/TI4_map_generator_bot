@@ -166,6 +166,8 @@ public class SlashCommandListener extends ListenerAdapter {
         if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
         }
+
+
         if (gameExists && (UserGameContextManager.getContextGame(userID) == null
             || !UserGameContextManager.getContextGame(userID).getName().equals(gameID)
                 && (GameManager.getGame(gameID) != null && (GameManager.getGame(gameID).isCommunityMode()
