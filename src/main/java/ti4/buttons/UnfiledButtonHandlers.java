@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DrawAC;
@@ -3396,25 +3395,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "warfare");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
-    }
-
-    @ButtonHandler("topAgenda_")
-    public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
-        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-        new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), game);
-        String key = "round" + game.getRound() + "AgendaPlacement";
-        if (game.getStoredValue(key).isEmpty()) {
-            game.setStoredValue(key, "top");
-        } else {
-            game.setStoredValue(key, game.getStoredValue(key) + "_top");
-        }
-        AgendaModel agenda = Mapper.getAgenda(game.lookAtTopAgenda(0));
-        Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-            "Put " + agenda.getName()
-                + " on the top of the agenda deck. You may use this button to undo that and reassign it.",
-            reassign);
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("retrieveAgenda_")
