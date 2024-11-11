@@ -1,9 +1,6 @@
 package ti4.commands;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.unions.IThreadContainerUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.SlashCommandAcceptanceHelper;
@@ -35,37 +32,14 @@ public abstract class GameStateSubcommand extends Subcommand {
     public void preExecute(SlashCommandInteractionEvent event) {
         super.preExecute(event);
         if (loadGame) {
-            game.set(GameManager.getGame(getGameName(event)));
+            String gameName = CommandHelper.getGameName(event);
+            if (!GameManager.isValidGame(gameName)) {
+                throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
+                        " in channel " + event.getChannel().getName());
+            }
+            game.set(GameManager.getGame(gameName));
             gameLastModifiedDate.set(game.get().getLastModifiedDate());
         }
-    }
-
-    private String getGameName(SlashCommandInteractionEvent event) {
-        // try to get game name from channel name
-        var channel = event.getChannel();
-        String gameName = getGameNameFromChannelName(channel.getName());
-        if (isValidGame(gameName)) {
-            return gameName;
-        }
-        // if a thread, try to get game name from parent
-        if (channel instanceof ThreadChannel) {
-            IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
-            gameName = getGameNameFromChannelName(parentChannel.getName());
-        }
-        if (isValidGame(gameName)) {
-            return gameName;
-        }
-        throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
-                " in channel " + channel.getName());
-    }
-
-    @NotNull
-    private static String getGameNameFromChannelName(String channelName) {
-        return StringUtils.substringBefore(channelName, "-");
-    }
-
-    private static boolean isValidGame(String gameName) {
-        return gameName != null && GameManager.isValidGame(gameName);
     }
 
     public void postExecute(SlashCommandInteractionEvent event) {

@@ -1,5 +1,14 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -28,15 +37,6 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ButtonHelperCommanders {
 
@@ -504,7 +504,7 @@ public class ButtonHelperCommanders {
             message = " used So Ata, the Yssaril commander, to look at SOs";
         }
         if ("pn".equalsIgnoreCase(type)) {
-            new ShowAllPN().showAll(enemy, player, game, false);
+            new ShowAllPN().showAll(enemy, player, game);
             message = " used So Ata, the Yssaril commander, to look at PNs ";
         }
         message = message + " of " + enemy.getRepresentation(false, false);

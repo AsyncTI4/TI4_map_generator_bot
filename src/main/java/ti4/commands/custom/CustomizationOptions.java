@@ -8,14 +8,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
-public class CustomizationOptions extends CustomSubcommandData {
+public class CustomizationOptions extends GameStateSubcommand {
 
     public CustomizationOptions() {
-        super(Constants.CUSTOMIZATION, "Small Customization Options");
+        super(Constants.CUSTOMIZATION, "Small Customization Options", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)").setAutoComplete(true));
         List<Choice> onOff = CommandHelper.toChoices("ON", "OFF");
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Turn ON or OFF strategy card follow reminders at the start of turn").addChoices(onOff));
@@ -45,7 +46,7 @@ public class CustomizationOptions extends CustomSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping stratPings = event.getOption(Constants.STRAT_PINGS);
         if (stratPings != null) {
@@ -87,7 +88,7 @@ public class CustomizationOptions extends CustomSubcommandData {
 
         String textSize = event.getOption(Constants.TEXT_SIZE, null, OptionMapping::getAsString);
         if (textSize != null)
-            getActiveGame().setTextSize(textSize);
+            game.setTextSize(textSize);
 
         Boolean showFullTextComponents = event.getOption(Constants.SHOW_FULL_COMPONENT_TEXT, null,
             OptionMapping::getAsBoolean);

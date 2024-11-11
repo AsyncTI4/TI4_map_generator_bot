@@ -66,7 +66,7 @@ public class GameManager {
     }
 
     public static boolean isValidGame(String gameName) {
-        return allGameNames.contains(gameName);
+        return gameName != null && allGameNames.contains(gameName);
     }
 
     public static List<String> getGameNames() {

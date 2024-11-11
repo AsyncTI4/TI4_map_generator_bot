@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.game.SetDeck;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -12,15 +13,15 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class ChangeToBaseGame extends CustomSubcommandData {
+public class ChangeToBaseGame extends GameStateSubcommand {
     public ChangeToBaseGame() {
-        super(Constants.CHANGE_TO_BASE_GAME, "Remove PoK ACs/SOs/POs/Agendas");
+        super(Constants.CHANGE_TO_BASE_GAME, "Remove PoK ACs/SOs/POs/Agendas", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex AC too? (y/n)").setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         OptionMapping codexOption = event.getOption(Constants.REMOVE_CODEX_AC);
         String codex = "";
         if (codexOption != null) {

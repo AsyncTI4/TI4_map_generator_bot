@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -12,14 +13,15 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowUnScoredSOs extends SOCardsSubcommandData {
+public class ShowUnScoredSOs extends GameStateSubcommand {
+
     public ShowUnScoredSOs() {
-        super(Constants.SHOW_UNSCORED_SOS, "List any SOs that are not scored yet");
+        super(Constants.SHOW_UNSCORED_SOS, "List any SOs that are not scored yet", true, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         showUnscored(game, event);
     }

@@ -4,38 +4,27 @@ import java.util.Map;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowPNToAll extends PNCardsSubcommandData {
+public class ShowPNToAll extends PlayerGameStateSubcommand {
+
     public ShowPNToAll() {
-        super(Constants.SHOW_PN_TO_ALL, "Show Promissory Note to table");
+        super(Constants.SHOW_PN_TO_ALL, "Show Promissory Note to table", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "PN ID that is sent between ()").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to show to All");
-            return;
-        }
-
-        int pnIndex = option.getAsInt();
+        Game game = getGame();
+        Player player = getPlayer();
+        int pnIndex = event.getOption(Constants.ACTION_CARD_ID).getAsInt();
         String pnID = null;
         for (Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
             if (pn.getValue().equals(pnIndex)) {

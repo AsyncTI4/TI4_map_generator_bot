@@ -8,12 +8,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.RevealAgenda;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -39,28 +38,19 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayPN extends PNCardsSubcommandData {
+public class PlayPN extends PlayerGameStateSubcommand {
+
     public PlayPN() {
-        super(Constants.PLAY_PN, "Play Promissory Note");
+        super(Constants.PLAY_PN, "Play Promissory Note", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Promissory Note to play");
-            return;
-        }
+        Game game = getGame();
+        Player player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
 
-        String value = option.getAsString().toLowerCase();
+        String value = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
         String pnID = null;
         int pnIndex;
         try {
@@ -276,7 +266,7 @@ public class PlayPN extends PNCardsSubcommandData {
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), reducedMsg);
                 }
-                RevealAgenda.revealAgenda(event, false, game, game.getMainGameChannel());
+                AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     "Political Favor (xxcha PN) was played");
             } else {

@@ -2,29 +2,31 @@ package ti4.commands.custom;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class SpinTilesInRings extends CustomSubcommandData {
+public class SpinTilesInRings extends GameStateSubcommand {
+
   private static final String CW = "cw";
   private static final String CCW = "ccw";
 
   public SpinTilesInRings() {
-    super(Constants.SPIN_TILES_IN_RINGS, "Rotate the map according to fin logic or give custom rotations");
+    super(Constants.SPIN_TILES_IN_RINGS, "Rotate the map according to fin logic or give custom rotations", true, true);
     addOptions(new OptionData(OptionType.STRING, Constants.CUSTOM, "Custom rotation Ring:Direction:Steps 1:cw:1 2:ccw:2"));
     addOptions(new OptionData(OptionType.STRING, Constants.MESSAGE, "Flavour message to send to main channel after spins"));
   }
 
   @Override
   public void execute(SlashCommandInteractionEvent event) {
-    Game game = getActiveGame();
-
+    Game game = getGame();
     if (event.getOption(Constants.CUSTOM) == null) {
       spinRings(game);
     } else {
