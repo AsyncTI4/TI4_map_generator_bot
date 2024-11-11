@@ -38,10 +38,11 @@ public class PutAgendaBottom extends GameStateSubcommand {
 
     public static void putBottom(int agendaID, Game game) {
         boolean success = game.putAgendaBottom(agendaID);
-        if (!success || game.isFowMode()) {
-            if (!game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
-            }
+        if (game.isFowMode()) {
+            return;
+        }
+        if (!success) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
             return;
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom");
