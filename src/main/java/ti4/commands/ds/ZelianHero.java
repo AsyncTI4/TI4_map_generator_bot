@@ -5,9 +5,9 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.commands.special.StellarConverter;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
@@ -25,38 +25,24 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class ZelianHero extends DiscordantStarsSubcommandData {
+public class ZelianHero extends PlayerGameStateSubcommand {
 
     public ZelianHero() {
-        super(Constants.ZELIAN_HERO, "Celestial Impact a system (replace with Zelian Asteroid field)");
+        super(Constants.ZELIAN_HERO, "Celestial Impact a system (replace with Zelian Asteroid field)", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using Zelian R, the Zelian heRo").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using Zelian R, the Zelian hero").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
-        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
-            return;
-        }
-
-        String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
+        Game game = getGame();
+        Player player = getPlayer();
+        String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-
         secondHalfOfCelestialImpact(player, event, tile, game);
     }
 

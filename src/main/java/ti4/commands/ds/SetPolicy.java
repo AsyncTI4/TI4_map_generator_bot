@@ -1,26 +1,27 @@
 package ti4.commands.ds;
 
 import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.CommandHelper;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.commands.player.AbilityInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
-public class SetPolicy extends DiscordantStarsSubcommandData {
+public class SetPolicy extends PlayerGameStateSubcommand {
 
     public SetPolicy() {
-        super(Constants.SET_POLICY, "Set Policies for Olradin Faction Abilities to their + or - side");
+        super(Constants.SET_POLICY, "Set Policies for Olradin Faction Abilities to their + or - side", true, true);
         List<Choice> people = CommandHelper.toChoices("Connect", "Control", "+", "-");
         addOptions(new OptionData(OptionType.STRING, Constants.SET_PEOPLE, "Policy: The People Choice - 'Connect (+)' or 'Control (-)'").addChoices(people));
         List<Choice> environment = CommandHelper.toChoices("Preserve", "Plunder", "+", "-");
@@ -32,28 +33,19 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not find player!");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
 
-        // List<String> playerAbilities = player.getAbilities().stream().sorted().toList();
         OptionMapping policy1 = event.getOption(Constants.SET_PEOPLE);
         OptionMapping policy2 = event.getOption(Constants.SET_ENVIRONMENT);
         OptionMapping policy3 = event.getOption(Constants.SET_ECONOMY);
-        String pol1 = null;
-        String pol2 = null;
-        String pol3 = null;
 
-        if ((policy1 == null) && (policy2 == null) && (policy3 == null)) {
+        if (policy1 == null && policy2 == null && policy3 == null) {
             MessageHelper.sendMessageToEventChannel(event, "Must set at least one Policy!");
             return;
         }
 
+        String pol1 = null;
         // break down choices into + or - from their original inputs
         if (policy1 != null) {
             pol1 = policy1.getAsString().toLowerCase();
@@ -63,6 +55,8 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                     "received an incorrect input for Policy: The People, will either ignore or default to + if this is your first time setting policies");
             }
         }
+
+        String pol2 = null;
         if (policy2 != null) {
             pol2 = policy2.getAsString().toLowerCase();
             pol2 = convertChoice(pol2);
@@ -71,6 +65,8 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                     "received an incorrect input for Policy: The Environment, will either ignore or default to + if this is your first time setting policies");
             }
         }
+
+        String pol3 = null;
         if (policy3 != null) {
             pol3 = policy3.getAsString().toLowerCase();
             pol3 = convertChoice(pol3);
@@ -103,8 +99,6 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
                 MessageHelper.sendMessageToEventChannel(event, "Need to initially set Economy policy. Defaulting to Policy - The Economy: Empower (+).");
             }
         }
-        // MessageHelper.sendMessageToEventChannel(event, "debug finalset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " +
-        // pol3); (debug messagesender if more work is needed)
 
         int negativePolicies = 0;
         int positivePolicies = 0;

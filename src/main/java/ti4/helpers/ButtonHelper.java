@@ -2916,7 +2916,7 @@ public class ButtonHelper {
         return shipOrders;
     }
 
-    public static void starChartStep0(Game game, Player player, List<String> newTileIDs) {
+    public static void starChartStep0(Player player, List<String> newTileIDs) {
         List<Button> buttons = new ArrayList<>();
         for (String newTileID : newTileIDs) {
             TileModel tile = TileHelper.getTileById(newTileID);
@@ -2928,7 +2928,7 @@ public class ButtonHelper {
             player.getRepresentation() + " choose the tile you want to add to the board", buttons);
     }
 
-    public static void detTileAdditionStep1(Game game, Player player, String newTileID) {
+    public static void detTileAdditionStep1(Player player, String newTileID) {
         List<Button> buttons = new ArrayList<>();
         TileModel tile = TileHelper.getTileById(newTileID);
         buttons.add(Buttons.green("detTileAdditionStep2_" + newTileID, "Next to only 1 tile"));
