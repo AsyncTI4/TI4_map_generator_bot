@@ -22,9 +22,14 @@ public class GenericButtonCommand implements Command {
         return Constants.BUTTON;
     }
 
+    public String getActionDescription() {
+        return "Send a single generic button to the channel to collect faction responses.";
+    }
+
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.acceptIfPlayerInGame(getActionId(), event);
+        return Command.super.accept(event) &&
+                SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
@@ -45,14 +50,8 @@ public class GenericButtonCommand implements Command {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
     }
 
-    protected String getActionDescription() {
-        return "Send a single generic button to the channel to collect faction responses.";
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionId(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true))

@@ -42,6 +42,10 @@ public class LookAtAgenda extends GameStateSubcommand {
 
         Game game = getGame();
         Player player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
+            return;
+        }
         lookAtAgendas(game, player, count, lookAtBottom);
     }
 

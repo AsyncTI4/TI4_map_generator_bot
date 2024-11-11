@@ -6,12 +6,13 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 
-public class AddUnits extends CaptureReleaseUnits {
+public class AddCaptureUnits extends CaptureUnitsSubcommand {
 
-    public AddUnits() {
+    public AddCaptureUnits() {
         super(Constants.ADD_UNITS, "Capture units");
     }
 
+    // TODO: this feels super hacky and would may be be better re-written...
     @Override
     protected void subExecute(SlashCommandInteractionEvent event, Tile tile) {
         ti4.commands.units.AddUnits addUnits = new ti4.commands.units.AddUnits() {

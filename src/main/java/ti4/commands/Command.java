@@ -1,6 +1,7 @@
 package ti4.commands;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -37,7 +38,9 @@ public interface Command {
 
     String getActionDescription();
 
-    Collection<Subcommand> getSubcommands();
+    default Collection<Subcommand> getSubcommands() {
+        return Collections.emptyList();
+    }
 
     default void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(

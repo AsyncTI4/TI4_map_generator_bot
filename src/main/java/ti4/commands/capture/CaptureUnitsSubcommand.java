@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -12,10 +12,10 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-abstract class CaptureReleaseUnits extends CaptureSubcommandData {
+abstract class CaptureUnitsSubcommand extends GameStateSubcommand {
 
-    public CaptureReleaseUnits(String id, String description) {
-        super(id, description);
+    public CaptureUnitsSubcommand(String id, String description) {
+        super(id, description, true, true);
         options();
     }
 
@@ -27,35 +27,19 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-            return;
-        }
-        Game game = UserGameContextManager.getContextGame(userID);
-        String color = Helper.getColor(game, event);
-        if (!Mapper.isValidColor(color)) {
-            MessageHelper.replyToMessage(event, "Color/Faction not valid");
-            return;
-        }
-
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event.getMember(), getUser().getId());
+        Game game = getGame();
+        Player player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
         }
 
         Tile tile = player.getNomboxTile();
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player nombox could not be found");
-            return;
-        }
         subExecute(event, tile);
     }
 
     public String getPlayerColor(GenericInteractionCreateEvent event) {
-        Player player = getActiveGame().getPlayer(getUser().getId());
+        Player player = getGame().getPlayer(event.getUser().getId());
         return player.getColor();
     }
 

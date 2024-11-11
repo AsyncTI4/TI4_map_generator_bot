@@ -87,8 +87,8 @@ import ti4.model.UnitModel;
 public class Helper {
 
     @Nullable
-    public static Player getPlayerFromGame(Game game, GenericInteractionCreateEvent event, String userID) {
-        return getPlayerFromGame(game, event.getMember(), userID);
+    public static Player getPlayerFromGame(Game game, GenericInteractionCreateEvent event, String userId) {
+        return getPlayerFromGame(game, event.getMember(), userId);
     }
 
     public static int getCurrentHour() {
@@ -100,9 +100,9 @@ public class Helper {
     }
 
     @Nullable
-    public static Player getPlayerFromGame(Game game, Member member, String userID) {
+    public static Player getPlayerFromGame(Game game, Member member, String userId) {
         if (!game.isCommunityMode() || member == null) {
-            return game.getPlayer(userID);
+            return game.getPlayer(userId);
         }
         Collection<Player> players = game.getPlayers().values();
         List<Role> roles = member.getRoles();

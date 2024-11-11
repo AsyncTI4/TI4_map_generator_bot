@@ -6,9 +6,9 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 
-public class RemoveUnits extends CaptureReleaseUnits {
+public class RemoveCaptureUnits extends CaptureUnitsSubcommand {
 
-    public RemoveUnits() {
+    public RemoveCaptureUnits() {
         super(Constants.REMOVE_UNITS, "Release units");
     }
 
