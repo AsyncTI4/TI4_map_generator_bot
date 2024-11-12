@@ -6,12 +6,13 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.commands.Subcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
-public class SetPreferredColourList extends UserSubcommandData {
+public class SetPreferredColourList extends Subcommand {
 
     public SetPreferredColourList() {
         super("set_preferred_colours", "Set your preferred colour list");
@@ -29,7 +30,8 @@ public class SetPreferredColourList extends UserSubcommandData {
             }
         }
         colourList.removeAll(badColours);
-        getUserSettings().setPreferredColourList(colourList);
+        var userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId());
+        userSettings.setPreferredColourList(colourList);
         StringBuilder sb = new StringBuilder();
         sb.append("Preferred Colour List updated to: `").append(colourList).append("`");
         if (!badColours.isEmpty()) {

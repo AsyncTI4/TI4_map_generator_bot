@@ -6,14 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 
 public class UserSettingsManager {
+
     private final Map<String, UserSettings> userSettingList = new HashMap<>();
     private final String userSettingsPath = Storage.getStoragePath() + File.separator + "user_settings";
     private static UserSettingsManager instance;
@@ -70,8 +71,6 @@ public class UserSettingsManager {
     public void loadUserSetting(String settingFilePath) {
         ObjectMapper objectMapper = new ObjectMapper();
         String filePath = settingFilePath;
-        //JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, UserSettings.class);
-
         if (filePath != null) {
             try {
                 InputStream input = new FileInputStream(filePath);

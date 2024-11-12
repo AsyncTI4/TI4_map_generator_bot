@@ -4,9 +4,10 @@ import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 
-public class ShowUserSettings extends UserSubcommandData {
+public class ShowUserSettings extends Subcommand {
 
     public ShowUserSettings() {
         super("show_settings", "Show your User Settings");
@@ -14,7 +15,8 @@ public class ShowUserSettings extends UserSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        showUserSettings(event, getUserSettings());
+        var userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId());
+        showUserSettings(event, userSettings);
     }
 
     public static void showUserSettings(GenericInteractionCreateEvent event, UserSettings userSettings) {

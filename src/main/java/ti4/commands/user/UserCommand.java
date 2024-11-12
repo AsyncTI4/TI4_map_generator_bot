@@ -1,18 +1,20 @@
 package ti4.commands.user;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.SlashCommandAcceptanceHelper;
 
 public class UserCommand implements Command {
 
-    private final Collection<UserSubcommandData> subcommandData = getSubcommands();
+    private final Collection<Subcommand> subcommands = List.of(
+            new ShowUserSettings(),
+            new SetPreferredColourList(),
+            new SetPersonalPingInterval());
 
     @Override
     public String getActionId() {
@@ -20,32 +22,18 @@ public class UserCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (UserSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                subcommand.postExecute(event);
-                break;
-            }
-        }
-    }
-
-    protected String getActionDescription() {
+    public String getActionDescription() {
         return "User";
     }
 
-    private Collection<UserSubcommandData> getSubcommands() {
-        Collection<UserSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ShowUserSettings());
-        subcommands.add(new SetPreferredColourList());
-        subcommands.add(new SetPersonalPingInterval());
-        return subcommands;
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return Command.super.accept(event) &&
+                SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands()));
+    public Collection<Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

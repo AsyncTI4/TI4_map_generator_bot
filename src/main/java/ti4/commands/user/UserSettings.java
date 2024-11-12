@@ -10,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -20,6 +19,7 @@ import ti4.buttons.Buttons;
 
 @Data
 public class UserSettings {
+
     private String userId;
     private List<String> preferredColourList = new ArrayList<>();
     private Integer personalPingInterval = 0;

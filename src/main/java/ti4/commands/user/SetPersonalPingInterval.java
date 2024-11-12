@@ -10,10 +10,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.Subcommand;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.MessageHelper;
 
-public class SetPersonalPingInterval extends UserSubcommandData {
+public class SetPersonalPingInterval extends Subcommand {
+
+    // OFFER PING INTERVAL BUTTONS
+    private static final String OFFER_PING_OPTIONS = "playerPref_personalPingInterval";
+    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray(OFFER_PING_OPTIONS, "Change Personal Ping Interval");
+    // SET PING INTERVAL BUTTONS
+    private static final String SET_PING_INTERVAL = "UserSetPersonalPingIntervalTo";
 
     public SetPersonalPingInterval() {
         super("set_personal_ping_interval", "Set your personal ping interval");
@@ -23,7 +30,7 @@ public class SetPersonalPingInterval extends UserSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         int pingInterval = event.getOption("hours", 0, OptionMapping::getAsInt);
-        UserSettings userSettings = getUserSettings();
+        var userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId());
         set(event, userSettings, pingInterval);
     }
 
@@ -46,9 +53,6 @@ public class SetPersonalPingInterval extends UserSubcommandData {
         set(event, userSettings, pingInterval);
     }
 
-    // SET PING INTERVAL BUTTONS
-    private static final String SET_PING_INTERVAL = "UserSetPersonalPingIntervalTo";
-
     @ButtonHandler(SET_PING_INTERVAL)
     public static void set(ButtonInteractionEvent event, String buttonID) {
         String pingIntervalRaw = buttonID.replace(SET_PING_INTERVAL, "");
@@ -63,10 +67,6 @@ public class SetPersonalPingInterval extends UserSubcommandData {
         event.getMessage().delete().queue();
         set(event, pingInterval);
     }
-
-    // OFFER PING INTERVAL BUTTONS
-    private static final String OFFER_PING_OPTIONS = "playerPref_personalPingInterval";
-    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray(OFFER_PING_OPTIONS, "Change Personal Ping Interval");
 
     @ButtonHandler(OFFER_PING_OPTIONS)
     public static void offerPersonalPingOptions(GenericInteractionCreateEvent event) {
