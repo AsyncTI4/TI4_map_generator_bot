@@ -346,7 +346,7 @@
     "name": "Energy Pulse",
     "phase": "Action",
     "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
-    "text": "Choose up to 2 units in that system. Those units lose their current unit abilities during this tactical action.",
+    "text": "Choose up to 2 units in that system. Those units lose their printed unit abilities during this tactical action.",
     "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
   },
