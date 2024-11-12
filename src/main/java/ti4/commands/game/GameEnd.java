@@ -398,7 +398,7 @@ public class GameEnd extends GameSubcommandData {
                 commonality++;
             }
         }
-        return commonality == 1 ? "" : ordinal(commonality) + " ";
+        return commonality == 1 ? "" : ordinal(commonality);
     }
 
     private static String formatPercent(double d) {
