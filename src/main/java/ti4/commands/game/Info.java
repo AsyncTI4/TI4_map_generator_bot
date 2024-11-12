@@ -117,7 +117,7 @@ public class Info extends GameSubcommandData {
         sb.append("Game Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
         sb.append("Player's Auto-Ping Time Interval (hrs):\n");
         for (Player player : game.getRealPlayers()) {
-            String interval = String.valueOf(UserSettingsManager.get(player.getUserID()));
+            String interval = String.valueOf(UserSettingsManager.get(player.getUserID()).getPersonalPingInterval());
             if ("0".equals(interval)) {
                 interval = "Off";
             }
