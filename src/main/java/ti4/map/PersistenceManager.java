@@ -12,10 +12,14 @@ import ti4.helpers.Storage;
 @UtilityClass
 public class PersistenceManager {
 
-    public static final String PERSISTENCE_MANAGER_JSON_PATH = "/pm_json/";
+    public static final String PERSISTENCE_MANAGER_JSON_PATH = Storage.getStoragePath() + "/pm_json/";
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static void writeObjectToJsonFile(String fileName, Object object) throws IOException {
+        writeObjectToJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, objectMapper.writeValueAsString(object));
+    }
+
+    public static void writeObjectToJsonFile(String directory, String fileName, Object object) throws IOException {
         if (object == null) {
             throw new IllegalArgumentException("The object to serialize cannot be null.");
         }
@@ -23,7 +27,7 @@ public class PersistenceManager {
             throw new IllegalArgumentException("The file path cannot be null or empty.");
         }
 
-        var file = getFile(fileName);
+        var file = getFile(directory, fileName);
         var parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists() && !parentDir.mkdirs()) {
             throw new IOException("Failed to create directories: " + parentDir.getAbsolutePath());
@@ -32,6 +36,10 @@ public class PersistenceManager {
     }
 
     public static <T> T readObjectFromJsonFile(String fileName, Class<T> clazz) throws IOException {
+        return readObjectFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
+    }
+
+    public static <T> T readObjectFromJsonFile(String directory, String fileName, Class<T> clazz) throws IOException {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("The file path cannot be null or empty.");
         }
@@ -39,7 +47,7 @@ public class PersistenceManager {
             throw new IllegalArgumentException("The class type cannot be null.");
         }
 
-        var file = getFile(fileName);
+        var file = getFile(directory, fileName);
         if (!file.exists()) {
             return null;
         }
@@ -48,8 +56,8 @@ public class PersistenceManager {
     }
 
     @NotNull
-    private static File getFile(String fileName) {
-        return new File(Storage.getStoragePath() + PERSISTENCE_MANAGER_JSON_PATH + fileName);
+    private static File getFile(String directory, String fileName) {
+        return new File(directory + File.separator + fileName);
     }
 
 }

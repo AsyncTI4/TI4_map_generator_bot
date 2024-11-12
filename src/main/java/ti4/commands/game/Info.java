@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.user.UserSettingsManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -115,7 +116,7 @@ public class Info extends GameSubcommandData {
         sb.append("Game Auto-Ping Time Interval (hrs): ").append(game.getAutoPingSpacer()).append(NEW_LINE);
         sb.append("Player's Auto-Ping Time Interval (hrs):\n");
         for (Player player : game.getRealPlayers()) {
-            String interval = String.valueOf(player.getPersonalPingInterval());
+            String interval = String.valueOf(UserSettingsManager.get(player.getUserID()));
             if ("0".equals(interval)) {
                 interval = "Off";
             }

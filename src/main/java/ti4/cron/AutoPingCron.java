@@ -14,6 +14,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.tech.GetTechButton;
+import ti4.commands.user.UserSettingsManager;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.GlobalSettings;
@@ -34,6 +35,7 @@ public class AutoPingCron {
 
     private static final long ONE_HOUR_IN_MILLISECONDS = 60 * 60 * 1000;
     private static final long TEN_MINUTES_IN_MILLISECONDS = 10 * 60 * 1000;
+    private static final int DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS = 8;
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
 
 
@@ -164,7 +166,7 @@ public class AutoPingCron {
         if (player == null || player.isAFK()) {
             return;
         }
-        int spacer = getSpacer(game, player);
+        int spacer = getPingIntervalInHours(game, player);
         if (spacer == 0) {
             return;
         }
@@ -223,8 +225,6 @@ public class AutoPingCron {
                         buttons);
             }
         }
-
-
     }
 
     private static void agendaPhasePing(Game game) {
@@ -291,15 +291,21 @@ public class AutoPingCron {
         }
     }
 
-    private static int getSpacer(Game game, Player player) {
-        int spacer = player.getPersonalPingInterval() > 0 ?
-                player.getPersonalPingInterval() :
-                game.getAutoPingSpacer();
-        if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame()) && spacer != 0) {
-            spacer = spacer / 3;
-            spacer = Math.max(spacer, 1);
+    private static int getPingIntervalInHours(Game game, Player player) {
+        int personalPingInterval = UserSettingsManager.get(player.getUserID()).getPersonalPingInterval();
+        int gamePingInterval = game.getAutoPingSpacer();
+        int pingIntervalInHours = DEFAULT_NUMBER_OF_HOURS_BETWEEN_PINGS;
+        if (personalPingInterval > 0 && gamePingInterval > 0) {
+            pingIntervalInHours = Math.min(personalPingInterval, gamePingInterval);
+        } else if (personalPingInterval > 0) {
+            pingIntervalInHours = personalPingInterval;
+        } else if (gamePingInterval > 0) {
+            pingIntervalInHours = gamePingInterval;
         }
-        return spacer;
+        if ("agendawaiting".equalsIgnoreCase(game.getPhaseOfGame())) {
+            pingIntervalInHours = Math.max(1, pingIntervalInHours / 3);
+        }
+        return pingIntervalInHours;
     }
 
     private static void appendScMessages(Game game, Player player, int sc, StringBuilder sb) {

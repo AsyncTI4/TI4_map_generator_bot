@@ -44,7 +44,6 @@ import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.player.ChangeColor;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
-import ti4.commands.user.UserSettings;
 import ti4.commands.user.UserSettingsManager;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
@@ -1522,7 +1521,6 @@ public class Player {
         } else {
             sb.append(getUserName());
         }
-        sb.append(getGlobalUserSetting("emojiAfterName").orElse(""));
         if (getColor() != null && !"null".equals(getColor()) && !noColor) {
             sb.append(" ").append(Emojis.getColorEmojiWithName(getColor()));
         }
@@ -1871,10 +1869,6 @@ public class Player {
 
     public int getTg() {
         return tg;
-    }
-
-    public int getPersonalPingInterval() {
-        return getGlobalUserSettings().getPersonalPingInterval();
     }
 
     public int getTurnCount() {
@@ -2935,15 +2929,6 @@ public class Player {
         this.eliminated = eliminated;
     }
 
-    /**
-     * @return a list of colours the user would prefer to play as, in order of
-     *         preference - the colours should all be "valid"- colourIDs
-     */
-    @JsonIgnore
-    public List<String> getPreferredColours() {
-        return UserSettingsManager.getInstance().getUserSettings(getUserID()).getPreferredColourList();
-    }
-
     @JsonIgnore
     public String getNextAvailableColour() {
         if (getColor() != null && !getColor().equals("null")) {
@@ -2955,27 +2940,12 @@ public class Player {
     @JsonIgnore
     public String getNextAvailableColorIgnoreCurrent() {
         Predicate<ColorModel> nonExclusive = cm -> !ChangeColor.colorIsExclusive(cm.getAlias(), this);
-        String color = getPreferredColours().stream()
+        String color = UserSettingsManager.get(getUserID()).getPreferredColourList().stream()
             .filter(c -> getGame().getUnusedColors().stream().anyMatch(col -> col.getName().equals(c)))
             .filter(c -> !ChangeColor.colorIsExclusive(c, this))
             .findFirst()
             .orElse(getGame().getUnusedColors().stream().filter(nonExclusive).findFirst().map(ColorModel::getName).orElse(null));
         return Mapper.getColorName(color);
-    }
-
-    public Optional<String> getGlobalUserSetting(String setting) {
-        return getGlobalUserSettings().getStoredValue(setting);
-    }
-
-    @JsonIgnore
-    public UserSettings getGlobalUserSettings() {
-        return UserSettingsManager.getInstance().getUserSettings(getUserID());
-    }
-
-    public void setGlobalUserSetting(String setting, String value) {
-        UserSettings userSetting = UserSettingsManager.getInstance().getUserSettings(getUserID());
-        userSetting.putStoredValue(setting, value);
-        UserSettingsManager.getInstance().saveUserSetting(userSetting);
     }
 
     @JsonIgnore
