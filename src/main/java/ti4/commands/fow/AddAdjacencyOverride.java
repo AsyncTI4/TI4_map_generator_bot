@@ -4,13 +4,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class AddAdjacencyOverride extends FOWSubcommandData {
+public class AddAdjacencyOverride extends GameStateSubcommand {
+
     public AddAdjacencyOverride() {
-        super(Constants.ADD_ADJACENCY_OVERRIDE, "Add Custom Adjacent Tiles. ");
+        super(Constants.ADD_ADJACENCY_OVERRIDE, "Add Custom Adjacent Tiles.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary tile position").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Direction the second tile is from the primary tile for linking hyperlanes")
             .setRequired(true).setAutoComplete(true));
@@ -19,7 +20,6 @@ public class AddAdjacencyOverride extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
         if (primaryTileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify primary tile");
@@ -56,6 +56,6 @@ public class AddAdjacencyOverride extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad data, try again");
             return;
         }
-        game.addAdjacentTileOverride(primaryTile, direction, secondaryTile);
+        getGame().addAdjacentTileOverride(primaryTile, direction, secondaryTile);
     }
 }
