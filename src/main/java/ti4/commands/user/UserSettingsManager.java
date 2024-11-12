@@ -32,12 +32,12 @@ public class UserSettingsManager {
         return readFile(userId);
     }
 
-    public static UserSettings get(String userID) {
-        var userSettings = userIdToSettingsCache.get(userID);
+    public static UserSettings get(String userId) {
+        var userSettings = userIdToSettingsCache.get(userId);
         if (userSettings == null) {
-            userSettings = new UserSettings(userID);
+            userSettings = new UserSettings(userId);
             persistFile(userSettings);
-            userIdToSettingsCache.put(userID, userSettings);
+            userIdToSettingsCache.put(userId, userSettings);
         }
         return userSettings;
     }

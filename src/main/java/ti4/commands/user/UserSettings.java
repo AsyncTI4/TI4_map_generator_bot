@@ -13,7 +13,7 @@ public class UserSettings {
 
     private String userId;
     private List<String> preferredColourList = new ArrayList<>();
-    private Integer personalPingInterval = 0;
+    private int personalPingInterval;
     private Map<String, String> storedValues = new HashMap<>();
 
     public UserSettings() {} // needed for ObjectMapper
