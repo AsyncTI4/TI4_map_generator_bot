@@ -13,7 +13,7 @@ public class ExploreReset extends ExploreSubcommandData {
     public ExploreReset() {
         super(Constants.RESET, "Reset the exploration decks, emptying discards and adding all cards to their respective decks.");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
-        addOptions(typeOption);
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true));
     }
 
     @Override

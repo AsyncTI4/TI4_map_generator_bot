@@ -21,7 +21,7 @@ public class ButtonHelperExplore {
     @ButtonHandler("exploreFront_")
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
-        new ExploreFrontier().expFront(event, game.getTileByPosition(pos), game, player);
+        ExploreFrontier.expFront(event, game.getTileByPosition(pos), game, player);
         List<ActionRow> actionRow2 = new ArrayList<>();
         String exhaustedMessage = event.getMessage().getContentRaw();
         for (ActionRow row : event.getMessage().getActionRows()) {

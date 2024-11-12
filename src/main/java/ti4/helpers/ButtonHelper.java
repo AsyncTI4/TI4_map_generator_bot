@@ -90,6 +90,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.UserGameContextManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -3401,7 +3402,7 @@ public class ButtonHelper {
                 msg2 = msg2 + name1 + ": " + card.getText() + "\n";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             } else {
-                new ExploreFrontier().expFront(event, tile, game, player);
+                ExploreFrontier.expFront(event, tile, game, player);
             }
 
             if (player.hasAbility("migrant_fleet")) {

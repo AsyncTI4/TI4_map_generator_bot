@@ -1,45 +1,40 @@
 package ti4.commands.explore;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-import java.util.List;
-
-public class ExploreLookAtTop extends ExploreSubcommandData {
+public class ExploreLookAtTop extends PlayerGameStateSubcommand {
 
     public ExploreLookAtTop() {
-        super(Constants.LOOK_AT_TOP, "Look at the top card of an explore deck. Sends to Cards Info thread.");
-        addOptions(typeOption.setRequired(true));
+        super(Constants.LOOK_AT_TOP, "Look at the top card of an explore deck. Sends to Cards Info thread.", true, false);
+        new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true).setRequired(true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        String trait = event.getOption(Constants.TRAIT, null, OptionMapping::getAsString);
-        if (trait == null || trait.isEmpty() || trait.isBlank()) {
+        String trait = event.getOption(Constants.TRAIT).getAsString();
+        if (trait.isBlank()) {
             MessageHelper.sendMessageToEventChannel(event, "Trait not found");
             return;
         }
 
+        Game game = getGame();
         List<String> deck = game.getExploreDeck(trait);
         List<String> discardPile = game.getExploreDiscard(trait);
 
         String traitNameWithEmoji = Emojis.getEmojiFromDiscord(trait) + trait;
+        Player player = getPlayer();
         String playerFactionNameWithEmoji = player.getFactionEmoji();
         if (deck.isEmpty() && discardPile.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");

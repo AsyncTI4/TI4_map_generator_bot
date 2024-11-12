@@ -567,7 +567,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String pos = stuff[1];
         String cardRefused = stuff[2];
         game.addExplore(cardRefused);
-        new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
+        ExploreFrontier.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
         ButtonHelper.deleteMessage(event);
     }
 

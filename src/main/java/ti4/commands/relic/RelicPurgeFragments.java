@@ -20,8 +20,8 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 
 	public RelicPurgeFragments() {
 		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic; may use unknown fragments).");
-		addOptions(typeOption.setRequired(true));
-		addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."));
+		new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true).setRequired(true))
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
 	}

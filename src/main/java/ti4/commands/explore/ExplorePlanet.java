@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
+import ti4.commands.PlayerGameStateSubcommand;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
@@ -23,6 +24,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -34,10 +36,10 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 
-public class ExplorePlanet extends ExploreSubcommandData {
+public class ExplorePlanet extends PlayerGameStateSubcommand {
 
     public ExplorePlanet() {
-        super(Constants.PLANET, "Explore a specific planet.");
+        super(Constants.PLANET, "Explore a specific planet.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
@@ -48,7 +50,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         String planetName = AliasHandler.resolvePlanet(StringUtils.substringBefore(planetOption.getAsString(), " ("));
-        Game game = getActiveGame();
+        Game game = getGame();
         if (!game.getPlanets().contains(planetName)) {
             MessageHelper.sendMessageToEventChannel(event, "Planet not found in map");
             return;
@@ -79,11 +81,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
         if (overRider != null && "YES".equalsIgnoreCase(overRider.getAsString())) {
             over = true;
         }
-        Player player = game.getPlayer(event.getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-
-        explorePlanet(event, tile, planetName, drawColor, player, false, game, 1, over);
+        explorePlanet(event, tile, planetName, drawColor, getPlayer(), false, game, 1, over);
     }
 
     public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Game game, int numExplores,
@@ -230,7 +228,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
             MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getMessageChannel(), message, embeds, buttons);
             return;
         }
-        resolveExplore(event, cardID, tile, planetName, messageText, player, game);
+        ExploreHelper.resolveExplore(event, cardID, tile, planetName, messageText, player, game);
         if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             PlanetRefresh.doAction(player, planetName, game);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab Arcologies.");
