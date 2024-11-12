@@ -16,6 +16,8 @@ public class UserSettings {
     private Integer personalPingInterval = 0;
     private Map<String, String> storedValues = new HashMap<>();
 
+    public UserSettings() {} // needed for ObjectMapper
+
     public UserSettings(String userId) {
         this.userId = userId;
     }
