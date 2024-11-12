@@ -1,10 +1,9 @@
 package ti4.commands.user;
 
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class UserSubcommandData extends SubcommandData {
 
@@ -25,12 +24,12 @@ public abstract class UserSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId());
+        userSettings = UserSettingsManager.get(event.getUser().getId());
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void postExecute(SlashCommandInteractionEvent event) {
-        UserSettingsManager.getInstance().saveUserSetting(userSettings);
+        UserSettingsManager.save(userSettings);
     }
 }
