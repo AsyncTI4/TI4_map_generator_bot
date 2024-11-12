@@ -38,11 +38,10 @@ public class SetPersonalPingInterval extends UserSubcommandData {
         }
         String message = "Set Personal Ping Interval to: `" + pingInterval + "`";
         MessageHelper.sendMessageToEventChannel(event, message);
-        settings.save();
     }
 
     public static void set(GenericInteractionCreateEvent event, int pingInterval) {
-        UserSettings userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId());
+        UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
         set(event, userSettings, pingInterval);
     }
 
@@ -71,7 +70,7 @@ public class SetPersonalPingInterval extends UserSubcommandData {
     @ButtonHandler(OFFER_PING_OPTIONS)
     public static void offerPersonalPingOptions(GenericInteractionCreateEvent event) {
         List<Button> buttons = getPersonalAutoPingButtons();
-        UserSettings userSettings = UserSettingsManager.getInstance().getUserSettings(event.getUser().getId());
+        UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
         String message = event.getUser().getAsMention() + " please select the number of hours you would like the bot to wait before it pings you that it is your turn.\n**This will apply to all your games**.\n> Your current interval is `" + userSettings.getPersonalPingInterval() + "`";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
