@@ -43,7 +43,7 @@ public class AutoPingCron {
 
     private static void autoPingGames() {
         boolean debug = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
-        StopWatch stopWatch = debug ? StopWatch.createStarted() : null;
+        var stopWatch = debug ? StopWatch.createStarted() : null;
 
         GameManager.getManagedGames().stream().filter(not(ManagedGame::isHasEnded))
                 .forEach(managedGame -> {

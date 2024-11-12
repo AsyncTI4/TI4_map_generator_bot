@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import org.jetbrains.annotations.Nullable;
 import ti4.cron.LogCacheStatsCron;
 import ti4.message.BotLogger;
 
@@ -37,6 +38,7 @@ public class GameManager {
         return GameSaveLoadManager.loadGame(gameName);
     }
 
+    @Nullable
     public static Game getGame(String gameName) {
         if (!isValidGame(gameName)) {
             return null;
