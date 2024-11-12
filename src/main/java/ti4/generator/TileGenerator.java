@@ -192,7 +192,7 @@ public class TileGenerator {
     public BufferedImage draw(Tile tile, TileStep step) {
         BufferedImage tileOutput = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
         Graphics tileGraphics = tileOutput.createGraphics();
-
+        var isSpiral = tile.getTileModel().getShipPositionsType() != null && tile.getTileModel().getShipPositionsType().isSpiral();
         switch (step) {
             case Setup -> {
             } // do nothing
@@ -217,7 +217,8 @@ public class TileGenerator {
 
                 // ADD HEX BORDERS FOR CONTROL
                 Player controllingPlayer = game.getPlayerControlMap().get(tile.getPosition());
-                if (!game.getHexBorderStyle().equals("off") && controllingPlayer != null && !tile.getTileModel().getShipPositionsType().isSpiral()) {
+
+                if (!game.getHexBorderStyle().equals("off") && controllingPlayer != null && !isSpiral) {
                     int sideNum = 0;
                     java.util.List<Integer> openSides = new ArrayList<>();
                     for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
@@ -301,7 +302,7 @@ public class TileGenerator {
                 }
                 if ((ButtonHelper.isLawInPlay(game, "shared_research")) && tile.isNebula()) {
                     BufferedImage nebulaBypass = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_shared_research.png"));
-                    if (shipPositionsType != null && shipPositionsType.isSpiral()) {
+                    if (isSpiral) {
                         switch (tile.getTileID()) {
                             case "51":
                                 tileGraphics.drawImage(nebulaBypass, TILE_PADDING + 42, TILE_PADDING + 235, null);
@@ -416,9 +417,8 @@ public class TileGenerator {
                 if (tileImage == null) {
                     break;
                 }
-
-                int x = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
-                int y = TILE_PADDING + (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                int x = TILE_PADDING + (isSpiral ? 36 : 0);
+                int y = TILE_PADDING + (isSpiral ? 43 : 0);
                 if (distance > 0) {
                     BufferedImage distanceColor = ImageHelper.read(ResourceHelper.getInstance().getTileFile(getColorFilterForDistance(distance)));
                     tileGraphics.drawImage(distanceColor, x, y, null);
@@ -448,13 +448,12 @@ public class TileGenerator {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
                 } else {
-                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
-                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
                     int count = FoWHelper.getTileWHs(game, tile.getPosition()).size();
                     x += (count == 1 ? 76 : 30);
                     y += (count == 1 ? 52 : 26);
                     for (String wh : FoWHelper.getTileWHs(game, tile.getPosition())) {
-
                         String whFile = ResourceHelper.getInstance().getTokenFile("token_wh" + wh + ".png");
                         if (whFile == null) {
                             whFile = ResourceHelper.getInstance().getTokenFile("token_custom_eronous_wh" + wh + ".png");
@@ -488,8 +487,8 @@ public class TileGenerator {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
                 } else {
-                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
-                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
                     x += 33;
                     y += 101;
                     String chevronFile = ResourceHelper.getInstance().getTileFile("tile_anomaly_chevron.png");
@@ -518,8 +517,8 @@ public class TileGenerator {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
                 } else {
-                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
-                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
                     String batFile = ResourceHelper.getInstance().getGeneralFile("zobat" + (ThreadLocalRandom.current().nextInt(4096) == 0 ? "_shiny" : "") + ".png");
                     BufferedImage bufferedImage = ImageHelper.read(batFile);
                     x += (345 - bufferedImage.getWidth()) / 2;
@@ -582,8 +581,8 @@ public class TileGenerator {
                     for (Planet planet : tile.getPlanetUnitHolders()) {
                         number += (planet.isLegendary() ? 1 : 0);
                     }
-                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
-                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
                     String legendaryFile = ResourceHelper.getInstance().getGeneralFile("Legendary_complete.png");
                     BufferedImage bufferedImage = ImageHelper.readScaled(legendaryFile, 0.5f);
                     if (number >= 2) {
@@ -621,8 +620,8 @@ public class TileGenerator {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
                 } else {
-                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
-                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
                     x += 93;
                     y += 70;
                     tileGraphics.setColor(Color.RED);
@@ -723,8 +722,8 @@ public class TileGenerator {
                     BufferedImage fogging = ImageHelper.read(tile.getFowTilePath(null));
                     tileGraphics.drawImage(fogging, x, y, null);
                 } else {
-                    x += (tile.getTileModel().getShipPositionsType().isSpiral() ? 36 : 0);
-                    y += (tile.getTileModel().getShipPositionsType().isSpiral() ? 43 : 0);
+                    x += (isSpiral ? 36 : 0);
+                    y += (isSpiral ? 43 : 0);
                     float scale = pdsDice.size() >= 3 ? 6.0f / pdsDice.size() : 3.0f;
 
                     Font bigFont;
