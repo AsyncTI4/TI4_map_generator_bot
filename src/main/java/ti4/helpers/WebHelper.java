@@ -72,7 +72,7 @@ public class WebHelper {
         }
     }
 
-    public static void putOverlays(String gameId, Map<String, WebsiteOverlay> overlays) {
+    public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
         if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
             return;
 

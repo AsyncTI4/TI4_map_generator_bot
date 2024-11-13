@@ -139,7 +139,7 @@ public class MapGenerator implements AutoCloseable {
     private final boolean allEyesOnMe;
     private final Map<String, Player> playerControlMap;
 
-    private final Map<String, WebsiteOverlay> websiteOverlays = new HashMap<>(); // ID, WebsiteOverlay
+    private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
     private int mapWidth;
     private int minX = -1;
     private int minY = -1;
@@ -4322,11 +4322,11 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay(cardType, cardID, x, y, width, height);
             return;
         }
-        websiteOverlays.put(cardType + ":" + cardID + ":" + player.getFaction(), new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+        websiteOverlays.add(new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
     }
 
     void addWebsiteOverlay(String cardType, String cardID, int x, int y, int width, int height) {
-        websiteOverlays.put(cardType + ":" + cardID, new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+        websiteOverlays.add(new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
     }
 
     String getGameName() {
