@@ -19,7 +19,8 @@ public class SendCommodities extends PlayerSubcommandData {
     public SendCommodities() {
         super(Constants.SEND_COMMODITIES, "Sent Commodities to player/faction");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodities count").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color to which you send Commodities").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to which you send Commodities").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
     }
 

@@ -133,7 +133,7 @@ public class CommandHelper {
             return game.getPlayer(playerID);
         }
 
-        OptionMapping factionColorOption = event.getOption(Constants.OTHER_FACTION_OR_COLOR);
+        OptionMapping factionColorOption = event.getOption(Constants.TARGET_FACTION_OR_COLOR);
         if (factionColorOption != null) {
             String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             return getPlayerByFactionColor(factionColor, game);

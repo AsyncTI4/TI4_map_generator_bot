@@ -19,7 +19,7 @@ public class Whisper extends FOWSubcommandData {
 
     public Whisper() {
         super(Constants.WHISPER, "Send a private message to a player in fog mode");
-        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
     }

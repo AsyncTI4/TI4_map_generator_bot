@@ -14,7 +14,7 @@ public class SwapSC extends SpecialSubcommandData {
     public SwapSC() {
         super(Constants.SWAP_SC, "Swap your SC with player2. Use OPTIONAL faction_or_color_2 to swap two other players' SCs");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(false));
     }
 
     @Override

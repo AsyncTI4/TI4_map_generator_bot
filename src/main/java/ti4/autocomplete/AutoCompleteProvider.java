@@ -114,7 +114,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION_COLOR, Constants.OTHER_FACTION_OR_COLOR -> {
+            case Constants.FACTION_COLOR, Constants.TARGET_FACTION_OR_COLOR -> {
                 if (game == null) {
                     event.replyChoiceStrings("No game found in this channel").queue();
                     break;

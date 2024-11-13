@@ -16,7 +16,8 @@ import ti4.message.MessageHelper;
 public class ShowAllSO extends SOCardsSubcommandData {
     public ShowAllSO() {
         super(Constants.SHOW_ALL_SO, "Show all Secret Objectives to one player");
-        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
     }
 
     @Override

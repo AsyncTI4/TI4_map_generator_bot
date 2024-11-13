@@ -20,7 +20,8 @@ public class RelicSend extends RelicSubcommandData {
     public RelicSend() {
         super(Constants.RELIC_SEND, "Send a relic to another Player");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to send from Target to Source").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Target Faction or Color").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target Faction or Color").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source Faction or Color (default is you)").setAutoComplete(true));
     }
 

@@ -20,7 +20,8 @@ public class SendTG extends PlayerSubcommandData {
     public SendTG() {
         super(Constants.SEND_TG, "Sent TG(s) to player/faction");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color to which you send TG(s)").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to which you send TG(s)").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.CLEAR_DEBT, "True to automatically clear any debt with receiving player"));
     }
 
