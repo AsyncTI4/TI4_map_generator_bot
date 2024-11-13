@@ -14,7 +14,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreLookAtTop extends GameStateSubcommand {
+class ExploreLookAtTop extends GameStateSubcommand {
 
     public ExploreLookAtTop() {
         super(Constants.LOOK_AT_TOP, "Look at the top card of an explore deck. Sends to Cards Info thread.", true, false);

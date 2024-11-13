@@ -10,7 +10,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class ReloadMap extends Subcommand {
+class ReloadMap extends Subcommand {
 
     public ReloadMap() {
         super(Constants.RELOAD_GAME, "Reload game from save file");

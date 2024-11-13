@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SoAddToGame extends GameStateSubcommand {
+class SoAddToGame extends GameStateSubcommand {
 
     public SoAddToGame() {
         super(Constants.ADD_SO_TO_GAME, "Add SO to game", true, true);

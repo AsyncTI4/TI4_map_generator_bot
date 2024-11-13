@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PutEventBottom extends GameStateSubcommand {
+class PutEventBottom extends GameStateSubcommand {
 
     public PutEventBottom() {
         super(Constants.PUT_BOTTOM, "Put Event bottom", true, true);

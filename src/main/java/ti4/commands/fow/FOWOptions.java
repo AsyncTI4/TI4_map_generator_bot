@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
-public class FOWOptions extends GameStateSubcommand {
+class FOWOptions extends GameStateSubcommand {
 
     public static final String HIDE_NAMES = "hide_player_names";
     public static final String HIDE_TOTAL_VOTES = "hide_total_votes";

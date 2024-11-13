@@ -17,7 +17,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DiscardACRandom extends GameStateSubcommand {
+class DiscardACRandom extends GameStateSubcommand {
 
     public DiscardACRandom() {
         super(Constants.DISCARD_AC_RANDOM, "Discard a random Action Card", true, true);

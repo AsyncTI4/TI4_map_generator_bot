@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
-public class FactionTechAdd extends FactionTechAddRemove {
+class FactionTechAdd extends FactionTechAddRemove {
 
     public FactionTechAdd() {
         super(Constants.FACTION_TECH_ADD, "Add a faction tech to your faction");

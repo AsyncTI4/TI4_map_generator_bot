@@ -13,7 +13,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.model.ActionCardModel;
 
-public class MakeCopiesOfACs extends GameStateSubcommand {
+class MakeCopiesOfACs extends GameStateSubcommand {
 
     public MakeCopiesOfACs() {
         super(Constants.MAKE_AC_COPIES, "Make Copies of ACS", true, true);

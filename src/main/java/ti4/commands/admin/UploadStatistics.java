@@ -5,7 +5,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.WebHelper;
 import ti4.message.MessageHelper;
 
-public class UploadStatistics extends Subcommand {
+class UploadStatistics extends Subcommand {
 
     public UploadStatistics() {
         super("upload_statistics", "Uploads the statistics to the s3 bucket");

@@ -15,7 +15,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class ExploreFrontier extends GameStateSubcommand {
+class ExploreFrontier extends GameStateSubcommand {
 
     public ExploreFrontier() {
         super(Constants.FRONTIER, "Explore a Frontier token on a Tile", true, true);

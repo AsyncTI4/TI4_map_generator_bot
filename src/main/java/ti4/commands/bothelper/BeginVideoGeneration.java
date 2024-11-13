@@ -13,7 +13,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class BeginVideoGeneration extends Subcommand {
+class BeginVideoGeneration extends Subcommand {
 
     public BeginVideoGeneration (){
         super(Constants.BEGIN_VIDEO_GEN, "Kickoff Video Process in AWS");

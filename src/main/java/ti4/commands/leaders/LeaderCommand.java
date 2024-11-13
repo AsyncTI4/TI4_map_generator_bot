@@ -12,7 +12,6 @@ import ti4.commands.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
 
 public class LeaderCommand implements ParentCommand {
 

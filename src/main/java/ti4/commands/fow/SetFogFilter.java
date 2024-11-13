@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetFogFilter extends GameStateSubcommand {
+class SetFogFilter extends GameStateSubcommand {
 
     public SetFogFilter() {
         super(Constants.SET_FOG_FILTER, "Set the color of the fog tiles for your view of the map.", true, true);

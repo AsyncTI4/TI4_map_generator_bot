@@ -7,7 +7,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class DrawSpecificAC extends GameStateSubcommand {
+class DrawSpecificAC extends GameStateSubcommand {
 
     public DrawSpecificAC() {
         super(Constants.DRAW_SPECIFIC_AC, "Draw Specific Action Card", true, true);

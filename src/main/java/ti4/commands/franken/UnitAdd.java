@@ -10,7 +10,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
-public class UnitAdd extends UnitAddRemove {
+class UnitAdd extends UnitAddRemove {
 
     public UnitAdd() {
         super(Constants.UNIT_ADD, "Add a unit to your faction");

@@ -9,7 +9,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 
-public class DrawAgenda extends GameStateSubcommand {
+class DrawAgenda extends GameStateSubcommand {
 
     public DrawAgenda() {
         super(Constants.DRAW, "Draw Agenda", true, true);

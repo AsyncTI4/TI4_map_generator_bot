@@ -14,7 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAllSO extends GameStateSubcommand {
+class ShowAllSO extends GameStateSubcommand {
 
     public ShowAllSO() {
         super(Constants.SHOW_ALL_SO, "Show all Secret Objectives to one player", true, false);

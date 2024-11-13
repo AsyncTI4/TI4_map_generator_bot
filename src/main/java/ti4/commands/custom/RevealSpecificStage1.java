@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
-public class RevealSpecificStage1 extends GameStateSubcommand {
+class RevealSpecificStage1 extends GameStateSubcommand {
 
     public RevealSpecificStage1() {
         super(Constants.REVEAL_SPECIFIC_STAGE1, "PO to reveal", true, false);

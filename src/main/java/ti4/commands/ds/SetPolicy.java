@@ -18,7 +18,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
-public class SetPolicy extends GameStateSubcommand {
+class SetPolicy extends GameStateSubcommand {
 
     public SetPolicy() {
         super(Constants.SET_POLICY, "Set Policies for Olradin Faction Abilities to their + or - side", true, true);

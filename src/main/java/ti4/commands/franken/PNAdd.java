@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PNAdd extends PNAddRemove {
+class PNAdd extends PNAddRemove {
 
     public PNAdd() {
         super(Constants.PN_ADD, "Add a Promissory Note to your faction's owned notes");

@@ -19,7 +19,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class ExploreUse extends GameStateSubcommand {
+class ExploreUse extends GameStateSubcommand {
 
     public ExploreUse() {
         super(Constants.USE, "Draw and activate an explore card from the deck or discard", true, true);

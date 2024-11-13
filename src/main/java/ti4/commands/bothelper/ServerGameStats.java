@@ -19,7 +19,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class ServerGameStats extends Subcommand {
+class ServerGameStats extends Subcommand {
 
     public ServerGameStats() {
         super(Constants.SERVER_GAME_STATS, "Game Statistics for Administration");

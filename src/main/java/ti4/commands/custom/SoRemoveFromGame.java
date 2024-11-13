@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SoRemoveFromGame extends GameStateSubcommand {
+class SoRemoveFromGame extends GameStateSubcommand {
 
     public SoRemoveFromGame() {
         super(Constants.REMOVE_SO_FROM_GAME, "SO remove from game", true, true);

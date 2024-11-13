@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetFactionDisplayName extends GameStateSubcommand {
+class SetFactionDisplayName extends GameStateSubcommand {
 
     public SetFactionDisplayName() {
         super(Constants.SET_FACTION_DISPLAY_NAME, "Set your faction Display Name (instead of your username)", true, true);

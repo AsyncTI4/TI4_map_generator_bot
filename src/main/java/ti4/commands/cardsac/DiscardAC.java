@@ -14,7 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DiscardAC extends GameStateSubcommand {
+class DiscardAC extends GameStateSubcommand {
 
     public DiscardAC() {
         super(Constants.DISCARD_AC, "Discard an Action Card", true, true);

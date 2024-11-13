@@ -38,7 +38,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayPN extends GameStateSubcommand {
+class PlayPN extends GameStateSubcommand {
 
     public PlayPN() {
         super(Constants.PLAY_PN, "Play Promissory Note", true, true);

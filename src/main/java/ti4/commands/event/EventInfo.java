@@ -14,7 +14,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class EventInfo extends GameStateSubcommand {
+class EventInfo extends GameStateSubcommand {
 
     public EventInfo() {
         super(Constants.INFO, "Send Event Cards to your Cards Info thread", true, true);

@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SCAddToGame extends GameStateSubcommand {
+class SCAddToGame extends GameStateSubcommand {
 
     public SCAddToGame() {
         super(Constants.ADD_SC_TO_GAME, "Add a Stategy Card # to the game", true, true);

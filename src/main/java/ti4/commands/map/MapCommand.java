@@ -1,20 +1,64 @@
 package ti4.commands.map;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.ParentCommand;
-import ti4.commands.uncategorized.ShowGame;
+import ti4.commands.Subcommand;
+import ti4.commands.special.AddFactionCCToFleetSupply;
+import ti4.commands.special.AdjustRoundNumber;
+import ti4.commands.special.CheckAllDistance;
+import ti4.commands.special.CheckDistance;
+import ti4.commands.special.CloneGame;
+import ti4.commands.special.DiploSystem;
+import ti4.commands.special.FighterConscription;
+import ti4.commands.special.IonFlip;
+import ti4.commands.special.MakeSecretIntoPO;
+import ti4.commands.special.MoveAllUnits;
+import ti4.commands.special.MoveCreussWormhole;
+import ti4.commands.special.NaaluCommander;
+import ti4.commands.special.NovaSeed;
+import ti4.commands.special.Rematch;
+import ti4.commands.special.RemoveFactionCCFromFleetSupply;
+import ti4.commands.special.RiseOfMessiah;
+import ti4.commands.special.SearchWarrant;
+import ti4.commands.special.SleeperToken;
+import ti4.commands.special.StasisInfantry;
+import ti4.commands.special.SwapSC;
+import ti4.commands.special.SwapTwoSystems;
+import ti4.commands.special.SwordsToPlowsharesTGGain;
+import ti4.commands.special.WormholeResearchFor;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.UserGameContextManager;
 
 public class MapCommand implements ParentCommand {
-    private final Collection<MapSubcommandData> subcommandData = getSubcommands();
+
+    private final Map<String, Subcommand> subcommands = Stream.of(
+            new AddFactionCCToFleetSupply(),
+            new RemoveFactionCCFromFleetSupply(),
+            new DiploSystem(),
+            new MakeSecretIntoPO(),
+            new AdjustRoundNumber(),
+            new SwapTwoSystems(),
+            new SearchWarrant(),
+            new SleeperToken(),
+            new IonFlip(),
+            new RiseOfMessiah(),
+            new Rematch(),
+            new CloneGame(),
+            new SwordsToPlowsharesTGGain(),
+            new WormholeResearchFor(),
+            new FighterConscription(),
+            new SwapSC(),
+            new MoveAllUnits(),
+            new NovaSeed(),
+            new StasisInfantry(),
+            new NaaluCommander(),
+            new MoveCreussWormhole(),
+            new CheckDistance(),
+            new CheckAllDistance()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
 
     @Override
     public String getName() {
@@ -22,41 +66,12 @@ public class MapCommand implements ParentCommand {
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (MapSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-            }
-        }
-        String userID = event.getUser().getId();
-        Game game = CommandHelper.getGameName(event);
-        if (game == null) return;
-        ShowGame.simpleShowGame(game, event);
-    }
-
     public String getDescription() {
         return "Game";
     }
 
-    private Collection<MapSubcommandData> getSubcommands() {
-        Collection<MapSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new AddTile());
-        subcommands.add(new AddTileList());
-        subcommands.add(new RemoveTile());
-        subcommands.add(new AddBorderAnomaly());
-        subcommands.add(new RemoveBorderAnomaly());
-        //subcommands.add(new InteractiveBuilder());
-        subcommands.add(new Preset());
-        subcommands.add(new ShowMapSetup());
-        subcommands.add(new ShowMapString());
-        subcommands.add(new SetMapTemplate());
-        return subcommands;
-    }
-
     @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

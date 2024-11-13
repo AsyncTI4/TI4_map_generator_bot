@@ -12,10 +12,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowACToAll extends GameStateSubcommand {
+class ShowACToAll extends GameStateSubcommand {
 
     public ShowACToAll() {
-        super(Constants.SHOW_AC_TO_ALL, "Show an Action Card to all players", false, false, false);
+        super(Constants.SHOW_AC_TO_ALL, "Show an Action Card to all players", false, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 

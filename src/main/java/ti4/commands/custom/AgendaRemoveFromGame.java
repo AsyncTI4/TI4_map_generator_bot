@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class AgendaRemoveFromGame extends GameStateSubcommand {
+class AgendaRemoveFromGame extends GameStateSubcommand {
 
     public AgendaRemoveFromGame() {
         super(Constants.REMOVE_AGENDA_FROM_GAME, "Agenda remove from game", true, false);

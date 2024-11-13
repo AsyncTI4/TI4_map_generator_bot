@@ -26,7 +26,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ApplyDraftBags extends GameStateSubcommand {
+class ApplyDraftBags extends GameStateSubcommand {
 
     public ApplyDraftBags() {
         super("apply_draft_bags", "Begin selecting items from draft bags to apply them to your faction.", true, false);

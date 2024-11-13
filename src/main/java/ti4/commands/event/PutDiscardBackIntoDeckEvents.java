@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
+class PutDiscardBackIntoDeckEvents extends GameStateSubcommand {
 
     public PutDiscardBackIntoDeckEvents() {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put Event back into deck from discard", true, true);

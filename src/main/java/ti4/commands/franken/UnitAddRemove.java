@@ -14,7 +14,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public abstract class UnitAddRemove extends GameStateSubcommand {
+abstract class UnitAddRemove extends GameStateSubcommand {
 
     public UnitAddRemove(String name, String description) {
         super(name, description, true, true);

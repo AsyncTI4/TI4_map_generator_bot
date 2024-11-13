@@ -5,7 +5,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FrankenDraftHelper;
 
-public class ShowFrankenBag extends GameStateSubcommand {
+class ShowFrankenBag extends GameStateSubcommand {
 
     public ShowFrankenBag() {
         super(Constants.SHOW_BAG, "Shows your current FrankenDraft bag of cards left to draft.", false, true);

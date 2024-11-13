@@ -8,12 +8,13 @@ import ti4.commands.GameStateSubcommand;
 import ti4.draft.DraftItem;
 import ti4.message.MessageHelper;
 
-public class FrankenViewCard extends GameStateSubcommand {
-    public FrankenViewCard() {
+class FrankenViewCard extends GameStateSubcommand {
 
+    public FrankenViewCard() {
         super("view_card", "View a Frankendraft card from its alias", false, false);
         addOptions(new OptionData(OptionType.STRING, "alias", "card alias").setRequired(true));
     }
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping editOption = event.getOption("alias");

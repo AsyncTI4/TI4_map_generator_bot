@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -22,15 +22,16 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class ScorePublic extends StatusSubcommandData {
+import static ti4.helpers.ButtonHelperListPlayerInfo.getObjectiveThreshold;
+import static ti4.helpers.ButtonHelperListPlayerInfo.getPlayerProgressOnObjective;
+
+public class ScorePublic extends GameStateSubcommand {
 
     public ScorePublic() {
-        super(Constants.SCORE_OBJECTIVE, "Score Public Objective");
+        super(Constants.SCORE_OBJECTIVE, "Score Public Objective", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
             .setRequired(true));
         addOptions(
@@ -40,23 +41,8 @@ public class ScorePublic extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        OptionMapping option = event.getOption(Constants.PO_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Public Objective to score");
-            return;
-        }
-
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
-        int poID = option.getAsInt();
-        scorePO(event, event.getChannel(), game, player, poID);
+        int poID = event.getOption(Constants.PO_ID).getAsInt();
+        scorePO(event, event.getChannel(), getGame(), getPlayer(), poID);
     }
 
     public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Game game, Player player, int poID) {
@@ -71,8 +57,8 @@ public class ScorePublic extends StatusSubcommandData {
             }
         }
         if (Mapper.getPublicObjective(id) != null && event instanceof ButtonInteractionEvent) {
-            int threshold = ListPlayerInfoButton.getObjectiveThreshold(id, game);
-            int playerProgress = ListPlayerInfoButton.getPlayerProgressOnObjective(id, game, player);
+            int threshold = getObjectiveThreshold(id, game);
+            int playerProgress = getPlayerProgressOnObjective(id, game, player);
             if (playerProgress < threshold) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " the bot does not believe you meet the requirements to score "
@@ -227,12 +213,5 @@ public class ScorePublic extends StatusSubcommandData {
                     "Did not deduct 6 CCs because you didn't have that");
             }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = CommandHelper.getGameName(event);
-        GameSaveLoadManager.saveGame(game, event);
     }
 }

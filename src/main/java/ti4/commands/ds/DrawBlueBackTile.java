@@ -21,7 +21,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.TileModel;
 
-public class DrawBlueBackTile extends GameStateSubcommand {
+class DrawBlueBackTile extends GameStateSubcommand {
 
     public DrawBlueBackTile() {
         super(Constants.DRAW_BLUE_BACK_TILE, "Draw a random blue back tile (for Star Charts and Decrypted Cartoglyph)", true, true);

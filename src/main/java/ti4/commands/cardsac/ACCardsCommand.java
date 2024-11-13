@@ -32,7 +32,7 @@ public class ACCardsCommand implements ParentCommand {
                     new ShuffleACBackIntoDeck(),
                     new RevealAndPutACIntoDiscard(),
                     new SendAC(),
-                    new SentACRandom(),
+                    new SendACRandom(),
                     new DrawSpecificAC(),
                     new MakeCopiesOfACs())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));

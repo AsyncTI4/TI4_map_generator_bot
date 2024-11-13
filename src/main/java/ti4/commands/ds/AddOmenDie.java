@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class AddOmenDie extends GameStateSubcommand {
+class AddOmenDie extends GameStateSubcommand {
 
     public AddOmenDie() {
         super(Constants.ADD_OMEN_DIE, "Add a Omen Die", true, true);

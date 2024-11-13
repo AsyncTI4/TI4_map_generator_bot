@@ -3520,7 +3520,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             ButtonHelper.offerSpeakerButtons(game, player);
             return;
         }
-        RevealStage1.revealTwoStage1(event, game.getMainGameChannel());
+        RevealStage1.revealTwoStage1(game);
         StartPhase.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);

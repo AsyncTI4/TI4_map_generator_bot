@@ -21,7 +21,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DealSOToAll extends GameStateSubcommand {
+class DealSOToAll extends GameStateSubcommand {
 
     public DealSOToAll() {
         super(Constants.DEAL_SO_TO_ALL, "Deal Secret Objective (count) to all game players", true, true);

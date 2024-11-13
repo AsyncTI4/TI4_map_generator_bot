@@ -10,7 +10,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class LeaderRemove extends LeaderAddRemove {
+class LeaderRemove extends LeaderAddRemove {
 
     public LeaderRemove() {
         super(Constants.LEADER_REMOVE, "Remove a leader from your faction");

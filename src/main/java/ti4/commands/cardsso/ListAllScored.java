@@ -8,7 +8,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListAllScored extends GameStateSubcommand {
+class ListAllScored extends GameStateSubcommand {
 
     public ListAllScored() {
         super(Constants.SO_LIST_SCORED, "Displays scored secret objectives", true, false);

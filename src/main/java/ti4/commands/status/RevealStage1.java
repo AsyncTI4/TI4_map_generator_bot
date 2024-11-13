@@ -6,21 +6,22 @@ import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
-public class RevealStage1 extends StatusSubcommandData {
+import static ti4.helpers.ButtonHelperListPlayerInfo.representScoring;
+
+public class RevealStage1 extends GameStateSubcommand {
 
     public RevealStage1() {
-        super(Constants.REVEAL_STAGE1, "Reveal Stage1 Public Objective");
+        super(Constants.REVEAL_STAGE1, "Reveal Stage1 Public Objective", true, false);
     }
 
     @Override
@@ -29,10 +30,8 @@ public class RevealStage1 extends StatusSubcommandData {
     }
 
     public void revealS1(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
-
+        Game game = getGame();
         Map.Entry<String, Integer> objective = game.revealStage1();
-
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
@@ -48,8 +47,7 @@ public class RevealStage1 extends StatusSubcommandData {
             if (playersWithSCs > 0) {
                 new Cleanup().runStatusCleanup(game);
                 if (!game.isFowMode()) {
-                    MessageHelper.sendMessageToChannel(channel,
-                        ListPlayerInfoButton.representScoring(game, objective.getKey(), 0));
+                    MessageHelper.sendMessageToChannel(channel, representScoring(game, objective.getKey(), 0));
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     game.getPing() + " **Status Cleanup Run!**");
@@ -60,20 +58,18 @@ public class RevealStage1 extends StatusSubcommandData {
             }
         } else {
             if (!game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(channel,
-                    ListPlayerInfoButton.representScoring(game, objective.getKey(), 0));
+                MessageHelper.sendMessageToChannel(channel, representScoring(game, objective.getKey(), 0));
             }
         }
     }
 
-    public static void revealTwoStage1(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
-
+    public static void revealTwoStage1(Game game) {
         Map.Entry<String, Integer> objective1 = game.revealStage1();
         Map.Entry<String, Integer> objective2 = game.revealStage1();
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
+        var channel = game.getMainGameChannel();
         MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 1 Public Objectives Revealed**");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
             .queue(m -> m.pin().queue());
@@ -92,12 +88,5 @@ public class RevealStage1 extends StatusSubcommandData {
             maxSCsPerPlayer = 1;
         }
         game.setStrategyCardsPerPlayer(maxSCsPerPlayer);
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = CommandHelper.getGameName(event);
-        GameSaveLoadManager.saveGame(game, event);
     }
 }

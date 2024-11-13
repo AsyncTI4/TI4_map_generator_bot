@@ -11,7 +11,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class SetHomeSystemPosition extends GameStateSubcommand {
+class SetHomeSystemPosition extends GameStateSubcommand {
 
     public SetHomeSystemPosition() {
         super(Constants.SET_HOMESYSTEM_POS, "Set home system position to override other checks.", true, true);

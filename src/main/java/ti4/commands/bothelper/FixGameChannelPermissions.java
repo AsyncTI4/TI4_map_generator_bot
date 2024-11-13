@@ -7,7 +7,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
 
-public class FixGameChannelPermissions extends GameStateSubcommand {
+class FixGameChannelPermissions extends GameStateSubcommand {
 
     public FixGameChannelPermissions() {
         super(Constants.FIX_CHANNEL_PERMISSIONS, "Ensure players in this game have access", false, false);

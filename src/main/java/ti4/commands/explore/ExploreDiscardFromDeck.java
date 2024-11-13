@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreDiscardFromDeck extends GameStateSubcommand {
+class ExploreDiscardFromDeck extends GameStateSubcommand {
 
     public ExploreDiscardFromDeck() {
         super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.", true, true);

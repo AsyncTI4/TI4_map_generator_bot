@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ResetAgendas extends GameStateSubcommand {
+class ResetAgendas extends GameStateSubcommand {
 
     public ResetAgendas() {
         super(Constants.RESET_AGENDAS, "Reset agenda deck", true, false);

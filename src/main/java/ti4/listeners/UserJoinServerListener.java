@@ -1,10 +1,9 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -107,7 +106,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             return;
         }
         String threadID = game.getLaunchPostThreadID();
-        if (threadID == null || !ButtonHelper.isNumeric(threadID)) {
+        if (!ButtonHelper.isNumeric(threadID)) {
             return;
         }
         ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);

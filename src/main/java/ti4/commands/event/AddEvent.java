@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class AddEvent extends GameStateSubcommand {
+class AddEvent extends GameStateSubcommand {
 
     public AddEvent() {
         super(Constants.ADD_EVENT, "Add Event as if it were a Law (Permanent/Temporary)", true, true);

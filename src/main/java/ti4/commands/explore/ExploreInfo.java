@@ -23,7 +23,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreInfo extends GameStateSubcommand {
+class ExploreInfo extends GameStateSubcommand {
 
     public ExploreInfo() {
         super(Constants.INFO, "Display cards in exploration decks and discards.", true, false);

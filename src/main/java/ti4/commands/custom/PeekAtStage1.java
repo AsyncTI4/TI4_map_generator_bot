@@ -13,7 +13,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
-public class PeekAtStage1 extends GameStateSubcommand {
+class PeekAtStage1 extends GameStateSubcommand {
 
     public PeekAtStage1() {
         super(Constants.PEEK_AT_STAGE1, "Peek at a stage 1 objective", true, false);

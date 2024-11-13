@@ -11,7 +11,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreDrawAndDiscard extends GameStateSubcommand {
+class ExploreDrawAndDiscard extends GameStateSubcommand {
 
     public ExploreDrawAndDiscard() {
         super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.", true, true);

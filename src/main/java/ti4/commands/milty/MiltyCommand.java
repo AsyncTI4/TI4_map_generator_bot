@@ -1,26 +1,34 @@
 package ti4.commands.milty;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.CommandHelper;
 import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
 
 public class MiltyCommand implements ParentCommand {
 
-    private final Collection<MiltySubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+            new DebugMilty(),
+            new ForcePick(),
+            new SetupMilty(),
+            new StartMilty(),
+            new ShowMilty()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
 
     @Override
     public String getName() {
         return Constants.MILTY;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Milty draft";
     }
 
     @Override
@@ -29,41 +37,7 @@ public class MiltyCommand implements ParentCommand {
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (MiltySubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                //executedCommand = subcommand;
-                break;
-            }
-        }
-        reply(event);
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = CommandHelper.getGameName(event);
-        GameSaveLoadManager.saveGame(game, event);
-    }
-
-    public String getDescription() {
-        return "Milty draft";
-    }
-
-    private Collection<MiltySubcommandData> getSubcommands() {
-        Collection<MiltySubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new DebugMilty());
-        subcommands.add(new ForcePick());
-        subcommands.add(new SetupMilty());
-        subcommands.add(new StartMilty());
-        subcommands.add(new ShowMilty());
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
-    }
-
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands()));
     }
 }

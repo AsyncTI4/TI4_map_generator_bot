@@ -25,7 +25,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.GenericCardModel;
 
-public class TrapReveal extends GameStateSubcommand {
+class TrapReveal extends GameStateSubcommand {
 
     public TrapReveal() {
         super(Constants.LIZHO_REVEAL_TRAP, "Select planets were to reveal trap tokens", true, true);

@@ -8,7 +8,8 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PNRemove extends PNAddRemove {
+class PNRemove extends PNAddRemove {
+
     public PNRemove() {
         super(Constants.PN_REMOVE, "Remove an Promissory Note from your faction's owned notes");
     }

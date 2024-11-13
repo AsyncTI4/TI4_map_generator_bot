@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
 // TODO: maybe combine PutTop and PutBottom?
-public class PutAgendaTop extends GameStateSubcommand {
+class PutAgendaTop extends GameStateSubcommand {
 
     public PutAgendaTop() {
         super(Constants.PUT_TOP, "Put Agenda top", true, false);

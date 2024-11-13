@@ -12,7 +12,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class LookAtTopEvent extends GameStateSubcommand {
+class LookAtTopEvent extends GameStateSubcommand {
 
     public LookAtTopEvent() {
         super(Constants.LOOK_AT_TOP, "Look at top Event from deck", true, false);

@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class RemoveFogTile extends GameStateSubcommand {
+class RemoveFogTile extends GameStateSubcommand {
 
     public RemoveFogTile() {
         super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, true);

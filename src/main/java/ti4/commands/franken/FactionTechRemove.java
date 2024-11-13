@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
-public class FactionTechRemove extends FactionTechAddRemove {
+class FactionTechRemove extends FactionTechAddRemove {
 
     public FactionTechRemove() {
         super(Constants.FACTION_TECH_REMOVE, "Remove a faction tech from your faction");

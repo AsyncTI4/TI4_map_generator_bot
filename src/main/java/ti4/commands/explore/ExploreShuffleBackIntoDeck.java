@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
+class ExploreShuffleBackIntoDeck extends GameStateSubcommand {
 
     public ExploreShuffleBackIntoDeck() {
         super(Constants.SHUFFLE_BACK_INTO_DECK, "Shuffle an Exploration card back into the deck, including purged cards", true, true);

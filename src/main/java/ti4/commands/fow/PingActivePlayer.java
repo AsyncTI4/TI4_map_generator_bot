@@ -12,7 +12,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PingActivePlayer extends GameStateSubcommand {
+class PingActivePlayer extends GameStateSubcommand {
 
     public PingActivePlayer() {
         super(Constants.PING_ACTIVE_PLAYER, "Ping the active player in this game", true, false);

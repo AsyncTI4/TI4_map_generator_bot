@@ -1,15 +1,17 @@
 package ti4.commands.status;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListDiceLuck extends StatusSubcommandData {
+public class ListDiceLuck extends GameStateSubcommand {
+
     public ListDiceLuck() {
-        super(Constants.DICE_LUCK, "List dice luck for this game");
+        super(Constants.DICE_LUCK, "List dice luck for this game", false, false);
     }
 
     @Override
@@ -48,10 +50,5 @@ public class ListDiceLuck extends StatusSubcommandData {
         return "> " + player.getUserName() + ": `" +
             String.format("%.2f", total) +
             "` (" + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)";
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        //We reply in execute command
     }
 }

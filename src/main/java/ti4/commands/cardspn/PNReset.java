@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PNReset extends GameStateSubcommand {
+class PNReset extends GameStateSubcommand {
 
     public PNReset() {
         super(Constants.PN_RESET, "Reset your Promissory Notes and send to your Cards Info thread", true, true);

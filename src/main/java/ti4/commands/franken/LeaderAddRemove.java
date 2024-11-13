@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public abstract class LeaderAddRemove extends GameStateSubcommand {
+abstract class LeaderAddRemove extends GameStateSubcommand {
 
     public LeaderAddRemove(String name, String description) {
         super(name, description, true, true);

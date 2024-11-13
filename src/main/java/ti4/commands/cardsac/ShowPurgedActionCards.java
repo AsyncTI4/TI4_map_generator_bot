@@ -11,10 +11,10 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ShowPurgedActionCards extends GameStateSubcommand {
+class ShowPurgedActionCards extends GameStateSubcommand {
 
     public ShowPurgedActionCards() {
-        super(Constants.SHOW_AC_PURGED_LIST, "Show Action Card purged list", false, false, false);
+        super(Constants.SHOW_AC_PURGED_LIST, "Show Action Card purged list", false, false);
     }
 
     @Override

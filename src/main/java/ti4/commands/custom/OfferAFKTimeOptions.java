@@ -7,7 +7,7 @@ import ti4.helpers.PlayerPreferenceHelper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class OfferAFKTimeOptions extends GameStateSubcommand {
+class OfferAFKTimeOptions extends GameStateSubcommand {
 
     public OfferAFKTimeOptions() {
         super(Constants.OFFER_AFKTIME_OPTIONS, "Offer hours in UTC which you'll be afk usually in (sleeping)", true, true);

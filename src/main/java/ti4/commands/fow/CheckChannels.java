@@ -9,7 +9,7 @@ import ti4.helpers.FoWHelper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class CheckChannels extends GameStateSubcommand {
+class CheckChannels extends GameStateSubcommand {
 
     public CheckChannels() {
         super(Constants.CHECK_CHANNELS, "Ping each channel that is set up", true, false);

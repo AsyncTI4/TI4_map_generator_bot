@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ATS extends GameStateSubcommand {
+class ATS extends GameStateSubcommand {
 
     public ATS() {
         super(Constants.LANEFIR_ATS_COUNT, "Set commodity count on the ATS Armaments tech", true, true);

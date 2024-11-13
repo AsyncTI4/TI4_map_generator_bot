@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PutEventTop extends GameStateSubcommand {
+class PutEventTop extends GameStateSubcommand {
 
     public PutEventTop() {
         super(Constants.PUT_TOP, "Put Event on top", true, true);

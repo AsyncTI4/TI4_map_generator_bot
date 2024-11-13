@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SendAC extends GameStateSubcommand {
+class SendAC extends GameStateSubcommand {
 
     public SendAC() {
         super(Constants.SEND_AC, "Send an Action Card to a player", true, true);

@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListVoteCount extends GameStateSubcommand {
+class ListVoteCount extends GameStateSubcommand {
 
     public ListVoteCount() {
         super(Constants.VOTE_COUNT, "List Vote count for agenda", false, false);

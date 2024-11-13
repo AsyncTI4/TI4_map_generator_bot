@@ -13,7 +13,7 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class LeaderAdd extends LeaderAddRemove {
+class LeaderAdd extends LeaderAddRemove {
 
     public LeaderAdd() {
         super(Constants.LEADER_ADD, "Add a leader to your faction");

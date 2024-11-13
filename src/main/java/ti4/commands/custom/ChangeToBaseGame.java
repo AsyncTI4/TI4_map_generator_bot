@@ -13,7 +13,8 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class ChangeToBaseGame extends GameStateSubcommand {
+class ChangeToBaseGame extends GameStateSubcommand {
+
     public ChangeToBaseGame() {
         super(Constants.CHANGE_TO_BASE_GAME, "Remove PoK ACs/SOs/POs/Agendas", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex AC too? (y/n)").setRequired(false));

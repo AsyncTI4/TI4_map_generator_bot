@@ -1,15 +1,17 @@
 package ti4.commands.status;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListSpends extends StatusSubcommandData {
+public class ListSpends extends GameStateSubcommand {
+
     public ListSpends() {
-        super(Constants.SPENDS, "List value of plastic and CCs gained by players this game");
+        super(Constants.SPENDS, "List value of plastic and CCs gained by players this game", false, false);
     }
 
     @Override
@@ -38,10 +40,5 @@ public class ListSpends extends StatusSubcommandData {
 
     private String playerSpends(Player player) {
         return "> " + player.getUserName() + ": " + player.getTotalExpenses() + " total i/r value of plastic built and CCs gained";
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        //We reply in execute command
     }
 }

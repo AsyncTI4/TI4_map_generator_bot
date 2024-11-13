@@ -17,7 +17,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class SendPN extends GameStateSubcommand {
+class SendPN extends GameStateSubcommand {
 
 	public SendPN() {
 		super(Constants.SEND_PN, "Send Promissory Note to player", true, true);

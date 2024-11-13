@@ -17,7 +17,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class FrankenEdit extends GameStateSubcommand {
+class FrankenEdit extends GameStateSubcommand {
 
     public FrankenEdit() {
         super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands", true, true);

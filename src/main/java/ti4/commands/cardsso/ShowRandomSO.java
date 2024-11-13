@@ -14,7 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowRandomSO extends GameStateSubcommand {
+class ShowRandomSO extends GameStateSubcommand {
 
     public ShowRandomSO() {
         super("show_random", "Show a Secret Objective to a player", true, false);

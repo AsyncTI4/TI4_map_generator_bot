@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
 import ti4.model.GenericCardModel;
 
-public class AbilityAdd extends AbilityAddRemove {
+class AbilityAdd extends AbilityAddRemove {
 
     public AbilityAdd() {
         super(Constants.ABILITY_ADD, "Add an ability to your faction");

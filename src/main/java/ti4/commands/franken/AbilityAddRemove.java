@@ -13,7 +13,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 
-public abstract class AbilityAddRemove extends GameStateSubcommand {
+abstract class AbilityAddRemove extends GameStateSubcommand {
 
     public AbilityAddRemove(String name, String description) {
         super(name, description, true, true);

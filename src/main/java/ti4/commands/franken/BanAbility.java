@@ -14,7 +14,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class BanAbility extends GameStateSubcommand {
+class BanAbility extends GameStateSubcommand {
 
     public BanAbility() {
         super(Constants.BAN_ABILITY, "Ban An Ability From The Draft", true, false);

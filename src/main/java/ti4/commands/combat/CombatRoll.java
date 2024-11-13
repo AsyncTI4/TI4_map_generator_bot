@@ -41,7 +41,7 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
-public class CombatRoll extends GameStateSubcommand {
+class CombatRoll extends GameStateSubcommand {
 
     public CombatRoll() {
         super(Constants.COMBAT_ROLL, "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*", true, false);

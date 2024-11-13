@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -19,10 +20,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class PersonalCleanup extends StatusSubcommandData {
+public class PersonalCleanup extends GameStateSubcommand {
 
     public PersonalCleanup() {
-        super(Constants.PERSONAL_CLEANUP, "Status phase cleanup");
+        super(Constants.PERSONAL_CLEANUP, "Status phase cleanup", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -35,12 +36,12 @@ public class PersonalCleanup extends StatusSubcommandData {
         }
         Game game = getGame();
         runStatusCleanup(game);
+        StatusCommand.reply(event, "Player has completed status phase.");
     }
 
-    public void runStatusCleanup(Game game) {
-
+    private void runStatusCleanup(Game game) {
         Map<String, Tile> tileMap = game.getTileMap();
-        Player player = game.getPlayer(getUser().getId());
+        Player player = getPlayer();
         String color = player.getColor();
         String ccID = Mapper.getCCID(color);
 
@@ -81,10 +82,5 @@ public class PersonalCleanup extends StatusSubcommandData {
                 }
             }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        StatusCommand.reply(event, "Player has completed status phase.");
     }
 }

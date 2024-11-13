@@ -18,7 +18,7 @@ import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class ArchiveOldThreads extends Subcommand {
+class ArchiveOldThreads extends Subcommand {
 
     private final static Predicate<ThreadChannel> oldThreadsFilter = c -> c.getLatestMessageIdLong() != 0 && !c.isArchived();
 
@@ -40,7 +40,6 @@ public class ArchiveOldThreads extends Subcommand {
     }
 
     public static void archiveOldThreads(Guild guild, Integer threadCount) {
-
         // Try gathering all threads that are not bot-map or cards-info threads
         List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()
             .filter(oldThreadsFilter)

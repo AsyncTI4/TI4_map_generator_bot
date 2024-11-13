@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ShuffleACBackIntoDeck extends GameStateSubcommand {
+class ShuffleACBackIntoDeck extends GameStateSubcommand {
 
     public ShuffleACBackIntoDeck() {
         super(Constants.SHUFFLE_AC_BACK_INTO_DECK, "Shuffle Action Card back into deck from the discard pile.", true, false);

@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.GlobalSettings;
 import ti4.message.MessageHelper;
 
-public class SetGlobalSetting extends Subcommand {
+class SetGlobalSetting extends Subcommand {
 
     public SetGlobalSetting() {
         super(Constants.SET_SETTING, "Set or change a global setting");

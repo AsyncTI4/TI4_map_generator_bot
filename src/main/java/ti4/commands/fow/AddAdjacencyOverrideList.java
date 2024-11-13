@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class AddAdjacencyOverrideList extends GameStateSubcommand {
+class AddAdjacencyOverrideList extends GameStateSubcommand {
 
   public AddAdjacencyOverrideList() {
     super(Constants.ADD_ADJACENCY_OVERRIDE_LIST, "Add Custom Adjacent Tiles as a List.", true, true);

@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ResetEvents extends GameStateSubcommand {
+class ResetEvents extends GameStateSubcommand {
 
     public ResetEvents() {
         super(Constants.RESET_EVENTS, "Reset event deck", true, false);

@@ -6,9 +6,10 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ShowACRemainingCardCount extends GameStateSubcommand {
+class ShowACRemainingCardCount extends GameStateSubcommand {
+
     public ShowACRemainingCardCount() {
-        super(Constants.SHOW_AC_REMAINING_CARD_COUNT, "Show Action Card deck card count", false, false, false);
+        super(Constants.SHOW_AC_REMAINING_CARD_COUNT, "Show Action Card deck card count", false, false);
     }
 
     @Override

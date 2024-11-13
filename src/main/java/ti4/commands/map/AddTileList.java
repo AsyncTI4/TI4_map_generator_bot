@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.ResourceHelper;
+import ti4.commands.CommandHelper;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;

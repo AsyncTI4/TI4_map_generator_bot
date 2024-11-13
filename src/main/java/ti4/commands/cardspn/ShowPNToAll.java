@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowPNToAll extends GameStateSubcommand {
+class ShowPNToAll extends GameStateSubcommand {
 
     public ShowPNToAll() {
         super(Constants.SHOW_PN_TO_ALL, "Show Promissory Note to table", false, true);

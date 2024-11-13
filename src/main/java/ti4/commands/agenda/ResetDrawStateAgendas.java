@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ResetDrawStateAgendas extends GameStateSubcommand {
+class ResetDrawStateAgendas extends GameStateSubcommand {
 
     public ResetDrawStateAgendas() {
         super(Constants.RESET_DRAW_STATE_FOR_AGENDAS, "Reset draw state of agenda deck", true, false);

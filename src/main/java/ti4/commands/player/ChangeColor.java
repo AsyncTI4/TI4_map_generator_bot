@@ -11,6 +11,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.CommandHelper;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -22,7 +23,6 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class ChangeColor extends PlayerSubcommandData {

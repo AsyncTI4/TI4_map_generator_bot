@@ -9,7 +9,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class Announce extends GameStateSubcommand {
+class Announce extends GameStateSubcommand {
 
     public Announce() {
         super(Constants.ANNOUNCE, "Send a message to the main channel", true, false);

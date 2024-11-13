@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -23,7 +24,7 @@ import ti4.map.Player;
 import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class Undo extends GameSubcommandData {
+public class Undo extends GameStateSubcommand {
     public Undo() {
         super(Constants.UNDO, "Undo the last action");
         addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_BEFORE_COMMAND, "Command to undo back to").setRequired(true).setAutoComplete(true));

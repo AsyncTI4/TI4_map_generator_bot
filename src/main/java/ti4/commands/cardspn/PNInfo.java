@@ -23,7 +23,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source.ComponentSource;
 
-public class PNInfo extends GameStateSubcommand {
+class PNInfo extends GameStateSubcommand {
 
     public PNInfo() {
         super(Constants.INFO, "Send your Promissory Notes to your Cards Info thread", false, true);

@@ -11,7 +11,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawSO extends GameStateSubcommand {
+class DrawSO extends GameStateSubcommand {
 
     public DrawSO() {
         super(Constants.DRAW_SO, "Draw Secret Objective", true, true);

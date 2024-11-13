@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-public class SpinTilesInRings extends GameStateSubcommand {
+class SpinTilesInRings extends GameStateSubcommand {
 
   private static final String CW = "cw";
   private static final String CCW = "ccw";

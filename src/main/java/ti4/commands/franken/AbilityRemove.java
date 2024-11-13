@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AbilityRemove extends AbilityAddRemove {
+class AbilityRemove extends AbilityAddRemove {
 
     public AbilityRemove() {
         super(Constants.ABILITY_REMOVE, "Remove an ability from your faction");

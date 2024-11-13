@@ -7,7 +7,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 
-public class RevealAgenda extends GameStateSubcommand {
+class RevealAgenda extends GameStateSubcommand {
 
     public RevealAgenda() {
         super(Constants.REVEAL, "Reveal top Agenda from deck", true, false);

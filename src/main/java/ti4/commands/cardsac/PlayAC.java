@@ -34,7 +34,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayAC extends GameStateSubcommand {
+class PlayAC extends GameStateSubcommand {
 
     public PlayAC() {
         super(Constants.PLAY_AC, "Play an Action Card", true, true);

@@ -17,7 +17,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class JazzCommand extends GameStateSubcommand {
+class JazzCommand extends GameStateSubcommand {
 
     public JazzCommand() {
         super("jazz_command", "jazzxhands", false, false);

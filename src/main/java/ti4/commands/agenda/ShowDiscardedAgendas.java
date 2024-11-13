@@ -25,7 +25,7 @@ import ti4.message.MessageHelper;
 
 import static ti4.helpers.ButtonHelper.deleteMessage;
 
-public class ShowDiscardedAgendas extends GameStateSubcommand {
+class ShowDiscardedAgendas extends GameStateSubcommand {
 
     public ShowDiscardedAgendas() {
         super(Constants.SHOW_DISCARDED, "Show discarded Agendas", false, false);

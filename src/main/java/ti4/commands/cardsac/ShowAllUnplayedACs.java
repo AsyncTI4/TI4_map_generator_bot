@@ -11,10 +11,10 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ShowAllUnplayedACs extends GameStateSubcommand {
+class ShowAllUnplayedACs extends GameStateSubcommand {
 
     public ShowAllUnplayedACs() {
-        super(Constants.SHOW_UNPLAYED_AC, "Show all unplayed Action Cards", false, false, false);
+        super(Constants.SHOW_UNPLAYED_AC, "Show all unplayed Action Cards", false, false);
     }
 
     @Override

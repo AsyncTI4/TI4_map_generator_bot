@@ -1,4 +1,4 @@
-package ti4.commands.status;
+package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,7 +8,6 @@ import java.util.Set;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -16,11 +15,6 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.player.Stats;
 import ti4.commands.player.UnitInfo;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -30,18 +24,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
-import ti4.model.Source.ComponentSource;
-import ti4.model.TechnologyModel.TechnologyType;
+import ti4.model.Source;
+import ti4.model.TechnologyModel;
 
-public class ListPlayerInfoButton extends StatusSubcommandData {
-    public ListPlayerInfoButton() {
-        super(Constants.TURN_ORDER, "List Turn order with SC played and Player passed status");
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        //Game game = getGame();
-    }
+public class ButtonHelperListPlayerInfo {
 
     @ButtonHandler("gameInfoButtons")
     public static void offerInfoButtons(ButtonInteractionEvent event) {
@@ -269,7 +255,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
     }
 
     public static void displayerScoringProgression(Game game, boolean onlyThisGameObj,
-        MessageChannel channel, String stage1sOrTwos) {
+                                                   MessageChannel channel, String stage1sOrTwos) {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
@@ -288,10 +274,10 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             msg.append(representTotalVPs(game)).append("\n");
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
-                if (Mapper.getPublicObjective(id).getSource() == ComponentSource.pok
-                    || Mapper.getPublicObjective(id).getSource() == ComponentSource.base) {
+                if (Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.pok
+                        || Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.base) {
                     if (stage1sOrTwos.equalsIgnoreCase("" + Mapper.getPublicObjective(id).getPoints())
-                        || stage1sOrTwos.equalsIgnoreCase("both")) {
+                            || stage1sOrTwos.equalsIgnoreCase("both")) {
                         msg.append(representScoring(game, id, x)).append("\n");
                         x++;
                     }
@@ -333,7 +319,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     }
                 } else {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
-                        && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
+                            && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
                         representation.append("✅  ");
                     } else {
                         representation.append(getPlayerProgressOnObjective(objID, game, player)).append("/").append(getObjectiveThreshold(objID, game)).append("  ");
@@ -395,7 +381,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int edge = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(game)
-                        && tile != player.getHomeSystemTile()) {
+                            && tile != player.getHomeSystemTile()) {
                         edge++;
                     }
                 }
@@ -416,8 +402,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 for (String planet : player.getPlanets()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()
-                        && (uH.getUnitCount(UnitType.Spacedock, player) > 0
-                            || uH.getUnitCount(UnitType.Pds, player) > 0)) {
+                            && (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
+                            || uH.getUnitCount(Units.UnitType.Pds, player) > 0)) {
                         counter++;
                     }
                 }
@@ -439,16 +425,16 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "diversify", "master_science" -> {
                 int numAbove1 = 0;
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.WARFARE) > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.WARFARE) > 1) {
                     numAbove1++;
                 }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.PROPULSION) > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.PROPULSION) > 1) {
                     numAbove1++;
                 }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.BIOTIC) > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.BIOTIC) > 1) {
                     numAbove1++;
                 }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.CYBERNETIC) > 1) {
+                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.CYBERNETIC) > 1) {
                     numAbove1++;
                 }
                 return numAbove1;
@@ -509,7 +495,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "build_defenses", "massive_cities" -> {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
             }
             case "lost_outposts", "ancient_monuments" -> {
                 int count = 0;
@@ -527,8 +513,8 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "engineer_marvel" -> {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fs", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
-                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
+                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
             }
             case "deep_space", "vast_territories" -> {
                 return ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(game, player);
@@ -561,7 +547,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "supremacy" -> {
                 int count = 0;
-                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship, UnitType.Warsun, UnitType.Lady)) {
+                for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
                     if ((tile.isHomeSystem() && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
                     }
@@ -634,7 +620,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int count = 0;
                 for (String p : player.getPlanets()) {
                     Planet planet = game.getPlanetsInfo().get(p);
-                    if (planet != null && planet.getUnitCount(UnitType.Spacedock, player) < 1) {
+                    if (planet != null && planet.getUnitCount(Units.UnitType.Spacedock, player) < 1) {
                         count = Math.max(count, ButtonHelper.getNumberOfGroundForces(player, planet));
                     }
                 }
@@ -644,7 +630,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                    if (uH != null && uH.getUnitCount(UnitType.Mech, player) > 0) {
+                    if (uH != null && uH.getUnitCount(Units.UnitType.Mech, player) > 0) {
                         count++;
                     }
                 }
@@ -689,7 +675,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         continue;
                     }
                     for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
-                        false, false)) {
+                            false, false)) {
                         Tile tile2 = game.getTileByPosition(pos);
                         if (ButtonHelper.checkNumberShips(player, game, tile2) > 0) {
                             count++;
@@ -701,7 +687,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "ose" -> {
                 Tile mecatol = game.getMecatolTile();
                 boolean controlsMecatol = player.getPlanets().stream()
-                    .anyMatch(Constants.MECATOLS::contains);
+                        .anyMatch(Constants.MECATOLS::contains);
                 if (mecatol == null || !FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {
@@ -713,10 +699,10 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             }
             case "mlp" -> {//4 techs of a color
                 int maxNum = 0;
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.WARFARE));
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.PROPULSION));
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.CYBERNETIC));
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyType.BIOTIC));
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.WARFARE));
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.PROPULSION));
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.CYBERNETIC));
+                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.BIOTIC));
                 return maxNum;
             }
             case "mp" -> {
@@ -727,7 +713,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 for (Tile tile : game.getTileMap().values()) {
                     if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
                         for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
-                            false, false)) {
+                                false, false)) {
                             Tile tile2 = game.getTileByPosition(pos);
                             if (tile2.isAnomaly(game)) {
                                 count++;
@@ -793,7 +779,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     if (p2 == player) {
                         continue;
                     }
-                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock)) {
+                    for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock)) {
                         if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
                             count++;
                         }
@@ -813,10 +799,5 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
         }
         return 0;
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        // We reply in execute command
     }
 }

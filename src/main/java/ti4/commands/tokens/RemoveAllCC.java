@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.CommandHelper;
 import ti4.commands.ParentCommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;

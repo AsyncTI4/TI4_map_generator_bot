@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
 
-public class ACInfo extends GameStateSubcommand {
+class ACInfo extends GameStateSubcommand {
 
     public ACInfo() {
         super(Constants.INFO, "Send Action Cards to your Cards Info thread", false, true);

@@ -7,7 +7,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ACRemoveFromGame extends GameStateSubcommand {
+class ACRemoveFromGame extends GameStateSubcommand {
 
     public ACRemoveFromGame() {
         super(Constants.REMOVE_AC_FROM_GAME, "AC remove from game", true, true);

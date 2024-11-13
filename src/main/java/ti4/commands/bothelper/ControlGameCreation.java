@@ -11,7 +11,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class ControlGameCreation extends Subcommand {
+class ControlGameCreation extends Subcommand {
 
     public ControlGameCreation() {
         super(Constants.CONTROL_GAME_CREATION, "Stop or allow game creation buttons to be pressed");

@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public abstract class FactionTechAddRemove extends GameStateSubcommand {
+abstract class FactionTechAddRemove extends GameStateSubcommand {
     
     public FactionTechAddRemove(String name, String description) {
         super(name, description, true, true);

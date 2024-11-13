@@ -6,6 +6,8 @@ import java.util.Map;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -17,7 +19,7 @@ import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
-public class RevealStage2 extends StatusSubcommandData {
+public class RevealStage2 extends GameStateSubcommand {
     public RevealStage2() {
         super(Constants.REVEAL_STAGE2, "Reveal Stage2 Public Objective");
     }

@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
-public class PutAgendaBottom extends GameStateSubcommand {
+class PutAgendaBottom extends GameStateSubcommand {
 
     public PutAgendaBottom() {
         super(Constants.PUT_BOTTOM, "Put Agenda bottom", true, false);

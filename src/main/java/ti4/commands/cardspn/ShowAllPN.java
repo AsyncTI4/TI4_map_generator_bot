@@ -15,7 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAllPN extends GameStateSubcommand {
+class ShowAllPN extends GameStateSubcommand {
 
     public ShowAllPN() {
         super(Constants.SHOW_ALL_PN, "Show Promissory Note to player", false, true);

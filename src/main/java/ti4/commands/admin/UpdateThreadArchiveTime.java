@@ -13,7 +13,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class UpdateThreadArchiveTime extends Subcommand {
+class UpdateThreadArchiveTime extends Subcommand {
 
     public UpdateThreadArchiveTime() {
         super(Constants.UPDATE_THREAD_ARCHIVE_TIME, "Update the AutoArchiveDuration for all currently open threads that contain the search string");

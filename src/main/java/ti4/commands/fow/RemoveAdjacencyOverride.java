@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class RemoveAdjacencyOverride extends GameStateSubcommand {
+class RemoveAdjacencyOverride extends GameStateSubcommand {
 
     public RemoveAdjacencyOverride() {
         super(Constants.REMOVE_ADJACENCY_OVERRIDE, "Remove Custom Adjacent Tiles.", true, true);

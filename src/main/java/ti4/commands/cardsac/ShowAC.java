@@ -15,10 +15,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAC extends GameStateSubcommand {
+class ShowAC extends GameStateSubcommand {
 
     public ShowAC() {
-        super(Constants.SHOW_AC, "Show an Action Card to one player", false, false, false);
+        super(Constants.SHOW_AC, "Show an Action Card to one player", false, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }

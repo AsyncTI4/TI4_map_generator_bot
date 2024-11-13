@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SCRemoveFromGame extends GameStateSubcommand {
+class SCRemoveFromGame extends GameStateSubcommand {
 
     public SCRemoveFromGame() {
         super(Constants.REMOVE_SC_FROM_GAME, "Remove a Stategy Card # from the game", true, false);

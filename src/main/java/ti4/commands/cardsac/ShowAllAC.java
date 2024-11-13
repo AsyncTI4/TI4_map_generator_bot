@@ -15,10 +15,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAllAC extends GameStateSubcommand {
+class ShowAllAC extends GameStateSubcommand {
 
     public ShowAllAC() {
-        super(Constants.SHOW_ALL_AC, "Show all Action Cards one player", false, false, false);
+        super(Constants.SHOW_ALL_AC, "Show all Action Cards one player", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 

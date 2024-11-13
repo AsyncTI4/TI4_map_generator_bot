@@ -15,7 +15,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class StartFrankenDraft extends GameStateSubcommand {
+class StartFrankenDraft extends GameStateSubcommand {
 
     public StartFrankenDraft() {
         super(Constants.START_FRANKEN_DRAFT, "Start a franken draft", true, false);

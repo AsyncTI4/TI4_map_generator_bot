@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawAC extends GameStateSubcommand {
+class DrawAC extends GameStateSubcommand {
 
     public DrawAC() {
         super(Constants.DRAW_AC, "Draw Action Card", true, true);

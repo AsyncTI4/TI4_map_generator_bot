@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class CardsInfoForPlayer extends GameStateSubcommand {
+class CardsInfoForPlayer extends GameStateSubcommand {
 
     CardsInfoForPlayer() {
         super(Constants.INFO, "Resent all my cards in Private Message", false, false);

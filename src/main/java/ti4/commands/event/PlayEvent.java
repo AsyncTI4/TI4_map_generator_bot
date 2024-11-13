@@ -16,7 +16,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class PlayEvent extends GameStateSubcommand {
+class PlayEvent extends GameStateSubcommand {
 
     public PlayEvent() {
         super(Constants.EVENT_PLAY, "Play an Event from your hand", true, false);

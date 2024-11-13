@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.special.Rematch;
 import ti4.commands.statistics.GameStatisticFilterer;
 import ti4.commands.statistics.GameStats;
@@ -48,7 +49,7 @@ import ti4.message.MessageHelper;
 
 import static ti4.helpers.StringHelper.ordinal;
 
-public class GameEnd extends GameSubcommandData {
+public class GameEnd extends GameStateSubcommand {
 
     public GameEnd() {
         super(Constants.GAME_END, "Declare the game has ended");

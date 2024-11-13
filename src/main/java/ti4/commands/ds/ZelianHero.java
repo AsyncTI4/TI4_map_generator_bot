@@ -25,7 +25,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class ZelianHero extends GameStateSubcommand {
+class ZelianHero extends GameStateSubcommand {
 
     public ZelianHero() {
         super(Constants.ZELIAN_HERO, "Celestial Impact a system (replace with Zelian Asteroid field)", true, true);

@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class PutDiscardBackIntoDeckAgendas extends GameStateSubcommand {
+class PutDiscardBackIntoDeckAgendas extends GameStateSubcommand {
 
     public PutDiscardBackIntoDeckAgendas() {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put agenda back into deck from discard", true, false);

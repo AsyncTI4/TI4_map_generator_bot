@@ -36,7 +36,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 
-public class ExplorePlanet extends GameStateSubcommand {
+class ExplorePlanet extends GameStateSubcommand {
 
     public ExplorePlanet() {
         super(Constants.PLANET, "Explore a specific planet.", true, true);

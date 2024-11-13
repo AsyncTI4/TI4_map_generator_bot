@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class DiscardSpecificAgenda extends GameStateSubcommand {
+class DiscardSpecificAgenda extends GameStateSubcommand {
 
     public DiscardSpecificAgenda() {
         super(Constants.DISCARD_SPECIFIC_AGENDA, "Discard Specific Agenda", true, true);

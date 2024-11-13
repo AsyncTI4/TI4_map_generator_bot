@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 
-public class DrawEvent extends GameStateSubcommand {
+class DrawEvent extends GameStateSubcommand {
 
     public DrawEvent() {
         super(Constants.DRAW, "Draw Event", true, true);

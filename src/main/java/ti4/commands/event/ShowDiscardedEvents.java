@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class ShowDiscardedEvents extends GameStateSubcommand {
+class ShowDiscardedEvents extends GameStateSubcommand {
 
     public ShowDiscardedEvents() {
         super(Constants.SHOW_DISCARDED, "Show discarded Events", true, false);

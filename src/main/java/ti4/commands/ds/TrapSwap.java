@@ -15,7 +15,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class TrapSwap extends GameStateSubcommand {
+class TrapSwap extends GameStateSubcommand {
 
     public TrapSwap() {
         super(Constants.LIZHO_SWAP_TRAP, "Select planets for which to swap traps", true, true);

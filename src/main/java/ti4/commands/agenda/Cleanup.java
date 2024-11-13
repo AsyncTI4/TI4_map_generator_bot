@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Cleanup extends GameStateSubcommand {
+class Cleanup extends GameStateSubcommand {
 
     public Cleanup() {
         super(Constants.CLEANUP, "Agenda phase cleanup", true, false);

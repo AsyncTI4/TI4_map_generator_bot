@@ -14,7 +14,7 @@ import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class RunManualDataMigration extends Subcommand {
+class RunManualDataMigration extends Subcommand {
 
     public RunManualDataMigration() {
         super(Constants.RUN_MANUAL_DATA_MIGRATION, "Run a manual data migration on a game.");

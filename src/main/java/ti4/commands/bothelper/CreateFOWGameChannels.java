@@ -30,7 +30,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CreateFOWGameChannels extends Subcommand {
+class CreateFOWGameChannels extends Subcommand {
 
     public CreateFOWGameChannels() {
         super(Constants.CREATE_FOW_GAME_CHANNELS, "Create Role and Game Channels for a New FOW Game");

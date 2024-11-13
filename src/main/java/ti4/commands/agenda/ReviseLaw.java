@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ReviseLaw extends GameStateSubcommand {
+class ReviseLaw extends GameStateSubcommand {
 
     public ReviseLaw() {
         super(Constants.REVISE_LAW, "Revise a law", true, false);

@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 
-public class ListButtons extends Subcommand {
+class ListButtons extends Subcommand {
 
     public ListButtons() {
         super("list_buttons", "list button IDs on a message");

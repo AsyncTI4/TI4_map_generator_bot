@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class KyroHero extends GameStateSubcommand {
+class KyroHero extends GameStateSubcommand {
 
     public KyroHero() {
         super(Constants.KYRO_HERO, "Mark a strategy card as the target of Speygh, the Kyro Hero.", true, true);

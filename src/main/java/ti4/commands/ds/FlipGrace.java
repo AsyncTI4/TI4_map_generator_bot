@@ -6,7 +6,7 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class FlipGrace extends GameStateSubcommand {
+class FlipGrace extends GameStateSubcommand {
 
     public FlipGrace() {
         super(Constants.FLIP_GRACE, "Flip Grace (Edyn Faction Ability) to show it has been used", true, true);

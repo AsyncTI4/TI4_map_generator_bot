@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class RevealEvent extends GameStateSubcommand {
+class RevealEvent extends GameStateSubcommand {
 
     public RevealEvent() {
         super(Constants.REVEAL, "Reveal top Agenda from deck", true, false);

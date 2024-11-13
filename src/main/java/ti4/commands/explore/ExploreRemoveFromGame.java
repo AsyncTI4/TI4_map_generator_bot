@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreRemoveFromGame extends GameStateSubcommand {
+class ExploreRemoveFromGame extends GameStateSubcommand {
 
     public ExploreRemoveFromGame() {
         super(Constants.REMOVE, "Remove an Exploration card from the game.", true, true);

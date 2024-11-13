@@ -10,7 +10,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class DeleteGame extends Subcommand {
+class DeleteGame extends Subcommand {
 
     DeleteGame() {
         super(Constants.DELETE_GAME, "Delete a game.");

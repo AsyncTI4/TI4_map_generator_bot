@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -14,10 +15,10 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-abstract public class AddRemovePlayer extends GameSubcommandData {
+abstract public class AddRemovePlayer extends GameStateSubcommand {
 
     public AddRemovePlayer(@NotNull String name, @NotNull String description) {
-        super(name, description);
+        super(name, description, true, false);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player @playerName").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player @playerName"));

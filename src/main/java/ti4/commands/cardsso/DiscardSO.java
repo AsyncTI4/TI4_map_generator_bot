@@ -23,7 +23,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class DiscardSO extends GameStateSubcommand {
+class DiscardSO extends GameStateSubcommand {
 
     public DiscardSO() {
         super(Constants.DISCARD_SO, "Discard Secret Objective", true, true);

@@ -11,7 +11,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PurgePN extends GameStateSubcommand {
+class PurgePN extends GameStateSubcommand {
 
     public PurgePN() {
         super(Constants.PURGE_PN, "Purge Promissory Note", true, true);

@@ -8,7 +8,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class RevealAndPutACIntoDiscard extends GameStateSubcommand {
+class RevealAndPutACIntoDiscard extends GameStateSubcommand {
 
     public RevealAndPutACIntoDiscard() {
         super(Constants.REVEAL_AND_PUT_AC_INTO_DISCARD, "Reveal Action Card from deck and put into discard pile", true, true);

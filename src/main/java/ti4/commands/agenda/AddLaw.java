@@ -11,7 +11,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class AddLaw extends GameStateSubcommand {
+class AddLaw extends GameStateSubcommand {
 
     public AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law", true, true);

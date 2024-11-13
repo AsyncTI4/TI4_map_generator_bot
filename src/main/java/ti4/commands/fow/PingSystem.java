@@ -15,7 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PingSystem extends GameStateSubcommand {
+class PingSystem extends GameStateSubcommand {
 
     public PingSystem() {
         super(Constants.PING_SYSTEM, "Alert players adjacent to a system with a message.", true, false);

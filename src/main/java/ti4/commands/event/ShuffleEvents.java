@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ShuffleEvents extends GameStateSubcommand {
+class ShuffleEvents extends GameStateSubcommand {
 
     public ShuffleEvents() {
         super(Constants.SHUFFLE_EVENTS, "Shuffle event deck", true, true);

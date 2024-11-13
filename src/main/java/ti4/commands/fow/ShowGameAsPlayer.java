@@ -9,7 +9,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 
-public class ShowGameAsPlayer extends GameStateSubcommand {
+class ShowGameAsPlayer extends GameStateSubcommand {
 
     public ShowGameAsPlayer() {
         super(Constants.SHOW_GAME_AS_PLAYER, "Shows map as the specified player sees it.", true, false);

@@ -11,7 +11,7 @@ import ti4.helpers.Constants;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class SetThreadName extends Subcommand {
+class SetThreadName extends Subcommand {
 
     public SetThreadName() {
         super(Constants.SET_THREAD_NAME, "Set the name of the thread");

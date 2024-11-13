@@ -7,7 +7,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class PoRemoveFromGame extends GameStateSubcommand {
+class PoRemoveFromGame extends GameStateSubcommand {
 
     public PoRemoveFromGame() {
         super(Constants.REMOVE_PO_FROM_GAME, "PO remove from game", true, true);

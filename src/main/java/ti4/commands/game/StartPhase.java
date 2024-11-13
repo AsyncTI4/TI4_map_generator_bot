@@ -13,12 +13,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PlayPN;
 import ti4.commands.player.TurnEnd;
 import ti4.commands.player.TurnStart;
 import ti4.commands.status.Cleanup;
-import ti4.commands.status.ListPlayerInfoButton;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.MapGenerator;
 import ti4.generator.MapRenderPipeline;
@@ -46,7 +46,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class StartPhase extends GameSubcommandData {
+public class StartPhase extends GameStateSubcommand {
     public StartPhase() {
         super(Constants.START_PHASE, "Start a specific phase of the game");
         addOptions(new OptionData(OptionType.STRING, Constants.SPECIFIC_PHASE, "What phase do you want to get buttons for?").setRequired(true).setAutoComplete(true));

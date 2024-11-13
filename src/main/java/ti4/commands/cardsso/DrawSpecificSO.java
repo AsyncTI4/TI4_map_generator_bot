@@ -13,7 +13,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawSpecificSO extends GameStateSubcommand {
+class DrawSpecificSO extends GameStateSubcommand {
 
     public DrawSpecificSO() {
         super(Constants.DRAW_SPECIFIC_SO, "Draw specific SO", true, true);

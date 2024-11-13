@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PurgeAC extends GameStateSubcommand {
+class PurgeAC extends GameStateSubcommand {
 
     public PurgeAC() {
         super(Constants.PURGE_AC, "Purge an Action Card", true, true);

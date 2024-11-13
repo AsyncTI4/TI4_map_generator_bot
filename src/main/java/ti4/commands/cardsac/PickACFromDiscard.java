@@ -20,7 +20,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PickACFromDiscard extends GameStateSubcommand {
+class PickACFromDiscard extends GameStateSubcommand {
 
     public PickACFromDiscard() {
         super(Constants.PICK_AC_FROM_DISCARD, "Pick an Action Card from discard pile into your hand", true, true);

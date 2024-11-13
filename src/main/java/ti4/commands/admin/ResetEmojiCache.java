@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 import ti4.listeners.ButtonListener;
 import ti4.message.BotLogger;
 
-public class ResetEmojiCache extends Subcommand {
+class ResetEmojiCache extends Subcommand {
 
     public ResetEmojiCache() {
         super(Constants.RESET_EMOJI_CACHE, "Reset Emoji Cache for Button reactions");

@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class RemoveAllAdjacencyOverrides extends GameStateSubcommand {
+class RemoveAllAdjacencyOverrides extends GameStateSubcommand {
 
     public RemoveAllAdjacencyOverrides() {
         super(Constants.REMOVE_ALL_ADJACENCY_OVERRIDES, "Remove all adjacency overrides from the map.", true, true);

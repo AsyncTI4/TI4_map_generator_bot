@@ -1,4 +1,4 @@
-package ti4.commands.franken;
+package ti4.buttons.handlers;
 
 import java.util.List;
 
@@ -6,6 +6,16 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.franken.AbilityAdd;
+import ti4.commands.franken.AbilityRemove;
+import ti4.commands.franken.FactionTechAdd;
+import ti4.commands.franken.FactionTechRemove;
+import ti4.commands.franken.LeaderAdd;
+import ti4.commands.franken.LeaderRemove;
+import ti4.commands.franken.PNAdd;
+import ti4.commands.franken.PNRemove;
+import ti4.commands.franken.UnitAdd;
+import ti4.commands.franken.UnitRemove;
 import ti4.commands.player.Stats;
 import ti4.commands.tech.TechAdd;
 import ti4.commands.tech.TechRemove;
@@ -18,7 +28,7 @@ import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 
-public class FrankenApplicator {
+public class FrankenButtonHandler {
 
     @ButtonHandler("frankenItemAdd")
     public static void resolveFrankenItemAddButton(ButtonInteractionEvent event, String buttonID, Player player) {

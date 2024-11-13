@@ -8,7 +8,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class RemoveLaw extends GameStateSubcommand {
+class RemoveLaw extends GameStateSubcommand {
 
     public RemoveLaw() {
         super(Constants.REMOVE_LAW, "Remove Law", true, false);

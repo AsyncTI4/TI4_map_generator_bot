@@ -8,6 +8,7 @@ import java.util.Set;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -16,9 +17,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListTurnOrder extends StatusSubcommandData {
+public class ListTurnOrder extends GameStateSubcommand {
+
     public ListTurnOrder() {
-        super(Constants.TURN_ORDER, "List Turn order with SC played and Player passed status");
+        super(Constants.TURN_ORDER, "List Turn order with SC played and Player passed status", false, false);
     }
 
     @Override
@@ -32,7 +34,6 @@ public class ListTurnOrder extends StatusSubcommandData {
     }
 
     public static void turnOrder(GenericInteractionCreateEvent event, Game game, boolean pingPeople) {
-
         if (game.isFowMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
             return;
@@ -110,10 +111,5 @@ public class ListTurnOrder extends StatusSubcommandData {
         }
         MessageHelper.sendMessageToChannel(channel, msg.toString());
 
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        //We reply in execute command
     }
 }

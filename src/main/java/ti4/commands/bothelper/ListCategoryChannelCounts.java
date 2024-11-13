@@ -10,7 +10,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ListCategoryChannelCounts extends Subcommand {
+class ListCategoryChannelCounts extends Subcommand {
 
     public ListCategoryChannelCounts(){
         super(Constants.CATEGORY_CHANNEL_COUNT, "List all categories and their channel counts.");

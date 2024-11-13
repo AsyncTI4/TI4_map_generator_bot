@@ -12,7 +12,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class AddFogTile extends GameStateSubcommand {
+class AddFogTile extends GameStateSubcommand {
 
     public AddFogTile() {
         super(Constants.ADD_FOG_TILE, "Add a Fog of War tile to the map.", true, true);

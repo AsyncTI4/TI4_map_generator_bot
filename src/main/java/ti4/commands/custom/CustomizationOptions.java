@@ -13,7 +13,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
-public class CustomizationOptions extends GameStateSubcommand {
+class CustomizationOptions extends GameStateSubcommand {
 
     public CustomizationOptions() {
         super(Constants.CUSTOMIZATION, "Small Customization Options", true, true);

@@ -13,7 +13,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class RemoveTitle extends Subcommand {
+class RemoveTitle extends Subcommand {
 
     public RemoveTitle() {
         super(Constants.REMOVE_TITLE, "Remove a title");

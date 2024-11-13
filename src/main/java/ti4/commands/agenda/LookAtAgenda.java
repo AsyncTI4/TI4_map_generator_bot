@@ -20,7 +20,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
-public class LookAtAgenda extends GameStateSubcommand {
+class LookAtAgenda extends GameStateSubcommand {
 
     public LookAtAgenda() {
         super(Constants.LOOK, "Look at the agenda deck", false, true);

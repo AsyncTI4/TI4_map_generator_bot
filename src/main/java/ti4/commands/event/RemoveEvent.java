@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class RemoveEvent extends GameStateSubcommand {
+class RemoveEvent extends GameStateSubcommand {
 
     public RemoveEvent() {
         super(Constants.REMOVE_EVENT, "Remove Event", true, true);

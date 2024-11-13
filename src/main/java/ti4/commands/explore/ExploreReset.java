@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ExploreReset extends GameStateSubcommand {
+class ExploreReset extends GameStateSubcommand {
 
     public ExploreReset() {
         super(Constants.RESET, "Reset the exploration decks, emptying discards and adding all cards to their respective decks.", true, true);

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.custom.SpinTilesInRings;
 import ti4.commands.leaders.RefreshLeader;
@@ -22,9 +23,10 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class Cleanup extends StatusSubcommandData {
+public class Cleanup extends GameStateSubcommand {
+
     public Cleanup() {
-        super(Constants.CLEANUP, "Status phase cleanup");
+        super(Constants.CLEANUP, "Status phase cleanup", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -38,6 +40,9 @@ public class Cleanup extends StatusSubcommandData {
         }
         Game game = getGame();
         runStatusCleanup(game);
+
+        int prevRound = game.getRound() - 1;
+        StatusCommand.reply(event, "End of round " + prevRound + " status phase.");
     }
 
     public void runStatusCleanup(Game game) {
@@ -137,14 +142,5 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
         }
-    }
-
-    @Override
-
-    public void reply(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        int prevRound = game.getRound() - 1;
-
-        StatusCommand.reply(event, "End of round " + prevRound + " status phase.");
     }
 }

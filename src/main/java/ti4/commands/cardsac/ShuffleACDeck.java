@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class ShuffleACDeck extends GameStateSubcommand {
+class ShuffleACDeck extends GameStateSubcommand {
 
     public ShuffleACDeck() {
         super(Constants.SHUFFLE_AC_DECK, "Shuffle Action Card deck", true, false);

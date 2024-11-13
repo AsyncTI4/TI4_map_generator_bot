@@ -15,7 +15,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 
-public abstract class PNAddRemove extends GameStateSubcommand {
+abstract class PNAddRemove extends GameStateSubcommand {
 
     public PNAddRemove(String name, String description) {
         super(name, description, true, true);

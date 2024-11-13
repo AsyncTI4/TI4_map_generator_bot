@@ -14,7 +14,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class AddCustomAdjacentTile extends GameStateSubcommand {
+class AddCustomAdjacentTile extends GameStateSubcommand {
 
     public AddCustomAdjacentTile() {
         super(Constants.ADD_CUSTOM_ADJACENT_TILES, "Add Custom Adjacent Tiles.", true, true);

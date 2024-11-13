@@ -20,7 +20,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.TileModel;
 
-public class DrawRedBackTile extends GameStateSubcommand {
+class DrawRedBackTile extends GameStateSubcommand {
 
     public DrawRedBackTile() {
         super(Constants.DRAW_RED_BACK_TILE, "Draw a random red back tile (for Dane's mystery tweet)", true, true);

@@ -41,7 +41,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class StartCombat extends GameStateSubcommand {
+class StartCombat extends GameStateSubcommand {
 
     public StartCombat() {
         super(Constants.START_COMBAT, "Start a new combat thread for a given tile.", true, false);

@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DealSO extends GameStateSubcommand {
+class DealSO extends GameStateSubcommand {
 
     public DealSO() {
         super(Constants.DEAL_SO, "Deal Secret Objective", true,  true);

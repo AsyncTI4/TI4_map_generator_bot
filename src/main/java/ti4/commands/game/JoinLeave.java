@@ -5,12 +5,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-abstract public class JoinLeave extends GameSubcommandData {
+abstract public class JoinLeave extends GameStateSubcommand {
 
     public JoinLeave(@NotNull String name, @NotNull String description) {
         super(name, description);

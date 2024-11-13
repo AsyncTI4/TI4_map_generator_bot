@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Whisper extends GameStateSubcommand {
+class Whisper extends GameStateSubcommand {
 
     public Whisper() {
         super(Constants.WHISPER, "Send a private message to a player in fog mode", true, false);

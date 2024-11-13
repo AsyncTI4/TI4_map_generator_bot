@@ -14,7 +14,6 @@ import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class InstallationCommand implements ParentCommand {

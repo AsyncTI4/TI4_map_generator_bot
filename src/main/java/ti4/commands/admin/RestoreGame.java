@@ -16,7 +16,7 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class RestoreGame extends Subcommand {
+class RestoreGame extends Subcommand {
 
     public RestoreGame() {
         super(Constants.RESTORE_GAME, "Restore a game by uploading a save file");

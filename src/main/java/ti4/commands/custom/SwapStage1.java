@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SwapStage1 extends GameStateSubcommand {
+class SwapStage1 extends GameStateSubcommand {
 
     public SwapStage1() {
         super(Constants.SWAP_STAGE1, "Swap the place of 1 Objective With Another", true, true);

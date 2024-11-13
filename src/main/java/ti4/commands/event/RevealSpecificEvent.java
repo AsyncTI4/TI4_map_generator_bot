@@ -13,7 +13,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class RevealSpecificEvent extends GameStateSubcommand {
+class RevealSpecificEvent extends GameStateSubcommand {
 
     public RevealSpecificEvent() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck", true, false);

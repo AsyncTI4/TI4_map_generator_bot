@@ -12,7 +12,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ServerLimitStats extends Subcommand {
+class ServerLimitStats extends Subcommand {
 
     public ServerLimitStats() {
         super(Constants.SERVER_LIMIT_STATS, "Server Limit Stats");

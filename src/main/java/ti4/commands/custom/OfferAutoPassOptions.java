@@ -6,7 +6,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.message.MessageHelper;
 
-public class OfferAutoPassOptions extends GameStateSubcommand {
+class OfferAutoPassOptions extends GameStateSubcommand {
 
     public OfferAutoPassOptions() {
         super(Constants.OFFER_AUTOPASS_OPTIONS, "Offer auto pass on Sabotages to every player in the game.", true, false);

@@ -5,7 +5,7 @@ import ti4.commands.Subcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 
-public class ReloadMapperObjects extends Subcommand {
+class ReloadMapperObjects extends Subcommand {
 
     public ReloadMapperObjects() {
         super(Constants.RELOAD_MAPPER_OBJECTS, "Reload static objects in mapper");

@@ -9,7 +9,7 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class SwapStage2 extends GameStateSubcommand {
+class SwapStage2 extends GameStateSubcommand {
 
     public SwapStage2() {
         super(Constants.SWAP_STAGE2, "Swap the place of 1 Objective With Another", true, true);

@@ -25,7 +25,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.SecretObjectiveModel;
 
-public class RevealSpecificAgenda extends GameStateSubcommand {
+class RevealSpecificAgenda extends GameStateSubcommand {
 
     public RevealSpecificAgenda() {
         super(Constants.REVEAL_SPECIFIC, "Reveal top Agenda from deck", true, false);

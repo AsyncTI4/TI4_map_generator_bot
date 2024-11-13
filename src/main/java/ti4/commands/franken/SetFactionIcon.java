@@ -14,7 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetFactionIcon extends GameStateSubcommand {
+class SetFactionIcon extends GameStateSubcommand {
 
     public SetFactionIcon() {
         super(Constants.SET_FACTION_ICON, "Set franken faction icon to use", true, true);
