@@ -27,7 +27,7 @@ public class RelicSendFragments extends RelicSubcommandData {
 		super(Constants.SEND_FRAGMENT, "Send a number of relic fragments (default 1) to another player");
 		addOptions(
 			typeOption.setRequired(true),
-			addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+			new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true),
 			new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to send to").setRequired(true).setAutoComplete(true),
 			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)"));
 	}
