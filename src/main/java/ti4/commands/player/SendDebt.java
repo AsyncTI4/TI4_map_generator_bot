@@ -2,12 +2,11 @@ package ti4.commands.player;
 
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -48,7 +47,7 @@ public class SendDebt extends PlayerSubcommandData {
             return;
         }
 
-        Player receivingPlayer = Helper.getPlayer(game, sendingPlayer, event);
+        Player receivingPlayer = Helper.getPlayerFromEvent(game, sendingPlayer, event);
         if (receivingPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to send Debt could not be found");
             return;

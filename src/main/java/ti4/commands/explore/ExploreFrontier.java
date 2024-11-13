@@ -4,43 +4,42 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.helpers.ExploreHelper;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class ExploreFrontier extends ExploreSubcommandData {
+public class ExploreFrontier extends GameStateSubcommand {
+
     public ExploreFrontier() {
-        super(Constants.FRONTIER, "Explore a Frontier token on a Tile");
+        super(Constants.FRONTIER, "Explore a Frontier token on a Tile", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Location of the frontier tile").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tileName = event.getOption(Constants.TILE_NAME).getAsString();
-        Game game = getActiveGame();
-        Tile tile = getTile(event, tileName, game);
+        Game game = getGame();
+        Tile tile = ExploreHelper.getTile(event, tileName, game);
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        expFront(event, tile, game, player);
+        expFront(event, tile, game, getPlayer());
 
     }
 
-    public void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player) {
+    public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = game.drawExplore(Constants.FRONTIER);
             String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
-            resolveExplore(event, cardID, tile, null, messageText, player, game);
+            ExploreHelper.resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);
@@ -51,13 +50,13 @@ public class ExploreFrontier extends ExploreSubcommandData {
         }
     }
 
-    public void expFrontAlreadyDone(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, String cardID) {
+    public static void expFrontAlreadyDone(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String messageText = Emojis.Frontier + "Frontier *(tile " + tile.getPosition() + ")* explored by " + player.getRepresentation() + ":";
-            resolveExplore(event, cardID, tile, null, messageText, player, game);
+            ExploreHelper.resolveExplore(event, cardID, tile, null, messageText, player, game);
 
             if (player.hasTech("dslaner")) {
                 player.setAtsCount(player.getAtsCount() + 1);

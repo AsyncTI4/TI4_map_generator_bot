@@ -1,12 +1,7 @@
 package ti4.commands.statistics;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,7 +12,10 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
+import static ti4.commands.statistics.commandsToConvert.ListSlashCommandsUsed.sortByValue;
+
 public class ListTitlesGiven extends StatisticsSubcommandData {
+    
     public ListTitlesGiven() {
         super(Constants.LIST_TITLES_GIVEN, "List the frequency with which slash commands are used");
         addOptions(new OptionData(OptionType.STRING, Constants.TITLE, "Breakdown for a specific title").setRequired(false));
@@ -29,24 +27,28 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
         if (specificTitle != null) {
             titleOnly = true;
         }
-        //String titles = game.getStoredValue("TitlesFor" + p2.getUserID());
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();
-        for (Game game : mapList.values()) {
-            for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
-                if (storedValue.contains("TitlesFor")) {
-                    String userID = storedValue.replace("TitlesFor", "");
-                    for (String title : game.getStoredValue(storedValue).split("_")) {
-                        timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
-                        titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
-                        timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
+
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getGamesPage(currentPage++);
+            for (Game game : pagedGames.getGames()) {
+                for (String storedValue : game.getMessagesThatICheckedForAllReacts().keySet()) {
+                    if (storedValue.contains("TitlesFor")) {
+                        String userID = storedValue.replace("TitlesFor", "");
+                        for (String title : game.getStoredValue(storedValue).split("_")) {
+                            timesTitleHasBeenBestowed.put(title, 1 + timesTitleHasBeenBestowed.getOrDefault(title, 0));
+                            titlesAPersonHas.put(userID, 1 + titlesAPersonHas.getOrDefault(userID, 0));
+                            timesPersonHasGottenSpecificTitle.put(userID + "_" + title, 1 + timesPersonHasGottenSpecificTitle.getOrDefault(userID + "_" + title, 0));
+                        }
                     }
                 }
             }
+        } while (pagedGames.hasNextPage());
 
-        }
         StringBuilder longMsg = new StringBuilder("The number of each title that has been bestowed:\n");
         Map<String, Integer> sortedTitlesMapAsc = sortByValue(timesTitleHasBeenBestowed, false);
         for (String title : sortedTitlesMapAsc.keySet()) {
@@ -76,19 +78,4 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());
     }
-
-    public static Map<String, Integer> sortByValue(Map<String, Integer> unsortMap, boolean order) {
-        List<Entry<String, Integer>> list = new ArrayList<>(unsortMap.entrySet());
-
-        // Sorting the list based on values
-        list.sort((o1, o2) -> order ? o1.getValue().compareTo(o2.getValue()) == 0
-            ? o1.getKey().compareTo(o2.getKey())
-            : o1.getValue().compareTo(o2.getValue())
-            : o2.getValue().compareTo(o1.getValue()) == 0
-                ? o2.getKey().compareTo(o1.getKey())
-                : o2.getValue().compareTo(o1.getValue()));
-        return list.stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b, LinkedHashMap::new));
-
-    }
-
 }

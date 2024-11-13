@@ -1,30 +1,30 @@
 package ti4.commands.game;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.buttons.Buttons;
-import ti4.commands.Command;
-import ti4.generator.MapRenderPipeline;
-import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-public class GameCommand implements Command {
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.buttons.Buttons;
+import ti4.commands.ParentCommand;
+import ti4.generator.MapRenderPipeline;
+import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
+import ti4.message.MessageHelper;
+
+public class GameCommand implements ParentCommand {
 
     private final Collection<GameSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.GAME;
     }
 
@@ -42,7 +42,7 @@ public class GameCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         if (game == null) return;
         if (!undoCommand) {
             GameSaveLoadManager.saveGame(game, event);
@@ -71,7 +71,7 @@ public class GameCommand implements Command {
         }
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Game";
     }
 
@@ -105,9 +105,9 @@ public class GameCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

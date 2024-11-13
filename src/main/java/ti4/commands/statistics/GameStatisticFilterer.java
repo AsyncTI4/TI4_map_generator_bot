@@ -40,15 +40,32 @@ public final class GameStatisticFilterer {
         Integer playerCountFilter = event.getOption(PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt);
         Integer minPlayerCountFilter = event.getOption(MIN_PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt);
         Integer victoryPointGoalFilter = event.getOption(VICTORY_POINT_GOAL_FILTER, null, OptionMapping::getAsInt);
-        Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
-        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, true, OptionMapping::getAsBoolean);
         String gameTypeFilter = event.getOption(GAME_TYPE_FILTER, null, OptionMapping::getAsString);
+        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, true, OptionMapping::getAsBoolean);
+        Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
-        return getFilteredGames(playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter, gameTypeFilter, fogFilter, homebrewFilter, hasWinnerFilter);
+
+        return getFilteredGames(playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter, gameTypeFilter, hasWinnerFilter,
+                homebrewFilter, fogFilter);
     }
 
-    public static List<Game> getFilteredGames(Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter, String gameTypeFilter, Boolean fogFilter, Boolean homebrewFilter, Boolean hasWinnerFilter) {
-        return GameManager.getInstance().getGameNameToGame().values().stream()
+    public static List<Game> getFilteredGames(Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter,
+                                              String gameTypeFilter, Boolean hasWinnerFilter, Boolean homebrewFilter, Boolean fogFilter) {
+        List<Game> filteredGames = new ArrayList<>();
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getGamesPage(currentPage++);
+            filteredGames.addAll(
+                    getFilteredGames(pagedGames.getGames(), playerCountFilter, minPlayerCountFilter, victoryPointGoalFilter,
+                            gameTypeFilter, hasWinnerFilter, homebrewFilter, fogFilter));
+        } while (pagedGames.hasNextPage());
+        return filteredGames;
+    }
+
+    public static List<Game> getFilteredGames(List<Game> games, Integer playerCountFilter, Integer minPlayerCountFilter, Integer victoryPointGoalFilter,
+                                              String gameTypeFilter, Boolean hasWinnerFilter, Boolean homebrewFilter, Boolean fogFilter) {
+        return games.stream()
             .filter(GameStatisticFilterer::filterAbortedGames)
             .filter(game -> filterOnPlayerCount(playerCountFilter, game))
             .filter(game -> filterOnMinPlayerCount(minPlayerCountFilter, game))
@@ -61,13 +78,25 @@ public final class GameStatisticFilterer {
     }
 
     public static List<Game> getNormalFinishedGames(Integer playerCountFilter, Integer victoryPointGoalFilter) {
-        return GameManager.getInstance().getGameNameToGame().values().stream()
-            .filter(GameStatisticFilterer::filterAbortedGames)
-            .filter(game -> filterOnPlayerCount(playerCountFilter, game))
-            .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-            .filter(game -> filterOnHomebrew(Boolean.FALSE, game))
-            .filter(game -> filterOnHasWinner(Boolean.TRUE, game))
-            .toList();
+        List<Game> filteredGames = new ArrayList<>();
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getGamesPage(currentPage++);
+            filteredGames.addAll(
+                    getNormalFinishedGames(pagedGames.getGames(), playerCountFilter, victoryPointGoalFilter));
+        } while (pagedGames.hasNextPage());
+        return filteredGames;
+    }
+
+    public static List<Game> getNormalFinishedGames(List<Game> games, Integer playerCountFilter, Integer victoryPointGoalFilter) {
+        return games.stream()
+                .filter(GameStatisticFilterer::filterAbortedGames)
+                .filter(game -> filterOnPlayerCount(playerCountFilter, game))
+                .filter(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
+                .filter(game -> filterOnHomebrew(Boolean.FALSE, game))
+                .filter(game -> filterOnHasWinner(Boolean.TRUE, game))
+                .toList();
     }
 
     private static boolean filterOnFogType(Boolean fogFilter, Game game) {

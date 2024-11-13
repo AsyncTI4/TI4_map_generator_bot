@@ -1,11 +1,10 @@
 package ti4.commands.player;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -25,7 +24,7 @@ public class SetStatsAnchor extends PlayerSubcommandData {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;

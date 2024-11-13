@@ -3,6 +3,7 @@ package ti4.commands.status;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -11,8 +12,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
@@ -29,7 +30,7 @@ public class PeekPublicObjectiveDeck extends StatusSubcommandData {
 
   @Override
   public void execute(SlashCommandInteractionEvent event) {
-    Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+    Game game = UserGameContextManager.getContextGame(event.getUser().getId());
     Player player = game.getPlayer(event.getUser().getId());
     int stage = event.getOption(STAGE_COMMAND_NAME).getAsInt();
     int count = Optional.ofNullable(event.getOption(Constants.COUNT)).map(OptionMapping::getAsInt).orElse(1);

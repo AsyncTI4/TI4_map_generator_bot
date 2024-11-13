@@ -1,6 +1,10 @@
 package ti4.commands.tokens;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.commands.units.AddRemoveUnits;
@@ -10,10 +14,6 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 public class RemoveControl extends AddRemoveToken {
     @Override
@@ -57,12 +57,12 @@ public class RemoveControl extends AddRemoveToken {
     }
 
     @Override
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Remove control token to planet";
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_CONTROL;
     }
 }

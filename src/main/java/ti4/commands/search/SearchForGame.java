@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class SearchForGame extends SearchSubcommandData {
@@ -21,14 +22,14 @@ public class SearchForGame extends SearchSubcommandData {
         Game game = null;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
-            String mapName = option.getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+            String gameName = option.getAsString();
+            if (!GameManager.isValidGame(gameName)) {
                 MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
                 return;
             }
-            game = GameManager.getInstance().getGame(mapName);
+            game = GameManager.getGame(gameName);
         } else {
-            game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+            game = UserGameContextManager.getContextGame(event.getUser().getId());
             if (game == null) {
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return;

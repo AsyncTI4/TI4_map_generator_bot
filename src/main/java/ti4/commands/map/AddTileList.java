@@ -30,10 +30,10 @@ import ti4.helpers.Emojis;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.MapStringMapper;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -52,9 +52,8 @@ public class AddTileList extends MapSubcommandData {
         }
 
         String userID = member.getId();
-        GameManager gameManager = GameManager.getInstance();
-        Game game = gameManager.getUserActiveGame(userID);
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        Game game = UserGameContextManager.getContextGame(userID);
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }

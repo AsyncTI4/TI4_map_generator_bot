@@ -3,13 +3,13 @@ package ti4.commands.uncategorized;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.selections.selectmenus.BigSelectDemo;
 
-public class SelectionBoxDemo implements Command {
+public class SelectionBoxDemo implements ParentCommand {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return "select_demo";
     }
 
@@ -19,9 +19,9 @@ public class SelectionBoxDemo implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
 
         commands.addCommands(
-            Commands.slash(getActionID(), "Show selection box demo"));
+            Commands.slash(getName(), "Show selection box demo"));
     }
 }

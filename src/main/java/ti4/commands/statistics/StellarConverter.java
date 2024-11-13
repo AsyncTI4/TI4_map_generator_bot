@@ -29,27 +29,32 @@ public class StellarConverter extends StatisticsSubcommandData {
     }
 
     private String getStellarConverts(SlashCommandInteractionEvent event) {
-        Map<String, Game> games = GameManager.getInstance().getGameNameToGame();
         Map<String, Integer> numberConverts = new HashMap<>();
 
         int count = 0;
-        for (Game g : games.values()) {
-            List<String> worldsThisGame = g.getTileMap().values().stream()
-                .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets
-                .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
-                .map(UnitHolder::getName)
-                .toList();
 
-            if (worldsThisGame.size() == 1) {
-                count++;
-                String planet = worldsThisGame.getFirst();
-                if (numberConverts.containsKey(planet)) {
-                    numberConverts.put(planet, numberConverts.get(planet) + 1);
-                } else {
-                    numberConverts.put(planet, 1);
+        int currentPage = 0;
+        GameManager.PagedGames pagedGames;
+        do {
+            pagedGames = GameManager.getGamesPage(currentPage++);
+            for (Game g : pagedGames.getGames()) {
+                List<String> worldsThisGame = g.getTileMap().values().stream()
+                        .flatMap(tile -> tile.getPlanetUnitHolders().stream()) //planets
+                        .filter(uh -> uh.getTokenList().contains(Constants.WORLD_DESTROYED_PNG))
+                        .map(UnitHolder::getName)
+                        .toList();
+
+                if (worldsThisGame.size() == 1) {
+                    count++;
+                    String planet = worldsThisGame.getFirst();
+                    if (numberConverts.containsKey(planet)) {
+                        numberConverts.put(planet, numberConverts.get(planet) + 1);
+                    } else {
+                        numberConverts.put(planet, 1);
+                    }
                 }
             }
-        }
+        } while (pagedGames.hasNextPage());
 
         Comparator<Entry<String, Integer>> comparator = (p1, p2) -> (-1) * p1.getValue().compareTo(p2.getValue());
 

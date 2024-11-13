@@ -7,17 +7,17 @@ import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.UserGameContextManager;
 
-public class MapCommand implements Command {
+public class MapCommand implements ParentCommand {
     private final Collection<MapSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.MAP;
     }
 
@@ -31,12 +31,12 @@ public class MapCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         if (game == null) return;
         ShowGame.simpleShowGame(game, event);
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Game";
     }
 
@@ -56,7 +56,7 @@ public class MapCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands()));
     }
 }

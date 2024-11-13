@@ -1,5 +1,10 @@
 package ti4.commands.franken;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -8,30 +13,25 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-
-public class FrankenCommand implements Command {
+public class FrankenCommand implements ParentCommand {
 
     private final Collection<FrankenSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.FRANKEN;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getActionID())) {
+        if (!event.getName().equals(getName())) {
             return false;
         }
         User user = event.getUser();
@@ -46,12 +46,11 @@ public class FrankenCommand implements Command {
             }
         }
 
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
         }
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
             MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
             return false;
@@ -80,12 +79,12 @@ public class FrankenCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Franken";
     }
 
@@ -115,8 +114,8 @@ public class FrankenCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        SlashCommandData list = Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands());
+    public void register(CommandListUpdateAction commands) {
+        SlashCommandData list = Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands());
         commands.addCommands(list);
     }
 }

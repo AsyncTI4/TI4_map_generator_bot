@@ -9,8 +9,8 @@ import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class RemoveTile extends AddRemoveTile {
@@ -25,11 +25,11 @@ public class RemoveTile extends AddRemoveTile {
     }
 
     @Override
-    protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
+    protected Game tileParsing(SlashCommandInteractionEvent event, String userID) {
         String positionOption = event.getOptions().getFirst().getAsString();
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position `" + position + "` is not valid");

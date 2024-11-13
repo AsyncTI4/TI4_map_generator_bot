@@ -2,12 +2,11 @@ package ti4.commands.player;
 
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -47,7 +46,7 @@ public class ClearDebt extends PlayerSubcommandData {
             return;
         }
 
-        Player clearedPlayer = Helper.getPlayer(game, clearingPlayer, event);
+        Player clearedPlayer = Helper.getPlayerFromEvent(game, clearingPlayer, event);
         if (clearedPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player to have debt cleared could not be found");
             return;

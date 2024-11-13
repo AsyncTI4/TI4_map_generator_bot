@@ -8,9 +8,11 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class ReverseSpeakerOrder extends GameSubcommandData {
+
     public ReverseSpeakerOrder() {
         super(Constants.REVERSE_SPEAKER_ORDER, "Change the speaker order from clockwise to counterclockwise or vice versa");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm").setRequired(true));
@@ -23,7 +25,8 @@ public class ReverseSpeakerOrder extends GameSubcommandData {
             return;
         }
         User user = event.getUser();
-        Game game = GameManager.getInstance().getUserActiveGame(user.getId());
+        String gameName = UserGameContextManager.getContextGame(user.getId());
+        Game game = GameManager.getGame(gameName);
 
         game.setReverseSpeakerOrder(!game.isReverseSpeakerOrder());
     }

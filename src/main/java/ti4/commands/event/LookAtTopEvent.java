@@ -1,27 +1,27 @@
 package ti4.commands.event;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class LookAtTopEvent extends EventSubcommandData {
+public class LookAtTopEvent extends GameStateSubcommand {
+
     public LookAtTopEvent() {
-        super(Constants.LOOK_AT_TOP, "Look at top Event from deck");
+        super(Constants.LOOK_AT_TOP, "Look at top Event from deck", true, false);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of events to look at");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
 
@@ -44,21 +44,16 @@ public class LookAtTopEvent extends EventSubcommandData {
         }
         sb.append("-----------\n");
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToUser(sb.toString(), event);
-        } else {
-            User userById = event.getJDA().getUserById(player.getUserID());
-            if (userById != null) {
-                if (game.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
-                } else {
-                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
-                }
+        Player player = getPlayer();
+        User userById = event.getJDA().getUserById(player.getUserID());
+        if (userById != null) {
+            if (game.isCommunityMode() && player.getPrivateChannel() != null) {
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
             } else {
-                MessageHelper.sendMessageToUser(sb.toString(), event);
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb.toString());
             }
+        } else {
+            MessageHelper.sendMessageToUser(sb.toString(), event);
         }
     }
 }

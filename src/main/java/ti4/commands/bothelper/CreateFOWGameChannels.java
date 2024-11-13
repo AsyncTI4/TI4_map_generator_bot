@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.Subcommand;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -29,7 +30,8 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CreateFOWGameChannels extends BothelperSubcommandData {
+public class CreateFOWGameChannels extends Subcommand {
+
     public CreateFOWGameChannels() {
         super(Constants.CREATE_FOW_GAME_CHANNELS, "Create Role and Game Channels for a New FOW Game");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName").setRequired(true));
@@ -207,12 +209,12 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
-        gameAndRoleNames.addAll(mapNames);
+        Set<String> gameNames = new HashSet<>(GameManager.getGameNames());
+        gameAndRoleNames.addAll(gameNames);
 
         //CHECK
         // TODO: what about game and role names list?
-        return mapNames.contains(name);
+        return gameNames.contains(name);
     }
 
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
@@ -236,11 +238,11 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
-            .filter(mapName -> mapName.startsWith("fow"))
+        List<String> gameNames = GameManager.getGameNames().stream()
+            .filter(gameName -> gameName.startsWith("fow"))
             .toList();
-        for (String mapName : mapNames) {
-            String pbdNum = mapName.replace("fow", "");
+        for (String gameName : gameNames) {
+            String pbdNum = gameName.replace("fow", "");
             if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -20,15 +21,16 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DealSOToAll extends SOCardsSubcommandData {
+public class DealSOToAll extends GameStateSubcommand {
+
     public DealSOToAll() {
-        super(Constants.DEAL_SO_TO_ALL, "Deal Secret Objective (count) to all game players");
+        super(Constants.DEAL_SO_TO_ALL, "Deal Secret Objective (count) to all game players", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         dealSOToAll(event, count, game);
     }
@@ -59,11 +61,6 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Speaker is not yet assigned. Secrets have been dealt, but please assign speaker soon (command is `/player speaker`)");
             }
-            // List<Button> buttons2 = new ArrayList<>();
-            // buttons2.add(Buttons.green("setOrder", "Set Speaker Order"));
-            // buttons2.add(Buttons.red("deleteButtons", "Decline"));
-            // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-            //     game.getPing() + " if your map has all players' HS in the same ring, you should set speaker order using this button", buttons2);
             Helper.setOrder(game);
         }
     }

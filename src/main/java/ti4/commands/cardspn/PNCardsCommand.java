@@ -1,80 +1,45 @@
 package ti4.commands.cardspn;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+public class PNCardsCommand implements ParentCommand {
 
-public class PNCardsCommand implements Command {
-
-    private final Collection<PNCardsSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ShowPN(),
+                    new ShowAllPN(),
+                    new ShowPNToAll(),
+                    new PlayPN(),
+                    new SendPN(),
+                    new PurgePN(),
+                    new PNInfo(),
+                    new PNReset())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CARDS_PN;
+    }
+
+    public String getDescription() {
+        return "Promissory Notes";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
+        return ParentCommand.super.accept(event) &&
+                CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        PNCardsSubcommandData subCommandExecuted = null;
-        for (PNCardsSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                subCommandExecuted = subcommand;
-                break;
-            }
-        }
-        if (subCommandExecuted == null) {
-            reply(event);
-        } else {
-            subCommandExecuted.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
-        // new GenerateMap().saveImage(activeMap, event);
-    }
-
-    protected String getActionDescription() {
-        return "Promissory Notes";
-    }
-
-    private Collection<PNCardsSubcommandData> getSubcommands() {
-        Collection<PNCardsSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ShowPN());
-        subcommands.add(new ShowAllPN());
-        subcommands.add(new ShowPNToAll());
-        subcommands.add(new PlayPN());
-        subcommands.add(new SendPN());
-        subcommands.add(new PurgePN());
-        subcommands.add(new PNInfo());
-        subcommands.add(new PNReset());
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
-    }
-
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
     }
 }

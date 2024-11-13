@@ -1,87 +1,60 @@
 package ti4.commands.cardsac;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+public class ACCardsCommand implements ParentCommand {
 
-public class ACCardsCommand implements Command {
-
-    private final Collection<ACCardsSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ACInfo(),
+                    new DrawAC(),
+                    new DiscardAC(),
+                    new PurgeAC(),
+                    new DiscardACRandom(),
+                    new ShowAC(),
+                    new ShowACToAll(),
+                    new PlayAC(),
+                    new ShuffleACDeck(),
+                    new ShowAllAC(),
+                    new ShowACRemainingCardCount(),
+                    new ShowAllUnplayedACs(),
+                    new PickACFromDiscard(),
+                    new PickACFromPurged(),
+                    new ShowDiscardActionCards(),
+                    new ShowPurgedActionCards(),
+                    new ShuffleACBackIntoDeck(),
+                    new RevealAndPutACIntoDiscard(),
+                    new SendAC(),
+                    new SentACRandom(),
+                    new DrawSpecificAC(),
+                    new MakeCopiesOfACs())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CARDS_AC;
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        ACCardsSubcommandData subCommandExecuted = null;
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (ACCardsSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                subCommandExecuted = subcommand;
-                break;
-            }
-        }
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
-        MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Action Cards";
     }
 
-    private Collection<ACCardsSubcommandData> getSubcommands() {
-        Collection<ACCardsSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ACInfo());
-        subcommands.add(new DrawAC());
-        subcommands.add(new DiscardAC());
-        subcommands.add(new PurgeAC());
-        subcommands.add(new DiscardACRandom());
-        subcommands.add(new ShowAC());
-        subcommands.add(new ShowACToAll());
-        subcommands.add(new PlayAC());
-        subcommands.add(new ShuffleACDeck());
-        subcommands.add(new ShowAllAC());
-        subcommands.add(new ShowACRemainingCardCount());
-        subcommands.add(new ShowAllUnplayedACs());
-        subcommands.add(new PickACFromDiscard());
-        subcommands.add(new PickACFromPurged());
-        subcommands.add(new ShowDiscardActionCards());
-        subcommands.add(new ShowPurgedActionCards());
-        subcommands.add(new ShuffleACBackIntoDeck());
-        subcommands.add(new RevealAndPutACIntoDiscard());
-        subcommands.add(new SentAC());
-        subcommands.add(new SentACRandom());
-        subcommands.add(new DrawSpecificAC());
-        subcommands.add(new MakeCopiesOfACs());
-        return subcommands;
+    @Override
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return ParentCommand.super.accept(event) &&
+                CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

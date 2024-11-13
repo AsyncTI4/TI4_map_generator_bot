@@ -1,21 +1,21 @@
 package ti4.commands.help;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
-import ti4.helpers.Constants;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 
-public class HelpCommand implements Command {
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.ParentCommand;
+import ti4.helpers.Constants;
+
+public class HelpCommand implements ParentCommand {
 
     private final Collection<HelpSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.HELP;
     }
 
@@ -41,7 +41,7 @@ public class HelpCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Help";
     }
 
@@ -61,9 +61,9 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

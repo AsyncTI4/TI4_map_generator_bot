@@ -7,16 +7,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class RemoveAllCC implements Command {
+public class RemoveAllCC implements ParentCommand {
 
     void parsingForTile(SlashCommandInteractionEvent event, Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
@@ -25,18 +25,17 @@ public class RemoveAllCC implements Command {
         }
     }
 
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_ALL_CC;
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game game = gameManager.getUserActiveGame(userID);
+            Game game = UserGameContextManager.getContextGame(userID);
             parsingForTile(event, game);
             GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);
@@ -45,10 +44,10 @@ public class RemoveAllCC implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Remove all CCs from entire map")
+            Commands.slash(getName(), "Remove all CCs from entire map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                     .setRequired(true)));
     }

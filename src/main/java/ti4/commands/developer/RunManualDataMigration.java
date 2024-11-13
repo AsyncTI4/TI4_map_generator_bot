@@ -7,13 +7,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.DataMigrationManager;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class RunManualDataMigration extends DeveloperSubcommandData {
+public class RunManualDataMigration extends Subcommand {
+
     public RunManualDataMigration() {
         super(Constants.RUN_MANUAL_DATA_MIGRATION, "Run a manual data migration on a game.");
         addOptions(new OptionData(OptionType.STRING, Constants.MIGRATION_NAME, "migration name").setRequired(true));
@@ -22,10 +24,9 @@ public class RunManualDataMigration extends DeveloperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         String migrationName = event.getOption(Constants.MIGRATION_NAME).getAsString();
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
-        Game game = GameManager.getInstance().getGame(gameName);
+        Game game = GameManager.getGame(gameName);
         if (game == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Can't find map for game name" + gameName);
             return;

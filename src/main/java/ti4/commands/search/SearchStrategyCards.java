@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.model.StrategyCardModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.StrategyCardModel;
 
 public class SearchStrategyCards extends SearchComponentModel {
 

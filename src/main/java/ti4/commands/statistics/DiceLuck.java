@@ -15,12 +15,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class DiceLuck extends StatisticsSubcommandData {
@@ -35,48 +33,31 @@ public class DiceLuck extends StatisticsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String text = getDiceLuck(event);
-        MessageHelper.sendMessageToThread(event.getChannel(), "Dice Luck Record", text);
+        String diceLuckRecord = getDiceLuck(event);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Dice Luck Record", diceLuckRecord);
     }
 
     private String getDiceLuck(SlashCommandInteractionEvent event) {
-
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
-        Map<String, Entry<Double, Integer>> playerDiceLucks = getAllPlayersDiceLuck(ignoreEndedGames);
-
-        //  HashMap<String, Double> playerMedianDiceLucks = playerAverageDiceLucks.entrySet().stream().map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList()))).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldEntry, newEntry) -> oldEntry, HashMap::new));
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("## __**Dice Luck**__\n");
-
         boolean sortOrderAscending = event.getOption("ascending", true, OptionMapping::getAsBoolean);
-        Comparator<Entry<String, Entry<Double, Integer>>> comparator = (o1, o2) -> {
-            double o1TurnCount = o1.getValue().getKey();
-            double o2TurnCount = o2.getValue().getKey();
-            int o1total = o1.getValue().getValue();
-            int o2total = o2.getValue().getValue();
-            if (o1TurnCount == 0 || o2TurnCount == 0) return -1;
-
-            double total1 = o1total / o1TurnCount;
-            double total2 = o2total / o2TurnCount;
-            return sortOrderAscending ? Double.compare(total1, total2) : -Double.compare(total1, total2);
-        };
-
+        var comparator = getDiceLuckComparator(sortOrderAscending);
         AtomicInteger index = new AtomicInteger(1);
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 10, OptionMapping::getAsInt);
+        int minimumExpectedHits = event.getOption(Constants.MINIMUM_NUMBER_OF_EXPECTED_HITS, 10, OptionMapping::getAsInt);
 
-        playerDiceLucks.entrySet().stream()
-            .filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
+        StringBuilder sb = new StringBuilder();
+        sb.append("## __**Dice Luck**__\n");
+
+        getAllPlayersDiceLuck(ignoreEndedGames).entrySet().stream()
+            .filter(entry -> entry.getValue().getKey() > minimumExpectedHits && entry.getValue().getValue() > 0)
             .sorted(comparator)
             .limit(topLimit)
-            .forEach(userTurnCountTotalTime -> {
-                User user = AsyncTI4DiscordBot.jda.getUserById(userTurnCountTotalTime.getKey());
-                double expectedHits = userTurnCountTotalTime.getValue().getKey();
-                int actualHits = userTurnCountTotalTime.getValue().getValue();
-
-                if (user != null && expectedHits != 0 && actualHits != 0) {
-                    appendDiceLuck(sb, index, user, expectedHits, actualHits);
+            .forEach(entry  -> {
+                var managedPlayer = GameManager.getManagedPlayer(entry.getKey());
+                double expectedHits = entry.getValue().getKey();
+                int actualHits = entry.getValue().getValue();
+                if (expectedHits > 0 && actualHits > 0) {
+                    appendDiceLuck(sb, index, managedPlayer.getName(), expectedHits, actualHits);
                 }
             });
 
@@ -84,28 +65,31 @@ public class DiceLuck extends StatisticsSubcommandData {
     }
 
     public Map<String, Entry<Double, Integer>> getAllPlayersDiceLuck(boolean ignoreEndedGames) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
-
         Map<String, Entry<Double, Integer>> playerDiceLucks = new HashMap<>();
         Map<String, Set<Double>> playerAverageDiceLucks = new HashMap<>();
 
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
-                playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
-                    (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
+        for (var game : GameManager.getInstance().getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+            for (var player : game.getRealPlayers()) {
+                Entry<Double, Integer> playerDiceLuck = Map.entry(
+                        game.getPlayerToExpectedHitsTimes10().get(player) / 10.0,
+                        game.getPlayerToActualHits().get(player));
+                playerDiceLucks.merge(player.getId(), playerDiceLuck,
+                        (oldEntry, newEntry) -> Map.entry(
+                                oldEntry.getKey() + playerDiceLuck.getKey(),
+                                oldEntry.getValue() + playerDiceLuck.getValue()));
 
                 if (playerDiceLuck.getKey() == 0) continue;
                 Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
-                playerAverageDiceLucks.compute(player.getUserID(), (key, value) -> {
+                playerAverageDiceLucks.compute(player.getId(), (key, value) -> {
                     if (value == null) value = new HashSet<>();
                     value.add(averageDiceLuck);
                     return value;
                 });
             }
         }
+
         return playerDiceLucks;
     }
 
@@ -117,21 +101,36 @@ public class DiceLuck extends StatisticsSubcommandData {
             Entry<Double, Integer> userTurnCountTotalTime = playerDiceLucks.get(user.getId());
             double expectedHits = userTurnCountTotalTime.getKey();
             int actualHits = userTurnCountTotalTime.getValue();
-
             if (expectedHits != 0 && actualHits != 0) {
-                appendDiceLuck(sb, index, user, expectedHits, actualHits);
+                appendDiceLuck(sb, index, user.getEffectiveName(), expectedHits, actualHits);
             }
         }
         return sb.toString();
     }
 
-    private void appendDiceLuck(StringBuilder sb, AtomicInteger index, User user, double expectedHits, int actualHits) {
+    private void appendDiceLuck(StringBuilder sb, AtomicInteger index, String playerName, double expectedHits, int actualHits) {
         double averageDiceLuck = actualHits / expectedHits;
         sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
         sb.append(String.format("%.2f", averageDiceLuck));
-        sb.append("` ").append(user.getEffectiveName());
+        sb.append("` ").append(playerName);
         sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
         sb.append("\n");
         index.getAndIncrement();
+    }
+
+    private Comparator<Entry<String, Entry<Double, Integer>>> getDiceLuckComparator(boolean ascending) {
+        return (o1, o2) -> {
+            double expected1 = o1.getValue().getKey();
+            double expected2 = o2.getValue().getKey();
+            int actual1 = o1.getValue().getValue();
+            int actual2 = o2.getValue().getValue();
+
+            if (expected1 == 0 || expected2 == 0) return -1;
+
+            double luck1 = actual1 / expected1;
+            double luck2 = actual2 / expected2;
+
+            return ascending ? Double.compare(luck1, luck2) : -Double.compare(luck1, luck2);
+        };
     }
 }

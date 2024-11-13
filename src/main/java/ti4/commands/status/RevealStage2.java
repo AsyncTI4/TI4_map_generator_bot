@@ -11,9 +11,9 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 
@@ -28,7 +28,7 @@ public class RevealStage2 extends StatusSubcommandData {
     }
 
     public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
         Map.Entry<String, Integer> objective = game.revealStage2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
@@ -66,7 +66,7 @@ public class RevealStage2 extends StatusSubcommandData {
     }
 
     public void revealTwoStage2(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
 
         Map.Entry<String, Integer> objective1 = game.revealStage2();
         Map.Entry<String, Integer> objective2 = game.revealStage2();
@@ -96,7 +96,7 @@ public class RevealStage2 extends StatusSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         GameSaveLoadManager.saveGame(game, event);
     }
 }

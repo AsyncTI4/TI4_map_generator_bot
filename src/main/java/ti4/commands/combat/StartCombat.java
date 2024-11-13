@@ -1,5 +1,8 @@
 package ti4.commands.combat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -15,6 +18,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.TileGenerator;
@@ -37,13 +41,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class StartCombat extends CombatSubcommandData {
+public class StartCombat extends GameStateSubcommand {
 
     public StartCombat() {
-        super(Constants.START_COMBAT, "Start a new combat thread for a given tile.");
+        super(Constants.START_COMBAT, "Start a new combat thread for a given tile.", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from")
             .setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_TYPE,
@@ -53,11 +54,11 @@ public class StartCombat extends CombatSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        String tileID = event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString);
+        String tileID = event.getOption(Constants.TILE_NAME).getAsString();
         tileID = StringUtils.substringBefore(tileID, " ");
         String combatType = event.getOption(Constants.COMBAT_TYPE, "space", OptionMapping::getAsString);
         tileID = AliasHandler.resolveTile(tileID);
+        Game game = getGame();
         if (game.isTileDuplicated(tileID)) {
             MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
             return;
@@ -73,8 +74,6 @@ public class StartCombat extends CombatSubcommandData {
 
         List<Player> spacePlayers = ButtonHelper.getPlayersWithShipsInTheSystem(game, tile);
         List<Player> groundPlayers = ButtonHelper.getPlayersWithUnitsInTheSystem(game, tile);
-        List<Player> onlyGroundPlayers = new ArrayList<>(groundPlayers);
-        onlyGroundPlayers.removeAll(spacePlayers);
 
         List<Player> playersForCombat = new ArrayList<>();
         switch (combatType) {

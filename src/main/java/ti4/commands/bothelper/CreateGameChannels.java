@@ -38,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
+import ti4.commands.Subcommand;
 import ti4.commands.game.GameCreate;
 import ti4.commands.help.NewPlayerInfo;
 import ti4.generator.MapGenerator;
@@ -56,7 +57,8 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CreateGameChannels extends BothelperSubcommandData {
+public class CreateGameChannels extends Subcommand {
+
     public CreateGameChannels() {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
@@ -377,7 +379,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         // Find new players
         for (Player player : game.getPlayers().values()) {
-            if (ButtonHelper.isPlayerNew(game, player)) {
+            if (ButtonHelper.isPlayerNew(player.getUserID())) {
                 newPlayers.add(player);
             }
         }
@@ -469,11 +471,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
-        gameAndRoleNames.addAll(mapNames);
+        Set<String> gameNames = new HashSet<>(GameManager.getGameNames());
+        gameAndRoleNames.addAll(gameNames);
 
         // CHECK
-        return mapNames.contains(name);
+        return gameNames.contains(name);
     }
 
     private static List<Integer> getAllExistingPBDNumbers() {
@@ -496,11 +498,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
-            .filter(mapName -> mapName.startsWith("pbd"))
+        List<String> gameNames = GameManager.getGameNames().stream()
+            .filter(gameName -> gameName.startsWith("pbd"))
             .toList();
-        for (String mapName : mapNames) {
-            String pbdNum = mapName.replace("pbd", "");
+        for (String gameName : gameNames) {
+            String pbdNum = gameName.replace("pbd", "");
             if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }

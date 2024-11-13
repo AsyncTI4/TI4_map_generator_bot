@@ -65,7 +65,7 @@ public class Replace extends GameSubcommandData {
             return;
         }
 
-        Player removedPlayer = Helper.getPlayer(game, null, event);
+        Player removedPlayer = Helper.getPlayerFromEvent(game, null, event);
         if (removedPlayer == null || (removePlayerOption == null && removedPlayer.getFaction() == null)) {
             MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;
@@ -136,7 +136,7 @@ public class Replace extends GameSubcommandData {
             game.setActivePlayerID(addedUser.getId());
         }
 
-        Helper.fixGameChannelPermissions(event.getGuild(), game);
+        Helper.fixGameChannelPermissions(event.getGuild(), GameManager.getManagedGame(game.getName()));
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
             mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);
@@ -147,10 +147,10 @@ public class Replace extends GameSubcommandData {
             game.setSpeakerUserID(player.getUserID());
         }
         GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game);
+        GameSaveLoadManager.reload(game.getName());
 
         // Load the new game instance so that we can repost the milty draft
-        game = GameManager.getInstance().getGame(game.getName());
+        game = GameManager.getGame(game.getName());
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }

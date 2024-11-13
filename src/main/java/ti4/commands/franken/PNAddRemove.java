@@ -3,12 +3,11 @@ package ti4.commands.franken;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.cardspn.PNInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -38,7 +37,7 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;

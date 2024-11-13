@@ -1,5 +1,9 @@
 package ti4.commands.special;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -7,12 +11,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
 abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandData {
     public AddRemoveFactionCCToFromFleet(String id, String description) {
@@ -27,7 +28,7 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;

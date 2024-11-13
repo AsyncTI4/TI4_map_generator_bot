@@ -14,7 +14,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
@@ -39,11 +41,10 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
-public class CombatRoll extends CombatSubcommandData {
+public class CombatRoll extends GameStateSubcommand {
 
     public CombatRoll() {
-        super(Constants.COMBAT_ROLL,
-            "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*");
+        super(Constants.COMBAT_ROLL, "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
             .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET,
@@ -58,31 +59,14 @@ public class CombatRoll extends CombatSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-
-        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         OptionMapping planetOption = event.getOption(Constants.PLANET);
-        OptionMapping rollTypeOption = event.getOption(Constants.COMBAT_ROLL_TYPE);
-
-        String userID = getUser().getId();
-        Player player = game.getPlayer(userID);
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
-
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
-        if (tileOption == null) {
-            return;
-        }
-
         String unitHolderName = Constants.SPACE;
         if (planetOption != null) {
             unitHolderName = planetOption.getAsString();
         }
 
+        Game game = getGame();
+        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         // Get tile info
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, game);
@@ -92,6 +76,14 @@ public class CombatRoll extends CombatSubcommandData {
             return;
         }
 
+        OptionMapping rollTypeOption = event.getOption(Constants.COMBAT_ROLL_TYPE);
+        Player player = getPlayer();
+        CombatRollType rollType = getCombatRollType(rollTypeOption);
+        secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType);
+    }
+
+    @NotNull
+    private static CombatRollType getCombatRollType(OptionMapping rollTypeOption) {
         CombatRollType rollType = CombatRollType.combatround;
         if (rollTypeOption != null) {
             if ("afb".equalsIgnoreCase(rollTypeOption.getAsString())) {
@@ -107,8 +99,7 @@ public class CombatRoll extends CombatSubcommandData {
                 rollType = CombatRollType.SpaceCannonDefence;
             }
         }
-
-        secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType);
+        return rollType;
     }
 
     public boolean checkIfUnitsOfType(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unitHolderName, CombatRollType rollType) {

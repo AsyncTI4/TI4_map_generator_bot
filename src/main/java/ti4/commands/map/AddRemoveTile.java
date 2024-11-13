@@ -9,9 +9,9 @@ import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 abstract public class AddRemoveTile extends MapSubcommandData {
@@ -29,17 +29,16 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             return;
         }
         String userID = member.getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game userActiveGame = tileParsing(event, userID, gameManager);
+            Game userActiveGame = tileParsing(event, userID);
             if (userActiveGame == null) return;
             GameSaveLoadManager.saveGame(userActiveGame, event);
         }
     }
 
-    protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
+    protected Game tileParsing(SlashCommandInteractionEvent event, String userID) {
         String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
         String position = event.getOptions().get(1).getAsString();
         if (!PositionMapper.isTilePositionValid(position)) {
@@ -63,7 +62,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             AddTile.addCustodianToken(tile);
         }
 
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        Game userActiveGame = UserGameContextManager.getContextGame(userID);
         Boolean isFowPrivate = null;
         if (userActiveGame.isFowMode()) {
             isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);

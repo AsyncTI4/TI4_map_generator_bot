@@ -1,5 +1,10 @@
 package ti4.commands.status;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -7,10 +12,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.RefreshLeader;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Leader;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.*;
 
 public class PersonalCleanup extends StatusSubcommandData {
 

@@ -68,7 +68,7 @@ public class Setup extends PlayerSubcommandData {
 
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -268,10 +268,10 @@ public class Setup extends PlayerSubcommandData {
 
                     List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
                     String msg = player.getRepresentationUnfogged() + " use the buttons to choose your starting technology:";
-                    if (techs.isEmpty() && bonusOptions > 0) {
+                    if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-                    } else if (bonusOptions > 0) {
+                    } else {
                         for (int x = 0; x < bonusOptions; x++) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                         }
@@ -332,19 +332,10 @@ public class Setup extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game2 : mapList.values()) {
-            for (Player player2 : game2.getRealPlayers()) {
-                if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
-                    if (!player2.getHoursThatPlayerIsAFK().isEmpty()) {
-                        player.setHoursThatPlayerIsAFK(player2.getHoursThatPlayerIsAFK());
-                    }
-                    if (player2.doesPlayerPreferDistanceBasedTacticalActions()) {
-                        player.setPreferenceForDistanceBasedTacticalActions(true);
-                    }
-                }
-            }
-        }
+
+        var managedPlayer = GameManager.getManagedPlayer(player.getUserID());
+        player.setHoursThatPlayerIsAFK(managedPlayer.getAfkHours());
+        player.setPreferenceForDistanceBasedTacticalActions(managedPlayer.isDistanceBasedTacticalActions());
 
         if (!game.isFowMode()) {
             StringBuilder sb = new SearchMyTitles().getPlayerTitles(player.getUserID(), player.getUserName(), false);
@@ -387,7 +378,8 @@ public class Setup extends PlayerSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
             UnitKey unitID = Mapper.getUnitKey(unit, color);
-            if (unitID == null) {
+            String unitPath = Tile.getUnitPath(unitID);
+            if (unitPath == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Unit: " + unit + " is not valid and not supported.");
                 continue;

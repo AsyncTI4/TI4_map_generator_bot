@@ -8,11 +8,11 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.units.RemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -25,10 +25,10 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.GenericCardModel;
 
-public class TrapReveal extends DiscordantStarsSubcommandData {
+public class TrapReveal extends GameStateSubcommand {
 
     public TrapReveal() {
-        super(Constants.LIZHO_REVEAL_TRAP, "Select planets were to reveal trap tokens");
+        super(Constants.LIZHO_REVEAL_TRAP, "Select planets were to reveal trap tokens", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.LIZHO_TRAP_ID, "Trap ID").setRequired(true));
 
@@ -36,35 +36,22 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-        OptionMapping planetOption = event.getOption(Constants.PLANET);
-        if (planetOption == null) {
-            return;
-        }
-        String planetName = planetOption.getAsString();
+        Game game = getGame();
+        Player player = getPlayer();
+
+        String planetName = event.getOption(Constants.PLANET).getAsString();
         if (!game.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
         }
 
-        OptionMapping trapIDOption = event.getOption(Constants.LIZHO_TRAP_ID);
-        if (trapIDOption == null) {
-            return;
-        }
-
         Collection<Integer> values = player.getTrapCards().values();
-        int trapID = trapIDOption.getAsInt();
+        int trapID = event.getOption(Constants.LIZHO_TRAP_ID).getAsInt();
         if (!values.contains(trapID)) {
             MessageHelper.replyToMessage(event, "Trap ID not found");
             return;
         }
+
         String stringTrapID = "";
         for (String trapIDS : player.getTrapCards().keySet()) {
             if (player.getTrapCards().get(trapIDS) == trapID) {

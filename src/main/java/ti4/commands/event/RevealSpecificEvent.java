@@ -6,29 +6,30 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class RevealSpecificEvent extends EventSubcommandData {
+public class RevealSpecificEvent extends GameStateSubcommand {
+
     public RevealSpecificEvent() {
-        super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck");
+        super(Constants.REVEAL_SPECIFIC, "Reveal top Event from deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.EVENT_ID, "Event ID (text ID found in /search events)").setRequired(true).setAutoComplete(true));
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force reveal the Event (even if it's not in the deck)");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-
         String eventID = event.getOption(Constants.EVENT_ID, "", OptionMapping::getAsString);
         if (!Mapper.isValidEvent(eventID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Event ID found, please retry");
             return;
         }
 
+        Game game = getGame();
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
         if (!game.revealEvent(eventID, force)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Event not found in deck, please retry");

@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -34,30 +34,21 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayAC extends ACCardsSubcommandData {
+public class PlayAC extends GameStateSubcommand {
+
     public PlayAC() {
-        super(Constants.PLAY_AC, "Play an Action Card");
+        super(Constants.PLAY_AC, "Play an Action Card", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action Card ID that is sent between () or Name/Part of Name").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getPlayer(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
+        String acId = event.getOption(Constants.ACTION_CARD_ID).getAsString().toLowerCase();
 
-        OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Action Card to discard");
-            return;
-        }
-
-        String reply = playAC(event, game, player, option.getAsString().toLowerCase(), event.getChannel());
+        String reply = playAC(event, game, player, acId, event.getChannel());
         if (reply != null) {
             MessageHelper.sendMessageToEventChannel(event, reply);
         }
@@ -93,7 +84,6 @@ public class PlayAC extends ACCardsSubcommandData {
             }
         }
         if (acID == null) {
-            // MessageHelper.sendMessageToEventChannel(event, );
             return "No such Action Card ID found, please retry";
         }
         return resolveActionCard(event, game, player, acID, acIndex, channel);

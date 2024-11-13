@@ -2,6 +2,7 @@ package ti4.commands.leaders;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -11,8 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.cardsac.ACInfo;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.relic.RelicDraw;
 import ti4.commands.special.KeleresHeroMentak;
@@ -22,6 +21,8 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
+import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -50,9 +51,7 @@ public class HeroPlay extends LeaderAction {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        var player = getPlayer();
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
@@ -299,7 +298,7 @@ public class HeroPlay extends LeaderAction {
                     .getFactionEmoji() + " may resolve " + size
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
                     + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
-                DrawAgenda.drawAgenda(event, size, game, player);
+                AgendaHelper.drawAgenda(event, size, game, player);
                 Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);
@@ -451,7 +450,7 @@ public class HeroPlay extends LeaderAction {
                         continue;
                     }
                     List<Button> buttons = new ArrayList<>(
-                        ACInfo.getYssarilHeroActionCardButtons(player, p2));
+                        getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged()
                             + " Kyver, Blade and Key, the Yssaril hero, has been played.  Use buttons to select which AC you will offer to them.",
@@ -470,5 +469,21 @@ public class HeroPlay extends LeaderAction {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Combat modifier will be applied next time you push the combat roll button.");
         }
+    }
+
+    private static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = notYssaril.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                if (ac_name != null) {
+                    acButtons.add(Buttons.gray("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name, Emojis.ActionCard));
+                }
+            }
+        }
+        return acButtons;
     }
 }

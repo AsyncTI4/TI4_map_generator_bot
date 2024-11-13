@@ -11,6 +11,7 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 abstract public class AddRemovePlayer extends GameSubcommandData {
@@ -25,34 +26,32 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player @playerName"));
-        //addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping gameOption = event.getOption(Constants.GAME_NAME);
         User callerUser = event.getUser();
-        String mapName;
+        String gameName;
         if (gameOption != null) {
-            mapName = event.getOptions().getFirst().getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+            gameName = event.getOptions().getFirst().getAsString();
+            if (!GameManager.isValidGame(gameName)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exist, use `/help list_games`");
                 return;
             }
         } else {
-            Game userActiveGame = GameManager.getInstance().getUserActiveGame(callerUser.getId());
-            if (userActiveGame == null) {
+            var userActiveGameId = UserGameContextManager.getContextGame(callerUser.getId());
+            if (userActiveGameId == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
                 return;
             }
-            mapName = userActiveGame.getName();
+            gameName = userActiveGameId;
         }
-        GameManager gameManager = GameManager.getInstance();
-        Game game = gameManager.getGame(mapName);
 
+        Game game = GameManager.getGame(gameName);
         User user = event.getUser();
         action(event, game, user);
-        Helper.fixGameChannelPermissions(event.getGuild(), game);
+        Helper.fixGameChannelPermissions(event.getGuild(), GameManager.getManagedGame(gameName));
         GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, getResponseMessage(game, user));
     }

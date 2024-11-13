@@ -1,30 +1,34 @@
 package ti4.commands.button;
 
+import java.util.Collections;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.message.MessageHelper;
 
-import java.util.Collections;
-
-public class GenericButtonCommand implements Command {
+public class GenericButtonCommand implements ParentCommand {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.BUTTON;
+    }
+
+    public String getDescription() {
+        return "Send a single generic button to the channel to collect faction responses.";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        return ParentCommand.super.accept(event) &&
+                CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
@@ -45,18 +49,10 @@ public class GenericButtonCommand implements Command {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
     }
 
-    protected String getActionDescription() {
-        return "Send a single generic button to the channel to collect faction responses.";
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true))
-                .addOptions(new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"))
-        );
+    public List<OptionData> getOptions() {
+        return List.of(
+                new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true),
+                new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"));
     }
 }

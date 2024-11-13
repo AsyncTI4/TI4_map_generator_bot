@@ -26,7 +26,7 @@ public class SCUnplay extends PlayerSubcommandData {
         Game game = getActiveGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "You're not a player of this game.");

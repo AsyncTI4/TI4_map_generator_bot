@@ -22,6 +22,7 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 
@@ -44,7 +45,7 @@ public class CorrectFaction extends PlayerSubcommandData {
         }
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -97,8 +98,10 @@ public class CorrectFaction extends PlayerSubcommandData {
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        // TODO this is a bad idea overall as the ContextGame may change between when the command was run and the reply
+        String userId = event.getUser().getId();
+        String gameName = UserGameContextManager.getContextGame(userId);
+        Game game = GameManager.getGame(gameName);
         GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }

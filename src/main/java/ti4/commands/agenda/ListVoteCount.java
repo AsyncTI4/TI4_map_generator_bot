@@ -1,9 +1,10 @@
 package ti4.commands.agenda;
 
 import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.fow.FOWOptions;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
@@ -12,22 +13,22 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListVoteCount extends AgendaSubcommandData {
+public class ListVoteCount extends GameStateSubcommand {
+
     public ListVoteCount() {
-        super(Constants.VOTE_COUNT, "List Vote count for agenda");
+        super(Constants.VOTE_COUNT, "List Vote count for agenda", false, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        turnOrder(event, game);
+        turnOrder(event, getGame());
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Game game) {
-        turnOrder(event, game, event.getChannel());
+        turnOrder(game, event.getChannel());
     }
 
-    public static void turnOrder(GenericInteractionCreateEvent event, Game game, MessageChannel channel) {
+    public static void turnOrder(Game game, MessageChannel channel) {
         List<Player> orderList = AgendaHelper.getVotingOrder(game);
         int votes = 0;
         for (Player player : orderList) {

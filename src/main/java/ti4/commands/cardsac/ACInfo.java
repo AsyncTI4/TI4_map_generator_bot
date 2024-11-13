@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.uncategorized.CardsInfoHelper;
-import ti4.commands.uncategorized.InfoThreadCommand;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -22,35 +22,27 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
 
-public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
-    public ACInfo() {
-        super(Constants.INFO, "Send Action Cards to your Cards Info thread");
-    }
+public class ACInfo extends GameStateSubcommand {
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+    public ACInfo() {
+        super(Constants.INFO, "Send Action Cards to your Cards Info thread", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        var game = getGame();
+        var player = getPlayer();
         sendActionCardInfo(game, player, event);
         MessageHelper.sendMessageToEventChannel(event, "AC Info Sent");
     }
 
     private static void sendTrapCardInfo(Game game, Player player) {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(game, player));
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, getTrapCardInfo(player));
         }
     }
 
-    private static String getTrapCardInfo(Game game, Player player) {
+    private static String getTrapCardInfo(Player player) {
         StringBuilder sb = new StringBuilder();
         sb.append("_ _\n");
         sb.append("**Trap Cards:**").append("\n");
@@ -92,7 +84,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
 
     @ButtonHandler("refreshACInfo")
     public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendActionCardInfo(game, player);
     }
@@ -219,23 +211,7 @@ public class ACInfo extends ACCardsSubcommandData implements InfoThreadCommand {
         return acButtons;
     }
 
-    public static List<Button> getYssarilHeroActionCardButtons(Player yssaril, Player notYssaril) {
-        List<Button> acButtons = new ArrayList<>();
-        Map<String, Integer> actionCards = notYssaril.getActionCards();
-        if (actionCards != null && !actionCards.isEmpty()) {
-            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                Integer value = ac.getValue();
-                String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
-                if (ac_name != null) {
-                    acButtons.add(Buttons.gray("yssarilHeroInitialOffering_" + value + "_" + yssaril.getFaction(), ac_name, Emojis.ActionCard));
-                }
-            }
-        }
-        return acButtons;
-    }
-
-    public static List<Button> getToBeStolenActionCardButtons(Game game, Player player) {
+    public static List<Button> getToBeStolenActionCardButtons(Player player) {
         List<Button> acButtons = new ArrayList<>();
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {

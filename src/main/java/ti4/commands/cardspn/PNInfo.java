@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.uncategorized.InfoThreadCommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -23,24 +23,16 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.Source.ComponentSource;
 
-public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
-    public PNInfo() {
-        super(Constants.INFO, "Send your Promissory Notes to your Cards Info thread");
-    }
+public class PNInfo extends GameStateSubcommand {
 
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+    public PNInfo() {
+        super(Constants.INFO, "Send your Promissory Notes to your Cards Info thread", false, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
         sendPromissoryNoteInfo(game, player, true, event);
         MessageHelper.sendMessageToEventChannel(event, "PN Info Sent");
     }

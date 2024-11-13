@@ -11,9 +11,10 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 
-public class ShowUserSettings extends UserSubcommandData {
+public class ShowUserSettings extends Subcommand {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -24,14 +25,10 @@ public class ShowUserSettings extends UserSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        showUserSettings(event, getUserSettings());
-    }
-
-    public static void showUserSettings(GenericInteractionCreateEvent event, UserSettings userSettings) {
         MessageHelper.sendMessageToChannelWithEmbedsAndButtons(
                 event.getMessageChannel(),
                 null,
-                List.of(getSettingEmbed(event, userSettings)),
+                List.of(getSettingEmbed(event, UserSettingsManager.get(event.getUser().getId()))),
                 getUserSettingsButtons());
     }
 

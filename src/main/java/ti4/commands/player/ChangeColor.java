@@ -19,10 +19,10 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class ChangeColor extends PlayerSubcommandData {
@@ -35,7 +35,7 @@ public class ChangeColor extends PlayerSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = UserGameContextManager.getContextGame(userID);
         GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }
@@ -51,7 +51,7 @@ public class ChangeColor extends PlayerSubcommandData {
         }
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;

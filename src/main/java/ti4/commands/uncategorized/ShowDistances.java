@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.MapRenderPipeline;
@@ -18,22 +18,23 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class ShowDistances implements Command {
+public class ShowDistances implements ParentCommand {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.SHOW_DISTANCES;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getActionID())) {
+        if (!event.getName().equals(getName())) {
             return false;
         }
 
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game userActiveGame = UserGameContextManager.getContextGame(event.getUser().getId());
         if (userActiveGame == null) {
             MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
             return false;
@@ -46,17 +47,16 @@ public class ShowDistances implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        GameManager gameManager = GameManager.getInstance();
         if (option != null) {
-            String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            String gameName = option.getAsString().toLowerCase();
+            game = GameManager.getGame(gameName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            game = UserGameContextManager.getContextGame(event.getUser().getId());
         }
 
         Player player = game.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -83,10 +83,10 @@ public class ShowDistances implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Shows map with distances to each tile from specified tile")
+            Commands.slash(getName(), "Shows map with distances to each tile from specified tile")
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")));
     }

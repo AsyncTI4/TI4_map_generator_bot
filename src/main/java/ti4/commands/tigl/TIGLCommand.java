@@ -7,15 +7,16 @@ import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.helpers.Constants;
 
-public class TIGLCommand implements Command {
+
+public class TIGLCommand implements ParentCommand {
 
     private final Collection<TIGLSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.TIGL;
     }
 
@@ -41,7 +42,7 @@ public class TIGLCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Twilight Imperium Global League (TIGL)";
     }
 
@@ -53,7 +54,7 @@ public class TIGLCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands()));
     }
 }

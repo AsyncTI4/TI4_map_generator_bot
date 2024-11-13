@@ -12,10 +12,10 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
@@ -37,7 +37,7 @@ public class AddUnits extends AddRemoveUnits {
             if (!event.getInteraction().getName().equals(Constants.MOVE_UNITS)) {
                 switch (value) {
                     case "t/tactics", "t", "tactics", "tac", "tact" -> {
-                        MoveUnits.removeTacticsCC(event, color, tile, GameManager.getInstance().getUserActiveGame(event.getUser().getId()));
+                        MoveUnits.removeTacticsCC(event, color, tile, UserGameContextManager.getContextGame(event.getUser().getId()));
                         AddCC.addCC(event, color, tile);
                         Helper.isCCCountCorrect(event, game, color);
                     }
@@ -55,7 +55,7 @@ public class AddUnits extends AddRemoveUnits {
                 String userID = event.getUser().getId();
                 Player player = game.getPlayer(userID);
                 player = Helper.getGamePlayer(game, player, event, null);
-                player = Helper.getPlayer(game, player, event);
+                player = Helper.getPlayerFromEvent(game, player, event);
                 if (player != null) {
                     player.exhaustTech("sr");
                 }
@@ -77,20 +77,20 @@ public class AddUnits extends AddRemoveUnits {
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.ADD_UNITS;
     }
 
     @Override
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Add units to map";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r - default is 'no'").setAutoComplete(true))

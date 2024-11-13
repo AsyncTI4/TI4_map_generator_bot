@@ -42,6 +42,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -58,8 +59,7 @@ public class GameEnd extends GameSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        GameManager gameManager = GameManager.getInstance();
-        Game game = gameManager.getUserActiveGame(event.getUser().getId());
+        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
 
         if (game == null) {
             MessageHelper.replyToMessage(event, "Must set active Game");
@@ -103,7 +103,7 @@ public class GameEnd extends GameSubcommandData {
         }
 
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
-        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), game);
+        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), GameManager.getManagedGame(gameName));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             "This game's channels' permissions have been updated.");
 
@@ -399,7 +399,7 @@ public class GameEnd extends GameSubcommandData {
                 commonality++;
             }
         }
-        return commonality == 1 ? "" : ordinal(commonality) + " ";
+        return commonality == 1 ? "" : ordinal(commonality);
     }
 
     private static String formatPercent(double d) {

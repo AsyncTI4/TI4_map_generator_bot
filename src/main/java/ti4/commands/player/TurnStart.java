@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.commands.fow.Whisper;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -49,7 +48,7 @@ public class TurnStart extends PlayerSubcommandData {
         Game game = getActiveGame();
         Player mainPlayer = game.getPlayer(getUser().getId());
         mainPlayer = Helper.getGamePlayer(game, mainPlayer, event, null);
-        mainPlayer = Helper.getPlayer(game, mainPlayer, event);
+        mainPlayer = Helper.getPlayerFromEvent(game, mainPlayer, event);
 
         if (mainPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());

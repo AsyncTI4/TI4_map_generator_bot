@@ -8,10 +8,12 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ServerLimitStats extends BothelperSubcommandData {
+public class ServerLimitStats extends Subcommand {
+
     public ServerLimitStats() {
         super(Constants.SERVER_LIMIT_STATS, "Server Limit Stats");
     }

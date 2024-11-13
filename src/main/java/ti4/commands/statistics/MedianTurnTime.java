@@ -3,8 +3,8 @@ package ti4.commands.statistics;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -18,7 +18,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class MedianTurnTime extends StatisticsSubcommandData {
@@ -37,8 +36,6 @@ public class MedianTurnTime extends StatisticsSubcommandData {
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
-
         Map<String, Integer> playerTurnCount = new HashMap<>();
 
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
@@ -46,17 +43,19 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : maps.values().stream().filter(endedGamesFilter).toList()) {
-            for (Player player : game.getPlayers().values()) {
-                Entry<Integer, Long> playerTurnTime = Map.entry(player.getNumberTurns(), player.getTotalTurnTime());
+        for (Game game : GameManager.getInstance().getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+            for (var player : game.getRealPlayers()) {
+                Integer totalTurns = game.getPlayerToTotalTurns().get(player.getId());
+                Long totalTurnTime = game.getPlayerToTurnTime().get(player.getId());
+                Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
                 if (playerTurnTime.getKey() == 0) continue;
                 Long averageTurnTime = playerTurnTime.getValue() / playerTurnTime.getKey();
-                playerAverageTurnTimes.compute(player.getUserID(), (key, value) -> {
+                playerAverageTurnTimes.compute(player.getId(), (key, value) -> {
                     if (value == null) value = new HashSet<>();
                     value.add(averageTurnTime);
                     return value;
                 });
-                playerTurnCount.merge(player.getUserID(), playerTurnTime.getKey(), Integer::sum);
+                playerTurnCount.merge(player.getId(), playerTurnTime.getKey(), Integer::sum);
             }
         }
 

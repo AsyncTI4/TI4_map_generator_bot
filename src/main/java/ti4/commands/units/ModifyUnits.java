@@ -3,40 +3,37 @@ package ti4.commands.units;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class ModifyUnits implements Command {
+public class ModifyUnits implements ParentCommand {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.MODIFY_UNITS;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+        return event.getName().equals(getName());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game  game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game  game = UserGameContextManager.getContextGame(event.getUser().getId());
         Player player = game.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        player = Helper.getPlayerFromEvent(game, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -59,8 +56,8 @@ public class ModifyUnits implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), "Present the Modify Units menu"));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), "Present the Modify Units menu"));
     }
 
 }

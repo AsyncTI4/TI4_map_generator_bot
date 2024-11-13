@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -24,32 +24,32 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CardsInfo implements Command, InfoThreadCommand {
+public class CardsInfo implements ParentCommand {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CARDS_INFO;
     }
 
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+        return SlashCommandAcceptanceHelper.acceptIfAdminOrPlayerInGame(getName(), event);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
         Game game;
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            game = gameManager.getUserActiveGame(userID);
+            game = UserGameContextManager.getContextGame(userID);
             String color = Helper.getColor(game, event);
             if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
@@ -314,16 +314,16 @@ public class CardsInfo implements Command, InfoThreadCommand {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Send to your Cards Info thread: Scored & Unscored SOs, ACs, and PNs in both hand and Play Area";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false)));
     }
 

@@ -69,8 +69,9 @@ public class CreateGameButton extends GameSubcommandData {
                 Member member = event.getOption("player" + i).getAsMember();
                 if (member != null)
                     members.add(member);
+                // TODO: MAGICAL USER NUMBER...?
                 if (member.getId().equalsIgnoreCase("400038967744921612")) {
-                    int amount = SearchMyGames.searchGames(member.getUser(), event, false, false, false, true, false, true, false, true);
+                    int amount = SearchMyGames.searchGames(member.getUser(), event, false, false, false, true, false, true);
                     if (amount > 4) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
                         return;
@@ -111,7 +112,7 @@ public class CreateGameButton extends GameSubcommandData {
 
         Member member = event.getMember();
         boolean isAdmin = false;
-        Game mapreference = GameManager.getInstance().getGame("finreference");
+        Game mapreference = GameManager.getGame("finreference");
 
         if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
@@ -138,7 +139,7 @@ public class CreateGameButton extends GameSubcommandData {
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
         String gameName = CreateGameChannels.getNextGameName();
         String lastGame = CreateGameChannels.getLastGameName();
-        Game game = GameManager.getInstance().getGame(lastGame);
+        Game game = GameManager.getGame(lastGame);
         if (game != null) {
             if (game.getCustomName().equalsIgnoreCase(gameSillyName)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),

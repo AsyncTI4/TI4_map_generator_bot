@@ -14,34 +14,33 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreInfo extends ExploreSubcommandData {
+public class ExploreInfo extends GameStateSubcommand {
 
     public ExploreInfo() {
-        super(Constants.INFO, "Display cards in exploration decks and discards.");
-        addOptions(typeOption);
+        super(Constants.INFO, "Display cards in exploration decks and discards.", true, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_FOW, "TRUE if override fog"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        List<String> types = new ArrayList<>();
-        OptionMapping reqType = event.getOption(Constants.TRAIT);
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
-
         boolean over = false;
         if (override != null) {
             over = "TRUE".equalsIgnoreCase(override.getAsString());
         }
+
+        OptionMapping reqType = event.getOption(Constants.TRAIT);
+        List<String> types = new ArrayList<>();
         if (reqType != null) {
             types.add(reqType.getAsString());
         } else {
@@ -50,9 +49,8 @@ public class ExploreInfo extends ExploreSubcommandData {
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
         }
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        secondHalfOfExpInfo(types, event, player, game, over);
+        Game game = getGame();
+        secondHalfOfExpInfo(types, event, getPlayer(), game, over);
     }
 
     public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide) {

@@ -9,10 +9,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class UpdateThreadArchiveTime extends AdminSubcommandData {
+public class UpdateThreadArchiveTime extends Subcommand {
+
     public UpdateThreadArchiveTime() {
         super(Constants.UPDATE_THREAD_ARCHIVE_TIME, "Update the AutoArchiveDuration for all currently open threads that contain the search string");
         addOptions(new OptionData(OptionType.STRING, Constants.THREAD_SEARCH_STRING, "Any thread containing this string will be updated.").setRequired(true));

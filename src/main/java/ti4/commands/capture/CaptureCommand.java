@@ -1,77 +1,39 @@
 package ti4.commands.capture;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
-import ti4.generator.MapRenderPipeline;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+public class CaptureCommand implements ParentCommand {
 
-public class CaptureCommand implements Command {
-
-    private final Collection<CaptureSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new AddCaptureUnits(),
+                    new RemoveCaptureUnits())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CAPTURE;
+    }
+
+    public String getDescription() {
+        return "Capture units";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        return ParentCommand.super.accept(event) &&
+                CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        CaptureSubcommandData executedCommand = null;
-        for (CaptureSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                executedCommand = subcommand;
-                break;
-            }
-        }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveGame(game, event);
-
-        MapRenderPipeline.renderToWebsiteOnly(game, event);
-    }
-
-    protected String getActionDescription() {
-        return "Capture units";
-    }
-
-    private Collection<CaptureSubcommandData> getSubcommands() {
-        Collection<CaptureSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new AddUnits());
-        subcommands.add(new RemoveUnits());
-
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
-    }
-
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
     }
 }

@@ -1,21 +1,23 @@
 package ti4.commands.fow;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.message.MessageHelper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class AddCustomAdjacentTile extends FOWSubcommandData {
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
+import ti4.helpers.Constants;
+import ti4.map.Game;
+import ti4.message.MessageHelper;
+
+public class AddCustomAdjacentTile extends GameStateSubcommand {
+
     public AddCustomAdjacentTile() {
-        super(Constants.ADD_CUSTOM_ADJACENT_TILES, "Add Custom Adjacent Tiles. ");
+        super(Constants.ADD_CUSTOM_ADJACENT_TILES, "Add Custom Adjacent Tiles.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary Tile").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ADJACENT_TILES, "Adjacent Tiles").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TWO_WAY, "Are added tiles two way connection").setRequired(false));
@@ -23,7 +25,6 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
         OptionMapping primaryTileOption = event.getOption(Constants.PRIMARY_TILE);
         if (primaryTileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Primary tile");
@@ -45,6 +46,7 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
         adjacentTiles = adjacentTiles.replace(" ", "");
         String[] tilesSplit = adjacentTiles.split(",");
         List<String> tiles = Arrays.asList(tilesSplit);
+        Game game = getGame();
         game.addCustomAdjacentTiles(primaryTile, tiles);
         OptionMapping twoWayOption = event.getOption(Constants.TWO_WAY);
         if (twoWayOption != null && twoWayOption.getAsBoolean()) {
