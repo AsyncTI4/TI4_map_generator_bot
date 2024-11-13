@@ -28,12 +28,11 @@ public class TechCommand implements Command {
     public boolean accept(SlashCommandInteractionEvent event) {
         if (event.getName().equals(getActionID())) {
             String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
+            if (!GameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
+            Game userActiveGame = GameManager.getUserActiveGame(userID);
             if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
                 MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
@@ -64,7 +63,7 @@ public class TechCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
 
         MapRenderPipeline.renderToWebsiteOnly(game, event);

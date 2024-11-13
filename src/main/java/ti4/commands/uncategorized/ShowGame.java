@@ -1,5 +1,8 @@
 package ti4.commands.uncategorized;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,9 +23,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ShowGame implements Command {
 
     @Override
@@ -38,12 +38,12 @@ public class ShowGame implements Command {
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+            if (!GameManager.getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
                 return false;
             }
         } else {
-            Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+            Game userActiveGame = GameManager.getUserActiveGame(event.getUser().getId());
             if (userActiveGame == null) {
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return false;
@@ -56,12 +56,11 @@ public class ShowGame implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            game = GameManager.getGame(mapName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            game = GameManager.getUserActiveGame(event.getUser().getId());
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);

@@ -19,13 +19,13 @@ import ti4.commands.combat.StartCombat;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
 import ti4.commands.uncategorized.ShowGame;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
@@ -41,21 +41,18 @@ abstract public class AddRemoveUnits implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game game = gameManager.getUserActiveGame(userID);
-        Player player = game.getPlayer(userID);
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Game game = GameManager.getUserActiveGame(userID);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
-        String color = Helper.getColor(game, event);
+        String color = CommandHelper.getColor(game, event);
         if (!Mapper.isValidColor(color)) {
             MessageHelper.replyToMessage(event, "Color/Faction not valid");
             return;
@@ -308,9 +305,8 @@ abstract public class AddRemoveUnits implements Command {
 
     public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
         if (game == null) {
-            game = gameManager.getUserActiveGame(userID);
+            game = GameManager.getUserActiveGame(userID);
         }
         // Map activeMap = mapManager.getUserActiveMap(userID);
         if (!Constants.SPACE.equals(planetName)) {

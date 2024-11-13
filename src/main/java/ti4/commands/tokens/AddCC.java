@@ -53,7 +53,7 @@ public class AddCC extends AddRemoveToken {
         String gameName = event.getChannel().getName();
         gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
         gameName = gameName.substring(0, gameName.indexOf("-"));
-        Game game = GameManager.getInstance().getGame(gameName);
+        Game game = GameManager.getGame(gameName);
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
@@ -67,7 +67,7 @@ public class AddCC extends AddRemoveToken {
     }
 
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game game = GameManager.getUserActiveGame(event.getUser().getId());
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {

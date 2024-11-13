@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.Helper;
+import ti4.commands2.CommandHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -35,9 +35,9 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getUserActiveGame(user.getId());
 
-        Player player = Helper.getGamePlayer(game, null, event, user.getId());
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player != null) {
             user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
         }

@@ -1,20 +1,5 @@
 package ti4.helpers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.core.exception.SdkClientException;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import ti4.ResourceHelper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameStatsDashboardPayload;
-import ti4.map.Player;
-import ti4.message.BotLogger;
-import ti4.website.WebsiteOverlay;
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -31,6 +16,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import ti4.ResourceHelper;
+import ti4.map.Game;
+import ti4.map.GameManager;
+import ti4.map.GameStatsDashboardPayload;
+import ti4.map.Player;
+import ti4.message.BotLogger;
+import ti4.website.WebsiteOverlay;
 
 import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
@@ -103,7 +103,7 @@ public class WebHelper {
         List<GameStatsDashboardPayload> payloads = new ArrayList<>();
         List<String> badGames = new ArrayList<>();
         int count = 0;
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : GameManager.getGameNameToGame().values()) {
             if (game.isHasEnded() && game.hasWinner()) {
                 count++;
                 try {

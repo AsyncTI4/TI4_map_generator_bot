@@ -1,5 +1,12 @@
 package ti4.commands.help;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,13 +21,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public class SampleDecals extends HelpSubcommandData {
     public SampleDecals() {

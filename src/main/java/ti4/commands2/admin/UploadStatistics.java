@@ -1,7 +1,7 @@
 package ti4.commands2.admin;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.Subcommand;
+import ti4.commands2.Subcommand;
 import ti4.helpers.WebHelper;
 import ti4.message.MessageHelper;
 

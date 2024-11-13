@@ -1,15 +1,11 @@
 package ti4.commands.special;
 
-import java.util.Objects;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.AliasHandler;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -18,7 +14,7 @@ public class SwapSC extends SpecialSubcommandData {
     public SwapSC() {
         super(Constants.SWAP_SC, "Swap your SC with player2. Use OPTIONAL faction_or_color_2 to swap two other players' SCs");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color to swap SC with").setAutoComplete(true).setRequired(false));
     }
 
     @Override
@@ -26,44 +22,18 @@ public class SwapSC extends SpecialSubcommandData {
         Game game = getActiveGame();
 
         //resolve player1
-        Player player1 = null; //OG player
-        OptionMapping player1option = event.getOption(Constants.FACTION_COLOR_2);
-        if (player1option == null) {
-            player1 = game.getPlayer(getUser().getId());
-            player1 = Helper.getGamePlayer(game, player1, event, null);
-        } else {
-            String factionColor = AliasHandler.resolveColor(player1option.getAsString().toLowerCase());
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
-                    player1 = player_;
-                    break;
-                }
-            }
-        }
+        Player player1 = CommandHelper.getPlayerFromEvent(game, event);
         if (player1 == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
 
         //resolve player2
-        Player player2 = null; //Player to swap with
-        OptionMapping player2option = event.getOption(Constants.FACTION_COLOR);
-        if (player2option != null) {
-            String factionColor = AliasHandler.resolveColor(player2option.getAsString().toLowerCase());
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
-                    player2 = player_;
-                    break;
-                }
-            }
-            if (player2 == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-                return;
-            }
+        Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (player2 == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player 2 could not be found");
+            return;
         }
-
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Players provided are the same player");
             return;

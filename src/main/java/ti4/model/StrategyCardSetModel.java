@@ -1,18 +1,16 @@
 package ti4.model;
 
-import lombok.Data;
-import ti4.generator.Mapper;
-import ti4.model.Source.ComponentSource;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import ti4.generator.Mapper;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class StrategyCardSetModel implements ModelInterface {

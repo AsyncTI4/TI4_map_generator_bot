@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.special.CheckDistance;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.commands2.CommandHelper;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -33,7 +34,7 @@ public class ShowDistances implements Command {
             return false;
         }
 
-        Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game userActiveGame = GameManager.getUserActiveGame(event.getUser().getId());
         if (userActiveGame == null) {
             MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
             return false;
@@ -46,17 +47,14 @@ public class ShowDistances implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            game = GameManager.getGame(mapName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            game = GameManager.getUserActiveGame(event.getUser().getId());
         }
 
-        Player player = game.getPlayer(event.getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;

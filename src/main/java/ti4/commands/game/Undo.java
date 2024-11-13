@@ -32,8 +32,7 @@ public class Undo extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        GameManager gameManager = GameManager.getInstance();
-        Game game = gameManager.getUserActiveGame(event.getUser().getId());
+        Game game = GameManager.getUserActiveGame(event.getUser().getId());
         if (game == null) {
             MessageHelper.replyToMessage(event, "Must set active Game");
             return;
@@ -102,8 +101,8 @@ public class Undo extends GameSubcommandData {
         }
         // MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
-        GameManager.getInstance().deleteGame(game.getName());
-        GameManager.getInstance().addGame(gameToRestore);
+        GameManager.deleteGame(game.getName());
+        GameManager.addGame(gameToRestore);
         GameSaveLoadManager.undo(gameToRestore, event);
     }
 

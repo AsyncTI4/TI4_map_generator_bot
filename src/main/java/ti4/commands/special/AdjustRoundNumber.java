@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.*;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class AdjustRoundNumber extends SpecialSubcommandData {

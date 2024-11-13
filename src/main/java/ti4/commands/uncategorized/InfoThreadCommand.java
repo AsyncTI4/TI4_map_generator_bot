@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.Helper;
+import ti4.commands2.CommandHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -18,8 +18,7 @@ public interface InfoThreadCommand {
     default boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
         if (event.getName().equals(actionID)) {
             String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
+            if (!GameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
@@ -32,9 +31,9 @@ public interface InfoThreadCommand {
                     }
                 }
             }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
+            Game userActiveGame = GameManager.getUserActiveGame(userID);
             if (userActiveGame.isCommunityMode()) {
-                Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
+                Player player = CommandHelper.getPlayerFromEvent(userActiveGame, event);
                 if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                     return false;

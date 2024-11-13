@@ -3,19 +3,18 @@ package ti4.commands.relic;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.helpers.TransactionHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -28,18 +27,16 @@ public class RelicSendFragments extends RelicSubcommandData {
 		super(Constants.SEND_FRAGMENT, "Send a number of relic fragments (default 1) to another player");
 		addOptions(
 			typeOption.setRequired(true),
-			new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true),
+			new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color to send to").setRequired(true).setAutoComplete(true),
 			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)"));
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Game game = getActiveGame();
-		User activeUser = getUser();
-		Player sender = game.getPlayers().get(activeUser.getId());
-		sender = Helper.getGamePlayer(game, sender, event, null);
+		Player sender = CommandHelper.getPlayerFromEvent(game, event);
 
-		Player receiver = Helper.getPlayer(game, null, event);
+		Player receiver = CommandHelper.getOtherPlayerFromEvent(game, event);
 		if (receiver == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Target player could not be found in game:" + game.getName());
 			return;
@@ -53,7 +50,6 @@ public class RelicSendFragments extends RelicSubcommandData {
 	}
 
 	public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {
-
 		List<String> fragments = new ArrayList<>();
 		for (String cardID : sender.getFragments()) {
 			ExploreModel card = Mapper.getExplore(cardID);

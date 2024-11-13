@@ -55,11 +55,10 @@ public class AddFrontierTokens implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game game = gameManager.getUserActiveGame(userID);
+            Game game = GameManager.getUserActiveGame(userID);
             parsingForTile(event, game);
             GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);

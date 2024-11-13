@@ -9,11 +9,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -28,8 +28,7 @@ public class SentAC extends ACCardsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -53,7 +52,7 @@ public class SentAC extends ACCardsSubcommandData {
             return;
         }
 
-        Player player_ = Helper.getPlayer(game, null, event);
+        Player player_ = CommandHelper.getPlayerFromEvent(game, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;

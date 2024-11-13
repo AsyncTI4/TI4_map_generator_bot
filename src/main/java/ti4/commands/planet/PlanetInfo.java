@@ -41,7 +41,7 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getUser();
-        Game game = GameManager.getInstance().getUserActiveGame(user.getId());
+        Game game = GameManager.getUserActiveGame(user.getId());
 
         Player player = game.getPlayer(user.getId());
         sendPlanetInfo(player);

@@ -12,10 +12,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.uncategorized.ShowGame;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -28,8 +28,7 @@ abstract public class AddRemoveToken implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
@@ -42,13 +41,13 @@ abstract public class AddRemoveToken implements Command {
 
         OptionMapping factionOrColour = event.getOption(Constants.FACTION_COLOR);
         List<String> colors = new ArrayList<>();
-        Game game = gameManager.getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         if (factionOrColour != null) {
             String colorString = factionOrColour.getAsString().toLowerCase();
             colorString = colorString.replace(" ", "");
             StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
             while (colorTokenizer.hasMoreTokens()) {
-                String color = Helper.getColorFromString(game, colorTokenizer.nextToken());
+                String color = CommandHelper.getColorFromString(game, colorTokenizer.nextToken());
                 if (!colors.contains(color)) {
                     colors.add(color);
                     if (!Mapper.isValidColor(color)) {
@@ -58,14 +57,12 @@ abstract public class AddRemoveToken implements Command {
                 }
             }
         } else {
-            Player player = game.getPlayer(userID);
-            player = Helper.getGamePlayer(game, player, event, null);
+            Player player = CommandHelper.getOtherPlayerFromEvent(game, event);
             if (player == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
                 return;
             }
             colors.add(player.getColor());
-
         }
 
         List<Tile> tiles = new ArrayList<>();

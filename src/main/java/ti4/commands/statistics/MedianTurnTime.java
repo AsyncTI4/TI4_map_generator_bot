@@ -3,8 +3,8 @@ package ti4.commands.statistics;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -37,7 +37,7 @@ public class MedianTurnTime extends StatisticsSubcommandData {
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> maps = GameManager.getGameNameToGame();
 
         Map<String, Integer> playerTurnCount = new HashMap<>();
 

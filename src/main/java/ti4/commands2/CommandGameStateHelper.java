@@ -2,7 +2,6 @@ package ti4.commands2;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -33,7 +32,7 @@ public class CommandGameStateHelper {
         if (!isPlayerCommand) {
             return;
         }
-        var gamePlayer = Helper.getPlayerFromEvent(getGame(), event);
+        var gamePlayer = CommandHelper.getPlayerFromEvent(getGame(), event);
         if (gamePlayer == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName() + " for game " + gameName);

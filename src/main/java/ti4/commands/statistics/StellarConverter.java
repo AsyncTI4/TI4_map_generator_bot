@@ -29,7 +29,7 @@ public class StellarConverter extends StatisticsSubcommandData {
     }
 
     private String getStellarConverts(SlashCommandInteractionEvent event) {
-        Map<String, Game> games = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> games = GameManager.getGameNameToGame();
         Map<String, Integer> numberConverts = new HashMap<>();
 
         int count = 0;

@@ -26,7 +26,7 @@ public class DeleteGame extends AdminSubcommandData {
         String mapName = event.getOption(Constants.GAME_NAME, OptionMapping::getAsString);
         if (mapName == null) return;
 
-        Game gameToDelete = GameManager.getInstance().getGame(mapName);
+        Game gameToDelete = GameManager.getGame(mapName);
         if (gameToDelete == null) {
             MessageHelper.replyToMessage(event, "Map: " + mapName + " was not found.");
             return;
@@ -51,7 +51,7 @@ public class DeleteGame extends AdminSubcommandData {
 
         if (GameSaveLoadManager.deleteGame(mapName)) {
             GameEnd.secondHalfOfGameEnd(event, gameToDelete, false, true, false);
-            GameManager.getInstance().deleteGame(mapName);
+            GameManager.deleteGame(mapName);
             MessageHelper.replyToMessage(event, "Map: " + mapName + " deleted.");
         } else {
             MessageHelper.replyToMessage(event, "Map could not be deleted");

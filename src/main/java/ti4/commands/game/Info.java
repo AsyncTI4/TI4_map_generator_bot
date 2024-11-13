@@ -27,7 +27,6 @@ public class Info extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        GameManager gameManager = GameManager.getInstance();
         Game game = getActiveGame();
         if (game == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found.");
@@ -36,7 +35,7 @@ public class Info extends GameSubcommandData {
 
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         if (gameNameOption != null && !game.getName().equalsIgnoreCase(gameNameOption.getAsString().toLowerCase())) {
-            game = gameManager.getGame(gameNameOption.getAsString().toLowerCase());
+            game = GameManager.getGame(gameNameOption.getAsString().toLowerCase());
         }
 
         StringBuilder sb = getGameInfo(game, event);

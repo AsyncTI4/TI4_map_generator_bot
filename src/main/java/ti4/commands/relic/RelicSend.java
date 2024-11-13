@@ -1,16 +1,14 @@
 package ti4.commands.relic;
 
 import java.util.List;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -22,57 +20,30 @@ public class RelicSend extends RelicSubcommandData {
     public RelicSend() {
         super(Constants.RELIC_SEND, "Send a relic to another Player");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to send from Target to Source").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Target Faction or Color").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Target Faction or Color").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source Faction or Color (default is you)").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player1 = game.getPlayer(getUser().getId());
-        player1 = Helper.getGamePlayer(game, player1, event, null);
-        player1 = Helper.getPlayer(game, player1, event);
+        Player player1 = CommandHelper.getPlayerFromEvent(game, event);
         if (player1 == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        String relicID = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
-        String targetFaction = event.getOption(Constants.FACTION_COLOR_2, null, OptionMapping::getAsString);
-        String sourceFaction = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
-
-        //resolve player1
-        if (sourceFaction != null) {
-            String factionColor = AliasHandler.resolveColor(sourceFaction.toLowerCase());
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
-                    player1 = player_;
-                    break;
-                }
-            }
-        }
 
         //resolve player2
-        Player player2 = null; //Player to send to
-        if (targetFaction != null) {
-            String factionColor = AliasHandler.resolveColor(targetFaction.toLowerCase());
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) || Objects.equals(factionColor, player_.getColor())) {
-                    player2 = player_;
-                    break;
-                }
-            }
-        }
+        Player player2 = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (player2 == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToEventChannel(event, "Player 2 could not be found");
             return;
         }
-
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The two players provided are the same player");
             return;
         }
 
+        String relicID = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
         List<String> player1Relics = player1.getRelics();
         if (!player1Relics.contains(relicID)) {
             MessageHelper.sendMessageToEventChannel(event, player1.getUserName() + " does not have relic: " + relicID);

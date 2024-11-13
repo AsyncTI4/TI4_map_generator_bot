@@ -12,10 +12,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.uncategorized.ShowGame;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -42,9 +42,7 @@ public class CorrectFaction extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Faction not valid");
             return;
         }
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -98,7 +96,7 @@ public class CorrectFaction extends PlayerSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
         ShowGame.simpleShowGame(game, event);
     }

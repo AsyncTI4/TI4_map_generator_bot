@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -29,9 +29,7 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Game game = getActiveGame();
-		Player activePlayer = game.getPlayer(getUser().getId());
-		activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
-		activePlayer = Helper.getPlayer(game, activePlayer, event);
+		Player activePlayer = CommandHelper.getPlayerFromEvent(game, event);
 		if (activePlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
 			return;

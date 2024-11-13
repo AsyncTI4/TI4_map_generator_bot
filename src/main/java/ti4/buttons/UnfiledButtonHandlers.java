@@ -3495,7 +3495,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you need to assign speaker first before drawing agendas. You can override this restriction with `/agenda draw`");
             return;
         }
-        DrawAgenda.drawAgenda(event, 2, game, player);
+        DrawAgenda.drawAgenda(2, game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false) + " drew 2 agendas");
         ButtonHelper.deleteMessage(event);
     }

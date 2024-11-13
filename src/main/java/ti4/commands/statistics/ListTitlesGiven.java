@@ -30,7 +30,7 @@ public class ListTitlesGiven extends StatisticsSubcommandData {
             titleOnly = true;
         }
         //String titles = game.getStoredValue("TitlesFor" + p2.getUserID());
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         Map<String, Integer> timesTitleHasBeenBestowed = new HashMap<>();
         Map<String, Integer> titlesAPersonHas = new HashMap<>();
         Map<String, Integer> timesPersonHasGottenSpecificTitle = new HashMap<>();

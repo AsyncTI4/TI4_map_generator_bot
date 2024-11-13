@@ -1,5 +1,8 @@
 package ti4.commands.units;
 
+import java.util.Objects;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,8 +16,6 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import java.util.Objects;
 
 public class RemoveUnits extends AddRemoveUnits {
 

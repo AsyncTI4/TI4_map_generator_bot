@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.tokens.AddCC;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -37,7 +38,7 @@ public class AddUnits extends AddRemoveUnits {
             if (!event.getInteraction().getName().equals(Constants.MOVE_UNITS)) {
                 switch (value) {
                     case "t/tactics", "t", "tactics", "tac", "tact" -> {
-                        MoveUnits.removeTacticsCC(event, color, tile, GameManager.getInstance().getUserActiveGame(event.getUser().getId()));
+                        MoveUnits.removeTacticsCC(event, color, tile, GameManager.getUserActiveGame(event.getUser().getId()));
                         AddCC.addCC(event, color, tile);
                         Helper.isCCCountCorrect(event, game, color);
                     }
@@ -52,10 +53,7 @@ public class AddUnits extends AddRemoveUnits {
         if (optionSlingRelay != null) {
             boolean useSlingRelay = optionSlingRelay.getAsBoolean();
             if (useSlingRelay) {
-                String userID = event.getUser().getId();
-                Player player = game.getPlayer(userID);
-                player = Helper.getGamePlayer(game, player, event, null);
-                player = Helper.getPlayer(game, player, event);
+                Player player = CommandHelper.getPlayerFromEvent(game, event);
                 if (player != null) {
                     player.exhaustTech("sr");
                 }

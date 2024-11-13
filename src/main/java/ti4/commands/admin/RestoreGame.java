@@ -56,8 +56,8 @@ public class RestoreGame extends AdminSubcommandData {
             return;
         }
 
-        GameManager.getInstance().deleteGame(game.getName());
-        GameManager.getInstance().addGame(game);
+        GameManager.deleteGame(game.getName());
+        GameManager.addGame(game);
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " restored.");
         GameSaveLoadManager.saveGame(game, event);
     }

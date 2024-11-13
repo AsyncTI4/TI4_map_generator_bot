@@ -1,5 +1,7 @@
 package ti4.commands.button;
 
+import java.util.Collections;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,8 +14,6 @@ import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.message.MessageHelper;
-
-import java.util.Collections;
 
 public class GenericButtonCommand implements Command {
 
