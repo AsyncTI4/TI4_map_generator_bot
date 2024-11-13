@@ -27,7 +27,7 @@ public class SentAC extends ACCardsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         if (player == null) {

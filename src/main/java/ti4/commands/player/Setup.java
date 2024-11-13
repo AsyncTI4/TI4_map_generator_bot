@@ -54,7 +54,7 @@ public class Setup extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         String faction = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
         if (faction != null) {
             faction = StringUtils.substringBefore(faction.toLowerCase().replace("the ", ""), " ");

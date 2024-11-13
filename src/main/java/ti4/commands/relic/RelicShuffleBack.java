@@ -21,7 +21,7 @@ public class RelicShuffleBack extends RelicSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         Player player = game.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayerFromEvent(game, player, event);

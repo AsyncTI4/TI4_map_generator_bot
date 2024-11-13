@@ -22,7 +22,7 @@ public class Setup extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping playerCount = event.getOption(Constants.PLAYER_COUNT_FOR_MAP);
         if (playerCount != null) {

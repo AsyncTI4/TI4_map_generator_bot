@@ -29,7 +29,7 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game game = getActiveGame();
+		Game game = getGame();
 		Player activePlayer = Helper.getPlayerFromGame(game, event, getUser().getId());
 		if (activePlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");

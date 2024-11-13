@@ -45,7 +45,7 @@ public class TurnStart extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         Player mainPlayer = game.getPlayer(getUser().getId());
         mainPlayer = Helper.getGamePlayer(game, mainPlayer, event, null);
         mainPlayer = Helper.getPlayerFromEvent(game, mainPlayer, event);

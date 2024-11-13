@@ -23,7 +23,7 @@ public class SwapSC extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         //resolve player1
         Player player1 = null; //OG player

@@ -52,7 +52,7 @@ public class SetupGameChannels extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         // Set main channel where SC's get played
         OptionMapping channel = event.getOption(Constants.MAIN_GAME_CHANNEL);

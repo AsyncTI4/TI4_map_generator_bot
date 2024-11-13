@@ -568,7 +568,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String pos = stuff[1];
         String cardRefused = stuff[2];
         game.addExplore(cardRefused);
-        new ExploreFrontier().expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
+        new ExploreFrontier();
+        ExploreFrontier.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3367,7 +3368,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("bottomAgenda_")
     public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-        new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), game);
+        new PutAgendaBottom();
+        PutAgendaBottom.putBottom(event, Integer.parseInt(agendaNumID), game);
         AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
@@ -3420,7 +3422,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("topAgenda_")
     public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-        new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), game);
+        new PutAgendaTop();
+        PutAgendaTop.putTop(event, Integer.parseInt(agendaNumID), game);
         String key = "round" + game.getRound() + "AgendaPlacement";
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "top");

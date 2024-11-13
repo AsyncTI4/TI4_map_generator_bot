@@ -25,7 +25,7 @@ public class SendDebt extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         Player sendingPlayer = game.getPlayer(getUser().getId());
         sendingPlayer = Helper.getGamePlayer(game, sendingPlayer, event, null);
 

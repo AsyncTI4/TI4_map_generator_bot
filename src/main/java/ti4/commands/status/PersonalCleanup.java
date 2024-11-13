@@ -33,7 +33,7 @@ public class PersonalCleanup extends StatusSubcommandData {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-        Game game = getActiveGame();
+        Game game = getGame();
         runStatusCleanup(game);
     }
 

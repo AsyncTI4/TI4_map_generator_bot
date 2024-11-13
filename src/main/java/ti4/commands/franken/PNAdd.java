@@ -3,6 +3,7 @@ package ti4.commands.franken;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.cardspn.PNInfo;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -10,13 +11,14 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class PNAdd extends PNAddRemove {
+
     public PNAdd() {
         super(Constants.PN_ADD, "Add a Promissory Note to your faction's owned notes");
     }
 
     @Override
-    public void doAction(Player player, List<String> pnIDs) {
-        addPromissoryNotes(getEvent(), getActiveGame(), player, pnIDs);
+    public void doAction(Player player, List<String> pnIDs, SlashCommandInteractionEvent event) {
+        addPromissoryNotes(event, getGame(), player, pnIDs);
     }
 
     public static void addPromissoryNotes(GenericInteractionCreateEvent event, Game game, Player player, List<String> pnIDs) {

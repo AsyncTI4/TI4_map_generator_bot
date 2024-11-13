@@ -35,7 +35,7 @@ public class CorrectFaction extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         String newFaction = AliasHandler.resolveColor(event.getOption(Constants.FACTION).getAsString().toLowerCase());
         newFaction = AliasHandler.resolveFaction(newFaction);

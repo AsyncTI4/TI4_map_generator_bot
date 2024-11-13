@@ -19,7 +19,7 @@ abstract public class JoinLeave extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         User user = event.getUser();
         action(game, user);
 

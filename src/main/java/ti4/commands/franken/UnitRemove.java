@@ -3,18 +3,20 @@ package ti4.commands.franken;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class UnitRemove extends UnitAddRemove {
+
     public UnitRemove() {
         super(Constants.UNIT_REMOVE, "Remove an unit from your faction");
     }
 
     @Override
-    public void doAction(Player player, List<String> unitIDs) {
-        removeUnits(getEvent(), player, unitIDs);
+    public void doAction(Player player, List<String> unitIDs, SlashCommandInteractionEvent event) {
+        removeUnits(event, player, unitIDs);
     }
 
     public static void removeUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs) {

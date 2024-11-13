@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.game.SetOrder;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
@@ -25,10 +26,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ApplyDraftBags extends FrankenSubcommandData {
+public class ApplyDraftBags extends GameStateSubcommand {
 
     public ApplyDraftBags() {
-        super("apply_draft_bags", "Begin selecting items from draft bags to apply them to your faction.");
+        super("apply_draft_bags", "Begin selecting items from draft bags to apply them to your faction.", true, false);
         addOption(OptionType.BOOLEAN, Constants.FORCE, "Force apply current bags, even if the bag draft is not complete.");
     }
 
@@ -44,16 +45,9 @@ public class ApplyDraftBags extends FrankenSubcommandData {
         Category.PN,
         Category.STARTINGTECH);
 
-    static final List<DraftItem.Category> mapBuildCategories = List.of(
-        Category.HOMESYSTEM,
-        Category.STARTINGFLEET,
-        Category.BLUETILE,
-        Category.REDTILE,
-        Category.DRAFTORDER);
-
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         BagDraft draft = game.getActiveBagDraft();
 
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);

@@ -40,7 +40,7 @@ public class SetDeck extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         Map<String, DeckModel> changedDecks = new HashMap<>();
 

@@ -34,7 +34,7 @@ public class RelicSendFragments extends RelicSubcommandData {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		Game game = getActiveGame();
+		Game game = getGame();
 		User activeUser = getUser();
 		Player sender = game.getPlayers().get(activeUser.getId());
 		sender = Helper.getGamePlayer(game, sender, event, null);

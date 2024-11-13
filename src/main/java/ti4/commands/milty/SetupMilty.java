@@ -17,7 +17,7 @@ public class SetupMilty extends MiltySubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         miltySetup(event, game);
     }
 

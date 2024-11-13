@@ -40,7 +40,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        //Game game = getActiveGame();
+        //Game game = getGame();
     }
 
     @ButtonHandler("gameInfoButtons")

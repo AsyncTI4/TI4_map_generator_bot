@@ -50,7 +50,7 @@ public class HeroPlay extends LeaderAction {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         var player = getPlayer();
 
         if (player == null) {

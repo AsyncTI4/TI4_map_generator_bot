@@ -1,32 +1,58 @@
 package ti4.commands.franken;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.CommandHelper;
 import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
+import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class FrankenCommand implements ParentCommand {
 
-    private final Collection<FrankenSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+            new AbilityAdd(),
+            new AbilityRemove(),
+            new LeaderAdd(),
+            new LeaderRemove(),
+            new FactionTechAdd(),
+            new FactionTechRemove(),
+            new PNAdd(),
+            new PNRemove(),
+            new UnitAdd(),
+            new UnitRemove(),
+            new StartFrankenDraft(),
+            new SetFactionIcon(),
+            new SetFactionDisplayName(),
+            new FrankenEdit(),
+            new ShowFrankenBag(),
+            new ShowFrankenHand(),
+            new FrankenViewCard(),
+            new BanAbility(),
+            new ApplyDraftBags(),
+            new SetHomeSystemPosition()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
 
     @Override
     public String getName() {
         return Constants.FRANKEN;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Franken";
     }
 
     @Override
@@ -46,12 +72,9 @@ public class FrankenCommand implements ParentCommand {
             }
         }
 
-        if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-            return false;
-        }
-        Game userActiveGame = CommandHelper.getGameName(event);
-        if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
+        String userActiveGameName = CommandHelper.getGameName(event);
+        Game game = GameManager.getGame(userActiveGameName);
+        if (!game.getPlayerIDs().contains(userID) && !game.isCommunityMode()) {
             MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
             return false;
         }
@@ -59,63 +82,7 @@ public class FrankenCommand implements ParentCommand {
     }
 
     @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        FrankenSubcommandData executedCommand = null;
-        for (FrankenSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                executedCommand = subcommand;
-                break;
-            }
-        }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = CommandHelper.getGameName(event);
-        GameSaveLoadManager.saveGame(game, event);
-        MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
-    }
-
-    public String getDescription() {
-        return "Franken";
-    }
-
-    private Collection<FrankenSubcommandData> getSubcommands() {
-        Collection<FrankenSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new AbilityAdd());
-        subcommands.add(new AbilityRemove());
-        subcommands.add(new LeaderAdd());
-        subcommands.add(new LeaderRemove());
-        subcommands.add(new FactionTechAdd());
-        subcommands.add(new FactionTechRemove());
-        subcommands.add(new PNAdd());
-        subcommands.add(new PNRemove());
-        subcommands.add(new UnitAdd());
-        subcommands.add(new UnitRemove());
-        subcommands.add(new StartFrankenDraft());
-        subcommands.add(new SetFactionIcon());
-        subcommands.add(new SetFactionDisplayName());
-        subcommands.add(new FrankenEdit());
-        subcommands.add(new ShowFrankenBag());
-        subcommands.add(new ShowFrankenHand());
-        subcommands.add(new FrankenViewCard());
-        subcommands.add(new BanAbility());
-        subcommands.add(new ApplyDraftBags());
-        subcommands.add(new SetHomeSystemPosition());
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
-    }
-
-    @Override
-    public void register(CommandListUpdateAction commands) {
-        SlashCommandData list = Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands());
-        commands.addCommands(list);
     }
 }

@@ -24,10 +24,6 @@ public class FrankenApplicator {
     public static void resolveFrankenItemAddButton(ButtonInteractionEvent event, String buttonID, Player player) {
         String frankenItem = buttonID.replace("frankenItemAdd", "");
         DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
-        if (draftItem == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot apply Franken Item: `" + frankenItem + "` does not exist.");
-            return;
-        }
 
         applyFrankenItemToPlayer(event, draftItem, player);
         event.editButton(draftItem.getRemoveButton()).queue();
@@ -56,10 +52,6 @@ public class FrankenApplicator {
     public static void resolveFrankenItemRemoveButton(ButtonInteractionEvent event, String buttonID, Player player) {
         String frankenItem = buttonID.replace("frankenItemRemove", "");
         DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
-        if (draftItem == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot apply Franken Item: `" + frankenItem + "` does not exist.");
-            return;
-        }
 
         removeFrankenItemFromPlayer(event, draftItem, player);
         event.editButton(draftItem.getAddButton()).queue();

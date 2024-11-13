@@ -29,7 +29,7 @@ public class LeaderInfo extends LeaderSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         event.deferReply();
-        Game game = getActiveGame();
+        Game game = getGame();
         User user = getUser();
         Player player = game.getPlayer(user.getId());
         player = Helper.getGamePlayer(game, player, event, null);

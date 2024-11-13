@@ -12,7 +12,7 @@ public class InteractiveBuilder extends MapSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         JimboHandlers.postMainMenu(event, game);
     }
 }

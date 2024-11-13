@@ -3,6 +3,7 @@ package ti4.commands.franken;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
@@ -11,13 +12,14 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 
 public class FactionTechRemove extends FactionTechAddRemove {
+
     public FactionTechRemove() {
         super(Constants.FACTION_TECH_REMOVE, "Remove a faction tech from your faction");
     }
     
     @Override
-    public void doAction(Player player, List<String> techIDs) {
-        removeFactionTechs(getEvent(), player, techIDs);
+    public void doAction(Player player, List<String> techIDs, SlashCommandInteractionEvent event) {
+        removeFactionTechs(event, player, techIDs);
     }
 
     public static void removeFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {

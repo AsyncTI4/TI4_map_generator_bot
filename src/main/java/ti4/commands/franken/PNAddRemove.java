@@ -8,17 +8,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.cardspn.PNInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
-public abstract class PNAddRemove extends FrankenSubcommandData {
+public abstract class PNAddRemove extends GameStateSubcommand {
+
     public PNAddRemove(String name, String description) {
-        super(name, description);
+        super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -34,21 +34,15 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         pnIDs.removeIf(StringUtils::isEmpty);
         pnIDs.removeIf(pn -> !Mapper.getAllPromissoryNoteIDs().contains(pn));
 
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
 
-        doAction(player, pnIDs);
+        doAction(player, pnIDs, event);
         game.checkPromissoryNotes();
-        PNInfo.checkAndAddPNs(getActiveGame(), player);
+        PNInfo.checkAndAddPNs(game, player);
         PNInfo.sendPromissoryNoteInfo(game, player, false, event);
     }
 
-    public abstract void doAction(Player player, List<String> pnIDs);
+    public abstract void doAction(Player player, List<String> pnIDs, SlashCommandInteractionEvent event);
 
 }

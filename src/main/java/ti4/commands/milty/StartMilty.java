@@ -82,7 +82,7 @@ public class StartMilty extends MiltySubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         DraftSpec specs = new DraftSpec(getActiveGame());
 
-        Game game = getActiveGame();
+        Game game = getGame();
 
         // Map Template ---------------------------------------------------------------------------
         MapTemplateModel template = getMapTemplateFromOption(event, game);

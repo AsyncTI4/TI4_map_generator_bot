@@ -40,7 +40,7 @@ public class ScorePublic extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Public Objective to score");

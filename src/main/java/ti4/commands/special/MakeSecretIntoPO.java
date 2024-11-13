@@ -22,7 +22,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to make Public");

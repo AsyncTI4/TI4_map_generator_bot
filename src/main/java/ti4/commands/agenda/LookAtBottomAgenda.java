@@ -18,7 +18,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         int count = 1;
         OptionMapping countOption = event.getOption(Constants.COUNT);

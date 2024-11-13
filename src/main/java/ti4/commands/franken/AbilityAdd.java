@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
@@ -15,13 +16,14 @@ import ti4.model.AbilityModel;
 import ti4.model.GenericCardModel;
 
 public class AbilityAdd extends AbilityAddRemove {
+
     public AbilityAdd() {
         super(Constants.ABILITY_ADD, "Add an ability to your faction");
     }
 
     @Override
-    public void doAction(Player player, List<String> abilityIDs) {
-        addAbilities(getEvent(), player, abilityIDs);
+    public void doAction(Player player, List<String> abilityIDs, SlashCommandInteractionEvent event) {
+        addAbilities(event, player, abilityIDs);
     }
 
     public static void addAbilities(GenericInteractionCreateEvent event, Player player, List<String> abilityIDs) {

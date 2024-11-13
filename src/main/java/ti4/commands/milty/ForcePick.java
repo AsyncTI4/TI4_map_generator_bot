@@ -28,7 +28,7 @@ public class ForcePick extends MiltySubcommandData {
             return;
         }
 
-        Game game = getActiveGame();
+        Game game = getGame();
         MiltyDraftManager manager = game.getMiltyDraftManager();
         Player player = manager.getCurrentDraftPlayer(game);
         if (player == null) {

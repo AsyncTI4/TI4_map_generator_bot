@@ -16,7 +16,7 @@ public class SCCount extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping scOption = event.getOption(Constants.STRATEGY_CARD);
         if (scOption == null) {

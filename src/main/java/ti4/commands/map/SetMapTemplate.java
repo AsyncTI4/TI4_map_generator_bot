@@ -22,7 +22,7 @@ public class SetMapTemplate extends MapSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String mapTemplate = event.getOption(Constants.MAP_TEMPLATE, null, OptionMapping::getAsString);
         boolean transform = event.getOption("transform", false, OptionMapping::getAsBoolean);
-        Game game = getActiveGame();
+        Game game = getGame();
 
         setMapTemplate(event, mapTemplate, transform, game);
     }

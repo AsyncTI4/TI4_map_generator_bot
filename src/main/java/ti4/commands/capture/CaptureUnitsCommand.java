@@ -12,7 +12,7 @@ import ti4.map.Tile;
 abstract class CaptureUnitsCommand extends GameStateSubcommand {
 
     public CaptureUnitsCommand(String id, String description) {
-        super(id, description, true, true, true);
+        super(id, description, true, true);
         options();
     }
 

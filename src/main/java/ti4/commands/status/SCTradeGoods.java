@@ -22,7 +22,7 @@ public class SCTradeGoods extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping scOption = event.getOption(Constants.STRATEGY_CARD);
         OptionMapping tgOption = event.getOption(Constants.TG);

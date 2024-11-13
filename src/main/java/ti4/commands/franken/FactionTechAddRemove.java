@@ -8,17 +8,18 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public abstract class FactionTechAddRemove extends FrankenSubcommandData {
+public abstract class FactionTechAddRemove extends GameStateSubcommand {
+    
     public FactionTechAddRemove(String name, String description) {
-        super(name, description);
+        super(name, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech Name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Tech Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Tech Name").setAutoComplete(true));
@@ -42,20 +43,14 @@ public abstract class FactionTechAddRemove extends FrankenSubcommandData {
             return;
         }
 
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayerFromEvent(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Game game = getGame();
+        Player player = getPlayer();
 
-        doAction(player, techIDs);
+        doAction(player, techIDs, event);
 
         TechInfo.sendTechInfo(game, player, event);
     }
 
-    public abstract void doAction(Player player, List<String> leaderIDs);
+    public abstract void doAction(Player player, List<String> leaderIDs, SlashCommandInteractionEvent event);
 
 }

@@ -31,7 +31,7 @@ public class Swap extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User callerUser = event.getUser();
-        Game game = getActiveGame();
+        Game game = getGame();
         Collection<Player> players = game.getPlayers().values();
         Member member = event.getMember();
         boolean isAdmin = false;

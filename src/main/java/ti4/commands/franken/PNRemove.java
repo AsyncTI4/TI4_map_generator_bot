@@ -3,6 +3,7 @@ package ti4.commands.franken;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -13,8 +14,8 @@ public class PNRemove extends PNAddRemove {
     }
 
     @Override
-    public void doAction(Player player, List<String> pnIDs) {
-        removePromissoryNotes(getEvent(), player, pnIDs);
+    public void doAction(Player player, List<String> pnIDs, SlashCommandInteractionEvent event) {
+        removePromissoryNotes(event, player, pnIDs);
     }
 
     public static void removePromissoryNotes(GenericInteractionCreateEvent event, Player player, List<String> pnIDs) {

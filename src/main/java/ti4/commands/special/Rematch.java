@@ -43,7 +43,7 @@ public class Rematch extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
             rematch(game, event);
         } else {

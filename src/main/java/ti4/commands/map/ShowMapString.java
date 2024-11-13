@@ -13,7 +13,7 @@ public class ShowMapString extends MapSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         showMapString(event, game);
     }
 

@@ -26,7 +26,7 @@ public class RelicSend extends RelicSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         Player player1 = game.getPlayer(getUser().getId());
         player1 = Helper.getGamePlayer(game, player1, event, null);
         player1 = Helper.getPlayerFromEvent(game, player1, event);

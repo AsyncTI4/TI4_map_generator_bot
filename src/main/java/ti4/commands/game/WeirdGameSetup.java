@@ -33,7 +33,7 @@ public class WeirdGameSetup extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         Boolean communityMode = event.getOption(Constants.COMMUNITY_MODE, null, OptionMapping::getAsBoolean);
         if (communityMode != null) game.setCommunityMode(communityMode);

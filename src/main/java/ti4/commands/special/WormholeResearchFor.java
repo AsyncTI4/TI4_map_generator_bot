@@ -22,7 +22,7 @@ public class WormholeResearchFor extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         doResearch(event, game);
     }
 

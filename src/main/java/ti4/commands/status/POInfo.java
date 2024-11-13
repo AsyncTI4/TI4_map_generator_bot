@@ -26,7 +26,7 @@ public class POInfo extends StatusSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         boolean includeScored = event.getOption(Constants.INCLUDE_SCORED, false, OptionMapping::getAsBoolean);
 
-        Game game = getActiveGame();
+        Game game = getGame();
         Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.keySet().stream()

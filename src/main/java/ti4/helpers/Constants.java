@@ -538,6 +538,8 @@ public class Constants {
     public static final String PO_NO_SCORING = "po_no_scoring";
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String FACTION_COLOR = "faction_or_color";
+    public static final String OTHER_FACTION_OR_COLOR = "other_faction_or_color";
+    public static final String OTHER_PLAYER = "other_player";
     public static final String TECH_TYPE = "tech_type";
     public static final String FACTION_COLOR_1 = "faction_or_color_1";
     public static final String FACTION_COLOR_2 = "faction_or_color_2";
@@ -659,6 +661,7 @@ public class Constants {
     public static final String PUT_DISCARD_BACK_INTO_DECK = "put_discard_back_into_deck";
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
+    public static final String LOOK = "look";
     public static final String REVEAL = "reveal";
     public static final String REVEAL_FROM_BOTTOM = "reveal_from_bottom";
     public static final String ADD_LAW = "add_law";

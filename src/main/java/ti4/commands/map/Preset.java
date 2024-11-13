@@ -31,7 +31,7 @@ public class Preset extends MapSubcommandData {
         OptionMapping template = event.getOption(Constants.MAP_TEMPLATE);
         if (template == null) return;
 
-        Game game = getActiveGame();
+        Game game = getGame();
         String slice1 = event.getOption(Constants.SLICE_1, null, OptionMapping::getAsString);
         String slice2 = event.getOption(Constants.SLICE_2, null, OptionMapping::getAsString);
         String slice3 = event.getOption(Constants.SLICE_3, null, OptionMapping::getAsString);

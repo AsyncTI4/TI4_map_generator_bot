@@ -30,7 +30,7 @@ public class MoveAllUnits extends SpecialSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");

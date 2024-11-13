@@ -17,7 +17,7 @@ public class AddCustomPO extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping poNameOption = event.getOption(Constants.PO_NAME);
         if (poNameOption == null || poNameOption.getName().trim().isEmpty()) {
