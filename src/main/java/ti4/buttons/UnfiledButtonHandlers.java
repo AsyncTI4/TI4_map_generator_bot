@@ -39,7 +39,6 @@ import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExplorePlanet;
-import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.game.StartPhase;
 import ti4.commands.game.Swap;
 import ti4.commands.leaders.CommanderUnlockCheck;

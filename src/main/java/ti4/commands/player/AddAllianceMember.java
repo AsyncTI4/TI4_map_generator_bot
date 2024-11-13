@@ -10,6 +10,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class AddAllianceMember extends PlayerSubcommandData {
+
     public AddAllianceMember() {
         super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
