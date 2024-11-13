@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
+import ti4.message.BotLogger;
 
 public class PersistenceManager {
 
@@ -56,6 +57,14 @@ public class PersistenceManager {
     @NotNull
     private static File getFile(String directory, String fileName) {
         return new File(directory + File.separator + fileName);
+    }
+
+    public static void deleteJsonFile(String fileName) {
+        var file = getFile(PERSISTENCE_MANAGER_JSON_PATH, fileName);
+        boolean deleted = file.delete();
+        if (!deleted) {
+            BotLogger.log("Failed to delete file: " + file.getAbsolutePath());
+        }
     }
 
 }
