@@ -176,7 +176,6 @@ abstract public class AddRemoveUnits implements Command {
             color = recheckColorForUnit(resolvedUnit, color, event);
 
             UnitKey unitID = Mapper.getUnitKey(resolvedUnit, color);
-            String unitPath = Tile.getUnitPath(unitID);
 
             // RESOLVE PLANET NAME
             String originalPlanetName = "";
@@ -194,7 +193,7 @@ abstract public class AddRemoveUnits implements Command {
             planetName = getPlanet(event, tile, planetName);
 
             boolean isValidCount = count > 0;
-            boolean isValidUnit = unitPath != null;
+            boolean isValidUnit = unitID != null;
             boolean isValidUnitHolder = Constants.SPACE.equals(planetName) || tile.isSpaceHolderValid(planetName);
             if (event instanceof SlashCommandInteractionEvent
                 && (!isValidCount || !isValidUnit || !isValidUnitHolder)) {
