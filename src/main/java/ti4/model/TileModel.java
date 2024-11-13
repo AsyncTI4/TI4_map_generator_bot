@@ -1,15 +1,15 @@
 package ti4.model;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
@@ -22,6 +22,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private List<String> aliases;
     private String imagePath;
     private List<String> planets;
+    @Nullable
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;

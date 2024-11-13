@@ -107,28 +107,15 @@ public class MessageListener extends ListenerAdapter {
 
             Game game = GameManager.getInstance().getGame(gameName);
             if (game != null && game.isBotFactionReacts() && !game.isFowMode()) {
-                Player player = game.getPlayer(event.getAuthor().getId());
-                if (game.isCommunityMode()) {
-
-                    List<Role> roles = event.getMember().getRoles();
-                    for (Player player2 : game.getRealPlayers()) {
-                        if (roles.contains(player2.getRoleForCommunity())) {
-                            player = player2;
-                        }
-                        if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
-                            player = player2;
-                        }
-                    }
-                }
+                Player player = getPlayer(event, game);
                 try {
                     MessageHistory mHistory = event.getChannel().getHistory();
                     RestAction<List<Message>> lis = mHistory.retrievePast(2);
-                    if (!event.getMessage().getAuthor().getId()
-                        .equalsIgnoreCase(lis.complete().get(1).getAuthor().getId())) {
-                        if (player != null && player.isRealPlayer()) {
-                            event.getChannel().addReactionById(event.getMessageId(),
+                    var messages = lis.complete();
+                    if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId()) &&
+                            player != null && player.isRealPlayer()) {
+                        event.getChannel().addReactionById(event.getMessageId(),
                                 Emoji.fromFormatted(player.getFactionEmoji())).queue();
-                        }
                     }
                 } catch (Exception e) {
                     BotLogger.log("Reading previous message", e);
@@ -250,27 +237,13 @@ public class MessageListener extends ListenerAdapter {
             if (messageContent.isEmpty()) {
                 BotLogger.log("User tried to send an empty whisper " + event.getJumpUrl());
             } else if (game != null) {
-                Player player = game.getPlayer(event.getAuthor().getId());
-                if (game.isCommunityMode()) {
-                    List<Role> roles = event.getMember().getRoles();
-                    for (Player player2 : game.getRealPlayers()) {
-                        if (roles.contains(player2.getRoleForCommunity())) {
-                            player = player2;
-                        }
-                        if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
-                            player = player2;
-                        }
-                    }
-                }
-
+                Player player = getPlayer(event, game);
                 Player player_ = game.getPlayer(event.getAuthor().getId());
                 if (messageToJazz && game.getRealPlayerIDs().contains(Constants.jazzId)) {
                     if (player_.getUserID().equals(Constants.jazzId)) {
                         messageToMyself = true;
                     } else {
-                        if (messageLowerCase.startsWith("tofuture")) {
-                            messageToFutureColor = true;
-                        } else {
+                        if (!messageLowerCase.startsWith("tofuture")) {
                             messageToColor = true;
                         }
                     }
@@ -327,6 +300,22 @@ public class MessageListener extends ListenerAdapter {
                 msg.delete().queue();
             }
         }
+    }
+
+    private Player getPlayer(MessageReceivedEvent event, Game game) {
+        Player player = game.getPlayer(event.getAuthor().getId());
+        if (game.isCommunityMode()) {
+            List<Role> roles = event.getMember().getRoles();
+            for (Player player2 : game.getRealPlayers()) {
+                if (roles.contains(player2.getRoleForCommunity())) {
+                    player = player2;
+                }
+                if (player2.getTeamMateIDs().contains(event.getMember().getUser().getId())) {
+                    player = player2;
+                }
+            }
+        }
+        return player;
     }
 
     private void mapLog(MessageReceivedEvent event, Message msg) {

@@ -346,7 +346,7 @@
     "name": "Energy Pulse",
     "phase": "Action",
     "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
-    "text": "Choose up to 2 units in that system. Those units lose their unit abilities during this tactical action.",
+    "text": "Choose up to 2 units in that system. Those units lose their printed unit abilities during this tactical action.",
     "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
     "source": "action_deck_2"
   },
@@ -831,7 +831,7 @@
     "alias": "sensor_jam",
     "name": "Sensor Jam",
     "phase": "Action",
-    "window": "After a player moves ships into the active system",
+    "window": "After the \"Move Ships\" substep of a tactical action",
     "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
     "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
     "source": "action_deck_2"
