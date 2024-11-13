@@ -63,22 +63,22 @@ public class WebHelper {
                 .build();
 
             httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .exceptionally(e -> {
-                        BotLogger.log("An exception occurred while performing an async send of game data to the website.", e);
-                        return null;
-                    });
+                .exceptionally(e -> {
+                    BotLogger.log("An exception occurred while performing an async send of game data to the website.", e);
+                    return null;
+                });
         } catch (IOException e) {
             BotLogger.log("Could not put data to web server", e);
         }
     }
 
     public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        // if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
+        //     return;
 
         try {
             String json = objectMapper.writeValueAsString(overlays);
-
+            System.out.println(json);
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
                 .key(String.format("overlays/%s/%s.json", gameId, gameId))
@@ -87,10 +87,10 @@ public class WebHelper {
                 .build();
 
             s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
-                    .exceptionally(e -> {
-                        BotLogger.log("An exception occurred while performing an async send of overlay data to the website.", e);
-                        return null;
-                    });
+                .exceptionally(e -> {
+                    BotLogger.log("An exception occurred while performing an async send of overlay data to the website.", e);
+                    return null;
+                });
         } catch (Exception e) {
             BotLogger.log("Could not put overlay to web server", e);
         }
@@ -132,10 +132,10 @@ public class WebHelper {
                 .build();
 
             s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
-                    .exceptionally(e -> {
-                        BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
-                        return null;
-                    });
+                .exceptionally(e -> {
+                    BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
+                    return null;
+                });
         } catch (Exception e) {
             BotLogger.log("Could not put statistics to web server", e);
         }
@@ -171,10 +171,10 @@ public class WebHelper {
                     .contentType("image/" + format)
                     .build();
                 s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(out.toByteArray()))
-                        .exceptionally(e -> {
-                            BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
-                            return null;
-                        });
+                    .exceptionally(e -> {
+                        BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
+                        return null;
+                    });
             }
         } catch (SdkClientException e) {
             BotLogger.log("Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);

@@ -34,7 +34,7 @@ public class StasisInfantry extends SpecialSubcommandData {
 
         OptionMapping option = event.getOption(Constants.COUNT);
         if (option != null) {
-            setValue(event, game, player, player::setStasisInfantry, player::getStasisInfantry, option.getAsString());
+            setValue(event, game, player, player::setStasisInfantry, player::getGenSynthesisInfantry, option.getAsString());
         }
 
     }

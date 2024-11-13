@@ -41,8 +41,8 @@ public class ObjectiveBox {
 
 		graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
 		graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
-		if (objective.revealed()) {
-			generator.addWebsiteOverlay("objective", objective.key(), x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+		if (objective.revealed() && Mapper.getPublicObjective(objective.key()) != null) {
+			generator.addWebsiteOverlay(Mapper.getPublicObjective(objective.key()), x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
 		}
 
 		x += maxTextWidth + bufferBetweenTextAndTokens;
