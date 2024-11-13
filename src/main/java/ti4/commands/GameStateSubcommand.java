@@ -30,6 +30,7 @@ public abstract class GameStateSubcommand extends Subcommand {
         return commandGameStateHelper.getGame();
     }
 
+    @NotNull
     protected Player getPlayer() {
         return commandGameStateHelper.getPlayer();
     }

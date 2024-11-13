@@ -57,6 +57,9 @@ public class CommandGameStateHelper {
 
     @NotNull
     public Player getPlayer() {
+        if (!isPlayerCommand) {
+            throw new IllegalStateException("CommandGameStateHelper cannot get player state because command was not set to be a player command.");
+        }
         return player.get();
     }
 }
