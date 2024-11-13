@@ -211,7 +211,7 @@ public class ButtonHelper {
         }
         if (d1.isSuccess() || player.hasTech("cl2")) {
             msg += " and revived. You will be prompted to place them on a planet in your HS at the start of your next turn.";
-            player.setStasisInfantry(player.getStasisInfantry() + 1);
+            player.setStasisInfantry(player.getGenSynthesisInfantry() + 1);
         } else {
             msg += " and failed. No revival";
         }
@@ -242,10 +242,10 @@ public class ButtonHelper {
 
         Tile tile = game.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, amount + " inf " + planet, game);
-        player.setStasisInfantry(player.getStasisInfantry() - Integer.parseInt(amount));
+        player.setStasisInfantry(player.getGenSynthesisInfantry() - Integer.parseInt(amount));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " Placed " + amount + " infantry on "
-            + Helper.getPlanetRepresentation(planet, game) + ". You have " + player.getStasisInfantry() + " infantry left to revive.");
-        if (player.getStasisInfantry() == 0) {
+            + Helper.getPlanetRepresentation(planet, game) + ". You have " + player.getGenSynthesisInfantry() + " infantry left to revive.");
+        if (player.getGenSynthesisInfantry() == 0) {
             deleteMessage(event);
         }
     }
@@ -289,7 +289,7 @@ public class ButtonHelper {
 
     public static List<Button> getPlaceStatusInfButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        if (player.getStasisInfantry() == 0) {
+        if (player.getGenSynthesisInfantry() == 0) {
             return buttons;
         }
         Tile tile = player.getHomeSystemTile();
@@ -298,10 +298,10 @@ public class ButtonHelper {
                 if (player.getPlanets().contains(unitHolder.getName())) {
                     buttons.add(Buttons.green("statusInfRevival_" + unitHolder.getName() + "_1",
                         "Place 1 infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-                    if (player.getStasisInfantry() > 1) {
+                    if (player.getGenSynthesisInfantry() > 1) {
                         buttons.add(Buttons.green(
-                            "statusInfRevival_" + unitHolder.getName() + "_" + player.getStasisInfantry(),
-                            "Place " + player.getStasisInfantry() + " infantry on "
+                            "statusInfRevival_" + unitHolder.getName() + "_" + player.getGenSynthesisInfantry(),
+                            "Place " + player.getGenSynthesisInfantry() + " infantry on "
                                 + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
 
                     }
@@ -5852,10 +5852,10 @@ public class ButtonHelper {
                 msgExtra + "\n Use Buttons to do turn.",
                 TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
 
-            if (privatePlayer.getStasisInfantry() > 0) {
+            if (privatePlayer.getGenSynthesisInfantry() > 0) {
                 if (!getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
+                        "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry()
                             + " infantry left to revive.",
                         getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
@@ -5874,10 +5874,10 @@ public class ButtonHelper {
                     "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
 
-                if (privatePlayer.getStasisInfantry() > 0) {
+                if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
+                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry()
                                 + " infantry left to revive.",
                             getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
