@@ -15,9 +15,9 @@ import ti4.model.ModelInterface;
 public class WebsiteOverlay {
     private String dataModel;
     private String dataModelID;
-    private List<Integer> boxXYWH;
     private String title;
     private String text;
+    private List<Integer> boxXYWH;
 
     public WebsiteOverlay(String title, String text, List<Integer> boxXYWH) {
         this.title = title;
