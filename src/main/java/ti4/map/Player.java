@@ -2503,7 +2503,7 @@ public class Player {
         refreshPlanetAbility(planet);
     }
 
-    public int getStasisInfantry() {
+    public int getGenSynthesisInfantry() {
         return stasisInfantry;
     }
 

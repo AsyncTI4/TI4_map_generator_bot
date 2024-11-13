@@ -13,25 +13,21 @@ import ti4.model.ModelInterface;
 @Setter
 @JsonInclude(Include.NON_NULL)
 public class WebsiteOverlay {
-    private String cardType;
-    private String cardID;
+    private String dataModel;
+    private String dataModelID;
     private List<Integer> boxXYWH;
+    private String title;
     private String text;
 
-    public WebsiteOverlay(String cardType, String cardID, List<Integer> boxXYWH) {
-        this.cardType = cardType;
-        this.cardID = cardID;
-        this.boxXYWH = boxXYWH;
-    }
-
-    public WebsiteOverlay(String text, List<Integer> boxXYWH) {
+    public WebsiteOverlay(String title, String text, List<Integer> boxXYWH) {
+        this.title = title;
         this.text = text;
         this.boxXYWH = boxXYWH;
     }
 
     public WebsiteOverlay(ModelInterface model, List<Integer> boxXYWH) {
-        this.cardType = model.getClass().getSimpleName();
-        this.cardID = model.getAlias();
+        this.dataModel = model.getClass().getSimpleName();
+        this.dataModelID = model.getAlias();
         this.boxXYWH = boxXYWH;
     }
 }

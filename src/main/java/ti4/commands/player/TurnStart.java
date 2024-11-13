@@ -120,10 +120,10 @@ public class TurnStart extends PlayerSubcommandData {
                     getMissedSCFollowsText(game, player));
             }
             Player privatePlayer = player;
-            if (privatePlayer.getStasisInfantry() > 0) {
+            if (privatePlayer.getGenSynthesisInfantry() > 0) {
                 if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);
@@ -153,10 +153,10 @@ public class TurnStart extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(game, player));
             }
             Player privatePlayer = player;
-            if (privatePlayer.getStasisInfantry() > 0) {
+            if (privatePlayer.getGenSynthesisInfantry() > 0) {
                 if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                        "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
                         ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
                     privatePlayer.setStasisInfantry(0);
