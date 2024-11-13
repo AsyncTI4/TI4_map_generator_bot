@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.time.StopWatch;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.WebHelper;
@@ -41,7 +42,8 @@ public class UploadStatsCron {
         try {
             return PersistenceManager.readObjectFromJsonFile(JSON_DATA_FILE_NAME, UploadStatsCronData.class);
         } catch (IOException e) {
-            BotLogger.log("Failed to read json data for UploadStatsCron. Stats will not be uploaded.", e);
+            BotLogger.log("Failed to read json data for UploadStatsCron. Stats will be uploaded more often than intended.", e);
+            PersistenceManager.deleteJsonFile(JSON_DATA_FILE_NAME);
             return null;
         }
     }
@@ -50,9 +52,9 @@ public class UploadStatsCron {
         try {
             PersistenceManager.writeObjectToJsonFile(JSON_DATA_FILE_NAME, new UploadStatsCronData(LocalDate.now()));
         } catch (Exception e) {
-            BotLogger.log("Failed to write json data for UploadStatsCron. Stats will be uploaded more often than anticipated.", e);
+            BotLogger.log("Failed to write json data for UploadStatsCron. Stats will be uploaded more often than intended.", e);
         }
     }
 
-    private record UploadStatsCronData(LocalDate lastUpload) {}
+    private record UploadStatsCronData(@JsonFormat(pattern = "yyyy-MM-dd") LocalDate lastUpload) {}
 }
