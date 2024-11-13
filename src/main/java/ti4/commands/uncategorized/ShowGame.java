@@ -14,19 +14,20 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class ShowGame implements Command {
+public class ShowGame implements ParentCommand {
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.SHOW_GAME;
     }
 
@@ -121,10 +122,10 @@ public class ShowGame implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionId(), "Shows selected map")
+            Commands.slash(getName(), "Shows selected map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }

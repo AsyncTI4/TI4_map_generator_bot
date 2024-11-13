@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 public class ResetAgendas extends GameStateSubcommand {
 
     public ResetAgendas() {
-        super(Constants.RESET_AGENDAS, "Reset agenda deck", true, true);
+        super(Constants.RESET_AGENDAS, "Reset agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 

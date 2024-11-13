@@ -10,7 +10,7 @@ import ti4.helpers.Constants;
 public class RevealAgenda extends GameStateSubcommand {
 
     public RevealAgenda() {
-        super(Constants.REVEAL, "Reveal top Agenda from deck", true, true);
+        super(Constants.REVEAL, "Reveal top Agenda from deck", true, false);
         addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM,
             "Reveal the agenda from the bottom of the deck instead of the top");
     }

@@ -1,12 +1,5 @@
 package ti4.cron;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
-import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.GlobalSettings;
-import ti4.helpers.ToStringHelper;
-import ti4.message.MessageHelper;
-
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +7,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.GlobalSettings;
+import ti4.helpers.ToStringHelper;
+import ti4.message.MessageHelper;
 
 public class LogCacheStatsCron {
 

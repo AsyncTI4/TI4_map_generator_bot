@@ -1,5 +1,8 @@
 package ti4.commands.statistics;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -7,9 +10,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.GameManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class GameStatisticFilterer {
 

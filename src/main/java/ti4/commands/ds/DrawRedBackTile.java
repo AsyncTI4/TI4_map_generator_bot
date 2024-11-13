@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.TileHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -20,7 +20,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.TileModel;
 
-public class DrawRedBackTile extends PlayerGameStateSubcommand {
+public class DrawRedBackTile extends GameStateSubcommand {
 
     public DrawRedBackTile() {
         super(Constants.DRAW_RED_BACK_TILE, "Draw a random red back tile (for Dane's mystery tweet)", true, true);

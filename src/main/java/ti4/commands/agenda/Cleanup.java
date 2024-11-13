@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class Cleanup extends GameStateSubcommand {
 
     public Cleanup() {
-        super(Constants.CLEANUP, "Agenda phase cleanup", true, true);
+        super(Constants.CLEANUP, "Agenda phase cleanup", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 

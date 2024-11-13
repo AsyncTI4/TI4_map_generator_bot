@@ -20,7 +20,7 @@ import ti4.message.MessageHelper;
 public class JazzCommand extends GameStateSubcommand {
 
     public JazzCommand() {
-        super("jazz_command", "jazzxhands", true, false);
+        super("jazz_command", "jazzxhands", false, false);
     }
 
     @Override

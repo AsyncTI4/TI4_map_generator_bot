@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -16,7 +16,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class PlayEvent extends PlayerGameStateSubcommand {
+public class PlayEvent extends GameStateSubcommand {
 
     public PlayEvent() {
         super(Constants.EVENT_PLAY, "Play an Event from your hand", true, false);

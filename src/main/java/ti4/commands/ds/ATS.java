@@ -3,12 +3,12 @@ package ti4.commands.ds;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ATS extends PlayerGameStateSubcommand {
+public class ATS extends GameStateSubcommand {
 
     public ATS() {
         super(Constants.LANEFIR_ATS_COUNT, "Set commodity count on the ATS Armaments tech", true, true);

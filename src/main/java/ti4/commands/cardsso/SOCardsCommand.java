@@ -1,50 +1,53 @@
 package ti4.commands.cardsso;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 
-public class SOCardsCommand implements Command {
+public class SOCardsCommand implements ParentCommand {
 
-    private final Collection<Subcommand> subcommands = List.of(
-            new DrawSO(),
-            new DiscardSO(),
-            new SOInfo(),
-            new ShowSO(),
-            new ShowSOToAll(),
-            new ScoreSO(),
-            new DealSO(),
-            new UnscoreSO(),
-            new ShowAllSO(),
-            new ShowAllSOToAll(),
-            new ShowRandomSO(),
-            new DealSOToAll(),
-            new DrawSpecificSO(),
-            new ShowUnScoredSOs(),
-            new ListAllScored());
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new DrawSO(),
+                    new DiscardSO(),
+                    new SOInfo(),
+                    new ShowSO(),
+                    new ShowSOToAll(),
+                    new ScoreSO(),
+                    new DealSO(),
+                    new UnscoreSO(),
+                    new ShowAllSO(),
+                    new ShowAllSOToAll(),
+                    new ShowRandomSO(),
+                    new DealSOToAll(),
+                    new DrawSpecificSO(),
+                    new ShowUnScoredSOs(),
+                    new ListAllScored())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.CARDS_SO;
     }
 
     @Override
-    public String getActionDescription() {
+    public String getDescription() {
         return "Secret Objectives";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return Command.super.accept(event) &&
-                SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
+        return ParentCommand.super.accept(event) &&
+                CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public Collection<Subcommand> getSubcommands() {
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
     }
 }

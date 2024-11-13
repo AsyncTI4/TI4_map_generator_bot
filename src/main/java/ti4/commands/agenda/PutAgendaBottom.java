@@ -19,7 +19,7 @@ import ti4.model.AgendaModel;
 public class PutAgendaBottom extends GameStateSubcommand {
 
     public PutAgendaBottom() {
-        super(Constants.PUT_BOTTOM, "Put Agenda bottom", true, true);
+        super(Constants.PUT_BOTTOM, "Put Agenda bottom", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 

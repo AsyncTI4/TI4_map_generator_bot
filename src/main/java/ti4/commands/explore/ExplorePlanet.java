@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
@@ -36,7 +36,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.PlanetModel;
 
-public class ExplorePlanet extends PlayerGameStateSubcommand {
+public class ExplorePlanet extends GameStateSubcommand {
 
     public ExplorePlanet() {
         super(Constants.PLANET, "Explore a specific planet.", true, true);

@@ -6,7 +6,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 
-public class AddCaptureUnits extends CaptureUnitsSubcommand {
+public class AddCaptureUnits extends CaptureUnitsCommand {
 
     public AddCaptureUnits() {
         super(Constants.ADD_UNITS, "Capture units");

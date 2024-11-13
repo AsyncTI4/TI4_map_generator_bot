@@ -8,7 +8,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -21,10 +22,10 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.GenericCardModel;
 
-public class ACInfo extends PlayerGameStateSubcommand {
+public class ACInfo extends GameStateSubcommand {
 
     public ACInfo() {
-        super(Constants.INFO, "Send Action Cards to your Cards Info thread", true, false);
+        super(Constants.INFO, "Send Action Cards to your Cards Info thread", false, true);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class ACInfo extends PlayerGameStateSubcommand {
 
     @ButtonHandler("refreshACInfo")
     public static void sendActionCardInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
         sendActionCardInfo(game, player);
     }

@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 
 public class ShowACRemainingCardCount extends GameStateSubcommand {
     public ShowACRemainingCardCount() {
-        super(Constants.SHOW_AC_REMAINING_CARD_COUNT, "Show Action Card deck card count", false, false);
+        super(Constants.SHOW_AC_REMAINING_CARD_COUNT, "Show Action Card deck card count", false, false, false);
     }
 
     @Override

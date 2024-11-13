@@ -7,7 +7,8 @@ import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -15,18 +16,18 @@ import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.UserGameContextManager;
 
-public class PlayerCommand implements Command {
+public class PlayerCommand implements ParentCommand {
 
     private final Collection<PlayerSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.PLAYER;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.acceptIfPlayerInGame(getActionId(), event);
+        return CommandHelper.acceptIfPlayerInGame(getName(), event);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class PlayerCommand implements Command {
         MapRenderPipeline.renderToWebsiteOnly(game, event);
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Player";
     }
 
@@ -92,9 +93,9 @@ public class PlayerCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionId(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

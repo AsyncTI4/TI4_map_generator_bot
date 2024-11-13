@@ -5,7 +5,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -14,7 +14,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreLookAtTop extends PlayerGameStateSubcommand {
+public class ExploreLookAtTop extends GameStateSubcommand {
 
     public ExploreLookAtTop() {
         super(Constants.LOOK_AT_TOP, "Look at the top card of an explore deck. Sends to Cards Info thread.", true, false);

@@ -7,7 +7,7 @@ import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -15,18 +15,18 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class StatusCommand implements Command {
+public class StatusCommand implements ParentCommand {
 
     private final Collection<StatusSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.STATUS;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.acceptIfAdminOrPlayerInGame(getActionId(), event);
+        return SlashCommandAcceptanceHelper.acceptIfAdminOrPlayerInGame(getName(), event);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class StatusCommand implements Command {
                 fileUpload -> MessageHelper.replyToMessage(event, fileUpload, false, message, message != null));
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Status phase";
     }
 
@@ -88,9 +88,9 @@ public class StatusCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionId(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

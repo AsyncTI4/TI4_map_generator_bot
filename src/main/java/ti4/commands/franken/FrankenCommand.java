@@ -13,24 +13,25 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class FrankenCommand implements Command {
+public class FrankenCommand implements ParentCommand {
 
     private final Collection<FrankenSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.FRANKEN;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getActionId())) {
+        if (!event.getName().equals(getName())) {
             return false;
         }
         User user = event.getUser();
@@ -83,7 +84,7 @@ public class FrankenCommand implements Command {
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Franken";
     }
 
@@ -113,8 +114,8 @@ public class FrankenCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        SlashCommandData list = Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands());
+    public void register(CommandListUpdateAction commands) {
+        SlashCommandData list = Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands());
         commands.addCommands(list);
     }
 }

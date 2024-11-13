@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -38,7 +38,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayPN extends PlayerGameStateSubcommand {
+public class PlayPN extends GameStateSubcommand {
 
     public PlayPN() {
         super(Constants.PLAY_PN, "Play Promissory Note", true, true);
@@ -48,7 +48,7 @@ public class PlayPN extends PlayerGameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        Player player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
+        Player player = getPlayer();
 
         String value = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
         String pnID = null;

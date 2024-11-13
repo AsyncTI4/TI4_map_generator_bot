@@ -11,19 +11,20 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class GameCommand implements Command {
+public class GameCommand implements ParentCommand {
 
     private final Collection<GameSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.GAME;
     }
 
@@ -70,7 +71,7 @@ public class GameCommand implements Command {
         }
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Game";
     }
 
@@ -104,9 +105,9 @@ public class GameCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionId(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

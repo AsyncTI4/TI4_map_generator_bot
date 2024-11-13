@@ -107,7 +107,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     command.execute(event);
                     command.postExecute(event);
                 } catch (Exception e) {
-                    String messageText = "Error trying to execute command: " + command.getActionId();
+                    String messageText = "Error trying to execute command: " + command.getName();
                     String errorMessage = ExceptionUtils.getMessage(e);
                     event.getHook().editOriginal(errorMessage).queue();
                     BotLogger.log(event, messageText, e);

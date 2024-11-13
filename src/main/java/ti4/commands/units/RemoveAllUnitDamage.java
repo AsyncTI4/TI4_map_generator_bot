@@ -17,16 +17,16 @@ public class RemoveAllUnitDamage extends RemoveAllUnits {
     }
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.REMOVE_ALL_UNIT_DAMAGE;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionId(), "Remove all unit damage from map")
+            Commands.slash(getName(), "Remove all unit damage from map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true)));
     }

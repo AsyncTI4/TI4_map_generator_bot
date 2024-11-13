@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 public class RemoveLaw extends GameStateSubcommand {
 
     public RemoveLaw() {
-        super(Constants.REMOVE_LAW, "Remove Law", true, true);
+        super(Constants.REMOVE_LAW, "Remove Law", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 

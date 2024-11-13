@@ -3,7 +3,7 @@ package ti4.commands.fow;
 import java.util.Date;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -12,7 +12,7 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PingActivePlayer extends PlayerGameStateSubcommand {
+public class PingActivePlayer extends GameStateSubcommand {
 
     public PingActivePlayer() {
         super(Constants.PING_ACTIVE_PLAYER, "Ping the active player in this game", true, false);

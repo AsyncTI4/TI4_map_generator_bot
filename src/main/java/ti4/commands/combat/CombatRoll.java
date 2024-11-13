@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
@@ -41,7 +41,7 @@ import ti4.model.NamedCombatModifierModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
-public class CombatRoll extends PlayerGameStateSubcommand {
+public class CombatRoll extends GameStateSubcommand {
 
     public CombatRoll() {
         super(Constants.COMBAT_ROLL, "*V2* *BETA* Combat rolls for units on tile. *Auto includes modifiers*", true, false);

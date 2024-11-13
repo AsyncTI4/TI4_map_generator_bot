@@ -4,12 +4,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetFogFilter extends PlayerGameStateSubcommand {
+public class SetFogFilter extends GameStateSubcommand {
 
     public SetFogFilter() {
         super(Constants.SET_FOG_FILTER, "Set the color of the fog tiles for your view of the map.", true, true);

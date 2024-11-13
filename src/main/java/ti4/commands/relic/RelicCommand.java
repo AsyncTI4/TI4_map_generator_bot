@@ -7,21 +7,22 @@ import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
+import ti4.map.UserGameContextManager;
 
-public class RelicCommand implements Command {
+public class RelicCommand implements ParentCommand {
 
     private final Collection<RelicSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.RELIC;
     }
 
-    public String getActionDescription() {
+    public String getDescription() {
         return "Relic";
     }
 
@@ -59,7 +60,7 @@ public class RelicCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands()));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands()));
     }
 }

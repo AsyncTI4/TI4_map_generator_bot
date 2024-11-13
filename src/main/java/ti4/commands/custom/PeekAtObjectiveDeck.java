@@ -7,13 +7,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PeekAtObjectiveDeck extends PlayerGameStateSubcommand {
+public class PeekAtObjectiveDeck extends GameStateSubcommand {
 
     public PeekAtObjectiveDeck() {
         super("peek_objective_decks", "Peek at stage 1 or 2 objective deck", true, false);

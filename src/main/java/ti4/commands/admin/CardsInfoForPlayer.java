@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class CardsInfoForPlayer extends GameStateSubcommand {
 
     CardsInfoForPlayer() {
-        super(Constants.INFO, "Resent all my cards in Private Message", true, false);
+        super(Constants.INFO, "Resent all my cards in Private Message", false, false);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Action Card").setRequired(true));
     }
 

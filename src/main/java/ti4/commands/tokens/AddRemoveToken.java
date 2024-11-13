@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -20,9 +20,10 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-abstract public class AddRemoveToken implements Command {
+abstract public class AddRemoveToken implements ParentCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -98,13 +99,13 @@ abstract public class AddRemoveToken implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
-        commands.addCommands(Commands.slash(getActionId(), getActionDescription())
+        commands.addCommands(Commands.slash(getName(), getDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true)));
     }
 
-    abstract protected String getActionDescription();
+    abstract public String getDescription();
 }

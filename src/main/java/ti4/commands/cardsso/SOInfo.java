@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.status.ListPlayerInfoButton;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -23,7 +23,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.SecretObjectiveModel;
 
-public class SOInfo extends PlayerGameStateSubcommand {
+public class SOInfo extends GameStateSubcommand {
 
     public SOInfo() {
         super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread", true, false);

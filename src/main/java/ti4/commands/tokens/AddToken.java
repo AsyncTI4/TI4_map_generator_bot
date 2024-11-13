@@ -139,21 +139,21 @@ public class AddToken extends AddRemoveToken {
     }
 
     @Override
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Add token to tile/planet";
     }
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.ADD_TOKEN;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionId(), getActionDescription())
+            Commands.slash(getName(), this.getDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))

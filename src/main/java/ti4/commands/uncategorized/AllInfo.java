@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
 import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -23,21 +23,21 @@ import ti4.map.Player;
 import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class AllInfo implements Command {
+public class AllInfo implements ParentCommand {
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.ALL_INFO;
     }
 
     @Override
-    public String getActionDescription() {
+    public String getDescription() {
         return "Send all available info to your Cards Info thread.";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return Command.super.accept(event) &&
+        return ParentCommand.super.accept(event) &&
                 CommandHelper.acceptIfPlayerInGame(event);
     }
 
@@ -78,10 +78,10 @@ public class AllInfo implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionId(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false)));
     }

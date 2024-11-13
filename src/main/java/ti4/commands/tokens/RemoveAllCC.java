@@ -7,15 +7,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class RemoveAllCC implements Command {
+public class RemoveAllCC implements ParentCommand {
 
     void parsingForTile(SlashCommandInteractionEvent event, Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
@@ -24,7 +25,7 @@ public class RemoveAllCC implements Command {
         }
     }
 
-    public String getActionId() {
+    public String getName() {
         return Constants.REMOVE_ALL_CC;
     }
 
@@ -43,10 +44,10 @@ public class RemoveAllCC implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionId(), "Remove all CCs from entire map")
+            Commands.slash(getName(), "Remove all CCs from entire map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                     .setRequired(true)));
     }

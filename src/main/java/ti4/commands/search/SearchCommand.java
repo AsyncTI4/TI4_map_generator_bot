@@ -7,15 +7,15 @@ import java.util.Objects;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.helpers.Constants;
 
-public class SearchCommand implements Command {
+public class SearchCommand implements ParentCommand {
 
     private final Collection<SearchSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.SEARCH;
     }
 
@@ -31,7 +31,7 @@ public class SearchCommand implements Command {
         }
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Search game component descriptions";
     }
 
@@ -65,7 +65,7 @@ public class SearchCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands()));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands()));
     }
 }

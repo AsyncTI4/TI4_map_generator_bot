@@ -3,11 +3,11 @@ package ti4.commands.cardsac;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class DrawSpecificAC extends PlayerGameStateSubcommand {
+public class DrawSpecificAC extends GameStateSubcommand {
 
     public DrawSpecificAC() {
         super(Constants.DRAW_SPECIFIC_AC, "Draw Specific Action Card", true, true);

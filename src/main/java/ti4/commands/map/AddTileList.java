@@ -33,6 +33,7 @@ import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.MapStringMapper;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 

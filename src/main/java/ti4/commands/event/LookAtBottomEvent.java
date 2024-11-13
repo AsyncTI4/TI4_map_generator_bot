@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -12,7 +12,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
 
-public class LookAtBottomEvent extends PlayerGameStateSubcommand {
+public class LookAtBottomEvent extends GameStateSubcommand {
 
     public LookAtBottomEvent() {
         super(Constants.LOOK_AT_BOTTOM, "Look at bottom Event from deck", true, false);

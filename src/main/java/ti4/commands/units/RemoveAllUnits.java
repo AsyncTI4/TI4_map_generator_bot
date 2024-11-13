@@ -33,23 +33,23 @@ public class RemoveAllUnits extends AddRemoveUnits {
     }
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.REMOVE_ALL_UNITS;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionId(), "Remove units from map")
+            Commands.slash(getName(), "Remove units from map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")));
     }
 
     @Override
-    protected String getActionDescription() {
+    public String getDescription() {
         return "";
     }
 }

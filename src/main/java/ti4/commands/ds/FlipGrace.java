@@ -1,12 +1,12 @@
 package ti4.commands.ds;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class FlipGrace extends PlayerGameStateSubcommand {
+public class FlipGrace extends GameStateSubcommand {
 
     public FlipGrace() {
         super(Constants.FLIP_GRACE, "Flip Grace (Edyn Faction Ability) to show it has been used", true, true);

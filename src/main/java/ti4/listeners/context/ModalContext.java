@@ -1,12 +1,12 @@
 package ti4.listeners.context;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.map.GameSaveLoadManager;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Getter
 public class ModalContext extends ListenerContext {

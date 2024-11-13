@@ -5,17 +5,17 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowACToAll extends PlayerGameStateSubcommand {
+public class ShowACToAll extends GameStateSubcommand {
 
     public ShowACToAll() {
-        super(Constants.SHOW_AC_TO_ALL, "Show an Action Card to all players", false, false);
+        super(Constants.SHOW_AC_TO_ALL, "Show an Action Card to all players", false, false, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 

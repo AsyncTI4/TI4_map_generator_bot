@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class ShuffleACBackIntoDeck extends GameStateSubcommand {
 
     public ShuffleACBackIntoDeck() {
-        super(Constants.SHUFFLE_AC_BACK_INTO_DECK, "Shuffle Action Card back into deck from the discard pile.", true, true);
+        super(Constants.SHUFFLE_AC_BACK_INTO_DECK, "Shuffle Action Card back into deck from the discard pile.", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 

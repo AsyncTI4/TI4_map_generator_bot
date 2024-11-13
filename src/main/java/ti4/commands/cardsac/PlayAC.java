@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -34,7 +34,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.TemporaryCombatModifierModel;
 
-public class PlayAC extends PlayerGameStateSubcommand {
+public class PlayAC extends GameStateSubcommand {
 
     public PlayAC() {
         super(Constants.PLAY_AC, "Play an Action Card", true, true);

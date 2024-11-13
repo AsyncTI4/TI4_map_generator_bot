@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -18,7 +18,7 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-public class TrapToken extends PlayerGameStateSubcommand {
+public class TrapToken extends GameStateSubcommand {
 
     public TrapToken() {
         super(Constants.LIZHO_TRAP, "Select planets were to add/remove trap tokens", true, true);

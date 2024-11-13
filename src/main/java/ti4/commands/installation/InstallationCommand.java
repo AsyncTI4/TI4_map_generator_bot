@@ -8,7 +8,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.generator.MapRenderPipeline;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -16,18 +17,18 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class InstallationCommand implements Command {
+public class InstallationCommand implements ParentCommand {
 
     private final Collection<InstallationSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.INSTALLATION;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.acceptIfPlayerInGame(getActionId(), event);
+        return CommandHelper.acceptIfPlayerInGame(getName(), event);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class InstallationCommand implements Command {
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Installations";
     }
 
@@ -69,8 +70,8 @@ public class InstallationCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        SlashCommandData list = Commands.slash(getActionId(), getActionDescription()).addSubcommands(getSubcommands());
+    public void register(CommandListUpdateAction commands) {
+        SlashCommandData list = Commands.slash(getName(), getDescription()).addSubcommands(getSubcommands());
         commands.addCommands(list);
     }
 }

@@ -4,11 +4,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.Player;
 
 public class DrawAgenda extends GameStateSubcommand {
 
@@ -20,16 +19,13 @@ public class DrawAgenda extends GameStateSubcommand {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) && SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
+        return super.accept(event) && CommandHelper.acceptIfPlayerInGame(event);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
         count = Math.max(count, 1);
-        OptionMapping fromBottomOption = event.getOption("from_bottom");
-        boolean fromBottom = fromBottomOption != null && fromBottomOption.getAsBoolean();
-        Game game = getGame();
-        Player player = game.getPlayer(event.getUser().getId());
-        AgendaHelper.drawAgenda(event, count, fromBottom, game, player);
+        var fromBottom = event.getOption("from_bottom", false, OptionMapping::getAsBoolean);
+        AgendaHelper.drawAgenda(event, count, fromBottom, getGame(), getPlayer());
     }
 }

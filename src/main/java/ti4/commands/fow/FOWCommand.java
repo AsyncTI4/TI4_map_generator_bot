@@ -1,52 +1,55 @@
 package ti4.commands.fow;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 
-public class FOWCommand implements Command {
+public class FOWCommand implements ParentCommand {
 
-    private final Collection<Subcommand> subcommands = List.of(
-            new AddCustomAdjacentTile(),
-            new AddAdjacencyOverride(),
-            new AddAdjacencyOverrideList(),
-            new AddFogTile(),
-            new CheckChannels(),
-            new PingActivePlayer(),
-            new PingSystem(),
-            new RemoveAdjacencyOverride(),
-            new RemoveAllAdjacencyOverrides(),
-            new RemoveFogTile(),
-            new RemoveCustomAdjacentTile(),
-            new RemoveAllCustomAdjacentTiles(),
-            new SetFogFilter(),
-            new Whisper(),
-            new Announce(),
-            new FOWOptions(),
-            new ShowGameAsPlayer());
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new AddCustomAdjacentTile(),
+                    new AddAdjacencyOverride(),
+                    new AddAdjacencyOverrideList(),
+                    new AddFogTile(),
+                    new CheckChannels(),
+                    new PingActivePlayer(),
+                    new PingSystem(),
+                    new RemoveAdjacencyOverride(),
+                    new RemoveAllAdjacencyOverrides(),
+                    new RemoveFogTile(),
+                    new RemoveCustomAdjacentTile(),
+                    new RemoveAllCustomAdjacentTiles(),
+                    new SetFogFilter(),
+                    new Whisper(),
+                    new Announce(),
+                    new FOWOptions(),
+                    new ShowGameAsPlayer())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.FOW;
     }
 
-    public String getActionDescription() {
+    public String getDescription() {
         return "Fog of War";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return Command.super.accept(event) &&
-                SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
+        return ParentCommand.super.accept(event) &&
+                CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public Collection<Subcommand> getSubcommands() {
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
     }
 }

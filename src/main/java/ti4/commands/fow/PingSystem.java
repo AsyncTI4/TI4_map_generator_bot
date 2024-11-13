@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -15,7 +15,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PingSystem extends PlayerGameStateSubcommand {
+public class PingSystem extends GameStateSubcommand {
 
     public PingSystem() {
         super(Constants.PING_SYSTEM, "Alert players adjacent to a system with a message.", true, false);

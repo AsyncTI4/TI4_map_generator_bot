@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class ShowPurgedActionCards extends GameStateSubcommand {
 
     public ShowPurgedActionCards() {
-        super(Constants.SHOW_AC_PURGED_LIST, "Show Action Card purged list", false, false);
+        super(Constants.SHOW_AC_PURGED_LIST, "Show Action Card purged list", false, false, false);
     }
 
     @Override

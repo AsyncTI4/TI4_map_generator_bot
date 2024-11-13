@@ -1,36 +1,38 @@
 package ti4.commands.admin;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 
-public class AdminCommand implements Command {
+public class AdminCommand implements ParentCommand {
 
-    private final Collection<Subcommand> subcommands = List.of(
-            new DeleteGame(),
-            new ResetEmojiCache(),
-            new ReloadMap(),
-            new ReloadMapperObjects(),
-            new RestoreGame(),
-            new CardsInfoForPlayer(),
-            new UpdateThreadArchiveTime(),
-            new UploadStatistics());
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new DeleteGame(),
+                    new ResetEmojiCache(),
+                    new ReloadMap(),
+                    new ReloadMapperObjects(),
+                    new RestoreGame(),
+                    new CardsInfoForPlayer(),
+                    new UpdateThreadArchiveTime(),
+                    new UploadStatistics())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.ADMIN;
     }
 
     @Override
-    public String getActionDescription() {
+    public String getDescription() {
         return "Admin";
     }
 
     @Override
-    public Collection<Subcommand> getSubcommands() {
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
     }
 }

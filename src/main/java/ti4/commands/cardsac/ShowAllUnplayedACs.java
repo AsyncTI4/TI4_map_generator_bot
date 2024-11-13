@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class ShowAllUnplayedACs extends GameStateSubcommand {
 
     public ShowAllUnplayedACs() {
-        super(Constants.SHOW_UNPLAYED_AC, "Show all unplayed Action Cards", false, false);
+        super(Constants.SHOW_UNPLAYED_AC, "Show all unplayed Action Cards", false, false, false);
     }
 
     @Override

@@ -7,14 +7,14 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowRandomSO extends PlayerGameStateSubcommand {
+public class ShowRandomSO extends GameStateSubcommand {
 
     public ShowRandomSO() {
         super("show_random", "Show a Secret Objective to a player", true, false);

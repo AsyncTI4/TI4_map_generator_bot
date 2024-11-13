@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 public class ExhaustSC extends GameStateSubcommand {
 
     public ExhaustSC() {
-        super(Constants.EXHAUST_SC, "Exhaust am SC due to absol agenda (or undo this)", true, true);
+        super(Constants.EXHAUST_SC, "Exhaust am SC due to absol agenda (or undo this)", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "SC you wish to exhaust").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO, "True to refresh (undo) instead of exhaust").setRequired(false));
     }

@@ -1,45 +1,48 @@
 package ti4.commands.ds;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 
-public class DiscordantStarsCommand implements Command {
+public class DiscordantStarsCommand implements ParentCommand {
 
-    private final Collection<Subcommand> subcommands = List.of(
-            new ZelianHero(),
-            new TrapToken(),
-            new TrapReveal(),
-            new TrapSwap(),
-            new FlipGrace(),
-            new SetPolicy(),
-            new DrawBlueBackTile(),
-            new DrawRedBackTile(),
-            new AddOmenDie(),
-            new KyroHero(),
-            new ATS());
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ZelianHero(),
+                    new TrapToken(),
+                    new TrapReveal(),
+                    new TrapSwap(),
+                    new FlipGrace(),
+                    new SetPolicy(),
+                    new DrawBlueBackTile(),
+                    new DrawRedBackTile(),
+                    new AddOmenDie(),
+                    new KyroHero(),
+                    new ATS())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.DS_COMMAND;
     }
 
     @Override
-    public String getActionDescription() {
+    public String getDescription() {
         return "Discordant Stars Commands";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
+        return CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
-    public Collection<Subcommand> getSubcommands() {
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
     }
 }

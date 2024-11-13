@@ -7,7 +7,7 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -15,10 +15,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAllAC extends PlayerGameStateSubcommand {
+public class ShowAllAC extends GameStateSubcommand {
 
     public ShowAllAC() {
-        super(Constants.SHOW_ALL_AC, "Show all Action Cards one player", false, false);
+        super(Constants.SHOW_ALL_AC, "Show all Action Cards one player", false, false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 

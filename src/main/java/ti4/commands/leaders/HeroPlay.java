@@ -51,7 +51,7 @@ public class HeroPlay extends LeaderAction {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        var player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
+        var player = getPlayer();
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");

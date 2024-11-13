@@ -5,7 +5,7 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
@@ -17,7 +17,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class SendPN extends PlayerGameStateSubcommand {
+public class SendPN extends GameStateSubcommand {
 
 	public SendPN() {
 		super(Constants.SEND_PN, "Send Promissory Note to player", true, true);
@@ -28,7 +28,7 @@ public class SendPN extends PlayerGameStateSubcommand {
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Game game = getGame();
-		Player player = Helper.getPlayerFromGame(game, event, event.getUser().getId());
+		Player player = getPlayer();
 		String value = event.getOption(Constants.PROMISSORY_NOTE_ID).getAsString().toLowerCase();
 		String id = null;
 		int pnIndex;

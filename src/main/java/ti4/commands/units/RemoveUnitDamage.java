@@ -19,12 +19,12 @@ public class RemoveUnitDamage extends AddRemoveUnits {
     }
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.REMOVE_UNIT_DAMAGE;
     }
 
     @Override
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Remove unit damage from map";
     }
 }

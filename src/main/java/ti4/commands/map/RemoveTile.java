@@ -9,8 +9,8 @@ import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.Tile;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class RemoveTile extends AddRemoveTile {

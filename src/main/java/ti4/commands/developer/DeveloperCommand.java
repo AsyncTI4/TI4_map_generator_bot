@@ -1,37 +1,40 @@
 package ti4.commands.developer;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 
-public class DeveloperCommand implements Command {
+public class DeveloperCommand implements ParentCommand {
 
-    private final Collection<Subcommand> subcommands = List.of(
-            new SetGlobalSetting(),
-            new RunManualDataMigration());
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new SetGlobalSetting(),
+                    new RunManualDataMigration())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.DEVELOPER;
     }
 
-    public String getActionDescription() {
+    public String getDescription() {
         return "Developer";
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return Command.super.accept(event) &&
-                SlashCommandAcceptanceHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
+        return ParentCommand.super.accept(event) &&
+                CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
     }
 
     @Override
-    public Collection<Subcommand> getSubcommands() {
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
     }
 }

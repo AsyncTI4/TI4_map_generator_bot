@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
 
-public class ShowGameAsPlayer extends PlayerGameStateSubcommand {
+public class ShowGameAsPlayer extends GameStateSubcommand {
 
     public ShowGameAsPlayer() {
         super(Constants.SHOW_GAME_AS_PLAYER, "Shows map as the specified player sees it.", true, false);

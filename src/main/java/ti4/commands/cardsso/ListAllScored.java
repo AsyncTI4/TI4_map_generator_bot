@@ -1,14 +1,14 @@
 package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ListAllScored extends PlayerGameStateSubcommand {
+public class ListAllScored extends GameStateSubcommand {
 
     public ListAllScored() {
         super(Constants.SO_LIST_SCORED, "Displays scored secret objectives", true, false);

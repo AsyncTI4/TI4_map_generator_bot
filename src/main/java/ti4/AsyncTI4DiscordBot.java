@@ -348,7 +348,7 @@ public class AsyncTI4DiscordBot {
             return;
         }
         CommandListUpdateAction commands = guild.updateCommands();
-        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
+        commandManager.getCommandList().forEach(command -> command.register(commands));
         commands.queue();
         BotLogger.logWithTimestamp(" BOT STARTED UP: " + guild.getName());
         guilds.add(guild);

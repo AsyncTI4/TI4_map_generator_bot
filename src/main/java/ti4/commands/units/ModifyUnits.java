@@ -6,25 +6,26 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-public class ModifyUnits implements Command {
+public class ModifyUnits implements ParentCommand {
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.MODIFY_UNITS;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionId());
+        return event.getName().equals(getName());
     }
 
     @Override
@@ -55,8 +56,8 @@ public class ModifyUnits implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionId(), "Present the Modify Units menu"));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), "Present the Modify Units menu"));
     }
 
 }

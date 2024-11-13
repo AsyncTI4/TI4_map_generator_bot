@@ -6,17 +6,17 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowPNToAll extends PlayerGameStateSubcommand {
+public class ShowPNToAll extends GameStateSubcommand {
 
     public ShowPNToAll() {
-        super(Constants.SHOW_PN_TO_ALL, "Show Promissory Note to table", true, false);
+        super(Constants.SHOW_PN_TO_ALL, "Show Promissory Note to table", false, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "PN ID that is sent between ()").setRequired(true));
     }
 

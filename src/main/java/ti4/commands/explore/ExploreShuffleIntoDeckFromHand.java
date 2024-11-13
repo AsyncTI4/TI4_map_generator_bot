@@ -3,7 +3,7 @@ package ti4.commands.explore;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -11,7 +11,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 
-public class ExploreShuffleIntoDeckFromHand extends PlayerGameStateSubcommand {
+public class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
 
     public ExploreShuffleIntoDeckFromHand() {
         super(Constants.SHUFFLE_INTO_DECK_FROM_HAND, "Discard an Exploration Card from the hand to deck.", true, true);

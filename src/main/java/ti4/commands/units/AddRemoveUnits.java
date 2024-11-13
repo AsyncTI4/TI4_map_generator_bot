@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
 import ti4.commands.combat.StartCombat;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.planet.PlanetAdd;
@@ -33,9 +33,10 @@ import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
-abstract public class AddRemoveUnits implements Command {
+abstract public class AddRemoveUnits implements ParentCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -283,7 +284,7 @@ abstract public class AddRemoveUnits implements Command {
             if (!pingedAlready) {
                 String colorMention = Emojis.getColorEmojiWithName(color);
                 String message = colorMention + " has modified units in the system. ";
-                if (getActionDescription().contains("add_units")) {
+                if (getDescription().contains("add_units")) {
                     message = message + " Specific units modified include: " + unitList;
                 }
                 message = message + "Refresh map to see what changed ";
@@ -295,7 +296,7 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
 
-        if (getActionDescription().toLowerCase().contains("add units")) {
+        if (getDescription().toLowerCase().contains("add units")) {
             Player player = game.getPlayerFromColorOrFaction(color);
             if (player == null) {
                 return;
@@ -366,10 +367,10 @@ abstract public class AddRemoveUnits implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionId(), getActionDescription())
+            Commands.slash(getName(), getDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                     .setRequired(true).setAutoComplete(true))
                 .addOptions(
@@ -382,7 +383,4 @@ abstract public class AddRemoveUnits implements Command {
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN,
                     "'True' to not generate a map update with this command")));
     }
-
-    abstract protected String getActionDescription();
-
 }

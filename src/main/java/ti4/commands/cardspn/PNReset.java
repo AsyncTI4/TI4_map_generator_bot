@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PNReset extends PlayerGameStateSubcommand {
+public class PNReset extends GameStateSubcommand {
 
     public PNReset() {
         super(Constants.PN_RESET, "Reset your Promissory Notes and send to your Cards Info thread", true, true);

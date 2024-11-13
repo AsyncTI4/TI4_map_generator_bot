@@ -5,14 +5,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.ResourceHelper;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class AddFogTile extends PlayerGameStateSubcommand {
+public class AddFogTile extends GameStateSubcommand {
 
     public AddFogTile() {
         super(Constants.ADD_FOG_TILE, "Add a Fog of War tile to the map.", true, true);

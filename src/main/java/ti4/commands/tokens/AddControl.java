@@ -61,12 +61,12 @@ public class AddControl extends AddRemoveToken {
     }
 
     @Override
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Add control token to planet";
     }
 
     @Override
-    public String getActionId() {
+    public String getName() {
         return Constants.ADD_CONTROL;
     }
 }

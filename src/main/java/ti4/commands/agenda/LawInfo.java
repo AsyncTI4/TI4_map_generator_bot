@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 public class LawInfo extends GameStateSubcommand {
 
     public LawInfo() {
-        super("law_info", "Show laws in play", true, false);
+        super("law_info", "Show laws in play", false, false);
     }
 
     @Override

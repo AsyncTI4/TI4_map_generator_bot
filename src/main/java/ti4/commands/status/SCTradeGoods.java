@@ -1,16 +1,17 @@
 package ti4.commands.status;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class SCTradeGoods extends StatusSubcommandData {
     public SCTradeGoods() {

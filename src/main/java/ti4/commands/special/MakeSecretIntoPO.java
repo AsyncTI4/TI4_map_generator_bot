@@ -1,6 +1,8 @@
 package ti4.commands.special;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -11,8 +13,6 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.LinkedHashMap;
 
 public class MakeSecretIntoPO extends SpecialSubcommandData {
     public MakeSecretIntoPO() {

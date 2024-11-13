@@ -5,13 +5,13 @@ import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.PlayerGameStateSubcommand;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PurgePN extends PlayerGameStateSubcommand {
+public class PurgePN extends GameStateSubcommand {
 
     public PurgePN() {
         super(Constants.PURGE_PN, "Purge Promissory Note", true, true);

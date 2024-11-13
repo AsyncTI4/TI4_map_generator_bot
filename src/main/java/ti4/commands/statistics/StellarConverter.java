@@ -1,5 +1,11 @@
 package ti4.commands.statistics;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -8,12 +14,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class StellarConverter extends StatisticsSubcommandData {
 

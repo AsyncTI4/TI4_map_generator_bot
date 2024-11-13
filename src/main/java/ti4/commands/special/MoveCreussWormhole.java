@@ -2,12 +2,11 @@ package ti4.commands.special;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;

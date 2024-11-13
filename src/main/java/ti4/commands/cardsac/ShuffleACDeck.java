@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 public class ShuffleACDeck extends GameStateSubcommand {
 
     public ShuffleACDeck() {
-        super(Constants.SHUFFLE_AC_DECK, "Shuffle Action Card deck", true, true);
+        super(Constants.SHUFFLE_AC_DECK, "Shuffle Action Card deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
