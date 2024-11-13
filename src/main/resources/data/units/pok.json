@@ -1226,7 +1226,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a combat roll, it rolls a number of dice equal to the number of your opponent's non-fighter ships in this system"
+        "ability": "When this unit makes a combat roll, it rolls a number of dice (hit on a 7) equal to the number of your opponent's non-fighter ships in this system"
     },
     {
         "id": "winnu_mech",
