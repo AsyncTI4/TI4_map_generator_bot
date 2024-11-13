@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.buttons.Buttons;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.message.MessageHelper;
 
 public class GenericButtonCommand implements Command {

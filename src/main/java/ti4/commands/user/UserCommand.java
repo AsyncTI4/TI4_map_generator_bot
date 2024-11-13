@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.commands.Command;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 
 public class UserCommand implements Command {
 

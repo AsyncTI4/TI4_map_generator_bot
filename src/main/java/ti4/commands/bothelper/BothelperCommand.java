@@ -8,7 +8,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 
 public class BothelperCommand implements Command {
 

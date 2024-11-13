@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.commands.CommandHelper;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
@@ -17,9 +18,9 @@ import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class AllInfo implements Command {
@@ -30,8 +31,14 @@ public class AllInfo implements Command {
     }
 
     @Override
+    public String getActionDescription() {
+        return "Send all available info to your Cards Info thread.";
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.acceptIfAdminOrPlayerInGame(getActionId(), event);
+        return Command.super.accept(event) &&
+                CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
@@ -67,10 +74,6 @@ public class AllInfo implements Command {
         ACInfo.sendActionCardInfo(game, player);
         PNInfo.sendPromissoryNoteInfo(game, player, false);
         CardsInfo.sendVariousAdditionalButtons(game, player);
-    }
-
-    protected String getActionDescription() {
-        return "Send all available info to your Cards Info thread.";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

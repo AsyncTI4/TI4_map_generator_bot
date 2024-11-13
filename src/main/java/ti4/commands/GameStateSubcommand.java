@@ -3,12 +3,9 @@ package ti4.commands;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-
-import static ti4.helpers.SlashCommandAcceptanceHelper.acceptIfHasRoles;
 
 public abstract class GameStateSubcommand extends Subcommand {
 
@@ -26,7 +23,7 @@ public abstract class GameStateSubcommand extends Subcommand {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return name.equals(event.getInteraction().getSubcommandName()) &&
-                acceptIfHasRoles(event, AsyncTI4DiscordBot.adminRoles) || SlashCommandAcceptanceHelper.acceptIfPlayerInGame(event);
+                CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.adminRoles) || CommandHelper.acceptIfPlayerInGame(event);
     }
 
     public void preExecute(SlashCommandInteractionEvent event) {
