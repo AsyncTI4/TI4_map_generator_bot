@@ -252,7 +252,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("planetAbilityExhaust_")
     public static void planetAbilityExhaust(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("planetAbilityExhaust_", "");
-        PlanetExhaustAbility.doAction(event, player, planet, game, true);
+        PlanetExhaustAbility.doAction(player, planet, game, true);
         ButtonHelper.deleteTheOneButton(event);
     }
 

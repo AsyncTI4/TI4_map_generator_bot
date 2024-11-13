@@ -32,18 +32,18 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
     @Override
     public void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
-        doAction(event, player, planet, game, true);
+        doAction(player, planet, game, true);
     }
 
-    public static void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust) {
+    public static void doAction(Player player, String planet, Game game, boolean exhaust) {
         if (player == null) return;
         if (exhaust) {
             player.exhaustPlanetAbility(planet);
         }
-        resolveAbility(event, player, planet, game);
+        resolveAbility(player, planet, game);
     }
 
-    public static void resolveAbility(GenericInteractionCreateEvent event, Player player, String planet, Game game) {
+    public static void resolveAbility(Player player, String planet, Game game) {
         planet = AliasHandler.resolvePlanet(planet);
         PlanetModel model = Mapper.getPlanet(planet);
         MessageChannel channel = player.getCorrectChannel();
