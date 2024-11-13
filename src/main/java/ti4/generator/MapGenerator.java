@@ -88,6 +88,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
 import ti4.model.EventModel;
 import ti4.model.LeaderModel;
+import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
@@ -139,7 +140,7 @@ public class MapGenerator implements AutoCloseable {
     private final boolean allEyesOnMe;
     private final Map<String, Player> playerControlMap;
 
-    private final Map<String, WebsiteOverlay> websiteOverlays = new HashMap<>(); // ID, WebsiteOverlay
+    private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
     private int mapWidth;
     private int minX = -1;
     private int minY = -1;
@@ -730,7 +731,8 @@ public class MapGenerator implements AutoCloseable {
                         } else {
                             DrawingUtil.superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
-                                addWebsiteOverlay(player, "strategyCardPlayerArea", scModel.getId(), x + 110, y + 20, 25, 50);
+                                addWebsiteOverlay("strategyCard", scModel.getId(), x + 110, y + 20, 25, 50);
+                                addWebsiteOverlay(scModel, x + 110, y + 20, 25, 50);
                                 // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
@@ -1699,7 +1701,7 @@ public class MapGenerator implements AutoCloseable {
         int widthOfSection = 180;
         int leftSide = width - widthOfSection - xDeltaFromRightSide;
         int verticalSpacing = 39;
-        addWebsiteOverlay(player, "unitCombatSummary", null, leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
+        addWebsiteOverlay("unitCombatSummary", null, leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
         int imageSize = verticalSpacing - 2;
         drawPAImageScaled(leftSide, y + verticalSpacing, "pa_resources.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
@@ -1916,11 +1918,11 @@ public class MapGenerator implements AutoCloseable {
         // RESOURCE/INFLUENCE TOTALS
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
-        graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
+        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 152, 152, game, player, "ResourceInfluenceSummary", null);
         if (player.hasLeaderUnlocked("xxchahero")) { // XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, game);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, game);
-            if (Constants.gedsDeadId.equals(player.getUserID())) {
+            if (Constants.gedsDeadId.equals(player.getUserID()) || ThreadLocalRandom.current().nextInt(1000) == 0) {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha_gedsdead.png", 0.9f);
             } else {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha.png", 0.9f);
@@ -2481,7 +2483,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             // Unit Overlays
-            addWebsiteOverlay(player, "unit", unit.getId(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+            addWebsiteOverlay("unit", unit.getId(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
             // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
         }
         graphics.setColor(Color.WHITE);
@@ -2694,7 +2696,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 // graphics.drawRect(x, y + 24, textWidth, 64); // debug
-                addWebsiteOverlay("strategyCardByScoretrack", scModel.getId(), x, y + 24, textWidth, 60);
+                addWebsiteOverlay("strategyCard", scModel.getId(), x, y + 24, textWidth, 60);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
                     graphics.setFont(Storage.getFont24());
@@ -3076,7 +3078,8 @@ public class MapGenerator implements AutoCloseable {
                     int fontYoffset = (scsize / 2) + 25;
                     DrawingUtil.superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     if (scModel != null) {
-                        addWebsiteOverlay(player, "strategyCardNearMap", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        addWebsiteOverlay("strategyCard", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        addWebsiteOverlay(scModel, point.x - 20, point.y + 20, 40, 50);
                         // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
                     }
                     point.translate(scsize, 0);
@@ -4314,19 +4317,15 @@ public class MapGenerator implements AutoCloseable {
 
     private void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, Player player, String cardType, String cardID) {
         g.drawRect(x, y, width, height);
-        addWebsiteOverlay(player, cardType, cardID, x, y, width, height);
-    }
-
-    void addWebsiteOverlay(Player player, String cardType, String cardID, int x, int y, int width, int height) {
-        if (player == null) {
-            addWebsiteOverlay(cardType, cardID, x, y, width, height);
-            return;
-        }
-        websiteOverlays.put(cardType + ":" + cardID + ":" + player.getFaction(), new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+        addWebsiteOverlay(cardType, cardID, x, y, width, height);
     }
 
     void addWebsiteOverlay(String cardType, String cardID, int x, int y, int width, int height) {
-        websiteOverlays.put(cardType + ":" + cardID, new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+        websiteOverlays.add(new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+    }
+
+    void addWebsiteOverlay(ModelInterface model, int x, int y, int width, int height) {
+        websiteOverlays.add(new WebsiteOverlay(model, List.of(x, y, width, height)));
     }
 
     String getGameName() {
