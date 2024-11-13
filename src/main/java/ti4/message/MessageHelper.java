@@ -337,7 +337,7 @@ public class MessageHelper {
 		if (channel == null) {
 			return;
 		}
-		if (embeds.removeIf(Objects::isNull)) {
+		if (embeds != null && embeds.removeIf(Objects::isNull)) {
 			BotLogger.log("Sanitized message with null embeds. Attempted to for message with text: " + messageText);
 		}
 
