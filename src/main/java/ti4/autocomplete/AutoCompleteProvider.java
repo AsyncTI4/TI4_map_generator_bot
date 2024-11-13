@@ -231,7 +231,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("all", "map", "stats", "split", "landscape",
                     "wormholes", "anomalies", "legendaries", "empties", "aetherstream", "space_cannon_offense",
-                    "traits", "technology_specialties", "attachments", "shipless",
+                    "traits", "technology_specialties", "attachments", "shipless", "googly",
                     "none")
                     .filter(value -> value.contains(enteredValue))
                     .limit(25)

@@ -106,6 +106,18 @@ public class ResourceHelper {
     }
 
     @Nullable
+    public String getUnitFile(UnitKey unit, boolean eyes) {
+        String name = unit.getFileName(eyes);
+        String unitPath = unitCache.get(name);
+        if (unitPath != null) {
+            return unitPath;
+        }
+        String filePath = getResourceFromFolder("units/", name, "Could not find unit file");
+        unitCache.put(name, filePath);
+        return filePath;
+    }
+
+    @Nullable
     public String getDecalFile(String name) {
         String decalPath = decalCache.get(name);
         if (decalPath != null) {

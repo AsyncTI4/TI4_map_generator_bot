@@ -50,6 +50,7 @@ import org.jetbrains.annotations.Nullable;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
@@ -135,6 +136,7 @@ public class MapGenerator implements AutoCloseable {
     private final int height;
     private final int heightForGameInfo;
     private final boolean extraRow;
+    private final boolean allEyesOnMe;
     private final Map<String, Player> playerControlMap;
 
     private final Map<String, WebsiteOverlay> websiteOverlays = new HashMap<>(); // ID, WebsiteOverlay
@@ -217,12 +219,15 @@ public class MapGenerator implements AutoCloseable {
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth + 4 * 520 + EXTRA_X * 2;
                 break;
+            case googly:
             default:
                 heightForGameInfo = mapHeight;
                 height = mapHeight + heightStats;
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
+        System.out.println(displayType);
+        allEyesOnMe = this.displayType.equals(DisplayType.googly);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
     }
@@ -1620,7 +1625,7 @@ public class MapGenerator implements AutoCloseable {
                 }
 
                 int numInReinforcements = unitCap - count;
-                BufferedImage image = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(unitKey));
+                BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
                 BufferedImage decal = null;
                 decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
                 for (int i = 0; i < numInReinforcements; i++) {
@@ -1806,7 +1811,7 @@ public class MapGenerator implements AutoCloseable {
                 Player p = game.getPlayerFromColorOrFaction(unitKey.getColor());
 
                 try {
-                    String unitPath = Tile.getUnitPath(unitKey);
+                    String unitPath = getUnitPath(unitKey);
                     if (unitPath != null) {
                         if (unitKey.getUnitType() == UnitType.Fighter) {
                             unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
@@ -2560,9 +2565,14 @@ public class MapGenerator implements AutoCloseable {
         }
     }
 
+    private String getUnitPath(UnitKey unit) {
+        ResourceHelper rs = ResourceHelper.getInstance();
+        return allEyesOnMe ? rs.getUnitFile(unit, allEyesOnMe) : rs.getUnitFile(unit);
+    }
+
     private void drawPAUnitUpgrade(int x, int y, UnitKey unitKey) {
         try {
-            String path = Tile.getUnitPath(unitKey);
+            String path = getUnitPath(unitKey);
             BufferedImage img = ImageHelper.read(path);
             graphics.drawImage(img, x, y, null);
         } catch (Exception e) {
@@ -4189,7 +4199,7 @@ public class MapGenerator implements AutoCloseable {
             int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
             int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
 
-            BufferedImage tileImage = new TileGenerator(game, event).draw(tile, step);
+            BufferedImage tileImage = new TileGenerator(game, event, displayType).draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
             BotLogger.log("Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(), exception);

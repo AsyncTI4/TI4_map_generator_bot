@@ -387,8 +387,7 @@ public class Setup extends PlayerSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
             UnitKey unitID = Mapper.getUnitKey(unit, color);
-            String unitPath = Tile.getUnitPath(unitID);
-            if (unitPath == null) {
+            if (unitID == null) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Unit: " + unit + " is not valid and not supported.");
                 continue;

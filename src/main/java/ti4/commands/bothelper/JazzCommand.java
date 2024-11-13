@@ -8,8 +8,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
+import ti4.commands.uncategorized.ShowGame;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.json.ObjectMapperFactory;
@@ -32,7 +33,7 @@ public class JazzCommand extends BothelperSubcommandData {
         //sendJazzButton(event);
 
         Game game = getActiveGame();
-        ButtonHelper.resolveSetupColorChecker(game);
+        ShowGame.simpleShowGame(game, event, DisplayType.googly);
     }
 
     public static void sendJazzButton(GenericInteractionCreateEvent event) {
