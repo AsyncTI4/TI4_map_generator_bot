@@ -1,107 +1,65 @@
 package ti4.commands.user;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import ti4.cron.LogCacheStatsCron;
 import ti4.helpers.Storage;
+import ti4.map.PersistenceManager;
 import ti4.message.BotLogger;
 
 public class UserSettingsManager {
-    private final Map<String, UserSettings> userSettingList = new HashMap<>();
-    private final String userSettingsPath = Storage.getStoragePath() + File.separator + "user_settings";
-    private static UserSettingsManager instance;
 
-    private UserSettingsManager() {
+    private static final String USER_SETTINGS_PATH = Storage.getStoragePath() + File.separator + "user_settings";
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final LoadingCache<String, UserSettings> userIdToSettingsCache;
+
+    static {
+        mapper.writer(new DefaultPrettyPrinter());
+        userIdToSettingsCache = Caffeine.newBuilder()
+                .maximumSize(200)
+                .expireAfterAccess(2, TimeUnit.HOURS)
+                .build(UserSettingsManager::load);
+        LogCacheStatsCron.registerCache("userIdToSettingsCache", userIdToSettingsCache);
     }
 
-    public static UserSettingsManager getInstance() {
-        if (instance == null) {
-            instance = new UserSettingsManager();
-        }
-        return instance;
+    private static UserSettings load(String userId) {
+        return readFile(userId);
     }
 
-    public void addUserSetting(UserSettings userSetting) {
-        userSettingList.put(userSetting.getUserId(), userSetting);
-    }
-
-    public UserSettings getUserSettings(String userID) {
-        UserSettings userSettings = userSettingList.get(userID);
+    public static UserSettings get(String userId) {
+        var userSettings = userIdToSettingsCache.get(userId);
         if (userSettings == null) {
-            userSettings = new UserSettings(userID);
-            userSettingList.put(userID, userSettings);
+            userSettings = new UserSettings(userId);
+            persistFile(userSettings);
+            userIdToSettingsCache.put(userId, userSettings);
         }
         return userSettings;
     }
 
-    public Map<String, UserSettings> getAllUserSettings() {
-        return userSettingList;
+    public static void save(UserSettings userSettings) {
+        persistFile(userSettings);
     }
 
-    public static void init() {
-        getInstance().loadUserSettingsFromFolder();
-    }
-
-    public void loadUserSettingsFromFolder() {
-        File folder = new File(userSettingsPath);
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-        File[] listOfFiles = folder.listFiles();
-        for (File file : listOfFiles) {
-            if (file.isFile() && file.getName().endsWith(".json")) {
-                try {
-                    loadUserSetting(userSettingsPath + File.separator + file.getName());
-                } catch (Exception e) {
-                    BotLogger.log("Could not import JSON Objects from File: " + userSettingsPath + "/" + file.getName(), e);
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public void loadUserSetting(String settingFilePath) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String filePath = settingFilePath;
-        //JavaType type = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, UserSettings.class);
-
-        if (filePath != null) {
-            try {
-                InputStream input = new FileInputStream(filePath);
-                UserSettings userSetting = objectMapper.readValue(input, UserSettings.class);
-                addUserSetting(userSetting);
-            } catch (Exception e) {
-                BotLogger.log("Could not import JSON Objects from File: " + settingFilePath, e);
-            }
-        }
-
-    }
-
-    public void saveUserSetting(UserSettings userSetting) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+    private static UserSettings readFile(String userId) {
         try {
-            writer.writeValue(getSettingsFile(userSetting), userSetting);
+            return PersistenceManager.readObjectFromJsonFile(USER_SETTINGS_PATH, userId + ".json", UserSettings.class);
         } catch (IOException e) {
-            BotLogger.log("Error saving User Settings", e);
+            BotLogger.log("Failed to read json data for UserSettingsManager.", e);
+            return null;
         }
     }
 
-    private File getSettingsFile(UserSettings userSetting) {
-        File folder = new File(userSettingsPath);
-        File[] listOfFiles = folder.listFiles();
-        for (File file : listOfFiles) {
-            if (file.isFile() && file.getName().endsWith(".json") && userSetting.getUserId().equals(file.getName())) {
-                return file;
-            }
+    private static void persistFile(UserSettings userSettings) {
+        try {
+            PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
+        } catch (Exception e) {
+            BotLogger.log("Failed to write json data for UserSettingsManager.", e);
         }
-        return new File(userSettingsPath + File.separator + userSetting.getUserId() + ".json");
     }
 }

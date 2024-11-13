@@ -80,7 +80,6 @@ import ti4.commands.units.RemoveAllUnits;
 import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
-import ti4.commands.user.UserSettingsManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.UploadStatsCron;
@@ -289,7 +288,6 @@ public class AsyncTI4DiscordBot {
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
-        UserSettingsManager.init();
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
