@@ -1,5 +1,8 @@
 package ti4.helpers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -9,9 +12,6 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class SlashCommandAcceptanceHelper {
 
     public static boolean shouldAcceptIfActivePlayerOfGame(String actionId, SlashCommandInteractionEvent event) {
@@ -19,7 +19,7 @@ public class SlashCommandAcceptanceHelper {
             return false;
         }
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
+        GameManager gameManager = GameManager;
         if (!gameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
@@ -56,7 +56,7 @@ public class SlashCommandAcceptanceHelper {
             return false;
         }
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
+        GameManager gameManager = GameManager;
         Member member = event.getMember();
         if (member != null) {
             List<Role> roles = member.getRoles();

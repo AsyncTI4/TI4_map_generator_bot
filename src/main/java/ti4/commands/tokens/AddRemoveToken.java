@@ -41,7 +41,7 @@ abstract public class AddRemoveToken implements ParentCommand {
 
         OptionMapping factionOrColour = event.getOption(Constants.FACTION_COLOR);
         List<String> colors = new ArrayList<>();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         if (factionOrColour != null) {
             String colorString = factionOrColour.getAsString().toLowerCase();
             colorString = colorString.replace(" ", "");

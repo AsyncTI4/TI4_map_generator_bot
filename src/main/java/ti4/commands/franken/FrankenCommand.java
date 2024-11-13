@@ -50,7 +50,7 @@ public class FrankenCommand implements ParentCommand {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return false;
         }
-        Game userActiveGame = UserGameContextManager.getContextGame(userID);
+        Game userActiveGame = CommandHelper.getGameName(event);
         if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
             MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
             return false;
@@ -79,7 +79,7 @@ public class FrankenCommand implements ParentCommand {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }

@@ -49,7 +49,7 @@ public class CardsInfo implements ParentCommand {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            game = UserGameContextManager.getContextGame(userID);
+            game = CommandHelper.getGameName(event);
             String color = Helper.getColor(game, event);
             if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");

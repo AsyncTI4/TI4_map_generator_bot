@@ -46,7 +46,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         boolean showMedian = event.getOption(Constants.SHOW_MEDIAN, false, OptionMapping::getAsBoolean);
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : GameManager.getInstance().getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
             mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
         }
 
@@ -132,10 +132,10 @@ public class AverageTurnTime extends StatisticsSubcommandData {
     }
 
     public Map<String, Entry<Integer, Long>> getAllPlayersTurnTimes(boolean ignoreEndedGames) {
-        Predicate<ManagedGame> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
+        Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
         Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
-        for (ManagedGame game : GameManager.getManagedGames().stream().filter(endedGamesFilter).toList()) {
+        for (var game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
             mapPlayerTurnTimes(playerTurnTimes, playerAverageTurnTimes, game);
         }
         return playerTurnTimes;

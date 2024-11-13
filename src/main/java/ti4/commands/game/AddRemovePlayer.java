@@ -6,12 +6,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
+import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 abstract public class AddRemovePlayer extends GameSubcommandData {
@@ -31,7 +31,6 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping gameOption = event.getOption(Constants.GAME_NAME);
-        User callerUser = event.getUser();
         String gameName;
         if (gameOption != null) {
             gameName = event.getOptions().getFirst().getAsString();
@@ -40,18 +39,13 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
                 return;
             }
         } else {
-            var userActiveGameId = UserGameContextManager.getContextGame(callerUser.getId());
-            if (userActiveGameId == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
-                return;
-            }
-            gameName = userActiveGameId;
+            gameName = CommandHelper.getGameName(event);
         }
 
         Game game = GameManager.getGame(gameName);
         User user = event.getUser();
         action(event, game, user);
-        Helper.fixGameChannelPermissions(event.getGuild(), GameManager.getManagedGame(gameName));
+        Helper.fixGameChannelPermissions(event.getGuild(), GameManager.getGame(gameName));
         GameSaveLoadManager.saveGame(game, event);
         MessageHelper.replyToMessage(event, getResponseMessage(game, user));
     }

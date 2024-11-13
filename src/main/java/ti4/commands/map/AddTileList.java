@@ -52,7 +52,7 @@ public class AddTileList extends MapSubcommandData {
         }
 
         String userID = member.getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;

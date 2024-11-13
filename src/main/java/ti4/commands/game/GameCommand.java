@@ -42,7 +42,7 @@ public class GameCommand implements ParentCommand {
             }
         }
         String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         if (game == null) return;
         if (!undoCommand) {
             GameSaveLoadManager.saveGame(game, event);

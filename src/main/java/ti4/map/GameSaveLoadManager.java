@@ -96,8 +96,8 @@ public class GameSaveLoadManager {
         // TODO: Make sure all commands and buttons and such actually save the game
         AtomicInteger savedGamesCount = new AtomicInteger();
         AtomicInteger skippedGamesCount = new AtomicInteger();
-        long loadTime = GameManager.getInstance().getLoadTime();
-        GameManager.getInstance().getGameNameToGame().values().parallelStream().forEach(game -> {
+        long loadTime = GameManager.getLoadTime();
+        GameManager.getGameNameToGame().values().parallelStream().forEach(game -> {
             try {
                 long time = game.getLastModifiedDate();
                 if (time > loadTime) {
@@ -265,8 +265,8 @@ public class GameSaveLoadManager {
                             CardsInfo.sendCardsInfo(loadedGame, p1);
                         }
                     }
-                    GameManager.getInstance().deleteGame(game.getName());
-                    GameManager.getInstance().addGame(loadedGame);
+                    GameManager.deleteGame(game.getName());
+                    GameManager.addGame(loadedGame);
 
                     if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
@@ -286,8 +286,8 @@ public class GameSaveLoadManager {
         if (originalMapFile.exists()) {
             Game loadedGame = loadGame(originalMapFile);
             if (loadedGame != null) {
-                GameManager.getInstance().deleteGame(game.getName());
-                GameManager.getInstance().addGame(loadedGame);
+                GameManager.deleteGame(game.getName());
+                GameManager.addGame(loadedGame);
             }
         }
     }
@@ -1186,7 +1186,7 @@ public class GameSaveLoadManager {
                             return;
                         }
                         if (file.getName().contains("reference") || Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 60 || game.isCustodiansScored()) {
-                            GameManager.getInstance().addGame(game);
+                            GameManager.addGame(game);
                         }
                     } catch (Exception e) {
                         BotLogger.log("Could not load game: " + file.getName(), e);
@@ -1196,7 +1196,7 @@ public class GameSaveLoadManager {
             BotLogger.log("Exception occurred while streaming map directory.", e);
         }
         long loadTime = System.nanoTime() - loadStart;
-        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getInstance().getGameNameToGame().size() + "` games: ", loadTime, loadTime));
+        BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getGameNameToGame().size() + "` games: ", loadTime, loadTime));
     }
 
     @Nullable

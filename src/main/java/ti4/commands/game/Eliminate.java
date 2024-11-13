@@ -145,7 +145,7 @@ public class Eliminate extends AddRemovePlayer {
                 player.setEliminated(true);
                 player.setDummy(true);
                 if (!game.isFowMode()) {
-                    Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), GameManager.getManagedGame(game.getName()));
+                    Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), GameManager.getGame(game.getName()));
                 }
             } else {
                 game.removePlayer(player.getUserID());

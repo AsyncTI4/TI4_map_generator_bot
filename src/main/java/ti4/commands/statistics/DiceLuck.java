@@ -70,7 +70,7 @@ public class DiceLuck extends StatisticsSubcommandData {
 
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (var game : GameManager.getInstance().getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+        for (var game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
             for (var player : game.getRealPlayers()) {
                 Entry<Double, Integer> playerDiceLuck = Map.entry(
                         game.getPlayerToExpectedHitsTimes10().get(player) / 10.0,

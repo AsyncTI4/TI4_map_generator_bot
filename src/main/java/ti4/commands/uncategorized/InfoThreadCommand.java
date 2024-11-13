@@ -18,7 +18,7 @@ public interface InfoThreadCommand {
     default boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
         if (event.getName().equals(actionID)) {
             String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
+            GameManager gameManager = GameManager;
             if (!gameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;

@@ -57,7 +57,7 @@ public class AddFrontierTokens implements ParentCommand {
         if (!UserGameContextManager.doesUserHaveContextGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game game = UserGameContextManager.getContextGame(userID);
+            Game game = CommandHelper.getGameName(event);
             parsingForTile(event, game);
             GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);

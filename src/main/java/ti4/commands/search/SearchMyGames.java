@@ -14,8 +14,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.ManagedGame;
 import ti4.message.MessageHelper;
 
 public class SearchMyGames extends SearchSubcommandData {
@@ -44,25 +44,25 @@ public class SearchMyGames extends SearchSubcommandData {
 
     public static int searchGames(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime,
                                   boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
-        Predicate<ManagedGame> ignoreSpectateFilter = ignoreSpectate ?
-                game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId())) :
-                game -> game.getPlayers().stream().anyMatch(player -> player.getId().equals(user.getId()));
-        Predicate<ManagedGame> onlyMyTurnFilter = onlyMyTurn ?
-                game -> Objects.equals(game.getActivePlayerId(), user.getId()) :
+        Predicate<Game> ignoreSpectateFilter = ignoreSpectate ?
+                game -> game.getRealPlayers().stream().anyMatch(player -> player.getUserID().equals(user.getId())) :
+                game -> game.getRealPlayers().stream().anyMatch(player -> player.getUserID().equals(user.getId()));
+        Predicate<Game> onlyMyTurnFilter = onlyMyTurn ?
+                game -> Objects.equals(game.getActivePlayerID(), user.getId()) :
                 game -> true;
-        Predicate<ManagedGame> endedGamesFilter = includeEndedGames ?
+        Predicate<Game> endedGamesFilter = includeEndedGames ?
                 game -> true :
                 game -> !game.isHasEnded() && !game.isFowMode();
-        Predicate<ManagedGame> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
-        Predicate<ManagedGame> ignoreAbortedFilter = ignoreAborted ?
-                game -> !game.isHasEnded() || game.isHasWinner() :
+        Predicate<Game> onlyEndedFoWGames = game -> !game.isFowMode() || game.isHasEnded();
+        Predicate<Game> ignoreAbortedFilter = ignoreAborted ?
+                game -> !game.isHasEnded() || game.hasWinner() :
                 game -> true;
-        Predicate<ManagedGame> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames)
+        Predicate<Game> allFilterPredicates = ignoreSpectateFilter.and(onlyMyTurnFilter).and(endedGamesFilter).and(onlyEndedFoWGames)
                 .and(ignoreAbortedFilter);
 
-        var filteredManagedGames = GameManager.getManagedGames().stream()
+        var filteredManagedGames = GameManager.getGameNameToGame().values().stream()
                 .filter(allFilterPredicates)
-                .sorted(Comparator.comparing(ManagedGame::getGameNameForSorting))
+                .sorted(Comparator.comparing(Game::getGameNameForSorting))
                 .toList();
 
         if (wantNum) {
@@ -71,7 +71,7 @@ public class SearchMyGames extends SearchSubcommandData {
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
-        for (ManagedGame game : filteredManagedGames) {
+        for (var game : filteredManagedGames) {
             sb.append("`").append(Helper.leftpad("" + index, 2)).append(".`");
             sb.append(getGameListRepresentation(game, user.getId(), showAverageTurnTime));
             sb.append("\n");
@@ -86,7 +86,7 @@ public class SearchMyGames extends SearchSubcommandData {
         return filteredManagedGames.size();
     }
 
-    public static String getGameListRepresentation(ManagedGame game, String userId, boolean showAverageTurnTime) {
+    public static String getGameListRepresentation(Game game, String userId, boolean showAverageTurnTime) {
         var actionsChannel = game.getActionsChannel();
         String gameChannelLink = actionsChannel == null ? "" : actionsChannel.getAsMention();
 
@@ -96,13 +96,13 @@ public class SearchMyGames extends SearchSubcommandData {
         sb.append(gameChannelLink);
         if (showAverageTurnTime) sb.append("  [Average Turn Time: `").append(averageTurnLengthForGame(game, userId)).append("`]");
         var player = game.getPlayer(userId);
-        if (player == game.getWinner()) sb.append(" **👑WINNER👑**");
-        if (game.getActivePlayerId() != null && game.getActivePlayerId().equals(userId) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
+        if (game.getWinner().isPresent() && Objects.equals(player, game.getWinner().get())) sb.append(" **👑WINNER👑**");
+        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userId) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
         if (game.isHasEnded()) sb.append(" [GAME IS OVER]");
         return sb.toString();
     }
 
-    private static String averageTurnLengthForGame(ManagedGame game, String playerId) {
+    private static String averageTurnLengthForGame(Game game, String playerId) {
         long totalMillis = game.getPlayerToTotalTurns().get(playerId);
         int numTurns = game.getPlayerToTotalTurns().get(playerId);
         if (numTurns == 0 || totalMillis == 0) {

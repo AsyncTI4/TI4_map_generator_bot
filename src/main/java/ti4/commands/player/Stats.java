@@ -24,7 +24,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.ManagedGame;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -164,7 +163,7 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
             player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-            for (ManagedGame managedGame : GameManager.getManagedGames()) {
+            for (var managedGame : GameManager.getGameNameToGame().values()) {
                 if (!managedGame.isHasEnded()) {
                     var gameToUpdate = GameManager.getGame(managedGame.getName());
                     for (Player playerToUpdate : gameToUpdate.getRealPlayers()) {

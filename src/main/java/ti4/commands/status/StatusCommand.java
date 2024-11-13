@@ -54,7 +54,7 @@ public class StatusCommand implements ParentCommand {
 
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         GameSaveLoadManager.saveGame(game, event);
 
         MapRenderPipeline.render(game, event,

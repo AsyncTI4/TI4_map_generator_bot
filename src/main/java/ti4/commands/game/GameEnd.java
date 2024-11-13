@@ -103,7 +103,7 @@ public class GameEnd extends GameSubcommandData {
         }
 
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
-        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), GameManager.getManagedGame(gameName));
+        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), GameManager.getGame(gameName));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             "This game's channels' permissions have been updated.");
 

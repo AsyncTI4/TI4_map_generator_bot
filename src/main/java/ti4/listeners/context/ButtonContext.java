@@ -1,7 +1,6 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;

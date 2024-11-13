@@ -45,7 +45,7 @@ abstract public class AddRemoveUnits implements ParentCommand {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         }
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         Player player = game.getPlayer(userID);
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayerFromEvent(game, player, event);
@@ -309,7 +309,7 @@ abstract public class AddRemoveUnits implements ParentCommand {
     public static void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Game game) {
         String userID = event.getUser().getId();
         if (game == null) {
-            game = UserGameContextManager.getContextGame(userID);
+            game = CommandHelper.getGameName(event);
         }
         // Map activeMap = mapManager.getUserActiveMap(userID);
         if (!Constants.SPACE.equals(planetName)) {

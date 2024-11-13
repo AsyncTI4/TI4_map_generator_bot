@@ -37,7 +37,7 @@ public class SearchMyTitles extends SearchSubcommandData {
         Map<String, Integer> titles = new HashMap<>();
 
         Predicate<Game> thisPlayerIsInGame = game -> game.hasPlayer(userId);
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
                 .filter(thisPlayerIsInGame.and(Game::isHasEnded))
                 .sorted(Comparator.comparing(Game::getGameNameForSorting))
                 .toList();

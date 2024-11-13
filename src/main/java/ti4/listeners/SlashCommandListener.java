@@ -1,5 +1,8 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -12,15 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
-import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 public class SlashCommandListener extends ListenerAdapter {
     @Override
@@ -51,7 +50,7 @@ public class SlashCommandListener extends ListenerAdapter {
                     .setEphemeral(true).queue();
                 return;
             } else {
-                Game userActiveGame = GameManager.getInstance().getUserActiveGame(userID);
+                Game userActiveGame = GameManager.getUserActiveGame(userID);
                 if (userActiveGame != null) {
                     userActiveGame.incrementSpecificSlashCommandCount(event.getFullCommandName());
                 }
@@ -65,7 +64,7 @@ public class SlashCommandListener extends ListenerAdapter {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue(m -> {
                 BotLogger.logSlashCommand(event, m);
-                Game userActiveGame = GameManager.getInstance().getUserActiveGame(userID);
+                Game userActiveGame = GameManager.getUserActiveGame(userID);
                 boolean harmless = false;
                 if (!event.getInteraction().getName().equals(Constants.HELP)
                     && !event.getInteraction().getName().equals(Constants.STATISTICS)
@@ -98,7 +97,7 @@ public class SlashCommandListener extends ListenerAdapter {
         }
 
         CommandManager commandManager = CommandManager.getInstance();
-        for (Command command : commandManager.getCommandList()) {
+        for (Command command : CommandManager.getCommands()) {
             if (command.accept(event)) {
                 try {
                     command.execute(event);
@@ -140,9 +139,9 @@ public class SlashCommandListener extends ListenerAdapter {
 
     public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
         String channelName = channel.getName();
-        GameManager gameManager = GameManager.getInstance();
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
-        List<String> mapList = gameManager.getGameNames();
+        GameManager gameManager = GameManager;
+        Game userActiveGame = GameManager.getUserActiveGame(userID);
+        List<String> mapList = GameManager.getGameNames();
 
         String gameID = StringUtils.substringBefore(channelName, "-");
         boolean gameExists = mapList.contains(gameID);
@@ -164,17 +163,17 @@ public class SlashCommandListener extends ListenerAdapter {
         if (!gameExists && !(isUnprotectedCommand) && !(isUnprotectedCommandSubcommand)) {
             return false;
         }
-        if (gameExists && (gameManager.getUserActiveGame(userID) == null
-            || !gameManager.getUserActiveGame(userID).getName().equals(gameID)
-                && (gameManager.getGame(gameID) != null && (gameManager.getGame(gameID).isCommunityMode()
-                    || gameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
-            gameManager.setGameForUser(userID, gameID);
-        } else if (gameManager.isUserWithActiveGame(userID)) {
+        if (gameExists && (GameManager.getUserActiveGame(userID) == null
+            || !GameManager.getUserActiveGame(userID).getName().equals(gameID)
+                && (GameManager.getGame(gameID) != null && (GameManager.getGame(gameID).isCommunityMode()
+                    || GameManager.getGame(gameID).getPlayerIDs().contains(userID))))) {
+            GameManager.setGameForUser(userID, gameID);
+        } else if (GameManager.isUserWithActiveGame(userID)) {
             if (gameExists && !channelName.startsWith(userActiveGame.getName())) {
                 // MessageHelper.sendMessageToChannel(channel,"Active game reset. Channel name
                 // indicates to have map associated with it. Please select correct active game
                 // or do action in neutral channel");
-                gameManager.resetGameForUser(userID);
+                GameManager.resetGameForUser(userID);
             }
         }
         return true;

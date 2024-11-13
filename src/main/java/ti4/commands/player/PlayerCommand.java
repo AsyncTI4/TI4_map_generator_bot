@@ -14,7 +14,6 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
 
 public class PlayerCommand implements ParentCommand {
 
@@ -27,7 +26,7 @@ public class PlayerCommand implements ParentCommand {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return CommandHelper.acceptIfPlayerInGame(getName(), event);
+        return CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
@@ -50,8 +49,7 @@ public class PlayerCommand implements ParentCommand {
     }
 
     public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        String gameName = UserGameContextManager.getContextGame(userID);
+        String gameName = CommandHelper.getGameName(event);
         Game game = GameManager.getGame(gameName);
         GameSaveLoadManager.saveGame(game, event);
 

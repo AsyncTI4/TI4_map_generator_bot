@@ -5,10 +5,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class ReverseSpeakerOrder extends GameSubcommandData {
@@ -25,7 +25,7 @@ public class ReverseSpeakerOrder extends GameSubcommandData {
             return;
         }
         User user = event.getUser();
-        String gameName = UserGameContextManager.getContextGame(user.getId());
+        String gameName = GameManager.getGame(CommandHelper.getGameName(event));
         Game game = GameManager.getGame(gameName);
 
         game.setReverseSpeakerOrder(!game.isReverseSpeakerOrder());

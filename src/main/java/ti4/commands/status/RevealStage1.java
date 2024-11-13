@@ -97,7 +97,7 @@ public class RevealStage1 extends StatusSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         GameSaveLoadManager.saveGame(game, event);
     }
 }

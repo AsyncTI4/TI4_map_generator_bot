@@ -1,10 +1,9 @@
 package ti4.generator;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
 import org.junit.jupiter.api.Test;
-
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class MapperTest extends BaseTi4Test {
 

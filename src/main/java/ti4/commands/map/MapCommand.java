@@ -31,7 +31,7 @@ public class MapCommand implements ParentCommand {
             }
         }
         String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         if (game == null) return;
         ShowGame.simpleShowGame(game, event);
     }

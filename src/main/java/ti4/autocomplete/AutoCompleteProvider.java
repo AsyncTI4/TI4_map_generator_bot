@@ -78,7 +78,7 @@ public class AutoCompleteProvider {
 
         String userID = event.getUser().getId();
         SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         Player player = null;
         if (game != null) {
             player = game.getPlayer(userID);
@@ -769,7 +769,7 @@ public class AutoCompleteProvider {
             }
             case Constants.GAME_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = GameManager.getInstance().getGameNames().stream()
+                List<Command.Choice> options = GameManager.getGameNames().stream()
                     .filter(token -> token.contains(enteredValue))
                     .limit(25)
                     .map(token -> new Command.Choice(token, token))

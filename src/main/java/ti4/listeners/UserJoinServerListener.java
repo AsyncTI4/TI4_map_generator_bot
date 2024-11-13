@@ -69,7 +69,7 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private void checkIfNewUserIsInExistingGamesAndAutoAddRole(Guild guild, User user) {
         List<Game> mapsJoined = new ArrayList<>();
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : GameManager.getGameNameToGame().values()) {
             Guild gameGuild = game.getGuild();
             if (gameGuild != null && gameGuild.equals(guild) && game.getPlayers().containsKey(user.getId())) {
                 mapsJoined.add(game);
@@ -129,7 +129,7 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private void checkIfUserLeftActiveGames(Guild guild, User user, boolean voluntary) {
         List<Game> gamesQuit = new ArrayList<>();
-        for (Game game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (Game game : GameManager.getGameNameToGame().values()) {
             boolean endVPReachedButNotEnded = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
             if (game.isHasEnded() || endVPReachedButNotEnded) continue;
             Guild gameGuild = game.getGuild();

@@ -4,10 +4,11 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
+import ti4.commands.CommandHelper;
 import ti4.generator.MapRenderPipeline;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
-import ti4.map.UserGameContextManager;
 
 public abstract class SpecialSubcommandData extends SubcommandData {
 
@@ -34,7 +35,7 @@ public abstract class SpecialSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = UserGameContextManager.getContextGame(user.getId());
+        game = GameManager.getGame(CommandHelper.getGameName(event));
     }
 
     public void reply(SlashCommandInteractionEvent event) {

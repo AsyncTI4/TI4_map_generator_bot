@@ -43,7 +43,7 @@ public class MedianTurnTime extends StatisticsSubcommandData {
         boolean ignoreEndedGames = event.getOption(Constants.IGNORE_ENDED_GAMES, false, OptionMapping::getAsBoolean);
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
 
-        for (Game game : GameManager.getInstance().getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
+        for (Game game : GameManager.getGameNameToGame().values().stream().filter(endedGamesFilter).toList()) {
             for (var player : game.getRealPlayers()) {
                 Integer totalTurns = game.getPlayerToTotalTurns().get(player.getId());
                 Long totalTurnTime = game.getPlayerToTurnTime().get(player.getId());

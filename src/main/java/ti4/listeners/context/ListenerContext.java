@@ -51,7 +51,7 @@ public abstract class ListenerContext {
         gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
         gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
         gameName = StringUtils.substringBefore(gameName, "-");
-        game = GameManager.getInstance().getGame(gameName);
+        game = GameManager.getGame(gameName);
 
         player = null;
         privateChannel = event.getMessageChannel();

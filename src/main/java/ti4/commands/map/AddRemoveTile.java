@@ -62,7 +62,7 @@ abstract public class AddRemoveTile extends MapSubcommandData {
             AddTile.addCustodianToken(tile);
         }
 
-        Game userActiveGame = UserGameContextManager.getContextGame(userID);
+        Game userActiveGame = CommandHelper.getGameName(event);
         Boolean isFowPrivate = null;
         if (userActiveGame.isFowMode()) {
             isFowPrivate = event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL);

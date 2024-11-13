@@ -136,7 +136,7 @@ public class Replace extends GameSubcommandData {
             game.setActivePlayerID(addedUser.getId());
         }
 
-        Helper.fixGameChannelPermissions(event.getGuild(), GameManager.getManagedGame(game.getName()));
+        Helper.fixGameChannelPermissions(event.getGuild(), GameManager.getGame(game.getName()));
         ThreadChannel mapThread = game.getBotMapUpdatesThread();
         if (mapThread != null && !mapThread.isLocked()) {
             mapThread.getManager().setArchived(false).queue(success -> mapThread.addThreadMember(addedMember).queueAfter(5, TimeUnit.SECONDS), BotLogger::catchRestError);

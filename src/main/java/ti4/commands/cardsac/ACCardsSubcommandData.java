@@ -35,7 +35,7 @@ public abstract class ACCardsSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getUserActiveGame(user.getId());
         Helper.checkThreadLimitAndArchive(event.getGuild());
 
         Player player = Helper.getGamePlayer(game, null, event, user.getId());

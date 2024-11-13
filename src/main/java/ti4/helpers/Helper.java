@@ -2310,7 +2310,7 @@ public class Helper {
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
 
-        for (var game : GameManager.getInstance().getGameNameToGame().values()) {
+        for (var game : GameManager.getGameNameToGame().values()) {
             if (!game.isHasEnded()) {
                 if (game.getGuild() != null && game.getGuild().equals(guild)) {
                     var tableTalkChannel = game.getTableTalkChannel();

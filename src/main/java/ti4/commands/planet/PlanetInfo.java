@@ -7,15 +7,16 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.commands.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.GameManager;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 
@@ -36,7 +37,7 @@ public class PlanetInfo extends PlanetSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getUser();
-        Game game = UserGameContextManager.getContextGame(user.getId());
+        Game game = GameManager.getGame(CommandHelper.getGameName(event));
 
         Player player = game.getPlayer(user.getId());
         sendPlanetInfo(player);

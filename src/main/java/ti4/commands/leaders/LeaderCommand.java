@@ -25,7 +25,7 @@ public class LeaderCommand implements ParentCommand {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return CommandHelper.acceptIfPlayerInGame(getName(), event);
+        return CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class LeaderCommand implements ParentCommand {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = UserGameContextManager.getContextGame(userID);
+        Game game = CommandHelper.getGameName(event);
         GameSaveLoadManager.saveGame(game, event);
     }
 

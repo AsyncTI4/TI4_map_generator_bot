@@ -23,11 +23,11 @@ public class CommandGameStateHelper {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         String gameName = CommandHelper.getGameName(event);
-        if (!GameManager.getInstance().isValidGame(gameName)) {
+        if (!GameManager.isValidGame(gameName)) {
             throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
                     " in channel " + event.getChannel().getName());
         }
-        game.set(GameManager.getInstance().getGame(gameName));
+        game.set(GameManager.getGame(gameName));
         gameLastModifiedDate.set(game.get().getLastModifiedDate());
 
         if (!isPlayerCommand) {

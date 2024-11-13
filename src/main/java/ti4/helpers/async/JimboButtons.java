@@ -7,13 +7,12 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.ListUtils;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.buttons.Buttons;
 import ti4.helpers.RegexHelper;
 import ti4.map.Game;

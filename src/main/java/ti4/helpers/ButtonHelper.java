@@ -21,11 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,6 +44,10 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -5081,7 +5080,7 @@ public class ButtonHelper {
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);
                 gameToRestore.shuffleDecks();
-                GameManager.getInstance().addGame(gameToRestore);
+                GameManager.addGame(gameToRestore);
                 // CREATE BOT/MAP THREAD
                 ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
                     .complete();
@@ -6002,7 +6001,7 @@ public class ButtonHelper {
     }
 
     public static boolean isPlayerNew(Game gameOG, Player player) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         for (Game game : mapList.values()) {
             if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
                 for (Player player2 : game.getRealPlayers()) {
@@ -6084,7 +6083,7 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         Player player = Helper.getGamePlayer(game, null, event.getMember(), userID);
         if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();
