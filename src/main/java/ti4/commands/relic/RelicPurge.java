@@ -18,7 +18,7 @@ public class RelicPurge extends RelicSubcommandData {
     public RelicPurge() {
         super(Constants.RELIC_PURGE, "Purge a relic");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to purge").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

@@ -1,5 +1,7 @@
 package ti4.commands.tokens;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,8 +16,6 @@ import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import java.util.List;
 
 public class RemoveCC extends AddRemoveToken {
     @Override
@@ -67,6 +67,6 @@ public class RemoveCC extends AddRemoveToken {
         commands.addCommands(
             Commands.slash(getActionID(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true)));
+                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true)));
     }
 }

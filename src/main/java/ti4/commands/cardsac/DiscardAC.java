@@ -19,7 +19,7 @@ public class DiscardAC extends ACCardsSubcommandData {
     public DiscardAC() {
         super(Constants.DISCARD_AC, "Discard an Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

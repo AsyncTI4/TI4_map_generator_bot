@@ -16,7 +16,7 @@ public class SetHomeSystemPosition extends FrankenSubcommandData {
     public SetHomeSystemPosition() {
         super(Constants.SET_HOMESYSTEM_POS, "Set home system position to override other checks.");
         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "Home system tile. Enter 'none' to reset to default.").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

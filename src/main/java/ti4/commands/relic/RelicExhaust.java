@@ -17,7 +17,7 @@ public class RelicExhaust extends RelicSubcommandData {
     public RelicExhaust() {
         super(Constants.RELIC_EXHAUST, "Exhaust a Relic");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
 	public RelicExhaust(String relicRefresh, String refresh_a_relic) {

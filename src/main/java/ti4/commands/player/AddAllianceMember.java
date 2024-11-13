@@ -12,9 +12,8 @@ import ti4.message.MessageHelper;
 public class AddAllianceMember extends PlayerSubcommandData {
     public AddAllianceMember() {
         super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR,
-            "Faction or Color with which you are in an alliance").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color with which you are in an alliance").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

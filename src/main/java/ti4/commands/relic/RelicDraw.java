@@ -29,7 +29,7 @@ public class RelicDraw extends RelicSubcommandData {
 
     public RelicDraw() {
         super(Constants.RELIC_DRAW, "Draw a relic");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

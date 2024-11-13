@@ -16,7 +16,7 @@ public class RelicShuffleBack extends RelicSubcommandData {
     public RelicShuffleBack() {
         super(Constants.SHUFFLE_BACK, "Shuffle relic back into deck from player area");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to shuffle back into deck from player area").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

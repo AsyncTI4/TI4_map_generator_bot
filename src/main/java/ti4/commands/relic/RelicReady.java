@@ -17,7 +17,7 @@ public class RelicReady extends RelicSubcommandData {
     public RelicReady() {
         super(Constants.RELIC_REFRESH, "Ready a Relic");
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to ready").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

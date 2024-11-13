@@ -14,7 +14,7 @@ public class DrawSpecificAC extends ACCardsSubcommandData {
     public DrawSpecificAC() {
         super(Constants.DRAW_SPECIFIC_AC, "Draw Specific Action Card");
         addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "ID of the card you want to draw").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class DealSO extends SOCardsSubcommandData {
     public DealSO() {
         super(Constants.DEAL_SO, "Deal Secret Objective");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to deal, default 1"));
     }
 

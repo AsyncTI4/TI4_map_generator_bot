@@ -24,8 +24,8 @@ import ti4.message.MessageHelper;
 public class SentACRandom extends ACCardsSubcommandData {
     public SentACRandom() {
         super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

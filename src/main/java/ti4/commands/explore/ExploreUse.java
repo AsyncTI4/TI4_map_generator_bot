@@ -24,7 +24,7 @@ public class ExploreUse extends ExploreSubcommandData {
         super(Constants.USE, "Draw and activate an explore card from the deck or discard");
         addOptions(idOption.setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FORCE, "True to force the draw, even if none are in the deck"));
     }
 

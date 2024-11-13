@@ -23,7 +23,7 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 		addOptions(typeOption.setRequired(true));
 		addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
-		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
 	}
 
 	@Override

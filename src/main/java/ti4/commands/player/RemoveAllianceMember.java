@@ -13,10 +13,8 @@ import ti4.message.MessageHelper;
 public class RemoveAllianceMember extends PlayerSubcommandData {
     public RemoveAllianceMember() {
         super(Constants.REMOVE_ALLIANCE_MEMBER, "Remove an alliance member");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR,
-            "Faction or Color with which you want to remove from your alliance").setAutoComplete(true)
-                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color with which you want to remove from your alliance").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

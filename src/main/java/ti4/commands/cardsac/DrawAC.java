@@ -17,7 +17,7 @@ public class DrawAC extends ACCardsSubcommandData {
     public DrawAC() {
         super(Constants.DRAW_AC, "Draw Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1, max 10"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override

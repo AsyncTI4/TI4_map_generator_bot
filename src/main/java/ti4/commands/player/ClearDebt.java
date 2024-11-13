@@ -14,8 +14,8 @@ public class ClearDebt extends PlayerSubcommandData {
     public ClearDebt() {
         super(Constants.CLEAR_DEBT, "Clear debt tokens (control token) for player/faction");
         addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to clear").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color having their debt cleared ").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color clearing the debt").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color having their debt cleared ").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color clearing the debt").setAutoComplete(true));
     }
 
     @Override
