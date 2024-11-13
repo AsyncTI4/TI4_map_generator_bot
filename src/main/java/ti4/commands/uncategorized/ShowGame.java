@@ -70,7 +70,7 @@ public class ShowGame implements Command {
             if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
                 MapRenderPipeline.render(game, event, displayType,
-                                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
+                    fileUpload -> MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload));
                 displayType = DisplayType.stats;
             } else {
                 for (DisplayType i : DisplayType.values()) {
@@ -104,8 +104,7 @@ public class ShowGame implements Command {
 
     public static boolean includeButtons(DisplayType displayType) {
         return switch (displayType) {
-            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments,
-                 shipless -> false;
+            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments, shipless -> false;
             default -> true;
         };
     }
