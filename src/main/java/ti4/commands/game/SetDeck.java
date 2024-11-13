@@ -24,7 +24,7 @@ public class SetDeck extends GameStateSubcommand {
     private final List<String> deckTypes;
 
     public SetDeck() {
-        super(Constants.SET_DECK, "Change game card decks");
+        super(Constants.SET_DECK, "Change game card decks", true, false);
         deckTypes = new ArrayList<>();
         addDefaultOption(Constants.AC_DECK, "AC");
         addDefaultOption(Constants.SO_DECK, "SO");

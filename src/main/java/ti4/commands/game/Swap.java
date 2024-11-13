@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
@@ -24,9 +23,9 @@ import ti4.message.MessageHelper;
 public class Swap extends GameStateSubcommand {
 
     public Swap() {
-        super(Constants.SWAP, "Swap factions with a player ");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color ").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(true));
+        super(Constants.SWAP, "Swap factions with a player", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.OTHER_PLAYER, "Replacement player @playerName").setRequired(true));
     }
 
     @Override
@@ -50,25 +49,19 @@ public class Swap extends GameStateSubcommand {
             return;
         }
         String message = "";
-        OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
-        OptionMapping addOption = event.getOption(Constants.PLAYER2);
-        if (removeOption != null && addOption != null) {
-            Player removedPlayer = Helper.getPlayerFromEvent(game, null, event);
-            Player swapperPlayer = game.getPlayer(addOption.getAsUser().getId());
-            if (removedPlayer == null) {
-                MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
-                return;
-            }
-            if (swapperPlayer == null || swapperPlayer.getFaction() == null) {
-                MessageHelper.replyToMessage(event, "Could not find faction/player to swap");
-                return;
-            }
-            User addedUser = addOption.getAsUser();
-            secondHalfOfSwap(game, swapperPlayer, removedPlayer, addedUser, event);
-        } else {
-            MessageHelper.replyToMessage(event, "Specify player to swap");
+
+        Player removedPlayer = Helper.getOtherPlayerFromEvent(game, event);
+        if (removedPlayer == null) {
+            MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
             return;
         }
+        Player swapperPlayer = getPlayer();
+        if (swapperPlayer.getFaction() == null) {
+            MessageHelper.replyToMessage(event, "Could not find faction/player to swap");
+            return;
+        }
+        User addedUser = event.getOption(Constants.OTHER_PLAYER).getAsUser();
+        secondHalfOfSwap(game, swapperPlayer, removedPlayer, addedUser, event);
         GameSaveLoadManager.saveGame(game, event);
         GameSaveLoadManager.reload(game.getName());
         MessageHelper.sendMessageToChannel(event.getChannel(), message);

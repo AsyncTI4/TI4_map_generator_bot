@@ -20,8 +20,9 @@ import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
 public class Observer extends GameStateSubcommand {
+
     public Observer() {
-        super(Constants.OBSERVER, "Add or remove observers to game channels");
+        super(Constants.OBSERVER, "Add or remove observers to game channels", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name I.E. pbd###-xxxxxx").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ADD_REMOVE, "add or remove player as observer").setRequired(true).setAutoComplete(true));
@@ -61,7 +62,7 @@ public class Observer extends GameStateSubcommand {
         if ("add".equals(addOrRemove)) {
             addObserver(event, member.getUser().getId(), tableTalk);
             addObserver(event, member.getUser().getId(), actionsChannel);
-        } else if ("remove".equals(addOrRemove)) {
+        } else {
             removeObserver(event, member.getUser().getId(), tableTalk);
             removeObserver(event, member.getUser().getId(), actionsChannel);
         }
@@ -74,7 +75,7 @@ public class Observer extends GameStateSubcommand {
             if (channel.getName().contains(gameName)) {
                 if ("add".equals(addOrRemove)) {
                     addObserver(event, member.getUser().getId(), channel);
-                } else if ("remove".equals(addOrRemove)) {
+                } else {
                     removeObserver(event, member.getUser().getId(), channel);
                 }
             }

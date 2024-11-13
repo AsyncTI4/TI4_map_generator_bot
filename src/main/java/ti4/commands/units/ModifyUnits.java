@@ -13,7 +13,6 @@ import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class ModifyUnits implements ParentCommand {
@@ -30,7 +29,7 @@ public class ModifyUnits implements ParentCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game  game = UserGameContextManager.getContextGame(event.getUser().getId());
+        Game  game = getGame();
         Player player = game.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(game, player, event, null);
         player = Helper.getPlayerFromEvent(game, player, event);

@@ -28,7 +28,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class Eliminate extends AddRemovePlayer {
+class Eliminate extends AddRemovePlayer {
 
     private StringBuilder sb = new StringBuilder();
 
@@ -56,23 +56,7 @@ public class Eliminate extends AddRemovePlayer {
     private void removeUser(SlashCommandInteractionEvent event, Game game, String playerID) {
         OptionMapping option;
         option = event.getOption(playerID);
-
-        // OptionMapping option2 = event.getOption(Constants.CONFIRM);
-        // if(!option2.getAsString().equalsIgnoreCase("yes"))
-        // {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Please confirm with yes");
-        //     return;
-        // }
         if (option != null) {
-
-            // OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
-
-            // if (removeOption == null) {
-            //     MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
-            //     return;
-            // }
-
-            // Player player = Helper.getPlayer(game, null, event);
             User extraUser = option.getAsUser();
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();

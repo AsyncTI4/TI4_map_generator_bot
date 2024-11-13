@@ -23,7 +23,7 @@ import ti4.message.MessageHelper;
 public class Tags extends GameStateSubcommand {
 
     public Tags() {
-        super("tags", "Add or remove a 'tag' to a game for sorting/reference");
+        super("tags", "Add or remove a 'tag' to a game for sorting/reference", true, false);
     }
 
     @Override

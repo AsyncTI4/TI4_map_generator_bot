@@ -22,7 +22,7 @@ public class Info extends GameStateSubcommand {
     public static final String NEW_LINE = "\n";
 
     public Info() {
-        super(Constants.INFO, "Game information:");
+        super(Constants.INFO, "Game information:", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name").setAutoComplete(true));
     }
 

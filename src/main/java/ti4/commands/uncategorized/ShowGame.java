@@ -21,7 +21,6 @@ import ti4.helpers.DisplayType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class ShowGame implements ParentCommand {
@@ -39,7 +38,7 @@ public class ShowGame implements ParentCommand {
             String gameName = option.getAsString().toLowerCase();
             game = GameManager.getGame(gameName);
         } else {
-            game = UserGameContextManager.getContextGame(event.getUser().getId());
+            game = getGame();
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);

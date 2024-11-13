@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 public class GameOptions extends GameStateSubcommand {
 
     public GameOptions() {
-        super(Constants.OPTIONS, "Modify some Game Options");
+        super(Constants.OPTIONS, "Modify some Game Options", true, false);
     }
 
     @Override

@@ -16,8 +16,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class WeirdGameSetup extends GameStateSubcommand {
+
     public WeirdGameSetup() {
-        super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games");
+        super(Constants.WEIRD_GAME_SETUP, "Game Setup for Weird Games", true, false);
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to enable Community mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FOW_MODE, "True to enable FoW mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BASE_GAME_MODE, "True to switch to No Expansion (base game) mode."));

@@ -6,14 +6,13 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class SetUnitCap extends GameStateSubcommand {
+
     public SetUnitCap() {
-        super(Constants.SET_UNIT_CAP, "Particular unit amount in reinforcements for a player.");
+        super(Constants.SET_UNIT_CAP, "Particular unit amount in reinforcements for a player.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color or faction that you're setting unit cap for").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAME, "Unit that you're setting the cap for").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.UNIT_CAP, "Unit Cap").setRequired(true));
@@ -21,14 +20,13 @@ public class SetUnitCap extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getGame();
-        String unit = event.getOption(Constants.UNIT_NAME).getAsString();
         int unitCap = event.getOption(Constants.UNIT_CAP).getAsInt();
         if (unitCap > 99) {
             unitCap = 99;
         }
-        Player player = Helper.getPlayerFromEvent(game, null, event);
+        String unit = event.getOption(Constants.UNIT_NAME).getAsString();
         String unitID = AliasHandler.resolveUnit(unit);
+        Player player = getPlayer();
         player.setUnitCap(unitID, unitCap);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation());
 

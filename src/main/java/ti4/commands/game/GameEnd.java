@@ -43,16 +43,15 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.map.UserGameContextManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import static ti4.helpers.StringHelper.ordinal;
 
-public class GameEnd extends GameStateSubcommand {
+class GameEnd extends GameStateSubcommand {
 
     public GameEnd() {
-        super(Constants.GAME_END, "Declare the game has ended");
+        super(Constants.GAME_END, "Declare the game has ended", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS, "True to archive the channels and delete the game role (Default: True)"));
@@ -60,12 +59,7 @@ public class GameEnd extends GameStateSubcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
-
-        if (game == null) {
-            MessageHelper.replyToMessage(event, "Must set active Game");
-            return;
-        }
+        Game game = getGame();
         String gameName = game.getName();
         if (!gameName.equals(StringUtils.substringBefore(event.getChannel().getName(), "-"))) {
             MessageHelper.replyToMessage(event, "`/game end` must be executed in game channel only!");

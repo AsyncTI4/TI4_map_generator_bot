@@ -29,7 +29,7 @@ import ti4.message.MessageHelper;
 public class Replace extends GameStateSubcommand {
 
     public Replace() {
-        super(Constants.REPLACE, "Replace player in game");
+        super(Constants.REPLACE, "Replace player in game", true, false);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player being replaced @playerName").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction being replaced").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(false));
@@ -66,7 +66,7 @@ public class Replace extends GameStateSubcommand {
             return;
         }
 
-        Player removedPlayer = Helper.getPlayerFromEvent(game, null, event);
+        Player removedPlayer = Helper.getPlayerFromEvent(game, event);
         if (removedPlayer == null || (removePlayerOption == null && removedPlayer.getFaction() == null)) {
             MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;

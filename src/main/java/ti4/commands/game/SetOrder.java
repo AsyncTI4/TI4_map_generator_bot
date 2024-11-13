@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 public class SetOrder extends GameStateSubcommand {
 
     public SetOrder() {
-        super(Constants.SET_ORDER, "Set player order in game");
+        super(Constants.SET_ORDER, "Set player order in game", true, false);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -38,13 +38,12 @@ public class SetOrder extends GameStateSubcommand {
         List<User> users = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
             User member = event.getOption("player" + i, null, OptionMapping::getAsUser);
-            if (member != null) {
-                users.add(member);
-            } else {
+            if (member == null) {
                 break;
             }
+            users.add(member);
         }
-        setPlayerOrder(event, getActiveGame(), users);
+        setPlayerOrder(event, getGame(), users);
     }
 
     public static void setPlayerOrder(GenericInteractionCreateEvent event, Game game, List<User> users) {

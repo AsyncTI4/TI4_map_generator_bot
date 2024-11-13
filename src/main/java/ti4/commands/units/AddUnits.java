@@ -15,7 +15,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
@@ -37,7 +36,7 @@ public class AddUnits extends AddRemoveUnits {
             if (!event.getInteraction().getName().equals(Constants.MOVE_UNITS)) {
                 switch (value) {
                     case "t/tactics", "t", "tactics", "tac", "tact" -> {
-                        MoveUnits.removeTacticsCC(event, color, tile, UserGameContextManager.getContextGame(event.getUser().getId()));
+                        MoveUnits.removeTacticsCC(event, color, tile, getGame();)
                         AddCC.addCC(event, color, tile);
                         Helper.isCCCountCorrect(event, game, color);
                     }

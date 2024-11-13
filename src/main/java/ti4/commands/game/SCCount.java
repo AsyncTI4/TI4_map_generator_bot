@@ -10,8 +10,9 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 public class SCCount extends GameStateSubcommand {
+
     public SCCount() {
-        super(Constants.SC_COUNT, "Strategy Cards count in game");
+        super(Constants.SC_COUNT, "Strategy Cards count in game", false, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards count").setRequired(true));
     }
 

@@ -21,19 +21,19 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class Undo extends GameStateSubcommand {
+
     public Undo() {
-        super(Constants.UNDO, "Undo the last action");
+        super(Constants.UNDO, "Undo the last action", false, false);
         addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_BEFORE_COMMAND, "Command to undo back to").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
+        Game game = getGame();
         if (game == null) {
             MessageHelper.replyToMessage(event, "Must set active Game");
             return;

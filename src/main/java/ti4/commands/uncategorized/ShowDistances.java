@@ -18,7 +18,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class ShowDistances implements ParentCommand {
@@ -34,7 +33,7 @@ public class ShowDistances implements ParentCommand {
             return false;
         }
 
-        Game userActiveGame = UserGameContextManager.getContextGame(event.getUser().getId());
+        Game userActiveGame = getGame();
         if (userActiveGame == null) {
             MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
             return false;
@@ -51,7 +50,7 @@ public class ShowDistances implements ParentCommand {
             String gameName = option.getAsString().toLowerCase();
             game = GameManager.getGame(gameName);
         } else {
-            game = UserGameContextManager.getContextGame(event.getUser().getId());
+            game = getGame();
         }
 
         Player player = game.getPlayer(event.getUser().getId());

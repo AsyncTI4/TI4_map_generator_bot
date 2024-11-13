@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 
-public class Add extends AddRemovePlayer {
+class Add extends AddRemovePlayer {
 
     public Add() {
         super(Constants.ADD, "Add player to game");

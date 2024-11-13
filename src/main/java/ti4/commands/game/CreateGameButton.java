@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.Subcommand;
 import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.search.SearchMyGames;
 import ti4.helpers.Constants;
@@ -27,7 +27,8 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-public class CreateGameButton extends GameStateSubcommand {
+class CreateGameButton extends Subcommand {
+
     public CreateGameButton() {
         super(Constants.CREATE_GAME_BUTTON, "Create Game Creation Button");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel").setRequired(true));

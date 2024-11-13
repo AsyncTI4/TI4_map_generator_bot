@@ -29,7 +29,7 @@ public class SearchForGame extends SearchSubcommandData {
             }
             game = GameManager.getGame(gameName);
         } else {
-            game = UserGameContextManager.getContextGame(event.getUser().getId());
+            game = getGame();
             if (game == null) {
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return;

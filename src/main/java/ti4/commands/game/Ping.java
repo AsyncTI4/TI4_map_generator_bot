@@ -6,20 +6,18 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class Ping extends GameStateSubcommand {
 
     public Ping() {
-        super(Constants.PING, "Ping all players in the game");
+        super(Constants.PING, "Ping all players in the game", false, false);
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-        String activeGameName = UserGameContextManager.getContextGame(event.getUser().getId());
-        Helper.fixGameChannelPermissions(event.getGuild(), GameManager.getGame(activeGameName));
-        pingGame(event, getActiveGame());
+        var game = getGame();
+        Helper.fixGameChannelPermissions(event.getGuild(), game);
+        pingGame(event, game);
     }
 
     public void pingGame(GenericInteractionCreateEvent event, Game game) {

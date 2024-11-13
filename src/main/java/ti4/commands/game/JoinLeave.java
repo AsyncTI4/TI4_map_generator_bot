@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 abstract public class JoinLeave extends GameStateSubcommand {
 
     public JoinLeave(@NotNull String name, @NotNull String description) {
-        super(name, description);
+        super(name, description, true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setAutoComplete(true));
     }
 

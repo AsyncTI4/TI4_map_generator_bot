@@ -21,7 +21,6 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UserGameContextManager;
 import ti4.message.MessageHelper;
 
 public class AddCC extends AddRemoveToken {
@@ -68,7 +67,7 @@ public class AddCC extends AddRemoveToken {
     }
 
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
-        Game game = UserGameContextManager.getContextGame(event.getUser().getId());
+        Game game = getGame();
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
