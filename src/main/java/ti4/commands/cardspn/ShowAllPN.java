@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 public class ShowAllPN extends PNCardsSubcommandData {
     public ShowAllPN() {
         super(Constants.SHOW_ALL_PN, "Show Promissory Note to player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
@@ -30,7 +30,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        Player targetPlayer = CommandHelper.getPlayerFromEvent(game, event);
+        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (targetPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Target player not found");
             return;

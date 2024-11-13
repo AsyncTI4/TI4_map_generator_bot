@@ -22,7 +22,7 @@ public class SentAC extends ACCardsSubcommandData {
     public SentAC() {
         super(Constants.SEND_AC, "Send an Action Card to a player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -52,12 +52,12 @@ public class SentAC extends ACCardsSubcommandData {
             return;
         }
 
-        Player player_ = CommandHelper.getPlayerFromEvent(game, event);
-        if (player_ == null) {
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
-        User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
+        User user = AsyncTI4DiscordBot.jda.getUserById(otherPlayer.getUserID());
         if (user == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
@@ -65,10 +65,10 @@ public class SentAC extends ACCardsSubcommandData {
 
         // FoW specific pinging
         if (game.isFowMode()) {
-            FoWHelper.pingPlayersTransaction(game, event, player, player_, Emojis.ActionCard + " Action Card", null);
+            FoWHelper.pingPlayersTransaction(game, event, player, otherPlayer, Emojis.ActionCard + " Action Card", null);
         }
 
-        sendActionCard(event, game, player, player_, acID);
+        sendActionCard(event, game, player, otherPlayer, acID);
     }
 
     public static void sendActionCard(GenericInteractionCreateEvent event, Game game, Player player, Player p2, String acID) {

@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 public class ShowAllAC extends ACCardsSubcommandData {
     public ShowAllAC() {
         super(Constants.SHOW_ALL_AC, "Show all Action Cards one player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -29,13 +29,13 @@ public class ShowAllAC extends ACCardsSubcommandData {
             return;
         }
 
-        Player player_ = CommandHelper.getPlayerFromEvent(game, event);
-        if (player_ == null) {
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
 
-        showAll(player, player_, game);
+        showAll(player, otherPlayer, game);
     }
 
     public static void showAll(Player player, Player player_, Game game) {

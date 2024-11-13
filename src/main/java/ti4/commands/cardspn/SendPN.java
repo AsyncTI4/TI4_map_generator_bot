@@ -21,14 +21,13 @@ public class SendPN extends PNCardsSubcommandData {
 	public SendPN() {
 		super(Constants.SEND_PN, "Send Promissory Note to player");
 		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
-		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Game game = getActiveGame();
-		Player player = game.getPlayer(getUser().getId());
-		player = CommandHelper.getPlayerFromEvent(game, event);
+		Player player = CommandHelper.getPlayerFromEvent(game, event);
 		if (player == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
 			return;
@@ -79,7 +78,7 @@ public class SendPN extends PNCardsSubcommandData {
 			return;
 		}
 
-		Player targetPlayer = CommandHelper.getPlayerFromEvent(game, event);
+		Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
 		if (targetPlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "No such Player in game");
 			return;

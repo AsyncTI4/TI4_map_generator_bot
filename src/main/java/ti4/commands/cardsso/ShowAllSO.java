@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 public class ShowAllSO extends SOCardsSubcommandData {
     public ShowAllSO() {
         super(Constants.SHOW_ALL_SO, "Show all Secret Objectives to one player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -28,12 +28,12 @@ public class ShowAllSO extends SOCardsSubcommandData {
             return;
         }
 
-        Player player_ = CommandHelper.getPlayerFromEvent(game, event);
-        if (player_ == null) {
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
-        showAll(player, player_, game);
+        showAll(player, otherPlayer, game);
     }
 
     public void showAll(Player player, Player player_, Game game) {

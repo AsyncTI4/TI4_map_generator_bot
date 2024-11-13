@@ -19,7 +19,7 @@ public class ShowAC extends ACCardsSubcommandData {
     public ShowAC() {
         super(Constants.SHOW_AC, "Show an Action Card to one player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -57,18 +57,18 @@ public class ShowAC extends ACCardsSubcommandData {
             "---------\n";
         player.setActionCard(acID);
 
-        Player player_ = CommandHelper.getPlayerFromEvent(game, event);
-        if (player_ == null) {
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
-        User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
+        User user = AsyncTI4DiscordBot.jda.getUserById(otherPlayer.getUserID());
         if (user == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
 
         ACInfo.sendActionCardInfo(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, game, sb);
     }
 }

@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 public class SentACRandom extends ACCardsSubcommandData {
     public SentACRandom() {
         super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OTHER_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -35,18 +35,18 @@ public class SentACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        Player player_ = CommandHelper.getPlayerFromEvent(game, event);
-        if (player_ == null) {
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
 
-        User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
+        User user = AsyncTI4DiscordBot.jda.getUserById(otherPlayer.getUserID());
         if (user == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        sendRandomACPart2(event, game, player, player_);
+        sendRandomACPart2(event, game, player, otherPlayer);
     }
 
     public void sendRandomACPart2(GenericInteractionCreateEvent event, Game game, Player player, Player player_) {
