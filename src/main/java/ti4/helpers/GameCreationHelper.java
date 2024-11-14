@@ -478,21 +478,24 @@ public class GameCreationHelper {
 		if (guild == null)
 			return false;
 
+		int maxGamesPerCategory = Math.max(1, Math.min(25, GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+
 		// SPACE FOR 25 ROLES
 		int roleCount = guild.getRoles().size();
-		if (roleCount > 200) {
+		if (roleCount > (250 - maxGamesPerCategory)) {
 			BotLogger.log("`GameCreationHelper.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-				+ guild.getName() + "** currently has **" + roleCount + "** roles.");
+				+ guild.getName() + "** currently has **" + roleCount + "** roles and a new category requires space for " + maxGamesPerCategory + " roles.");
 			return false;
 		}
 
 		// SPACE FOR 50 CHANNELS
 		int channelCount = guild.getChannels().size();
 		int channelMax = 500;
-		int channelsCountRequiredForNewCategory = 1 + 2 * Math.max(1, Math.min(25, GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+		int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
 		if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
 			BotLogger.log("`GameCreationHelper.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-				+ guild.getName() + "** currently has " + channelCount + " channels.");
+				+ guild.getName() + "** currently has " + channelCount + " channels and a new category requires space for "
+				+ channelsCountRequiredForNewCategory + " new channels.");
 			return false;
 		}
 
