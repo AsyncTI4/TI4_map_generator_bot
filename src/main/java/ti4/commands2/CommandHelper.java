@@ -42,6 +42,10 @@ public class CommandHelper {
 
     @NotNull
     public static String getGameName(SlashCommandInteraction event) {
+        OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
+        if (gameNameOption != null) {
+            return gameNameOption.getAsString();
+        }
         // try to get game name from channel name
         var channel = event.getChannel();
         String gameName = getGameNameFromChannelName(channel.getName());
