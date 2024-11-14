@@ -131,7 +131,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return;
         }
 
-		// CHECK IF SERVER CAN SUPPORT A NEW GAME
+        // CHECK IF SERVER CAN SUPPORT A NEW GAME
         Guild guild = categoryChannel.getGuild();
         if (!serverCanHostNewGame(guild)) {
             MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
