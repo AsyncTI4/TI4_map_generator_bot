@@ -1531,7 +1531,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int checkNumberShips(Player player, Game game, Tile tile) {
+    public static int checkNumberShips(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnits().keySet()) {
@@ -2104,16 +2104,16 @@ public class ButtonHelper {
     }
 
     public static int checkNetGain(Player player, String ccs) {
-        int netgain;
+        int netGain;
         int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
         ccs = ccs.substring(ccs.indexOf("/") + 1);
         int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
         ccs = ccs.substring(ccs.indexOf("/") + 1);
         int oldStrat = Integer.parseInt(ccs);
 
-        netgain = (player.getTacticalCC() - oldTactic) + (player.getFleetCC() - oldFleet)
+        netGain = (player.getTacticalCC() - oldTactic) + (player.getFleetCC() - oldFleet)
             + (player.getStrategicCC() - oldStrat);
-        return netgain;
+        return netGain;
     }
 
     public static void resetCCs(Player player, String ccs) {

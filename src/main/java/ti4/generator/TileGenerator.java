@@ -72,11 +72,11 @@ public class TileGenerator {
     private final DisplayType displayType;
     private final boolean allEyesOnMe;
 
-    public TileGenerator(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
+    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, DisplayType displayType) {
         this(game, event, displayType, 0, "000");
     }
 
-    public TileGenerator(Game game, @Nullable GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, String focusTile) {
+    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile) {
         this.game = game;
         this.event = event;
         this.displayType = displayType;

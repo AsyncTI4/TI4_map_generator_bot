@@ -61,7 +61,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
 
     public static void secondHalfOfCelestialImpact(Player player, GenericInteractionCreateEvent event, Tile tile, Game game) {
         String message1 = "Moments before disaster in game " + game.getName();
-        StellarConverter.postTileInDisasterWatch(game, tile, 1, message1);
+        StellarConverter.postTileInDisasterWatch(game, event, tile, 1, message1);
 
         //Remove all other players ground force units from the tile in question
         for (Player player_ : game.getPlayers().values()) {
@@ -97,7 +97,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         String message2 = tile.getRepresentation() +
                 " has been celestially impacted by " +
                 player.getRepresentation();
-        StellarConverter.postTileInDisasterWatch(game, asteroidTile, 1, message2);
+        StellarConverter.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {
             Leader playerLeader = player.getLeader("zelianhero").orElse(null);
