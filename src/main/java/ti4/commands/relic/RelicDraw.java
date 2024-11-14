@@ -109,9 +109,6 @@ public class RelicDraw extends RelicSubcommandData {
         StringBuilder helpMessage = new StringBuilder();
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> helpMessage.append("Run the following commands to use Nanoforge:\n")
-                .append("     `/explore relic_purge relic: nanoforge`\n")
-                .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
 
