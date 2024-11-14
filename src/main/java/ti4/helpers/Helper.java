@@ -2187,7 +2187,7 @@ public class Helper {
     }
 
     public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
-        var players = game.getRealPlayerIDs();
+        var players = game.getPlayerIDs();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
             addPlayerPermissionsToGameChannel(guild, tableTalkChannel, players);
@@ -2263,11 +2263,11 @@ public class Helper {
     }
 
     private static void addGameRoleToMapPlayers(Guild guild, Role role, Game game) {
-        for (var player : game.getRealPlayers()) {
-            if (game.getRound() > 1) {
+        for (var playerId : game.getPlayerIDs()) {
+            if (game.getRound() > 1 && !game.getPlayer(playerId).isRealPlayer()) {
                 continue;
             }
-            Member member = guild.getMemberById(player.getUserID());
+            Member member = guild.getMemberById(playerId);
             if (member != null && !member.getRoles().contains(role)) guild.addRoleToMember(member, role).queue();
         }
     }
