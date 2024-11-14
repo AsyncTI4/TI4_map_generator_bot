@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Predicate;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -15,12 +14,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
-import ti4.message.BotLogger;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.message.MessageHelper;
 
 class ArchiveOldThreads extends Subcommand {
-
-    private final static Predicate<ThreadChannel> oldThreadsFilter = c -> c.getLatestMessageIdLong() != 0 && !c.isArchived();
 
     public ArchiveOldThreads() {
         super(Constants.ARCHIVE_OLD_THREADS, "Archive a number of the oldest active threads");
@@ -36,40 +33,14 @@ class ArchiveOldThreads extends Subcommand {
         MessageHelper.sendMessageToEventChannel(event, "Archiving " + threadCount + " threads");
         MessageHelper.sendMessageToEventChannel(event, getOldThreadsMessage(event.getGuild(), threadCount));
 
-        archiveOldThreads(event.getGuild(), threadCount);
-    }
-
-    public static void archiveOldThreads(Guild guild, Integer threadCount) {
-        // Try gathering all threads that are not bot-map or cards-info threads
-        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()
-            .filter(oldThreadsFilter)
-            .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates") && !threadChannel.getName().contains("cards-info"))
-            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-            .limit(threadCount)
-            .toList();
-
-        // If there are fewer channels in the list than requested to close, include cards-info threads
-        if (threadChannels.size() < (threadCount - 1)) {
-            threadChannels = guild.getThreadChannels().stream()
-                .filter(oldThreadsFilter)
-                .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates"))
-                .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                .limit(threadCount)
-                .toList();
-        }
-
-        for (ThreadChannel threadChannel : threadChannels) {
-            threadChannel.getManager()
-                .setArchived(true)
-                .queue(null, BotLogger::catchRestError);
-        }
+        ThreadArchiveHelper.archiveOldThreads(event.getGuild(), threadCount);
     }
 
     private static String getOldThreadsMessage(Guild guild, Integer channelCount) {
         StringBuilder sb;
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
-                .filter(oldThreadsFilter)
+                .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
                 .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
                 .limit(channelCount)
                 .toList();

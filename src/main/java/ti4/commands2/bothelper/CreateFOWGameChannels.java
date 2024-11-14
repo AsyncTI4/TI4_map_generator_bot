@@ -258,7 +258,7 @@ class CreateFOWGameChannels extends Subcommand {
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
         if (roleCount >= 250) {
-            BotLogger.log("`CreateGameChannels.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
+            BotLogger.log("`GameCreationHelper.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -269,7 +269,7 @@ class CreateFOWGameChannels extends Subcommand {
         int channelMax = 500;
         int channelsCountRequiredForNewGame = 2;
         if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.log("`CreateGameChannels.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
+            BotLogger.log("`GameCreationHelper.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;

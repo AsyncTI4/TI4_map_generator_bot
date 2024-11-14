@@ -23,11 +23,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.fow.Whisper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
@@ -54,7 +54,7 @@ public class MessageListener extends ListenerAdapter {
                 msg.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
             }
             //947310962485108816
-            Role lfgRole = CreateGameChannels.getRole("LFG", event.getGuild());
+            Role lfgRole = GameCreationHelper.getRole("LFG", event.getGuild());
             if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
                 String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + msg.getJumpUrl();
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
