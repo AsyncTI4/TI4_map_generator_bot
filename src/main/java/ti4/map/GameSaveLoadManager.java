@@ -907,7 +907,7 @@ public class GameSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
             writer.write(System.lineSeparator());
-            writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
+            writer.write(Constants.STASIS_INFANTRY + " " + player.getGenSynthesisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
