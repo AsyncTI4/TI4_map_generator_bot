@@ -152,7 +152,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().delete().queue();
     }
 
-    public static void autoMateGroundCombat(Player p1, Player p2, String planet, Game game, ButtonInteractionEvent event) {
+    public static void automateGroundCombat(Player p1, Player p2, String planet, Game game, ButtonInteractionEvent event) {
         boolean haveGroundForces = true;
         Tile tile = game.getTileFromPlanet(planet);
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
