@@ -23,11 +23,7 @@ public class FrankenApplicator {
     @ButtonHandler("frankenItemAdd")
     public static void resolveFrankenItemAddButton(ButtonInteractionEvent event, String buttonID, Player player) {
         String frankenItem = buttonID.replace("frankenItemAdd", "");
-        DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
-        if (draftItem == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot apply Franken Item: `" + frankenItem + "` does not exist.");
-            return;
-        }
+        DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
 
         applyFrankenItemToPlayer(event, draftItem, player);
         event.editButton(draftItem.getRemoveButton()).queue();
@@ -37,13 +33,13 @@ public class FrankenApplicator {
             if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
                 for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
-                    DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     applyFrankenItemToPlayer(event, item, player);
                 }
             }
             if (draftItem.Errata.OptionalSwaps != null) { // Offer Optional Swaps
                 for (DraftErrataModel i : draftItem.Errata.OptionalSwaps) {
-                    DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     Button button = item.getAddButton().withEmoji(Emoji.fromFormatted(item.getItemEmoji()));
                     String message = "You have the option to swap in the following item:\n" + item.getLongDescription();
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, List.of(button));
@@ -55,11 +51,7 @@ public class FrankenApplicator {
     @ButtonHandler("frankenItemRemove")
     public static void resolveFrankenItemRemoveButton(ButtonInteractionEvent event, String buttonID, Player player) {
         String frankenItem = buttonID.replace("frankenItemRemove", "");
-        DraftItem draftItem = DraftItem.GenerateFromAlias(frankenItem);
-        if (draftItem == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot apply Franken Item: `" + frankenItem + "` does not exist.");
-            return;
-        }
+        DraftItem draftItem = DraftItem.generateFromAlias(frankenItem);
 
         removeFrankenItemFromPlayer(event, draftItem, player);
         event.editButton(draftItem.getAddButton()).queue();
@@ -69,13 +61,13 @@ public class FrankenApplicator {
             if (draftItem.Errata.AdditionalComponents != null) { // Auto-add Additional Components
                 MessageHelper.sendMessageToEventChannel(event, "Some additional items were added:");
                 for (DraftErrataModel i : draftItem.Errata.AdditionalComponents) {
-                    DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     removeFrankenItemFromPlayer(event, item, player);
                 }
             }
             if (draftItem.Errata.OptionalSwaps != null) { // Offer Optional Swaps
                 for (DraftErrataModel i : draftItem.Errata.OptionalSwaps) {
-                    DraftItem item = DraftItem.Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = DraftItem.generate(i.ItemCategory, i.ItemId);
                     Button button = item.getAddButton().withEmoji(Emoji.fromFormatted(item.getItemEmoji()));
                     String message = "WARNING! The following items were optional and may or may not have been removed by pressing the parent button:\n" + item.getLongDescription();
                     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, List.of(button));

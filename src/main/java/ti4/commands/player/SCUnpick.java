@@ -123,9 +123,7 @@ public class SCUnpick extends PlayerSubcommandData {
             if (allPicked) {
                 ListTurnOrder.turnOrder(event, game);
             }
-            if (!msgExtra.isEmpty()) {
-                MessageHelper.sendMessageToEventChannel(event, msgExtra);
-            }
+            MessageHelper.sendMessageToEventChannel(event, msgExtra);
         }
     }
 }

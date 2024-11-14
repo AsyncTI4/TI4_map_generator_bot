@@ -84,7 +84,7 @@ public class FrankenEdit extends FrankenSubcommandData {
         if (editingBag != null) {
             if (command.contains("add")) {
                 if (card1 != null) {
-                    editingBag.Contents.add(DraftItem.GenerateFromAlias(card1.getAsString()));
+                    editingBag.Contents.add(DraftItem.generateFromAlias(card1.getAsString()));
                 }
             } else if (command.contains("remove")) {
                 if (card1 != null) {
@@ -93,7 +93,7 @@ public class FrankenEdit extends FrankenSubcommandData {
             } else if (command.contains("swap")) {
                 if (card1 != null && card2 != null) {
                     editingBag.Contents.removeIf((DraftItem item) -> Objects.equals(item.getAlias(), card1.getAsString()));
-                    editingBag.Contents.add(DraftItem.GenerateFromAlias(card2.getAsString()));
+                    editingBag.Contents.add(DraftItem.generateFromAlias(card2.getAsString()));
                 }
             }
 

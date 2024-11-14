@@ -16,7 +16,7 @@ class FixGameChannelPermissions extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
         var game = getGame();
-        if (guild != null && game != null) {
+        if (guild != null) {
             Helper.fixGameChannelPermissions(guild, game);
         }
         MessageHelper.sendMessageToEventChannel(event, "Channel Permissions Fixed");

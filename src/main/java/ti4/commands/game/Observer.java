@@ -60,7 +60,7 @@ public class Observer extends GameSubcommandData {
         if ("add".equals(addOrRemove)) {
             addObserver(event, member.getUser().getId(), tableTalk);
             addObserver(event, member.getUser().getId(), actionsChannel);
-        } else if ("remove".equals(addOrRemove)) {
+        } else {
             removeObserver(event, member.getUser().getId(), tableTalk);
             removeObserver(event, member.getUser().getId(), actionsChannel);
         }
@@ -73,7 +73,7 @@ public class Observer extends GameSubcommandData {
             if (channel.getName().contains(gameName)) {
                 if ("add".equals(addOrRemove)) {
                     addObserver(event, member.getUser().getId(), channel);
-                } else if ("remove".equals(addOrRemove)) {
+                } else {
                     removeObserver(event, member.getUser().getId(), channel);
                 }
             }
