@@ -323,6 +323,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return "Combat: " + getCombatHitsOn() + "\n";
         } else if (getCombatDieCount() > 1) {
             return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
+        } else if ("winnu_flagship".equals(getId())) {
+            return "Combat: " + getCombatHitsOn() + " (x # of opponent's non-fighter ships)\n";
         }
         return "";
     }
