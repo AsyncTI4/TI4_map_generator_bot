@@ -13,10 +13,6 @@ public abstract class PNCardsSubcommandData extends SubcommandData {
     private Game game;
     private User user;
 
-    public String getActionID() {
-        return getName();
-    }
-
     public PNCardsSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }

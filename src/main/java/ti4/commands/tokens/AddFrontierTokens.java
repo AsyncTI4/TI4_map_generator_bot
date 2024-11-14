@@ -26,7 +26,7 @@ import ti4.message.MessageHelper;
 public class AddFrontierTokens implements Command {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.ADD_FRONTIER_TOKENS;
     }
 
@@ -67,10 +67,10 @@ public class AddFrontierTokens implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Add Frontier tokens to all possible tiles")
+            Commands.slash(getName(), "Add Frontier tokens to all possible tiles")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                     .setRequired(true))
 

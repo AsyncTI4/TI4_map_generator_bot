@@ -19,13 +19,13 @@ import ti4.message.MessageHelper;
 public class ModifyUnits implements Command {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.MODIFY_UNITS;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+        return event.getName().equals(getName());
     }
 
     @Override
@@ -54,8 +54,8 @@ public class ModifyUnits implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), "Present the Modify Units menu"));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), "Present the Modify Units menu"));
     }
 
 }

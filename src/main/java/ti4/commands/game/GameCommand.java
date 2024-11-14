@@ -24,7 +24,7 @@ public class GameCommand implements Command {
     private final Collection<GameSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.GAME;
     }
 
@@ -105,9 +105,9 @@ public class GameCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

@@ -20,13 +20,13 @@ public class TechCommand implements Command {
     private final Collection<TechSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.TECH;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
+        if (event.getName().equals(getName())) {
             String userID = event.getUser().getId();
             if (!GameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
@@ -88,9 +88,9 @@ public class TechCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 

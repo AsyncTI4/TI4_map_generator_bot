@@ -17,13 +17,13 @@ public class DeveloperCommand implements Command {
     private final Collection<DeveloperSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.DEVELOPER;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getActionID(), event, AsyncTI4DiscordBot.developerRoles);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getName(), event, AsyncTI4DiscordBot.developerRoles);
     }
 
     @Override
@@ -50,9 +50,9 @@ public class DeveloperCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

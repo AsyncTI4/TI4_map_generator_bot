@@ -13,7 +13,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public interface InfoThreadCommand {
-    String getActionID();
+    String getName();
 
     default boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
         if (event.getName().equals(actionID)) {

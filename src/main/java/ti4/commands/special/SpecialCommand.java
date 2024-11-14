@@ -20,13 +20,13 @@ public class SpecialCommand implements Command {
     private final Collection<SpecialSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.SPECIAL;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getName(), event);
     }
 
     @Override
@@ -92,9 +92,9 @@ public class SpecialCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

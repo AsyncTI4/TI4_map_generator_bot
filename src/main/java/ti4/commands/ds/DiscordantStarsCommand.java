@@ -19,13 +19,13 @@ public class DiscordantStarsCommand implements Command {
     private final Collection<DiscordantStarsSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.DS_COMMAND;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getName(), event);
     }
 
     @Override
@@ -78,9 +78,9 @@ public class DiscordantStarsCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

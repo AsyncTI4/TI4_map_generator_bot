@@ -364,10 +364,10 @@ abstract public class AddRemoveUnits implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                     .setRequired(true).setAutoComplete(true))
                 .addOptions(

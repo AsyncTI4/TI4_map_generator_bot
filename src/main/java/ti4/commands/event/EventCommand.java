@@ -20,13 +20,13 @@ public class EventCommand implements Command {
     private final Collection<EventSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.EVENT;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getName(), event);
     }
 
     @Override
@@ -78,9 +78,9 @@ public class EventCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

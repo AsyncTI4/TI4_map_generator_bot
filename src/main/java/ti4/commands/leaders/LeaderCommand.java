@@ -19,13 +19,13 @@ public class LeaderCommand implements Command {
     private final Collection<LeaderSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.LEADERS;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getName(), event);
     }
 
     @Override
@@ -73,9 +73,9 @@ public class LeaderCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

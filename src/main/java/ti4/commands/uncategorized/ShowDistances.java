@@ -14,7 +14,6 @@ import ti4.generator.MapRenderPipeline;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -24,13 +23,13 @@ import ti4.message.MessageHelper;
 public class ShowDistances implements Command {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.SHOW_DISTANCES;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getActionID())) {
+        if (!event.getName().equals(getName())) {
             return false;
         }
 
@@ -81,10 +80,10 @@ public class ShowDistances implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Shows map with distances to each tile from specified tile")
+            Commands.slash(getName(), "Shows map with distances to each tile from specified tile")
                 .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.MAX_DISTANCE, "Max distance to check")));
     }

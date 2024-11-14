@@ -19,13 +19,13 @@ public class MiltyCommand implements Command {
     private final Collection<MiltySubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.MILTY;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getName(), event);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MiltyCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

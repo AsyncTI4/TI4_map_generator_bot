@@ -20,13 +20,13 @@ public class ACCardsCommand implements Command {
     private final Collection<ACCardsSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CARDS_AC;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfIsAdminOrIsPartOfGame(getName(), event);
     }
 
     @Override
@@ -79,9 +79,9 @@ public class ACCardsCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

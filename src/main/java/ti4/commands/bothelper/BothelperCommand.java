@@ -17,13 +17,13 @@ public class BothelperCommand implements Command {
     private final Collection<BothelperSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.BOTHELPER;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getActionID(), event, AsyncTI4DiscordBot.bothelperRoles);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getName(), event, AsyncTI4DiscordBot.bothelperRoles);
     }
 
     @Override
@@ -69,9 +69,9 @@ public class BothelperCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

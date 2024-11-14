@@ -16,10 +16,6 @@ public abstract class ACCardsSubcommandData extends SubcommandData {
     private Game game;
     private User user;
 
-    public String getActionID() {
-        return getName();
-    }
-
     public ACCardsSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }

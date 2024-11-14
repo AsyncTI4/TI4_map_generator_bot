@@ -26,7 +26,7 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.PLANET_INFO;
     }
 
@@ -35,7 +35,7 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+        return acceptEvent(event, this.getName());
     }
 
     @Override

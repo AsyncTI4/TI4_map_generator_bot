@@ -55,6 +55,7 @@ public class SentACRandom extends ACCardsSubcommandData {
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
         if (actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Action Cards in hand");
+            return;
         }
         Collections.shuffle(actionCards);
         String acID = actionCards.getFirst();

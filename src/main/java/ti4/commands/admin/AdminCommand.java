@@ -17,13 +17,13 @@ public class AdminCommand implements Command {
     private final Collection<AdminSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.ADMIN;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getActionID(), event, AsyncTI4DiscordBot.adminRoles);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfHasRole(getName(), event, AsyncTI4DiscordBot.adminRoles);
     }
 
     @Override
@@ -56,9 +56,9 @@ public class AdminCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

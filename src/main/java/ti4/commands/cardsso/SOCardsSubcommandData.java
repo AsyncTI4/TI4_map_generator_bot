@@ -15,10 +15,6 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
     private Game game;
     private User user;
 
-    public String getActionID() {
-        return getName();
-    }
-
     public SOCardsSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }

@@ -15,10 +15,6 @@ abstract class RelicSubcommandData extends SubcommandData {
     private User user;
     protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
 
-    public String getActionID() {
-        return getName();
-    }
-
     public RelicSubcommandData(String name, String description) {
         super(name, description);
     }

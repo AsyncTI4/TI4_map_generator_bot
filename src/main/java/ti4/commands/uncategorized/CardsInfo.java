@@ -32,12 +32,12 @@ import ti4.message.MessageHelper;
 public class CardsInfo implements Command, InfoThreadCommand {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CARDS_INFO;
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+        return acceptEvent(event, getName());
     }
 
     @Override
@@ -318,10 +318,10 @@ public class CardsInfo implements Command, InfoThreadCommand {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false)));
     }
 

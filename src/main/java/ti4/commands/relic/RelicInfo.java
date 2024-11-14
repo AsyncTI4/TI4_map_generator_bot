@@ -25,7 +25,7 @@ public class RelicInfo extends RelicSubcommandData implements InfoThreadCommand 
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+        return acceptEvent(event, getName());
     }
 
     @Override

@@ -9,7 +9,7 @@ import ti4.selections.selectmenus.BigSelectDemo;
 public class SelectionBoxDemo implements Command {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return "select_demo";
     }
 
@@ -19,9 +19,9 @@ public class SelectionBoxDemo implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
 
         commands.addCommands(
-            Commands.slash(getActionID(), "Show selection box demo"));
+            Commands.slash(getName(), "Show selection box demo"));
     }
 }

@@ -97,18 +97,16 @@ public class SlashCommandListener extends ListenerAdapter {
             }, BotLogger::catchRestError);
         }
 
-        CommandManager commandManager = CommandManager.getInstance();
-        for (Command command : commandManager.getCommandList()) {
-            if (command.accept(event)) {
-                try {
-                    command.execute(event);
-                    command.postExecute(event);
-                } catch (Exception e) {
-                    String messageText = "Error trying to execute command: " + command.getActionID();
-                    String errorMessage = ExceptionUtils.getMessage(e);
-                    event.getHook().editOriginal(errorMessage).queue();
-                    BotLogger.log(event, messageText, e);
-                }
+        Command command = CommandManager.getCommand(event.getName());
+        if (command.accept(event)) {
+            try {
+                command.execute(event);
+                command.postExecute(event);
+            } catch (Exception e) {
+                String messageText = "Error trying to execute command: " + command.getName();
+                String errorMessage = ExceptionUtils.getMessage(e);
+                event.getHook().editOriginal(errorMessage).queue();
+                BotLogger.log(event, messageText, e);
             }
         }
         long endTime = System.currentTimeMillis();
