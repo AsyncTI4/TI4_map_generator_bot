@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import ti4.helpers.GameCreationHelper;
 import ti4.testUtils.BaseTi4Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class CreateGameChannelsTest extends BaseTi4Test {
     @Test
     public void testGetCategoryNameForGame() {

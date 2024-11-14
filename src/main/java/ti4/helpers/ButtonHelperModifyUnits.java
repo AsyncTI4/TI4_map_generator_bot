@@ -158,8 +158,8 @@ public class ButtonHelperModifyUnits {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int count = 0;
         while (haveGroundForces) {
-            int hitP1 = new CombatRoll().secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
-            int hitP2 = new CombatRoll().secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
+			int hitP1 = CombatRoll.secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
+			int hitP2 = CombatRoll.secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
 
             if (p1.hasTech("vpw") && hitP2 > 0) {
                 hitP1++;
@@ -1390,10 +1390,10 @@ public class ButtonHelperModifyUnits {
                     new AddUnits().unitParsing(event, player.getColor(), game.getTileByPosition(planetName), unitID, game);
                     successMessage = "Produced a " + Emojis.getEmojiFromDiscord(unitLong) + " in tile " + game.getTileByPosition(AliasHandler.resolveTile(planetName)).getRepresentationForButtons(game, player) + ".";
                     if (player.hasAbility("cloaked_fleets")) {
-                        List<Button> shroadedFleets = new ArrayList<>();
-                        shroadedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnit(unitID).getName()));
-                        shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "You may use your cloaked fleets ability to capture this produced ship.", shroadedFleets);
+                        List<Button> cloakedFleets = new ArrayList<>();
+                        cloakedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnit(unitID).getName()));
+                        cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "You may use your cloaked fleets ability to capture this produced ship.", cloakedFleets);
                     }
                 }
 
