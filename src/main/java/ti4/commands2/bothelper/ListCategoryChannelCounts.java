@@ -1,4 +1,4 @@
-package ti4.commands.bothelper;
+package ti4.commands2.bothelper;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -6,10 +6,12 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ListCategoryChannelCounts extends BothelperSubcommandData {
+class ListCategoryChannelCounts extends Subcommand {
+
     public ListCategoryChannelCounts(){
         super(Constants.CATEGORY_CHANNEL_COUNT, "List all categories and their channel counts.");
     }

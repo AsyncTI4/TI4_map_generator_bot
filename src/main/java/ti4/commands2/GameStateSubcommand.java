@@ -26,6 +26,7 @@ public abstract class GameStateSubcommand extends Subcommand {
         commandGameStateHelper.postExecute(event);
     }
 
+    @NotNull
     protected Game getGame() {
         return commandGameStateHelper.getGame();
     }

@@ -94,7 +94,7 @@ public class Buttons {
         }
         if (e == null && (label == null || label.isBlank())) {
             // BotLogger.log("Button sanitized: " + id);
-            return Button.of(style, id, " ", e);
+            return Button.of(style, id, " ", null);
         }
         return Button.of(style, id, label, e);
     }
@@ -102,8 +102,7 @@ public class Buttons {
     private static Emoji getEmoji(String emoji) {
         if (StringUtils.isBlank(emoji)) return null; // no need to error on null/blank
         try {
-            Emoji output = Emoji.fromFormatted(emoji);
-            return output;
+            return Emoji.fromFormatted(emoji);
         } catch (Exception e) {
             BotLogger.log("Failed to load emoji [" + emoji + "]", e);
         }

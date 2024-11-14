@@ -83,9 +83,8 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        List<SettingInterface> implemented = new ArrayList<>();
         // implemented.add(draftMode);
-        return implemented;
+        return new ArrayList<>();
     }
 
     @Override
@@ -137,7 +136,6 @@ public class MiltySettings extends SettingsMenu {
     }
 
     protected String startMilty(GenericInteractionCreateEvent event) {
-        String errorMessage = StartMilty.startFromSettings(event, this);
-        return errorMessage;
+        return StartMilty.startFromSettings(event, this);
     }
 }

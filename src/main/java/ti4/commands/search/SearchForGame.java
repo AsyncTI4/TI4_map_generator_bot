@@ -18,7 +18,7 @@ public class SearchForGame extends SearchSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = null;
+        Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();

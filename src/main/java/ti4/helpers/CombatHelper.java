@@ -614,7 +614,7 @@ public class CombatHelper {
         }
         ButtonHelper.deleteTheOneButton(event);
         if (opponent == null || opponent.isDummy() || confirmed.equalsIgnoreCase("confirmed")) {
-            ButtonHelperModifyUnits.autoMateGroundCombat(p1, p2, planet, game, event);
+            ButtonHelperModifyUnits.automateGroundCombat(p1, p2, planet, game, event);
         } else if (p1 != null && p2 != null) {
             Button automate = Buttons.green(opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_"
                 + p1.getFaction() + "_" + p2.getFaction() + "_" + planet + "_confirmed", "Automate Combat");

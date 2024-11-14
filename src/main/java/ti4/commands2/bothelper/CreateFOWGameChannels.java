@@ -1,11 +1,9 @@
-package ti4.commands.bothelper;
+package ti4.commands2.bothelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,7 +18,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -29,7 +29,8 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-public class CreateFOWGameChannels extends BothelperSubcommandData {
+class CreateFOWGameChannels extends Subcommand {
+
     public CreateFOWGameChannels() {
         super(Constants.CREATE_FOW_GAME_CHANNELS, "Create Role and Game Channels for a New FOW Game");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName").setRequired(true));
@@ -45,14 +46,12 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Guild guild;
-
         //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         String gameName;
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
-            if (gameOrRoleAlreadyExists(gameName)) {
+            if (GameCreationHelper.gameOrRoleAlreadyExists(gameName)) {
                 MessageHelper.sendMessageToEventChannel(event, "Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
                 return;
             }
@@ -61,10 +60,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         //CHECK IF GIVEN CATEGORY IS VALID
-
-        guild = event.getGuild();
-        //CHECK IF CATEGORY EXISTS
-
+        Guild guild = event.getGuild();
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(event, "Guild was null");
             return;
@@ -194,27 +190,6 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         return "fow" + nextPBDNumber;
     }
 
-    private static boolean gameOrRoleAlreadyExists(String name) {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
-        List<String> gameAndRoleNames = new ArrayList<>();
-
-        // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            //EXISTING ROLE NAMES
-            for (Role role : guild.getRoles()) {
-                gameAndRoleNames.add(role.getName());
-            }
-        }
-
-        // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getGameNameToGame().keySet());
-        gameAndRoleNames.addAll(mapNames);
-
-        //CHECK
-        // TODO: what about game and role names list?
-        return mapNames.contains(name);
-    }
-
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
@@ -236,11 +211,11 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getGameNameToGame().keySet().stream()
-            .filter(mapName -> mapName.startsWith("fow"))
+        List<String> gameNames = GameManager.getGameNames().stream()
+            .filter(gameName -> gameName.startsWith("fow"))
             .toList();
-        for (String mapName : mapNames) {
-            String pbdNum = mapName.replace("fow", "");
+        for (String gameName : gameNames) {
+            String pbdNum = gameName.replace("fow", "");
             if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
@@ -256,7 +231,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
         if (roleCount >= 250) {
-            BotLogger.log("`CreateGameChannels.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
+            BotLogger.log("`GameCreationHelper.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
         return true;
@@ -267,15 +242,9 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         int channelMax = 500;
         int channelsCountRequiredForNewGame = 2;
         if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.log("`CreateGameChannels.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
+            BotLogger.log("`GameCreationHelper.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
         return true;
-    }
-
-    public static List<Category> getAllAvailablePBDCategories() {
-        return AsyncTI4DiscordBot.jda.getCategories().stream()
-            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
-            .toList();
     }
 }

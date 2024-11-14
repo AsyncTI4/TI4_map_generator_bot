@@ -68,7 +68,7 @@ public class AbilityDraftItem extends DraftItem {
                 if (Arrays.asList(results).contains(ability)) {
                     continue;
                 }
-                allItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(DraftItem.generate(DraftItem.Category.ABILITY, ability));
             }
         }
         return allItems;
@@ -78,7 +78,7 @@ public class AbilityDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String ability : faction.getAbilities()) {
-                allItems.add(DraftItem.Generate(DraftItem.Category.ABILITY, ability));
+                allItems.add(DraftItem.generate(DraftItem.Category.ABILITY, ability));
             }
         }
         return allItems;

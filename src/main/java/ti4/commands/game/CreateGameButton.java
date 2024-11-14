@@ -18,9 +18,9 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.search.SearchMyGames;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -43,12 +43,12 @@ public class CreateGameButton extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
-        String gameName = CreateGameChannels.getNextGameName();
+        String gameName = GameCreationHelper.getNextGameName();
 
         // CHECK IF GIVEN CATEGORY IS VALID
-        String categoryChannelName = CreateGameChannels.getCategoryNameForGame(gameName);
+        String categoryChannelName = GameCreationHelper.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
-        List<Category> categories = CreateGameChannels.getAllAvailablePBDCategories();
+        List<Category> categories = GameCreationHelper.getAllAvailablePBDCategories();
         for (Category category : categories) {
             if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
                 categoryChannel = category;
@@ -56,7 +56,7 @@ public class CreateGameButton extends GameSubcommandData {
             }
         }
         if (categoryChannel == null)
-            categoryChannel = CreateGameChannels.createNewCategory(categoryChannelName);
+            categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
 
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
@@ -84,7 +84,7 @@ public class CreateGameButton extends GameSubcommandData {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        CreateGameChannels.inviteUsersToServer(guild, members, event.getMessageChannel());
+        GameCreationHelper.inviteUsersToServer(guild, members, event.getMessageChannel());
 
         StringBuilder buttonMsg = new StringBuilder();
         List<Button> buttons = new ArrayList<>();
@@ -136,8 +136,8 @@ public class CreateGameButton extends GameSubcommandData {
 
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
-        String gameName = CreateGameChannels.getNextGameName();
-        String lastGame = CreateGameChannels.getLastGameName();
+        String gameName = GameCreationHelper.getNextGameName();
+        String lastGame = GameCreationHelper.getLastGameName();
         Game game = GameManager.getGame(lastGame);
         if (game != null) {
             if (game.getCustomName().equalsIgnoreCase(gameSillyName)) {
@@ -163,9 +163,9 @@ public class CreateGameButton extends GameSubcommandData {
         }
 
         // CHECK IF GIVEN CATEGORY IS VALID
-        String categoryChannelName = CreateGameChannels.getCategoryNameForGame(gameName);
+        String categoryChannelName = GameCreationHelper.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
-        List<Category> categories = CreateGameChannels.getAllAvailablePBDCategories();
+        List<Category> categories = GameCreationHelper.getAllAvailablePBDCategories();
         for (Category category : categories) {
             if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
                 categoryChannel = category;
@@ -173,8 +173,8 @@ public class CreateGameButton extends GameSubcommandData {
             }
         }
         if (categoryChannel == null)
-            categoryChannel = CreateGameChannels.createNewCategory(categoryChannelName);
+            categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
         event.getMessage().delete().queue();
-        CreateGameChannels.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+        GameCreationHelper.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
     }
 }

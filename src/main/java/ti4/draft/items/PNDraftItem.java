@@ -51,7 +51,7 @@ public class PNDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String pnID : faction.getPromissoryNotes()) {
-                allItems.add(DraftItem.Generate(Category.PN, pnID));
+                allItems.add(DraftItem.generate(Category.PN, pnID));
             }
         }
         return allItems;

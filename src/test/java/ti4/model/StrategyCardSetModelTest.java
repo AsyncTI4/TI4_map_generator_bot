@@ -1,11 +1,10 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
-
 import ti4.generator.Mapper;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StrategyCardSetModelTest extends BaseTi4Test {
     @Test
@@ -30,7 +29,6 @@ public class StrategyCardSetModelTest extends BaseTi4Test {
             .map(StrategyCardModel::getInitiative)
             .distinct()
             .count() == scSetModel.getScIDs().stream()
-                .map(Mapper::getStrategyCard)
                 .count();
     }
 }

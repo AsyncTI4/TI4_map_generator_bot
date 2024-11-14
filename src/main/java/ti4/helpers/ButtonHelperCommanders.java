@@ -159,7 +159,7 @@ public class ButtonHelperCommanders {
             for (String tech : p2.getTechs()) {
                 if (!player.getTechs().contains(tech) && !techsSummed.contains(tech)) {
                     TechnologyModel model = Mapper.getTech(tech);
-                    if (model.getFaction().isPresent() || !model.getFaction().isEmpty() || !model.getRequirements().isPresent() || model.getRequirements().isEmpty()) {
+                    if (model.getFaction().isPresent() || model.getFaction().isPresent() || model.getRequirements().isEmpty() || model.getRequirements().isEmpty()) {
                         continue;
                     }
                     techsSummed.add(tech);

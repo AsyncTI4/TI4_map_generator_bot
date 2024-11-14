@@ -65,7 +65,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use /map add_tile to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
-        if (ids.size() == 1) {
+        if (ids.size() == 1) { //TODO this is never true, ids isn't updated...
             if (game.isDiscordantStarsMode()) {
                 ButtonHelper.starChartStep1(game, player, ids.getFirst());
             } else {

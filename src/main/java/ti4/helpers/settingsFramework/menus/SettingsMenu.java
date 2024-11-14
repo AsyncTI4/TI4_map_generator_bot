@@ -48,10 +48,10 @@ public abstract class SettingsMenu {
     protected static final String menuNav = "jmfN";
     protected static final String menuAction = "jmfA";
 
-    protected String menuId = null;
-    protected String menuName = null;
+    protected String menuId;
+    protected String menuName;
     protected List<String> description = new ArrayList<>();
-    protected SettingsMenu parent = null;
+    protected SettingsMenu parent;
     private String messageID = null;
 
     protected SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
@@ -416,8 +416,7 @@ public abstract class SettingsMenu {
     public String json() {
         ObjectMapper mapper = ObjectMapperFactory.build();
         try {
-            String val = mapper.writeValueAsString(this);
-            return val;
+            return mapper.writeValueAsString(this);
         } catch (Exception e) {
             BotLogger.log("Error mapping to json:", e);
         }

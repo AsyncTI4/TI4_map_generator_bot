@@ -172,9 +172,8 @@ public class CombatModHelper {
             }
         }
         Set<NamedCombatModifierModel> set = new HashSet<>(modifiers);
-        List<NamedCombatModifierModel> uniqueList = new ArrayList<>(set);
 
-        return uniqueList;
+        return new ArrayList<>(set);
     }
 
     public static Integer GetCombinedModifierForUnit(UnitModel unit, Integer numOfUnit,

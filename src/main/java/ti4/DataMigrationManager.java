@@ -690,7 +690,7 @@ public class DataMigrationManager {
         for (int i = 0; i < bag.Contents.size(); i++) {
             DraftItem item = bag.Contents.get(i);
             if ("keleres".equals(item.ItemId)) {
-                var newItem = DraftItem.Generate(item.ItemCategory, "keleresa");
+                var newItem = DraftItem.generate(item.ItemCategory, "keleresa");
                 swapBagItem(bag, i, newItem);
                 item = newItem;
             }
@@ -699,41 +699,41 @@ public class DataMigrationManager {
                     var faction = Mapper.getFaction(item.ItemId);
                     var units = faction.getUnits();
                     units.removeIf((String unit) -> !"mech".equals(Mapper.getUnit(unit).getBaseType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.MECH, units.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.MECH, units.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.FLAGSHIP) {
                 if (Mapper.getUnit(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     var units = faction.getUnits();
                     units.removeIf((String unit) -> !"flagship".equals(Mapper.getUnit(unit).getBaseType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.FLAGSHIP, units.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.FLAGSHIP, units.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.AGENT) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"agent".equals(Mapper.getLeader(leader).getType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.AGENT, agents.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.AGENT, agents.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.COMMANDER) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"commander".equals(Mapper.getLeader(leader).getType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.COMMANDER, agents.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.COMMANDER, agents.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.HERO) {
                 if (Mapper.getLeader(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> agents = faction.getLeaders();
                     agents.removeIf((String leader) -> !"hero".equals(Mapper.getLeader(leader).getType()));
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.HERO, agents.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.HERO, agents.getFirst()));
                 }
             } else if (item.ItemCategory == DraftItem.Category.PN) {
                 if (Mapper.getPromissoryNote(item.ItemId) == null) {
                     var faction = Mapper.getFaction(item.ItemId);
                     List<String> pns = faction.getPromissoryNotes();
-                    swapBagItem(bag, i, DraftItem.Generate(DraftItem.Category.PN, pns.getFirst()));
+                    swapBagItem(bag, i, DraftItem.generate(DraftItem.Category.PN, pns.getFirst()));
                 }
             }
         }
