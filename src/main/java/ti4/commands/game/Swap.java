@@ -95,39 +95,16 @@ public class Swap extends GameSubcommandData {
                 player.setDummy(false);
                 swapperPlayer.setDummy(true);
             }
-            // LinkedHashSet<Integer> holder = new LinkedHashSet<>(player.getSCs());
-            // player.setSCs(new LinkedHashSet<>(swapperPlayer.getSCs()));
-            // swapperPlayer.setSCs(holder);
             swapperPlayer.setUserName(removedPlayer.getUserName());
             swapperPlayer.setUserID(removedPlayer.getUserID());
             player.setUserName(addedUser.getName());
             player.setUserID(addedUser.getId());
-
-            if (game.getActivePlayerID() != null && game.getActivePlayerID().equalsIgnoreCase(player.getUserID())) {
-                // if (!game.isFoWMode()) {
-                //     try {
-                //         if (game.getLatestTransactionMsg() != null && !"".equals(game.getLatestTransactionMsg())) {
-                //             game.getMainGameChannel().deleteMessageById(game.getLatestTransactionMsg()).queue();
-                //             game.setLatestTransactionMsg("");
-                //         }
-                //     } catch (Exception e) {
-                //         //  Block of code to handle errors
-                //     }
-                // }
-                // String text = "# " + player.getRepresentationUnfogged() + " UP NEXT";
-                // String buttonText = "Use buttons to do your turn. ";
-                // List<Button> buttons = TurnStart.getStartOfTurnButtons(player, game, true, event);
-                // MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);
-                // MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), buttonText, buttons);
-            }
         } else {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
             return;
         }
         GameSaveLoadManager.saveGame(game, event);
         GameSaveLoadManager.reload(game.getName());
-        // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
-        // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
         message.append("> **After:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
     }
