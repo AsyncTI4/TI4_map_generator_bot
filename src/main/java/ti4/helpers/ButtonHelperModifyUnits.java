@@ -167,8 +167,8 @@ public class ButtonHelperModifyUnits {
             if (p2.hasTech("vpw") && hitP1 > 0) {
                 hitP2++;
             }
-            int p1SardakkMechHits = 0;
-            int p2SardakkMechHits = 0;
+            int p1SardakkMechHits;
+            int p2SardakkMechHits;
             if (p1.getPlanets().contains(planet)) {
                 p2SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p2, game, planet, hitP1, event);
                 p1SardakkMechHits = ButtonHelperModifyUnits.autoAssignGroundCombatHits(p1, game, planet, hitP2, event);

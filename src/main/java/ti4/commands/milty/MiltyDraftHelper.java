@@ -40,12 +40,7 @@ public class MiltyDraftHelper {
     public static void generateAndPostSlices(Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
         FileUpload fileUpload = generateImage(game);
-
-        if (fileUpload == null) {
-            MessageHelper.sendMessageToChannel(mainGameChannel, "There was an error building the slices image.");
-        } else {
-            MessageHelper.sendFileUploadToChannel(mainGameChannel, fileUpload);
-        }
+        MessageHelper.sendFileUploadToChannel(mainGameChannel, fileUpload);
     }
 
     private static FileUpload generateImage(Game game) {
@@ -314,9 +309,7 @@ public class MiltyDraftHelper {
     private static boolean isInvalid(TileModel tileModel) {
         if (tileModel.getTileBackOption().isPresent()) {
             String back = tileModel.getTileBackOption().orElse("");
-            if (back.equals("red") || back.equals("blue")) {
-                //good
-            } else {
+            if (!back.equals("red") && !back.equals("blue")) {
                 return true;
             }
         }
