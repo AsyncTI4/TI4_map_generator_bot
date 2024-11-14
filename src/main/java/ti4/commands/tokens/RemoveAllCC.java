@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 
 public class RemoveAllCC implements Command {
 
-    void parsingForTile(SlashCommandInteractionEvent event, Game game) {
+    void parsingForTile(Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
         for (Tile tile : tileList) {
             tile.removeAllCC();
@@ -36,7 +36,7 @@ public class RemoveAllCC implements Command {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
             Game game = GameManager.getUserActiveGame(userID);
-            parsingForTile(event, game);
+            parsingForTile(game);
             GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);
         }
