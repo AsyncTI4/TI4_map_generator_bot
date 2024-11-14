@@ -54,6 +54,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 
 public class MessageHelper {
+
 	public interface MessageFunction {
 		void run(Message msg);
 	}

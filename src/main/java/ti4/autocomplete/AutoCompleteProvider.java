@@ -70,9 +70,9 @@ public class AutoCompleteProvider {
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
 
-        String userID = event.getUser().getId();
-        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
-        Game game = GameManager.getUserActiveGame(userID);
+        String userId = event.getUser().getId();
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userId, event.getName(), event.getSubcommandName());
+        Game game = GameManager.getUserActiveGame(userId);
         Player player = null;
         if (game != null) {
             player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
@@ -421,7 +421,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getDecals().stream()
                     .filter(value -> value.contains(enteredValue) || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
-                    .filter(decalID -> ChangeUnitDecal.userMayUseDecal(userID, decalID))
+                    .filter(decalID -> ChangeUnitDecal.userMayUseDecal(userId, decalID))
                     .limit(25)
                     .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
                     .collect(Collectors.toList());
