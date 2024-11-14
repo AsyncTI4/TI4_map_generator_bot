@@ -2488,8 +2488,11 @@ public class ButtonHelper {
         return checkForTechSkips(game, planetName);
     }
 
-    public static boolean isPlanetLegendaryOrHome(String planetName, Game game, boolean onlyIncludeYourHome,
-        Player p1) {
+    public static boolean isPlanetLegendaryOrHome(String planetName, Game game, boolean onlyIncludeYourHome, Player p1) {
+        PlanetModel planetModel = Mapper.getPlanet(planetName);
+        if (planetModel != null && planetModel.isLegendary()) {
+            return true;
+        }
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
         Planet planetHolder = (Planet) unitHolder;
         Tile tile = game.getTileFromPlanet(planetName);
@@ -6444,24 +6447,6 @@ public class ButtonHelper {
         } else {
             MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), message, buttons);
         }
-    }
-
-    public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanetsAllianceMode()) {
-            Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = unitHolder;
-            if (planetReal == null)
-                continue;
-
-            boolean legendaryOrHome = isPlanetLegendaryOrHome(planet, game, false, null);
-            if (!legendaryOrHome) {
-                buttons.add(Buttons.green("nanoforgePlanet_" + planet,
-                    Helper.getPlanetRepresentation(planet, game)));
-            }
-        }
-        String message = "Use buttons to select which planet to nanoforge";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
     public static void offerCodexButtons(Player player, Game game, GenericInteractionCreateEvent event) {
