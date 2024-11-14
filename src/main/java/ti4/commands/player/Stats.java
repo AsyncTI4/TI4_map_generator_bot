@@ -262,7 +262,7 @@ public class Stats extends PlayerSubcommandData {
 
     public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
         if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
-            MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
+            MessageHelper.sendMessageToEventChannel(event, "# " + player.getRepresentation() + "**Warning:** Total Commodities count seems like a wrong value:");
         }
         player.setCommoditiesTotal(commoditiesTotalCount);
         String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;

@@ -385,7 +385,7 @@ public class ButtonHelperAgents {
             message = player.getRepresentationUnfogged() + " increased your commodities by two";
             ButtonHelperStats.gainComms(event, game, player, 2, false, true);
         } else {
-            message = "Refreshed " + player.getFactionEmojiOrColor() + "'s commodities";
+            message = player.getFactionEmojiOrColor() + " refreshed " + p2.getFactionEmojiOrColor() + "'s commodities";
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " your commodities were refreshed by " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Carth of Golden Sands, the Hacan" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             ButtonHelperStats.replenishComms(event, game, p2, true);
