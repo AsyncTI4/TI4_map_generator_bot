@@ -57,12 +57,10 @@ abstract public class AddRemoveToken implements Command {
                 }
             }
         } else {
-            Player player = CommandHelper.getOtherPlayerFromEvent(game, event);
-            if (player == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-                return;
+            Player player = CommandHelper.getPlayerFromEvent(game, event);
+            if (player != null) {
+                colors.add(player.getColor());
             }
-            colors.add(player.getColor());
         }
 
         List<Tile> tiles = new ArrayList<>();
