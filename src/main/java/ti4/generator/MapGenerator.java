@@ -2758,42 +2758,65 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private int drawCardDecks(int x, int y) {
-        if (!game.isFowMode()) {
-            int cardWidth = 60;
-            int cardHeight = 90;
-            int horSpacing = cardWidth + 15;
-            int textY = y + cardHeight - 10;
-            Stroke outline = stroke2;
+        if (game.isFowMode()) return x;
 
-            graphics.setFont(Storage.getFont24());
+        int cardWidth = 60;
+        int cardHeight = 90;
+        int horSpacing = cardWidth + 15;
+        int textY = y + cardHeight - 10;
+        Stroke outline = stroke2;
+        String overlayText;
 
-            drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        graphics.setFont(Storage.getFont24());
 
-            drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getSecretObjectiveDeckSize() + "/" + game.getSecretObjectiveFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Secret Objective Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getActionCards().size() + "/" + game.getActionCardFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Action Card Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getCulturalExploreDeckSize() + "/" + game.getCulturalExploreFullDeckSize() + " in the deck \n" + game.getCulturalExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Cultural Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getIndustrialExploreDeckSize() + "/" + game.getIndustrialExploreFullDeckSize() + " in the deck \n" + game.getIndustrialExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Industrial Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
-            drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getRelicDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
-        }
+        drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getHazardousExploreDeckSize() + "/" + game.getHazardousExploreFullDeckSize() + " in the deck \n" + game.getHazardousExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Hazardous Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getFrontierExploreDeckSize() + "/" + game.getFrontierExploreFullDeckSize() + " in the deck \n" + game.getFrontierExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Frontier Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getRelicDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getRelicDeckSize() + "/" + game.getRelicFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Relic Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_agenda.png", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getAgendaDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getAgendaDeckSize() + "/" + game.getAgendaFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Agenda Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
         return x;
     }
 
