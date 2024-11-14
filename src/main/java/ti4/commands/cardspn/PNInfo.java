@@ -68,13 +68,14 @@ public class PNInfo extends PNCardsSubcommandData implements InfoThreadCommand {
     private static List<Button> getPNButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (String pnShortHand : player.getPromissoryNotes().keySet()) {
-            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) {
-                continue;
-            }
+            if (player.getPromissoryNotesInPlayArea().contains(pnShortHand)) continue;
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = game.getPNOwner(pnShortHand);
-            if (owner == player || pnShortHand.endsWith("_ta"))
+            if (owner == null) {
+                BotLogger.log("Unable to find owner for " + pnShortHand + " in game " + game.getName());
                 continue;
+            }
+            if (owner == player || pnShortHand.endsWith("_ta")) continue;
 
             Button transact;
             if (game.isFowMode()) {
