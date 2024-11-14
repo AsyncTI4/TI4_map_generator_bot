@@ -22,6 +22,7 @@ import ti4.buttons.Buttons;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.event.RevealEvent;
 import ti4.commands.relic.RelicDraw;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -50,9 +51,7 @@ public class SCPlay extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
 
         Helper.checkThreadLimitAndArchive(event.getGuild());
 

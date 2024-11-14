@@ -24,6 +24,7 @@ import ti4.commands.tech.TechInfo;
 import ti4.commands.tokens.AddToken;
 import ti4.commands.uncategorized.CardsInfo;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
@@ -66,9 +67,7 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -332,7 +331,7 @@ public class Setup extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player was set up.");
         }
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         for (Game game2 : mapList.values()) {
             for (Player player2 : game2.getRealPlayers()) {
                 if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {

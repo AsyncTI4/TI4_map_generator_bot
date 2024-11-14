@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.map.Game;

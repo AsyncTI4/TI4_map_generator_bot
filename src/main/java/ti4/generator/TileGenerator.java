@@ -22,12 +22,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.fow.ShowGameAsPlayer;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -83,7 +83,7 @@ public class TileGenerator {
         this.context = context;
         this.focusTile = focusTile;
         isFoWPrivate = isFowModeActive();
-        fowPlayer = getFowPlayer();
+        fowPlayer = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
         allEyesOnMe = displayType != null && displayType.equals(DisplayType.googly);
     }
 
@@ -91,13 +91,6 @@ public class TileGenerator {
         return game.isFowMode() && event != null &&
             (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
                 event instanceof ShowGameAsPlayer.SlashCommandCustomUserWrapper);
-    }
-
-    private Player getFowPlayer() {
-        if (event == null)
-            return null;
-        String user = event.getUser().getId();
-        return game.getPlayer(user);
     }
 
     public FileUpload createFileUpload() {

@@ -6,12 +6,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -21,14 +21,14 @@ public class SendPN extends PNCardsSubcommandData {
 	public SendPN() {
 		super(Constants.SEND_PN, "Send Promissory Note to player");
 		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
-		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Game game = getActiveGame();
-		Player player = game.getPlayer(getUser().getId());
-		player = Helper.getGamePlayer(game, player, event, null);
+		Player player = CommandHelper.getPlayerFromEvent(game, event);
 		if (player == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
 			return;
@@ -79,7 +79,7 @@ public class SendPN extends PNCardsSubcommandData {
 			return;
 		}
 
-		Player targetPlayer = Helper.getPlayer(game, null, event);
+		Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
 		if (targetPlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "No such Player in game");
 			return;

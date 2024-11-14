@@ -40,7 +40,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
     }
 
     private String getAverageTurnTimeText(SlashCommandInteractionEvent event) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> maps = GameManager.getGameNameToGame();
 
         Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();
@@ -129,7 +129,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
     }
 
     public Map<String, Entry<Integer, Long>> getAllPlayersTurnTimes(boolean ignoreEndedGames) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> maps = GameManager.getGameNameToGame();
         Predicate<Game> endedGamesFilter = ignoreEndedGames ? m -> !m.isHasEnded() : m -> true;
         Map<String, Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         Map<String, Set<Long>> playerAverageTurnTimes = new HashMap<>();

@@ -5,7 +5,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,9 +36,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
@@ -84,70 +81,12 @@ import ti4.model.UnitModel;
 
 public class Helper {
 
-    @Nullable
-    public static Player getGamePlayer(Game game, Player initialPlayer, GenericInteractionCreateEvent event, String userID) {
-        return getGamePlayer(game, initialPlayer, event.getMember(), userID);
-    }
-
     public static int getCurrentHour() {
         long currentTime = System.currentTimeMillis();
         currentTime = currentTime / 1000;
         currentTime = currentTime % (60 * 60 * 24);
         currentTime = currentTime / (60 * 60);
         return (int) currentTime;
-    }
-
-    @Nullable
-    public static Player getGamePlayer(Game game, Player initialPlayer, Member member, String userID) {
-        Collection<Player> players = game.getPlayers().values();
-        if (!game.isCommunityMode()) {
-            Player player = game.getPlayer(userID);
-            if (player != null)
-                return player;
-            return initialPlayer;
-        }
-        if (member == null) {
-            Player player = game.getPlayer(userID);
-            if (player != null)
-                return player;
-            return initialPlayer;
-        }
-        List<Role> roles = member.getRoles();
-        for (Player player : players) {
-            if (roles.contains(player.getRoleForCommunity())) {
-                return player;
-            }
-            if (player.getTeamMateIDs().contains(member.getUser().getId())) {
-                return player;
-            }
-        }
-        return initialPlayer != null ? initialPlayer : game.getPlayer(userID);
-    }
-
-    @Nullable
-    public static Player getPlayer(Game game, Player player, SlashCommandInteractionEvent event) {
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
-        if (playerOption != null) {
-            String playerID = playerOption.getAsUser().getId();
-            if (game.getPlayer(playerID) != null) {
-                player = game.getPlayers().get(playerID);
-            } else {
-                player = null;
-            }
-        } else if (factionColorOption != null) {
-            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
-            factionColor = StringUtils.substringBefore(factionColor, " "); // TO HANDLE UNRESOLVED AUTOCOMPLETE
-            factionColor = AliasHandler.resolveFaction(factionColor);
-            for (Player player_ : game.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) ||
-                    Objects.equals(factionColor, player_.getColor())) {
-                    player = player_;
-                    break;
-                }
-            }
-        }
-        return player;
     }
 
     public static List<String> unplayedACs(Game game) {
@@ -582,38 +521,6 @@ public class Helper {
             }
         }
         return player;
-    }
-
-    @Nullable
-    public static String getColor(Game game, SlashCommandInteractionEvent event) {
-        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
-        if (factionColorOption != null) {
-            String colorFromString = getColorFromString(game, factionColorOption.getAsString());
-            if (Mapper.isValidColor(colorFromString)) {
-                return colorFromString;
-            }
-        } else {
-            String userID = event.getUser().getId();
-            Player foundPlayer = game.getPlayers().values().stream()
-                .filter(player -> player.getUserID().equals(userID)).findFirst().orElse(null);
-            foundPlayer = getGamePlayer(game, foundPlayer, event, null);
-            if (foundPlayer != null) {
-                return foundPlayer.getColor();
-            }
-        }
-        return null;
-    }
-
-    public static String getColorFromString(Game game, String factionColor) {
-        factionColor = AliasHandler.resolveColor(factionColor);
-        factionColor = AliasHandler.resolveFaction(factionColor);
-        for (Player player_ : game.getPlayers().values()) {
-            if (Objects.equals(factionColor, player_.getFaction()) ||
-                Objects.equals(factionColor, player_.getColor())) {
-                return player_.getColor();
-            }
-        }
-        return factionColor;
     }
 
     @Nullable
@@ -1968,20 +1875,16 @@ public class Helper {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
-        } else {
-            Planet planet = unitHolder;
-            return planet.getResources();
         }
+        return unitHolder.getResources();
     }
 
     public static int getPlanetInfluence(String planetID, Game game) {
         Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
             return 0;
-        } else {
-            Planet planet = unitHolder;
-            return planet.getInfluence();
         }
+        return unitHolder.getInfluence();
     }
 
     @Deprecated
@@ -2261,62 +2164,70 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Game game) {
-        if (!game.isFowMode() && !game.isCommunityMode()) {
-            String gameName = game.getName();
-            List<Role> roles = guild.getRolesByName(gameName, true);
-            Role role = null;
-            if (!roles.isEmpty()) {
-                if (roles.size() > 1) {
-                    BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName
-                        + "` - please investigate, as this may cause issues.");
-                    return;
-                }
-                role = roles.getFirst();
+        if (game.isFowMode() || game.isCommunityMode()) {
+            return;
+        }
+        String gameName = game.getName();
+        List<Role> roles = guild.getRolesByName(gameName, true);
+        Role role = null;
+        if (!roles.isEmpty()) {
+            if (roles.size() > 1) {
+                BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName
+                    + "` - please investigate, as this may cause issues.");
+                return;
             }
+            role = roles.getFirst();
+        }
 
-            if (role == null) { // make sure players have access to the game channels
-                addMapPlayerPermissionsToGameChannels(guild, game);
-            } else { // make sure players have the role
-                addGameRoleToMapPlayers(guild, game, role);
-            }
+        if (role == null) { // make sure players have access to the game channels
+            addMapPlayerPermissionsToGameChannels(guild, game);
+        } else { // make sure players have the role
+            addGameRoleToMapPlayers(guild, role, game);
         }
     }
 
     public static void addMapPlayerPermissionsToGameChannels(Guild guild, Game game) {
+        var players = game.getRealPlayerIDs();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null) {
-            addPlayerPermissionsToGameChannel(guild, game, tableTalkChannel);
+            addPlayerPermissionsToGameChannel(guild, tableTalkChannel, players);
         }
         TextChannel actionsChannel = game.getMainGameChannel();
         if (actionsChannel != null) {
-            addPlayerPermissionsToGameChannel(guild, game, actionsChannel);
+            addPlayerPermissionsToGameChannel(guild, actionsChannel, players);
         }
         String gameName = game.getName();
         List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
             .toList();
         for (GuildChannel channel : channels) {
-            addPlayerPermissionsToGameChannel(guild, game, channel);
+            addPlayerPermissionsToGameChannel(guild, channel, players);
         }
     }
 
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
+        if (guild == null) {
+            BotLogger.log("Guild was null in addBotHelperPermissionsToGameChannels.");
+            return;
+        }
         // long role = 1093925613288562768L;
         long role = 1166011604488425482L;
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
-        for (Game game : mapList.values()) {
+
+        for (var game : GameManager.getGameNameToGame().values()) {
             if (!game.isHasEnded()) {
-                TextChannel tableTalkChannel = game.getTableTalkChannel();
-                if (tableTalkChannel != null && game.getGuild() == guild) {
-                    addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
-                }
-                TextChannel actionsChannel = game.getMainGameChannel();
-                if (actionsChannel != null && game.getGuild() == guild) {
-                    addRolePermissionsToGameChannel(guild, actionsChannel, role);
+                if (game.getGuild() != null && game.getGuild().equals(guild)) {
+                    var tableTalkChannel = game.getTableTalkChannel();
+                    if (tableTalkChannel != null) {
+                        addRolePermissionsToGameChannel(guild, tableTalkChannel, role);
+                    }
+                    var mainGameChannel = game.getMainGameChannel();
+                    if (mainGameChannel != null) {
+                        addRolePermissionsToGameChannel(guild, mainGameChannel, role);
+                    }
                 }
                 String gameName = game.getName();
                 List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-                    .toList();
+                        .toList();
                 for (GuildChannel channel : channels) {
                     addRolePermissionsToGameChannel(guild, channel, role);
                 }
@@ -2324,11 +2235,11 @@ public class Helper {
         }
     }
 
-    private static void addPlayerPermissionsToGameChannel(Guild guild, Game game, GuildChannel channel) {
+    private static void addPlayerPermissionsToGameChannel(Guild guild, GuildChannel channel, List<String> playerIds) {
         TextChannel textChannel = guild.getTextChannelById(channel.getId());
         if (textChannel != null) {
             TextChannelManager textChannelManager = textChannel.getManager();
-            for (String playerID : game.getPlayerIDs()) {
+            for (String playerID : playerIds) {
                 Member member = guild.getMemberById(playerID);
                 if (member == null)
                     continue;
@@ -2336,8 +2247,6 @@ public class Helper {
                 textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
             textChannelManager.queue();
-            // textChannel.sendMessage("This channel's permissions have been
-            // updated.").queue();
         }
     }
 
@@ -2353,14 +2262,13 @@ public class Helper {
         }
     }
 
-    private static void addGameRoleToMapPlayers(Guild guild, Game game, Role role) {
-        for (String playerID : game.getPlayerIDs()) {
-            if (game.getRound() > 1 && !game.getPlayer(playerID).isRealPlayer()) {
+    private static void addGameRoleToMapPlayers(Guild guild, Role role, Game game) {
+        for (var player : game.getRealPlayers()) {
+            if (game.getRound() > 1) {
                 continue;
             }
-            Member member = guild.getMemberById(playerID);
-            if (member != null && !member.getRoles().contains(role))
-                guild.addRoleToMember(member, role).queue();
+            Member member = guild.getMemberById(player.getUserID());
+            if (member != null && !member.getRoles().contains(role)) guild.addRoleToMember(member, role).queue();
         }
     }
 

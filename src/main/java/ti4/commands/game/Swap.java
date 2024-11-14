@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
@@ -25,7 +25,7 @@ public class Swap extends GameSubcommandData {
     public Swap() {
         super(Constants.SWAP, "Swap factions with a player ");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color ").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.OTHER_PLAYER, "Replacement player @playerName").setRequired(true));
     }
 
     @Override
@@ -50,9 +50,9 @@ public class Swap extends GameSubcommandData {
         }
         String message = "";
         OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
-        OptionMapping addOption = event.getOption(Constants.PLAYER2);
+        OptionMapping addOption = event.getOption(Constants.OTHER_PLAYER);
         if (removeOption != null && addOption != null) {
-            Player removedPlayer = Helper.getPlayer(game, null, event);
+            Player removedPlayer = CommandHelper.getPlayerFromEvent(game, event);
             Player swapperPlayer = game.getPlayer(addOption.getAsUser().getId());
             if (removedPlayer == null) {
                 MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
@@ -69,7 +69,7 @@ public class Swap extends GameSubcommandData {
             return;
         }
         GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game);
+        GameSaveLoadManager.reload(game.getName());
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
@@ -125,7 +125,7 @@ public class Swap extends GameSubcommandData {
             return;
         }
         GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game);
+        GameSaveLoadManager.reload(game.getName());
         // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
         // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
         message.append("> **After:** ").append(swapperPlayer.getRepresentation()).append(" & ").append(removedPlayer.getRepresentation()).append("\n");

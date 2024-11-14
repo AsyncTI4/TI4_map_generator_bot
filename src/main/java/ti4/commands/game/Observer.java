@@ -32,7 +32,7 @@ public class Observer extends GameSubcommandData {
         String gameName = event.getOption("game_name", null, OptionMapping::getAsString);
         String addOrRemove = event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
 
-        if (!GameManager.getInstance().isValidGame(gameName)) {
+        if (!GameManager.isValidGame(gameName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found: " + gameName);
             return;
         }
@@ -42,7 +42,7 @@ public class Observer extends GameSubcommandData {
             return;
         }
 
-        Game game = GameManager.getInstance().getGame(gameName);
+        Game game = GameManager.getGame(gameName);
         Guild guild = game.getGuild();
         Member member = guild.getMemberById(user.getId());
 

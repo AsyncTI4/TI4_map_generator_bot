@@ -37,7 +37,7 @@ public class ListSlashCommandsUsed extends BothelperSubcommandData {
         }
         int largestAmountOfButtonsIn1Game = 0;
         String largestGame = "";
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         Map<String, Integer> slashCommands = new HashMap<>();
         Map<String, Integer> actionCards = new HashMap<>();
         Map<String, Integer> actionCardsPlayed = new HashMap<>();

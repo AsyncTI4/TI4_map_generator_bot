@@ -67,7 +67,7 @@ public class FoWHelper {
 			String gameName = channel.getName();
 			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			game = GameManager.getInstance().getGame(gameName);
+			game = GameManager.getGame(gameName);
 			if (game == null) {
 				return false;
 			}

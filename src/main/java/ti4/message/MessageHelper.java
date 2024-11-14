@@ -840,7 +840,7 @@ public class MessageHelper {
 		String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
 		gameName = StringUtils.substringBefore(gameName, "-");
-		return GameManager.getInstance().getGame(gameName);
+		return GameManager.getGame(gameName);
 	}
 
 	/**

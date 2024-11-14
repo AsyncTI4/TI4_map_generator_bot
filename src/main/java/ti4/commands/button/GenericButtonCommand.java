@@ -1,5 +1,7 @@
 package ti4.commands.button;
 
+import java.util.Collections;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -13,18 +15,16 @@ import ti4.helpers.Constants;
 import ti4.helpers.SlashCommandAcceptanceHelper;
 import ti4.message.MessageHelper;
 
-import java.util.Collections;
-
 public class GenericButtonCommand implements Command {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.BUTTON;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getActionID(), event);
+        return SlashCommandAcceptanceHelper.shouldAcceptIfActivePlayerOfGame(getName(), event);
     }
 
     @Override
@@ -51,10 +51,10 @@ public class GenericButtonCommand implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
+                Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true))
                 .addOptions(new OptionData(OptionType.STRING, "spoof_id", "Spoof the buttonID, mainly for debugging purposes"))
         );

@@ -11,10 +11,10 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.apache.commons.collections4.ListUtils;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -33,13 +33,12 @@ public class SelectFaction implements Selection {
 
     @Override
     public void execute(StringSelectInteractionEvent event) {
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game game = GameManager.getUserActiveGame(event.getUser().getId());
         if (game == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Game could not be found");
             return;
         }
-        Player player = game.getPlayer(event.getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;

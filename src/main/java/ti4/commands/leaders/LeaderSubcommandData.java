@@ -32,7 +32,7 @@ public abstract class LeaderSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        game = GameManager.getInstance().getUserActiveGame(user.getId());
+        game = GameManager.getUserActiveGame(user.getId());
     }
 
     public void reply(SlashCommandInteractionEvent event) {

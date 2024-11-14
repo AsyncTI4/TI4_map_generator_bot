@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.commands2.CommandHelper;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -65,9 +66,7 @@ public class CombatRoll extends CombatSubcommandData {
         OptionMapping rollTypeOption = event.getOption(Constants.COMBAT_ROLL_TYPE);
 
         String userID = getUser().getId();
-        Player player = game.getPlayer(userID);
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
 
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");

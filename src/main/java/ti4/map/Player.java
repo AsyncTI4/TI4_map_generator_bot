@@ -237,7 +237,7 @@ public class Player {
 
     @JsonIgnore
     public Game getGame() {
-        return GameManager.getInstance().getGame(gameID);
+        return GameManager.getGame(gameID);
     }
 
     @JsonIgnore

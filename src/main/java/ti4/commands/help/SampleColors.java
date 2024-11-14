@@ -1,5 +1,12 @@
 package ti4.commands.help;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,13 +21,6 @@ import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class SampleColors extends HelpSubcommandData {
     public SampleColors() {

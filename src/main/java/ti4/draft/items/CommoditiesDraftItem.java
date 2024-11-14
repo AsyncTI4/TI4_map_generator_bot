@@ -1,14 +1,14 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.helpers.Emojis;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommoditiesDraftItem extends DraftItem {
     public CommoditiesDraftItem(String itemId) {

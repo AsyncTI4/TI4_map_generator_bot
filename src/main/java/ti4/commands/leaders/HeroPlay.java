@@ -22,6 +22,7 @@ import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -50,9 +51,7 @@ public class HeroPlay extends LeaderAction {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
 
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
@@ -299,7 +298,7 @@ public class HeroPlay extends LeaderAction {
                     .getFactionEmoji() + " may resolve " + size
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
                     + " After putting the agendas on top in the order you want (don't bottom any), please press the button to reveal an agenda");
-                DrawAgenda.drawAgenda(event, size, game, player);
+                DrawAgenda.drawAgenda(size, game, player);
                 Button flipAgenda = Buttons.blue("flip_agenda", "Press this to flip agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Flip Agenda", buttons);

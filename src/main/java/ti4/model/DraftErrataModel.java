@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
 import ti4.model.Source.ComponentSource;

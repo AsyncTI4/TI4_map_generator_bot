@@ -1,4 +1,4 @@
-package ti4.commands.admin;
+package ti4.commands2.admin;
 
 
 import java.io.File;
@@ -9,14 +9,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class RestoreGame extends AdminSubcommandData {
+class RestoreGame extends Subcommand {
 
     public RestoreGame() {
         super(Constants.RESTORE_GAME, "Restore a game by uploading a save file");
@@ -26,7 +26,6 @@ public class RestoreGame extends AdminSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Attachment attachment = event.getOption(Constants.SAVE_FILE, null, OptionMapping::getAsAttachment);
-
         if (attachment == null) {
             MessageHelper.sendMessageToEventChannel(event, "No save file specified.");
             return;
@@ -55,10 +54,6 @@ public class RestoreGame extends AdminSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Save file name must be the same as the game name.");
             return;
         }
-
-        GameManager.getInstance().deleteGame(game.getName());
-        GameManager.getInstance().addGame(game);
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " restored.");
-        GameSaveLoadManager.saveGame(game, event);
     }
 }

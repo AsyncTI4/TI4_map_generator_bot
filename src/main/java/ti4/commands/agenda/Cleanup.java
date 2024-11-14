@@ -1,14 +1,15 @@
 package ti4.commands.agenda;
 
+import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.Map;
 
 public class Cleanup extends AgendaSubcommandData {
     public Cleanup() {

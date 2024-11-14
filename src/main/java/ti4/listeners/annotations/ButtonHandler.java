@@ -1,7 +1,5 @@
 package ti4.listeners.annotations;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
@@ -13,6 +11,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.map.Game;
 import ti4.map.Player;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * <p>ButtonHandler(string) where buttonID.startsWith(string)</p>

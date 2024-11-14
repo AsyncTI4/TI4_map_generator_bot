@@ -16,12 +16,12 @@ import ti4.commands.Command;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -32,33 +32,31 @@ import ti4.message.MessageHelper;
 public class CardsInfo implements Command, InfoThreadCommand {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CARDS_INFO;
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+        return acceptEvent(event, getName());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
         Game game;
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            game = gameManager.getUserActiveGame(userID);
-            String color = Helper.getColor(game, event);
+            game = GameManager.getUserActiveGame(userID);
+            String color = CommandHelper.getColor(game, event);
             if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }
         }
 
-        Player player = game.getPlayer(userID);
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -320,10 +318,10 @@ public class CardsInfo implements Command, InfoThreadCommand {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false)));
     }
 

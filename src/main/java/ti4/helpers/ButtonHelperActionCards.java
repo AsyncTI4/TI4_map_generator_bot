@@ -1,5 +1,12 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -34,13 +41,6 @@ import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class ButtonHelperActionCards {
 
@@ -1117,7 +1117,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveEmergencyMeeting")
     public static void resolveEmergencyMeeting(Player player, Game game, ButtonInteractionEvent event) {
         game.shuffleAllAgendasBackIntoDeck();
-        DrawAgenda.drawAgenda(event, 3, game, player);
+        DrawAgenda.drawAgenda(3, game, player);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top 3 agendas to " + player.getFactionEmojiOrColor() + " cards info");
         ButtonHelper.deleteMessage(event);
     }

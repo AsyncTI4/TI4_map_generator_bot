@@ -15,7 +15,7 @@ public class UserCommand implements Command {
     private final Collection<UserSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.USER;
     }
 
@@ -45,7 +45,7 @@ public class UserCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

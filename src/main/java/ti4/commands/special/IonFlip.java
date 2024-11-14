@@ -8,7 +8,9 @@ import ti4.commands.uncategorized.ShowGame;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class IonFlip extends SpecialSubcommandData {

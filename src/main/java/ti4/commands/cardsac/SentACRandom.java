@@ -11,12 +11,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -24,30 +24,30 @@ import ti4.message.MessageHelper;
 public class SentACRandom extends ACCardsSubcommandData {
     public SentACRandom() {
         super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(game, null, event);
-        if (player_ == null) {
+        Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (otherPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
 
-        User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
+        User user = AsyncTI4DiscordBot.jda.getUserById(otherPlayer.getUserID());
         if (user == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        sendRandomACPart2(event, game, player, player_);
+        sendRandomACPart2(event, game, player, otherPlayer);
     }
 
     public void sendRandomACPart2(GenericInteractionCreateEvent event, Game game, Player player, Player player_) {
@@ -55,6 +55,7 @@ public class SentACRandom extends ACCardsSubcommandData {
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
         if (actionCards.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No Action Cards in hand");
+            return;
         }
         Collections.shuffle(actionCards);
         String acID = actionCards.getFirst();

@@ -61,7 +61,7 @@ public class SearchMyGames extends SearchSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();

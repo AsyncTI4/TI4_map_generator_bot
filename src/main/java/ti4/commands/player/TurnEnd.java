@@ -24,6 +24,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListPlayerInfoButton;
+import ti4.commands2.CommandHelper;
 import ti4.generator.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -49,6 +50,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
 public class TurnEnd extends PlayerSubcommandData {
+
     public TurnEnd() {
         super(Constants.TURN_END, "End Turn");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
@@ -58,10 +60,7 @@ public class TurnEnd extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player mainPlayer = game.getPlayer(getUser().getId());
-        mainPlayer = Helper.getGamePlayer(game, mainPlayer, event, null);
-        mainPlayer = Helper.getPlayer(game, mainPlayer, event);
-
+        Player mainPlayer = CommandHelper.getPlayerFromEvent(game, event);
         if (mainPlayer == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
             return;

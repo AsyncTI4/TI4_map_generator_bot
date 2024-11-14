@@ -38,7 +38,7 @@ public class GameCreate extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Game name can only contain a-z 0-9 symbols");
             return;
         }
-        if (GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+        if (GameManager.getGameNameToGame().containsKey(mapName)) {
             MessageHelper.replyToMessage(event, "Game with such name exist already, choose different name");
             return;
         }
@@ -60,9 +60,8 @@ public class GameCreate extends GameSubcommandData {
         newGame.setName(gameName);
         newGame.setAutoPing(true);
         newGame.setAutoPingSpacer(24);
-        GameManager gameManager = GameManager.getInstance();
-        gameManager.addGame(newGame);
-        boolean setMapSuccessful = gameManager.setGameForUser(ownerID, gameName);
+        GameManager.addGame(newGame);
+        boolean setMapSuccessful = GameManager.setGameForUser(ownerID, gameName);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + gameName);

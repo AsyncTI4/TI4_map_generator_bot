@@ -640,7 +640,7 @@ public class DataMigrationManager {
                 migrationDateString), e);
         }
         List<String> migrationsAppliedThisTime = new ArrayList<>();
-        Map<String, Game> loadedMaps = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> loadedMaps = GameManager.getGameNameToGame();
         for (Game game : loadedMaps.values()) {
             DateFormat mapCreatedOnFormat = new SimpleDateFormat("yyyy.MM.dd");
             Date mapCreatedOn = null;

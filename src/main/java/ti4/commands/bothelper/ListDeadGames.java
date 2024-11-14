@@ -23,7 +23,7 @@ public class ListDeadGames extends BothelperSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
 
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
         StringBuilder sb2 = new StringBuilder("Dead Roles\n");

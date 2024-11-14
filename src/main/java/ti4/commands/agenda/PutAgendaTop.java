@@ -19,7 +19,6 @@ public class PutAgendaTop extends AgendaSubcommandData {
     public void putTop(GenericInteractionCreateEvent event, int agendaID, Game game) {
         boolean success = game.putAgendaTop(agendaID);
         if (success && !game.isFowMode()) {
-
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on top");
             ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game, "Agenda put on top", "politics");
         } else {

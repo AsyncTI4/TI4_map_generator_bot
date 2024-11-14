@@ -23,7 +23,6 @@ import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import org.jetbrains.annotations.NotNull;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.helpers.DiceHelper.Die;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.message.BotLogger;

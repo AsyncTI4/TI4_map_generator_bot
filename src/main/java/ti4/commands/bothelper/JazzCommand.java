@@ -1,7 +1,6 @@
 package ti4.commands.bothelper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

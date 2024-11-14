@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
