@@ -57,6 +57,11 @@ public class CreateGameButton extends GameSubcommandData {
         }
         if (categoryChannel == null)
             categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
+        if (categoryChannel == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
+                + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+            return;
+        }
 
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
@@ -174,6 +179,11 @@ public class CreateGameButton extends GameSubcommandData {
         }
         if (categoryChannel == null)
             categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
+        if (categoryChannel == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
+                + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+            return;
+        }
         event.getMessage().delete().queue();
         GameCreationHelper.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
     }

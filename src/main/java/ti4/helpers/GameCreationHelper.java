@@ -439,11 +439,15 @@ public class GameCreationHelper {
 			return AsyncTI4DiscordBot.guildPrimary;
 		}
 
+		if (guilds.isEmpty()) {
+			BotLogger.log("`GameCreationHelper.getServerWithMostCapacity` No available servers to create a new game category");
+			return null;
+		}
+
 		String debugText = guilds.stream()
 			.map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
 			.collect(Collectors.joining("\n"));
 		BotLogger.log("Server Game Capacity Check:\n" + debugText);
-
 		return guilds.getLast();
 	}
 
