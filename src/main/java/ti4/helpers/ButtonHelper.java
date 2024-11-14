@@ -5093,7 +5093,7 @@ public class ButtonHelper {
                     player.setCardsInfoThreadID(null);
                 }
                 GameSaveLoadManager.saveGame(gameToRestore, event);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             }
 

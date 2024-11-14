@@ -48,7 +48,7 @@ public class TechDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (var tech : faction.getFactionTech()) {
-                allItems.add(DraftItem.Generate(DraftItem.Category.TECH, tech));
+                allItems.add(DraftItem.generate(DraftItem.Category.TECH, tech));
             }
         }
         return allItems;

@@ -882,9 +882,8 @@ public class Player {
 
     @JsonIgnore
     public Set<String> getSpecialUnitsOwned() {
-        Set<String> specialUnits = unitsOwned.stream()
+        return unitsOwned.stream()
             .filter(u -> Mapper.getUnit(u).getFaction().isPresent()).collect(Collectors.toSet());
-        return specialUnits;
     }
 
     public boolean hasUnit(String unit) {
@@ -2206,7 +2205,7 @@ public class Player {
     public void loadDraftHand(List<String> saveString) {
         DraftBag newBag = new DraftBag();
         for (String item : saveString) {
-            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.generateFromAlias(item));
         }
         draftHand = newBag;
     }
@@ -2214,7 +2213,7 @@ public class Player {
     public void loadCurrentDraftBag(List<String> saveString) {
         DraftBag newBag = new DraftBag();
         for (String item : saveString) {
-            newBag.Contents.add(DraftItem.GenerateFromAlias(item));
+            newBag.Contents.add(DraftItem.generateFromAlias(item));
         }
         currentDraftBag = newBag;
     }
@@ -2222,7 +2221,7 @@ public class Player {
     public void loadItemsToDraft(List<String> saveString) {
         List<DraftItem> items = new ArrayList<>();
         for (String item : saveString) {
-            items.add(DraftItem.GenerateFromAlias(item));
+            items.add(DraftItem.generateFromAlias(item));
         }
         draftItemQueue.Contents = items;
     }

@@ -96,7 +96,6 @@ public class RelicSendFragments extends RelicSubcommandData {
 			FoWHelper.pingPlayersTransaction(game, event, sender, receiver, fragString, null);
 		}
 		TransactionHelper.checkTransactionLegality(game, sender, receiver);
-		Player player = receiver;
-		CommanderUnlockCheck.checkPlayer(player, "kollecc");
+        CommanderUnlockCheck.checkPlayer(receiver, "kollecc");
 	}
 }

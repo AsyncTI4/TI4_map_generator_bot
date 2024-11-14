@@ -206,7 +206,6 @@ abstract public class UnitHolder {
 
     @JsonIgnore
     public boolean hasUnits() {
-        if (units == null) return false;
         for (Integer count : units.values())
             if (count > 0) return true;
         return false;

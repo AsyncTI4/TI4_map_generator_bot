@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.uncategorized.ShowGame;
 import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
@@ -45,6 +46,7 @@ public class ShowGameAsPlayer extends FOWSubcommandData {
             this.overriddenUser = overriddenUser;
         }
 
+        @NotNull
         @Override
         public User getUser() {
             return overriddenUser;

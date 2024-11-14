@@ -48,7 +48,7 @@ public class StartingFleetDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.STARTINGFLEET, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.STARTINGFLEET, faction.getAlias()));
         }
         return allItems;
     }

@@ -537,10 +537,6 @@ public class StartPhase extends GameSubcommandData {
             ListTurnOrder.turnOrder(event, game);
             if (!msgExtra.isEmpty()) {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-                if (privatePlayer == null) {
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find player.");
-                    return;
-                }
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.", TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
 
                 if (privatePlayer.getGenSynthesisInfantry() > 0) {

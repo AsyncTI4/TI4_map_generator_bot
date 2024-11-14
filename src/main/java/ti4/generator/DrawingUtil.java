@@ -73,7 +73,7 @@ public class DrawingUtil {
             outlineColor = Color.BLACK;
             textColor = Color.WHITE;
         }
-        if (outlineSize == null || outlineColor == null) {
+        if (outlineColor == null) {
             g.drawString(txt, x, y);
         } else {
             drawStringOutlined(g, txt, x, y, outlineSize, outlineColor, textColor);

@@ -42,6 +42,10 @@ public class CommandHelper {
 
     @NotNull
     public static String getGameName(SlashCommandInteraction event) {
+        OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
+        if (gameNameOption != null) {
+            return gameNameOption.getAsString();
+        }
         // try to get game name from channel name
         var channel = event.getChannel();
         String gameName = getGameNameFromChannelName(channel.getName());
@@ -52,9 +56,6 @@ public class CommandHelper {
         if (channel instanceof ThreadChannel) {
             IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
             gameName = getGameNameFromChannelName(parentChannel.getName());
-        }
-        if (GameManager.isValidGame(gameName)) {
-            return gameName;
         }
         return gameName;
     }
@@ -127,7 +128,7 @@ public class CommandHelper {
 
     @Nullable
     public static Player getOtherPlayerFromEvent(Game game, SlashCommandInteractionEvent event) {
-        OptionMapping playerOption = event.getOption(Constants.OTHER_PLAYER);
+        OptionMapping playerOption = event.getOption(Constants.TARGET_PLAYER);
         if (playerOption != null) {
             String playerID = playerOption.getAsUser().getId();
             return game.getPlayer(playerID);

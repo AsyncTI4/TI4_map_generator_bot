@@ -413,27 +413,9 @@ public class AgendaHelper {
                     if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
                         message = message + " Also passed the speaker token.";
                         boolean foundSpeaker = false;
-                        boolean assignedSpeaker = false;
                         for (Player p4 : game.getRealPlayers()) {
-                            if (assignedSpeaker) {
-                                break;
-                            }
                             if (foundSpeaker) {
                                 game.setSpeakerUserID(p4.getUserID());
-                                assignedSpeaker = true;
-                                break;
-                            }
-                            if (p4 == player2) {
-                                foundSpeaker = true;
-                            }
-                        }
-                        for (Player p4 : game.getRealPlayers()) {
-                            if (assignedSpeaker) {
-                                break;
-                            }
-                            if (foundSpeaker) {
-                                game.setSpeakerUserID(p4.getUserID());
-                                assignedSpeaker = true;
                                 break;
                             }
                             if (p4 == player2) {

@@ -36,7 +36,7 @@ public class SearchEmojis extends SearchSubcommandData {
         String message = emojis.stream().map(e -> getEmojiMessage(e, includeRAW)).collect(Collectors.joining("\n"));
 
         if (emojis.size() > 3) {
-            String threadName = event.getFullCommandName() + (searchString == null ? "" : " search: " + searchString);
+            String threadName = event.getFullCommandName() + " search: " + searchString;
             MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -45,8 +45,7 @@ public class SearchEmojis extends SearchSubcommandData {
 
     private static String getEmojiMessage(RichCustomEmoji emoji, boolean includeRAW) {
         if (!includeRAW) return "# " + emoji.getFormatted();
-        String sb = emoji.getFormatted() +
+        return emoji.getFormatted() +
                 " `" + emoji.getFormatted() + "`";
-        return sb;
     }
 }
