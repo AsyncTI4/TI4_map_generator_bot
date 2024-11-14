@@ -104,7 +104,7 @@ public class WebHelper {
         List<String> badGames = new ArrayList<>();
         int count = 0;
         for (Game game : GameManager.getGameNameToGame().values()) {
-            if (game.isHasEnded() && game.hasWinner()) {
+            if (game.getRound() > 2 || (game.isHasEnded() && game.hasWinner())) {
                 count++;
                 try {
                     // Quick & Dirty bypass for failed json creation
