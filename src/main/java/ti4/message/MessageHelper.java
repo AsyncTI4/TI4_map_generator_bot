@@ -682,7 +682,7 @@ public class MessageHelper {
 			return new ArrayList<>();
 		}
 		embeds = embeds.stream().filter(Objects::nonNull).collect(Collectors.toList());
-		return ListUtils.partition(embeds, 9); //max 10, but we've had issues with 6k char limit, so max 9
+		return ListUtils.partition(embeds, 8); //max is 10, but we've had issues with 6k char limit in embeds in single message
 	}
 
 	public static void sendMessageToThread(MessageChannel channel, String threadName, String messageToSend) {
