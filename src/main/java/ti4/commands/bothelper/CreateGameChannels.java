@@ -326,15 +326,15 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
     private static void sendMessageAboutAggressionMetas(Game game) {
         String aggressionMsg = """
-                Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
-                 Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
-                .\s
-                The conflict metas are loosely classified as the following:\s
-                - Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four "slice" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one.\
+            Strangers playing with eachother for the first time can have different aggression metas, and be unpleasantly surprised when they find themselves playing with others who don't share that meta.\
+             Therefore, you can use the buttons below to anonymously share your aggression meta, and if a conflict seems apparent, you can have a conversation about it, or leave the game if the difference is too much and the conversation went badly. These have no binding effect on the game, they just are for setting expectations and starting necessary conversations at the start, rather than in a tense moment 3 weeks down the line\
+            .\s
+            The conflict metas are loosely classified as the following:\s
+            - Friendly -- No early home system takes, only as destructive as the objectives require them to be, expects a person's four "slice" tiles to be respected, generally open to and looking for a diplomatic solution rather than a forceful one.\
 
-                - No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2.\
+            - No Strong Preference -- Can handle a friendly or aggressive environment, is ready for any trouble that comes their way, even if that trouble is someone activating their home system round 2.\
 
-                - Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system.\s""";
+            - Aggressive -- Likes to exploit military weakness to extort and/or claim land, even early in the game, and even if the objectives don't necessarily relate. Their slice is where their plastic is, and that plastic may be in your home system.\s""";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("anonDeclare_Friendly", "Friendly"));
         buttons.add(Buttons.blue("anonDeclare_No Strong Preference", "No Strong Preference"));
@@ -601,21 +601,23 @@ public class CreateGameChannels extends BothelperSubcommandData {
         if (guild == null)
             return false;
 
+        int maxGamesPerCategory = Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
-        if (roleCount > 200) {
+        if (roleCount > (250 - maxGamesPerCategory)) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-                + guild.getName() + "** currently has **" + roleCount + "** roles.");
+                + guild.getName() + "** currently has **" + roleCount + "** roles and a new category requires space for " + maxGamesPerCategory + " roles.");
             return false;
         }
 
         // SPACE FOR 50 CHANNELS
         int channelCount = guild.getChannels().size();
         int channelMax = 500;
-        int channelsCountRequiredForNewCategory = 1 + 2 * Math.max(1, Math.min(25, GlobalSettings.getSetting(ImplementedSettings.MAX_GAMES_PER_CATEGORY.toString(), Integer.class, 10)));
+        int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
         if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
             BotLogger.log("`CreateGameChannels.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
-                + guild.getName() + "** currently has " + channelCount + " channels.");
+                + guild.getName() + "** currently has " + channelCount + " channels and a new category requires space for " + channelsCountRequiredForNewCategory + " new channels.");
             return false;
         }
 

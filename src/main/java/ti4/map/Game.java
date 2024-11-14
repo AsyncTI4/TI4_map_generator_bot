@@ -3788,6 +3788,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public int getHazardousExploreDiscardSize() {
+        return getExploreDiscard(Constants.HAZARDOUS).size();
+    }
+
+    @JsonIgnore
     public int getHazardousExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.HAZARDOUS);
     }
@@ -3795,6 +3800,11 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getCulturalExploreDeckSize() {
         return getExploreDeckSize(Constants.CULTURAL);
+    }
+
+    @JsonIgnore
+    public int getCulturalExploreDiscardSize() {
+        return getExploreDiscard(Constants.CULTURAL).size();
     }
 
     @JsonIgnore
@@ -3808,6 +3818,11 @@ public class Game extends GameProperties {
     }
 
     @JsonIgnore
+    public int getIndustrialExploreDiscardSize() {
+        return getExploreDiscard(Constants.INDUSTRIAL).size();
+    }
+
+    @JsonIgnore
     public int getIndustrialExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.INDUSTRIAL);
     }
@@ -3815,6 +3830,11 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getFrontierExploreDeckSize() {
         return getExploreDeckSize(Constants.FRONTIER);
+    }
+
+    @JsonIgnore
+    public int getFrontierExploreDiscardSize() {
+        return getExploreDiscard(Constants.FRONTIER).size();
     }
 
     @JsonIgnore

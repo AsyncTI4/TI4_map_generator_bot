@@ -1,7 +1,16 @@
 package ti4.generator;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -29,17 +38,20 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
+import javax.imageio.ImageIO;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
@@ -75,6 +87,7 @@ import ti4.model.AgendaModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
 import ti4.model.EventModel;
+import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
@@ -85,8 +98,6 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.website.WebsiteOverlay;
-
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -576,14 +587,17 @@ public class MapGenerator implements AutoCloseable {
         }
         if (game.isAbsolMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_Absol.png");
+            addWebsiteOverlay("Absol", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
         if (game.isMiltyModMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
+            addWebsiteOverlay("MiltyMod", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
         if (game.isDiscordantStarsMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_DiscordantStars.png");
+            addWebsiteOverlay("Discordant Stars", null, x + deltaX, y + deltaY, 90, 90);
         }
 
         // GAME FUN NAME
@@ -2082,16 +2096,23 @@ public class MapGenerator implements AutoCloseable {
                 String planetTypeName = "pc_upgrade.png";
                 if (planet.getTokenList().contains("attachment_tombofemphidia.png")) {
                     planetTypeName = "pc_upgrade_tomb.png";
+                    ExploreModel tomb = Mapper.getExplore("toe");
+                    addWebsiteOverlay(tomb, x + deltaX + 26, y + 40, 20, 20);
                 }
                 drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName, planetName);
             }
 
             if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                 String khraskGardenWorlds = "pc_ds_khraskbonus.png";
+                addWebsiteOverlay("Garden World", null, x + deltaX, y, 20, 20);
                 drawPlanetImage(x + deltaX, y, khraskGardenWorlds, planetName);
             }
 
             if (planet.isLegendary()) {
+                PlanetModel planetModel = planet.getPlanetModel();
+                if (planetModel != null) {
+                    addWebsiteOverlay(planetModel, x + deltaX + 26, y + 60, 20, 20);
+                }
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planetName) ? "_exh" : "_rdy";
                 String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
                 drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName, planetName);
@@ -2102,6 +2123,7 @@ public class MapGenerator implements AutoCloseable {
             // BENTOR ENCRYPTION KEY
             if (hasBentorEncryptionKey) {
                 String imageFileName = "pc_tech_bentor_encryptionkey.png";
+                addWebsiteOverlay("Bentor Encryption Key", null, x + deltaX + 26, y + 82, 20, 20);
                 drawPlanetImage(x + deltaX + 26, y + 82, imageFileName, planetName);
             }
 
@@ -2758,42 +2780,65 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private int drawCardDecks(int x, int y) {
-        if (!game.isFowMode()) {
-            int cardWidth = 60;
-            int cardHeight = 90;
-            int horSpacing = cardWidth + 15;
-            int textY = y + cardHeight - 10;
-            Stroke outline = stroke2;
+        if (game.isFowMode()) return x;
 
-            graphics.setFont(Storage.getFont24());
+        int cardWidth = 60;
+        int cardHeight = 90;
+        int horSpacing = cardWidth + 15;
+        int textY = y + cardHeight - 10;
+        Stroke outline = stroke2;
+        String overlayText;
 
-            drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        graphics.setFont(Storage.getFont24());
 
-            drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getSecretObjectiveDeckSize() + "/" + game.getSecretObjectiveFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Secret Objective Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getActionCards().size() + "/" + game.getActionCardFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Action Card Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getCulturalExploreDeckSize() + "/" + game.getCulturalExploreFullDeckSize() + " in the deck \n" + game.getCulturalExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Cultural Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getIndustrialExploreDeckSize() + "/" + game.getIndustrialExploreFullDeckSize() + " in the deck \n" + game.getIndustrialExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Industrial Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
-            drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getRelicDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
-        }
+        drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getHazardousExploreDeckSize() + "/" + game.getHazardousExploreFullDeckSize() + " in the deck \n" + game.getHazardousExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Hazardous Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getFrontierExploreDeckSize() + "/" + game.getFrontierExploreFullDeckSize() + " in the deck \n" + game.getFrontierExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Frontier Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getRelicDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getRelicDeckSize() + "/" + game.getRelicFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Relic Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_agenda.png", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getAgendaDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getAgendaDeckSize() + "/" + game.getAgendaFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Agenda Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
         return x;
     }
 
