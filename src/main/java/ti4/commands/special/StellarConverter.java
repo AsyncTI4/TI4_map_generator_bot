@@ -73,7 +73,7 @@ public class StellarConverter extends SpecialSubcommandData {
         }
 
         String message1 = (ThreadLocalRandom.current().nextInt(20) == 0 ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
-        postTileInDisasterWatch(game, tile, 1, "Moments before disaster in game " + game.getName());
+        postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName());
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 
         for (Player p2 : game.getRealPlayers()) {
@@ -106,14 +106,14 @@ public class StellarConverter extends SpecialSubcommandData {
 
         message2.append(" by ");
         message2.append(game.getPlayer(event.getUser().getId()).getRepresentation());
-        postTileInDisasterWatch(game, tile, 0, message2.toString());
+        postTileInDisasterWatch(game, event, tile, 0, message2.toString());
     }
 
-    public static void postTileInDisasterWatch(Game game, Tile tile, Integer rings, String message) {
+    public static void postTileInDisasterWatch(Game game, GenericInteractionCreateEvent event, Tile tile, Integer rings, String message) {
         if (!AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).isEmpty() && !game.isFowMode()) {
-            TextChannel watchPary = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
-            FileUpload systemWithContext = new TileGenerator(game, null, null, rings, tile.getPosition()).createFileUpload();
-            MessageHelper.sendMessageWithFile(watchPary, systemWithContext, message, false);
+            TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
+            FileUpload systemWithContext = new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload();
+            MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
         }
     }
 
