@@ -15,11 +15,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -65,7 +65,7 @@ public class Replace extends GameSubcommandData {
             return;
         }
 
-        Player removedPlayer = Helper.getPlayer(game, null, event);
+        Player removedPlayer = CommandHelper.getPlayerFromEvent(game, event);
         if (removedPlayer == null || (removePlayerOption == null && removedPlayer.getFaction() == null)) {
             MessageHelper.replyToMessage(event, "Could not find faction/color to replace");
             return;
@@ -147,10 +147,8 @@ public class Replace extends GameSubcommandData {
             game.setSpeakerUserID(player.getUserID());
         }
         GameSaveLoadManager.saveGame(game, event);
-        GameSaveLoadManager.reload(game);
-
         // Load the new game instance so that we can repost the milty draft
-        game = GameManager.getInstance().getGame(game.getName());
+        game = GameSaveLoadManager.reload(game.getName());
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
             game.getMiltyDraftManager().repostDraftInformation(game);
         }

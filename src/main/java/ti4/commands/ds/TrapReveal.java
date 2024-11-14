@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -37,9 +38,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;

@@ -5,10 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -18,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -32,24 +29,13 @@ public class DrawAgenda extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, "from_bottom", "Whether to draw from bottom, default false"));
     }
 
-    public static void drawAgenda(GenericInteractionCreateEvent event, int count, Game game, @NotNull Player player) {
-        drawAgenda(event, count, false, game, player);
-    }
-
-    public static void drawAgenda(GenericInteractionCreateEvent event, int count, boolean fromBottom, Game game, @NotNull Player player) {
-        drawAgenda(count, fromBottom, game, player, false);
-    }
-
     public static void drawAgenda(int count, Game game, @NotNull Player player) {
         drawAgenda(count, false, game, player, false);
     }
 
     public static void drawAgenda(int count, boolean fromBottom, Game game, @NotNull Player player, boolean discard) {
         String sb = player.getRepresentationUnfogged() + " here " + (count == 1 ? "is" : "are") + " the agenda" + (count == 1 ? "" : "s") + " you have drawn:";
-        Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);
-        if (realPlayer == null || game == null) return;
-
-        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);
         for (int i = 0; i < count; i++) {
             Map.Entry<String, Integer> entry = fromBottom ? game.drawBottomAgenda() : game.drawAgenda();
             if (entry != null) {
@@ -57,18 +43,15 @@ public class DrawAgenda extends AgendaSubcommandData {
                 List<MessageEmbed> agendaEmbed = Collections.singletonList(agenda.getRepresentationEmbed());
 
                 List<Button> buttons = agendaButtons(agenda, entry.getValue(), discard);
-                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(realPlayer.getCardsInfoThread(), null, agendaEmbed, buttons);
+                MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, agendaEmbed, buttons);
             }
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, "__Note: if you put both agendas on top, the second one you put will be revealed first!__");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, "__Note: if you put both agendas on top, the second one you put will be revealed first!__");
     }
 
     public static void drawSpecificAgenda(String agendaID, Game game, @NotNull Player player) {
         String sb = player.getRepresentationUnfogged() + " here is the agenda you have drawn:";
-        Player realPlayer = Helper.getGamePlayer(game, player, (Member) null, null);
-        if (realPlayer == null || game == null) return;
-
-        MessageHelper.sendMessageToPlayerCardsInfoThread(realPlayer, game, sb);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, sb);
 
         Map.Entry<String, Integer> entry = game.drawSpecificAgenda(agendaID);
         if (entry != null) {
@@ -76,7 +59,7 @@ public class DrawAgenda extends AgendaSubcommandData {
             List<MessageEmbed> agendaEmbed = Collections.singletonList(agenda.getRepresentationEmbed());
 
             List<Button> buttons = agendaButtons(agenda, entry.getValue(), false);
-            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(realPlayer.getCardsInfoThread(), null, agendaEmbed, buttons);
+            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null, agendaEmbed, buttons);
         }
 
     }
@@ -111,6 +94,6 @@ public class DrawAgenda extends AgendaSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "You are not a player of this game");
             return;
         }
-        drawAgenda(event, count, fromBottom, game, player);
+        drawAgenda(count, fromBottom, game, player, false);
     }
 }

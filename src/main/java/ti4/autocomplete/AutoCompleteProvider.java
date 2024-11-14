@@ -29,6 +29,7 @@ import ti4.commands.player.ChangeUnitDecal;
 import ti4.commands.statistics.GameStats.GameStatistics;
 import ti4.commands.statistics.PlayerStats;
 import ti4.commands.uncategorized.ServerPromote;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
@@ -65,24 +66,16 @@ import ti4.model.WormholeModel;
 public class AutoCompleteProvider {
 
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
-        // List<OptionMapping> allOptions = event.getOptions();
-        //String fullCommandName = event.getFullCommandName();
         String commandName = event.getName();
-        //String subCommandGroupName = event.getSubcommandGroup();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
 
-        //boolean showAllChoicesInGame = false;
-        //OptionMapping factionOrColorOption = event.getOption(Constants.FACTION_COLOR);
-        //if (factionOrColorOption != null) showAllChoicesInGame = true;
-
         String userID = event.getUser().getId();
         SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         Player player = null;
         if (game != null) {
-            player = game.getPlayer(userID);
-            player = Helper.getGamePlayer(game, player, event, null);
+            player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
         }
 
         // VERY SPECIFIC HANDLING OF OPTIONS
@@ -121,7 +114,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
+            case Constants.FACTION_COLOR, Constants.TARGET_FACTION_OR_COLOR -> {
                 if (game == null) {
                     event.replyChoiceStrings("No game found in this channel").queue();
                     break;
@@ -769,7 +762,7 @@ public class AutoCompleteProvider {
             }
             case Constants.GAME_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = GameManager.getInstance().getGameNames().stream()
+                List<Command.Choice> options = GameManager.getGameNames().stream()
                     .filter(token -> token.contains(enteredValue))
                     .limit(25)
                     .map(token -> new Command.Choice(token, token))

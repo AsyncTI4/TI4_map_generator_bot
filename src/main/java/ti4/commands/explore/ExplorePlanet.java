@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,11 +12,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -41,7 +41,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
         super(Constants.PLANET, "Explore a specific planet.");
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ, "Override ownership requirement. Enter YES if so").setRequired(false));
     }
 
@@ -80,9 +80,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
         if (overRider != null && "YES".equalsIgnoreCase(overRider.getAsString())) {
             over = true;
         }
-        Player player = game.getPlayer(event.getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
 
         explorePlanet(event, tile, planetName, drawColor, player, false, game, 1, over);
     }

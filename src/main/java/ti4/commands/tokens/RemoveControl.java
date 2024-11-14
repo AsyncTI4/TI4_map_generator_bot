@@ -62,7 +62,7 @@ public class RemoveControl extends AddRemoveToken {
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_CONTROL;
     }
 }

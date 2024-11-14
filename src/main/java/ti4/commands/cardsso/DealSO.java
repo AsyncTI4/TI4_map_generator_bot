@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class DealSO extends SOCardsSubcommandData {
     public DealSO() {
         super(Constants.DEAL_SO, "Deal Secret Objective");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to deal, default 1"));
     }
 
@@ -29,21 +29,21 @@ public class DealSO extends SOCardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player_ = Helper.getPlayer(game, null, event);
-        if (player_ == null) {
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found");
             return;
         }
-        User user = AsyncTI4DiscordBot.jda.getUserById(player_.getUserID());
+        User user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
         if (user == null) {
             MessageHelper.sendMessageToEventChannel(event, "User for faction not found. Report to ADMIN");
             return;
         }
 
         for (int i = 0; i < count; i++) {
-            game.drawSecretObjective(player_.getUserID());
+            game.drawSecretObjective(player.getUserID());
         }
         MessageHelper.sendMessageToEventChannel(event, count + " SO Dealt");
-        SOInfo.sendSecretObjectiveInfo(game, player_, event);
+        SOInfo.sendSecretObjectiveInfo(game, player, event);
     }
 }

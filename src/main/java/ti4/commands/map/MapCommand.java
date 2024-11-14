@@ -17,7 +17,7 @@ public class MapCommand implements Command {
     private final Collection<MapSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.MAP;
     }
 
@@ -31,7 +31,7 @@ public class MapCommand implements Command {
             }
         }
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         if (game == null) return;
         ShowGame.simpleShowGame(game, event);
     }
@@ -56,7 +56,7 @@ public class MapCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+    public void register(CommandListUpdateAction commands) {
+        commands.addCommands(Commands.slash(getName(), getActionDescription()).addSubcommands(getSubcommands()));
     }
 }

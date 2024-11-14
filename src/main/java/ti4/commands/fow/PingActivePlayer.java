@@ -3,9 +3,9 @@ package ti4.commands.fow;
 import java.util.Date;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.GameSaveLoadManager;
@@ -31,7 +31,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player playerOrig = Helper.getGamePlayer(game, player, event, null);
+        Player playerOrig = CommandHelper.getPlayerFromEvent(game, event);
         long milliSinceLastPing = System.currentTimeMillis() - game.getLastActivePlayerPing().getTime();
         boolean samePlayer = false;
         if (playerOrig != null) {
@@ -51,7 +51,7 @@ public class PingActivePlayer extends FOWSubcommandData {
             game.setLastActivePlayerPing(new Date());
             GameSaveLoadManager.saveGame(game, "Auto Ping");
         }
-        ButtonHelper.increasePingCounter(GameManager.getInstance().getGame("finreference"), player.getUserID());
+        ButtonHelper.increasePingCounter(GameManager.getGame("finreference"), player.getUserID());
     }
 
     @Override

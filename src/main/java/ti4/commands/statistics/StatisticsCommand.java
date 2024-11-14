@@ -18,7 +18,7 @@ public class StatisticsCommand implements Command {
     private final Collection<StatisticsSubcommandData> subcommandData = getSubcommands();
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.STATISTICS;
     }
 
@@ -43,7 +43,7 @@ public class StatisticsCommand implements Command {
 
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
     }
 
@@ -71,9 +71,9 @@ public class StatisticsCommand implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addSubcommands(getSubcommands()));
     }
 }

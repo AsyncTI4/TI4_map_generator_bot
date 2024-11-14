@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.milty.MiltyDraftTile;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -30,9 +31,7 @@ public class DrawBlueBackTile extends DiscordantStarsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;

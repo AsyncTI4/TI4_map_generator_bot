@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -53,9 +54,7 @@ public class Stats extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
 
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -164,7 +163,7 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionPref = event.getOption(Constants.PREFERS_DISTANCE);
         if (optionPref != null) {
             player.setPreferenceForDistanceBasedTacticalActions(optionPref.getAsBoolean());
-            Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+            Map<String, Game> mapList = GameManager.getGameNameToGame();
             for (Game activeGame2 : mapList.values()) {
                 for (Player player2 : activeGame2.getRealPlayers()) {
                     if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {

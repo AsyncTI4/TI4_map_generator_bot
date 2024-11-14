@@ -1,13 +1,13 @@
 package ti4.commands.event;
 
+import java.util.Map.Entry;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.EventModel;
-
-import java.util.Map.Entry;
 
 public class ShowDiscardedEvents extends EventSubcommandData {
     public ShowDiscardedEvents() {

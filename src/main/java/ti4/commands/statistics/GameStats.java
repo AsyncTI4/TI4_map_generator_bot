@@ -150,7 +150,7 @@ public class GameStats extends StatisticsSubcommandData {
     }
 
     public static void listPingCounterList(SlashCommandInteractionEvent event) {
-        Game reference = GameManager.getInstance().getGame("finreference");
+        Game reference = GameManager.getGame("finreference");
         Map<String, Integer> pings = new HashMap<>();
         for (String pingsFor : reference.getMessagesThatICheckedForAllReacts().keySet()) {
 
@@ -331,7 +331,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
@@ -345,7 +345,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
@@ -359,7 +359,7 @@ public class GameStats extends StatisticsSubcommandData {
 
         Comparator<Game> mapSort = Comparator.comparing(Game::getGameNameForSorting);
 
-        List<Game> games = GameManager.getInstance().getGameNameToGame().values().stream()
+        List<Game> games = GameManager.getGameNameToGame().values().stream()
             .filter(allFilterPredicates)
             .sorted(mapSort)
             .toList();
@@ -409,7 +409,7 @@ public class GameStats extends StatisticsSubcommandData {
     private static void showMostPlayedFactions(GenericInteractionCreateEvent event) {
         Map<String, Integer> factionCount = new HashMap<>();
         Map<String, Integer> custodians = new HashMap<>();
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         for (Game game : mapList.values()) {
             for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
                 String faction = player.getFaction();
@@ -689,7 +689,7 @@ public class GameStats extends StatisticsSubcommandData {
 
     private static void showMostWinningColour(GenericInteractionCreateEvent event) {
         Map<String, Integer> winnerColorCount = new HashMap<>();
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         for (Game game : mapList.values()) {
             Optional<Player> winner = game.getWinner();
             if (winner.isEmpty()) {

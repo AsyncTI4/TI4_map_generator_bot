@@ -71,7 +71,7 @@ public class Eliminate extends AddRemovePlayer {
             //     return;
             // }
 
-            // Player player = Helper.getPlayer(game, null, event);
+            // Player player = CommandHelper.getPlayerFromEvent(game, event);
             User extraUser = option.getAsUser();
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();

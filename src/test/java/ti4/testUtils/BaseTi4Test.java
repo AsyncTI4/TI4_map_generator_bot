@@ -1,7 +1,6 @@
 package ti4.testUtils;
 
 import org.junit.jupiter.api.BeforeAll;
-
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.generator.TileHelper;

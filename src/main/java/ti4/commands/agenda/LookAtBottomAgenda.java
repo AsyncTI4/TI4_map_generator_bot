@@ -3,8 +3,8 @@ package ti4.commands.agenda;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -27,8 +27,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "You are not a player in this game.");
             return;

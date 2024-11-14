@@ -19,9 +19,9 @@ import ti4.commands.player.AbilityInfo;
 import ti4.commands.player.UnitInfo;
 import ti4.commands.relic.RelicInfo;
 import ti4.commands.tech.TechInfo;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
@@ -30,20 +30,19 @@ import ti4.message.MessageHelper;
 public class AllInfo implements Command {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.ALL_INFO;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+        return acceptEvent(event, getName());
     }
 
     public static boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
         if (event.getName().equals(actionID)) {
             String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
+            if (!GameManager.isUserWithActiveGame(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
@@ -56,9 +55,9 @@ public class AllInfo implements Command {
                     }
                 }
             }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
+            Game userActiveGame = GameManager.getUserActiveGame(userID);
             if (userActiveGame.isCommunityMode()) {
-                Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
+                Player player = CommandHelper.getPlayerFromEvent(userActiveGame, event);
                 if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
                     MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                     return false;
@@ -79,22 +78,20 @@ public class AllInfo implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
         Game game;
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-            game = gameManager.getUserActiveGame(userID);
-            String color = Helper.getColor(game, event);
+            game = GameManager.getUserActiveGame(userID);
+            String color = CommandHelper.getColor(game, event);
             if (!Mapper.isValidColor(color)) {
                 MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }
         }
 
-        Player player = game.getPlayer(userID);
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -118,10 +115,10 @@ public class AllInfo implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
+            Commands.slash(getName(), getActionDescription())
                 .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false)));
     }

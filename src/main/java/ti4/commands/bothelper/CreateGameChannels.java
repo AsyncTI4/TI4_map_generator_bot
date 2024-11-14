@@ -469,7 +469,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        Set<String> mapNames = new HashSet<>(GameManager.getInstance().getGameNameToGame().keySet());
+        Set<String> mapNames = new HashSet<>(GameManager.getGameNameToGame().keySet());
         gameAndRoleNames.addAll(mapNames);
 
         // CHECK
@@ -496,7 +496,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = GameManager.getInstance().getGameNameToGame().keySet().stream()
+        List<String> mapNames = GameManager.getGameNameToGame().keySet().stream()
             .filter(mapName -> mapName.startsWith("pbd"))
             .toList();
         for (String mapName : mapNames) {

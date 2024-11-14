@@ -41,7 +41,7 @@ public class SearchGames extends SearchSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         boolean includeNormalGames = event.getOption(Constants.NORMAL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeTIGLGames = event.getOption(Constants.TIGL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeCommunityGames = event.getOption(Constants.COMMUNITY_MODE, false, OptionMapping::getAsBoolean);

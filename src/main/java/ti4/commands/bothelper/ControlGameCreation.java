@@ -21,7 +21,7 @@ public class ControlGameCreation extends BothelperSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
-        Game mapreference = GameManager.getInstance().getGame("finreference");
+        Game mapreference = GameManager.getGame("finreference");
         Boolean light = event.getOption(Constants.ALLOW_GAME_CREATION, null, OptionMapping::getAsBoolean);
         if (light != null && !light) {
             mapreference.setStoredValue("allowedButtonPress", "false");

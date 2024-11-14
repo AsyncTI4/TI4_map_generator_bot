@@ -1,5 +1,8 @@
 package ti4.commands.uncategorized;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,30 +23,27 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ShowGame implements Command {
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.SHOW_GAME;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(getActionID())) {
+        if (!event.getName().equals(getName())) {
             return false;
         }
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         if (option != null) {
             String mapName = option.getAsString();
-            if (!GameManager.getInstance().getGameNameToGame().containsKey(mapName)) {
+            if (!GameManager.getGameNameToGame().containsKey(mapName)) {
                 MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
                 return false;
             }
         } else {
-            Game userActiveGame = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+            Game userActiveGame = GameManager.getUserActiveGame(event.getUser().getId());
             if (userActiveGame == null) {
                 MessageHelper.replyToMessage(event, "No active game set, need to specify what map to show");
                 return false;
@@ -56,12 +56,11 @@ public class ShowGame implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         Game game;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
-        GameManager gameManager = GameManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            game = gameManager.getGame(mapName);
+            game = GameManager.getGame(mapName);
         } else {
-            game = gameManager.getUserActiveGame(event.getUser().getId());
+            game = GameManager.getUserActiveGame(event.getUser().getId());
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
@@ -144,10 +143,10 @@ public class ShowGame implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Shows selected map")
+            Commands.slash(getName(), "Shows selected map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }

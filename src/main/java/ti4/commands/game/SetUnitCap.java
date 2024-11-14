@@ -3,10 +3,9 @@ package ti4.commands.game;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
+import ti4.commands2.CommandHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -27,7 +26,7 @@ public class SetUnitCap extends GameSubcommandData {
         if (unitCap > 99) {
             unitCap = 99;
         }
-        Player player = Helper.getPlayer(game, null, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         String unitID = AliasHandler.resolveUnit(unit);
         player.setUnitCap(unitID, unitCap);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set " + unit + " max to " + unitCap + " for " + player.getRepresentation());
