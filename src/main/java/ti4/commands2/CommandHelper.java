@@ -127,7 +127,7 @@ public class CommandHelper {
 
     @Nullable
     public static Player getOtherPlayerFromEvent(Game game, SlashCommandInteractionEvent event) {
-        OptionMapping playerOption = event.getOption(Constants.OTHER_PLAYER);
+        OptionMapping playerOption = event.getOption(Constants.TARGET_PLAYER);
         if (playerOption != null) {
             String playerID = playerOption.getAsUser().getId();
             return game.getPlayer(playerID);

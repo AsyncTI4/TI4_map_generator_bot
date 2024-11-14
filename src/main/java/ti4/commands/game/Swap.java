@@ -25,7 +25,7 @@ public class Swap extends GameSubcommandData {
     public Swap() {
         super(Constants.SWAP, "Swap factions with a player ");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color ").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.OTHER_PLAYER, "Replacement player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "Replacement player @playerName").setRequired(true));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class Swap extends GameSubcommandData {
         }
         String message = "";
         OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
-        OptionMapping addOption = event.getOption(Constants.OTHER_PLAYER);
+        OptionMapping addOption = event.getOption(Constants.TARGET_PLAYER);
         if (removeOption != null && addOption != null) {
             Player removedPlayer = CommandHelper.getPlayerFromEvent(game, event);
             Player swapperPlayer = game.getPlayer(addOption.getAsUser().getId());

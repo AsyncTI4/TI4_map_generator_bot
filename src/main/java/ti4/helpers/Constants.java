@@ -539,7 +539,7 @@ public class Constants {
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String FACTION_COLOR = "faction_or_color";
     public static final String TARGET_FACTION_OR_COLOR = "target_faction_or_color";
-    public static final String OTHER_PLAYER = "other_player";
+    public static final String TARGET_PLAYER = "target_player";
     public static final String TECH_TYPE = "tech_type";
     public static final String STATS = "stats";
     public static final String SEND_TG = "send_tg";

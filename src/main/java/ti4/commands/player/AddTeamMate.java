@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 public class AddTeamMate extends PlayerSubcommandData {
     public AddTeamMate() {
         super(Constants.ADD_TEAMMATE, "Add a teammate");
-        addOptions(new OptionData(OptionType.USER, Constants.OTHER_PLAYER, "User who is on your team").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "User who is on your team").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
@@ -25,7 +25,7 @@ public class AddTeamMate extends PlayerSubcommandData {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
         }
-        OptionMapping addOption = event.getOption(Constants.OTHER_PLAYER);
+        OptionMapping addOption = event.getOption(Constants.TARGET_PLAYER);
         if (addOption != null) {
             if (player.getTeamMateIDs().contains(addOption.getAsUser().getId())) {
                 MessageHelper.sendMessageToEventChannel(event, "User " + addOption.getAsUser().getAsMention() + " is already a part of " + player.getFaction() + "'s team.");
