@@ -31,14 +31,10 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class AddToken extends AddRemoveToken {
+
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
-
-        String tokenName = event.getOption(Constants.TOKEN, "", OptionMapping::getAsString).toLowerCase();
-        if (tokenName.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
-            return;
-        }
+        String tokenName = event.getOption(Constants.TOKEN).getAsString().toLowerCase();
         tokenName = StringUtils.substringBefore(tokenName, " ");
         tokenName = AliasHandler.resolveAttachment(tokenName);
         if (!Mapper.isValidToken(tokenName)) {
