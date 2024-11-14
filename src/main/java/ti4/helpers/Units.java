@@ -68,7 +68,7 @@ public class Units {
                 return "PlenaryOrbital.png";
             }
             if (UnitType.Monument == unitType) {
-                return "monument.png"; // TODO: Colours
+                return getColor() + "_monument.png";
             }
 
             return String.format("%s_%s.png", colorID, asyncID());
