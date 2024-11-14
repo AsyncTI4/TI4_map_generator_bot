@@ -1173,39 +1173,44 @@ public class MapGenerator implements AutoCloseable {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-        Collection<Player> players = game.getPlayers().values();
+
         for (String pn : player.getPromissoryNotesInPlayArea()) {
             graphics.setColor(Color.WHITE);
-            
+
             boolean commanderUnlocked = false;
             Player promissoryNoteOwner = game.getPNOwner(pn);
             if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
-                String error = game.getName() + " " + player.getUserName();
-                error += "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: "
-                    + pn;
+                String error = game.getName() + " " + player.getUserName() + "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: " + pn;
                 BotLogger.log(error);
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
-            for (Player player_ : players) {
-                if (player_ != player) {
-                    String playerColor = player_.getColor();
-                    String playerFaction = player_.getFaction();
-                    if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor())
-                        || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
-                        String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
-                        drawPAImage(x + deltaX, y, pnColorFile);
-                        if (game.isFrankenGame()) {
-                            drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
-                        }
-                        DrawingUtil.drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
-                        Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
-                        if (leader != null) {
-                            commanderUnlocked = !leader.isLocked();
-                        }
-                        break;
+
+            if (pn.endsWith("_an")) { // Overlay for alliance commander
+                if (promissoryNoteOwner.getLeader(Constants.COMMANDER).isPresent() &&
+                    promissoryNoteOwner.getLeader(Constants.COMMANDER).get().getLeaderModel().isPresent()) {
+                    LeaderModel leaderModel = promissoryNoteOwner.getLeader(Constants.COMMANDER).get().getLeaderModel().get();
+                    drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, leaderModel);
+                }
+            } else {
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
+            }
+            for (Player player_ : player.getOtherRealPlayers()) {
+                String playerColor = player_.getColor();
+                String playerFaction = player_.getFaction();
+                if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor())
+                    || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
+                    String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
+                    drawPAImage(x + deltaX, y, pnColorFile);
+                    if (game.isFrankenGame()) {
+                        drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
                     }
+                    DrawingUtil.drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
+                    Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
+                    if (leader != null) {
+                        commanderUnlocked = !leader.isLocked();
+                    }
+                    break;
                 }
             }
 
