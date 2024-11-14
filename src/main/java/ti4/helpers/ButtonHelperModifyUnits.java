@@ -158,8 +158,8 @@ public class ButtonHelperModifyUnits {
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int count = 0;
         while (haveGroundForces) {
-			int hitP1 = CombatRoll.secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
-			int hitP2 = CombatRoll.secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP1 = CombatRoll.secondHalfOfCombatRoll(p1, game, event, tile, planet, CombatRollType.combatround, true);
+            int hitP2 = CombatRoll.secondHalfOfCombatRoll(p2, game, event, tile, planet, CombatRollType.combatround, true);
 
             if (p1.hasTech("vpw") && hitP2 > 0) {
                 hitP1++;
