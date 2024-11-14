@@ -3,6 +3,7 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
@@ -87,13 +88,29 @@ public class ButtonHelperRelics {
         }
     }
 
+    public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            Planet unitHolder = game.getPlanetsInfo().get(planet);
+            Planet planetReal = unitHolder;
+            if (planetReal == null)
+                continue;
+
+            boolean legendaryOrHome = ButtonHelper.isPlanetLegendaryOrHome(planet, game, false, null);
+            if (!legendaryOrHome) {
+                buttons.add(Buttons.green("nanoforgePlanet_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            }
+        }
+        String message = "Use buttons to select which planet to nanoforge";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+
     @ButtonHandler("nanoforgePlanet_")
     public static void nanoforgePlanet(ButtonInteractionEvent event, String buttonID, Game game) {
         String planet = buttonID.replace("nanoforgePlanet_", "");
         Planet planetReal = game.getPlanetsInfo().get(planet);
         planetReal.addToken("attachment_nanoforge.png");
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Attached Nano-Forge to " + Helper.getPlanetRepresentation(planet, game));
         ButtonHelper.deleteMessage(event);
     }
 

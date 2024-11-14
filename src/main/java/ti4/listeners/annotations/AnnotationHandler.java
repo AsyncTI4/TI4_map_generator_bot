@@ -153,7 +153,14 @@ public class AnnotationHandler {
                 method.setAccessible(true);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
-                BotLogger.log("Error within button handler:", e.getCause());
+                BotLogger.log("Error within button handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
+                for (Object arg : args) {
+                    if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
+                        buttonInteractionEvent.getInteraction().getMessage()
+                            .reply("The button failed. An exception has been logged for the developers.")
+                            .queue();
+                    }
+                }
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters()).map(param -> param.getType().getSimpleName()).toList();
                 List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
