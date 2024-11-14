@@ -573,6 +573,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .collect(Collectors.joining("\n"));
         BotLogger.log("Server Game Capacity Check:\n" + debugText);
 
+        if (guilds.isEmpty()) {
+            BotLogger.log("No guilds had room for a new full category during game creation.");
+            throw new IllegalStateException("Servers are full!");
+        }
         return guilds.getLast();
     }
 
