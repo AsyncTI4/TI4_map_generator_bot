@@ -106,7 +106,7 @@ public class UserJoinServerListener extends ListenerAdapter {
             return;
         }
         String threadID = game.getLaunchPostThreadID();
-        if (threadID == null || !ButtonHelper.isNumeric(threadID)) {
+        if (!ButtonHelper.isNumeric(threadID)) {
             return;
         }
         ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);
