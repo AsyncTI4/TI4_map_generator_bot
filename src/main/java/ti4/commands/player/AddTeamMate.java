@@ -13,8 +13,8 @@ import ti4.message.MessageHelper;
 public class AddTeamMate extends PlayerSubcommandData {
     public AddTeamMate() {
         super(Constants.ADD_TEAMMATE, "Add a teammate");
-        addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "User who is on your team").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "User to add to your team").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color receiving the teammate (defaults to you)").setAutoComplete(true));
     }
 
     @Override
