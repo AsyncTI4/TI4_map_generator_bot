@@ -73,12 +73,12 @@ public class WebHelper {
     }
 
     public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
-        // if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-        //     return;
+        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
+            return;
 
         try {
             String json = objectMapper.writeValueAsString(overlays);
-            System.out.println(json);
+
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
                 .key(String.format("overlays/%s/%s.json", gameId, gameId))
@@ -104,7 +104,7 @@ public class WebHelper {
         List<String> badGames = new ArrayList<>();
         int count = 0;
         for (Game game : GameManager.getGameNameToGame().values()) {
-            if (game.isHasEnded() && game.hasWinner()) {
+            if (game.getRound() > 2 || (game.isHasEnded() && game.hasWinner())) {
                 count++;
                 try {
                     // Quick & Dirty bypass for failed json creation
