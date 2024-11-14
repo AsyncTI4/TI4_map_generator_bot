@@ -1173,39 +1173,44 @@ public class MapGenerator implements AutoCloseable {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-        Collection<Player> players = game.getPlayers().values();
+
         for (String pn : player.getPromissoryNotesInPlayArea()) {
             graphics.setColor(Color.WHITE);
-            
+
             boolean commanderUnlocked = false;
             Player promissoryNoteOwner = game.getPNOwner(pn);
             if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
-                String error = game.getName() + " " + player.getUserName();
-                error += "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: "
-                    + pn;
+                String error = game.getName() + " " + player.getUserName() + "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: " + pn;
                 BotLogger.log(error);
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
-            for (Player player_ : players) {
-                if (player_ != player) {
-                    String playerColor = player_.getColor();
-                    String playerFaction = player_.getFaction();
-                    if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor())
-                        || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
-                        String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
-                        drawPAImage(x + deltaX, y, pnColorFile);
-                        if (game.isFrankenGame()) {
-                            drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
-                        }
-                        DrawingUtil.drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
-                        Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
-                        if (leader != null) {
-                            commanderUnlocked = !leader.isLocked();
-                        }
-                        break;
+
+            if (pn.endsWith("_an")) { // Overlay for alliance commander
+                if (promissoryNoteOwner.getLeader(Constants.COMMANDER).isPresent() &&
+                    promissoryNoteOwner.getLeader(Constants.COMMANDER).get().getLeaderModel().isPresent()) {
+                    LeaderModel leaderModel = promissoryNoteOwner.getLeader(Constants.COMMANDER).get().getLeaderModel().get();
+                    drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, leaderModel);
+                }
+            } else {
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
+            }
+            for (Player player_ : player.getOtherRealPlayers()) {
+                String playerColor = player_.getColor();
+                String playerFaction = player_.getFaction();
+                if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor())
+                    || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
+                    String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
+                    drawPAImage(x + deltaX, y, pnColorFile);
+                    if (game.isFrankenGame()) {
+                        drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
                     }
+                    DrawingUtil.drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
+                    Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
+                    if (leader != null) {
+                        commanderUnlocked = !leader.isLocked();
+                    }
+                    break;
                 }
             }
 
@@ -1681,7 +1686,7 @@ public class MapGenerator implements AutoCloseable {
         int widthOfSection = 180;
         int leftSide = width - widthOfSection - xDeltaFromRightSide;
         int verticalSpacing = 39;
-        addWebsiteOverlay("Fleet Stats", "Total Resources | Total Hit Points | Total Expected Hits", leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
+        addWebsiteOverlay("Fleet Stats", "- Total Resources\n- Total Hit Points\n- Total Expected Hits", leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
         int imageSize = verticalSpacing - 2;
         drawPAImageScaled(leftSide, y + verticalSpacing, "pa_resources.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
@@ -1898,7 +1903,7 @@ public class MapGenerator implements AutoCloseable {
         // RESOURCE/INFLUENCE TOTALS
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
-        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 152, 152, "Resource & Influence Summary", "This is an overview of your resources and influence. The top number is your available resources, the middle number is your total resources, and the bottom number is your optimal resources. The left side is resources, and the right side is influence.");
+        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 152, 152, "Resource & Influence Summary", "This is an overview of your resources and influence. The left side is resources, and the right side is influence.\nThe top number how many you have available\nThe middle number is the total\nThe bottom number is the 'optimal' available\nThe bottom-centre number is the flex 'optimal' available");
         if (player.hasLeaderUnlocked("xxchahero")) { // XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, game);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, game);
