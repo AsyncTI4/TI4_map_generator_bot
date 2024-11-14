@@ -1804,12 +1804,11 @@ public class AgendaHelper {
     @ButtonHandler("rider_")
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String[] choiceParams = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.lastIndexOf("_")).split(";");
-        // String choiceType = choiceParams[0];
         String choice = choiceParams[1];
 
         String rider = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
-        // if(activeMap)
+
         String cleanedChoice = choice;
         if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
             cleanedChoice = Helper.getPlanetRepresentation(choice, game);
