@@ -37,7 +37,6 @@ class ArchiveOldThreads extends Subcommand {
     }
 
     private static String getOldThreadsMessage(Guild guild, Integer channelCount) {
-        StringBuilder sb;
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
                 .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
@@ -45,7 +44,7 @@ class ArchiveOldThreads extends Subcommand {
                 .limit(channelCount)
                 .toList();
 
-        sb = new StringBuilder("Least Active Threads:\n");
+        StringBuilder sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
             Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());

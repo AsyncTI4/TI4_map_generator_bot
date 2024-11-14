@@ -2,10 +2,8 @@ package ti4.commands2.bothelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,6 +20,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.game.GameCreate;
 import ti4.commands2.Subcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -47,14 +46,12 @@ class CreateFOWGameChannels extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Guild guild;
-
         //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         String gameName;
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
-            if (gameOrRoleAlreadyExists(gameName)) {
+            if (GameCreationHelper.gameOrRoleAlreadyExists(gameName)) {
                 MessageHelper.sendMessageToEventChannel(event, "Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
                 return;
             }
@@ -63,10 +60,7 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         //CHECK IF GIVEN CATEGORY IS VALID
-
-        guild = event.getGuild();
-        //CHECK IF CATEGORY EXISTS
-
+        Guild guild = event.getGuild();
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(event, "Guild was null");
             return;
@@ -196,27 +190,6 @@ class CreateFOWGameChannels extends Subcommand {
         return "fow" + nextPBDNumber;
     }
 
-    private static boolean gameOrRoleAlreadyExists(String name) {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
-        List<String> gameAndRoleNames = new ArrayList<>();
-
-        // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            //EXISTING ROLE NAMES
-            for (Role role : guild.getRoles()) {
-                gameAndRoleNames.add(role.getName());
-            }
-        }
-
-        // GET ALL EXISTING PBD MAP NAMES
-        Set<String> gameNames = new HashSet<>(GameManager.getGameNames());
-        gameAndRoleNames.addAll(gameNames);
-
-        //CHECK
-        // TODO: what about game and role names list?
-        return gameNames.contains(name);
-    }
-
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
@@ -273,11 +246,5 @@ class CreateFOWGameChannels extends Subcommand {
             return false;
         }
         return true;
-    }
-
-    public static List<Category> getAllAvailablePBDCategories() {
-        return AsyncTI4DiscordBot.jda.getCategories().stream()
-            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
-            .toList();
     }
 }

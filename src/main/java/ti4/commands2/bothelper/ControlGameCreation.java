@@ -1,7 +1,6 @@
 package ti4.commands2.bothelper;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.Subcommand;
@@ -17,21 +16,20 @@ class ControlGameCreation extends Subcommand {
         super(Constants.CONTROL_GAME_CREATION, "Stop or allow game creation buttons to be pressed");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALLOW_GAME_CREATION,
             "True to allow the button to be pressed").setRequired(true));
-
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
-        Game mapreference = GameManager.getGame("finreference");
-        Boolean light = event.getOption(Constants.ALLOW_GAME_CREATION, null, OptionMapping::getAsBoolean);
-        if (light != null && !light) {
-            mapreference.setStoredValue("allowedButtonPress", "false");
+        Game mapReference = GameManager.getGame("finreference");
+        boolean allowGameCreation = event.getOption(Constants.ALLOW_GAME_CREATION).getAsBoolean();
+        if (!allowGameCreation) {
+            mapReference.setStoredValue("allowedButtonPress", "false");
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set game creation button presses as unallowed");
         } else {
-            mapreference.setStoredValue("allowedButtonPress", "true");
+            mapReference.setStoredValue("allowedButtonPress", "true");
             MessageHelper.sendMessageToChannel(event.getChannel(), "Set game creation button presses as allowed");
         }
-        GameSaveLoadManager.saveGame(mapreference, "Updated Setting");
+        GameSaveLoadManager.saveGame(mapReference, "Updated Setting");
     }
 }
