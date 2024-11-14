@@ -889,12 +889,11 @@ public class AutoCompleteProvider {
 
     private static <T extends ModelInterface & EmbeddableModel> List<Command.Choice> searchModels(CommandAutoCompleteInteractionEvent event, Collection<T> models, ComponentSource source) {
         String enteredValue = event.getFocusedOption().getValue();
-        List<Command.Choice> options = models.stream()
+        return models.stream()
             .filter(model -> model.search(enteredValue, source))
             .limit(25)
             .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
             .collect(Collectors.toList());
-        return options;
     }
 
     private static void resolveSearchCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {

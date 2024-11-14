@@ -57,9 +57,6 @@ public class CommandHelper {
             IThreadContainerUnion parentChannel = ((ThreadChannel) channel).getParentChannel();
             gameName = getGameNameFromChannelName(parentChannel.getName());
         }
-        if (GameManager.isValidGame(gameName)) {
-            return gameName;
-        }
         return gameName;
     }
 

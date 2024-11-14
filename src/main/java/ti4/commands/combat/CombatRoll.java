@@ -216,7 +216,7 @@ public class CombatRoll extends CombatSubcommandData {
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
         int round;
-        String combatName = "combatRoundTracker" + (opponent == null ? "nullfaction" : opponent.getFaction()) + tile.getPosition() + combatOnHolder.getName();
+        String combatName = "combatRoundTracker" + opponent.getFaction() + tile.getPosition() + combatOnHolder.getName();
         if (game.getStoredValue(combatName).isEmpty()) {
             round = 0;
         } else {
@@ -243,7 +243,7 @@ public class CombatRoll extends CombatSubcommandData {
             String thalnosMessage = "Use this button to roll for Thalnos.\n-# Note that if it matters, the dice were just rolled in the following format: (normal dice for unit 1)+(normal dice for unit 2)...etc...+(extra dice for unit 1)+(extra dice for unit 2)...etc.\n-# Sol and Letnev agents automatically are given as extra dice for unit 1.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), thalnosMessage, List.of(thalnosButton, decline));
         }
-        if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != null && opponent != player) {
+        if (!game.isFowMode() && rollType == CombatRollType.combatround && combatOnHolder instanceof Planet && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " you suffered " + h + " hit" + (h == 1 ? "" : "s") + " in round #" + round2;
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (!automated) {
@@ -296,7 +296,7 @@ public class CombatRoll extends CombatSubcommandData {
             }
         } else {
             List<Button> buttons = new ArrayList<>();
-            if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != null && opponent != player) {
+            if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != player) {
                 if (round2 > round) {
                     if (opponent.isDummy()) {
                         buttons.add(Buttons.blue(opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Dummy For Combat Round #" + (round + 1)));
@@ -328,7 +328,7 @@ public class CombatRoll extends CombatSubcommandData {
                 }
 
             } else {
-                if (game.isFowMode() && opponent != null && opponent.isDummy() && h > 0) {
+                if (game.isFowMode() && opponent.isDummy() && h > 0) {
                     if (combatOnHolder instanceof Planet) {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_" + combatOnHolder.getName(), "Roll Dice For Dummy for Combat Round #" + (round + 1)));
@@ -344,7 +344,7 @@ public class CombatRoll extends CombatSubcommandData {
                 }
             }
         }
-        if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != null && opponent != player) {
+        if (!game.isFowMode() && rollType == CombatRollType.AFB && opponent != player) {
             String msg2 = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from AFB";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
             if (h > 0) {
@@ -357,18 +357,16 @@ public class CombatRoll extends CombatSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg, buttons);
             }
         }
-        if (!game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != null && opponent != player) {
+        if (!game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != player) {
             String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from space cannon offense";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
             List<Button> buttons = new ArrayList<>();
-            if (h > 0) {
-                String finChecker = "FFCC_" + opponent.getFaction() + "_";
-                buttons.add(Buttons.green(finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s")));
-                buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "deleteThis_pds", "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                buttons.add(Buttons.gray(finChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
-                String msg2 = opponent.getFactionEmoji() + " may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
-            }
+            String finChecker = "FFCC_" + opponent.getFaction() + "_";
+            buttons.add(Buttons.green(finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s")));
+            buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "deleteThis_pds", "Manually Assign Hit" + (h == 1 ? "" : "s")));
+            buttons.add(Buttons.gray(finChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
+            String msg2 = opponent.getFactionEmoji() + " may automatically assign " + (h == 1 ? "the hit" : "hits") + ". The hit" + (h == 1 ? "" : "s") + " would be assigned in the following way:\n\n" + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2, buttons);
         }
         if (!game.isFowMode() && rollType == CombatRollType.bombardment && h > 0) {
 

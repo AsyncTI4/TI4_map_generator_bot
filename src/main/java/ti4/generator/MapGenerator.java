@@ -2315,7 +2315,7 @@ public class MapGenerator implements AutoCloseable {
             centerX += 5;
         }
         graphics.drawString(String.valueOf(genSynthesisInfantry), x + deltaX + 3 + centerX, y + 148);
-        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, "Gen Synthesis (Infantry II)", "Number of infantry to revive: " + String.valueOf(genSynthesisInfantry));
+        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, "Gen Synthesis (Infantry II)", "Number of infantry to revive: " + genSynthesisInfantry);
         deltaX += 48;
         return deltaX;
     }
@@ -2334,7 +2334,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         mainImage.flush();
         graphics.dispose();
         logDebug();

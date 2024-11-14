@@ -31,7 +31,7 @@ public class StartingTechDraftItem extends DraftItem {
         return getFaction().getFactionName() + " Starting Tech";
     }
 
-    public static Map<String, String> selectableStartingTechs = Map.ofEntries(
+    public static final Map<String, String> selectableStartingTechs = Map.ofEntries(
         Map.entry("winnu", "Choose any 1 technology that has no prerequisites."),
         Map.entry("argent", "Choose 2 of the following: :Biotictech: Neural Motivator, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring"),
         Map.entry("keleresa", "Choose 2 non-faction technologies owned by other players."),
@@ -89,7 +89,7 @@ public class StartingTechDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.STARTINGTECH, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.STARTINGTECH, faction.getAlias()));
         }
         return allItems;
     }

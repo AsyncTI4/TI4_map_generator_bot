@@ -59,9 +59,8 @@ public class GameCreationHelper {
 		}
 
 		// CHECK IF CATEGORY HAS ROOM
-		Category category = categoryChannel;
-		if (category.getChannels().size() > 48) {
-			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Category: **" + category.getName()
+        if (categoryChannel.getChannels().size() > 48) {
+			MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Category: **" + categoryChannel.getName()
 				+ "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
 			return;
 		}
@@ -104,14 +103,14 @@ public class GameCreationHelper {
 		long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
 		// CREATE TABLETALK CHANNEL
-		TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
+		TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
 			.syncPermissionOverrides()
 			.addRolePermissionOverride(gameRoleID, permission, 0)
 			.complete();
 		newGame.setTableTalkChannelID(chatChannel.getId());
 
 		// CREATE ACTIONS CHANNEL
-		TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
+		TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, categoryChannel)
 			.syncPermissionOverrides()
 			.addRolePermissionOverride(gameRoleID, permission, 0)
 			.complete();

@@ -2466,7 +2466,7 @@ public class Helper {
                 int parsedLocation = 9999;
                 try {
                     parsedLocation = Integer.parseInt(tile.getPosition());
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
                 hsLocations.add(parsedLocation);
                 unsortedPlayers.put(parsedLocation, player);

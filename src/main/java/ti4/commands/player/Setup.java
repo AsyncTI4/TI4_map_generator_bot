@@ -267,10 +267,10 @@ public class Setup extends PlayerSubcommandData {
 
                     List<Button> buttons = Helper.getTechButtons(techs, player, "nekro");
                     String msg = player.getRepresentationUnfogged() + " use the buttons to choose your starting technology:";
-                    if (techs.isEmpty() && bonusOptions > 0) {
+                    if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
-                    } else if (bonusOptions > 0) {
+                    } else {
                         for (int x = 0; x < bonusOptions; x++) {
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                         }

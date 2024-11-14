@@ -680,10 +680,9 @@ public class GameStats extends StatisticsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Time Per Phase:").append("\n");
-        timeCount.entrySet()
-            .forEach(entry -> sb.append(entry.getKey()).append(": ")
-                .append(StringUtils.leftPad(convertMillisecondsToDays((float) entry.getValue() / amountCount.get(entry.getKey())), 4)).append(" days (based on ").append(amountCount.get(entry.getKey())).append(" games)")
-                .append("\n"));
+        timeCount.forEach((key, value) -> sb.append(key).append(": ")
+            .append(StringUtils.leftPad(convertMillisecondsToDays((float) value / amountCount.get(key)), 4)).append(" days (based on ").append(amountCount.get(key)).append(" games)")
+            .append("\n"));
         MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }
 

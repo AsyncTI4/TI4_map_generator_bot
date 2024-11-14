@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
@@ -25,6 +26,7 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
         super(Constants.PLANET_INFO, "List Planets");
     }
 
+    @NotNull
     @Override
     public String getName() {
         return Constants.PLANET_INFO;
