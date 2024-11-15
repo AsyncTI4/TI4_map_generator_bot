@@ -1817,7 +1817,7 @@ public class Helper {
             unitButtons.add(Buttons.gray("resetProducedThings", "Reset Build"));
         }
         if (player.hasTech("yso")) {
-            if ("sling".equalsIgnoreCase(warfareNOtherstuff)) {
+            if ("sling".equalsIgnoreCase(warfareNOtherstuff) || "freelancers".equalsIgnoreCase(warfareNOtherstuff) || "chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                 List<Button> unitButtons2 = new ArrayList<>();
                 unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -2228,7 +2228,7 @@ public class Helper {
                 }
                 String gameName = game.getName();
                 List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-                        .toList();
+                    .toList();
                 for (GuildChannel channel : channels) {
                     addRolePermissionsToGameChannel(guild, channel, role);
                 }
