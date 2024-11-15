@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
-import ti4.message.BotLogger;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper;
@@ -175,13 +174,7 @@ public class ResourceHelper {
 
     @Nullable
     public String getPAResource(String name) {
-        String paInfoPath = paCache.get(name);
-        if (paInfoPath != null) {
-            return paInfoPath;
-        }
-        String token = getResourceFromFolder("player_area/", name);
-        paCache.put(name, token);
-        return token;
+        return getResourceFromFolder("player_area/", name);
     }
 
     @Nullable
@@ -200,7 +193,7 @@ public class ResourceHelper {
         if (resourceFile.exists()) {
             return resourceFile.getAbsolutePath();
         }
-        BotLogger.log("Could not find resource file: " + resourceFile.getAbsolutePath());
+        //BotLogger.log("Could not find resource file: " + resourceFile.getAbsolutePath());
         return null;
     }
 

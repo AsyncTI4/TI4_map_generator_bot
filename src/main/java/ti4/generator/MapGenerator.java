@@ -1427,9 +1427,8 @@ public class MapGenerator implements AutoCloseable {
 
             String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
             String resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
-            BufferedImage resourceBufferedImage;
             try {
-                resourceBufferedImage = ImageHelper.read(resourcePath);
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
                     LeaderModel leaderModel = Mapper.getLeader(leader.getId());
                     g2.setFont(Storage.getFont16());
