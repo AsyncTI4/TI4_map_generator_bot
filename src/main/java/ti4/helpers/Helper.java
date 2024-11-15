@@ -2257,8 +2257,6 @@ public class Helper {
             long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             textChannelManager.putRolePermissionOverride(role, allow, 0);
             textChannelManager.queue();
-            // textChannel.sendMessage("This channel's permissions have been
-            // updated.").queue();
         }
     }
 
