@@ -1148,6 +1148,7 @@ public class GameSaveLoadManager {
         BotLogger.logWithTimestamp(debugString("Time to load `" + GameManager.getGameNameToGame().size() + "` games: ", loadTime, loadTime));
     }
 
+    // TODO: sanitize so that "null" string literal isn't used
     @Nullable
     public static Game loadGame(File mapFile) {
         if (mapFile == null || !mapFile.exists()) {

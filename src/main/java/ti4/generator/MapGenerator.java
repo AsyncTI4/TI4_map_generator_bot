@@ -1,16 +1,7 @@
 package ti4.generator;
 
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -38,20 +29,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
-
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
@@ -98,6 +86,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.website.WebsiteOverlay;
+
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -695,6 +685,9 @@ public class MapGenerator implements AutoCloseable {
                 String faction = player.getFaction();
                 if (faction != null) {
                     DrawingUtil.drawPlayerFactionIconImage(graphics, player, x, y, 95, 95);
+                    if (!player.hasCustomFactionEmoji()) {
+                        addWebsiteOverlay(player.getFactionModel(), x + 10, y + 10, 75, 75);
+                    }
                 }
                 y += 4;
 
@@ -1338,7 +1331,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setColor(Color.WHITE);
             }
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, relicModel);
 
             drawPAImage(x + deltaX, y, "pa_relics_fakerelicicon.png");
 
@@ -1367,6 +1360,7 @@ public class MapGenerator implements AutoCloseable {
             deltaX += 10;
         }
         for (String relicID : axisOrderRelics) {
+            RelicModel relicModel = Mapper.getRelic(relicID);
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
                 graphics.setColor(Color.GRAY);
@@ -1374,7 +1368,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setColor(Color.WHITE);
             }
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 54, 152);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 54, 152, relicModel);
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
@@ -1433,9 +1427,8 @@ public class MapGenerator implements AutoCloseable {
 
             String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
             String resourcePath = ResourceHelper.getInstance().getPAResource(leaderInfoFileName);
-            BufferedImage resourceBufferedImage;
             try {
-                resourceBufferedImage = ImageHelper.read(resourcePath);
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 if (resourceBufferedImage == null) {
                     LeaderModel leaderModel = Mapper.getLeader(leader.getId());
                     g2.setFont(Storage.getFont16());
@@ -1556,6 +1549,10 @@ public class MapGenerator implements AutoCloseable {
                 case "policy_the_economy_exploit" -> abilityFileName = "pa_ds_olra_policy_ineg";
             }
 
+            if (abilityFileName == null) {
+                continue;
+            }
+
             boolean isExhaustedLocked = player.getExhaustedAbilities().contains(abilityID);
             if (isExhaustedLocked) {
                 graphics.setColor(Color.GRAY);
@@ -1564,7 +1561,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            abilityFileName = abilityFileName + status + ".png";
+            abilityFileName += status + ".png";
             String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
             if (resourcePath != null) {
@@ -1627,15 +1624,16 @@ public class MapGenerator implements AutoCloseable {
 
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
-                BufferedImage decal = null;
-                decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
-                for (int i = 0; i < numInReinforcements; i++) {
-                    Point position = reinforcementsPosition.getPosition(unitID);
-                    graphics.drawImage(image, x + position.x, y + position.y, null);
-                    graphics.drawImage(decal, x + position.x, y + position.y, null);
-                    if (onlyPaintOneUnit) break;
+                String decal = player.getDecalFile(unitID);
+                if (decal != null) {
+                    var decalImage = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decal));
+                    for (int i = 0; i < numInReinforcements; i++) {
+                        Point position = reinforcementsPosition.getPosition(unitID);
+                        graphics.drawImage(image, x + position.x, y + position.y, null);
+                        graphics.drawImage(decalImage, x + position.x, y + position.y, null);
+                        if (onlyPaintOneUnit) break;
+                    }
                 }
-
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.isCcNPlasticLimit()) {
                     String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
@@ -1860,14 +1858,12 @@ public class MapGenerator implements AutoCloseable {
                     }
                 }
 
-                String decalFile = p != null ? p.getDecalFile(unitKey.asyncID()) : null;
-                BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFile));
                 BufferedImage spoopy = null;
                 if (unitKey.getUnitType() == UnitType.Warsun) {
                     int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
                     if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
-                        String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
-                        spoopy = ImageHelper.read(spoopypath);
+                        String spoopyPath = ResourceHelper.getInstance().getSpoopyFile();
+                        spoopy = ImageHelper.read(spoopyPath);
                     }
                 }
 
@@ -1878,10 +1874,15 @@ public class MapGenerator implements AutoCloseable {
                     break;
                 }
                 position.y -= (countOfUnits * 7);
+
+                Optional<BufferedImage> decal = Optional.ofNullable(p)
+                    .map(player1 -> player1.getDecalFile(unitKey.asyncID()))
+                    .map(decalFileName -> ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFileName)));
+
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
-                    if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
-                        graphics.drawImage(decal, position.x, position.y + deltaY, null);
+                    if (decal.isPresent() && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                        graphics.drawImage(decal.get(), position.x, position.y + deltaY, null);
                     }
                     if (spoopy != null) {
                         graphics.drawImage(spoopy, position.x, position.y + deltaY, null);
@@ -2574,8 +2575,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private String getUnitPath(UnitKey unit) {
-        ResourceHelper rs = ResourceHelper.getInstance();
-        return allEyesOnMe ? rs.getUnitFile(unit, allEyesOnMe) : rs.getUnitFile(unit);
+        return allEyesOnMe ? ResourceHelper.getInstance().getUnitFile(unit, allEyesOnMe) : ResourceHelper.getInstance().getUnitFile(unit);
     }
 
     private void drawPAUnitUpgrade(int x, int y, UnitKey unitKey) {
@@ -2757,6 +2757,9 @@ public class MapGenerator implements AutoCloseable {
                     BufferedImage bufferedImage = DrawingUtil.getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, y - 70, null);
+                        if (!player.hasCustomFactionEmoji()) {
+                            addWebsiteOverlay(player.getFactionModel(), x + 10, y - 60, 75, 75);
+                        }
                         x += 100;
                     }
                 }
@@ -3208,9 +3211,9 @@ public class MapGenerator implements AutoCloseable {
             boolean hasStellar = player.hasRelic("stellarconverter") || player.hasRelic("absol_stellarconverter");
             String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
             boolean hasHero = player.hasLeaderUnlocked("muaathero") || player.hasLeaderUnlocked("zelianhero");
-            String heroFile = ResourceHelper.getInstance().getResourceFromFolder("emojis/leaders/", "Hero.png", "Could not find command token file");
+            String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
             if (player.hasLeaderUnlocked("muaathero")) {
-                heroFile = ResourceHelper.getInstance().getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png", "Could not find command token file");
+                heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");
             }
             BufferedImage bufferedImage;
             if (hasStellar && hasHero) {

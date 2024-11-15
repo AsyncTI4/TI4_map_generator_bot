@@ -148,12 +148,10 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean hasImageFile() {
-        return imageFileName != null
-            && ResourceHelper.getInstance().getResourceFromFolder("strat_cards/",
-                imageFileName + ".png", null) != null;
+        return imageFileName != null && ResourceHelper.getResourceFromFolder("strat_cards/", imageFileName + ".png") != null;
     }
 
     public String getImageFilePath() {
-        return ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", getImageFileName() + ".png", "Could not find SC image!");
+        return ResourceHelper.getResourceFromFolder("strat_cards/", getImageFileName() + ".png");
     }
 }

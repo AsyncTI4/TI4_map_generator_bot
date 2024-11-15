@@ -21,6 +21,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -225,6 +226,7 @@ public class GetTechButton extends TechSubcommandData {
         if (game.getStoredValue(key2).equalsIgnoreCase("0")) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg.toString());
             game.setStoredValue("TechSummaryRound" + game.getRound(), "yes");
+            GameSaveLoadManager.saveGame(game, "Tech Summary Posted");
         } else {
             if (game.getStoredValue(key2).isEmpty()) {
                 game.setStoredValue(key2, "6");
@@ -234,6 +236,7 @@ public class GetTechButton extends TechSubcommandData {
 
     /**
      * Generate buttons to pay for tech.
+     * 
      * @param game
      * @param player
      * @param event

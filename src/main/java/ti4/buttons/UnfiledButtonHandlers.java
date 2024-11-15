@@ -82,6 +82,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -1899,6 +1900,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (matchingFactionReactions >= numberOfPlayers) {
             respondAllPlayersReacted(event, game);
             game.removeStoredValue(messageId);
+
         }
     }
 
@@ -1936,6 +1938,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
             if (game.getMessageIDsForSabo().contains(messageId)) {
                 game.removeMessageIDForSabo(messageId);
+                GameSaveLoadManager.saveGame(game, "No Sabo");
             }
         }
     }

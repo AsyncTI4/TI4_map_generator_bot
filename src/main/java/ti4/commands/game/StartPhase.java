@@ -296,7 +296,7 @@ public class StartPhase extends GameSubcommandData {
         if (game.getTile("SIG02") != null && !game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Please destroy all units in the pulsar.");
         }
-        if ("action_deck_2".equals(game.getAcDeckID())) {
+        if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
         }
     }

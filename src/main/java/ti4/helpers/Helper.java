@@ -525,8 +525,7 @@ public class Helper {
 
     @Nullable
     public static String getDamagePath() {
-        String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", "marker_damage.png",
-            "Could not find damage token file");
+        String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_damage.png");
         if (tokenPath == null) {
             BotLogger.log("Could not find token: marker_damage");
             return null;
@@ -541,8 +540,7 @@ public class Helper {
             case 0, 5, 1 -> file += "north.png";
             case 2, 4, 3 -> file += "south.png";
         }
-        String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", file,
-            "Could not find adjacency file for direction: " + direction);
+        String tokenPath = ResourceHelper.getResourceFromFolder("extra/", file);
         if (tokenPath == null) {
             BotLogger.log("Could not find token: " + file);
             return null;
@@ -663,9 +661,9 @@ public class Helper {
         }
         StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
         String scImagePath = scModel.getImageFilePath();
-        if (scImagePath == null)
-            scImagePath = ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", "sadFace.png",
-                "Could not find strategy card image!");
+        if (scImagePath == null) {
+            scImagePath = ResourceHelper.getResourceFromFolder("strat_cards/", "sadFace.png");
+        }
 
         return new File(scImagePath);
     }
@@ -1390,6 +1388,11 @@ public class Helper {
         }
         String planet = uH.getName();
         int planetUnitVal = 0;
+        if (uH.getName().equals("space")) {
+            if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                productionValueTotal = productionValueTotal + 5;
+            }
+        }
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }
@@ -1448,11 +1451,6 @@ public class Helper {
             planetUnitVal = 3;
             if (player.hasRelic("boon_of_the_cerulean_god")) {
                 productionValueTotal++;
-            }
-        }
-        if (uH.getName().equals("space")) {
-            if (tile.isSupernova() && player.hasTech("mr") && FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                productionValueTotal = productionValueTotal + 5;
             }
         }
 
@@ -1816,7 +1814,7 @@ public class Helper {
             unitButtons.add(Buttons.gray("resetProducedThings", "Reset Build"));
         }
         if (player.hasTech("yso")) {
-            if ("sling".equalsIgnoreCase(warfareNOtherstuff)) {
+            if ("sling".equalsIgnoreCase(warfareNOtherstuff) || "freelancers".equalsIgnoreCase(warfareNOtherstuff) || "chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
                 List<Button> unitButtons2 = new ArrayList<>();
                 unitButtons2.add(Buttons.gray("startYinSpinner", "Yin Spin 2 Duders", Emojis.Yin));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -2227,7 +2225,7 @@ public class Helper {
                 }
                 String gameName = game.getName();
                 List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName))
-                        .toList();
+                    .toList();
                 for (GuildChannel channel : channels) {
                     addRolePermissionsToGameChannel(guild, channel, role);
                 }
