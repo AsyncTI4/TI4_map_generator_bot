@@ -22,14 +22,14 @@ public class SearchFactions extends SearchComponentModel {
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         
         if (Mapper.isValidFaction(searchString)) {
-            event.getChannel().sendMessageEmbeds(Mapper.getFaction(searchString).getRepresentationEmbed(true, true)).queue();
+            event.getChannel().sendMessageEmbeds(Mapper.getFaction(searchString).getRepresentationEmbed(true, false)).queue();
             return;
         }
         
         List<MessageEmbed> messageEmbeds = Mapper.getFactions().stream()
             .filter(model -> model.search(searchString, source))
             .sorted(Comparator.comparing(FactionModel::getAlias))
-            .map(model -> model.getRepresentationEmbed(true, true))
+            .map(model -> model.getRepresentationEmbed(true, false))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
     }
