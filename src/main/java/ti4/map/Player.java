@@ -247,9 +247,14 @@ public class Player {
 
     @JsonIgnore
     public String getDecalFile(String unitType) {
-        if (getDecalSet() == null)
+        if (decalSet == null)
             return null;
-        return String.format("%s_%s%s", getDecalSet(), unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
+        // TODO: Eventually remove if we stop setting values to string literal null, which is not good...
+        if (decalSet.equals("null")) {
+            decalSet = null;
+            return null;
+        }
+        return String.format("%s_%s%s", decalSet, unitType, DrawingUtil.getBlackWhiteFileSuffix(getColorID()));
     }
 
     public Tile getNomboxTile() {
