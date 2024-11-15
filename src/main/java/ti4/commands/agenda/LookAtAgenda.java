@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.CommandHelper;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
 import ti4.helpers.ButtonHelper;
@@ -26,11 +25,6 @@ class LookAtAgenda extends GameStateSubcommand {
         super(Constants.LOOK, "Look at the agenda deck", false, true);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of agendas to look at");
         addOption(OptionType.BOOLEAN, Constants.LOOK_AT_BOTTOM, "To look at top or bottom");
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return super.accept(event) && CommandHelper.acceptIfPlayerInGame(event);
     }
 
     @Override

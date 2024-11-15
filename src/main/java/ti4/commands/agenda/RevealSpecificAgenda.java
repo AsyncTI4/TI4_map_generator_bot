@@ -162,7 +162,7 @@ class RevealSpecificAgenda extends GameStateSubcommand {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Whens", game, whenButtons, "when");
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, "Afters", game, afterButtons, "after");
 
-        ListVoteCount.turnOrder(game, channel);
+        AgendaHelper.listVoteCount(game, channel);
         Button proceed = Buttons.red("proceedToVoting", "Skip waiting and start the voting for everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         Button transaction = Buttons.blue("transaction", "Transaction");
