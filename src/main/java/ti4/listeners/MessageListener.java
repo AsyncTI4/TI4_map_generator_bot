@@ -1,6 +1,5 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,6 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -21,7 +24,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.fow.Whisper;
 import ti4.generator.Mapper;
@@ -32,6 +34,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
+import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -66,6 +69,7 @@ public class MessageListener extends ListenerAdapter {
                     if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
                         mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
                         MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
+                        GameSaveLoadManager.saveGame(mapreference, "newChannel");
                     }
                 }
             }
@@ -86,7 +90,7 @@ public class MessageListener extends ListenerAdapter {
         if ("ttpg-exports".equalsIgnoreCase(event.getChannel().getName())) {
             List<Message.Attachment> attachments = event.getMessage().getAttachments();
             if (!attachments.isEmpty() && "json".equalsIgnoreCase(attachments.getFirst().getFileExtension())) { // write to
-                                                                                                            // file
+                // file
                 String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
                 String fileName = "ttpgexport_" + currentDateTime + ".json";
                 String filePath = Storage.getTTPGExportDirectory() + "/" + fileName;
@@ -113,9 +117,9 @@ public class MessageListener extends ListenerAdapter {
                     RestAction<List<Message>> lis = mHistory.retrievePast(2);
                     var messages = lis.complete();
                     if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId()) &&
-                            player != null && player.isRealPlayer()) {
+                        player != null && player.isRealPlayer()) {
                         event.getChannel().addReactionById(event.getMessageId(),
-                                Emoji.fromFormatted(player.getFactionEmoji())).queue();
+                            Emoji.fromFormatted(player.getFactionEmoji())).queue();
                     }
                 } catch (Exception e) {
                     BotLogger.log("Reading previous message", e);
