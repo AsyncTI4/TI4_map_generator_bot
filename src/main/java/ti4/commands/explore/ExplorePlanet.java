@@ -14,12 +14,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
@@ -241,7 +241,7 @@ public class ExplorePlanet extends ExploreSubcommandData {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
             PlanetRefresh.doAction(player, planetName, game);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
-            ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+            AgendaHelper.listVoteCount(game, game.getMainGameChannel());
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());

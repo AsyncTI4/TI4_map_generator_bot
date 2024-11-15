@@ -653,6 +653,8 @@ public class Constants {
     public static final String RELIC_INFO = "info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
+    public static final String PUT_IN_DECK = "put_in_deck";
+    public static final String PUT_ON_BOTTOM = "put_on_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
     public static final String RESET_AGENDAS = "reset_deck";
     public static final String RESET_DRAW_STATE_FOR_AGENDAS = "reset_draw_state_for_deck";
