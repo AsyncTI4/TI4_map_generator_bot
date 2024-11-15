@@ -1,4 +1,4 @@
-package ti4.commands2.agenda;
+package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;

@@ -29,7 +29,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
-import ti4.commands2.agenda.AgendaCommand;
+import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.capture.CaptureCommand;
 import ti4.commands.cardsac.ACCardsCommand;

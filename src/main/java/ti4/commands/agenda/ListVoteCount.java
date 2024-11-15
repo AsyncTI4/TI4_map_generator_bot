@@ -1,4 +1,4 @@
-package ti4.commands2.agenda;
+package ti4.commands.agenda;
 
 import java.util.List;
 

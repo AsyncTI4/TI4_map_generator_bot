@@ -1,4 +1,4 @@
-package ti4.commands2.agenda;
+package ti4.commands.agenda;
 
 import com.amazonaws.util.StringUtils;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

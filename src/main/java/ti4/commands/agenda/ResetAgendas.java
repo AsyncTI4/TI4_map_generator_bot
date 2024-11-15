@@ -1,4 +1,4 @@
-package ti4.commands2.agenda;
+package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -6,24 +6,26 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-class ShuffleAgendas extends GameStateSubcommand {
+class ResetAgendas extends GameStateSubcommand {
 
-    public ShuffleAgendas() {
-        super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck", true, false);
+    public ResetAgendas() {
+        super(Constants.RESET_AGENDAS, "Reset agenda deck", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String confirm = event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString);
-        if (!"YES".equals(confirm)){
+        OptionMapping confirmOption = event.getOption(Constants.CONFIRM);
+        if (confirmOption == null || !"YES".equals(confirmOption.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
 
-        getGame().shuffleAgendas();
-        MessageHelper.replyToMessage(event, "Agenda deck shuffled");
+        Game game = getGame();
+        game.resetAgendas();
+        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + game.getAgendaDeckID() + "`. Discards removed. All shuffled as new");
     }
 }
