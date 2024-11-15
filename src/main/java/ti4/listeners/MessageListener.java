@@ -23,11 +23,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.fow.Whisper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.map.Game;
@@ -54,7 +54,7 @@ public class MessageListener extends ListenerAdapter {
                 msg.reply("to explore strange new maps; to seek out new tiles and new factions\nhttps://discord.gg/RZ7qg9kbVZ").queue();
             }
             //947310962485108816
-            Role lfgRole = CreateGameChannels.getRole("LFG", event.getGuild());
+            Role lfgRole = GameCreationHelper.getRole("LFG", event.getGuild());
             if (!event.getAuthor().isBot() && lfgRole != null && event.getChannel() instanceof ThreadChannel && msg.getContentRaw().contains(lfgRole.getAsMention())) {
                 String msg2 = lfgRole.getAsMention() + " this game is looking for more members (it's old if it has -launched [FULL] in its title) " + msg.getJumpUrl();
                 TextChannel lfgPings = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("lfg-pings", true).stream().findFirst().orElse(null);
@@ -62,7 +62,7 @@ public class MessageListener extends ListenerAdapter {
             }
             if (event.getChannel() instanceof ThreadChannel channel) {
                 if (channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
-                    Game mapreference = GameManager.getInstance().getGame("finreference");
+                    Game mapreference = GameManager.getGame("finreference");
                     if (mapreference.getStoredValue("makingGamePost" + channel.getId()).isEmpty()) {
                         mapreference.setStoredValue("makingGamePost" + channel.getId(), System.currentTimeMillis() + "");
                         MessageHelper.sendMessageToChannel(event.getChannel(), "To launch a new game, please run the command `/game create_game_button`, filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members are correct.");
@@ -105,7 +105,7 @@ public class MessageListener extends ListenerAdapter {
         if (!event.getAuthor().isBot() && event.getChannel().getName().contains("-")) {
             String gameName = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
-            Game game = GameManager.getInstance().getGame(gameName);
+            Game game = GameManager.getGame(gameName);
             if (game != null && game.isBotFactionReacts() && !game.isFowMode()) {
                 Player player = getPlayer(event, game);
                 try {
@@ -163,7 +163,7 @@ public class MessageListener extends ListenerAdapter {
         if (isFowCombatThread) {
             String gameName2 = event.getChannel().getName().substring(0, event.getChannel().getName().indexOf("-"));
 
-            Game game = GameManager.getInstance().getGame(gameName2);
+            Game game = GameManager.getGame(gameName2);
             Player player3 = game.getPlayer(event.getAuthor().getId());
             if (game.isCommunityMode()) {
                 Collection<Player> players = game.getPlayers().values();
@@ -232,7 +232,7 @@ public class MessageListener extends ListenerAdapter {
             String gameName = event.getChannel().getName();
             gameName = gameName.replace("Cards Info-", "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
-            Game game = GameManager.getInstance().getGame(gameName);
+            Game game = GameManager.getGame(gameName);
 
             if (messageContent.isEmpty()) {
                 BotLogger.log("User tried to send an empty whisper " + event.getJumpUrl());

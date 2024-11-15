@@ -8,9 +8,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.CommanderUnlockCheck;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -23,15 +23,13 @@ public class RelicPurgeFragments extends RelicSubcommandData {
 		addOptions(typeOption.setRequired(true));
 		addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA Fabrication or Black Market Forgery)."));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
-		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Game game = getActiveGame();
-		Player activePlayer = game.getPlayer(getUser().getId());
-		activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
-		activePlayer = Helper.getPlayer(game, activePlayer, event);
+		Player activePlayer = CommandHelper.getPlayerFromEvent(game, event);
 		if (activePlayer == null) {
 			MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
 			return;

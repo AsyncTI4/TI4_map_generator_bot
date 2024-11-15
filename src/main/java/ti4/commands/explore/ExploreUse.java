@@ -2,16 +2,15 @@ package ti4.commands.explore;
 
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -25,7 +24,7 @@ public class ExploreUse extends ExploreSubcommandData {
         super(Constants.USE, "Draw and activate an explore card from the deck or discard");
         addOptions(idOption.setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FORCE, "True to force the draw, even if none are in the deck"));
     }
 
@@ -66,7 +65,7 @@ public class ExploreUse extends ExploreSubcommandData {
                 }
             }
             Player player = game.getPlayer(event.getUser().getId());
-            player = Helper.getGamePlayer(game, player, event, null);
+            player = CommandHelper.getPlayerFromEvent(game, event);
             String messageText = player.getRepresentation() + " used explore card: " + id;
             if (force) messageText += "\nTHIS CARD WAS DRAWN FORCEFULLY (if the card wasn't in the deck, it was created from thin air)";
             resolveExplore(event, id, tile, planetName, messageText, player, game);

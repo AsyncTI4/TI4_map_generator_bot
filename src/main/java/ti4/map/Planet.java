@@ -119,7 +119,7 @@ public class Planet extends UnitHolder {
     public boolean hasGroundForces(Game game) {
         return getUnits().keySet().stream()
             .flatMap(uk -> game.getPriorityUnitByUnitKey(uk, this).stream())
-            .filter(Objects::nonNull)
+            .filter(obj -> true)
             .anyMatch(UnitModel::getIsGroundForce);
     }
 

@@ -21,11 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,6 +44,10 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -78,6 +77,7 @@ import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.commands.units.RemoveUnits;
+import ti4.commands2.CommandHelper;
 import ti4.generator.MapRenderPipeline;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -211,7 +211,7 @@ public class ButtonHelper {
         }
         if (d1.isSuccess() || player.hasTech("cl2")) {
             msg += " and revived. You will be prompted to place them on a planet in your HS at the start of your next turn.";
-            player.setStasisInfantry(player.getStasisInfantry() + 1);
+            player.setStasisInfantry(player.getGenSynthesisInfantry() + 1);
         } else {
             msg += " and failed. No revival";
         }
@@ -242,10 +242,10 @@ public class ButtonHelper {
 
         Tile tile = game.getTileFromPlanet(planet);
         new AddUnits().unitParsing(event, player.getColor(), tile, amount + " inf " + planet, game);
-        player.setStasisInfantry(player.getStasisInfantry() - Integer.parseInt(amount));
+        player.setStasisInfantry(player.getGenSynthesisInfantry() - Integer.parseInt(amount));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " Placed " + amount + " infantry on "
-            + Helper.getPlanetRepresentation(planet, game) + ". You have " + player.getStasisInfantry() + " infantry left to revive.");
-        if (player.getStasisInfantry() == 0) {
+            + Helper.getPlanetRepresentation(planet, game) + ". You have " + player.getGenSynthesisInfantry() + " infantry left to revive.");
+        if (player.getGenSynthesisInfantry() == 0) {
             deleteMessage(event);
         }
     }
@@ -289,7 +289,7 @@ public class ButtonHelper {
 
     public static List<Button> getPlaceStatusInfButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        if (player.getStasisInfantry() == 0) {
+        if (player.getGenSynthesisInfantry() == 0) {
             return buttons;
         }
         Tile tile = player.getHomeSystemTile();
@@ -298,10 +298,10 @@ public class ButtonHelper {
                 if (player.getPlanets().contains(unitHolder.getName())) {
                     buttons.add(Buttons.green("statusInfRevival_" + unitHolder.getName() + "_1",
                         "Place 1 infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-                    if (player.getStasisInfantry() > 1) {
+                    if (player.getGenSynthesisInfantry() > 1) {
                         buttons.add(Buttons.green(
-                            "statusInfRevival_" + unitHolder.getName() + "_" + player.getStasisInfantry(),
-                            "Place " + player.getStasisInfantry() + " infantry on "
+                            "statusInfRevival_" + unitHolder.getName() + "_" + player.getGenSynthesisInfantry(),
+                            "Place " + player.getGenSynthesisInfantry() + " infantry on "
                                 + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
 
                     }
@@ -1531,7 +1531,7 @@ public class ButtonHelper {
         return count;
     }
 
-    public static int checkNumberShips(Player player, Game game, Tile tile) {
+    public static int checkNumberShips(Player player, Tile tile) {
         int count = 0;
         UnitHolder space = tile.getUnitHolders().get("space");
         for (UnitKey unit : space.getUnits().keySet()) {
@@ -2104,16 +2104,16 @@ public class ButtonHelper {
     }
 
     public static int checkNetGain(Player player, String ccs) {
-        int netgain;
+        int netGain;
         int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
         ccs = ccs.substring(ccs.indexOf("/") + 1);
         int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
         ccs = ccs.substring(ccs.indexOf("/") + 1);
         int oldStrat = Integer.parseInt(ccs);
 
-        netgain = (player.getTacticalCC() - oldTactic) + (player.getFleetCC() - oldFleet)
+        netGain = (player.getTacticalCC() - oldTactic) + (player.getFleetCC() - oldFleet)
             + (player.getStrategicCC() - oldStrat);
-        return netgain;
+        return netGain;
     }
 
     public static void resetCCs(Player player, String ccs) {
@@ -2488,8 +2488,11 @@ public class ButtonHelper {
         return checkForTechSkips(game, planetName);
     }
 
-    public static boolean isPlanetLegendaryOrHome(String planetName, Game game, boolean onlyIncludeYourHome,
-        Player p1) {
+    public static boolean isPlanetLegendaryOrHome(String planetName, Game game, boolean onlyIncludeYourHome, Player p1) {
+        PlanetModel planetModel = Mapper.getPlanet(planetName);
+        if (planetModel != null && planetModel.isLegendary()) {
+            return true;
+        }
         UnitHolder unitHolder = getUnitHolderFromPlanetName(planetName, game);
         Planet planetHolder = (Planet) unitHolder;
         Tile tile = game.getTileFromPlanet(planetName);
@@ -5081,7 +5084,7 @@ public class ButtonHelper {
                 gameToRestore.setMainChannelID(actionsChannel.getId());
                 gameToRestore.setName(newName);
                 gameToRestore.shuffleDecks();
-                GameManager.getInstance().addGame(gameToRestore);
+                GameManager.addGame(gameToRestore);
                 // CREATE BOT/MAP THREAD
                 ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
                     .complete();
@@ -5090,7 +5093,7 @@ public class ButtonHelper {
                     player.setCardsInfoThreadID(null);
                 }
                 GameSaveLoadManager.saveGame(gameToRestore, event);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
 
             }
 
@@ -5852,10 +5855,10 @@ public class ButtonHelper {
                 msgExtra + "\n Use Buttons to do turn.",
                 TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
 
-            if (privatePlayer.getStasisInfantry() > 0) {
+            if (privatePlayer.getGenSynthesisInfantry() > 0) {
                 if (!getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                     MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
+                        "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry()
                             + " infantry left to revive.",
                         getPlaceStatusInfButtons(game, privatePlayer));
                 } else {
@@ -5874,10 +5877,10 @@ public class ButtonHelper {
                     "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
 
-                if (privatePlayer.getStasisInfantry() > 0) {
+                if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry()
+                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry()
                                 + " infantry left to revive.",
                             getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
@@ -6002,7 +6005,7 @@ public class ButtonHelper {
     }
 
     public static boolean isPlayerNew(Game gameOG, Player player) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         for (Game game : mapList.values()) {
             if (!game.getName().equalsIgnoreCase(gameOG.getName())) {
                 for (Player player2 : game.getRealPlayers()) {
@@ -6084,8 +6087,12 @@ public class ButtonHelper {
             return;
 
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        Player player = Helper.getGamePlayer(game, null, event.getMember(), userID);
+        Game game = GameManager.getUserActiveGame(userID);
+        if (game == null) {
+            event.getChannel().sendMessage("Unable to determine active game.").queue();
+            return;
+        }
+        Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), userID);
         if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
@@ -6440,24 +6447,6 @@ public class ButtonHelper {
         } else {
             MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), message, buttons);
         }
-    }
-
-    public static void offerNanoforgeButtons(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getPlanetsAllianceMode()) {
-            Planet unitHolder = game.getPlanetsInfo().get(planet);
-            Planet planetReal = unitHolder;
-            if (planetReal == null)
-                continue;
-
-            boolean legendaryOrHome = isPlanetLegendaryOrHome(planet, game, false, null);
-            if (!legendaryOrHome) {
-                buttons.add(Buttons.green("nanoforgePlanet_" + planet,
-                    Helper.getPlanetRepresentation(planet, game)));
-            }
-        }
-        String message = "Use buttons to select which planet to nanoforge";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
     public static void offerCodexButtons(Player player, Game game, GenericInteractionCreateEvent event) {

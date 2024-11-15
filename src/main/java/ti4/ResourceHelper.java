@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
 import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -96,6 +97,18 @@ public class ResourceHelper {
     @Nullable
     public String getUnitFile(UnitKey unit) {
         String name = unit.getFileName();
+        String unitPath = unitCache.get(name);
+        if (unitPath != null) {
+            return unitPath;
+        }
+        String filePath = getResourceFromFolder("units/", name, "Could not find unit file");
+        unitCache.put(name, filePath);
+        return filePath;
+    }
+
+    @Nullable
+    public String getUnitFile(UnitKey unit, boolean eyes) {
+        String name = unit.getFileName(eyes);
         String unitPath = unitCache.get(name);
         if (unitPath != null) {
             return unitPath;

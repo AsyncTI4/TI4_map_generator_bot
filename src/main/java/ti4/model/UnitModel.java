@@ -70,7 +70,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && asyncId != null
             && source != null
             && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
-            && getEligiblePlanetTypes().stream().allMatch(type -> List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY").contains(type));
+            && List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY").containsAll(getEligiblePlanetTypes());
     }
 
     public String getAlias() {
@@ -113,8 +113,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         String name = getName();
-        StringBuilder title = new StringBuilder(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji());
-        eb.setTitle(title.toString(), null);
+        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
         if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
@@ -323,6 +322,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return "Combat: " + getCombatHitsOn() + "\n";
         } else if (getCombatDieCount() > 1) {
             return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
+        } else if ("winnu_flagship".equals(getId())) {
+            return "Combat: " + getCombatHitsOn() + " (x # of opponent's non-fighter ships)\n";
         }
         return "";
     }

@@ -2,8 +2,8 @@ package ti4.model;
 
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ShipPositionModel {

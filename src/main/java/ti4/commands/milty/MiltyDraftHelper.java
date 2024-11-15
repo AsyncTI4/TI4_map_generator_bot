@@ -40,12 +40,7 @@ public class MiltyDraftHelper {
     public static void generateAndPostSlices(Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
         FileUpload fileUpload = generateImage(game);
-
-        if (fileUpload == null) {
-            MessageHelper.sendMessageToChannel(mainGameChannel, "There was an error building the slices image.");
-        } else {
-            MessageHelper.sendFileUploadToChannel(mainGameChannel, fileUpload);
-        }
+        MessageHelper.sendFileUploadToChannel(mainGameChannel, fileUpload);
     }
 
     private static FileUpload generateImage(Game game) {
@@ -54,7 +49,7 @@ public class MiltyDraftHelper {
         MapTemplateModel mapTemplate = Mapper.getMapTemplate(manager.getMapTemplate());
 
         int sliceCount = slices.size();
-        int spanW = (int) (Math.ceil(Math.sqrt(sliceCount)) + 0.01);
+        int spanW = (int) Math.ceil(Math.sqrt(sliceCount));
         int spanH = (sliceCount + spanW - 1) / spanW;
 
         float scale = 1f;
@@ -95,7 +90,9 @@ public class MiltyDraftHelper {
                 deltaX = 0;
             }
 
-            if (!desc.toString().isBlank()) desc.append(";\n");
+            if (!desc.isEmpty()) {
+                desc.append(";\n");
+            }
             desc.append(slice.ttsString());
         }
 
@@ -314,9 +311,7 @@ public class MiltyDraftHelper {
     private static boolean isInvalid(TileModel tileModel) {
         if (tileModel.getTileBackOption().isPresent()) {
             String back = tileModel.getTileBackOption().orElse("");
-            if (back.equals("red") || back.equals("blue")) {
-                //good
-            } else {
+            if (!back.equals("red") && !back.equals("blue")) {
                 return true;
             }
         }

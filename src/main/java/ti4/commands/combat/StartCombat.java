@@ -1,5 +1,8 @@
 package ti4.commands.combat;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -36,9 +39,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class StartCombat extends CombatSubcommandData {
 
@@ -379,7 +379,7 @@ public class StartCombat extends CombatSubcommandData {
         if (playersWithPds2.isEmpty()) {
             return;
         }
-        if (!game.isFowMode() && !playersWithPds2.isEmpty()) {
+        if (!game.isFowMode()) {
             pdsMessage.append("These players have space cannon offense coverage in this system:\n");
             for (Player playerWithPds : playersWithPds2) {
                 pdsMessage.append("> ").append(playerWithPds.getRepresentation()).append("\n");
@@ -1025,7 +1025,7 @@ public class StartCombat extends CombatSubcommandData {
     }
 
     private static String getSpaceCombatIntroMessage() {
-        String sb = """
+        return """
                 ## Steps for Space Combat:
                 > 1. End of movement abilities (Foresight, Stymie, etc.)
                 > 2. Firing of PDS
@@ -1034,11 +1034,10 @@ public class StartCombat extends CombatSubcommandData {
                 > 5. Declare Retreats (including Rout)
                 > 6. Roll Dice!
                 """;
-        return sb;
     }
 
     private static String getGroundCombatIntroMessage() {
-        String sb = """
+        return """
                 ## Steps for Invasion:
                 > 1. Start of invasion abilities (Tekklar, Blitz, Bunker, etc.)
                 > 2. Bombardment
@@ -1047,6 +1046,5 @@ public class StartCombat extends CombatSubcommandData {
                 > 5. Start of Combat (Morale Boost, etc.)
                 > 6. Roll Dice!
                 """;
-        return sb;
     }
 }

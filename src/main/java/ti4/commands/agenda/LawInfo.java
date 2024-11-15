@@ -1,9 +1,8 @@
 package ti4.commands.agenda;
 
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.message.MessageHelper;
-
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class LawInfo extends AgendaSubcommandData {
     public LawInfo() {

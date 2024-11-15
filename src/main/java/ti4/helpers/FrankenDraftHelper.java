@@ -104,14 +104,14 @@ public class FrankenDraftHelper {
             }
         }
         DraftBag currentBag = player.getCurrentDraftBag();
-        DraftItem selectedItem = DraftItem.GenerateFromAlias(action);
+        DraftItem selectedItem = DraftItem.generateFromAlias(action);
 
         if (!selectedItem.isDraftable(player)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Something went wrong. You are not allowed to draft " + selectedItem.getShortDescription() + " right now. Please select another item.");
             return;
         }
         currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(action));
-        player.queueDraftItem(DraftItem.GenerateFromAlias(action));
+        player.queueDraftItem(DraftItem.generateFromAlias(action));
 
         if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
             draft.setPlayerReadyToPass(player, true);

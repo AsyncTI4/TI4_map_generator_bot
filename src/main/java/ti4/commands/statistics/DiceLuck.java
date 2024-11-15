@@ -84,7 +84,7 @@ public class DiceLuck extends StatisticsSubcommandData {
     }
 
     public Map<String, Entry<Double, Integer>> getAllPlayersDiceLuck(boolean ignoreEndedGames) {
-        Map<String, Game> maps = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> maps = GameManager.getGameNameToGame();
 
         Map<String, Entry<Double, Integer>> playerDiceLucks = new HashMap<>();
         Map<String, Set<Double>> playerAverageDiceLucks = new HashMap<>();

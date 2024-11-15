@@ -46,7 +46,7 @@ public class IgnisAuroraHelperTechs {
         }
         if (deleteMsg) {
             ButtonHelper.deleteMessage(event);
-        } else if (deleteButton) {
+        } else {
             ButtonHelper.deleteTheOneButton(event);
         }
     }

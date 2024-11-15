@@ -13,13 +13,13 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -71,13 +71,13 @@ public class Eliminate extends AddRemovePlayer {
             //     return;
             // }
 
-            // Player player = Helper.getPlayer(game, null, event);
+            // Player player = CommandHelper.getPlayerFromEvent(game, event);
             User extraUser = option.getAsUser();
             Player player = game.getPlayer(extraUser.getId());
             Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
             if (player != null && player.getColor() != null && player.getFaction() != null && !"null".equalsIgnoreCase(player.getFaction()) && player.isRealPlayer() && !"".equalsIgnoreCase(player.getFaction())) {
                 if (!player.getPlanetsAllianceMode().isEmpty()) {
-                    Role bothelperRole = CreateGameChannels.getRole("Bothelper", event.getGuild());
+                    Role bothelperRole = GameCreationHelper.getRole("Bothelper", event.getGuild());
                     String msg = "This person doesn't meet the elimination conditions. If you want to replace a player, run /game replace.";
                     if (bothelperRole != null) {
                         msg = msg + " Pinging bothelper for assistance: " + bothelperRole.getAsMention();

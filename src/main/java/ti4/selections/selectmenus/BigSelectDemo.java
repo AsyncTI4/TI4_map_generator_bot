@@ -1,13 +1,13 @@
 package ti4.selections.selectmenus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import ti4.selections.Selection;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BigSelectDemo implements Selection {
 

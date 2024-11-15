@@ -1,27 +1,22 @@
 package ti4.commands;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommandManager {
-    private final List<Command> commandList = new ArrayList<>();
-    private static CommandManager manager;
 
-    private CommandManager() {
+    public static final Map<String, Command> commands = new HashMap<>();
+
+    public static void addCommand(Command command) {
+        commands.put(command.getName(), command);
     }
 
-    public static CommandManager getInstance() {
-        if (manager == null) {
-            manager = new CommandManager();
-        }
-        return manager;
+    public static Command getCommand(String name) {
+        return commands.get(name);
     }
 
-    public List<Command> getCommandList() {
-        return commandList;
-    }
-
-    public void addCommand(Command command) {
-        commandList.add(command);
+    public static Collection<Command> getCommands() {
+        return commands.values();
     }
 }

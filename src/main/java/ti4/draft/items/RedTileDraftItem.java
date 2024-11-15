@@ -90,7 +90,7 @@ public class RedTileDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
         List<DraftItem> allItems = new ArrayList<>();
         for (MiltyDraftTile tile : draftManager.getRed()) {
-            allItems.add(DraftItem.Generate(Category.REDTILE,
+            allItems.add(DraftItem.generate(Category.REDTILE,
                     tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.REDTILE);

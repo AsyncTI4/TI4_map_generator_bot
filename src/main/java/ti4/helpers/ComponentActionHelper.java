@@ -539,8 +539,7 @@ public class ComponentActionHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event,
-        String relicID) {
+    private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event, String relicID) {
         if (!Mapper.isValidRelic(relicID) || !player.hasRelic(relicID)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Invalid relic or player does not have specified relic: `" + relicID + "`");
@@ -581,7 +580,7 @@ public class ComponentActionHelper {
         switch (relicID) {
             case "enigmaticdevice" -> ButtonHelperActionCards.resolveResearch(game, player, event);
             case "codex", "absol_codex" -> ButtonHelper.offerCodexButtons(player, game, event);
-            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelper.offerNanoforgeButtons(player, game, event);
+            case "nanoforge", "absol_nanoforge", "baldrick_nanoforge" -> ButtonHelperRelics.offerNanoforgeButtons(player, game, event);
             case "decrypted_cartoglyph" -> DrawBlueBackTile.drawBlueBackTiles(event, game, player, 3);
             case "throne_of_the_false_emperor" -> {
                 List<Button> buttons = new ArrayList<>();

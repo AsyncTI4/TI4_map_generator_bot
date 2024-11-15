@@ -29,7 +29,7 @@ public class PeekPublicObjectiveDeck extends StatusSubcommandData {
 
   @Override
   public void execute(SlashCommandInteractionEvent event) {
-    Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+    Game game = GameManager.getUserActiveGame(event.getUser().getId());
     Player player = game.getPlayer(event.getUser().getId());
     int stage = event.getOption(STAGE_COMMAND_NAME).getAsInt();
     int count = Optional.ofNullable(event.getOption(Constants.COUNT)).map(OptionMapping::getAsInt).orElse(1);

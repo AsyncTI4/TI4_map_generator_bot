@@ -71,7 +71,7 @@ public class PlayerPreferenceHelper {
         if ("true".equals(trueOrFalse)) {
             if ("distance".equals(distanceOrAgenda)) {
                 player.setPreferenceForDistanceBasedTacticalActions(true);
-                Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+                Map<String, Game> mapList = GameManager.getGameNameToGame();
                 for (Game game2 : mapList.values()) {
                     for (Player player2 : game2.getRealPlayers()) {
                         if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
@@ -86,7 +86,7 @@ public class PlayerPreferenceHelper {
         } else {
             if ("distance".equals(distanceOrAgenda)) {
                 player.setPreferenceForDistanceBasedTacticalActions(false);
-                Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+                Map<String, Game> mapList = GameManager.getGameNameToGame();
                 for (Game game2 : mapList.values()) {
                     for (Player player2 : game2.getRealPlayers()) {
                         if (player2.getUserID().equalsIgnoreCase(player.getUserID())) {
@@ -231,7 +231,7 @@ public class PlayerPreferenceHelper {
         player.addHourThatIsAFK(time);
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
+        Map<String, Game> mapList = GameManager.getGameNameToGame();
         String afkTimes = player.getHoursThatPlayerIsAFK();
         for (Game game : mapList.values()) {
             if (!game.isHasEnded()) {

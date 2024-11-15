@@ -481,7 +481,7 @@ public class MiltyDraftManager {
         if (current.getPosition() != null) return "You have already picked speaker order. Try again.";
         try {
             Integer draftedSpeakerOrder = Integer.parseInt(order);
-            if (draftedSpeakerOrder != null && isOrderTaken(draftedSpeakerOrder)) return "The item you chose is already taken. Try again.";
+            if (isOrderTaken(draftedSpeakerOrder)) return "The item you chose is already taken. Try again.";
 
             // Success
             current.setPosition(draftedSpeakerOrder);

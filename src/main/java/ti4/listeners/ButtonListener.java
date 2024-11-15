@@ -1,7 +1,6 @@
 package ti4.listeners;
 
 import javax.annotation.Nonnull;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,9 +108,6 @@ public class ButtonListener extends ListenerAdapter {
         MessageChannel mainGameChannel = context.getMainGameChannel();
         MessageChannel actionsChannel = context.getActionsChannel();
 
-        // hacking
-        Player nullable = player; // why?
-
         // Check the list of ButtonHandlers first
         if (handleKnownButtons(context)) return;
 
@@ -138,7 +134,7 @@ public class ButtonListener extends ListenerAdapter {
             game.getMiltyDraftManager().doMiltyPick(event, game, buttonID, player);
         } else if (buttonID.startsWith("showMiltyDraft")) {
             game.getMiltyDraftManager().repostDraftInformation(game);
-        } else if (nullable != null && buttonID.startsWith("miltyFactionInfo_")) {
+        } else if (player != null && buttonID.startsWith("miltyFactionInfo_")) {
             UnfiledButtonHandlers.miltyFactionInfo(player, buttonID, game);
         } else if (buttonID.startsWith("agendaResolution_")) {
             AgendaHelper.resolveAgenda(game, buttonID, event);

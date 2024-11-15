@@ -1,6 +1,6 @@
 package ti4.generator;
 
-import static ti4.helpers.ImageHelper.*;
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -56,6 +56,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
 import ti4.commands.fow.ShowGameAsPlayer;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -86,7 +87,9 @@ import ti4.model.AgendaModel;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.ColorModel;
 import ti4.model.EventModel;
+import ti4.model.ExploreModel;
 import ti4.model.LeaderModel;
+import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.PromissoryNoteModel;
@@ -135,9 +138,10 @@ public class MapGenerator implements AutoCloseable {
     private final int height;
     private final int heightForGameInfo;
     private final boolean extraRow;
+    private final boolean allEyesOnMe;
     private final Map<String, Player> playerControlMap;
 
-    private final Map<String, WebsiteOverlay> websiteOverlays = new HashMap<>(); // ID, WebsiteOverlay
+    private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
     private int mapWidth;
     private int minX = -1;
     private int minY = -1;
@@ -217,12 +221,15 @@ public class MapGenerator implements AutoCloseable {
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth + 4 * 520 + EXTRA_X * 2;
                 break;
+            case googly:
             default:
                 heightForGameInfo = mapHeight;
                 height = mapHeight + heightStats;
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
+        System.out.println(displayType);
+        allEyesOnMe = this.displayType.equals(DisplayType.googly);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
     }
@@ -354,11 +361,9 @@ public class MapGenerator implements AutoCloseable {
             return;
         }
         isFoWPrivate = true;
-        Player player = getFowPlayer();
-
         // IMPORTANT NOTE : This method used to be local and was refactored to extract
         // any references to tilesToDisplay
-        fowPlayer = Helper.getGamePlayer(game, player, event, null);
+        fowPlayer = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
 
         Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
         Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
@@ -421,7 +426,7 @@ public class MapGenerator implements AutoCloseable {
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
         } else if (isFoWPrivate) {
-            Player player = getFowPlayer();
+            Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
             WebHelper.putMap(game.getName(), mainImage, true, player);
         }
     }
@@ -451,13 +456,6 @@ public class MapGenerator implements AutoCloseable {
             BotLogger.log("Could not create FileUpload for " + filenamePrefix, e);
         }
         return fileUpload;
-    }
-
-    private Player getFowPlayer() {
-        if (event == null)
-            return null;
-        String user = event.getUser().getId();
-        return game.getPlayer(user);
     }
 
     @NotNull
@@ -589,14 +587,17 @@ public class MapGenerator implements AutoCloseable {
         }
         if (game.isAbsolMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_Absol.png");
+            addWebsiteOverlay("Absol", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
         if (game.isMiltyModMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
+            addWebsiteOverlay("MiltyMod", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
         if (game.isDiscordantStarsMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_DiscordantStars.png");
+            addWebsiteOverlay("Discordant Stars", null, x + deltaX, y + deltaY, 90, 90);
         }
 
         // GAME FUN NAME
@@ -725,7 +726,7 @@ public class MapGenerator implements AutoCloseable {
                         } else {
                             DrawingUtil.superDrawString(graphics, scText, x + 120, y + 70, getSCColor(sc, game), HorizontalAlign.Center, VerticalAlign.Bottom, stroke2, Color.BLACK);
                             if (scModel != null) {
-                                addWebsiteOverlay(player, "strategyCardPlayerArea", scModel.getId(), x + 110, y + 20, 25, 50);
+                                addWebsiteOverlay(scModel, x + 110, y + 20, 25, 50);
                                 // graphics.drawRect(x + 110, y + 20, 25, 50); // debug
                             }
                             if (getSCColor(sc, game).equals(Color.GRAY)) {
@@ -1186,39 +1187,44 @@ public class MapGenerator implements AutoCloseable {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(stroke2);
-        Collection<Player> players = game.getPlayers().values();
+
         for (String pn : player.getPromissoryNotesInPlayArea()) {
             graphics.setColor(Color.WHITE);
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "pn", pn);
 
             boolean commanderUnlocked = false;
             Player promissoryNoteOwner = game.getPNOwner(pn);
             if (promissoryNoteOwner == null) { // nobody owns this note - possibly eliminated player
-                String error = game.getName() + " " + player.getUserName();
-                error += "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: "
-                    + pn;
+                String error = game.getName() + " " + player.getUserName() + "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: " + pn;
                 BotLogger.log(error);
                 continue;
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pn);
-            for (Player player_ : players) {
-                if (player_ != player) {
-                    String playerColor = player_.getColor();
-                    String playerFaction = player_.getFaction();
-                    if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor())
-                        || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
-                        String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
-                        drawPAImage(x + deltaX, y, pnColorFile);
-                        if (game.isFrankenGame()) {
-                            drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
-                        }
-                        DrawingUtil.drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
-                        Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
-                        if (leader != null) {
-                            commanderUnlocked = !leader.isLocked();
-                        }
-                        break;
+
+            if (pn.endsWith("_an")) { // Overlay for alliance commander
+                if (promissoryNoteOwner.getLeader(Constants.COMMANDER).isPresent() &&
+                    promissoryNoteOwner.getLeader(Constants.COMMANDER).get().getLeaderModel().isPresent()) {
+                    LeaderModel leaderModel = promissoryNoteOwner.getLeader(Constants.COMMANDER).get().getLeaderModel().get();
+                    drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, leaderModel);
+                }
+            } else {
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, promissoryNote);
+            }
+            for (Player player_ : player.getOtherRealPlayers()) {
+                String playerColor = player_.getColor();
+                String playerFaction = player_.getFaction();
+                if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor())
+                    || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
+                    String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
+                    drawPAImage(x + deltaX, y, pnColorFile);
+                    if (game.isFrankenGame()) {
+                        drawFactionIconImage(graphics, promissoryNote.getFaction().orElse(""), x + deltaX - 1, y + 86, 42, 42);
                     }
+                    DrawingUtil.drawPlayerFactionIconImage(graphics, promissoryNoteOwner, x + deltaX - 1, y + 108, 42, 42);
+                    Leader leader = player_.unsafeGetLeader(Constants.COMMANDER);
+                    if (leader != null) {
+                        commanderUnlocked = !leader.isLocked();
+                    }
+                    break;
                 }
             }
 
@@ -1291,7 +1297,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             int rectX = x + deltaX - 2;
-            drawRectWithOverlay(g2, rectX, rectY, rectW, rectH, game, player, "relic", relicID);
+            drawRectWithOverlay(g2, rectX, rectY, rectW, rectH, relicModel);
             drawPAImage(x + deltaX, y, "pa_relics_icon.png");
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
@@ -1393,7 +1399,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "leader", leader.getId());
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, Mapper.getLeader(leader.getId()));
 
             if (Mapper.isValidLeader(leader.getId())) {
                 LeaderModel leaderModel = Mapper.getLeader(leader.getId());
@@ -1458,7 +1464,7 @@ public class MapGenerator implements AutoCloseable {
                         if (leader_ != null) {
                             String status_ = leader_.isLocked() ? "_exh" : "_rdy";
                             String imperiaColorFile = "pa_leaders_imperia" + status_ + ".png";
-                            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "leader", leader_.getId());
+                            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, Mapper.getLeader(leader_.getId()));
                             DrawingUtil.drawPlayerFactionIconImage(graphics, player_, x + deltaX - 1, y + 108, 42, 42);
                             drawPAImage(x + deltaX, y, imperiaColorFile);
                             String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
@@ -1560,16 +1566,16 @@ public class MapGenerator implements AutoCloseable {
             String status = isExhaustedLocked ? "_exh" : "_rdy";
             abilityFileName = abilityFileName + status + ".png";
             String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
+            AbilityModel abilityModel = Mapper.getAbility(abilityID);
             if (resourcePath != null) {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "ability", abilityID);
-            } else if (game.isFrankenGame()) { // TODO: or game.showAbilitiesOnMap bool = true
-                AbilityModel abilityModel = Mapper.getAbility(abilityID);
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
+            } else {
                 drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
                 g2.setFont(Storage.getFont16());
                 drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
-                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, game, player, "ability", abilityID);
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
             }
 
             deltaX += 48;
@@ -1620,7 +1626,7 @@ public class MapGenerator implements AutoCloseable {
                 }
 
                 int numInReinforcements = unitCap - count;
-                BufferedImage image = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(unitKey));
+                BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
                 BufferedImage decal = null;
                 decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
                 for (int i = 0; i < numInReinforcements; i++) {
@@ -1694,7 +1700,7 @@ public class MapGenerator implements AutoCloseable {
         int widthOfSection = 180;
         int leftSide = width - widthOfSection - xDeltaFromRightSide;
         int verticalSpacing = 39;
-        addWebsiteOverlay(player, "unitCombatSummary", null, leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
+        addWebsiteOverlay("Fleet Stats", "- Total Resources\n- Total Hit Points\n- Total Expected Hits", leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
         int imageSize = verticalSpacing - 2;
         drawPAImageScaled(leftSide, y + verticalSpacing, "pa_resources.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
@@ -1806,7 +1812,7 @@ public class MapGenerator implements AutoCloseable {
                 Player p = game.getPlayerFromColorOrFaction(unitKey.getColor());
 
                 try {
-                    String unitPath = Tile.getUnitPath(unitKey);
+                    String unitPath = getUnitPath(unitKey);
                     if (unitPath != null) {
                         if (unitKey.getUnitType() == UnitType.Fighter) {
                             unitPath = unitPath.replace(Constants.COLOR_FF, Constants.BULK_FF);
@@ -1911,11 +1917,11 @@ public class MapGenerator implements AutoCloseable {
         // RESOURCE/INFLUENCE TOTALS
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
-        graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
+        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 152, 152, "Resource & Influence Summary", "This is an overview of your resources and influence. The left side is resources, and the right side is influence.\nThe top number how many you have available\nThe middle number is the total\nThe bottom number is the 'optimal' available\nThe bottom-centre number is the flex 'optimal' available");
         if (player.hasLeaderUnlocked("xxchahero")) { // XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, game);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, game);
-            if (Constants.gedsDeadId.equals(player.getUserID())) {
+            if (Constants.gedsDeadId.equals(player.getUserID()) || ThreadLocalRandom.current().nextInt(1000) == 0) {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha_gedsdead.png", 0.9f);
             } else {
                 drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha.png", 0.9f);
@@ -2090,16 +2096,23 @@ public class MapGenerator implements AutoCloseable {
                 String planetTypeName = "pc_upgrade.png";
                 if (planet.getTokenList().contains("attachment_tombofemphidia.png")) {
                     planetTypeName = "pc_upgrade_tomb.png";
+                    ExploreModel tomb = Mapper.getExplore("toe");
+                    addWebsiteOverlay(tomb, x + deltaX + 26, y + 40, 20, 20);
                 }
                 drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName, planetName);
             }
 
             if (planet.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                 String khraskGardenWorlds = "pc_ds_khraskbonus.png";
+                addWebsiteOverlay("Garden World", null, x + deltaX, y, 20, 20);
                 drawPlanetImage(x + deltaX, y, khraskGardenWorlds, planetName);
             }
 
             if (planet.isLegendary()) {
+                PlanetModel planetModel = planet.getPlanetModel();
+                if (planetModel != null) {
+                    addWebsiteOverlay(planetModel, x + deltaX + 26, y + 60, 20, 20);
+                }
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planetName) ? "_exh" : "_rdy";
                 String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
                 drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName, planetName);
@@ -2110,6 +2123,7 @@ public class MapGenerator implements AutoCloseable {
             // BENTOR ENCRYPTION KEY
             if (hasBentorEncryptionKey) {
                 String imageFileName = "pc_tech_bentor_encryptionkey.png";
+                addWebsiteOverlay("Bentor Encryption Key", null, x + deltaX + 26, y + 82, 20, 20);
                 drawPlanetImage(x + deltaX + 26, y + 82, imageFileName, planetName);
             }
 
@@ -2178,7 +2192,7 @@ public class MapGenerator implements AutoCloseable {
         deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, deltaX, player);
         deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, deltaX, player);
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), deltaX, player, game);
-        deltaX = techStasisCapsule(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
+        deltaX = techGenSynthesis(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE));
         return x + deltaX + 20;
     }
 
@@ -2245,7 +2259,7 @@ public class MapGenerator implements AutoCloseable {
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 148, 130);
             }
 
-            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "tech", tech);
+            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
             deltaX += 48;
         }
         return deltaX;
@@ -2259,23 +2273,23 @@ public class MapGenerator implements AutoCloseable {
         for (String tech : techs) {
             graphics.setColor(Color.DARK_GRAY);
 
-            TechnologyModel techInformation = Mapper.getTech(tech);
-            if (techInformation.isUnitUpgrade()) {
+            TechnologyModel techModel = Mapper.getTech(tech);
+            if (techModel.isUnitUpgrade()) {
                 continue;
             }
 
             int types = 0;
             String techIcon = "";
-            if (techInformation.isPropulsionTech()) {
+            if (techModel.isPropulsionTech()) {
                 types++;
                 techIcon += "propulsion";
             }
-            if (techInformation.isCyberneticTech()) {
+            if (techModel.isCyberneticTech()) {
                 types++;
                 techIcon += "cybernetic";
             }
-            if (techInformation.isBioticTech() && types++ < 2) techIcon += "biotic";
-            if (techInformation.isWarfareTech() && types++ < 2) techIcon += "warfare";
+            if (techModel.isBioticTech() && types++ < 2) techIcon += "biotic";
+            if (techModel.isWarfareTech() && types++ < 2) techIcon += "warfare";
 
             if (!game.getStoredValue("colorChange" + tech).isEmpty()) {
                 techIcon = game.getStoredValue("colorChange" + tech);
@@ -2286,8 +2300,8 @@ public class MapGenerator implements AutoCloseable {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (techInformation.getFaction().isPresent()) {
-                drawFactionIconImageOpaque(graphics, techInformation.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
+            if (techModel.getFaction().isPresent()) {
+                drawFactionIconImageOpaque(graphics, techModel.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
             }
 
             String techName = "pa_tech_techname_" + tech + "_exh.png";
@@ -2296,35 +2310,34 @@ public class MapGenerator implements AutoCloseable {
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
             } else {
-                TechnologyModel techModel = Mapper.getTech(tech);
                 graphics.setFont(Storage.getFont20());
                 drawTwoLinesOfTextVertically(graphics, techModel.getName(), x + deltaX + 5, y + 130, 110);
             }
 
-            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "tech", tech);
+            drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, techModel);
             deltaX += 48;
         }
         return deltaX;
     }
 
-    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs) {
-        int stasisInfantry = player.getStasisInfantry();
-        if ((techs == null && stasisInfantry == 0) || !hasInfantryII(techs) && stasisInfantry == 0) {
+    private int techGenSynthesis(int x, int y, int deltaX, Player player, List<String> techs) {
+        int genSynthesisInfantry = player.getGenSynthesisInfantry();
+        if ((techs == null && genSynthesisInfantry == 0) || !hasInfantryII(techs) && genSynthesisInfantry == 0) {
             return deltaX;
         }
         String techSpec = "pa_tech_techname_stasiscapsule.png";
         drawPAImage(x + deltaX, y, techSpec);
-        if (stasisInfantry < 20) {
+        if (genSynthesisInfantry < 20) {
             graphics.setFont(Storage.getFont35());
         } else {
             graphics.setFont(Storage.getFont30());
         }
         int centerX = 0;
-        if (stasisInfantry < 10) {
+        if (genSynthesisInfantry < 10) {
             centerX += 5;
         }
-        graphics.drawString(String.valueOf(stasisInfantry), x + deltaX + 3 + centerX, y + 148);
-        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, game, player, "stasisCapsule", String.valueOf(stasisInfantry));
+        graphics.drawString(String.valueOf(genSynthesisInfantry), x + deltaX + 3 + centerX, y + 148);
+        drawRectWithOverlay(graphics, x + deltaX - 2, y - 2, 44, 152, "Gen Synthesis (Infantry II)", "Number of infantry to revive: " + genSynthesisInfantry);
         deltaX += 48;
         return deltaX;
     }
@@ -2343,7 +2356,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         mainImage.flush();
         graphics.dispose();
         logDebug();
@@ -2476,7 +2489,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
             // Unit Overlays
-            addWebsiteOverlay(player, "unit", unit.getId(), deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+            addWebsiteOverlay(unit, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
             // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
         }
         graphics.setColor(Color.WHITE);
@@ -2560,9 +2573,14 @@ public class MapGenerator implements AutoCloseable {
         }
     }
 
+    private String getUnitPath(UnitKey unit) {
+        ResourceHelper rs = ResourceHelper.getInstance();
+        return allEyesOnMe ? rs.getUnitFile(unit, allEyesOnMe) : rs.getUnitFile(unit);
+    }
+
     private void drawPAUnitUpgrade(int x, int y, UnitKey unitKey) {
         try {
-            String path = Tile.getUnitPath(unitKey);
+            String path = getUnitPath(unitKey);
             BufferedImage img = ImageHelper.read(path);
             graphics.drawImage(img, x, y, null);
         } catch (Exception e) {
@@ -2684,7 +2702,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, deltaY);
                 // graphics.drawRect(x, y + 24, textWidth, 64); // debug
-                addWebsiteOverlay("strategyCardByScoretrack", scModel.getId(), x, y + 24, textWidth, 60);
+                addWebsiteOverlay(scModel, x, y + 24, textWidth, 60);
                 Integer tg = scTGs.getValue();
                 if (tg > 0) {
                     graphics.setFont(Storage.getFont24());
@@ -2762,42 +2780,65 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private int drawCardDecks(int x, int y) {
-        if (!game.isFowMode()) {
-            int cardWidth = 60;
-            int cardHeight = 90;
-            int horSpacing = cardWidth + 15;
-            int textY = y + cardHeight - 10;
-            Stroke outline = stroke2;
+        if (game.isFowMode()) return x;
 
-            graphics.setFont(Storage.getFont24());
+        int cardWidth = 60;
+        int cardHeight = 90;
+        int horSpacing = cardWidth + 15;
+        int textY = y + cardHeight - 10;
+        Stroke outline = stroke2;
+        String overlayText;
 
-            drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        graphics.setFont(Storage.getFont24());
 
-            drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_secret.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getSecretObjectiveDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getSecretObjectiveDeckSize() + "/" + game.getSecretObjectiveFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Secret Objective Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_action.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getActionCards().size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getActionCards().size() + "/" + game.getActionCardFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Action Card Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_cultural.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("cultural").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getCulturalExploreDeckSize() + "/" + game.getCulturalExploreFullDeckSize() + " in the deck \n" + game.getCulturalExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Cultural Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
+        drawPAImageScaled(x, y, "cardback_industrial.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("industrial").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getIndustrialExploreDeckSize() + "/" + game.getIndustrialExploreFullDeckSize() + " in the deck \n" + game.getIndustrialExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Industrial Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
 
-            drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
-            drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
-            DrawingUtil.superDrawString(graphics, Integer.toString(game.getRelicDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
-            x += horSpacing;
-        }
+        drawPAImageScaled(x, y, "cardback_hazardous.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("hazardous").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getHazardousExploreDeckSize() + "/" + game.getHazardousExploreFullDeckSize() + " in the deck \n" + game.getHazardousExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Hazardous Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_frontier.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getExploreDeck("frontier").size()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getFrontierExploreDeckSize() + "/" + game.getFrontierExploreFullDeckSize() + " in the deck \n" + game.getFrontierExploreDiscardSize() + " cards in the discard pile";
+        addWebsiteOverlay("Frontier Explore Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_relic.jpg", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getRelicDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getRelicDeckSize() + "/" + game.getRelicFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Relic Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
+        drawPAImageScaled(x, y, "cardback_agenda.png", cardWidth, cardHeight);
+        DrawingUtil.superDrawString(graphics, Integer.toString(game.getAgendaDeckSize()), x + cardWidth / 2, textY, Color.WHITE, HorizontalAlign.Center, VerticalAlign.Bottom, outline, Color.BLACK);
+        overlayText = game.getAgendaDeckSize() + "/" + game.getAgendaFullDeckSize() + " cards in the deck";
+        addWebsiteOverlay("Agenda Deck", overlayText, x, y, cardWidth, cardHeight);
+        x += horSpacing;
+
         return x;
     }
 
@@ -3066,7 +3107,7 @@ public class MapGenerator implements AutoCloseable {
                     int fontYoffset = (scsize / 2) + 25;
                     DrawingUtil.superDrawString(graphics, Integer.toString(sc), point.x, point.y + fontYoffset, getSCColor(sc, game), center, bottom, stroke6, Color.BLACK);
                     if (scModel != null) {
-                        addWebsiteOverlay(player, "strategyCardNearMap", scModel.getId(), point.x - 20, point.y + 20, 40, 50);
+                        addWebsiteOverlay(scModel, point.x - 20, point.y + 20, 40, 50);
                         // graphics.drawRect(point.x - 20, point.y + 20, 40, 50); //debug
                     }
                     point.translate(scsize, 0);
@@ -3780,7 +3821,7 @@ public class MapGenerator implements AutoCloseable {
 
             graphics.drawRect(x, y, 1178, 110);
             if (agendaModel != null) {
-                addWebsiteOverlay("agenda", agendaModel.getAlias(), x, y, 1178, 110);
+                addWebsiteOverlay(agendaModel, x, y, 1178, 110);
             }
             String agendaTitle = Mapper.getAgendaTitle(lawID);
             if (agendaTitle == null) {
@@ -4027,7 +4068,7 @@ public class MapGenerator implements AutoCloseable {
             if (scoredPlayerID != null) {
                 drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, true);
             }
-            drawRectWithOverlay(graphics, x - 4, y - 5, 600, 38, game, null, "so", key);
+            drawRectWithOverlay(graphics, x - 4, y - 5, 600, 38, Mapper.getSecretObjective(key));
 
             y += 43;
         }
@@ -4189,7 +4230,7 @@ public class MapGenerator implements AutoCloseable {
             int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
             int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
 
-            BufferedImage tileImage = new TileGenerator(game, event).draw(tile, step);
+            BufferedImage tileImage = new TileGenerator(game, event, displayType).draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
             BotLogger.log("Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(), exception);
@@ -4302,21 +4343,26 @@ public class MapGenerator implements AutoCloseable {
         return op.filter(image, null);
     }
 
-    private void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, Game game, Player player, String cardType, String cardID) {
+    private void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, String overlayTitle, String overlayText) {
         g.drawRect(x, y, width, height);
-        addWebsiteOverlay(player, cardType, cardID, x, y, width, height);
+        addWebsiteOverlay(overlayTitle, overlayText, x, y, width, height);
     }
 
-    void addWebsiteOverlay(Player player, String cardType, String cardID, int x, int y, int width, int height) {
-        if (player == null) {
-            addWebsiteOverlay(cardType, cardID, x, y, width, height);
-            return;
+    private void drawRectWithOverlay(Graphics g, int x, int y, int width, int height, ModelInterface dataModel) {
+        g.drawRect(x, y, width, height);
+        if (dataModel == null) {
+            addWebsiteOverlay("missingDataModel", "missingDataModel", x, y, width, height);
+        } else {
+            addWebsiteOverlay(dataModel, x, y, width, height);
         }
-        websiteOverlays.put(cardType + ":" + cardID + ":" + player.getFaction(), new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
     }
 
-    void addWebsiteOverlay(String cardType, String cardID, int x, int y, int width, int height) {
-        websiteOverlays.put(cardType + ":" + cardID, new WebsiteOverlay(cardType, cardID, List.of(x, y, width, height)));
+    void addWebsiteOverlay(String overlayTitle, String overlayText, int x, int y, int width, int height) {
+        websiteOverlays.add(new WebsiteOverlay(overlayTitle, overlayText, List.of(x, y, width, height)));
+    }
+
+    void addWebsiteOverlay(ModelInterface dataModel, int x, int y, int width, int height) {
+        websiteOverlays.add(new WebsiteOverlay(dataModel, List.of(x, y, width, height)));
     }
 
     String getGameName() {

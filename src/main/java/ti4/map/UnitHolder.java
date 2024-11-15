@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -11,14 +11,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
+import org.jetbrains.annotations.NotNull;
 import ti4.generator.Mapper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
@@ -208,7 +206,6 @@ abstract public class UnitHolder {
 
     @JsonIgnore
     public boolean hasUnits() {
-        if (units == null) return false;
         for (Integer count : units.values())
             if (count > 0) return true;
         return false;

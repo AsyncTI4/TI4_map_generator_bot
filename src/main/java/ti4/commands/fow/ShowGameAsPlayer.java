@@ -4,9 +4,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.uncategorized.ShowGame;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -21,15 +22,14 @@ public class ShowGameAsPlayer extends FOWSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
 
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You're not a player of this game");
             return;
         }
 
-        Player showMapAsPlayer = Helper.getPlayer(game, null, event);
+        Player showMapAsPlayer = CommandHelper.getPlayerFromEvent(game, event);
         if (showMapAsPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
@@ -46,6 +46,7 @@ public class ShowGameAsPlayer extends FOWSubcommandData {
             this.overriddenUser = overriddenUser;
         }
 
+        @NotNull
         @Override
         public User getUser() {
             return overriddenUser;

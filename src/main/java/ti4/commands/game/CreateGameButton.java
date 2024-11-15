@@ -18,9 +18,9 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.commands.bothelper.CreateGameChannels;
 import ti4.commands.search.SearchMyGames;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.GameManager;
@@ -43,12 +43,12 @@ public class CreateGameButton extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         // GAME NAME
-        String gameName = CreateGameChannels.getNextGameName();
+        String gameName = GameCreationHelper.getNextGameName();
 
         // CHECK IF GIVEN CATEGORY IS VALID
-        String categoryChannelName = CreateGameChannels.getCategoryNameForGame(gameName);
+        String categoryChannelName = GameCreationHelper.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
-        List<Category> categories = CreateGameChannels.getAllAvailablePBDCategories();
+        List<Category> categories = GameCreationHelper.getAllAvailablePBDCategories();
         for (Category category : categories) {
             if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
                 categoryChannel = category;
@@ -56,7 +56,12 @@ public class CreateGameButton extends GameSubcommandData {
             }
         }
         if (categoryChannel == null)
-            categoryChannel = CreateGameChannels.createNewCategory(categoryChannelName);
+            categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
+        if (categoryChannel == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
+                + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+            return;
+        }
 
         // SET GUILD BASED ON CATEGORY SELECTED
         Guild guild = categoryChannel.getGuild();
@@ -84,7 +89,7 @@ public class CreateGameButton extends GameSubcommandData {
         }
 
         // CHECK IF GUILD HAS ALL PLAYERS LISTED
-        CreateGameChannels.inviteUsersToServer(guild, members, event.getMessageChannel());
+        GameCreationHelper.inviteUsersToServer(guild, members, event.getMessageChannel());
 
         StringBuilder buttonMsg = new StringBuilder();
         List<Button> buttons = new ArrayList<>();
@@ -111,7 +116,7 @@ public class CreateGameButton extends GameSubcommandData {
 
         Member member = event.getMember();
         boolean isAdmin = false;
-        Game mapreference = GameManager.getInstance().getGame("finreference");
+        Game mapreference = GameManager.getGame("finreference");
 
         if (mapreference != null && mapreference.getStoredValue("allowedButtonPress").equalsIgnoreCase("false")) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
@@ -136,9 +141,9 @@ public class CreateGameButton extends GameSubcommandData {
 
         String buttonMsg = event.getMessage().getContentRaw();
         String gameSillyName = StringUtils.substringBetween(buttonMsg, "Game Fun Name: ", "\n");
-        String gameName = CreateGameChannels.getNextGameName();
-        String lastGame = CreateGameChannels.getLastGameName();
-        Game game = GameManager.getInstance().getGame(lastGame);
+        String gameName = GameCreationHelper.getNextGameName();
+        String lastGame = GameCreationHelper.getLastGameName();
+        Game game = GameManager.getGame(lastGame);
         if (game != null) {
             if (game.getCustomName().equalsIgnoreCase(gameSillyName)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -163,9 +168,9 @@ public class CreateGameButton extends GameSubcommandData {
         }
 
         // CHECK IF GIVEN CATEGORY IS VALID
-        String categoryChannelName = CreateGameChannels.getCategoryNameForGame(gameName);
+        String categoryChannelName = GameCreationHelper.getCategoryNameForGame(gameName);
         Category categoryChannel = null;
-        List<Category> categories = CreateGameChannels.getAllAvailablePBDCategories();
+        List<Category> categories = GameCreationHelper.getAllAvailablePBDCategories();
         for (Category category : categories) {
             if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
                 categoryChannel = category;
@@ -173,8 +178,13 @@ public class CreateGameButton extends GameSubcommandData {
             }
         }
         if (categoryChannel == null)
-            categoryChannel = CreateGameChannels.createNewCategory(categoryChannelName);
+            categoryChannel = GameCreationHelper.createNewCategory(categoryChannelName);
+        if (categoryChannel == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not automatically find a category that begins with **" + categoryChannelName
+                + "** - Please create this category.\n# Warning, this may mean all servers are at capacity.");
+            return;
+        }
         event.getMessage().delete().queue();
-        CreateGameChannels.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
+        GameCreationHelper.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
     }
 }
