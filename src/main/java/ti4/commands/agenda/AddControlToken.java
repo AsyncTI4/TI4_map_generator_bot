@@ -18,14 +18,8 @@ class AddControlToken extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        var option = event.getOption(Constants.AGENDA_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
-            return;
-        }
-
         var game = getGame();
-        int lawId = option.getAsInt();
+        int lawId = event.getOption(Constants.AGENDA_ID).getAsInt();
         String msg = game.getStoredValue("controlTokensOnAgenda" + lawId);
         boolean undo = false;
         var option2 = event.getOption(Constants.UNDO);
