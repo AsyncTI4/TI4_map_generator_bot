@@ -413,27 +413,9 @@ public class AgendaHelper {
                     if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
                         message = message + " Also passed the speaker token.";
                         boolean foundSpeaker = false;
-                        boolean assignedSpeaker = false;
                         for (Player p4 : game.getRealPlayers()) {
-                            if (assignedSpeaker) {
-                                break;
-                            }
                             if (foundSpeaker) {
                                 game.setSpeakerUserID(p4.getUserID());
-                                assignedSpeaker = true;
-                                break;
-                            }
-                            if (p4 == player2) {
-                                foundSpeaker = true;
-                            }
-                        }
-                        for (Player p4 : game.getRealPlayers()) {
-                            if (assignedSpeaker) {
-                                break;
-                            }
-                            if (foundSpeaker) {
-                                game.setSpeakerUserID(p4.getUserID());
-                                assignedSpeaker = true;
                                 break;
                             }
                             if (p4 == player2) {
@@ -1804,12 +1786,11 @@ public class AgendaHelper {
     @ButtonHandler("rider_")
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String[] choiceParams = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.lastIndexOf("_")).split(";");
-        // String choiceType = choiceParams[0];
         String choice = choiceParams[1];
 
         String rider = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
-        // if(activeMap)
+
         String cleanedChoice = choice;
         if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
             cleanedChoice = Helper.getPlanetRepresentation(choice, game);

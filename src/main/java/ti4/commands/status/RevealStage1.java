@@ -29,7 +29,7 @@ public class RevealStage1 extends StatusSubcommandData {
     }
 
     public void revealS1(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game game = GameManager.getUserActiveGame(event.getUser().getId());
 
         Map.Entry<String, Integer> objective = game.revealStage1();
 
@@ -67,7 +67,7 @@ public class RevealStage1 extends StatusSubcommandData {
     }
 
     public static void revealTwoStage1(GenericInteractionCreateEvent event, MessageChannel channel) {
-        Game game = GameManager.getInstance().getUserActiveGame(event.getUser().getId());
+        Game game = GameManager.getUserActiveGame(event.getUser().getId());
 
         Map.Entry<String, Integer> objective1 = game.revealStage1();
         Map.Entry<String, Integer> objective2 = game.revealStage1();
@@ -97,7 +97,7 @@ public class RevealStage1 extends StatusSubcommandData {
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        Game game = GameManager.getUserActiveGame(userID);
         GameSaveLoadManager.saveGame(game, event);
     }
 }

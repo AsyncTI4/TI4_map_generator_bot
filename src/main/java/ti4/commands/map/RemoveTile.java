@@ -25,11 +25,11 @@ public class RemoveTile extends AddRemoveTile {
     }
 
     @Override
-    protected Game tileParsing(SlashCommandInteractionEvent event, String userID, GameManager gameManager) {
+    protected Game tileParsing(SlashCommandInteractionEvent event, String userID) {
         String positionOption = event.getOptions().getFirst().getAsString();
         Set<String> positions = Helper.getSetFromCSV(positionOption);
 
-        Game userActiveGame = gameManager.getUserActiveGame(userID);
+        Game userActiveGame = GameManager.getUserActiveGame(userID);
         for (String position : positions) {
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Tile position `" + position + "` is not valid");

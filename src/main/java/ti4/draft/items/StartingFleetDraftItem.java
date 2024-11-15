@@ -1,5 +1,8 @@
 package ti4.draft.items;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
 import ti4.generator.Mapper;
@@ -7,9 +10,6 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class StartingFleetDraftItem extends DraftItem {
     public StartingFleetDraftItem(String itemId) {
@@ -48,7 +48,7 @@ public class StartingFleetDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.STARTINGFLEET, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.STARTINGFLEET, faction.getAlias()));
         }
         return allItems;
     }

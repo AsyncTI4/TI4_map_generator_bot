@@ -1,9 +1,9 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -19,9 +19,8 @@ public class ExploreShuffleIntoDeckFromHand extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player activePlayer = game.getPlayer(getUser().getId());
-        activePlayer = Helper.getGamePlayer(game, activePlayer, event, null);
-        if (activePlayer == null) {
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
+        if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player not found in game.");
             return;
         }
@@ -31,7 +30,7 @@ public class ExploreShuffleIntoDeckFromHand extends ExploreSubcommandData {
         for (String id : idList) {
             ExploreModel explore = Mapper.getExplore(id);
             if (explore != null) {
-                activePlayer.removeFragment(id);
+                player.removeFragment(id);
                 sb.append("Fragment discarded: ").append(explore.textRepresentation()).append(System.lineSeparator());
                 game.addExplore(id);
             } else {

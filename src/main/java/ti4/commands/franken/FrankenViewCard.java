@@ -19,7 +19,7 @@ public class FrankenViewCard extends FrankenSubcommandData {
         OptionMapping editOption = event.getOption("alias");
         String alias = editOption.getAsString();
 
-        DraftItem item = DraftItem.GenerateFromAlias(alias);
+        DraftItem item = DraftItem.generateFromAlias(alias);
 
         MessageHelper.sendMessageToEventChannel(event, item.getItemEmoji() + " " + item.getShortDescription() + "\n" + item.getLongDescription());
     }

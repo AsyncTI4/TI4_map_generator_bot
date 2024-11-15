@@ -68,9 +68,8 @@ public class RegexHelper {
     }
 
     public static String oneOf(List<String> regex) {
-        String sb = "(" + "(" + String.join(")|(", regex) + ")" +
+        return "(" + "(" + String.join(")|(", regex) + ")" +
                 ")";
-        return sb;
     }
 
     /**

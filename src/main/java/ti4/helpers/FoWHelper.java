@@ -67,7 +67,7 @@ public class FoWHelper {
 			String gameName = channel.getName();
 			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			game = GameManager.getInstance().getGame(gameName);
+			game = GameManager.getGame(gameName);
 			if (game == null) {
 				return false;
 			}
@@ -103,10 +103,7 @@ public class FoWHelper {
 			return true;
 		}
 
-		return viewingPlayer != null && player != null && game != null &&
-			(hasHomeSystemInView(game, player, viewingPlayer)
-				|| hasPlayersPromInPlayArea(player, viewingPlayer)
-				|| hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
+		return game != null && (hasHomeSystemInView(game, player, viewingPlayer) || hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer) || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
 	}
 
 	/**
@@ -885,10 +882,7 @@ public class FoWHelper {
 				sb.append("???");
 			}
 			sb.append(" sent ").append(transactedObject).append(" to ");
-			if (receivingPlayer == null) {
-				BotLogger.log(event, "`FoWHelper.pingPlayersTransaction` Warning, receivingPlayer is null");
-			}
-			if (receiverVisible && receivingPlayer != null) {
+            if (receiverVisible) {
 				sb.append(receivingPlayer.getRepresentation());
 			} else {
 				sb.append("???");

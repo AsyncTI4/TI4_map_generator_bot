@@ -1,12 +1,16 @@
 package ti4.helpers;
 
-import ti4.ResourceHelper;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+import ti4.ResourceHelper;
 
 public class LoggerHandler {
     private static Logger logger;

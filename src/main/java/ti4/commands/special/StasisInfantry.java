@@ -1,17 +1,18 @@
 package ti4.commands.special;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.player.Stats;
+import ti4.commands2.CommandHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class StasisInfantry extends SpecialSubcommandData {
     public StasisInfantry() {
@@ -24,9 +25,7 @@ public class StasisInfantry extends SpecialSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -34,7 +33,7 @@ public class StasisInfantry extends SpecialSubcommandData {
 
         OptionMapping option = event.getOption(Constants.COUNT);
         if (option != null) {
-            setValue(event, game, player, player::setStasisInfantry, player::getStasisInfantry, option.getAsString());
+            setValue(event, game, player, player::setStasisInfantry, player::getGenSynthesisInfantry, option.getAsString());
         }
 
     }

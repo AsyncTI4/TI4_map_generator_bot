@@ -57,7 +57,7 @@ public class ServerPromote implements Command {
     };
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.SERVERPROMOTE;
     }
 
@@ -155,9 +155,9 @@ public class ServerPromote implements Command {
     }
 
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         commands.addCommands(
-            Commands.slash(getActionID(), "Promotes Authorised User On Any Async Server")
+            Commands.slash(getName(), "Promotes Authorised User On Any Async Server")
                 .addOptions(new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setRequired(false).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setRequired(false).setAutoComplete(true)));

@@ -65,7 +65,7 @@ public class AgentDraftItem extends DraftItem {
             List<String> agents = faction.getLeaders();
             agents.removeIf((String leader) -> !"agent".equals(allLeaders.get(leader).getType()));
             for (String agent : agents) {
-                allItems.add(DraftItem.Generate(Category.AGENT, agent));
+                allItems.add(DraftItem.generate(Category.AGENT, agent));
             }
         }
         return allItems;

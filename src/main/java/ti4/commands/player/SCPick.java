@@ -25,6 +25,7 @@ import ti4.commands.cardspn.PlayPN;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.commands.status.ListTurnOrder;
+import ti4.commands2.CommandHelper;
 import ti4.generator.MapGenerator;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -56,9 +57,7 @@ public class SCPick extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -413,10 +412,10 @@ public class SCPick extends PlayerSubcommandData {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
                     TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-                if (privatePlayer.getStasisInfantry() > 0) {
+                if (privatePlayer.getGenSynthesisInfantry() > 0) {
                     if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                         MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
                             ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                     } else {
                         privatePlayer.setStasisInfantry(0);
@@ -445,10 +444,10 @@ public class SCPick extends PlayerSubcommandData {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
                         TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-                    if (privatePlayer.getStasisInfantry() > 0) {
+                    if (privatePlayer.getGenSynthesisInfantry() > 0) {
                         if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
                             MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                                "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
+                                "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
                                 ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
                         } else {
                             privatePlayer.setStasisInfantry(0);

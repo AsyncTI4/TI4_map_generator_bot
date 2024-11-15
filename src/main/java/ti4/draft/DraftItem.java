@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -51,10 +50,9 @@ public abstract class DraftItem implements ModelInterface {
 
     public DraftErrataModel Errata;
 
-    public static DraftItem Generate(Category category, String itemId) {
+    public static DraftItem generate(Category category, String itemId) {
         DraftItem item = null;
         switch (category) {
-
             case ABILITY -> item = new AbilityDraftItem(itemId);
             case TECH -> item = new TechDraftItem(itemId);
             case AGENT -> item = new AgentDraftItem(itemId);
@@ -75,9 +73,9 @@ public abstract class DraftItem implements ModelInterface {
         return item;
     }
 
-    public static DraftItem GenerateFromAlias(String alias) {
+    public static DraftItem generateFromAlias(String alias) {
         String[] split = alias.split(":");
-        return Generate(Category.valueOf(split[0]), split[1]);
+        return generate(Category.valueOf(split[0]), split[1]);
     }
 
     public static List<DraftItem> generateAllDraftableCards() {
@@ -121,7 +119,7 @@ public abstract class DraftItem implements ModelInterface {
         var frankenErrata = Mapper.getFrankenErrata().values();
         for (DraftErrataModel errataItem : frankenErrata) {
             if (errataItem.ItemCategory == type && errataItem.AlwaysAddToPool) {
-                alwaysInclude.add(GenerateFromAlias(errataItem.getAlias()));
+                alwaysInclude.add(generateFromAlias(errataItem.getAlias()));
             }
         }
 
@@ -143,7 +141,7 @@ public abstract class DraftItem implements ModelInterface {
             if (Errata.AdditionalComponents != null) {
                 sb.append("\n>  - *Also adds: ");
                 for (DraftErrataModel i : Errata.AdditionalComponents) {
-                    DraftItem item = Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
@@ -152,7 +150,7 @@ public abstract class DraftItem implements ModelInterface {
             if (Errata.OptionalSwaps != null) {
                 sb.append("\n>  - *Includes optional swaps: ");
                 for (DraftErrataModel i : Errata.OptionalSwaps) {
-                    DraftItem item = Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }

@@ -1,13 +1,13 @@
 package ti4.generator;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.List;
+
 import ti4.helpers.ImageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.List;
 
 public class ObjectiveBox {
 	public static final int objectiveBoxHeight = 38;
@@ -41,8 +41,8 @@ public class ObjectiveBox {
 
 		graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
 		graphics.drawRect(x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
-		if (objective.revealed()) {
-			generator.addWebsiteOverlay("objective", objective.key(), x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
+		if (objective.revealed() && Mapper.getPublicObjective(objective.key()) != null) {
+			generator.addWebsiteOverlay(Mapper.getPublicObjective(objective.key()), x - horizontalBoxOffset, y - spacingBetweenBoxes, boxWidth, objectiveBoxHeight);
 		}
 
 		x += maxTextWidth + bufferBetweenTextAndTokens;

@@ -1151,7 +1151,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void assignSpeaker(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = StringUtils.substringAfter(buttonID, "assignSpeaker_");
         game.setStoredValue("hasntSetSpeaker", "");
-        if (game != null && !game.isFowMode()) {
+        if (!game.isFowMode()) {
             for (Player player_ : game.getPlayers().values()) {
                 if (player_.getFaction().equals(faction)) {
                     game.setSpeakerUserID(player_.getUserID());
@@ -1172,18 +1172,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
         faction = faction.replace("assignSpeaker_", "");
         game.setStoredValue("hasntSetSpeaker", "");
-        if (game != null) {
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_.getFaction().equals(faction)) {
-                    game.setSpeakerUserID(player_.getUserID());
-                    String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-                    if (game.isFowMode() && player != player_) {
-                        MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
-                    }
-                    if (!game.isFowMode()) {
-                        ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
-                    }
+        for (Player player_ : game.getPlayers().values()) {
+            if (player_.getFaction().equals(faction)) {
+                game.setSpeakerUserID(player_.getUserID());
+                String message = Emojis.SpeakerToken + " Speaker assigned to: " + player_.getRepresentation(false, true);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                if (game.isFowMode() && player != player_) {
+                    MessageHelper.sendMessageToChannel(player_.getPrivateChannel(), message);
+                }
+                if (!game.isFowMode()) {
+                    ButtonHelper.sendMessageToRightStratThread(player, game, message, "politics");
                 }
             }
         }
@@ -1258,7 +1256,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void getSODiscardButtons(ButtonInteractionEvent event, Player player, Game game) {
         String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
         List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveDiscardButtons(game, player);
-        if (soButtons != null && !soButtons.isEmpty()) {
+        if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Developers");
@@ -1353,7 +1351,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void getSoScoreButtons(ButtonInteractionEvent event, Game game, Player player) {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = SOInfo.getUnscoredSecretObjectiveButtons(game, player);
-        if (soButtons != null && !soButtons.isEmpty()) {
+        if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
@@ -3495,7 +3493,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you need to assign speaker first before drawing agendas. You can override this restriction with `/agenda draw`");
             return;
         }
-        DrawAgenda.drawAgenda(event, 2, game, player);
+        DrawAgenda.drawAgenda(2, game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false) + " drew 2 agendas");
         ButtonHelper.deleteMessage(event);
     }

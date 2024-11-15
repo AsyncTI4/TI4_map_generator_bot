@@ -29,9 +29,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
-import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
-import ti4.commands.bothelper.BothelperCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.capture.CaptureCommand;
 import ti4.commands.cardsac.ACCardsCommand;
@@ -80,6 +78,8 @@ import ti4.commands.units.RemoveAllUnits;
 import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
+import ti4.commands2.admin.AdminCommand;
+import ti4.commands2.bothelper.BothelperCommand;
 import ti4.cron.AutoPingCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.UploadStatsCron;
@@ -174,77 +174,76 @@ public class AsyncTI4DiscordBot {
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
-        CommandManager commandManager = CommandManager.getInstance();
-        commandManager.addCommand(new AddUnits());
-        commandManager.addCommand(new RemoveUnits());
-        commandManager.addCommand(new RemoveAllUnits());
-        commandManager.addCommand(new AllInfo());
-        commandManager.addCommand(new CardsInfo());
-        commandManager.addCommand(new ShowGame());
-        commandManager.addCommand(new ShowDistances());
-        commandManager.addCommand(new AddCC());
-        commandManager.addCommand(new RemoveCC());
-        commandManager.addCommand(new RemoveAllCC());
-        commandManager.addCommand(new AddFrontierTokens());
-        commandManager.addCommand(new MoveUnits());
-        commandManager.addCommand(new ModifyUnits());
-        commandManager.addCommand(new RemoveToken());
-        commandManager.addCommand(new AddToken());
-        commandManager.addCommand(new AddUnitDamage());
-        commandManager.addCommand(new RemoveUnitDamage());
-        commandManager.addCommand(new RemoveAllUnitDamage());
+        CommandManager.addCommand(new AddUnits());
+        CommandManager.addCommand(new RemoveUnits());
+        CommandManager.addCommand(new RemoveAllUnits());
+        CommandManager.addCommand(new AllInfo());
+        CommandManager.addCommand(new CardsInfo());
+        CommandManager.addCommand(new ShowGame());
+        CommandManager.addCommand(new ShowDistances());
+        CommandManager.addCommand(new AddCC());
+        CommandManager.addCommand(new RemoveCC());
+        CommandManager.addCommand(new RemoveAllCC());
+        CommandManager.addCommand(new AddFrontierTokens());
+        CommandManager.addCommand(new MoveUnits());
+        CommandManager.addCommand(new ModifyUnits());
+        CommandManager.addCommand(new RemoveToken());
+        CommandManager.addCommand(new AddToken());
+        CommandManager.addCommand(new AddUnitDamage());
+        CommandManager.addCommand(new RemoveUnitDamage());
+        CommandManager.addCommand(new RemoveAllUnitDamage());
 
-        commandManager.addCommand(new MapCommand());
-        commandManager.addCommand(new HelpCommand());
-        commandManager.addCommand(new SearchCommand());
-        commandManager.addCommand(new ExploreCommand());
-        commandManager.addCommand(new RelicCommand());
+        CommandManager.addCommand(new MapCommand());
+        CommandManager.addCommand(new HelpCommand());
+        CommandManager.addCommand(new SearchCommand());
+        CommandManager.addCommand(new ExploreCommand());
+        CommandManager.addCommand(new RelicCommand());
 
-        commandManager.addCommand(new AdminCommand());
-        commandManager.addCommand(new DeveloperCommand());
-        commandManager.addCommand(new BothelperCommand());
-        commandManager.addCommand(new PlayerCommand());
-        commandManager.addCommand(new GameCommand());
+        CommandManager.addCommand(new AdminCommand());
+        CommandManager.addCommand(new DeveloperCommand());
+        CommandManager.addCommand(new BothelperCommand());
+        CommandManager.addCommand(new PlayerCommand());
+        CommandManager.addCommand(new GameCommand());
 
-        commandManager.addCommand(new ACCardsCommand());
-        commandManager.addCommand(new PNCardsCommand());
-        commandManager.addCommand(new SOCardsCommand());
-        commandManager.addCommand(new StatusCommand());
-        commandManager.addCommand(new AgendaCommand());
-        commandManager.addCommand(new EventCommand());
+        CommandManager.addCommand(new ACCardsCommand());
+        CommandManager.addCommand(new PNCardsCommand());
+        CommandManager.addCommand(new SOCardsCommand());
+        CommandManager.addCommand(new StatusCommand());
+        CommandManager.addCommand(new AgendaCommand());
+        CommandManager.addCommand(new EventCommand());
 
-        commandManager.addCommand(new SpecialCommand());
-        commandManager.addCommand(new LeaderCommand());
-        commandManager.addCommand(new CombatCommand());
-        commandManager.addCommand(new CustomCommand());
-        commandManager.addCommand(new FOWCommand());
-        commandManager.addCommand(new InstallationCommand());
-        commandManager.addCommand(new MiltyCommand());
-        commandManager.addCommand(new FrankenCommand());
-        commandManager.addCommand(new CaptureCommand());
-        commandManager.addCommand(new GenericButtonCommand());
-        commandManager.addCommand(new DiscordantStarsCommand());
-        commandManager.addCommand(new StatisticsCommand());
-        commandManager.addCommand(new TechCommand());
-        commandManager.addCommand(new PlanetCommand());
-        commandManager.addCommand(new SelectionBoxDemo());
-        commandManager.addCommand(new UserCommand());
-        commandManager.addCommand(new TIGLCommand());
+        CommandManager.addCommand(new SpecialCommand());
+        CommandManager.addCommand(new LeaderCommand());
+        CommandManager.addCommand(new CombatCommand());
+        CommandManager.addCommand(new CustomCommand());
+        CommandManager.addCommand(new FOWCommand());
+        CommandManager.addCommand(new InstallationCommand());
+        CommandManager.addCommand(new MiltyCommand());
+        CommandManager.addCommand(new FrankenCommand());
+        CommandManager.addCommand(new CaptureCommand());
+        CommandManager.addCommand(new GenericButtonCommand());
+        CommandManager.addCommand(new DiscordantStarsCommand());
+        CommandManager.addCommand(new StatisticsCommand());
+        CommandManager.addCommand(new TechCommand());
+        CommandManager.addCommand(new PlanetCommand());
+        CommandManager.addCommand(new SelectionBoxDemo());
+        CommandManager.addCommand(new UserCommand());
+        CommandManager.addCommand(new TIGLCommand());
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
-        startBot(commandManager, guildPrimary);
+        startBot(guildPrimary);
 
         // Community Plays TI
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
-            startBot(commandManager, guildCommunityPlays);
+            startBot(guildCommunityPlays);
         }
 
         // Async: FOW Chapter
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
-            startBot(commandManager, guildFogOfWar);
+            startBot(guildFogOfWar);
 
             // JAZZ WILL GET PINGED IF SHIT IS BROKEN FOR FOG GAMES
             FoWHelper.sanityCheckFowReacts();
@@ -253,35 +252,35 @@ public class AsyncTI4DiscordBot {
         // Async: Stroter's Paradise
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
-            startBot(commandManager, guildSecondary);
+            startBot(guildSecondary);
             serversToCreateNewGamesOn.add(guildSecondary);
         }
 
         // Async: Dreadn't
         if (args.length >= 7) {
             guildTertiary = jda.getGuildById(args[6]);
-            startBot(commandManager, guildTertiary);
+            startBot(guildTertiary);
             serversToCreateNewGamesOn.add(guildTertiary);
         }
 
         // Async: War Sun Tzu
         if (args.length >= 8) {
             guildQuaternary = jda.getGuildById(args[7]);
-            startBot(commandManager, guildQuaternary);
+            startBot(guildQuaternary);
             serversToCreateNewGamesOn.add(guildQuaternary);
         }
 
         // Async: Fighter Club
         if (args.length >= 9) {
             guildQuinary = jda.getGuildById(args[8]);
-            startBot(commandManager, guildQuinary);
+            startBot(guildQuinary);
             serversToCreateNewGamesOn.add(guildQuinary);
         }
 
         // Async: Tommer Hawk
         if (args.length >= 10) {
             guildSenary = jda.getGuildById(args[9]);
-            startBot(commandManager, guildSenary);
+            startBot(guildSenary);
             serversToCreateNewGamesOn.add(guildSenary);
         }
 
@@ -344,12 +343,12 @@ public class AsyncTI4DiscordBot {
         }));
     }
 
-    private static void startBot(CommandManager commandManager, Guild guild) {
+    private static void startBot(Guild guild) {
         if (guild == null) {
             return;
         }
         CommandListUpdateAction commands = guild.updateCommands();
-        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
+        CommandManager.getCommands().forEach(command -> command.register(commands));
         commands.queue();
         BotLogger.logWithTimestamp(" BOT STARTED UP: " + guild.getName());
         guilds.add(guild);

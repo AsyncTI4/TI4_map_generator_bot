@@ -1,7 +1,7 @@
 package ti4.commands.units;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
@@ -19,7 +19,7 @@ public class RemoveUnitDamage extends AddRemoveUnits {
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_UNIT_DAMAGE;
     }
 

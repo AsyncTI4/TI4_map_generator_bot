@@ -1,8 +1,7 @@
 package ti4.selections;
 
-import org.apache.commons.lang3.function.Consumers;
-
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.message.BotLogger;
 

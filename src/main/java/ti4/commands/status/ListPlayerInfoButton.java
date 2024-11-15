@@ -28,6 +28,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source.ComponentSource;
@@ -605,7 +606,9 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 int count = 0;
                 for (String p : player.getPlanets()) {
                     Planet planet = game.getPlanetsInfo().get(p);
-                    if (planet.isLegendary()) {
+                    if (planet == null) {
+                        BotLogger.log("Planet \"" + p + "\" not found for game " + game.getName());
+                    } else if (planet.isLegendary()) {
                         count++;
                     }
                 }
@@ -691,7 +694,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                     for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
                         false, false)) {
                         Tile tile2 = game.getTileByPosition(pos);
-                        if (ButtonHelper.checkNumberShips(player, game, tile2) > 0) {
+                        if (ButtonHelper.checkNumberShips(player, tile2) > 0) {
                             count++;
                         }
                     }
@@ -705,7 +708,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                 if (mecatol == null || !FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {
-                    return ButtonHelper.checkNumberShips(player, game, mecatol);
+                    return ButtonHelper.checkNumberShips(player, mecatol);
                 }
             }
             case "mrm" -> {
@@ -725,7 +728,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "lsc" -> {
                 int count = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
+                    if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                         for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player,
                             false, false)) {
                             Tile tile2 = game.getTileByPosition(pos);
@@ -781,7 +784,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
             case "ctr" -> {
                 int count = 0;
                 for (Tile tile : game.getTileMap().values()) {
-                    if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
+                    if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                         count++;
                     }
                 }
@@ -794,7 +797,7 @@ public class ListPlayerInfoButton extends StatusSubcommandData {
                         continue;
                     }
                     for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock)) {
-                        if (ButtonHelper.checkNumberShips(player, game, tile) > 0) {
+                        if (ButtonHelper.checkNumberShips(player, tile) > 0) {
                             count++;
                         }
                     }

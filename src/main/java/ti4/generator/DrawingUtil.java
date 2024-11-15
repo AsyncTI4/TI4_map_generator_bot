@@ -1,5 +1,12 @@
 package ti4.generator;
 
+import java.awt.*;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -14,13 +21,6 @@ import ti4.helpers.Storage;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
-
-import java.awt.*;
-import java.awt.font.GlyphVector;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import java.util.Set;
 
 @UtilityClass
 public class DrawingUtil {
@@ -73,7 +73,7 @@ public class DrawingUtil {
             outlineColor = Color.BLACK;
             textColor = Color.WHITE;
         }
-        if (outlineSize == null || outlineColor == null) {
+        if (outlineColor == null) {
             g.drawString(txt, x, y);
         } else {
             drawStringOutlined(g, txt, x, y, outlineSize, outlineColor, textColor);

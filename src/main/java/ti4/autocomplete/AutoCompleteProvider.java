@@ -29,6 +29,7 @@ import ti4.commands.player.ChangeUnitDecal;
 import ti4.commands.statistics.GameStats.GameStatistics;
 import ti4.commands.statistics.PlayerStats;
 import ti4.commands.uncategorized.ServerPromote;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
@@ -65,24 +66,16 @@ import ti4.model.WormholeModel;
 public class AutoCompleteProvider {
 
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
-        // List<OptionMapping> allOptions = event.getOptions();
-        //String fullCommandName = event.getFullCommandName();
         String commandName = event.getName();
-        //String subCommandGroupName = event.getSubcommandGroup();
         String subCommandName = event.getSubcommandName();
         String optionName = event.getFocusedOption().getName();
 
-        //boolean showAllChoicesInGame = false;
-        //OptionMapping factionOrColorOption = event.getOption(Constants.FACTION_COLOR);
-        //if (factionOrColorOption != null) showAllChoicesInGame = true;
-
-        String userID = event.getUser().getId();
-        SlashCommandListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
+        String userId = event.getUser().getId();
+        SlashCommandListener.setActiveGame(event.getMessageChannel(), userId, event.getName(), event.getSubcommandName());
+        Game game = GameManager.getUserActiveGame(userId);
         Player player = null;
         if (game != null) {
-            player = game.getPlayer(userID);
-            player = Helper.getGamePlayer(game, player, event, null);
+            player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
         }
 
         // VERY SPECIFIC HANDLING OF OPTIONS
@@ -121,7 +114,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
+            case Constants.FACTION_COLOR, Constants.TARGET_FACTION_OR_COLOR -> {
                 if (game == null) {
                     event.replyChoiceStrings("No game found in this channel").queue();
                     break;
@@ -231,7 +224,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("all", "map", "stats", "split", "landscape",
                     "wormholes", "anomalies", "legendaries", "empties", "aetherstream", "space_cannon_offense",
-                    "traits", "technology_specialties", "attachments", "shipless",
+                    "traits", "technology_specialties", "attachments", "shipless", "googly",
                     "none")
                     .filter(value -> value.contains(enteredValue))
                     .limit(25)
@@ -428,7 +421,7 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getDecals().stream()
                     .filter(value -> value.contains(enteredValue) || Mapper.getDecalName(value).toLowerCase().contains(enteredValue))
-                    .filter(decalID -> ChangeUnitDecal.userMayUseDecal(userID, decalID))
+                    .filter(decalID -> ChangeUnitDecal.userMayUseDecal(userId, decalID))
                     .limit(25)
                     .map(value -> new Command.Choice(Mapper.getDecalName(value), value))
                     .collect(Collectors.toList());
@@ -769,7 +762,7 @@ public class AutoCompleteProvider {
             }
             case Constants.GAME_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = GameManager.getInstance().getGameNames().stream()
+                List<Command.Choice> options = GameManager.getGameNames().stream()
                     .filter(token -> token.contains(enteredValue))
                     .limit(25)
                     .map(token -> new Command.Choice(token, token))
@@ -896,12 +889,11 @@ public class AutoCompleteProvider {
 
     private static <T extends ModelInterface & EmbeddableModel> List<Command.Choice> searchModels(CommandAutoCompleteInteractionEvent event, Collection<T> models, ComponentSource source) {
         String enteredValue = event.getFocusedOption().getValue();
-        List<Command.Choice> options = models.stream()
+        return models.stream()
             .filter(model -> model.search(enteredValue, source))
             .limit(25)
             .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
             .collect(Collectors.toList());
-        return options;
     }
 
     private static void resolveSearchCommandAutoComplete(CommandAutoCompleteInteractionEvent event, String subCommandName, String optionName) {

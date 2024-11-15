@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.commands.uncategorized.InfoThreadCommand;
 import ti4.generator.Mapper;
@@ -25,8 +26,9 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
         super(Constants.PLANET_INFO, "List Planets");
     }
 
+    @NotNull
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.PLANET_INFO;
     }
 
@@ -35,13 +37,13 @@ public class PlanetInfo extends PlanetSubcommandData implements InfoThreadComman
     }
 
     public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
+        return acceptEvent(event, this.getName());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         User user = event.getUser();
-        Game game = GameManager.getInstance().getUserActiveGame(user.getId());
+        Game game = GameManager.getUserActiveGame(user.getId());
 
         Player player = game.getPlayer(user.getId());
         sendPlanetInfo(player);

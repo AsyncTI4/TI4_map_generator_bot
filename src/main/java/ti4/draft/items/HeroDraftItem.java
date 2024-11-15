@@ -66,7 +66,7 @@ public class HeroDraftItem extends DraftItem {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf((String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(DraftItem.Generate(Category.HERO, leader));
+                allItems.add(DraftItem.generate(Category.HERO, leader));
             }
         }
         return allItems;

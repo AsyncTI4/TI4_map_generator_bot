@@ -5,9 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.CombatRollType;
 import ti4.map.Game;
 import ti4.map.Player;

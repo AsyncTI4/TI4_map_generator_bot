@@ -18,26 +18,25 @@ import ti4.message.MessageHelper;
 
 public class RemoveAllCC implements Command {
 
-    void parsingForTile(SlashCommandInteractionEvent event, Game game) {
+    void parsingForTile(Game game) {
         Collection<Tile> tileList = game.getTileMap().values();
         for (Tile tile : tileList) {
             tile.removeAllCC();
         }
     }
 
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_ALL_CC;
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
-        GameManager gameManager = GameManager.getInstance();
-        if (!gameManager.isUserWithActiveGame(userID)) {
+        if (!GameManager.isUserWithActiveGame(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-            Game game = gameManager.getUserActiveGame(userID);
-            parsingForTile(event, game);
+            Game game = GameManager.getUserActiveGame(userID);
+            parsingForTile(game);
             GameSaveLoadManager.saveGame(game, event);
             ShowGame.simpleShowGame(game, event);
         }
@@ -45,10 +44,10 @@ public class RemoveAllCC implements Command {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
+    public void register(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-            Commands.slash(getActionID(), "Remove all CCs from entire map")
+            Commands.slash(getName(), "Remove all CCs from entire map")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                     .setRequired(true)));
     }

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import ti4.commands2.CommandHelper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -40,9 +41,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
+        Player player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -58,7 +57,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
 
         Set<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(OptionMapping::getAsString).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(game, player) + ":");
+        MessageHelper.sendMessageToEventChannel(event, getActionHeaderMessage(player) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, game);
@@ -100,7 +99,7 @@ public abstract class PlanetAddRemove extends PlanetSubcommandData {
     /**
      * Customize the initial header response depending on ActionID (which /player planet_* action is used)
      */
-    private String getActionHeaderMessage(Game game, Player player) {
+    private String getActionHeaderMessage(Player player) {
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" ");
         return switch (getActionID()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s):").toString();

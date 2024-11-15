@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -53,6 +54,7 @@ import ti4.map.GameManager;
 import ti4.map.Player;
 
 public class MessageHelper {
+
 	public interface MessageFunction {
 		void run(Message msg);
 	}
@@ -337,15 +339,19 @@ public class MessageHelper {
 		if (channel == null) {
 			return;
 		}
-		if (embeds.removeIf(Objects::isNull)) {
-			BotLogger.log("Sanitized message with null embeds. Attempted to for message with text: " + messageText);
+
+		List<MessageEmbed> sanitizedEmbeds;
+		if (embeds == null) {
+			sanitizedEmbeds = Collections.emptyList();
+		} else {
+			sanitizedEmbeds = embeds.stream().filter(Objects::nonNull).collect(Collectors.toList());
 		}
 
 		if (channel instanceof ThreadChannel thread) {
 			if (thread.isArchived() && !thread.isLocked()) {
 				String txt = messageText;
 				List<Button> butts = buttons;
-				thread.getManager().setArchived(false).queue((v) -> splitAndSentWithAction(txt, channel, restAction, embeds, butts), BotLogger::catchRestError);
+				thread.getManager().setArchived(false).queue((v) -> splitAndSentWithAction(txt, channel, restAction, sanitizedEmbeds, butts), BotLogger::catchRestError);
 				return;
 			} else if (thread.isLocked()) {
 				BotLogger.log("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
@@ -359,7 +365,7 @@ public class MessageHelper {
 			messageText = injectRules(messageText);
 		}
 		final String message = messageText;
-		List<MessageCreateData> objects = getMessageCreateDataObjects(message, embeds, buttons);
+		List<MessageCreateData> objects = getMessageCreateDataObjects(message, sanitizedEmbeds, buttons);
 		Iterator<MessageCreateData> iterator = objects.iterator();
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
@@ -672,15 +678,11 @@ public class MessageHelper {
 		if (embeds == null) {
 			return new ArrayList<>();
 		}
-		try {
-			embeds.removeIf(Objects::isNull);
-		} catch (Exception e) {
-			// Do nothing
-		}
 		if (embeds.isEmpty()) {
 			return new ArrayList<>();
 		}
-		return ListUtils.partition(embeds, 9); //max 10, but we've had issues with 6k char limit, so max 9
+		embeds = embeds.stream().filter(Objects::nonNull).collect(Collectors.toList());
+		return ListUtils.partition(embeds, 8); //max is 10, but we've had issues with 6k char limit in embeds in single message
 	}
 
 	public static void sendMessageToThread(MessageChannel channel, String threadName, String messageToSend) {
@@ -839,7 +841,7 @@ public class MessageHelper {
 		String gameName = channelName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 		gameName = gameName.replace(Constants.BAG_INFO_THREAD_PREFIX, "");
 		gameName = StringUtils.substringBefore(gameName, "-");
-		return GameManager.getInstance().getGame(gameName);
+		return GameManager.getGame(gameName);
 	}
 
 	/**

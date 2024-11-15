@@ -23,7 +23,7 @@ public class Preset extends MapSubcommandData {
         //addOption(OptionType.STRING, Constants.SLICE_8, "Player 8's slice", false);
     }
 
-    public static List<String> templates = List.of("Solo (1 slice)", "Minimal Solo (1 slice)", "TspMap (6 slices)", "Magi's Madness (0 slices)");
+    public static final List<String> templates = List.of("Solo (1 slice)", "Minimal Solo (1 slice)", "TspMap (6 slices)", "Magi's Madness (0 slices)");
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {

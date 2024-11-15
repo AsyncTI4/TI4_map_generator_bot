@@ -12,8 +12,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.bothelper.CreateGameChannels;
 import ti4.helpers.Constants;
+import ti4.helpers.GameCreationHelper;
 import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.message.MessageHelper;
@@ -32,7 +32,7 @@ public class Observer extends GameSubcommandData {
         String gameName = event.getOption("game_name", null, OptionMapping::getAsString);
         String addOrRemove = event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
 
-        if (!GameManager.getInstance().isValidGame(gameName)) {
+        if (!GameManager.isValidGame(gameName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found: " + gameName);
             return;
         }
@@ -42,12 +42,12 @@ public class Observer extends GameSubcommandData {
             return;
         }
 
-        Game game = GameManager.getInstance().getGame(gameName);
+        Game game = GameManager.getGame(gameName);
         Guild guild = game.getGuild();
         Member member = guild.getMemberById(user.getId());
 
         // INVITE TO GAME SERVER IF MISSING
-        if (!CreateGameChannels.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
+        if (!GameCreationHelper.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User was not a member of the Game's server (" + guild.getName() + ")\nPlease run this command again once the user joins the server.");
             return;
         }
@@ -60,7 +60,7 @@ public class Observer extends GameSubcommandData {
         if ("add".equals(addOrRemove)) {
             addObserver(event, member.getUser().getId(), tableTalk);
             addObserver(event, member.getUser().getId(), actionsChannel);
-        } else if ("remove".equals(addOrRemove)) {
+        } else {
             removeObserver(event, member.getUser().getId(), tableTalk);
             removeObserver(event, member.getUser().getId(), actionsChannel);
         }
@@ -73,7 +73,7 @@ public class Observer extends GameSubcommandData {
             if (channel.getName().contains(gameName)) {
                 if ("add".equals(addOrRemove)) {
                     addObserver(event, member.getUser().getId(), channel);
-                } else if ("remove".equals(addOrRemove)) {
+                } else {
                     removeObserver(event, member.getUser().getId(), channel);
                 }
             }

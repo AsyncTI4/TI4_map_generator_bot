@@ -1,5 +1,9 @@
 package ti4.model;
 
+import java.awt.*;
+import java.util.List;
+import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -7,10 +11,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.model.Source.ComponentSource;
-
-import java.awt.*;
-import java.util.List;
-import java.util.Optional;
 
 @Data
 public class StrategyCardModel implements ModelInterface, EmbeddableModel {

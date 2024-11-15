@@ -39,7 +39,7 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
-        var games = GameManager.getInstance().getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
+        var games = GameManager.getGameNameToGame().values().stream().filter(not(Game::isHasEnded)).toList();
         for (Game game : games) {
             handleTechSummary(game); // TODO, move this?
             checkAllSaboWindows(game);
@@ -179,7 +179,7 @@ public class AutoPingCron {
 
             pingPlayer(game, player, milliSinceLastTurnChange, spacer, pingMessage, pingNumber, realIdentity);
 
-            Game mapReference = GameManager.getInstance().getGame("finreference");
+            Game mapReference = GameManager.getGame("finreference");
             if (mapReference != null) ButtonHelper.increasePingCounter(mapReference, player.getUserID());
             player.setWhetherPlayerShouldBeTenMinReminded(false);
             game.setLastActivePlayerPing(new Date());

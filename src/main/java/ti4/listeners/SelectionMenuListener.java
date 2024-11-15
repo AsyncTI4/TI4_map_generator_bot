@@ -2,6 +2,7 @@ package ti4.listeners;
 
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.listeners.context.SelectionMenuContext;
 import ti4.message.BotLogger;
@@ -9,7 +10,7 @@ import ti4.selections.SelectionMenuProvider;
 
 public class SelectionMenuListener extends ListenerAdapter {
     @Override
-    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+    public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to receive selections.").setEphemeral(true).queue();
             return;
