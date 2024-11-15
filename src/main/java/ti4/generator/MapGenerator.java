@@ -695,6 +695,9 @@ public class MapGenerator implements AutoCloseable {
                 String faction = player.getFaction();
                 if (faction != null) {
                     DrawingUtil.drawPlayerFactionIconImage(graphics, player, x, y, 95, 95);
+                    if (!player.hasCustomFactionEmoji()) {
+                        addWebsiteOverlay(player.getFactionModel(), x + 10, y + 10, 75, 75);
+                    }
                 }
                 y += 4;
 
@@ -2758,6 +2761,9 @@ public class MapGenerator implements AutoCloseable {
                     BufferedImage bufferedImage = DrawingUtil.getPlayerFactionIconImage(player);
                     if (bufferedImage != null) {
                         graphics.drawImage(bufferedImage, x, y - 70, null);
+                        if (!player.hasCustomFactionEmoji()) {
+                            addWebsiteOverlay(player.getFactionModel(), x + 10, y - 60, 75, 75);
+                        }
                         x += 100;
                     }
                 }
