@@ -119,13 +119,13 @@ public class Setup extends PlayerSubcommandData {
         player.getTechs().clear();
         player.getFactionTechs().clear();
 
-        FactionModel setupInfo = player.getFactionSetupInfo();
+        FactionModel factionModel = player.getFactionSetupInfo();
 
         if (game.isBaseGameMode()) {
             player.setLeaders(new ArrayList<>());
         }
 
-        if (ComponentSource.miltymod.equals(setupInfo.getSource()) && !game.isMiltyModMode()) {
+        if (ComponentSource.miltymod.equals(factionModel.getSource()) && !game.isMiltyModMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "MiltyMod factions are a Homebrew Faction. Please enable the MiltyMod Game Mode first if you wish to use MiltyMod factions");
             return;
         }
@@ -136,7 +136,7 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
 
-        String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
+        String hsTile = AliasHandler.resolveTile(factionModel.getHomeSystem());
         Tile tile = new Tile(hsTile, positionHS);
         if (!StringUtils.isBlank(hsTile)) {
             game.setTile(tile);
@@ -153,10 +153,10 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // STARTING COMMODITIES
-        player.setCommoditiesTotal(setupInfo.getCommodities());
+        player.setCommoditiesTotal(factionModel.getCommodities());
 
         // STARTING PLANETS
-        for (String planet : setupInfo.getHomePlanets()) {
+        for (String planet : factionModel.getHomePlanets()) {
             if (planet.isEmpty()) {
                 continue;
             }
@@ -168,12 +168,12 @@ public class Setup extends PlayerSubcommandData {
         player.getExhaustedPlanets().clear();
 
         // STARTING UNITS
-        addUnits(setupInfo, tile, color, event);
+        addUnits(factionModel, tile, color, event);
 
         // STARTING TECH
-        List<String> startingTech = setupInfo.getStartingTech();
+        List<String> startingTech = factionModel.getStartingTech();
         if (startingTech != null) {
-            for (String tech : setupInfo.getStartingTech()) {
+            for (String tech : factionModel.getStartingTech()) {
                 if (tech.trim().isEmpty()) {
                     continue;
                 }
@@ -193,7 +193,7 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        for (String tech : setupInfo.getFactionTech()) {
+        for (String tech : factionModel.getFactionTech()) {
             if (tech.trim().isEmpty()) {
                 continue;
             }
@@ -208,7 +208,7 @@ public class Setup extends PlayerSubcommandData {
         // STARTING PNs
         player.initPNs();
         Set<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
-        playerPNs.addAll(setupInfo.getPromissoryNotes());
+        playerPNs.addAll(factionModel.getPromissoryNotes());
         player.setPromissoryNotesOwned(playerPNs);
         if (game.isBaseGameMode()) {
             Set<String> pnsOwned = new HashSet<>(player.getPromissoryNotesOwned());
@@ -229,7 +229,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // STARTING OWNED UNITS
-        Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+        Set<String> playerOwnedUnits = new HashSet<>(factionModel.getUnits());
         player.setUnitsOwned(playerOwnedUnits);
 
         // Don't do special stuff if Franken Faction
@@ -238,6 +238,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         // SEND STUFF
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
         AbilityInfo.sendAbilityInfo(game, player, event);
         TechInfo.sendTechInfo(game, player, event);
         LeaderInfo.sendLeadersInfo(game, player, event);
@@ -251,8 +252,8 @@ public class Setup extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, getTech);
             } else {
                 // STARTING TECH OPTIONS
-                Integer bonusOptions = setupInfo.getStartingTechAmount();
-                List<String> startingTechOptions = setupInfo.getStartingTechOptions();
+                Integer bonusOptions = factionModel.getStartingTechAmount();
+                List<String> startingTechOptions = factionModel.getStartingTechOptions();
                 if (startingTechOptions != null && bonusOptions != null && bonusOptions > 0) {
                     List<TechnologyModel> techs = new ArrayList<>();
                     if (!startingTechOptions.isEmpty()) {

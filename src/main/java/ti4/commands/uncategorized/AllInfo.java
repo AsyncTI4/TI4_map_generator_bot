@@ -26,6 +26,7 @@ import ti4.map.Game;
 import ti4.map.GameManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 
 public class AllInfo implements Command {
 
@@ -96,8 +97,12 @@ public class AllInfo implements Command {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event) + "`";
+
+        FactionModel factionModel = player.getFactionModel();
+
+        String headerText = player.getRepresentation() + CardsInfoHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, headerText);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, game, factionModel.getFactionSheetMessage());
         AbilityInfo.sendAbilityInfo(game, player);
         UnitInfo.sendUnitInfo(game, player, false);
         LeaderInfo.sendLeadersInfo(game, player);
@@ -110,17 +115,13 @@ public class AllInfo implements Command {
     }
 
     protected String getActionDescription() {
-        return "Send all available info to your Cards Info thread.";
+        return "Send all available faction info to your Cards Info thread.";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void register(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-            Commands.slash(getName(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false))
-                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false)));
+        commands.addCommands(Commands.slash(getName(), getActionDescription()));
     }
 
 }
