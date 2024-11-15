@@ -15,7 +15,7 @@ public class PersistenceManager {
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static void writeObjectToJsonFile(String fileName, Object object) throws IOException {
-        writeObjectToJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, objectMapper.writeValueAsString(object));
+        writeObjectToJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, object);
     }
 
     public static void writeObjectToJsonFile(String directory, String fileName, Object object) throws IOException {
