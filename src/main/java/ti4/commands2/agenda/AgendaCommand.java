@@ -1,4 +1,4 @@
-package ti4.commands.agenda;
+package ti4.commands2.agenda;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,8 +14,7 @@ public class AgendaCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new DrawAgenda(),
-                    new PutAgendaTop(),
-                    new PutAgendaBottom(),
+                    new PutDrawnAgendaBackIntoDeck(),
                     new LookAtAgenda(),
                     new RevealAgenda(),
                     new RevealSpecificAgenda(),

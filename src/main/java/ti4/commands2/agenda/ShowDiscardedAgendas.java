@@ -1,4 +1,4 @@
-package ti4.commands.agenda;
+package ti4.commands2.agenda;
 
 import java.util.ArrayList;
 import java.util.List;

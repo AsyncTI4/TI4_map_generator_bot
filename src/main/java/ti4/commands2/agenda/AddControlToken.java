@@ -1,4 +1,4 @@
-package ti4.commands.agenda;
+package ti4.commands2.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,6 +20,10 @@ class AddControlToken extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         var game = getGame();
         int lawId = event.getOption(Constants.AGENDA_ID).getAsInt();
+        if (!game.getLaws().containsValue(lawId)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Law with id " + lawId + " does not exist");
+            return;
+        }
         String msg = game.getStoredValue("controlTokensOnAgenda" + lawId);
         boolean undo = false;
         var option2 = event.getOption(Constants.UNDO);

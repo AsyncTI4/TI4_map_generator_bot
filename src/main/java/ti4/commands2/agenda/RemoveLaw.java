@@ -1,7 +1,6 @@
-package ti4.commands.agenda;
+package ti4.commands2.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands2.GameStateSubcommand;
@@ -17,13 +16,8 @@ class RemoveLaw extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping agendaIdOption = event.getOption(Constants.AGENDA_ID);
-        if (agendaIdOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
-            return;
-        }
-
-        boolean success = getGame().removeLaw(agendaIdOption.getAsInt());
+        int agendaId = event.getOption(Constants.AGENDA_ID).getAsInt();
+        boolean success = getGame().removeLaw(agendaId);
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law removed");
         } else {
