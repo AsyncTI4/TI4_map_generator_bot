@@ -1,16 +1,7 @@
 package ti4.generator;
 
-import static ti4.helpers.ImageHelper.writeCompressedFormat;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -38,20 +29,17 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
-
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.fow.FOWOptions;
@@ -98,6 +86,8 @@ import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.website.WebsiteOverlay;
+
+import static ti4.helpers.ImageHelper.writeCompressedFormat;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -2578,8 +2568,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private String getUnitPath(UnitKey unit) {
-        ResourceHelper rs = ResourceHelper.getInstance();
-        return allEyesOnMe ? rs.getUnitFile(unit, allEyesOnMe) : rs.getUnitFile(unit);
+        return allEyesOnMe ? ResourceHelper.getInstance().getUnitFile(unit, allEyesOnMe) : ResourceHelper.getInstance().getUnitFile(unit);
     }
 
     private void drawPAUnitUpgrade(int x, int y, UnitKey unitKey) {
@@ -3215,9 +3204,9 @@ public class MapGenerator implements AutoCloseable {
             boolean hasStellar = player.hasRelic("stellarconverter") || player.hasRelic("absol_stellarconverter");
             String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
             boolean hasHero = player.hasLeaderUnlocked("muaathero") || player.hasLeaderUnlocked("zelianhero");
-            String heroFile = ResourceHelper.getInstance().getResourceFromFolder("emojis/leaders/", "Hero.png", "Could not find command token file");
+            String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
             if (player.hasLeaderUnlocked("muaathero")) {
-                heroFile = ResourceHelper.getInstance().getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png", "Could not find command token file");
+                heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");
             }
             BufferedImage bufferedImage;
             if (hasStellar && hasHero) {
