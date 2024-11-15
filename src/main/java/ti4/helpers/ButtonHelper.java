@@ -21,6 +21,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import lombok.Data;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -44,10 +49,6 @@ import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -990,12 +991,22 @@ public class ButtonHelper {
                 } else {
                     Button arboCommander = Buttons.green(
                         fincheckerForNonActive + "arboCommanderBuild_" + activeSystem.getPosition(),
-                        "Build 1 Unit With Arborec Commander");
+                        "Build 1 Unit");
                     Button decline = Buttons.red(fincheckerForNonActive + "deleteButtons", "Decline Commander");
                     List<Button> buttons = List.of(arboCommander, decline);
                     MessageHelper.sendMessageToChannelWithButtons(nonActivePlayer.getCorrectChannel(),
                         ident + " use buttons to resolve Dirzuga Rophal, the Arborec commander.", buttons);
                 }
+            }
+            if (doesPlayerHaveFSHere("arborec_flagship", player, activeSystem)) {
+                Button arboCommander = Buttons.green(
+                    fincheckerForNonActive + "umbatTile_" + activeSystem.getPosition(),
+                    "Build 5 Units With Arborec FS");
+                Button decline = Buttons.red("deleteButtons", "Decline Build");
+                List<Button> buttons = List.of(arboCommander, decline);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    ident + " use buttons to resolve the Arborec Flagship Build.", buttons);
+
             }
             if (nonActivePlayer.hasLeaderUnlocked("celdaurihero")
                 && FoWHelper.playerHasPlanetsInSystem(nonActivePlayer, activeSystem)
@@ -2489,6 +2500,9 @@ public class ButtonHelper {
     }
 
     public static boolean isPlanetLegendaryOrHome(String planetName, Game game, boolean onlyIncludeYourHome, Player p1) {
+        if (planetName.toLowerCase().contains("custodia")) {
+            return true;
+        }
         PlanetModel planetModel = Mapper.getPlanet(planetName);
         if (planetModel != null && planetModel.isLegendary()) {
             return true;
@@ -3154,10 +3168,15 @@ public class ButtonHelper {
         if (centerTile != null) {
             Button rex = Buttons.green(finChecker + "ringTile_000",
                 centerTile.getRepresentationForButtons(game, player));
-            ringButtons.add(rex);
+            if (!AddCC.hasCC(player, centerTile)) {
+                ringButtons.add(rex);
+            }
         }
         int rings = game.getRingCount();
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock)) {
+            if (AddCC.hasCC(player, tile)) {
+                continue;
+            }
             ringButtons.add(Buttons.green(finChecker + "ringTile_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)).withEmoji(Emoji.fromFormatted(Emojis.spacedock)));
         }
         for (int x = 1; x < rings + 1; x++) {
