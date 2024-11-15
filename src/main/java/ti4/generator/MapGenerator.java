@@ -1550,6 +1550,10 @@ public class MapGenerator implements AutoCloseable {
                 case "policy_the_economy_exploit" -> abilityFileName = "pa_ds_olra_policy_ineg";
             }
 
+            if (abilityFileName == null) {
+                continue;
+            }
+
             boolean isExhaustedLocked = player.getExhaustedAbilities().contains(abilityID);
             if (isExhaustedLocked) {
                 graphics.setColor(Color.GRAY);
@@ -1558,7 +1562,7 @@ public class MapGenerator implements AutoCloseable {
             }
 
             String status = isExhaustedLocked ? "_exh" : "_rdy";
-            abilityFileName = abilityFileName + status + ".png";
+            abilityFileName += status + ".png";
             String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
             if (resourcePath != null) {
@@ -1621,15 +1625,16 @@ public class MapGenerator implements AutoCloseable {
 
                 int numInReinforcements = unitCap - count;
                 BufferedImage image = ImageHelper.read(getUnitPath(unitKey));
-                BufferedImage decal = null;
-                decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitID)));
-                for (int i = 0; i < numInReinforcements; i++) {
-                    Point position = reinforcementsPosition.getPosition(unitID);
-                    graphics.drawImage(image, x + position.x, y + position.y, null);
-                    graphics.drawImage(decal, x + position.x, y + position.y, null);
-                    if (onlyPaintOneUnit) break;
+                String decal = player.getDecalFile(unitID);
+                if (decal != null) {
+                    var decalImage = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decal));
+                    for (int i = 0; i < numInReinforcements; i++) {
+                        Point position = reinforcementsPosition.getPosition(unitID);
+                        graphics.drawImage(image, x + position.x, y + position.y, null);
+                        graphics.drawImage(decalImage, x + position.x, y + position.y, null);
+                        if (onlyPaintOneUnit) break;
+                    }
                 }
-
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (numInReinforcements < 0 && !game.isDiscordantStarsMode() && game.isCcNPlasticLimit()) {
                     String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
@@ -1854,14 +1859,12 @@ public class MapGenerator implements AutoCloseable {
                     }
                 }
 
-                String decalFile = p != null ? p.getDecalFile(unitKey.asyncID()) : null;
-                BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFile));
                 BufferedImage spoopy = null;
                 if (unitKey.getUnitType() == UnitType.Warsun) {
                     int chanceToSeeSpoop = CalendarHelper.isNearHalloween() ? 10 : 1000;
                     if (ThreadLocalRandom.current().nextInt(chanceToSeeSpoop) == 0) {
-                        String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
-                        spoopy = ImageHelper.read(spoopypath);
+                        String spoopyPath = ResourceHelper.getInstance().getSpoopyFile();
+                        spoopy = ImageHelper.read(spoopyPath);
                     }
                 }
 
@@ -1872,10 +1875,15 @@ public class MapGenerator implements AutoCloseable {
                     break;
                 }
                 position.y -= (countOfUnits * 7);
+
+                Optional<BufferedImage> decal = Optional.ofNullable(p)
+                    .map(player1 -> player1.getDecalFile(unitKey.asyncID()))
+                    .map(decalFileName -> ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFileName)));
+
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
-                    if (!List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
-                        graphics.drawImage(decal, position.x, position.y + deltaY, null);
+                    if (decal.isPresent() && !List.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                        graphics.drawImage(decal.get(), position.x, position.y + deltaY, null);
                     }
                     if (spoopy != null) {
                         graphics.drawImage(spoopy, position.x, position.y + deltaY, null);
