@@ -73,7 +73,6 @@ public class AddFrontierTokens implements Command {
             Commands.slash(getName(), "Add Frontier tokens to all possible tiles")
                 .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES to confirm")
                     .setRequired(true))
-
         );
     }
 }
