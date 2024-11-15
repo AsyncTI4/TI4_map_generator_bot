@@ -18,8 +18,6 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.explore.ExploreFrontier;
 import ti4.commands.explore.ExploreSubcommandData;
@@ -1208,7 +1206,7 @@ public class ButtonHelperAgents {
             Player edyn2 = game.getPlayerFromColorOrFaction(preset.split("_")[1]);
             if (edyn2 == null)
                 return false;
-            DrawAgenda.drawAgenda(1, false, game, edyn2, true);
+            AgendaHelper.drawAgenda(1, false, game, edyn2, true);
             Player newActivePlayer = game.getPlayerFromColorOrFaction(preset.split("_")[2]);
             game.setStoredValue("edynAgentInAction", "");
             if (newActivePlayer != null) {
@@ -1258,7 +1256,7 @@ public class ButtonHelperAgents {
                     PlanetRefresh.doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
-                    ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+                    AgendaHelper.listVoteCount(game, game.getMainGameChannel());
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
@@ -1298,7 +1296,7 @@ public class ButtonHelperAgents {
                     PlanetRefresh.doAction(player, planetName, game);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
-                    ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+                    AgendaHelper.listVoteCount(game, game.getMainGameChannel());
                 }
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                     UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());

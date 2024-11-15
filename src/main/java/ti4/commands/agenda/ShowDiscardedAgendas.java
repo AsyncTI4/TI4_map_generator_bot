@@ -2,10 +2,7 @@ package ti4.commands.agenda;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -16,7 +13,7 @@ import ti4.commands.explore.ExploreInfo;
 import ti4.commands.relic.RelicShowRemaining;
 import ti4.commands.tech.TechShowDeck;
 import ti4.commands2.GameStateSubcommand;
-import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -33,20 +30,7 @@ class ShowDiscardedAgendas extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        showDiscards(getGame(), event);
-    }
-
-    private static void showDiscards(Game game, GenericInteractionCreateEvent event) {
-        StringBuilder sb2 = new StringBuilder();
-        String sb = "### __**Discarded Agendas:**__";
-        Map<String, Integer> discardAgendas = game.getDiscardAgendas();
-        List<MessageEmbed> agendaEmbeds = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
-            agendaEmbeds.add(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
-            sb2.append(Mapper.getAgenda(entry.getKey()).getName()).append(" (ID: ").append(entry.getValue()).append(")\n");
-        }
-        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb, agendaEmbeds);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb2.toString());
+        AgendaHelper.showDiscards(getGame(), event);
     }
 
     @ButtonHandler("showDeck_")
@@ -54,7 +38,7 @@ class ShowDiscardedAgendas extends GameStateSubcommand {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
             case "ac" -> ShowDiscardActionCards.showDiscard(game, event, false);
-            case "agenda" -> ShowDiscardedAgendas.showDiscards(game, event);
+            case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
             case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);

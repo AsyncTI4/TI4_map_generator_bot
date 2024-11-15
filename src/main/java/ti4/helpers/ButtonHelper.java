@@ -51,8 +51,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.commands.agenda.ListVoteCount;
-import ti4.commands.agenda.ShowDiscardedAgendas;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ShowDiscardActionCards;
 import ti4.commands.cardspn.PNInfo;
@@ -661,7 +659,7 @@ public class ButtonHelper {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
             case "ac" -> ShowDiscardActionCards.showDiscard(game, event, false);
-            case "agenda" -> ShowDiscardedAgendas.showDiscards(game, event);
+            case "agenda" -> AgendaHelper.showDiscards(game, event);
             case "relic" -> RelicShowRemaining.showRemaining(event, false, game, player);
             case "unscoredSO" -> ShowUnScoredSOs.showUnscored(game, event);
             case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> TechShowDeck.displayTechDeck(game, event, deck);
@@ -3535,7 +3533,7 @@ public class ButtonHelper {
                 PlanetRefresh.doAction(player, planetName, game);
                 MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Planet has been refreshed because of Quaxdol Junitas, the Florzen Commander.");
-                ListVoteCount.turnOrder(event, game, game.getMainGameChannel());
+                AgendaHelper.listVoteCount(game, game.getMainGameChannel());
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                 UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());

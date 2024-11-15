@@ -3980,4 +3980,17 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom");
         ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game, "Agenda put on bottom", "politics");
     }
+
+    public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
+        StringBuilder sb2 = new StringBuilder();
+        String sb = "### __**Discarded Agendas:**__";
+        Map<String, Integer> discardAgendas = game.getDiscardAgendas();
+        List<MessageEmbed> agendaEmbeds = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
+            agendaEmbeds.add(Mapper.getAgenda(entry.getKey()).getRepresentationEmbed());
+            sb2.append(Mapper.getAgenda(entry.getKey()).getName()).append(" (ID: ").append(entry.getValue()).append(")\n");
+        }
+        MessageHelper.sendMessageToChannelWithEmbeds(event.getMessageChannel(), sb, agendaEmbeds);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb2.toString());
+    }
 }
