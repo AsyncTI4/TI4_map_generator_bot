@@ -32,7 +32,7 @@ public class BorderAnomalyModel {
 
         BorderAnomalyType(String name, String fileName) {
             this.name = name;
-            imageFilePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
+            imageFilePath = ResourceHelper.getResourceFromFolder("borders/", fileName);
         }
 
         @Override
