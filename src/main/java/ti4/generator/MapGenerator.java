@@ -1338,7 +1338,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setColor(Color.WHITE);
             }
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, relicModel);
 
             drawPAImage(x + deltaX, y, "pa_relics_fakerelicicon.png");
 
@@ -1367,6 +1367,7 @@ public class MapGenerator implements AutoCloseable {
             deltaX += 10;
         }
         for (String relicID : axisOrderRelics) {
+            RelicModel relicModel = Mapper.getRelic(relicID);
             boolean isExhausted = exhaustedRelics.contains(relicID);
             if (isExhausted) {
                 graphics.setColor(Color.GRAY);
@@ -1374,7 +1375,7 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setColor(Color.WHITE);
             }
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 54, 152);
+            drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 54, 152, relicModel);
 
             String relicStatus = isExhausted ? "_exh" : "_rdy";
             String relicFileName = "pa_relics_" + relicID + relicStatus + ".png";
