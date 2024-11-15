@@ -1549,10 +1549,6 @@ public class MapGenerator implements AutoCloseable {
                 case "policy_the_economy_exploit" -> abilityFileName = "pa_ds_olra_policy_ineg";
             }
 
-            if (abilityFileName == null) {
-                continue;
-            }
-
             boolean isExhaustedLocked = player.getExhaustedAbilities().contains(abilityID);
             if (isExhaustedLocked) {
                 graphics.setColor(Color.GRAY);
@@ -1560,11 +1556,12 @@ public class MapGenerator implements AutoCloseable {
                 graphics.setColor(Color.WHITE);
             }
 
-            String status = isExhaustedLocked ? "_exh" : "_rdy";
-            abilityFileName += status + ".png";
-            String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
-            if (resourcePath != null) {
+            if (abilityFileName != null) {
+                String status = isExhaustedLocked ? "_exh" : "_rdy";
+                abilityFileName += status + ".png";
+                String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
+
                 BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
                 graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                 drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
