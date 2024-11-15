@@ -331,8 +331,7 @@ public class StartCombat extends CombatSubcommandData {
         }
     }
 
-    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event,
-        String spaceOrGround) {
+    private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
         Helper.checkThreadLimitAndArchive(event.getGuild());
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
 

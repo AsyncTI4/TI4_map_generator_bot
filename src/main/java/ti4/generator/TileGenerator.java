@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
@@ -825,8 +826,7 @@ public class TileGenerator {
                     } else if (traits.size() == 1) {
                         String t = planet.getPlanetType().getFirst();
                         traitFile = ResourceHelper.getInstance().getGeneralFile(("" + t.charAt(0)).toUpperCase() + t.substring(1).toLowerCase() + ".png");
-                    } else if (traits.isEmpty()) {
-                    } else {
+                    } else if (!traits.isEmpty()) {
                         String t = "";
                         t += traits.contains("cultural") ? "C" : "";
                         t += traits.contains("hazardous") ? "H" : "";
@@ -1213,7 +1213,7 @@ public class TileGenerator {
                     rectangles.add(
                         new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
                     if (player != null && player.isRealPlayer() && player.getExhaustedPlanets().contains(unitHolder.getName())) {
-                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getInstance().getResourceFromFolder("command_token/", "exhaustedControl.png", "Could not find command token file"), scale);
+                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getResourceFromFolder("command_token/", "exhaustedControl.png"), scale);
                         DrawingUtil.drawControlToken(tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
                         rectangles.add(
                             new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
@@ -1226,7 +1226,7 @@ public class TileGenerator {
                     rectangles.add(
                         new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
                     if (player != null && player.isRealPlayer() && player.getExhaustedPlanets().contains(unitHolder.getName())) {
-                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getInstance().getResourceFromFolder("command_token/", "exhaustedControl", "Could not find command token file"), scale);
+                        BufferedImage exhaustedTokenImage = ImageHelper.readScaled(ResourceHelper.getResourceFromFolder("command_token/", "exhaustedControl"), scale);
                         DrawingUtil.drawControlToken(tileGraphics, exhaustedTokenImage, player, imgX, imgY, convertToGeneric, scale);
                         rectangles.add(
                             new Rectangle(imgX, imgY, controlTokenImage.getWidth(), controlTokenImage.getHeight()));
@@ -1305,7 +1305,7 @@ public class TileGenerator {
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     scale = 1.32f;
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
-                    scale = 0.5f; // didnt previous get changed for custodians
+                    scale = 0.5f; // didn't previous get changed for custodians
                 }
                 tokenImage = ImageHelper.readScaled(tokenPath, scale);
                 if (tokenImage == null)
@@ -1578,8 +1578,7 @@ public class TileGenerator {
     }
 
     private String getUnitPath(UnitKey unit) {
-        ResourceHelper rs = ResourceHelper.getInstance();
-        return allEyesOnMe ? rs.getUnitFile(unit, allEyesOnMe) : rs.getUnitFile(unit);
+        return allEyesOnMe ? ResourceHelper.getInstance().getUnitFile(unit, allEyesOnMe) : ResourceHelper.getInstance().getUnitFile(unit);
     }
 
     private void addUnits(Tile tile, Graphics tileGraphics, List<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius, Player fowPlayer) {
@@ -1679,7 +1678,6 @@ public class TileGenerator {
                         unitPath = unitPath.replace("lady", "fs");
                     }
                     if (unitKey.getUnitType() == Units.UnitType.Cavalry) {
-                        unitPath = unitPath.replace("cavalry", "fs");
                         String name = "Memoria_1.png";
                         if (game.getPNOwner("cavalry") != null && game.getPNOwner("cavalry").hasTech("m2")) {
                             name = "Memoria_2.png";
@@ -1699,10 +1697,6 @@ public class TileGenerator {
             if (unitImage == null)
                 continue;
 
-            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
-            BufferedImage decal = null;
-            if (player != null) decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(player.getDecalFile(unitKey.asyncID())));
-
             if (bulkUnitCount != null && bulkUnitCount > 0) {
                 unitCount = 1;
 
@@ -1710,10 +1704,8 @@ public class TileGenerator {
 
             BufferedImage spoopy = null;
             if ((unitKey.getUnitType() == Units.UnitType.Warsun) && (ThreadLocalRandom.current().nextInt(1000) == 0)) {
-
-                String spoopypath = ResourceHelper.getInstance().getSpoopyFile();
-                spoopy = ImageHelper.read(spoopypath);
-                // BotLogger.log("SPOOPY TIME: " + spoopypath);
+                String spoopyPath = ResourceHelper.getInstance().getSpoopyFile();
+                spoopy = ImageHelper.read(spoopyPath);
             }
 
             if (unitKey.getUnitType() == Units.UnitType.Lady) {
@@ -1721,6 +1713,7 @@ public class TileGenerator {
                 String spoopyPath = ResourceHelper.getInstance().getDecalFile(name);
                 spoopy = ImageHelper.read(spoopyPath);
             }
+            Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             if (unitKey.getUnitType() == Units.UnitType.Flagship && player.ownsUnit("ghemina_flagship_lord")) {
                 String name = "units_ds_ghemina_lord_wht.png";
                 String spoopyPath = ResourceHelper.getInstance().getDecalFile(name);
@@ -1833,8 +1826,13 @@ public class TileGenerator {
                     BufferedImage wsCrackImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID())));
                     tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
                 }
-                if (!List.of(Units.UnitType.Fighter, Units.UnitType.Infantry).contains(unitKey.getUnitType())) {
-                    tileGraphics.drawImage(decal, imageX, imageY, null);
+
+                Optional<BufferedImage> decal = Optional.ofNullable(player)
+                    .map(p -> p.getDecalFile(unitKey.asyncID()))
+                    .map(decalFileName -> ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalFileName)));
+
+                if (decal.isPresent() && !List.of(Units.UnitType.Fighter, Units.UnitType.Infantry).contains(unitKey.getUnitType())) {
+                    tileGraphics.drawImage(decal.get(), imageX, imageY, null);
                 }
                 if (spoopy != null) {
                     tileGraphics.drawImage(spoopy, imageX, imageY, null);
