@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.SentACRandom;
 import ti4.commands.cardsso.SOInfo;
@@ -1117,7 +1116,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveEmergencyMeeting")
     public static void resolveEmergencyMeeting(Player player, Game game, ButtonInteractionEvent event) {
         game.shuffleAllAgendasBackIntoDeck();
-        DrawAgenda.drawAgenda(3, game, player);
+        AgendaHelper.drawAgenda(3, game, player);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Sent top 3 agendas to " + player.getFactionEmojiOrColor() + " cards info");
         ButtonHelper.deleteMessage(event);
     }

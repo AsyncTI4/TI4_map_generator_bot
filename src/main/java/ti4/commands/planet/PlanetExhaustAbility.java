@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.player.TurnStart;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
@@ -96,7 +95,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                     MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), "Please select your target", game, player, riderButtons);
                     MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate no afters again.", game, afterButtons, "after");
                 } else {
-                    DrawAgenda.drawAgenda(1, game, player);
+                    AgendaHelper.drawAgenda(1, game, player);
                 }
             }
             case "prism" -> {

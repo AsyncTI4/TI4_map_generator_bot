@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.PickACFromDiscard;
 import ti4.commands.game.StartPhase;
 import ti4.commands.leaders.CommanderUnlockCheck;
@@ -276,7 +275,7 @@ public class PlayPN extends PNCardsSubcommandData {
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), reducedMsg);
                 }
-                RevealAgenda.revealAgenda(event, false, game, game.getMainGameChannel());
+                AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     "Political Favor (xxcha PN) was played");
             } else {

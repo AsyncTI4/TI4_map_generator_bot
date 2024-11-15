@@ -3379,7 +3379,6 @@ public class MapGenerator implements AutoCloseable {
         } else if (displayType == DisplayType.techskips) {
             List<String> techFiles = new ArrayList<>();
             for (String planet : player.getPlanets()) {
-                PlanetModel custodiaVigilia = Mapper.getPlanet(planet);
                 if (game.getTileFromPlanet(planet) == null) {
                     Planet planetReal = game.getPlanetsInfo().get(planet);
                     List<String> skips = planetReal.getTechSpeciality();

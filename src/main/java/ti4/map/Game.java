@@ -2008,30 +2008,28 @@ public class Game extends GameProperties {
                 break;
             }
         }
-        if (!id.isEmpty()) {
-            if ("warrant".equalsIgnoreCase(id)) {
-                for (Player p2 : getRealPlayers()) {
-                    if (ButtonHelper.isPlayerElected(this, p2, id)) {
-                        p2.setSearchWarrant(false);
-                    }
-                }
-            }
-            if ("censure".equalsIgnoreCase(id)) {
-
-                Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
-                for (String customPO : customPOs.keySet()) {
-                    if (customPO.toLowerCase().contains("political censure")) {
-                        removeCustomPO(customPOs.get(customPO));
-                    }
-                }
-
-            }
-            laws.remove(id);
-            lawsInfo.remove(id);
-            addDiscardAgenda(id);
-            return true;
+        if (id.isEmpty()) {
+            return false;
         }
-        return false;
+        if ("warrant".equalsIgnoreCase(id)) {
+            for (Player p2 : getRealPlayers()) {
+                if (ButtonHelper.isPlayerElected(this, p2, id)) {
+                    p2.setSearchWarrant(false);
+                }
+            }
+        }
+        if ("censure".equalsIgnoreCase(id)) {
+            Map<String, Integer> customPOs = new HashMap<>(getRevealedPublicObjectives());
+            for (String customPO : customPOs.keySet()) {
+                if (customPO.toLowerCase().contains("political censure")) {
+                    removeCustomPO(customPOs.get(customPO));
+                }
+            }
+        }
+        laws.remove(id);
+        lawsInfo.remove(id);
+        addDiscardAgenda(id);
+        return true;
     }
 
     public boolean removeLaw(String id) {
