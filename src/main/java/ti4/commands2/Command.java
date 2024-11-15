@@ -2,7 +2,7 @@ package ti4.commands2;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-//TODO REMOVE EXTENSION WHEN READY
+// TODO: Remove once old Command interface is gone.
 public interface Command extends ti4.commands.Command {
 
     default boolean accept(SlashCommandInteractionEvent event) {
