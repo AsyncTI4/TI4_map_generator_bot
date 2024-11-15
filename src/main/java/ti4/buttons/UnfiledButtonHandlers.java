@@ -25,10 +25,6 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.agenda.PutAgendaBottom;
-import ti4.commands.agenda.PutAgendaTop;
-import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.DrawAC;
 import ti4.commands.cardsac.PlayAC;
@@ -388,21 +384,20 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         player.setAutoSaboPassMedian(median);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours");
         if (median > 0) {
-            if (player.hasAbility("quash") || player.ownsPromissoryNote("rider")
-                || player.getPromissoryNotes().containsKey("riderm")
-                || player.hasAbility("radiance") || player.hasAbility("galactic_threat")
-                || player.hasAbility("conspirators")
-                || player.ownsPromissoryNote("riderx")
-                || player.ownsPromissoryNote("riderm") || player.ownsPromissoryNote("ridera")
-                || player.hasTechReady("gr")) {
-            } else {
-                List<Button> buttons = new ArrayList<>();
-                String msg = player.getRepresentation()
-                    + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
-                buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
-                buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
-            }
+            if (!player.hasAbility("quash") && !player.ownsPromissoryNote("rider")
+                && !player.getPromissoryNotes().containsKey("riderm")
+                && !player.hasAbility("radiance") && !player.hasAbility("galactic_threat")
+                && !player.hasAbility("conspirators")
+                && !player.ownsPromissoryNote("riderx")
+                && !player.ownsPromissoryNote("riderm") && !player.ownsPromissoryNote("ridera")
+                && !player.hasTechReady("gr")) {
+                    List<Button> buttons = new ArrayList<>();
+                    String msg = player.getRepresentation()
+                        + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
+                    buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
+                    buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg, buttons);
+                }
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -2408,7 +2403,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                 "# The hidden agenda was " + agendaName + "! You may find it in the discard.");
         }
-        RevealAgenda.revealAgenda(event, false, game, game.getMainGameChannel());
+        AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2590,7 +2585,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         List<Button> buttons = Helper.getPlanetRefreshButtons(event, player, game);
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message, buttons);
-        RevealAgenda.revealAgenda(event, false, game, actionsChannel);
+        AgendaHelper.revealAgenda(event, false, game, actionsChannel);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to ready 2 planets to the person who pressed the button");
     }
 
@@ -3004,7 +2999,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("flip_agenda")
     public static void flipAgenda(ButtonInteractionEvent event, Game game) {
-        RevealAgenda.revealAgenda(event, false, game, event.getChannel());
+        AgendaHelper.revealAgenda(event, false, game, event.getChannel());
         ButtonHelper.deleteMessage(event);
     }
 
@@ -3366,7 +3361,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("bottomAgenda_")
     public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-        new PutAgendaBottom().putBottom(event, Integer.parseInt(agendaNumID), game);
+        AgendaHelper.putBottom(Integer.parseInt(agendaNumID), game);
         AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
@@ -3419,7 +3414,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("topAgenda_")
     public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-        new PutAgendaTop().putTop(event, Integer.parseInt(agendaNumID), game);
+        AgendaHelper.putTop(Integer.parseInt(agendaNumID), game);
         String key = "round" + game.getRound() + "AgendaPlacement";
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "top");
@@ -3438,7 +3433,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("retrieveAgenda_")
     public static void retrieveAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String agendaID = buttonID.substring(buttonID.indexOf("_") + 1);
-        DrawAgenda.drawSpecificAgenda(agendaID, game, player);
+        AgendaHelper.drawSpecificAgenda(agendaID, game, player);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -3493,7 +3488,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you need to assign speaker first before drawing agendas. You can override this restriction with `/agenda draw`");
             return;
         }
-        DrawAgenda.drawAgenda(2, game, player);
+        AgendaHelper.drawAgenda(2, game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false) + " drew 2 agendas");
         ButtonHelper.deleteMessage(event);
     }

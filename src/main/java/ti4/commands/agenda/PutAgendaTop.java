@@ -2,13 +2,13 @@ package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands2.GameStateSubcommand;
 import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
@@ -26,31 +26,14 @@ class PutAgendaTop extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping option = event.getOption(Constants.AGENDA_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
-            return;
-        }
-        putTop(option.getAsInt(), getGame());
-    }
-
-    private static void putTop(int agendaID, Game game) {
-        boolean success = game.putAgendaTop(agendaID);
-        if (game.isFowMode()) {
-            return;
-        }
-        if (!success) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
-            return;
-        }
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on top");
-        ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game, "Agenda put on top", "politics");
+        int agendaId = event.getOption(Constants.AGENDA_ID).getAsInt();
+        AgendaHelper.putTop(agendaId, getGame());
     }
 
     @ButtonHandler("topAgenda_")
     public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
-        putTop(Integer.parseInt(agendaNumID), game);
+        AgendaHelper.putTop(Integer.parseInt(agendaNumID), game);
         String key = "round" + game.getRound() + "AgendaPlacement";
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "top");

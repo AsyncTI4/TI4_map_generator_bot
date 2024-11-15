@@ -3954,4 +3954,30 @@ public class AgendaHelper {
         }
         MessageHelper.sendMessageToChannel(channel, sb.toString());
     }
+
+    public static void putTop(int agendaID, Game game) {
+        boolean success = game.putAgendaTop(agendaID);
+        if (game.isFowMode()) {
+            return;
+        }
+        if (!success) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
+            return;
+        }
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on top");
+        ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game, "Agenda put on top", "politics");
+    }
+
+    public static void putBottom(int agendaID, Game game) {
+        boolean success = game.putAgendaBottom(agendaID);
+        if (game.isFowMode()) {
+            return;
+        }
+        if (!success) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
+            return;
+        }
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom");
+        ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game, "Agenda put on bottom", "politics");
+    }
 }
